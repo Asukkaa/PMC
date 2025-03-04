@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
