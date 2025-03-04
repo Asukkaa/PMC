@@ -17,15 +17,11 @@ import java.util.Map;
  */
 public class CommonFinals {
 
-    public static final String tip_reLaunch = "保存所有改动并重启程序";
-
     public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志";
 
     public static final String tip_learButton = "点击将会清空列表中的数据";
 
     public static final String tip_openDirectory = "勾选后任务结束将会打开对应文件夹";
-
-    public static final String tip_tabSwitch = "点击即可启用或禁用该功能页";
 
     public static final String tip_openLink = "点击即可跳转对应网盘分享页";
 
@@ -113,10 +109,6 @@ public class CommonFinals {
 
     public static final String text_nowValue = "当前所填值为 ";
 
-    public static final String text_VMOptions = "JLINK_VM_OPTIONS=";
-
-    public static final String text_activation = "启用";
-
     public static final String text_saveSuccess = "所有数据已导出到： ";
 
     public static final String text_loadSuccess = "已导入自动操作流程：";
@@ -165,27 +157,9 @@ public class CommonFinals {
 
     public static final String win = "win";
 
-    public static final String Byte = "Byte";
-
-    public static final String KB = "KB";
-
-    public static final String MB = "MB";
-
-    public static final String GB = "GB";
-
-    public static final String TB = "TB";
-
-    public static final String g = "g";
-
     public static final String activation = "1";
 
     public static final String unActivation = "0";
-
-    public static final String id_settingTab = "settingTab";
-
-    public static final String id_aboutTab = "aboutTab";
-
-    public static final String id_autoClickTab = "autoClickTab";
 
     public static final String key_logsNum = "logsNum";
 
@@ -198,8 +172,6 @@ public class CommonFinals {
     public static final String key_appHeight = "appHeight";
 
     public static final String key_appTitle = "appTitle";
-
-    public static final String key_tabIds = "tabIds";
 
     public static final String key_baiduLink = "baiduLink";
 

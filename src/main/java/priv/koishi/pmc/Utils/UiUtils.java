@@ -792,20 +792,4 @@ public class UiUtils {
         control.setPrefWidth(prefWidth);
     }
 
-    /**
-     * 将Tab按照id排序
-     *
-     * @param tabs 要排序的tab
-     * @param ids  tab对应的id列表
-     * @return 排序后的tab
-     */
-    public static ObservableList<Tab> sortTabsByIds(ObservableList<Tab> tabs, List<String> ids) {
-        Map<String, Integer> orderMap = new HashMap<>();
-        for (int i = 0; i < ids.size(); i++) {
-            orderMap.put(ids.get(i), i);
-        }
-        tabs.sort(Comparator.comparingInt(tab -> orderMap.getOrDefault(tab.getId(), Integer.MAX_VALUE)));
-        return tabs;
-    }
-
 }

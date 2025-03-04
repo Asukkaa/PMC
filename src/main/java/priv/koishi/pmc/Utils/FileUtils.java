@@ -42,53 +42,6 @@ public class FileUtils {
     }
 
     /**
-     * 根据操作系统将数值转换为文件大小
-     *
-     * @param size          没带单位的文件大小
-     * @param distinguishOS 区分操作系统文件大小单位进制，true区分，false不区分，macos文件大小为1000进制，内存大小为1024进制
-     * @return 带单位的文件大小
-     */
-    public static String getUnitSize(long size, boolean distinguishOS) {
-        long win = 1024;
-        long mac = 1000;
-        long kb;
-        // macOS与Windows文件大小进制不同
-        if (systemName.contains(macos) && distinguishOS) {
-            kb = mac;
-        } else {
-            kb = win;
-        }
-        return getRet(kb, size);
-    }
-
-    /**
-     * 格式化文件大小数据
-     *
-     * @param kb   文件大小单位进制
-     * @param size 不带单位的文件大小
-     * @return 带单位的文件大小
-     */
-    private static String getRet(long kb, long size) {
-        long mb = kb * kb;
-        long gb = mb * kb;
-        long tb = gb * kb;
-        String ret = "";
-        DecimalFormat df = new DecimalFormat("0.00");
-        if (size >= tb) {
-            ret = df.format(size / (tb * 1.0)) + " " + TB;
-        } else if (size >= gb) {
-            ret = df.format(size / (gb * 1.0)) + " " + GB;
-        } else if (size >= mb) {
-            ret = df.format(size / (mb * 1.0)) + " " + MB;
-        } else if (size >= kb) {
-            ret = df.format(size / (kb * 1.0)) + " " + KB;
-        } else if (size >= 0) {
-            ret = df.format(size) + " " + Byte;
-        }
-        return ret;
-    }
-
-    /**
      * 更新配置文件
      *
      * @param properties 要更新的配置文件
