@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
+    <VBox fx:id="vBox_Set" spacing="10" AnchorPane.topAnchor="10">
+
+        <Label prefHeight="25" text="功能设置："/>
+
+        <HBox spacing="50">
+            <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction" prefHeight="25" style="-fx-cursor: hand"
+                      selected="true" text="记住关闭前打开的页面"/>
+
+            <CheckBox fx:id="fullWindow_Set" onAction="#loadFullWindowAction" prefHeight="25"
+                      style="-fx-cursor: hand" selected="true" text="记住程序关闭时窗口是否最大化"/>
+
+            <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction" prefHeight="25" prefWidth="320"
+                      style="-fx-cursor: hand" selected="true" text="自动操作工具 功能加载上次设置信息"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

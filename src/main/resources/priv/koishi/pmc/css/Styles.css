@@ -1,0 +1,8 @@
+.label-button-style {
+    -fx-cursor: hand;
+    -fx-text-fill: #005880;
+}
+
+.tooltip-font-size {
+    -fx-font-size: 12px;
+}

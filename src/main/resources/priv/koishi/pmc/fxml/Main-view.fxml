@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="priv.koishi.pmc.Controller.MainController">
+    <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+
+        <Tab style="-fx-cursor: hand" fx:id="autoClickTab" text="自动操作工具">
+            <AnchorPane>
+                <fx:include source="AutoClick-tab.fxml"/>
+            </AnchorPane>
+        </Tab>
+
+        <Tab style="-fx-cursor: hand" fx:id="settingTab" text="设置">
+            <AnchorPane>
+                <fx:include source="Setting-tab.fxml"/>
+            </AnchorPane>
+        </Tab>
+
+        <Tab style="-fx-cursor: hand" fx:id="aboutTab" text="关于">
+            <AnchorPane>
+                <fx:include source="About-tab.fxml"/>
+            </AnchorPane>
+        </Tab>
+    </TabPane>
+</VBox>

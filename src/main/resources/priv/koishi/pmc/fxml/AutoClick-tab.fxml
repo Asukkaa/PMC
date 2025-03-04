@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<AnchorPane fx:id="anchorPane_Click" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AutoClickController">
+    <VBox fx:id="vbox_Click" spacing="10" AnchorPane.topAnchor="10">
+        <HBox fx:id="cancelTipHBox_Click" spacing="10">
+            <Label prefHeight="25" prefWidth="250" fx:id="mousePosition_Click"/>
+
+            <Label prefHeight="25" textFill="coral" text="提示：1 秒 = 1000 毫秒  列表中每条数据为一步，每步可操作多次"/>
+
+            <Label fx:id="cancelTip_Click" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
+                   text="执行或录制自动化任务时按下 esc 即可取消任务"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <Label prefHeight="25" text="鼠标点击起始横(X)坐标："/>
+            <TextField fx:id="mouseStartX_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="鼠标点击起始纵(Y)坐标："/>
+            <TextField fx:id="mouseStartY_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="鼠标点击结束横(X)坐标："/>
+            <TextField fx:id="mouseEndX_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="鼠标点击结束纵(Y)坐标："/>
+            <TextField fx:id="mouseEndY_Click" prefWidth="80"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <Label prefHeight="25" text="每步执行前等待时间："/>
+            <TextField fx:id="wait_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="每步操作次数："/>
+            <TextField fx:id="clickNumBer_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="单次操作点击时长："/>
+            <TextField fx:id="timeClick_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="单次操作点击间隔时间："/>
+            <TextField fx:id="interval_Click" prefWidth="80"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <Label prefHeight="25" text="操作名称："/>
+            <TextField fx:id="clickName_Click" prefWidth="150"/>
+
+            <Label prefHeight="25" text="操作类型："/>
+            <ChoiceBox fx:id="clickType_Click" prefHeight="25" prefWidth="120">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="鼠标左键点击"/>
+                        <String fx:value="鼠标右键点击"/>
+                        <String fx:value="鼠标中键点击"/>
+                        <String fx:value="鼠标前侧键点击"/>
+                        <String fx:value="鼠标后侧键点击"/>
+                        <String fx:value="鼠标仅移动"/>
+                    </FXCollections>
+                </items>
+                <value>
+                    <String fx:value="鼠标左键点击"/>
+                </value>
+            </ChoiceBox>
+
+            <Label prefHeight="25" text="循环次数："/>
+            <TextField fx:id="loopTime_Click" prefWidth="80"/>
+
+            <Label prefHeight="25" text="导出自动流程文件名称："/>
+            <TextField fx:id="outFileName_Click" prefWidth="140"/>
+
+            <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand" text="导出后打开文件夹"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand" text="选择导出文件夹"/>
+            <Label fx:id="outPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+
+            <Label prefHeight="25" text="录制自动操作前准备时间："/>
+            <TextField fx:id="preparationTime_Click" prefWidth="50"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="firstClick_Click" prefHeight="25" style="-fx-cursor: hand" text="执行自动流程前点击第一个起始坐标"/>
+
+            <CheckBox fx:id="hideWindowRun_Click" prefHeight="25" style="-fx-cursor: hand" text="执行自动流程前最小化本程序" selected="true"/>
+
+            <CheckBox fx:id="showWindowRun_Click" prefHeight="25" style="-fx-cursor: hand" text="执行自动流程结束后弹出本程序" selected="true"/>
+
+            <CheckBox fx:id="hideWindowRecord_Click" prefHeight="25" style="-fx-cursor: hand" text="录制自动流程前最小化本程序" selected="true"/>
+
+            <CheckBox fx:id="showWindowRecord_Click" prefHeight="25" style="-fx-cursor: hand" text="录制自动流程结束后弹出本程序" selected="true"/>
+        </HBox>
+
+        <HBox fx:id="fileNumberHBox_Click" spacing="10">
+            <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand" text="添加操作流程"/>
+            <Button fx:id="clickTest_Click" onAction="#clickTest" style="-fx-cursor: hand" text="测试操作流程"/>
+            <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
+            <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand" text="导出操作流程"/>
+            <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
+            <Button fx:id="runClick_Click" onAction="#runClick" style="-fx-cursor: hand" text="运行自动操作"/>
+            <Button fx:id="recordClick_Click" onAction="#recordClick" style="-fx-cursor: hand" text="录制自动操作"/>
+
+            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+        </HBox>
+
+        <TableView fx:id="tableView_Click" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+            <placeholder>
+                <Label text="拖拽操作流程文件或点击导入操作流程即可追加操作流程，设置操作流程后点击添加操作流程即可新增自定义流程"/>
+            </placeholder>
+
+            <columns>
+                <TableColumn fx:id="name_Click" text="操作名称" sortable="false"/>
+                <TableColumn fx:id="startX_Click" text="起始横(X)坐标" sortable="false"/>
+                <TableColumn fx:id="startY_Click" text="起始纵(Y)坐标" sortable="false"/>
+                <TableColumn fx:id="endX_Click" text="结束横(X)坐标" sortable="false"/>
+                <TableColumn fx:id="endY_Click" text="结束纵(Y)坐标" sortable="false"/>
+                <TableColumn fx:id="clickTime_Click" text="操作时长(毫秒)" sortable="false"/>
+                <TableColumn fx:id="clickNum_Click" text="操作次数" sortable="false"/>
+                <TableColumn fx:id="clickInterval_Click" text="点击间隔(毫秒)" sortable="false"/>
+                <TableColumn fx:id="waitTime_Click" text="执行前等待时间(毫秒)" sortable="false"/>
+                <TableColumn fx:id="type_Click" text="操作类型" sortable="false"/>
+            </columns>
+        </TableView>
+
+        <HBox fx:id="tipHBox_Click" spacing="10">
+            <ProgressBar fx:id="progressBar_Click" visible="false" prefWidth="200.0" progress="0.0"/>
+            <Label fx:id="tip_Click" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
+                   text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整操作，双击单元格可进行编辑"/>
+        </HBox>
+
+        <Label fx:id="log_Click"/>
+    </VBox>
+</AnchorPane>

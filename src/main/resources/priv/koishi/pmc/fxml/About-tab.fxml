@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="anchorPane_Abt" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AboutController">
+    <VBox fx:id="vBox_Abt" spacing="10" AnchorPane.topAnchor="10">
+
+        <Label prefHeight="25" text="关于："/>
+
+        <Label prefHeight="25" text="Tools 是一个由 javafx 实现的按照设置流程进行自动操作的工具。"/>
+
+        <Label prefHeight="25" text="自动操作功能目前支持鼠标左右键、鼠标中键、鼠标前后侧键点击长按或直线拖拽，可自己编辑操作流程或直接录制流程，自动流程可进行循环操作。"/>
+
+        <Label prefHeight="25" text="目前软件正在继续开发中，仍有很多功能还未实现，问题肯定也不少，有问题或建议可以给下面邮箱发邮件反馈。"/>
+
+        <Label prefHeight="25" text="如果遇到报错可到将 logs 文件夹压缩后发送给反馈邮件。"/>
+
+        <HBox spacing="5">
+            <Label prefHeight="25" text="logs 文件夹目录："/>
+            <Label prefHeight="25" prefWidth="400" fx:id="logsPath_Abt"/>
+
+            <Label prefHeight="25" text="log 文件保留数量："/>
+            <TextField fx:id="logsNum_Abt" prefHeight="20" prefWidth="50"/>
+            <Label prefHeight="25" text="个"/>
+        </HBox>
+
+        <HBox spacing="5">
+            <Label prefHeight="25" text="反馈邮箱："/>
+            <Label fx:id="mail_Abt" prefHeight="25" textFill="blue" text="csolxqt@foxmail.com"/>
+        </HBox>
+
+        <Separator/>
+
+        <VBox spacing="15">
+            <Label prefHeight="25" text="版本更新："/>
+            <Label prefHeight="25" text="目前主要下载渠道为网盘下载，最新版本将会在下列网盘发布，点击查看最新版本即可跳转对应网盘分享页面。"/>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="百度网盘："/>
+                <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" style="-fx-cursor: hand" text="点击查看最新版本"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="夸克网盘："/>
+                <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" style="-fx-cursor: hand" text="点击查看最新版本"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="迅雷网盘："/>
+                <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" style="-fx-cursor: hand" text="点击查看最新版本"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="当前版本："/>
+                <Label fx:id="version_Abt" prefHeight="25" textFill="limegreen" text="2.0.0"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</AnchorPane>
