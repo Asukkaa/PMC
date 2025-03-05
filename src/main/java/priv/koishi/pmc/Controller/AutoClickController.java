@@ -977,7 +977,7 @@ public class AutoClickController extends CommonProperties {
     public void loadAutoClick(ActionEvent actionEvent) throws IOException {
         if (autoClickTask == null && !recordClicking) {
             getConfig();
-            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(new FileChooser.ExtensionFilter("Perfect Mind Control", "*.pmc")));
+            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(new FileChooser.ExtensionFilter("Perfect Mouse Control", "*.pmc")));
             File selectedFile = creatFileChooser(actionEvent, inFilePath, extensionFilters, text_selectAutoFile);
             if (selectedFile != null) {
                 inFilePath = selectedFile.getPath();
