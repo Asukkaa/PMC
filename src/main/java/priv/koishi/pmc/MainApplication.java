@@ -74,7 +74,7 @@ public class MainApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
         stage.setTitle(prop.getProperty(key_appTitle));
         stage.setScene(scene);
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icon/Tools.png")).toExternalForm()));
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icon/PMC.png")).toExternalForm()));
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
         TabPane tabPane = (TabPane) scene.lookup("#tabPane");
         // 设置默认选中的Tab

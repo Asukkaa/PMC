@@ -241,7 +241,7 @@ public class UiUtils {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("异常信息");
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource("icon/Tools.png")).toString()));
+        stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource("icon/PMC.png")).toString()));
         // 创建展示异常信息的TextArea
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
