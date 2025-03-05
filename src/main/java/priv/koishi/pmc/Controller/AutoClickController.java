@@ -775,6 +775,7 @@ public class AutoClickController extends CommonProperties {
                                 log_Click.setTextFill(Color.BLUE);
                                 log_Click.setText("录制已结束");
                             }
+                            // 停止运行计时
                             if (runTimeline != null) {
                                 runTimeline.stop();
                                 runTimeline = null;
