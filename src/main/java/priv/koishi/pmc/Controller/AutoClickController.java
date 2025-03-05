@@ -477,7 +477,7 @@ public class AutoClickController extends CommonProperties {
             taskBean.setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
                     .setFirstClick(firstClick.isSelected())
                     .setFloatingLabel(floatingLabel)
-                    .setRunTimeline(recordTimeline)
+                    .setRunTimeline(runTimeline)
                     .setDisableControls(disableControls)
                     .setProgressBar(progressBar_Click)
                     .setBeanList(clickPositionBeans)
@@ -542,6 +542,8 @@ public class AutoClickController extends CommonProperties {
                 runTimeline = null;
             });
             if (!autoClickTask.isRunning()) {
+                // 改变要防重复点击的组件状态
+                changeDisableControls(taskBean, true);
                 // 获取准备时间值
                 int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
@@ -781,8 +783,7 @@ public class AutoClickController extends CommonProperties {
                                 runTimeline = null;
                                 autoClickTask = null;
                                 AutoClickTaskBean taskBean = new AutoClickTaskBean();
-                                taskBean.setFloatingLabel(floatingLabel)
-                                        .setDisableControls(disableControls)
+                                taskBean.setDisableControls(disableControls)
                                         .setProgressBar(progressBar_Click)
                                         .setMassageLabel(log_Click);
                                 taskNotSuccess(taskBean, text_taskCancelled);

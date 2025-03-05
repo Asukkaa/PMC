@@ -15,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import static javafx.scene.input.MouseButton.NONE;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.UiUtils.changeDisableControls;
 
 /**
  * 自动点击线程任务类
@@ -35,8 +34,6 @@ public class AutoClickService {
         return new Task<>() {
             @Override
             protected Void call() {
-                // 改变要防重复点击的组件状态
-                changeDisableControls(taskBean, true);
                 Timeline timeline = taskBean.getRunTimeline();
                 if (timeline != null) {
                     timeline.stop();
