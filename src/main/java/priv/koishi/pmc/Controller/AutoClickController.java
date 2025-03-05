@@ -309,7 +309,7 @@ public class AutoClickController extends CommonProperties {
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig))) {
             setControlLastConfig(wait_Click, prop, key_lastWait, false, null);
-            setControlLastConfig(outPath_Click, prop, key_outFilePath, false, null);
+            setControlLastConfig(outPath_Click, prop, key_outFilePath, false, anchorPane_Click);
             setControlLastConfig(interval_Click, prop, key_lastInterval, false, null);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, false, null);
             setControlLastConfig(clickName_Click, prop, key_lastClickName, true, null);
