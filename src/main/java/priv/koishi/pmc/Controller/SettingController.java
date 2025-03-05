@@ -37,7 +37,7 @@ public class SettingController {
     private VBox vBox_Set;
 
     @FXML
-    private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set;
+    private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set;
 
     /**
      * 组件自适应宽高
@@ -79,6 +79,11 @@ public class SettingController {
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         setControlLastConfig(checkBox, prop, key_loadLastConfig, false, null);
+        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, false, null);
+        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, false, null);
+        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, false, null);
+        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, false, null);
+        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, false, null);
         input.close();
     }
 
@@ -91,8 +96,8 @@ public class SettingController {
     private void getConfig(Properties prop) throws IOException {
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
-        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, false, null);
         setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, false, null);
+        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, false, null);
         input.close();
     }
 
@@ -113,6 +118,11 @@ public class SettingController {
     private void setToolTip() {
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
+        addToolTip(tip_firstClick, firstClick_Set);
+        addToolTip(tip_hideWindowRun, hideWindowRun_Set);
+        addToolTip(tip_showWindowRun, showWindowRun_Set);
+        addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
+        addToolTip(tip_showWindowRecord, showWindowRecord_Set);
     }
 
     /**
@@ -156,6 +166,56 @@ public class SettingController {
     @FXML
     private void loadFullWindowAction() throws IOException {
         setLoadLastConfigCheckBox(fullWindow_Set, configFile, key_loadLastFullWindow);
+    }
+
+    /**
+     * 执行自动流程前最小化本程序
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadHideWindowRunAction() throws IOException {
+        setLoadLastConfigCheckBox(hideWindowRun_Set, configFile_Click, key_lastHideWindowRun);
+    }
+
+    /**
+     * 执行自动流程结束后弹出本程序
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadShowWindowRunAction() throws IOException {
+        setLoadLastConfigCheckBox(showWindowRun_Set, configFile_Click, key_lastShowWindowRun);
+    }
+
+    /**
+     * 录制自动流程前最小化本程序
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadHideWindowRecordAction() throws IOException {
+        setLoadLastConfigCheckBox(hideWindowRecord_Set, configFile_Click, key_lastHideWindowRecord);
+    }
+
+    /**
+     * 录制自动流程结束后弹出本程序
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadShowWindowRecordAction() throws IOException {
+        setLoadLastConfigCheckBox(showWindowRecord_Set, configFile_Click, key_lastShowWindowRecord);
+    }
+
+    /**
+     * 执行自动流程前点击第一个起始坐标
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadFirstClickAction() throws IOException {
+        setLoadLastConfigCheckBox(firstClick_Set, configFile_Click, key_lastFirstClick);
     }
 
     /**

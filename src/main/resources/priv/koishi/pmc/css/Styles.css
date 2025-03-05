@@ -6,3 +6,9 @@
 .tooltip-font-size {
     -fx-font-size: 12px;
 }
+
+.checkBox-setting-style {
+    -fx-cursor: hand;
+    -fx-pref-height: 25;
+    -fx-pref-width: 250;
+}

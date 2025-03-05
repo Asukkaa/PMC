@@ -249,7 +249,7 @@ public class UiUtils {
         textArea.setText(errString);
         // 创建VBox并添加TextArea
         VBox details = new VBox();
-        details.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> textArea.setPrefHeight(details.getHeight())));
+        details.heightProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> textArea.setPrefHeight(details.getHeight())));
         details.getChildren().add(textArea);
         alert.getDialogPane().setExpandableContent(details);
         return alert;

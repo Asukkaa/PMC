@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -50,7 +51,7 @@ public class AboutController {
     private TextField logsNum_Abt;
 
     @FXML
-    private Label logsPath_Abt, mail_Abt, version_Abt;
+    private Label logsPath_Abt, mail_Abt, version_Abt, title_Abt;
 
     @FXML
     private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt;
@@ -83,6 +84,8 @@ public class AboutController {
         baiduLink = prop.getProperty(key_baiduLink);
         quarkLink = prop.getProperty(key_quarkLink);
         xunleiLink = prop.getProperty(key_xunleiLink);
+        title_Abt.setTextFill(Color.HOTPINK);
+        title_Abt.setText(prop.getProperty(key_appTitle));
         input.close();
     }
 

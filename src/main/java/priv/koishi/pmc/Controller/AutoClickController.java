@@ -89,7 +89,12 @@ public class AutoClickController extends CommonProperties {
     /**
      * 默认录制准备时间
      */
-    private static String defaultPreparationTime;
+    private static String defaultPreparationRecordTime;
+
+    /**
+     * 默认运行准备时间
+     */
+    private static String defaultPreparationRunTime;
 
     /**
      * 要防重复点击的组件
@@ -104,7 +109,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 线程池实例
      */
-    ExecutorService executorService = commonThreadPoolExecutor.createNewThreadPool();
+    private final ExecutorService executorService = commonThreadPoolExecutor.createNewThreadPool();
 
     /**
      * 自动点击任务
@@ -139,7 +144,12 @@ public class AutoClickController extends CommonProperties {
     /**
      * 录制时间线
      */
-    private Timeline timeline;
+    private Timeline recordTimeline;
+
+    /**
+     * 运行时间线
+     */
+    private Timeline runTimeline;
 
     /**
      * 录制开始时间
@@ -175,13 +185,13 @@ public class AutoClickController extends CommonProperties {
     private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click;
 
     @FXML
-    private CheckBox firstClick_Click, openDirectory_Click, hideWindowRun_Click, showWindowRun_Click, hideWindowRecord_Click, showWindowRecord_Click;
+    private CheckBox openDirectory_Click;
 
     @FXML
     private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click, exportAutoClick_Click, addOutPath_Click, recordClick_Click;
 
     @FXML
-    private TextField mouseStartX_Click, mouseStartY_Click, mouseEndX_Click, mouseEndY_Click, wait_Click, loopTime_Click, clickNumBer_Click, timeClick_Click, clickName_Click, interval_Click, outFileName_Click, preparationTime_Click;
+    private TextField mouseStartX_Click, mouseStartY_Click, mouseEndX_Click, mouseEndY_Click, wait_Click, loopTime_Click, clickNumBer_Click, timeClick_Click, clickName_Click, interval_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
 
     @FXML
     private TableView<ClickPositionBean> tableView_Click;
@@ -268,9 +278,6 @@ public class AutoClickController extends CommonProperties {
             prop.put(key_lastTimeClick, timeClick.getText());
             TextField interval = (TextField) scene.lookup("#interval_Click");
             prop.put(key_lastInterval, interval.getText());
-            CheckBox firstClick = (CheckBox) scene.lookup("#firstClick_Click");
-            String lastFirstClickValue = firstClick.isSelected() ? activation : unActivation;
-            prop.put(key_lastFirstClick, lastFirstClickValue);
             TextField clickName = (TextField) scene.lookup("#clickName_Click");
             prop.put(key_lastClickName, clickName.getText());
             ChoiceBox<?> clickType = (ChoiceBox<?>) scene.lookup("#clickType_Click");
@@ -280,20 +287,10 @@ public class AutoClickController extends CommonProperties {
             CheckBox openDirectory = (CheckBox) scene.lookup("#openDirectory_Click");
             String lastOpenDirectoryValue = openDirectory.isSelected() ? activation : unActivation;
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
-            CheckBox hideWindowRun = (CheckBox) scene.lookup("#hideWindowRun_Click");
-            String lastHideWindowRunValue = hideWindowRun.isSelected() ? activation : unActivation;
-            prop.put(key_lastHideWindowRun, lastHideWindowRunValue);
-            CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Click");
-            String lastShowWindowRunValue = showWindowRun.isSelected() ? activation : unActivation;
-            prop.put(key_lastShowWindowRun, lastShowWindowRunValue);
-            CheckBox hideWindowRecord = (CheckBox) scene.lookup("#hideWindowRecord_Click");
-            String lastHideWindowRecordValue = hideWindowRecord.isSelected() ? activation : unActivation;
-            prop.put(key_lastHideWindowRecord, lastHideWindowRecordValue);
-            CheckBox showWindowRecord = (CheckBox) scene.lookup("#showWindowRecord_Click");
-            String lastShowWindowRecordValue = showWindowRecord.isSelected() ? activation : unActivation;
-            prop.put(key_lastShowWindowRecord, lastShowWindowRecordValue);
-            TextField preparationTime = (TextField) scene.lookup("#preparationTime_Click");
-            prop.put(key_lastPreparationTime, preparationTime.getText());
+            TextField preparationRecordTime = (TextField) scene.lookup("#preparationRecordTime_Click");
+            prop.put(key_lastPreparationRecordTime, preparationRecordTime.getText());
+            TextField preparationRunTime = (TextField) scene.lookup("#preparationRunTime_Click");
+            prop.put(key_lastPreparationRunTime, preparationRunTime.getText());
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
@@ -320,17 +317,13 @@ public class AutoClickController extends CommonProperties {
             setControlLastConfig(mouseEndY_Click, prop, key_lastMouseEndY, false, null);
             setControlLastConfig(timeClick_Click, prop, key_lastTimeClick, false, null);
             setControlLastConfig(clickType_Click, prop, key_lastClickType, false, null);
-            setControlLastConfig(firstClick_Click, prop, key_lastFirstClick, false, null);
             setControlLastConfig(mouseStartX_Click, prop, key_lastMouseStartX, false, null);
             setControlLastConfig(mouseStartY_Click, prop, key_lastMouseStartY, false, null);
             setControlLastConfig(clickNumBer_Click, prop, key_lastClickNumBer, false, null);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, false, null);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, false, null);
-            setControlLastConfig(hideWindowRun_Click, prop, key_lastHideWindowRun, false, null);
-            setControlLastConfig(showWindowRun_Click, prop, key_lastShowWindowRun, false, null);
-            setControlLastConfig(preparationTime_Click, prop, key_lastPreparationTime, false, null);
-            setControlLastConfig(hideWindowRecord_Click, prop, key_lastHideWindowRecord, false, null);
-            setControlLastConfig(showWindowRecord_Click, prop, key_lastShowWindowRecord, false, null);
+            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, false, null);
+            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, false, null);
         }
         input.close();
     }
@@ -347,7 +340,8 @@ public class AutoClickController extends CommonProperties {
         inFilePath = prop.getProperty(key_inFilePath);
         outFilePath = prop.getProperty(key_outFilePath);
         defaultOutFileName = prop.getProperty(key_defaultOutFileName);
-        defaultPreparationTime = prop.getProperty(key_defaultPreparationTime);
+        defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
+        defaultPreparationRecordTime = prop.getProperty(key_defaultPreparationRecordTime);
         input.close();
     }
 
@@ -476,18 +470,22 @@ public class AutoClickController extends CommonProperties {
      * @param clickPositionBeans 自动操作流程
      */
     private void launchClickTask(List<ClickPositionBean> clickPositionBeans) {
-        if (!recordClicking && autoClickTask == null) {
+        if (!recordClicking && autoClickTask == null && runTimeline == null) {
+            Scene scene = anchorPane_Click.getScene();
+            CheckBox firstClick = (CheckBox) scene.lookup("#firstClick_Set");
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
-                    .setFirstClick(firstClick_Click.isSelected())
+                    .setFirstClick(firstClick.isSelected())
                     .setFloatingLabel(floatingLabel)
+                    .setRunTimeline(recordTimeline)
                     .setDisableControls(disableControls)
                     .setProgressBar(progressBar_Click)
                     .setBeanList(clickPositionBeans)
                     .setMassageLabel(log_Click);
             updateLabel(log_Click, "");
-            Stage stage = (Stage) anchorPane_Click.getScene().getWindow();
-            if (hideWindowRun_Click.isSelected()) {
+            Stage stage = (Stage) scene.getWindow();
+            CheckBox hideWindowRun = (CheckBox) scene.lookup("#hideWindowRun_Set");
+            if (hideWindowRun.isSelected()) {
                 stage.setIconified(true);
             }
             // 开启键盘监听
@@ -503,21 +501,29 @@ public class AutoClickController extends CommonProperties {
                 massageLabel.setTextFill(Color.GREEN);
                 massageLabel.setText(text_taskFinished);
                 hideFloatingWindow();
-                if (showWindowRun_Click.isSelected()) {
+                CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Set");
+                if (showWindowRun.isSelected()) {
                     showStage(stage);
                 }
                 // 移除键盘监听器
                 stopNativeKeyListener();
                 autoClickTask = null;
+                runTimeline = null;
             });
             autoClickTask.setOnFailed(event -> {
                 taskNotSuccess(taskBean, text_taskFailed);
                 hideFloatingWindow();
-                if (showWindowRun_Click.isSelected()) {
+                CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Set");
+                if (showWindowRun.isSelected()) {
                     showStage(stage);
                 }
                 // 移除键盘监听器
                 stopNativeKeyListener();
+                // 移除开始前的倒计时
+                if (runTimeline != null) {
+                    runTimeline.stop();
+                    runTimeline = null;
+                }
                 // 获取抛出的异常
                 Throwable ex = autoClickTask.getException();
                 autoClickTask = null;
@@ -526,19 +532,55 @@ public class AutoClickController extends CommonProperties {
             autoClickTask.setOnCancelled(event -> {
                 taskNotSuccess(taskBean, text_taskCancelled);
                 hideFloatingWindow();
-                if (showWindowRun_Click.isSelected()) {
+                CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Set");
+                if (showWindowRun.isSelected()) {
                     showStage(stage);
                 }
                 // 移除键盘监听器
                 stopNativeKeyListener();
                 autoClickTask = null;
+                runTimeline = null;
             });
             if (!autoClickTask.isRunning()) {
-                // 使用新线程启动
-                executorService.execute(autoClickTask);
+                // 获取准备时间值
+                int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
+                // 设置浮窗文本显示准备时间
+                floatingLabel.setText(text_cancelTask + preparationTimeValue + text_run);
                 showFloatingWindow();
+                // 延时执行任务
+                runTimeline = executeTimeLineMission(preparationTimeValue);
+                // 启动 Timeline
+                runTimeline.play();
             }
         }
+    }
+
+    /**
+     * 延时执行任务
+     *
+     * @param preparationTimeValue 准备时间
+     */
+    private Timeline executeTimeLineMission(int preparationTimeValue) {
+        runTimeline = new Timeline();
+        AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
+        // 创建 Timeline 来实现倒计时
+        Timeline finalTimeline = runTimeline;
+        runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            preparationTime.getAndDecrement();
+            if (preparationTime.get() > 0) {
+                floatingLabel.setText(text_cancelTask + preparationTime + text_run);
+            } else {
+                // 停止 Timeline
+                finalTimeline.stop();
+                // 更新浮窗文本
+                floatingLabel.setText(text_cancelTask + text_recordClicking);
+                // 使用新线程启动
+                executorService.execute(autoClickTask);
+            }
+        }));
+        // 设置 Timeline 的循环次数
+        runTimeline.setCycleCount(preparationTimeValue);
+        return runTimeline;
     }
 
     /**
@@ -630,8 +672,10 @@ public class AutoClickController extends CommonProperties {
         integerRangeTextField(mouseStartY_Click, 0, null, tip_mouseStartY);
         // 限制点击次数文本输入框内容
         integerRangeTextField(clickNumBer_Click, 0, null, tip_clickNumBer);
-        // 限制准备时间文本输入框内容
-        integerRangeTextField(preparationTime_Click, 0, null, tip_preparationTime + defaultPreparationTime);
+        // 限制运行准备时间文本输入框内容
+        integerRangeTextField(preparationRunTime_Click, 0, null, tip_preparationRunTime + defaultPreparationRunTime);
+        // 限制录制准备时间文本输入框内容
+        integerRangeTextField(preparationRecordTime_Click, 0, null, tip_preparationRecordTime + defaultPreparationRecordTime);
     }
 
     /**
@@ -647,7 +691,6 @@ public class AutoClickController extends CommonProperties {
         addToolTip(tip_clickTime, timeClick_Click);
         addToolTip(tip_clickName, clickName_Click);
         addToolTip(tip_clickTest, clickTest_Click);
-        addToolTip(tip_firstClick, firstClick_Click);
         addToolTip(tip_clickInterval, interval_Click);
         addToolTip(tip_learButton, clearButton_Click);
         addToolTip(tip_addPosition, addPosition_Click);
@@ -655,16 +698,13 @@ public class AutoClickController extends CommonProperties {
         addToolTip(tip_mouseStartX, mouseStartX_Click);
         addToolTip(tip_mouseStartY, mouseStartY_Click);
         addToolTip(tip_recordClick, recordClick_Click);
-        addToolTip(tip_hideWindowRun, hideWindowRun_Click);
-        addToolTip(tip_showWindowRun, showWindowRun_Click);
         addToolTip(tip_outAutoClickPath, addOutPath_Click);
         addToolTip(tip_openDirectory, openDirectory_Click);
         addToolTip(tip_loadAutoClick, loadAutoClick_Click);
         addToolTip(tip_exportAutoClick, exportAutoClick_Click);
-        addToolTip(tip_hideWindowRecord, hideWindowRecord_Click);
-        addToolTip(tip_showWindowRecord, showWindowRecord_Click);
         addToolTip(tip_autoClickFileName + defaultOutFileName, outFileName_Click);
-        addToolTip(tip_preparationTime + defaultPreparationTime, preparationTime_Click);
+        addToolTip(tip_preparationRunTime + defaultPreparationRunTime, preparationRunTime_Click);
+        addToolTip(tip_preparationRecordTime + defaultPreparationRecordTime, preparationRecordTime_Click);
     }
 
     /**
@@ -720,7 +760,7 @@ public class AutoClickController extends CommonProperties {
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
                     // 仅在自动操作与录制情况下才监听键盘
-                    if (autoClickTask != null && autoClickTask.isRunning() || timeline != null) {
+                    if (autoClickTask != null && autoClickTask.isRunning() || recordTimeline != null || runTimeline != null) {
                         // 检测快捷键 esc
                         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
                             // 停止自动操作
@@ -729,11 +769,22 @@ public class AutoClickController extends CommonProperties {
                                 autoClickTask = null;
                             }
                             // 停止录制计时
-                            if (timeline != null) {
-                                timeline.stop();
-                                timeline = null;
+                            if (recordTimeline != null) {
+                                recordTimeline.stop();
+                                recordTimeline = null;
                                 log_Click.setTextFill(Color.BLUE);
                                 log_Click.setText("录制已结束");
+                            }
+                            if (runTimeline != null) {
+                                runTimeline.stop();
+                                runTimeline = null;
+                                autoClickTask = null;
+                                AutoClickTaskBean taskBean = new AutoClickTaskBean();
+                                taskBean.setFloatingLabel(floatingLabel)
+                                        .setDisableControls(disableControls)
+                                        .setProgressBar(progressBar_Click)
+                                        .setMassageLabel(log_Click);
+                                taskNotSuccess(taskBean, text_taskCancelled);
                             }
                             // 改变要防重复点击的组件状态
                             changeDisableControls(disableControls, false);
@@ -741,8 +792,10 @@ public class AutoClickController extends CommonProperties {
                             stopNativeMouseListener();
                             hideFloatingWindow();
                             recordClicking = false;
-                            Stage stage = (Stage) anchorPane_Click.getScene().getWindow();
-                            if (showWindowRecord_Click.isSelected()) {
+                            Scene scene = anchorPane_Click.getScene();
+                            Stage stage = (Stage) scene.getWindow();
+                            CheckBox showWindowRecord = (CheckBox) scene.lookup("#showWindowRecord_Set");
+                            if (showWindowRecord.isSelected()) {
                                 showStage(stage);
                             }
                         }
@@ -1093,11 +1146,13 @@ public class AutoClickController extends CommonProperties {
             // 改变要防重复点击的组件状态
             changeDisableControls(disableControls, true);
             // 获取准备时间值
-            int preparationTimeValue = setDefaultIntValue(preparationTime_Click, Integer.parseInt(defaultPreparationTime), 0, null);
+            int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click, Integer.parseInt(defaultPreparationRecordTime), 0, null);
             // 开始录制
             recordClicking = true;
-            Stage stage = (Stage) anchorPane_Click.getScene().getWindow();
-            if (hideWindowRecord_Click.isSelected()) {
+            Scene scene = anchorPane_Click.getScene();
+            Stage stage = (Stage) scene.getWindow();
+            CheckBox hideWindowRecord = (CheckBox) scene.lookup("#hideWindowRecord_Set");
+            if (hideWindowRecord.isSelected()) {
                 stage.setIconified(true);
             }
             // 开启键盘监听
@@ -1106,11 +1161,11 @@ public class AutoClickController extends CommonProperties {
             floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
             // 显示浮窗
             showFloatingWindow();
-            timeline = new Timeline();
+            recordTimeline = new Timeline();
             AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
             // 创建 Timeline 来实现倒计时
-            Timeline finalTimeline = timeline;
-            timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            Timeline finalTimeline = recordTimeline;
+            recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
                 preparationTime.getAndDecrement();
                 if (preparationTime.get() > 0) {
                     floatingLabel.setText(text_cancelTask + preparationTime + text_preparation);
@@ -1126,9 +1181,9 @@ public class AutoClickController extends CommonProperties {
                 }
             }));
             // 设置 Timeline 的循环次数
-            timeline.setCycleCount(preparationTimeValue);
+            recordTimeline.setCycleCount(preparationTimeValue);
             // 启动 Timeline
-            timeline.play();
+            recordTimeline.play();
         }
     }
 

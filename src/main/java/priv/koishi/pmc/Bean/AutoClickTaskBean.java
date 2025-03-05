@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Bean;
 
+import javafx.animation.Timeline;
 import javafx.scene.control.Label;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,5 +32,10 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionBean> {
      * 执行自动操作时的信息输出栏
      */
     Label floatingLabel;
+
+    /**
+     * 运行时间线
+     */
+    Timeline runTimeline;
 
 }

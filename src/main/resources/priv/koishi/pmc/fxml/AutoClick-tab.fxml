@@ -13,7 +13,7 @@
             <Label prefHeight="25" textFill="coral" text="提示：1 秒 = 1000 毫秒  列表中每条数据为一步，每步可操作多次"/>
 
             <Label fx:id="cancelTip_Click" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
-                   text="执行或录制自动化任务时按下 esc 即可取消任务"/>
+                   text="运行或录制自动化任务时按下 esc 即可取消任务"/>
         </HBox>
 
         <HBox spacing="10">
@@ -64,9 +64,11 @@
                     <String fx:value="鼠标左键点击"/>
                 </value>
             </ChoiceBox>
+        </HBox>
 
-            <Label prefHeight="25" text="循环次数："/>
-            <TextField fx:id="loopTime_Click" prefWidth="80"/>
+        <HBox spacing="10">
+            <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand" text="选择导出文件夹"/>
+            <Label fx:id="outPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
 
             <Label prefHeight="25" text="导出自动流程文件名称："/>
             <TextField fx:id="outFileName_Click" prefWidth="140"/>
@@ -75,33 +77,24 @@
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand" text="选择导出文件夹"/>
-            <Label fx:id="outPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
-
-            <Label prefHeight="25" text="录制自动操作前准备时间："/>
-            <TextField fx:id="preparationTime_Click" prefWidth="50"/>
-        </HBox>
-
-        <HBox spacing="10">
-            <CheckBox fx:id="firstClick_Click" prefHeight="25" style="-fx-cursor: hand" text="执行自动流程前点击第一个起始坐标"/>
-
-            <CheckBox fx:id="hideWindowRun_Click" prefHeight="25" style="-fx-cursor: hand" text="执行自动流程前最小化本程序" selected="true"/>
-
-            <CheckBox fx:id="showWindowRun_Click" prefHeight="25" style="-fx-cursor: hand" text="执行自动流程结束后弹出本程序" selected="true"/>
-
-            <CheckBox fx:id="hideWindowRecord_Click" prefHeight="25" style="-fx-cursor: hand" text="录制自动流程前最小化本程序" selected="true"/>
-
-            <CheckBox fx:id="showWindowRecord_Click" prefHeight="25" style="-fx-cursor: hand" text="录制自动流程结束后弹出本程序" selected="true"/>
-        </HBox>
-
-        <HBox fx:id="fileNumberHBox_Click" spacing="10">
             <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand" text="添加操作流程"/>
             <Button fx:id="clickTest_Click" onAction="#clickTest" style="-fx-cursor: hand" text="测试操作流程"/>
             <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
             <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand" text="导出操作流程"/>
             <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
-            <Button fx:id="runClick_Click" onAction="#runClick" style="-fx-cursor: hand" text="运行自动操作"/>
+        </HBox>
+
+        <HBox fx:id="fileNumberHBox_Click" spacing="10">
+            <Label prefHeight="25" text="录制自动操作前准备时间："/>
+            <TextField fx:id="preparationRecordTime_Click" prefWidth="50"/>
             <Button fx:id="recordClick_Click" onAction="#recordClick" style="-fx-cursor: hand" text="录制自动操作"/>
+
+            <Label prefHeight="25" text="运行自动操作前准备时间："/>
+            <TextField fx:id="preparationRunTime_Click" prefWidth="50"/>
+            <Button fx:id="runClick_Click" onAction="#runClick" style="-fx-cursor: hand" text="运行自动操作"/>
+
+            <Label prefHeight="25" text="循环次数："/>
+            <TextField fx:id="loopTime_Click" prefWidth="80"/>
 
             <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
         </HBox>
