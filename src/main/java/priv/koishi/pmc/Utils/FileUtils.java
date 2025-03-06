@@ -169,11 +169,7 @@ public class FileUtils {
         if (isRunningFromJar()) {
             input = new FileInputStream(resourcesPath + path);
         } else {
-            String inputPath = packagePath + path;
-            if (!new File(inputPath).exists()) {
-                inputPath = path;
-            }
-            input = new FileInputStream(inputPath);
+            input = new FileInputStream(getAppResourcePath(path));
         }
         return input;
     }
@@ -190,13 +186,28 @@ public class FileUtils {
         if (isRunningFromJar()) {
             output = new FileOutputStream(resourcesPath + path);
         } else {
-            String outputPath = packagePath + path;
-            if (!new File(outputPath).exists()) {
-                outputPath = path;
-            }
-            output = new FileOutputStream(outputPath);
+            output = new FileOutputStream(getAppResourcePath(path));
         }
         return output;
+    }
+
+    /**
+     * 获取app资源文件绝对路径
+     *
+     * @param path 资源文件相对路径
+     * @return 资源文件绝对路径
+     */
+    public static String getAppResourcePath(String path) {
+        String resourcePath = packagePath + path;
+        // 处理macos打包成.app文件后的路径
+        if (systemName.contains(macos)) {
+            String appPath = System.getProperty("java.home");
+            resourcePath = appPath + "/bin/" + path;
+        }
+        if (!new File(resourcePath).exists()) {
+            resourcePath = path;
+        }
+        return resourcePath;
     }
 
 }

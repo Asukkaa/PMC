@@ -1,1 +1,0 @@
-jpackage --name 'Perfect Mouse Control'  --type app-image -m priv.koishi.pmc/priv.koishi.pmc.MainApplication --runtime-image app --icon PMC.ico --app-version 1.0.0
