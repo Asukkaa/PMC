@@ -16,8 +16,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.CommonUtils.*;
-import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 

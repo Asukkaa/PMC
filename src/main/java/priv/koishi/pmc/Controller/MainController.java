@@ -17,8 +17,8 @@ import static priv.koishi.pmc.Controller.AutoClickController.autoClickAdaption;
 import static priv.koishi.pmc.Controller.AutoClickController.autoClickSaveLastConfig;
 import static priv.koishi.pmc.Controller.SettingController.settingAdaption;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.CommonUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.CommonUtils.checkRunningOutputStream;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
 
 /**
  * 全局页面控制器

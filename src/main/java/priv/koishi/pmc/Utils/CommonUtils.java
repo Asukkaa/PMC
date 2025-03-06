@@ -2,8 +2,8 @@ package priv.koishi.pmc.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
-import java.net.URL;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.regex.Pattern;
 
 /**
@@ -13,10 +13,7 @@ import java.util.regex.Pattern;
  */
 public class CommonUtils {
 
-    /**
-     * 资源文件夹地址前缀
-     */
-    static String resourcesPath = "src/main/resources/priv/koishi/pmc/";
+
 
     /**
      * 正则表达式用于匹配指定范围的整数
@@ -69,58 +66,6 @@ public class CommonUtils {
         pw.flush();
         sw.flush();
         return sw.toString();
-    }
-
-    /**
-     * 判断程序是否打包运行
-     *
-     * @return 在jar环境运为true，其他环境为false
-     */
-    public static boolean isRunningFromJar() {
-        // 获取当前运行的JVM的类加载器
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        // 获取URL资源
-        URL resource = classLoader.getResource("");
-        // 检查URL的协议是否是jar或者file协议，file协议表示不是从JAR中加载
-        String protocol = null;
-        if (resource != null) {
-            protocol = resource.getProtocol();
-        }
-        return "jar".equals(protocol);
-    }
-
-    /**
-     * 根据不同运行环境来创建输入流
-     *
-     * @param path 输入流路径
-     * @return 根据不同运行环境创建的输入流
-     * @throws IOException io异常
-     */
-    public static InputStream checkRunningInputStream(String path) throws IOException {
-        InputStream input;
-        if (isRunningFromJar()) {
-            input = new FileInputStream(resourcesPath + path);
-        } else {
-            input = new FileInputStream(path);
-        }
-        return input;
-    }
-
-    /**
-     * 根据不同运行环境来创建输出流
-     *
-     * @param path 输出流路径
-     * @return 根据不同运行环境创建的输出流
-     * @throws IOException io异常
-     */
-    public static OutputStream checkRunningOutputStream(String path) throws IOException {
-        OutputStream output;
-        if (isRunningFromJar()) {
-            output = new FileOutputStream(resourcesPath + path);
-        } else {
-            output = new FileOutputStream(path);
-        }
-        return output;
     }
 
 }

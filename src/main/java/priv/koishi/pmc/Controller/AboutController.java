@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.CommonUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.CommonUtils.checkRunningOutputStream;
-import static priv.koishi.pmc.Utils.FileUtils.getFileType;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**

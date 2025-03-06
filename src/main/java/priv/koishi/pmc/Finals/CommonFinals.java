@@ -238,6 +238,21 @@ public class CommonFinals {
     public static final String key_defaultPreparationRunTime = "defaultPreparationRunTime";
 
     /**
+     * 资源文件夹地址前缀
+     */
+    public static String resourcesPath = "src/main/resources/priv/koishi/pmc/";
+
+    /**
+     * jpackage打包后的资源文件路径
+     */
+    public static String packagePath = "runtime/bin/";
+
+    /**
+     * log4j配置文件名称
+     */
+    public static String log4j2 = "log4j2.xml";
+
+    /**
      * app配置文件路径
      */
     public static final String configFile = "config/config.properties";

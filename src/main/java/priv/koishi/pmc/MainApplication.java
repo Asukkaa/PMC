@@ -12,6 +12,7 @@ import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 import static priv.koishi.pmc.Controller.MainController.mainAdaption;
 import static priv.koishi.pmc.Controller.MainController.saveLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.CommonUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.CommonUtils.isRunningFromJar;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
+import static priv.koishi.pmc.Utils.FileUtils.isRunningFromJar;
 import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
 
 /**
@@ -132,7 +133,11 @@ public class MainApplication extends Application {
     public static void main(String[] args) throws IOException {
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
-            ConfigurationSource source = new ConfigurationSource(new FileInputStream("log4j2.xml"));
+            String inputPath = packagePath + log4j2;
+            if (!new File(inputPath).exists()) {
+                inputPath = log4j2;
+            }
+            ConfigurationSource source = new ConfigurationSource(new FileInputStream(inputPath));
             Configurator.initialize(null, source);
         }
         launch();
