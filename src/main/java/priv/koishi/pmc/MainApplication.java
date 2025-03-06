@@ -48,7 +48,7 @@ public class MainApplication extends Application {
     /**
      * 线程池实例
      */
-    ExecutorService executorService = commonThreadPoolExecutor.createNewThreadPool();
+    private final ExecutorService executorService = commonThreadPoolExecutor.createNewThreadPool();
 
     /**
      * 加载fxml页面
