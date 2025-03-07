@@ -269,9 +269,24 @@ public class CommonFinals {
     public static final String configFile_Click = "config/autoClickConfig.properties";
 
     /**
+     * log文件夹目录
+     */
+    public static final String logsDir = "/bin/logs";
+
+    /**
+     * log文件夹名称
+     */
+    public static final String logs = "logs";
+
+    /**
      * 当前程序运行位置
      */
-    public static final String currentDir = System.getProperty("user.dir");
+    public static final String userDir = System.getProperty("user.dir");
+
+    /**
+     * java home目录
+     */
+    public static final String javaHome = System.getProperty("java.home");
 
     /**
      * 当前程序运行操作系统

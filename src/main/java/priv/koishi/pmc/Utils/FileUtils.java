@@ -210,4 +210,18 @@ public class FileUtils {
         return resourcePath;
     }
 
+    /**
+     * 获取logs文件夹地址
+     *
+     * @return 不同操作系统下logs文件夹地址
+     */
+    public static String getLogsPath() {
+        String logsPath = userDir + File.separator + logs;
+        // 处理macos打包成.app文件后的路径
+        if (systemName.contains(macos) && !isRunningFromJar()) {
+            logsPath = javaHome + logsDir;
+        }
+        return logsPath;
+    }
+
 }

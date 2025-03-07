@@ -93,7 +93,7 @@ public class AboutController {
      * 获取logs文件夹路径并展示
      */
     private void setLogsPath() {
-        String logsPath = currentDir + File.separator + "logs";
+        String logsPath = getLogsPath();
         setPathLabel(logsPath_Abt, logsPath, false, anchorPane_Abt);
     }
 

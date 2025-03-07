@@ -12,6 +12,7 @@ import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,6 +132,14 @@ public class MainApplication extends Application {
     public static void main(String[] args) throws IOException {
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
+            String logsPath = getLogsPath();
+            System.setProperty("log.dir", logsPath);
+            File logDirectory = new File(logsPath);
+            if (!logDirectory.exists()) {
+                if (logDirectory.mkdirs()) {
+                    throw new IOException("日志文件夹创建失败： " + logsPath);
+                }
+            }
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
         }
