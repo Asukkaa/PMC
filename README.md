@@ -4,7 +4,7 @@
 本项目是一个用 javafx 开发的自动操作工具。
 可以编辑自动操作流程或录制自动操作流程，支持导入导出自动操作流程，支持循环自动操作。
 自动流程文件为 .pmc 文件，本质为 json 文件，更改文件拓展名只为方便过滤可导入的文件。
-打包工具为 maven javafx:jlink 插件，使用 jdk 版本为 Amazon Corretto 21.0.6 。
+打包工具为 maven javafx:jlink 插件 + jpackage ，使用 jdk 版本为 Amazon Corretto 21.0.6 。
 
 ## 项目背景
 开发这个项目主要目的是为了 ios 手游自动操作，由于 ios 没有模拟器，目前通过 macOS 的 iPhone 连接手机，然后使用 macOS 的鼠标进行操作，也就可以通过自动操作工具来控制 iPhone 。
