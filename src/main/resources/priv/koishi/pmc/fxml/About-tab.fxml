@@ -35,13 +35,15 @@
 
         <Separator/>
 
-        <HBox spacing="50">
-            <Label prefHeight="25" text="git地址："/>
+        <Label prefHeight="25" text="git地址："/>
 
-            <Label prefHeight="25" text="gitHub地址："/>
+        <HBox spacing="10">
+            <Label prefHeight="25" text="gitHub地址:"/>
             <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" style="-fx-cursor: hand" text="点击查看本项目gitHub主页"/>
 
-            <Label prefHeight="25" text="gitee地址："/>
+            <Label prefWidth="100"/>
+
+            <Label prefHeight="25" text="gitee地址:"/>
             <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" style="-fx-cursor: hand" text="点击查看本项目gitee主页"/>
         </HBox>
 
