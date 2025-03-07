@@ -24,3 +24,5 @@ macOS下只能在应用程序文件夹下运行，且需要开启辅助操作权
 GitHub：https://github.com/Asukkaa/PMC
 
 Gitee：https://gitee.com/wowxqt/pmc
+
+'/Applications/Perfect Mouse Control.app/Contents/runtime/Contents/Home'
