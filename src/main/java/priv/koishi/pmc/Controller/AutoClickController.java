@@ -291,6 +291,8 @@ public class AutoClickController extends CommonProperties {
             prop.put(key_lastPreparationRecordTime, preparationRecordTime.getText());
             TextField preparationRunTime = (TextField) scene.lookup("#preparationRunTime_Click");
             prop.put(key_lastPreparationRunTime, preparationRunTime.getText());
+            Label outPath = (Label) scene.lookup("#outPath_Click");
+            prop.put(key_outFilePath, outPath.getText());
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
