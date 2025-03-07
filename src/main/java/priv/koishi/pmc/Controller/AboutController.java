@@ -35,9 +35,9 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class AboutController {
 
     /**
-     * 百度、夸克、迅雷、阿里网盘地址
+     * 百度、夸克、迅雷、阿里网盘地址、github、gitee主页地址
      */
-    private String baiduLink, quarkLink, xunleiLink;
+    private String baiduLink, quarkLink, xunleiLink, githubLink, giteeLink;
 
     @FXML
     private AnchorPane anchorPane_Abt;
@@ -52,7 +52,7 @@ public class AboutController {
     private Label logsPath_Abt, mail_Abt, version_Abt, title_Abt;
 
     @FXML
-    private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt;
+    private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt;
 
     /**
      * 组件自适应宽高
@@ -81,7 +81,9 @@ public class AboutController {
         // 获取网盘地址配置
         baiduLink = prop.getProperty(key_baiduLink);
         quarkLink = prop.getProperty(key_quarkLink);
+        giteeLink = prop.getProperty(key_giteeLink);
         xunleiLink = prop.getProperty(key_xunleiLink);
+        githubLink = prop.getProperty(key_githubLink);
         title_Abt.setTextFill(Color.HOTPINK);
         title_Abt.setText(prop.getProperty(key_appTitle));
         input.close();
@@ -149,6 +151,8 @@ public class AboutController {
     private void setToolTip() {
         // 给网盘跳转按钮添加鼠标悬停提示
         addToolTip(tip_openLink, openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
+        // 给github、gitee跳转按钮添加鼠标悬停提示
+        addToolTip(tip_openGitLink, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
         // 版本号鼠标悬停提示
         addToolTip(tip_version, version_Abt);
     }
@@ -202,6 +206,26 @@ public class AboutController {
     @FXML
     private void openXunleiLink() throws Exception {
         Desktop.getDesktop().browse(new URI(xunleiLink));
+    }
+
+    /**
+     * 打开GitHub链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openGitHubLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(githubLink));
+    }
+
+    /**
+     * 打开Gitee链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openGiteeLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(giteeLink));
     }
 
 }

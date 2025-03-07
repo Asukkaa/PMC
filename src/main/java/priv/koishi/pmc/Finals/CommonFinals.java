@@ -25,6 +25,8 @@ public class CommonFinals {
 
     public static final String tip_openLink = "点击即可跳转对应网盘分享页";
 
+    public static final String tip_openGitLink = "点击即可跳转对应 git 仓库";
+
     public static final String tip_wait = "每步操作执行前等待时间，单位为毫秒，只能填自然数，不填默认为 0";
 
     public static final String tip_mouseStartX = "鼠标点击位置起始横坐标，与结束位置横坐标不同则执行拖拽操作，只能填自然数，不填默认为 0";
@@ -182,6 +184,10 @@ public class CommonFinals {
     public static final String key_quarkLink = "quarkLink";
 
     public static final String key_xunleiLink = "xunleiLink";
+
+    public static final String key_githubLink = "githubLink";
+
+    public static final String key_giteeLink = "giteeLink";
 
     public static final String key_loadLastConfig = "loadLastConfig";
 
