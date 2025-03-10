@@ -36,7 +36,8 @@ public class SettingController {
     private VBox vBox_Set;
 
     @FXML
-    private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set;
+    private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
+            hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set;
 
     /**
      * 组件自适应宽高
@@ -118,8 +119,10 @@ public class SettingController {
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
         addToolTip(tip_firstClick, firstClick_Set);
+        addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_hideWindowRun, hideWindowRun_Set);
         addToolTip(tip_showWindowRun, showWindowRun_Set);
+        addToolTip(tip_floatingRecord, floatingRecord_Set);
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
     }
@@ -215,6 +218,26 @@ public class SettingController {
     @FXML
     private void loadFirstClickAction() throws IOException {
         setLoadLastConfigCheckBox(firstClick_Set, configFile_Click, key_lastFirstClick);
+    }
+
+    /**
+     * 执行自动流程时显示信息浮窗
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadFloatingRunAction() throws IOException {
+        setLoadLastConfigCheckBox(floatingRun_Set, configFile_Click, key_loadFloatingRun);
+    }
+
+    /**
+     * 录制自动流程时显示信息浮窗
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadFloatingRecordAction() throws IOException {
+        setLoadLastConfigCheckBox(floatingRecord_Set, configFile_Click, key_loadFloatingRecord);
     }
 
     /**

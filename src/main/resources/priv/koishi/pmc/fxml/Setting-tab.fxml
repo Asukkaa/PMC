@@ -6,7 +6,7 @@
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
     <VBox fx:id="vBox_Set" spacing="10" AnchorPane.topAnchor="10">
 
-        <Label prefHeight="25" text="功能设置："/>
+        <Label prefHeight="25" text="基础设置："/>
 
         <HBox spacing="10">
             <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction" styleClass="checkBox-setting-style"
@@ -17,23 +17,37 @@
 
             <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction" styleClass="checkBox-setting-style"
                       selected="true" text="自动操作工具 功能加载上次设置信息"/>
-
-            <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-setting-style"
-                      text="执行自动流程前点击第一个起始坐标"/>
         </HBox>
+
+        <Label prefHeight="25" text="功能设置："/>
 
         <HBox spacing="10">
             <CheckBox fx:id="hideWindowRun_Set" onAction="#loadHideWindowRunAction" styleClass="checkBox-setting-style"
-                      text="执行自动流程前最小化本程序" selected="true"/>
+                      text="运行自动流程前最小化本程序" selected="true"/>
 
             <CheckBox fx:id="showWindowRun_Set" onAction="#loadShowWindowRunAction" styleClass="checkBox-setting-style"
-                      text="执行自动流程结束后弹出本程序" selected="true"/>
+                      text="运行自动流程结束后弹出本程序" selected="true"/>
 
             <CheckBox fx:id="hideWindowRecord_Set" onAction="#loadHideWindowRecordAction" styleClass="checkBox-setting-style"
                       text="录制自动流程前最小化本程序" selected="true"/>
 
             <CheckBox fx:id="showWindowRecord_Set" onAction="#loadShowWindowRecordAction" styleClass="checkBox-setting-style"
                       text="录制自动流程结束后弹出本程序" selected="true"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-setting-style"
+                      text="运行自动流程前点击第一个起始坐标"/>
+        </HBox>
+
+        <Label prefHeight="25" text="浮窗设置："/>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction" styleClass="checkBox-setting-style"
+                      text="运行自动流程时显示信息浮窗" selected="true"/>
+
+            <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction" styleClass="checkBox-setting-style"
+                      text="录制自动流程时显示信息浮窗" selected="true"/>
         </HBox>
     </VBox>
 </AnchorPane>

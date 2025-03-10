@@ -413,7 +413,7 @@ public class AutoClickController extends CommonProperties {
      */
     private void initFloatingWindow() {
         double width = 550;
-        double height = 100;
+        double height = 110;
         // 创建一个矩形作为浮窗的内容
         Rectangle rectangle = new Rectangle(width, height);
         // 设置透明度
@@ -447,12 +447,18 @@ public class AutoClickController extends CommonProperties {
     /**
      * 显示浮窗
      */
-    private void showFloatingWindow() {
-        Platform.runLater(() -> {
-            if (floatingStage != null && !floatingStage.isShowing()) {
-                floatingStage.show();
-            }
-        });
+    private void showFloatingWindow(boolean isRun) {
+        Scene scene = anchorPane_Click.getScene();
+        CheckBox floatingRun = (CheckBox) scene.lookup("#floatingRun_Set");
+        CheckBox floatingRecord = (CheckBox) scene.lookup("#floatingRecord_Set");
+        boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
+        if (isShow) {
+            Platform.runLater(() -> {
+                if (floatingStage != null && !floatingStage.isShowing()) {
+                    floatingStage.show();
+                }
+            });
+        }
     }
 
     /**
@@ -550,11 +556,9 @@ public class AutoClickController extends CommonProperties {
                 int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
                 floatingLabel.setText(text_cancelTask + preparationTimeValue + text_run);
-                showFloatingWindow();
+                showFloatingWindow(true);
                 // 延时执行任务
-                runTimeline = executeTimeLineMission(preparationTimeValue);
-                // 启动 Timeline
-                runTimeline.play();
+                runTimeline = executeRunTimeLine(preparationTimeValue);
             }
         }
     }
@@ -563,8 +567,15 @@ public class AutoClickController extends CommonProperties {
      * 延时执行任务
      *
      * @param preparationTimeValue 准备时间
+     * @return runTimeline 运行时间线
      */
-    private Timeline executeTimeLineMission(int preparationTimeValue) {
+    private Timeline executeRunTimeLine(int preparationTimeValue) {
+        if (preparationTimeValue == 0) {
+            floatingLabel.setText(text_cancelTask + text_recordClicking);
+            // 使用新线程启动
+            executorService.execute(autoClickTask);
+            return runTimeline;
+        }
         runTimeline = new Timeline();
         AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
         // 创建 Timeline 来实现倒计时
@@ -584,6 +595,7 @@ public class AutoClickController extends CommonProperties {
         }));
         // 设置 Timeline 的循环次数
         runTimeline.setCycleCount(preparationTimeValue);
+        runTimeline.play();
         return runTimeline;
     }
 
@@ -764,7 +776,7 @@ public class AutoClickController extends CommonProperties {
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
                     // 仅在自动操作与录制情况下才监听键盘
-                    if (autoClickTask != null && autoClickTask.isRunning() || recordTimeline != null || runTimeline != null) {
+                    if (autoClickTask != null && autoClickTask.isRunning() || recordTimeline != null || runTimeline != null || recordClicking) {
                         // 检测快捷键 esc
                         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
                             // 停止自动操作
@@ -1159,35 +1171,44 @@ public class AutoClickController extends CommonProperties {
             if (hideWindowRecord.isSelected()) {
                 stage.setIconified(true);
             }
-            // 开启键盘监听
+            // 开启键盘监听0
             startNativeKeyListener();
             // 设置浮窗文本显示准备时间
             floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
             // 显示浮窗
-            showFloatingWindow();
-            recordTimeline = new Timeline();
-            AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
-            // 创建 Timeline 来实现倒计时
-            Timeline finalTimeline = recordTimeline;
-            recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-                preparationTime.getAndDecrement();
-                if (preparationTime.get() > 0) {
-                    floatingLabel.setText(text_cancelTask + preparationTime + text_preparation);
-                } else {
-                    // 开启鼠标监听
-                    startNativeMouseListener();
-                    // 录制开始时间
-                    recordingStartTime = System.currentTimeMillis();
-                    // 停止 Timeline
-                    finalTimeline.stop();
-                    // 更新浮窗文本
-                    floatingLabel.setText(text_cancelTask + text_recordClicking);
-                }
-            }));
-            // 设置 Timeline 的循环次数
-            recordTimeline.setCycleCount(preparationTimeValue);
-            // 启动 Timeline
-            recordTimeline.play();
+            showFloatingWindow(false);
+            if (preparationTimeValue == 0) {
+                // 开启鼠标监听
+                startNativeMouseListener();
+                // 录制开始时间
+                recordingStartTime = System.currentTimeMillis();
+                // 更新浮窗文本
+                floatingLabel.setText(text_cancelTask + text_recordClicking);
+            } else {
+                recordTimeline = new Timeline();
+                AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
+                // 创建 Timeline 来实现倒计时
+                Timeline finalTimeline = recordTimeline;
+                recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                    preparationTime.getAndDecrement();
+                    if (preparationTime.get() > 0) {
+                        floatingLabel.setText(text_cancelTask + preparationTime + text_preparation);
+                    } else {
+                        // 开启鼠标监听
+                        startNativeMouseListener();
+                        // 录制开始时间
+                        recordingStartTime = System.currentTimeMillis();
+                        // 停止 Timeline
+                        finalTimeline.stop();
+                        // 更新浮窗文本
+                        floatingLabel.setText(text_cancelTask + text_recordClicking);
+                    }
+                }));
+                // 设置 Timeline 的循环次数
+                recordTimeline.setCycleCount(preparationTimeValue);
+                // 启动 Timeline
+                recordTimeline.play();
+            }
         }
     }
 

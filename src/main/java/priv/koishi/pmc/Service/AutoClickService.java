@@ -96,8 +96,8 @@ public class AutoClickService {
                     String clickNum = clickPositionBean.getClickNum();
                     Platform.runLater(() -> {
                         String text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                "\n操作内容：" + clickPositionBean.getType() + " X：" + startX + " Y：" + startY + " 在 " +
-                                clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
+                                "\n操作内容：" + clickPositionBean.getType() + " X：" + startX + " Y：" + startY +
+                                "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
                                 "\n每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒，共 " + clickNum + " 次";
                         updateMessage(text);
                         floatingLabel.setText(text_cancelTask + text);

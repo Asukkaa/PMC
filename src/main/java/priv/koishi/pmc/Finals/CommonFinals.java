@@ -73,6 +73,10 @@ public class CommonFinals {
 
     public static final String tip_preparationRunTime = "在运行自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为 ";
 
+    public static final String tip_floatingRun = "勾选后在运行自动操作时将会显示一个运行信息浮窗";
+
+    public static final String tip_floatingRecord = "勾选后在录制自动操作时将会显示一个录制信息浮窗";
+
     public static final String tip_recordClick = """
             点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
             每次鼠标点击并松开为一个步骤，每次点击间隔为操作前等待时间""";
@@ -90,7 +94,7 @@ public class CommonFinals {
             Windows 会直接点击对应窗口的对应坐标，macOS 需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标""";
 
     public static final String tip_version = """
-            version：1.0.0
+            version：1.1.0
             2025年3月构建""";
 
     public static final String text_selectDirectory = "选择文件夹";
@@ -149,7 +153,7 @@ public class CommonFinals {
 
     public static final String text_taskCancelled = "任务已取消";
 
-    public static final String text_taskFinished = "所有操作都以执行完毕";
+    public static final String text_taskFinished = "所有操作都已执行完毕";
 
     public static final String text_isAdd = " (添加)";
 
@@ -232,6 +236,10 @@ public class CommonFinals {
     public static final String key_lastHideWindowRecord = "lastHideWindowRecord";
 
     public static final String key_lastShowWindowRecord = "lastShowWindowRecord";
+
+    public static final String key_loadFloatingRun = "lastFloatingRun";
+
+    public static final String key_loadFloatingRecord = "lastFloatingRecord";
 
     public static final String key_defaultOutFileName = "defaultOutFileName";
 
