@@ -86,10 +86,10 @@ public class AutoClickService {
                 for (int j = 0; j < dataSize; j++) {
                     updateProgress(j + 1, dataSize);
                     ClickPositionBean clickPositionBean = tableViewItems.get(j);
-                    double startX = Double.parseDouble(clickPositionBean.getStartX());
-                    double startY = Double.parseDouble(clickPositionBean.getStartY());
-                    double endX = Double.parseDouble(clickPositionBean.getEndX());
-                    double endY = Double.parseDouble(clickPositionBean.getEndY());
+                    int startX = Integer.parseInt((clickPositionBean.getStartX()));
+                    int startY = Integer.parseInt((clickPositionBean.getStartY()));
+                    int endX = Integer.parseInt((clickPositionBean.getEndX()));
+                    int endY = Integer.parseInt((clickPositionBean.getEndY()));
                     String waitTime = clickPositionBean.getWaitTime();
                     String clickTime = clickPositionBean.getClickTime();
                     String name = clickPositionBean.getName();

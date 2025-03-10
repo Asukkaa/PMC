@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
@@ -17,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -31,6 +31,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -54,7 +55,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
-import static priv.koishi.pmc.Utils.CommonUtils.*;
+import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -92,6 +93,31 @@ public class AutoClickController extends CommonProperties {
      * 默认运行准备时间
      */
     private static String defaultPreparationRunTime;
+
+    /**
+     * 浮窗X坐标
+     */
+    int floatingX;
+
+    /**
+     * 浮窗Y坐标
+     */
+    int floatingY;
+
+    /**
+     * 浮窗距离屏幕的边距
+     */
+    int margin;
+
+    /**
+     * 浮窗宽度
+     */
+    int floatingWidth;
+
+    /**
+     * 浮窗高度
+     */
+    int floatingHeight;
 
     /**
      * 要防重复点击的组件
@@ -340,9 +366,17 @@ public class AutoClickController extends CommonProperties {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
+        String marginStr = prop.getProperty(key_margin);
+        if (StringUtils.isNotBlank(marginStr)) {
+            margin = Integer.parseInt(marginStr);
+        }
         inFilePath = prop.getProperty(key_inFilePath);
         outFilePath = prop.getProperty(key_outFilePath);
         defaultOutFileName = prop.getProperty(key_defaultOutFileName);
+        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
+        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
+        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
+        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
         defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
         defaultPreparationRecordTime = prop.getProperty(key_defaultPreparationRecordTime);
         input.close();
@@ -413,10 +447,11 @@ public class AutoClickController extends CommonProperties {
      * 初始化浮窗
      */
     private void initFloatingWindow() {
-        double width = 550;
-        double height = 110;
+        // 获取主屏幕信息（初始位置用）
+        Screen primaryScreen = Screen.getPrimary();
+        Rectangle2D primaryBounds = primaryScreen.getBounds();
         // 创建一个矩形作为浮窗的内容
-        Rectangle rectangle = new Rectangle(width, height);
+        Rectangle rectangle = new Rectangle(floatingWidth, floatingHeight);
         // 设置透明度
         rectangle.setOpacity(0);
         StackPane root = new StackPane();
@@ -437,16 +472,15 @@ public class AutoClickController extends CommonProperties {
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
-        // 设置浮窗的位置在屏幕最上方正中间
-        java.awt.Rectangle screenBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-        double x = (screenBounds.getWidth() - width) / 2;
-        double y = 0;
-        floatingStage.setX(x);
-        floatingStage.setY(y);
+        // 初始位置设置在主屏幕顶部居中
+        floatingStage.setX(primaryBounds.getMinX() + (primaryBounds.getWidth() - floatingWidth) / 2);
+        floatingStage.setY(primaryBounds.getMinY() - margin);
     }
 
     /**
      * 显示浮窗
+     *
+     * @param isRun 是否为运行自动操作
      */
     private void showFloatingWindow(boolean isRun) {
         Scene scene = anchorPane_Click.getScene();
@@ -455,6 +489,8 @@ public class AutoClickController extends CommonProperties {
         Color color = colorPicker.getValue();
         floatingLabel.setTextFill(color);
         floatingMousePosition.setTextFill(color);
+        floatingStage.setX(floatingX);
+        floatingStage.setY(floatingY);
         // 获取浮窗的显示设置
         CheckBox floatingRun = (CheckBox) scene.lookup("#floatingRun_Set");
         CheckBox floatingRecord = (CheckBox) scene.lookup("#floatingRecord_Set");
@@ -963,18 +999,17 @@ public class AutoClickController extends CommonProperties {
      * 页面初始化
      *
      * @throws IOException         配置文件读取失败
-     * @throws NativeHookException 注册全局输入监听器失败
      */
     @FXML
-    private void initialize() throws IOException, NativeHookException {
-        // 初始化浮窗
-        initFloatingWindow();
+    private void initialize() throws IOException {
         // 获取鼠标坐标监听器
         moussePositionListener();
         // 设置javafx单元格宽度
         bindPrefWidthProperty();
         // 读取配置文件
         getConfig();
+        // 初始化浮窗
+        initFloatingWindow();
         // 设置要防重复点击的组件
         setDisableControls();
         // 设置鼠标悬停提示
@@ -983,8 +1018,6 @@ public class AutoClickController extends CommonProperties {
         textFieldChangeListener();
         // 设置初始配置值为上次配置值
         setLastConfig();
-        // 注册全局输入监听器
-        GlobalScreen.registerNativeHook();
     }
 
     /**

@@ -16,6 +16,7 @@ import static priv.koishi.pmc.Controller.AboutController.saveLogsNumSetting;
 import static priv.koishi.pmc.Controller.AutoClickController.autoClickAdaption;
 import static priv.koishi.pmc.Controller.AutoClickController.autoClickSaveLastConfig;
 import static priv.koishi.pmc.Controller.SettingController.settingAdaption;
+import static priv.koishi.pmc.Controller.SettingController.settingSaveLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
@@ -59,6 +60,8 @@ public class MainController {
         Scene scene = stage.getScene();
         // 保存自动操作工具功能最后设置
         autoClickSaveLastConfig(scene);
+        // 保存设置功能最后设置
+        settingSaveLastConfig(scene);
         // 保存关程序闭前页面状态设置
         mainSavaLastConfig(stage);
         // 保存日志文件数量设置

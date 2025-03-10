@@ -19,6 +19,8 @@
                       selected="true" text="自动操作工具 功能加载上次设置信息"/>
         </HBox>
 
+        <Separator/>
+
         <Label prefHeight="25" text="功能设置："/>
 
         <HBox spacing="10">
@@ -40,6 +42,8 @@
                       text="运行自动流程前点击第一个起始坐标"/>
         </HBox>
 
+        <Separator/>
+
         <Label prefHeight="25" text="浮窗设置："/>
 
         <HBox spacing="10">
@@ -51,8 +55,15 @@
         </HBox>
 
         <HBox spacing="10">
-            <Label prefHeight="25" text="浮窗字体颜色："/>
+            <Label prefHeight="25" text="浮窗字体颜色:"/>
             <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#loadColorAction"/>
+
+            <Label prefWidth="30"/>
+            <Label prefHeight="25" text="浮窗离屏幕边界距离:"/>
+            <TextField fx:id="floatingDistance_Set" prefWidth="50"/>
+
+            <Label prefWidth="30"/>
+            <Button fx:id="setFloatingCoordinate_Set" onAction="#setFloatingCoordinate" style="-fx-cursor: hand" text="设置浮窗位置"/>
         </HBox>
     </VBox>
 </AnchorPane>

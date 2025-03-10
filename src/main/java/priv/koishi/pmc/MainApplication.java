@@ -55,8 +55,7 @@ public class MainApplication extends Application {
      * 加载fxml页面
      *
      * @param stage 程序主舞台
-     * @throws RuntimeException io异常
-     * @throws Exception        io异常
+     * @throws Exception        io异常、设置全局异常处理器异常
      */
     @Override
     public void start(Stage stage) throws Exception {
@@ -90,6 +89,8 @@ public class MainApplication extends Application {
         stage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
         // 监听窗口面板高度变化
         stage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
+        // 注册全局输入监听器
+        GlobalScreen.registerNativeHook();
         stage.show();
     }
 
