@@ -251,6 +251,10 @@ public class CommonFinals {
 
     public static final String key_defaultPreparationRunTime = "defaultPreparationRunTime";
 
+    public static final String key_lastFloatingTextColor = "lastFloatingTextColor";
+
+    public static final String key_lastColorCustom = "lastColorCustom";
+
     /**
      * 资源文件夹地址前缀
      */

@@ -49,5 +49,10 @@
             <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction" styleClass="checkBox-setting-style"
                       text="录制自动流程时显示信息浮窗" selected="true"/>
         </HBox>
+
+        <HBox spacing="10">
+            <Label prefHeight="25" text="浮窗字体颜色："/>
+            <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#loadColorAction"/>
+        </HBox>
     </VBox>
 </AnchorPane>

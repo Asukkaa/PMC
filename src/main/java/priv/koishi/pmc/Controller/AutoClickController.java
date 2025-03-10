@@ -26,10 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
@@ -188,16 +185,20 @@ public class AutoClickController extends CommonProperties {
     private CheckBox openDirectory_Click;
 
     @FXML
-    private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click, exportAutoClick_Click, addOutPath_Click, recordClick_Click;
+    private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
+            exportAutoClick_Click, addOutPath_Click, recordClick_Click;
 
     @FXML
-    private TextField mouseStartX_Click, mouseStartY_Click, mouseEndX_Click, mouseEndY_Click, wait_Click, loopTime_Click, clickNumBer_Click, timeClick_Click, clickName_Click, interval_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
+    private TextField mouseStartX_Click, mouseStartY_Click, mouseEndX_Click, mouseEndY_Click, wait_Click,
+            loopTime_Click, clickNumBer_Click, timeClick_Click, clickName_Click, interval_Click, outFileName_Click,
+            preparationRecordTime_Click, preparationRunTime_Click;
 
     @FXML
     private TableView<ClickPositionBean> tableView_Click;
 
     @FXML
-    private TableColumn<ClickPositionBean, String> name_Click, startX_Click, startY_Click, endX_Click, endY_Click, clickTime_Click, clickNum_Click, clickInterval_Click, waitTime_Click, type_Click;
+    private TableColumn<ClickPositionBean, String> name_Click, startX_Click, startY_Click, endX_Click, endY_Click,
+            clickTime_Click, clickNum_Click, clickInterval_Click, waitTime_Click, type_Click;
 
     /**
      * 组件自适应宽高
@@ -417,9 +418,9 @@ public class AutoClickController extends CommonProperties {
         // 创建一个矩形作为浮窗的内容
         Rectangle rectangle = new Rectangle(width, height);
         // 设置透明度
-        rectangle.setOpacity(0.0);
+        rectangle.setOpacity(0);
         StackPane root = new StackPane();
-        root.setStyle("-fx-background-color: transparent");
+        root.setBackground(Background.fill(Color.TRANSPARENT));
         Color labelTextFill = Color.WHITE;
         floatingLabel = new Label(text_cancelTask);
         floatingLabel.setTextFill(labelTextFill);
@@ -449,6 +450,12 @@ public class AutoClickController extends CommonProperties {
      */
     private void showFloatingWindow(boolean isRun) {
         Scene scene = anchorPane_Click.getScene();
+        // 获取浮窗的文本颜色设置
+        ColorPicker colorPicker = (ColorPicker) scene.lookup("#colorPicker_Set");
+        Color color = colorPicker.getValue();
+        floatingLabel.setTextFill(color);
+        floatingMousePosition.setTextFill(color);
+        // 获取浮窗的显示设置
         CheckBox floatingRun = (CheckBox) scene.lookup("#floatingRun_Set");
         CheckBox floatingRecord = (CheckBox) scene.lookup("#floatingRecord_Set");
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();

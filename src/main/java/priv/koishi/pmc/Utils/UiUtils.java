@@ -623,6 +623,28 @@ public class UiUtils {
     }
 
     /**
+     * 为颜色选择器设置上次配置值
+     *
+     * @param colorPicker    颜色选择器
+     * @param prop           配置文件
+     * @param colorKey       选中的颜色key
+     * @param colorCustomKey 保存的自定义颜色key
+     */
+    public static void setColorPickerConfig(ColorPicker colorPicker, Properties prop, String colorKey, String colorCustomKey) {
+        String selectColor = prop.getProperty(colorKey);
+        if (StringUtils.isNotBlank(selectColor)) {
+            colorPicker.setValue(Color.web(selectColor));
+        }
+        String colorCustom = prop.getProperty(colorCustomKey);
+        if (StringUtils.isNotBlank(colorCustom)) {
+            String[] colors = colorCustom.split(" ");
+            for (String color : colors) {
+                colorPicker.getCustomColors().add(Color.web(color));
+            }
+        }
+    }
+
+    /**
      * 显示可打开的文件类路径
      *
      * @param pathLabel  文件路径文本栏

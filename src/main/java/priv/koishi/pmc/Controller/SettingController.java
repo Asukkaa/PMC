@@ -1,24 +1,26 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 设置页面控制器
@@ -34,6 +36,9 @@ public class SettingController {
 
     @FXML
     private VBox vBox_Set;
+
+    @FXML
+    private ColorPicker colorPicker_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
@@ -98,6 +103,7 @@ public class SettingController {
         prop.load(input);
         setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, false, null);
         setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, false, null);
+        setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         input.close();
     }
 
@@ -128,6 +134,29 @@ public class SettingController {
     }
 
     /**
+     * 监听并保存颜色选择器自定义颜色
+     */
+    private void setCustomColorsListener() {
+        // 监听 customColors 的变化
+        colorPicker_Set.getCustomColors().addListener((ListChangeListener<Color>) change -> {
+            while (change.next()) {
+                if (change.wasAdded() || change.wasRemoved() || change.wasUpdated()) {
+                    // 保存自定义颜色
+                    ObservableList<Color> customColors = colorPicker_Set.getCustomColors();
+                    StringBuilder colorsString = new StringBuilder();
+                    customColors.forEach(color -> colorsString.append(color.toString()).append(" "));
+                    String result = colorsString.toString().trim();
+                    try {
+                        updateProperties(configFile_Click, key_lastColorCustom, result);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
@@ -136,6 +165,8 @@ public class SettingController {
     private void initialize() throws IOException {
         // 设置是否加载最后一次功能配置信息初始值
         setLoadLastConfigs();
+        // 监听并保存颜色选择器自定义颜色
+        setCustomColorsListener();
         // 设置鼠标悬停提示
         setToolTip();
     }
@@ -265,20 +296,10 @@ public class SettingController {
         }
     }
 
-    /**
-     * 文件查询默认排序设置监听
-     *
-     * @throws IOException io异常
-     */
     @FXML
-    private void sortAction() throws IOException {
-        InputStream input = checkRunningInputStream(configFile);
-        Properties prop = new Properties();
-        prop.load(input);
-        OutputStream output = checkRunningOutputStream(configFile);
-        prop.store(output, null);
-        input.close();
-        output.close();
+    private void loadColorAction() throws IOException {
+        // 保存选择的颜色
+        updateProperties(configFile_Click, key_lastFloatingTextColor, String.valueOf(colorPicker_Set.getValue()));
     }
 
 }
