@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
@@ -238,36 +239,28 @@ public class SettingController {
      * 开启全局键盘监听
      */
     private void startNativeKeyListener() {
-        stopNativeKeyListener();
+        removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
-                    // 检测快捷键 esc
-                    if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-                        System.out.println("esc");
-                        hideFloatingWindow();
-                        try {
-                            saveFloatingCoordinate();
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
+                    if (floatingStage != null && floatingStage.isShowing()) {
+                        // 检测快捷键 esc
+                        if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                            hideFloatingWindow();
+                            try {
+                                saveFloatingCoordinate();
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
+                        removeNativeListener(nativeKeyListener);
                     }
                 });
             }
         };
         GlobalScreen.addNativeKeyListener(nativeKeyListener);
-    }
-
-    /**
-     * 移除键盘监听器
-     */
-    private void stopNativeKeyListener() {
-        if (nativeKeyListener != null) {
-            GlobalScreen.removeNativeKeyListener(nativeKeyListener);
-            nativeKeyListener = null;
-        }
     }
 
     /**

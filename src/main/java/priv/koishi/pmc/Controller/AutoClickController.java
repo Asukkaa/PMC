@@ -56,6 +56,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
+import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -557,7 +558,7 @@ public class AutoClickController extends CommonProperties {
                     showStage(stage);
                 }
                 // 移除键盘监听器
-                stopNativeKeyListener();
+                removeNativeListener(nativeKeyListener);
                 autoClickTask = null;
                 runTimeline = null;
             });
@@ -569,7 +570,7 @@ public class AutoClickController extends CommonProperties {
                     showStage(stage);
                 }
                 // 移除键盘监听器
-                stopNativeKeyListener();
+                removeNativeListener(nativeKeyListener);
                 // 移除开始前的倒计时
                 if (runTimeline != null) {
                     runTimeline.stop();
@@ -588,7 +589,7 @@ public class AutoClickController extends CommonProperties {
                     showStage(stage);
                 }
                 // 移除键盘监听器
-                stopNativeKeyListener();
+                removeNativeListener(nativeKeyListener);
                 autoClickTask = null;
                 runTimeline = null;
             });
@@ -812,7 +813,7 @@ public class AutoClickController extends CommonProperties {
      * 开启全局键盘监听
      */
     private void startNativeKeyListener() {
-        stopNativeKeyListener();
+        removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
             @Override
@@ -848,7 +849,7 @@ public class AutoClickController extends CommonProperties {
                             // 改变要防重复点击的组件状态
                             changeDisableControls(disableControls, false);
                             // 移除鼠标监听器
-                            stopNativeMouseListener();
+                            removeNativeListener(nativeMouseListener);
                             hideFloatingWindow();
                             recordClicking = false;
                             Scene scene = anchorPane_Click.getScene();
@@ -857,6 +858,7 @@ public class AutoClickController extends CommonProperties {
                             if (showWindowRecord.isSelected()) {
                                 showStage(stage);
                             }
+                            removeNativeListener(nativeKeyListener);
                         }
                     }
                 });
@@ -878,20 +880,10 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
-     * 移除键盘监听器
-     */
-    private void stopNativeKeyListener() {
-        if (nativeKeyListener != null) {
-            GlobalScreen.removeNativeKeyListener(nativeKeyListener);
-            nativeKeyListener = null;
-        }
-    }
-
-    /**
      * 开启全局鼠标监听
      */
     private void startNativeMouseListener() {
-        stopNativeMouseListener();
+        removeNativeListener(nativeMouseListener);
         // 鼠标监听器
         nativeMouseListener = new NativeMouseListener() {
             // 记录点击时刻
@@ -970,16 +962,6 @@ public class AutoClickController extends CommonProperties {
             }
         };
         GlobalScreen.addNativeMouseListener(nativeMouseListener);
-    }
-
-    /**
-     * 移除鼠标监听器
-     */
-    private void stopNativeMouseListener() {
-        if (nativeMouseListener != null) {
-            GlobalScreen.removeNativeMouseListener(nativeMouseListener);
-            nativeMouseListener = null;
-        }
     }
 
     /**

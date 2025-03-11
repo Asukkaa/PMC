@@ -1,9 +1,13 @@
 package priv.koishi.pmc.Utils;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.EventListener;
 import java.util.regex.Pattern;
 
 /**
@@ -12,7 +16,6 @@ import java.util.regex.Pattern;
  * Time:下午1:14
  */
 public class CommonUtils {
-
 
 
     /**
@@ -66,6 +69,21 @@ public class CommonUtils {
         pw.flush();
         sw.flush();
         return sw.toString();
+    }
+
+    /**
+     * 移除全局输入监听
+     *
+     * @param listener 要移除的监听器
+     */
+    public static void removeNativeListener(EventListener listener) {
+        if (listener != null) {
+            if (listener instanceof NativeMouseListener) {
+                GlobalScreen.removeNativeMouseListener((NativeMouseListener) listener);
+            } else if (listener instanceof NativeKeyListener) {
+                GlobalScreen.removeNativeKeyListener((NativeKeyListener) listener);
+            }
+        }
     }
 
 }
