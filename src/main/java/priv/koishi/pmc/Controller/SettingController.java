@@ -246,6 +246,7 @@ public class SettingController {
                 Platform.runLater(() -> {
                     // 检测快捷键 esc
                     if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                        System.out.println("esc");
                         hideFloatingWindow();
                         try {
                             saveFloatingCoordinate();
@@ -280,22 +281,6 @@ public class SettingController {
     }
 
     /**
-     * 根据是否加载最后一次功能选项框选择值更新相关配置文件
-     *
-     * @param checkBox   更改配置的选项框
-     * @param configFile 要更新的配置文件相对路径
-     * @param key        要更新的配置
-     * @throws IOException io异常
-     */
-    private void setLoadLastConfigCheckBox(CheckBox checkBox, String configFile, String key) throws IOException {
-        if (checkBox.isSelected()) {
-            updateProperties(configFile, key, activation);
-        } else {
-            updateProperties(configFile, key, unActivation);
-        }
-    }
-
-    /**
      * 读取配置文件
      *
      * @throws IOException io异常
@@ -304,8 +289,8 @@ public class SettingController {
         Properties prop = new Properties();
         InputStream configFileInput = checkRunningInputStream(configFile);
         prop.load(configFileInput);
-        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, false, null);
-        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, false, null);
+        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig);
+        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow);
         setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
@@ -318,15 +303,15 @@ public class SettingController {
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
         floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
-        setControlLastConfig(floatingDistance_Set, prop, key_margin, false, null);
-        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, false, null);
-        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, false, null);
-        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, false, null);
-        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, false, null);
-        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, false, null);
-        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, false, null);
-        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, false, null);
-        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, false, null);
+        setControlLastConfig(floatingDistance_Set, prop, key_margin);
+        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
+        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
+        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig);
+        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun);
+        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun);
+        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord);
+        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
+        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
         clickFileInput.close();
     }
 

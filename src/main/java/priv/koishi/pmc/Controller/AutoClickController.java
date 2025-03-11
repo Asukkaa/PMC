@@ -337,22 +337,22 @@ public class AutoClickController extends CommonProperties {
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig))) {
-            setControlLastConfig(wait_Click, prop, key_lastWait, false, null);
-            setControlLastConfig(outPath_Click, prop, key_outFilePath, false, anchorPane_Click);
-            setControlLastConfig(interval_Click, prop, key_lastInterval, false, null);
-            setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, false, null);
-            setControlLastConfig(clickName_Click, prop, key_lastClickName, true, null);
-            setControlLastConfig(mouseEndX_Click, prop, key_lastMouseEndX, false, null);
-            setControlLastConfig(mouseEndY_Click, prop, key_lastMouseEndY, false, null);
-            setControlLastConfig(timeClick_Click, prop, key_lastTimeClick, false, null);
-            setControlLastConfig(clickType_Click, prop, key_lastClickType, false, null);
-            setControlLastConfig(mouseStartX_Click, prop, key_lastMouseStartX, false, null);
-            setControlLastConfig(mouseStartY_Click, prop, key_lastMouseStartY, false, null);
-            setControlLastConfig(clickNumBer_Click, prop, key_lastClickNumBer, false, null);
-            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, false, null);
-            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, false, null);
-            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, false, null);
-            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, false, null);
+            setControlLastConfig(wait_Click, prop, key_lastWait);
+            setControlLastConfig(interval_Click, prop, key_lastInterval);
+            setControlLastConfig(loopTime_Click, prop, key_lastLoopTime);
+            setControlLastConfig(mouseEndX_Click, prop, key_lastMouseEndX);
+            setControlLastConfig(mouseEndY_Click, prop, key_lastMouseEndY);
+            setControlLastConfig(timeClick_Click, prop, key_lastTimeClick);
+            setControlLastConfig(clickType_Click, prop, key_lastClickType);
+            setControlLastConfig(mouseStartX_Click, prop, key_lastMouseStartX);
+            setControlLastConfig(mouseStartY_Click, prop, key_lastMouseStartY);
+            setControlLastConfig(clickNumBer_Click, prop, key_lastClickNumBer);
+            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName);
+            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory);
+            setControlLastConfig(outPath_Click, prop, key_outFilePath, anchorPane_Click);
+            setControlLastConfig(clickName_Click, prop, key_lastClickName, true);
+            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime);
+            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime);
         }
         input.close();
     }
@@ -998,7 +998,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 页面初始化
      *
-     * @throws IOException         配置文件读取失败
+     * @throws IOException 配置文件读取失败
      */
     @FXML
     private void initialize() throws IOException {

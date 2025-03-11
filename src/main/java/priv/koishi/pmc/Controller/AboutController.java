@@ -77,7 +77,7 @@ public class AboutController {
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
         // 获取日志储存数量配置
-        setControlLastConfig(logsNum_Abt, prop, key_logsNum, false, null);
+        setControlLastConfig(logsNum_Abt, prop, key_logsNum);
         // 获取网盘地址配置
         baiduLink = prop.getProperty(key_baiduLink);
         quarkLink = prop.getProperty(key_quarkLink);

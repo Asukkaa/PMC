@@ -591,14 +591,12 @@ public class UiUtils {
     /**
      * 为配置组件设置上次配置值
      *
-     * @param control    需要处理的组件
-     * @param prop       配置文件
-     * @param key        要读取的key
-     * @param canBlank   组件所填文本是否可为空格，ture可填写空格，false不可填写空格
-     * @param anchorPane 组件所在布局
+     * @param control 需要处理的组件
+     * @param prop    配置文件
+     * @param key     要读取的key
      */
     @SuppressWarnings("unchecked")
-    public static void setControlLastConfig(Control control, Properties prop, String key, boolean canBlank, AnchorPane anchorPane) {
+    public static void setControlLastConfig(Control control, Properties prop, String key) {
         String lastValue = prop.getProperty(key);
         if (StringUtils.isNotBlank(lastValue)) {
             if (control instanceof ChoiceBox) {
@@ -607,18 +605,40 @@ public class UiUtils {
             } else if (control instanceof CheckBox checkBox) {
                 checkBox.setSelected(activation.equals(lastValue));
             } else if (control instanceof Label label) {
-                if (isValidPath(lastValue)) {
-                    setPathLabel(label, lastValue, false, anchorPane);
-                } else {
-                    label.setText(lastValue);
-                }
+                label.setText(lastValue);
             } else if (control instanceof TextField textField) {
                 textField.setText(lastValue);
             }
-        } else if (StringUtils.isNotEmpty(lastValue) && canBlank) {
-            if (control instanceof TextField textField) {
-                textField.setText(lastValue);
-            }
+        }
+    }
+
+    /**
+     * 为路径文本框设置上次配置值
+     *
+     * @param label      需要处理的文本框
+     * @param prop       配置文件
+     * @param key        要读取的key
+     * @param anchorPane 组件所在布局
+     */
+    public static void setControlLastConfig(Label label, Properties prop, String key, AnchorPane anchorPane) {
+        String lastValue = prop.getProperty(key);
+        if (isValidPath(lastValue)) {
+            setPathLabel(label, lastValue, false, anchorPane);
+        }
+    }
+
+    /**
+     * 为输入框设置上次配置值
+     *
+     * @param textField 需要处理的输入框
+     * @param prop      配置文件
+     * @param key       要读取的key
+     * @param canBlank  组件所填文本是否可为空格，ture可填写空格，false不可填写空格
+     */
+    public static void setControlLastConfig(TextField textField, Properties prop, String key, boolean canBlank) {
+        String lastValue = prop.getProperty(key);
+        if (StringUtils.isNotEmpty(lastValue) && canBlank) {
+            textField.setText(lastValue);
         }
     }
 
@@ -812,6 +832,22 @@ public class UiUtils {
             }
         }
         control.setPrefWidth(prefWidth);
+    }
+
+    /**
+     * 保存多选框选择设置
+     *
+     * @param checkBox   更改配置的选项框
+     * @param configFile 要更新的配置文件相对路径
+     * @param key        要更新的配置
+     * @throws IOException io异常
+     */
+    public static void setLoadLastConfigCheckBox(CheckBox checkBox, String configFile, String key) throws IOException {
+        if (checkBox.isSelected()) {
+            updateProperties(configFile, key, activation);
+        } else {
+            updateProperties(configFile, key, unActivation);
+        }
     }
 
 }
