@@ -3,6 +3,7 @@ package priv.koishi.pmc.Controller;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -10,6 +11,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -20,8 +24,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +36,6 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -46,27 +49,22 @@ public class SettingController {
     /**
      * 浮窗X坐标
      */
-    int floatingX;
+    private int floatingX;
 
     /**
      * 浮窗Y坐标
      */
-    int floatingY;
-
-    /**
-     * 浮窗距离屏幕的边距
-     */
-    int margin;
+    private int floatingY;
 
     /**
      * 浮窗宽度
      */
-    int floatingWidth;
+    private int floatingWidth;
 
     /**
      * 浮窗高度
      */
-    int floatingHeight;
+    private int floatingHeight;
 
     /**
      * 浮窗Stage
@@ -93,14 +91,15 @@ public class SettingController {
     private ColorPicker colorPicker_Set;
 
     @FXML
-    private TextField floatingDistance_Set;
-
-    @FXML
     private Button setFloatingCoordinate_Set;
 
     @FXML
+    private TextField floatingDistance_Set, offsetX_Set, offsetY_Set;
+
+    @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
-            hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set;
+            hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
+            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set;
 
     /**
      * 组件自适应宽高
@@ -150,6 +149,7 @@ public class SettingController {
         StackPane root = new StackPane();
         root.setBackground(Background.fill(Color.TRANSPARENT));
         root.setStyle("-fx-cursor: hand");
+        int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
         // 添加拖拽事件处理器
         final double[] xOffset = new double[1];
         final double[] yOffset = new double[1];
@@ -160,7 +160,7 @@ public class SettingController {
         });
         root.setOnMouseDragged(event -> {
             // 获取当前所在屏幕
-            Screen currentScreen = getCurrentScreen();
+            Screen currentScreen = getCurrentScreen(floatingStage);
             Rectangle2D screenBounds = currentScreen.getBounds();
             // 计算新坐标
             double newX = event.getScreenX() - xOffset[0];
@@ -192,35 +192,54 @@ public class SettingController {
     }
 
     /**
-     * 获取当前所在屏幕
-     *
-     * @return 当前所在屏幕
+     * 获取鼠标坐标
      */
-    private Screen getCurrentScreen() {
-        for (Screen screen : Screen.getScreens()) {
-            Rectangle2D bounds = screen.getBounds();
-            if (bounds.contains(floatingStage.getX(), floatingStage.getY())) {
-                return screen;
+    private void getNowMousePosition() {
+        // 使用java.awt.MouseInfo获取鼠标的全局位置
+        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+        Platform.runLater(() -> {
+            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
+                int offsetX = setDefaultIntValue(offsetX_Set, 30, null, null);
+                int offsetY = setDefaultIntValue(offsetY_Set, 30, null, null);
+                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
             }
-        }
-        // 默认返回主屏幕
-        return Screen.getPrimary();
+        });
+    }
+
+    /**
+     * 获取鼠标坐标监听器
+     */
+    private void moussePositionListener() {
+        // 启动定时器，实时获取鼠标位置
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                getNowMousePosition();
+            }
+        };
+        timer.start();
     }
 
     /**
      * 显示浮窗
      */
     private void showFloatingWindow() {
-        Scene scene = anchorPane_Set.getScene();
-        // 获取浮窗的文本颜色设置
-        ColorPicker colorPicker = (ColorPicker) scene.lookup("#colorPicker_Set");
-        floatingLabel.setTextFill(colorPicker.getValue());
+        floatingLabel.setTextFill(colorPicker_Set.getValue());
         floatingStage.setX(floatingX);
         floatingStage.setY(floatingY);
         Platform.runLater(() -> {
-            if (floatingStage != null && !floatingStage.isShowing()) {
-                floatingStage.show();
+            if (mouseFloating_Set.isSelected()) {
+                floatingLabel.setText(text_escCloseFloating);
+                setFloatingCoordinate_Set.setText(text_closeFloating);
+                addToolTip(tip_closeFloating, setFloatingCoordinate_Set);
+            } else {
+                floatingLabel.setText(text_saveFloatingCoordinate);
+                setFloatingCoordinate_Set.setText(text_saveCloseFloating);
+                addToolTip(tip_saveFloating, setFloatingCoordinate_Set);
             }
+            floatingStage.show();
+            // 监听键盘事件
+            startNativeKeyListener();
         });
     }
 
@@ -229,9 +248,17 @@ public class SettingController {
      */
     private void hideFloatingWindow() {
         Platform.runLater(() -> {
-            if (floatingStage != null && floatingStage.isShowing()) {
-                floatingStage.hide();
+            if (!mouseFloating_Set.isSelected()) {
+                try {
+                    saveFloatingCoordinate();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
+            floatingStage.hide();
+            setFloatingCoordinate_Set.setText(text_showFloating);
+            addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
+            removeNativeListener(nativeKeyListener);
         });
     }
 
@@ -249,13 +276,7 @@ public class SettingController {
                         // 检测快捷键 esc
                         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
                             hideFloatingWindow();
-                            try {
-                                saveFloatingCoordinate();
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
-                            }
                         }
-                        removeNativeListener(nativeKeyListener);
                     }
                 });
             }
@@ -288,23 +309,24 @@ public class SettingController {
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        String marginStr = prop.getProperty(key_margin);
-        if (StringUtils.isNotBlank(marginStr)) {
-            margin = Integer.parseInt(marginStr);
-        }
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
         floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
+        setControlLastConfig(offsetX_Set, prop, key_offsetX);
+        setControlLastConfig(offsetY_Set, prop, key_offsetY);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
+        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig);
         setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun);
         setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun);
         setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord);
+        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun);
         setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
+        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord);
         clickFileInput.close();
     }
 
@@ -314,13 +336,20 @@ public class SettingController {
     private void setToolTip() {
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
+        addToolTip(tip_offsetX, offsetX_Set);
+        addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
+        addToolTip(tip_margin, floatingDistance_Set);
+        addToolTip(tip_mouseFloating, mouseFloating_Set);
         addToolTip(tip_hideWindowRun, hideWindowRun_Set);
         addToolTip(tip_showWindowRun, showWindowRun_Set);
         addToolTip(tip_floatingRecord, floatingRecord_Set);
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
+        addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
+        addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
+        addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
     }
 
     /**
@@ -350,7 +379,12 @@ public class SettingController {
      * 给输入框添加内容变化监听
      */
     private void textFieldChangeListener() {
-        integerRangeTextField(floatingDistance_Set, 0, null, tip_floatingDistance);
+        // 浮窗跟随鼠标时横轴偏移量输入框监听
+        integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
+        // 浮窗跟随鼠标时纵轴偏移量输入框监听
+        integerRangeTextField(offsetY_Set, null, null, tip_offsetY);
+        // 浮窗离屏幕边界距离输入框监听
+        integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
     }
 
     /**
@@ -360,6 +394,8 @@ public class SettingController {
      */
     @FXML
     private void initialize() throws IOException {
+        // 设置鼠标悬停提示
+        setToolTip();
         // 文本框输入监听
         textFieldChangeListener();
         // 读取配置文件
@@ -368,8 +404,8 @@ public class SettingController {
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
-        // 设置鼠标悬停提示
-        setToolTip();
+        // 获取鼠标坐标监听器
+        moussePositionListener();
     }
 
     /**
@@ -473,6 +509,56 @@ public class SettingController {
     }
 
     /**
+     * 监听并保存浮窗字体颜色
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadColorAction() throws IOException {
+        updateProperties(configFile_Click, key_lastFloatingTextColor, String.valueOf(colorPicker_Set.getValue()));
+    }
+
+    /**
+     * 运行自动流程时信息浮窗跟随鼠标
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadMouseFloatingRunAction() throws IOException {
+        setLoadLastConfigCheckBox(mouseFloatingRun_Set, configFile_Click, key_mouseFloatingRun);
+    }
+
+    /**
+     * 录制自动流程时信息浮窗跟随鼠标
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadMouseFloatingRecordAction() throws IOException {
+        setLoadLastConfigCheckBox(mouseFloatingRecord_Set, configFile_Click, key_mouseFloatingRecord);
+    }
+
+    /**
+     * 显示浮窗位置时信息浮窗跟随鼠标
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void mouseFloatingAction() throws IOException {
+        setLoadLastConfigCheckBox(mouseFloating_Set, configFile_Click, key_mouseFloating);
+        if (floatingStage != null && floatingStage.isShowing() && mouseFloating_Set.isSelected()) {
+            floatingLabel.setText(text_escCloseFloating);
+            setFloatingCoordinate_Set.setText(text_closeFloating);
+            addToolTip(tip_closeFloating, setFloatingCoordinate_Set);
+        }
+        if (floatingStage != null && floatingStage.isShowing() && !mouseFloating_Set.isSelected()) {
+            floatingLabel.setText(text_saveFloatingCoordinate);
+            setFloatingCoordinate_Set.setText(text_saveCloseFloating);
+            addToolTip(tip_saveFloating, setFloatingCoordinate_Set);
+        }
+    }
+
+    /**
      * 重启程序按钮
      *
      * @throws IOException io异常
@@ -498,24 +584,18 @@ public class SettingController {
     }
 
     /**
-     * 监听并保存浮窗字体颜色
-     *
-     * @throws IOException io异常
-     */
-    @FXML
-    private void loadColorAction() throws IOException {
-        updateProperties(configFile_Click, key_lastFloatingTextColor, String.valueOf(colorPicker_Set.getValue()));
-    }
-
-    /**
-     * 开始编辑浮窗位置
+     * 显示或隐藏浮窗位置
      */
     @FXML
     private void setFloatingCoordinate() {
         // 显示浮窗
-        showFloatingWindow();
-        // 监听键盘事件
-        startNativeKeyListener();
+        if (floatingStage != null && !floatingStage.isShowing()) {
+            showFloatingWindow();
+        }
+        // 隐藏浮窗
+        if (floatingStage != null && floatingStage.isShowing()) {
+            hideFloatingWindow();
+        }
     }
 
 }

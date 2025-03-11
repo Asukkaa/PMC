@@ -9,14 +9,14 @@
         <Label prefHeight="25" text="基础设置："/>
 
         <HBox spacing="10">
-            <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction" styleClass="checkBox-setting-style"
-                      selected="true" text="记住关闭前所在的页面"/>
+            <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction"
+                      styleClass="checkBox-setting-style" selected="true" text="记住关闭前所在的页面"/>
 
-            <CheckBox fx:id="fullWindow_Set" onAction="#loadFullWindowAction" styleClass="checkBox-setting-style"
-                      selected="true" text="记住程序关闭时窗口是否最大化"/>
+            <CheckBox fx:id="fullWindow_Set" onAction="#loadFullWindowAction"
+                      styleClass="checkBox-setting-style" selected="true" text="记住程序关闭时窗口是否最大化"/>
 
-            <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction" styleClass="checkBox-setting-style"
-                      selected="true" text="自动操作工具 功能加载上次设置信息"/>
+            <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction"
+                      styleClass="checkBox-setting-style" selected="true" text="自动操作工具 功能加载上次设置信息"/>
         </HBox>
 
         <Separator/>
@@ -24,17 +24,17 @@
         <Label prefHeight="25" text="功能设置："/>
 
         <HBox spacing="10">
-            <CheckBox fx:id="hideWindowRun_Set" onAction="#loadHideWindowRunAction" styleClass="checkBox-setting-style"
-                      text="运行自动流程前最小化本程序" selected="true"/>
+            <CheckBox fx:id="hideWindowRun_Set" onAction="#loadHideWindowRunAction"
+                      styleClass="checkBox-setting-style" text="运行自动流程前最小化本程序" selected="true"/>
 
-            <CheckBox fx:id="showWindowRun_Set" onAction="#loadShowWindowRunAction" styleClass="checkBox-setting-style"
-                      text="运行自动流程结束后弹出本程序" selected="true"/>
+            <CheckBox fx:id="showWindowRun_Set" onAction="#loadShowWindowRunAction"
+                      styleClass="checkBox-setting-style" text="运行自动流程结束后弹出本程序" selected="true"/>
 
-            <CheckBox fx:id="hideWindowRecord_Set" onAction="#loadHideWindowRecordAction" styleClass="checkBox-setting-style"
-                      text="录制自动流程前最小化本程序" selected="true"/>
+            <CheckBox fx:id="hideWindowRecord_Set" onAction="#loadHideWindowRecordAction"
+                      styleClass="checkBox-setting-style" text="录制自动流程前最小化本程序" selected="true"/>
 
-            <CheckBox fx:id="showWindowRecord_Set" onAction="#loadShowWindowRecordAction" styleClass="checkBox-setting-style"
-                      text="录制自动流程结束后弹出本程序" selected="true"/>
+            <CheckBox fx:id="showWindowRecord_Set" onAction="#loadShowWindowRecordAction"
+                      styleClass="checkBox-setting-style" text="录制自动流程结束后弹出本程序" selected="true"/>
         </HBox>
 
         <HBox spacing="10">
@@ -47,23 +47,49 @@
         <Label prefHeight="25" text="浮窗设置："/>
 
         <HBox spacing="10">
-            <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction" styleClass="checkBox-setting-style"
-                      text="运行自动流程时显示信息浮窗" selected="true"/>
+            <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction"
+                      styleClass="checkBox-setting-style" text="运行自动流程时显示信息浮窗" selected="true"/>
 
-            <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction" styleClass="checkBox-setting-style"
-                      text="录制自动流程时显示信息浮窗" selected="true"/>
+            <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction"
+                      styleClass="checkBox-setting-style" text="录制自动流程时显示信息浮窗" selected="true"/>
+
+            <CheckBox fx:id="mouseFloatingRun_Set" onAction="#loadMouseFloatingRunAction"
+                      styleClass="checkBox-setting-style" text="运行自动流程时信息浮窗跟随鼠标"/>
+
+            <CheckBox fx:id="mouseFloatingRecord_Set" onAction="#loadMouseFloatingRecordAction"
+                      styleClass="checkBox-setting-style" text="录制自动流程时信息浮窗跟随鼠标"/>
         </HBox>
 
         <HBox spacing="10">
-            <Label prefHeight="25" text="浮窗字体颜色:"/>
-            <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#loadColorAction"/>
+            <HBox spacing="10" prefWidth="250">
+                <Label prefHeight="25" text="浮窗字体颜色:"/>
+                <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#loadColorAction"/>
+            </HBox>
 
-            <Label prefWidth="30"/>
-            <Label prefHeight="25" text="浮窗离屏幕边界距离:"/>
-            <TextField fx:id="floatingDistance_Set" prefWidth="50"/>
+            <HBox spacing="10" prefWidth="250">
+                <Label prefHeight="25" text="浮窗离屏幕边界距离:"/>
+                <TextField fx:id="floatingDistance_Set" prefWidth="50"/>
+            </HBox>
 
-            <Label prefWidth="30"/>
-            <Button fx:id="setFloatingCoordinate_Set" onAction="#setFloatingCoordinate" style="-fx-cursor: hand" text="设置浮窗位置"/>
+            <HBox spacing="10" prefWidth="250">
+                <Label prefHeight="25" text="浮窗跟随鼠标时横轴偏移量:"/>
+                <TextField fx:id="offsetX_Set" prefWidth="50"/>
+            </HBox>
+
+            <HBox spacing="10" prefWidth="250">
+                <Label prefHeight="25" text="浮窗跟随鼠标时纵轴偏移量:"/>
+                <TextField fx:id="offsetY_Set" prefWidth="50"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox spacing="10" prefWidth="250">
+                <Button fx:id="setFloatingCoordinate_Set" onAction="#setFloatingCoordinate"
+                        style="-fx-cursor: hand" text="显示浮窗位置"/>
+            </HBox>
+
+            <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction"
+                      styleClass="checkBox-setting-style" text="浮窗跟随鼠标"/>
         </HBox>
     </VBox>
 </AnchorPane>

@@ -69,6 +69,14 @@ public class CommonFinals {
 
     public static final String tip_showWindowRecord = "勾选后录制自动操作结束后将会弹出本程序的窗口";
 
+    public static final String tip_mouseFloatingRun = "勾选后在运行自动操作时运行信息浮窗会跟随鼠标移动";
+
+    public static final String tip_mouseFloatingRecord = "勾选后在录制自动操作时信息浮窗会跟随鼠标移动";
+
+    public static final String tip_mouseFloating = "勾选后点击 显示浮窗位置 按钮所显示的浮窗会跟随鼠标移动";
+
+    public static final String tip_margin = "用来控制浮窗距离屏幕边界的最小距离，只能填自然数，不填默认为0，单位像素";
+
     public static final String tip_preparationRecordTime = "在录制自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为 ";
 
     public static final String tip_preparationRunTime = "在运行自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为 ";
@@ -77,7 +85,15 @@ public class CommonFinals {
 
     public static final String tip_floatingRecord = "勾选后在录制自动操作时将会显示一个录制信息浮窗";
 
-    public static final String tip_floatingDistance = "用来控制浮窗距离屏幕边界的最小距离，只能填自然数，不填默认为0，单位像素";
+    public static final String tip_setFloatingCoordinate = "点击后将会展示浮窗位置，之后按下 esc 可关闭浮窗";
+
+    public static final String tip_closeFloating = "点击后将会关闭浮窗";
+
+    public static final String tip_saveFloating = "点击后将会关闭浮窗并保存浮窗位置";
+
+    public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为30";
+
+    public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为30";
 
     public static final String tip_recordClick = """
             点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
@@ -92,8 +108,8 @@ public class CommonFinals {
             勾选后：
             如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作
             如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作
-            建议 Windows 用户不要勾选， macOS 用户需要勾选
-            Windows 会直接点击对应窗口的对应坐标，macOS 需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标""";
+            Windows 会直接点击对应窗口的对应坐标，macOS 需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
+            建议 Windows 用户不要勾选， macOS 用户需要勾选""";
 
     public static final String tip_version = """
             version：1.1.0
@@ -131,7 +147,15 @@ public class CommonFinals {
 
     public static final String text_cancelTask = "按下 esc 即可取消任务\n";
 
-    public static final String text_saveFloatingCoordinate = "鼠标拖拽浮窗即可移动浮窗位置，按下 esc 即可保存浮窗位置\n";
+    public static final String text_saveFloatingCoordinate = "鼠标拖拽浮窗即可移动浮窗\n按下 esc 即可保存浮窗位置";
+
+    public static final String text_escCloseFloating = "按下 esc 即可关闭浮窗";
+
+    public static final String text_closeFloating = "关闭浮窗";
+
+    public static final String text_saveCloseFloating = "关闭并保存浮窗位置";
+
+    public static final String text_showFloating = "显示浮窗位置";
 
     public static final String text_loadAutoClick = "导入自动化流程文件：";
 
@@ -202,6 +226,16 @@ public class CommonFinals {
     public static final String key_floatingY = "floatingY";
 
     public static final String key_margin = "margin";
+
+    public static final String key_mouseFloatingRun = "mouseFloatingRun";
+
+    public static final String key_mouseFloatingRecord = "mouseFloatingRecord";
+
+    public static final String key_mouseFloating = "mouseFloating";
+
+    public static final String key_offsetX = "offsetX";
+
+    public static final String key_offsetY = "offsetY";
 
     public static final String key_floatingWidth = "floatingWidth";
 

@@ -6,7 +6,13 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -15,10 +21,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.PopupWindow;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,9 +33,11 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -848,6 +853,64 @@ public class UiUtils {
         } else {
             updateProperties(configFile, key, unActivation);
         }
+    }
+
+    /**
+     * 获取当前所在屏幕
+     *
+     * @return 当前所在屏幕
+     */
+    public static Screen getCurrentScreen(Stage floatingStage) {
+        for (Screen screen : Screen.getScreens()) {
+            Rectangle2D bounds = screen.getBounds();
+            if (bounds.contains(floatingStage.getX(), floatingStage.getY())) {
+                return screen;
+            }
+        }
+        // 默认返回主屏幕
+        return Screen.getPrimary();
+    }
+
+    /**
+     * 设置浮窗跟随鼠标移动
+     *
+     * @param floatingStage 浮窗
+     * @param mousePoint    鼠标位置
+     * @param offsetX       x轴偏移量
+     * @param offsetY       y轴偏移量
+     */
+    public static void floatingMove(Stage floatingStage, Point mousePoint, int offsetX, int offsetY) {
+        // 获取当前所在屏幕
+        Screen currentScreen = getCurrentScreen(floatingStage);
+        Rectangle2D screenBounds = currentScreen.getBounds();
+        double width = floatingStage.getWidth();
+        double height = floatingStage.getHeight();
+        double mousePointX = mousePoint.getX();
+        double mousePointY = mousePoint.getY();
+        double x = mousePointX + offsetX;
+        double borderX = x + width;
+        if (borderX > screenBounds.getMaxX()) {
+            x = mousePointX - offsetX - width;
+        }
+        if (offsetX < 0) {
+            x = mousePointX - offsetX - width;
+            if (x < screenBounds.getMinX()) {
+                x = mousePointX + offsetX;
+            }
+        }
+        double y = mousePointY + offsetY;
+        double borderY = y + height;
+        if (borderY > screenBounds.getMaxY()) {
+            y = mousePointY - offsetY - height;
+        }
+        if (offsetY < 0) {
+            y = mousePointY - offsetY - height;
+            if (y < screenBounds.getMinY()) {
+                y = mousePointY + offsetY + height;
+            }
+        }
+        floatingStage.setX(x);
+        floatingStage.setY(y);
     }
 
 }

@@ -34,6 +34,10 @@ public class CommonUtils {
         if (str.indexOf("0") == 0 && str.length() > 1) {
             return false;
         }
+        // 禁止出现负数开头的0
+        if (str.indexOf("-0") == 0) {
+            return false;
+        }
         Pattern integerPattern = Pattern.compile("^-?\\d{1,10}$");
         // 使用正则表达式判断字符串是否为整数
         if (!integerPattern.matcher(str).matches()) {
