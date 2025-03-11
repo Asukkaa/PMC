@@ -91,6 +91,13 @@ public class MainApplication extends Application {
         stage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
         // 注册全局输入监听器
         GlobalScreen.registerNativeHook();
+        stage.setOnCloseRequest(event -> {
+            try {
+                stop();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         stage.show();
     }
 
