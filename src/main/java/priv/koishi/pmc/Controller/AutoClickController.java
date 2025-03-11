@@ -123,7 +123,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 要防重复点击的组件
      */
-    private static final List<Control> disableControls = new ArrayList<>();
+    private static final List<Node> disableNodes = new ArrayList<>();
 
     /**
      * 线程池
@@ -144,21 +144,6 @@ public class AutoClickController extends CommonProperties {
      * 页面标识符
      */
     private static final String tabId = "_Click";
-
-    /**
-     * 浮窗Stage
-     */
-    private Stage floatingStage;
-
-    /**
-     * 顶部浮窗信息输出栏
-     */
-    private Label floatingLabel;
-
-    /**
-     * 顶部浮窗鼠标位置信息栏
-     */
-    private Label floatingMousePosition;
 
     /**
      * 正在录制标识
@@ -194,6 +179,31 @@ public class AutoClickController extends CommonProperties {
      * 全局键盘监听器
      */
     private NativeKeyListener nativeKeyListener;
+
+    /**
+     * 浮窗Stage
+     */
+    private Stage floatingStage;
+
+    /**
+     * 顶部浮窗信息输出栏
+     */
+    private Label floatingLabel;
+
+    /**
+     * 顶部浮窗鼠标位置信息栏
+     */
+    private Label floatingMousePosition;
+
+    /**
+     * 程序主场景
+     */
+    private Scene mainScene;
+
+    /**
+     * 程序主舞台
+     */
+    private Stage mainStage;
 
     @FXML
     private AnchorPane anchorPane_Click;
@@ -397,12 +407,11 @@ public class AutoClickController extends CommonProperties {
         int x = (int) mousePoint.getX();
         int y = (int) mousePoint.getY();
         String text = "当前鼠标位置为： X: " + x + " Y: " + y;
-        Scene scene = anchorPane_Click.getScene();
-        CheckBox mouseFloatingRun = (CheckBox) scene.lookup("#mouseFloatingRun_Set");
-        CheckBox mouseFloatingRecord = (CheckBox) scene.lookup("#mouseFloatingRecord_Set");
-        TextField offsetXTextField = (TextField) scene.lookup("#offsetX_Set");
+        CheckBox mouseFloatingRun = (CheckBox) mainScene.lookup("#mouseFloatingRun_Set");
+        CheckBox mouseFloatingRecord = (CheckBox) mainScene.lookup("#mouseFloatingRecord_Set");
+        TextField offsetXTextField = (TextField) mainScene.lookup("#offsetX_Set");
         int offsetX = setDefaultIntValue(offsetXTextField, 30, 0, null);
-        TextField offsetYTextField = (TextField) scene.lookup("#offsetY_Set");
+        TextField offsetYTextField = (TextField) mainScene.lookup("#offsetY_Set");
         int offsetY = setDefaultIntValue(offsetYTextField, 30, 0, null);
         Platform.runLater(() -> {
             floatingMousePosition.setText(text);
@@ -501,17 +510,16 @@ public class AutoClickController extends CommonProperties {
      * @param isRun 是否为运行自动操作
      */
     private void showFloatingWindow(boolean isRun) {
-        Scene scene = anchorPane_Click.getScene();
         // 获取浮窗的文本颜色设置
-        ColorPicker colorPicker = (ColorPicker) scene.lookup("#colorPicker_Set");
+        ColorPicker colorPicker = (ColorPicker) mainScene.lookup("#colorPicker_Set");
         Color color = colorPicker.getValue();
         floatingLabel.setTextFill(color);
         floatingMousePosition.setTextFill(color);
         floatingStage.setX(floatingX);
         floatingStage.setY(floatingY);
         // 获取浮窗的显示设置
-        CheckBox floatingRun = (CheckBox) scene.lookup("#floatingRun_Set");
-        CheckBox floatingRecord = (CheckBox) scene.lookup("#floatingRecord_Set");
+        CheckBox floatingRun = (CheckBox) mainScene.lookup("#floatingRun_Set");
+        CheckBox floatingRecord = (CheckBox) mainScene.lookup("#floatingRecord_Set");
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
         if (isShow) {
             Platform.runLater(() -> {
@@ -541,22 +549,20 @@ public class AutoClickController extends CommonProperties {
     private void launchClickTask(List<ClickPositionBean> clickPositionBeans) {
         if (!runClicking && !recordClicking) {
             runClicking = true;
-            Scene scene = anchorPane_Click.getScene();
-            CheckBox firstClick = (CheckBox) scene.lookup("#firstClick_Set");
+            CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
                     .setFirstClick(firstClick.isSelected())
                     .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
-                    .setDisableControls(disableControls)
+                    .setDisableNodes(disableNodes)
                     .setProgressBar(progressBar_Click)
                     .setBeanList(clickPositionBeans)
                     .setMassageLabel(log_Click);
             updateLabel(log_Click, "");
-            Stage stage = (Stage) scene.getWindow();
-            CheckBox hideWindowRun = (CheckBox) scene.lookup("#hideWindowRun_Set");
+            CheckBox hideWindowRun = (CheckBox) mainScene.lookup("#hideWindowRun_Set");
             if (hideWindowRun.isSelected()) {
-                stage.setIconified(true);
+                mainStage.setIconified(true);
             }
             // 开启键盘监听
             startNativeKeyListener();
@@ -571,9 +577,9 @@ public class AutoClickController extends CommonProperties {
                 massageLabel.setTextFill(Color.GREEN);
                 massageLabel.setText(text_taskFinished);
                 hideFloatingWindow();
-                CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Set");
+                CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
                 if (showWindowRun.isSelected()) {
-                    showStage(stage);
+                    showStage(mainStage);
                 }
                 // 移除键盘监听器
                 removeNativeListener(nativeKeyListener);
@@ -584,9 +590,9 @@ public class AutoClickController extends CommonProperties {
             autoClickTask.setOnFailed(event -> {
                 taskNotSuccess(taskBean, text_taskFailed);
                 hideFloatingWindow();
-                CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Set");
+                CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
                 if (showWindowRun.isSelected()) {
-                    showStage(stage);
+                    showStage(mainStage);
                 }
                 // 移除键盘监听器
                 removeNativeListener(nativeKeyListener);
@@ -604,9 +610,9 @@ public class AutoClickController extends CommonProperties {
             autoClickTask.setOnCancelled(event -> {
                 taskNotSuccess(taskBean, text_taskCancelled);
                 hideFloatingWindow();
-                CheckBox showWindowRun = (CheckBox) scene.lookup("#showWindowRun_Set");
+                CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
                 if (showWindowRun.isSelected()) {
-                    showStage(stage);
+                    showStage(mainStage);
                 }
                 // 移除键盘监听器
                 removeNativeListener(nativeKeyListener);
@@ -616,7 +622,7 @@ public class AutoClickController extends CommonProperties {
             });
             if (runTimeline == null) {
                 // 改变要防重复点击的组件状态
-                changeDisableControls(taskBean, true);
+                changeDisableNodes(taskBean, true);
                 // 获取准备时间值
                 int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
@@ -868,16 +874,14 @@ public class AutoClickController extends CommonProperties {
                                 taskNotSuccess(taskBean, text_taskCancelled);
                             }
                             // 改变要防重复点击的组件状态
-                            changeDisableControls(disableControls, false);
+                            changeDisableNodes(disableNodes, false);
                             // 移除鼠标监听器
                             removeNativeListener(nativeMouseListener);
                             hideFloatingWindow();
                             // 弹出程序主窗口
-                            Scene scene = anchorPane_Click.getScene();
-                            Stage stage = (Stage) scene.getWindow();
-                            CheckBox showWindowRecord = (CheckBox) scene.lookup("#showWindowRecord_Set");
+                            CheckBox showWindowRecord = (CheckBox) mainScene.lookup("#showWindowRecord_Set");
                             if (showWindowRecord.isSelected()) {
-                                showStage(stage);
+                                showStage(mainStage);
                             }
                             // 移除键盘监听器
                             removeNativeListener(nativeKeyListener);
@@ -991,14 +995,20 @@ public class AutoClickController extends CommonProperties {
     /**
      * 设置要防重复点击的组件
      */
-    private void setDisableControls() {
-        disableControls.add(runClick_Click);
-        disableControls.add(clickTest_Click);
-        disableControls.add(recordClick_Click);
-        disableControls.add(addPosition_Click);
-        disableControls.add(clearButton_Click);
-        disableControls.add(loadAutoClick_Click);
-        disableControls.add(exportAutoClick_Click);
+    private void setDisableNodes() {
+        disableNodes.add(runClick_Click);
+        disableNodes.add(clickTest_Click);
+        disableNodes.add(recordClick_Click);
+        disableNodes.add(addPosition_Click);
+        disableNodes.add(clearButton_Click);
+        disableNodes.add(loadAutoClick_Click);
+        disableNodes.add(exportAutoClick_Click);
+        Node autoClickTab = mainScene.lookup("#autoClickTab");
+        disableNodes.add(autoClickTab);
+        Node settingTab = mainScene.lookup("#settingTab");
+        disableNodes.add(settingTab);
+        Node aboutTab = mainScene.lookup("#aboutTab");
+        disableNodes.add(aboutTab);
     }
 
     /**
@@ -1008,22 +1018,26 @@ public class AutoClickController extends CommonProperties {
      */
     @FXML
     private void initialize() throws IOException {
-        // 获取鼠标坐标监听器
-        moussePositionListener();
         // 设置javafx单元格宽度
         bindPrefWidthProperty();
         // 读取配置文件
         getConfig();
         // 初始化浮窗
         initFloatingWindow();
-        // 设置要防重复点击的组件
-        setDisableControls();
         // 设置鼠标悬停提示
         setToolTip();
         // 给输入框添加内容变化监听
         textFieldChangeListener();
         // 设置初始配置值为上次配置值
         setLastConfig();
+        Platform.runLater(() -> {
+            mainScene = anchorPane_Click.getScene();
+            mainStage = (Stage) mainScene.getWindow();
+            // 获取鼠标坐标监听器
+            moussePositionListener();
+            // 设置要防重复点击的组件
+            setDisableNodes();
+        });
     }
 
     /**
@@ -1207,15 +1221,13 @@ public class AutoClickController extends CommonProperties {
         if (!runClicking && !recordClicking) {
             recordClicking = true;
             // 改变要防重复点击的组件状态
-            changeDisableControls(disableControls, true);
+            changeDisableNodes(disableNodes, true);
             // 获取准备时间值
             int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click, Integer.parseInt(defaultPreparationRecordTime), 0, null);
             // 开始录制
-            Scene scene = anchorPane_Click.getScene();
-            Stage stage = (Stage) scene.getWindow();
-            CheckBox hideWindowRecord = (CheckBox) scene.lookup("#hideWindowRecord_Set");
+            CheckBox hideWindowRecord = (CheckBox) mainScene.lookup("#hideWindowRecord_Set");
             if (hideWindowRecord.isSelected()) {
-                stage.setIconified(true);
+                mainStage.setIconified(true);
             }
             // 开启键盘监听0
             startNativeKeyListener();

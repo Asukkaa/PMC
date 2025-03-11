@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -67,6 +69,16 @@ public class SettingController {
     private int floatingHeight;
 
     /**
+     * 全局键盘监听器
+     */
+    private NativeKeyListener nativeKeyListener;
+
+    /**
+     * 要防重复点击的组件
+     */
+    private static final List<Node> disableNodes = new ArrayList<>();
+
+    /**
      * 浮窗Stage
      */
     private Stage floatingStage;
@@ -77,9 +89,9 @@ public class SettingController {
     private Label floatingLabel;
 
     /**
-     * 全局键盘监听器
+     * 程序主场景
      */
-    private NativeKeyListener nativeKeyListener;
+    private Scene mainScene;
 
     @FXML
     private AnchorPane anchorPane_Set;
@@ -228,6 +240,8 @@ public class SettingController {
         floatingStage.setX(floatingX);
         floatingStage.setY(floatingY);
         Platform.runLater(() -> {
+            // 改变要防重复点击的组件状态
+            changeDisableNodes(disableNodes, true);
             if (mouseFloating_Set.isSelected()) {
                 floatingLabel.setText(text_escCloseFloating);
                 setFloatingCoordinate_Set.setText(text_closeFloating);
@@ -258,6 +272,8 @@ public class SettingController {
             floatingStage.hide();
             setFloatingCoordinate_Set.setText(text_showFloating);
             addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
+            // 改变要防重复点击的组件状态
+            changeDisableNodes(disableNodes, false);
             removeNativeListener(nativeKeyListener);
         });
     }
@@ -388,6 +404,18 @@ public class SettingController {
     }
 
     /**
+     * 设置要防重复点击的组件
+     */
+    private void setDisableNodes() {
+        Node autoClickTab = mainScene.lookup("#autoClickTab");
+        disableNodes.add(autoClickTab);
+        Node settingTab = mainScene.lookup("#settingTab");
+        disableNodes.add(settingTab);
+        Node aboutTab = mainScene.lookup("#aboutTab");
+        disableNodes.add(aboutTab);
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
@@ -406,6 +434,11 @@ public class SettingController {
         setCustomColorsListener();
         // 获取鼠标坐标监听器
         moussePositionListener();
+        Platform.runLater(() -> {
+            mainScene = anchorPane_Set.getScene();
+            // 设置要防重复点击的组件
+            setDisableNodes();
+        });
     }
 
     /**

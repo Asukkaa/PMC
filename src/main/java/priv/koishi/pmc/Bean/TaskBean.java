@@ -1,6 +1,6 @@
 package priv.koishi.pmc.Bean;
 
-import javafx.scene.control.Control;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
@@ -54,6 +54,6 @@ public class TaskBean<T> {
     /**
      * 要防重复点击的组件
      */
-    List<Control> disableControls;
+    List<Node> disableNodes;
 
 }
