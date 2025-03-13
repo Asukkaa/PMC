@@ -75,16 +75,28 @@ public class UiUtils {
     }
 
     /**
-     * 设置鼠标停留提示框参数
+     * 设置永久显示的鼠标停留提示框参数
      *
      * @param tip 提示文案
      * @return 设置参数后的Tooltip对象
      */
     public static Tooltip creatTooltip(String tip) {
+        return creatTooltip(tip, Duration.INDEFINITE);
+    }
+
+    /**
+     * 设置鼠标停留提示框参数
+     *
+     * @param tip 提示文案
+     * @param duration 显示时长
+     * @return 设置参数后的Tooltip对象
+     */
+    public static Tooltip creatTooltip(String tip, Duration duration) {
         Tooltip tooltip = new Tooltip(tip);
         tooltip.setWrapText(true);
-        tooltip.setShowDuration(showDuration);
+        tooltip.setShowDuration(duration);
         tooltip.setShowDelay(Duration.ZERO);
+        tooltip.setHideDelay(Duration.ZERO);
         tooltip.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT);
         tooltip.getStyleClass().add("tooltip-font-size");
         return tooltip;
