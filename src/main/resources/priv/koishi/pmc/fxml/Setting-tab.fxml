@@ -50,11 +50,11 @@
             <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction"
                       styleClass="checkBox-setting-style" text="运行自动流程时显示信息浮窗" selected="true"/>
 
-            <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction"
-                      styleClass="checkBox-setting-style" text="录制自动流程时显示信息浮窗" selected="true"/>
-
             <CheckBox fx:id="mouseFloatingRun_Set" onAction="#loadMouseFloatingRunAction"
                       styleClass="checkBox-setting-style" text="运行自动流程时信息浮窗跟随鼠标"/>
+
+            <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction"
+                      styleClass="checkBox-setting-style" text="录制自动流程时显示信息浮窗" selected="true"/>
 
             <CheckBox fx:id="mouseFloatingRecord_Set" onAction="#loadMouseFloatingRecordAction"
                       styleClass="checkBox-setting-style" text="录制自动流程时信息浮窗跟随鼠标"/>
@@ -89,7 +89,7 @@
             </HBox>
 
             <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction"
-                      styleClass="checkBox-setting-style" text="浮窗跟随鼠标"/>
+                      styleClass="checkBox-setting-style" text="显示浮窗位置按钮显示的浮窗跟随鼠标"/>
         </HBox>
     </VBox>
 </AnchorPane>
