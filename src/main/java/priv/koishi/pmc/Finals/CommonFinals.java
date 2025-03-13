@@ -3,7 +3,6 @@ package priv.koishi.pmc.Finals;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -359,10 +358,11 @@ public class CommonFinals {
      */
     public static final String userHome = System.getProperty("user.home");
 
-    /**
-     * 程序根目录
-     */
-    public static final String Tools = "Tools" + File.separator;
+    public static final String appName = "Perfect Mouse Control";
+
+    public static final String exe = ".exe";
+
+    public static final String app = ".app";
 
     /**
      * 默认浮窗横轴偏移量

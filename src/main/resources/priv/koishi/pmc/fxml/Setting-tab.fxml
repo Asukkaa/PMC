@@ -91,5 +91,11 @@
             <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction"
                       styleClass="checkBox-setting-style" text="显示浮窗位置按钮显示的浮窗跟随鼠标"/>
         </HBox>
+
+        <Separator/>
+
+        <Label prefHeight="25" text="重启程序："/>
+
+        <Button text="重启程序" onAction="#reLaunch" />
     </VBox>
 </AnchorPane>

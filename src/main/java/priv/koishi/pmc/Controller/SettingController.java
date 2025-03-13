@@ -26,7 +26,6 @@ import javafx.stage.StageStyle;
 import priv.koishi.pmc.Listener.MousePositionListener;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -586,19 +585,13 @@ public class SettingController {
     private void reLaunch() throws IOException {
         Platform.exit();
         if (!isRunningFromJar()) {
-            ProcessBuilder processBuilder = null;
+            ProcessBuilder processBuilder = new ProcessBuilder();
             if (systemName.contains(win)) {
-                String path = userDir.substring(0, userDir.lastIndexOf(Tools) + Tools.length());
-                String appPath = path + File.separator + "Tools.exe";
-                processBuilder = new ProcessBuilder(appPath);
+                processBuilder.command(getAppPath());
             } else if (systemName.contains(macos)) {
-                String appName = File.separator + "Tools.app";
-                String appPath = userDir.substring(0, userDir.lastIndexOf(appName)) + appName;
-                processBuilder = new ProcessBuilder("open", "-n", appPath);
+                processBuilder.command("open", "-n", getAppPath());
             }
-            if (processBuilder != null) {
-                processBuilder.start();
-            }
+            processBuilder.start();
         }
     }
 

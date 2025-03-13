@@ -55,7 +55,7 @@ public class MainApplication extends Application {
      * 加载fxml页面
      *
      * @param stage 程序主舞台
-     * @throws Exception        io异常、设置全局异常处理器异常
+     * @throws Exception io异常、设置全局异常处理器异常
      */
     @Override
     public void start(Stage stage) throws Exception {
@@ -144,7 +144,7 @@ public class MainApplication extends Application {
             System.setProperty("log.dir", logsPath);
             File logDirectory = new File(logsPath);
             if (!logDirectory.exists()) {
-                if (logDirectory.mkdirs()) {
+                if (!logDirectory.mkdirs()) {
                     throw new IOException("日志文件夹创建失败： " + logsPath);
                 }
             }
