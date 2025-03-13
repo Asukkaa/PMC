@@ -223,11 +223,16 @@ public class FileUtils {
         return logsPath;
     }
 
+    /**
+     * 获取程序启动路径
+     *
+     * @return 不同操作系统下程序启动路径
+     */
     public static String getAppPath() {
         if (systemName.contains(win)) {
             return new File(javaHome).getParent() + File.separator + appName + exe;
         } else if (systemName.contains(macos)) {
-            return new File(javaHome).getParent() + File.separator + appName + app;
+            return javaHome.substring(0, javaHome.indexOf(app) + app.length());
         }
         return javaHome;
     }
