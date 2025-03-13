@@ -6,8 +6,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -19,6 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -39,7 +43,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.errToString;
@@ -585,7 +588,7 @@ public class UiUtils {
      * 改变要防重复点击的组件状态
      *
      * @param disableNodes 防重复点击组件列表
-     * @param disable         可点击状态，true设置为不可点击，false设置为可点击
+     * @param disable      可点击状态，true设置为不可点击，false设置为可点击
      */
     public static void changeDisableNodes(List<Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
@@ -672,13 +675,13 @@ public class UiUtils {
     /**
      * 显示可打开的文件类路径
      *
-     * @param pathLabel  文件路径文本栏
-     * @param path       文件路径
-     * @param openFile   点击是否打开文件，true打开文件，false打开文件所在文件夹
-     * @param anchorPane 组件所在布局
+     * @param pathLabel 文件路径文本栏
+     * @param path      文件路径
+     * @param openFile  点击是否打开文件，true打开文件，false打开文件所在文件夹
+     * @param pane      组件所在布局
      * @throws RuntimeException io异常
      */
-    public static void setPathLabel(Label pathLabel, String path, boolean openFile, AnchorPane anchorPane) {
+    public static void setPathLabel(Label pathLabel, String path, boolean openFile, Pane pane) {
         pathLabel.setText(path);
         pathLabel.getStyleClass().add("label-button-style");
         File file = new File(path);
@@ -706,17 +709,17 @@ public class UiUtils {
         });
         addToolTip(path + "\n鼠标左键点击打开 " + openPath, pathLabel);
         // 设置右键菜单
-        setPathLabelContextMenu(pathLabel, anchorPane);
+        setPathLabelContextMenu(pathLabel, pane);
     }
 
     /**
      * 给路径Label设置右键菜单
      *
      * @param valueLabel 要处理的文本栏
-     * @param anchorPane 组件所在布局
+     * @param pane       组件所在布局
      * @throws RuntimeException io异常
      */
-    public static void setPathLabelContextMenu(Label valueLabel, AnchorPane anchorPane) {
+    public static void setPathLabelContextMenu(Label valueLabel, Pane pane) {
         String path = valueLabel.getText();
         ContextMenu contextMenu = new ContextMenu();
         MenuItem openDirectoryMenuItem = new MenuItem("打开文件夹");
@@ -742,7 +745,7 @@ public class UiUtils {
         MenuItem copyValueMenuItem = new MenuItem("复制路径");
         contextMenu.getItems().add(copyValueMenuItem);
         valueLabel.setContextMenu(contextMenu);
-        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText(), anchorPane));
+        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText(), pane));
         valueLabel.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
                 contextMenu.show(valueLabel, event.getScreenX(), event.getScreenY());
@@ -755,9 +758,9 @@ public class UiUtils {
      *
      * @param valueLabel 要处理的文本栏
      * @param text       右键菜单文本
-     * @param anchorPane 组件所在布局
+     * @param pane       组件所在布局
      */
-    public static void setCopyValueContextMenu(Label valueLabel, String text, AnchorPane anchorPane) {
+    public static void setCopyValueContextMenu(Label valueLabel, String text, Pane pane) {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem copyValueMenuItem = new MenuItem(text);
         contextMenu.getItems().add(copyValueMenuItem);
@@ -768,16 +771,16 @@ public class UiUtils {
             }
         });
         // 设置右键菜单行为
-        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText(), anchorPane));
+        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText(), pane));
     }
 
     /**
      * 复制文本
      *
-     * @param value      要复制的文本
-     * @param anchorPane 组件所在布局
+     * @param value 要复制的文本
+     * @param pane  组件所在布局
      */
-    public static void copyText(String value, AnchorPane anchorPane) {
+    public static void copyText(String value, Pane pane) {
         // 获取当前系统剪贴板
         Clipboard clipboard = Clipboard.getSystemClipboard();
         // 创建剪贴板内容对象
@@ -787,35 +790,34 @@ public class UiUtils {
         // 设置剪贴板内容
         clipboard.setContent(content);
         // 复制成功消息气泡
-        buildMessageBubble(anchorPane, text_copySuccess, 1);
+        buildMessageBubble(pane, text_copySuccess, 2);
     }
 
     /**
      * 创建消息弹窗
      *
-     * @param anchorPane 组件所在布局
-     * @param text       消息弹窗提示文案
-     * @param time       显示弹窗时间
+     * @param pane 组件所在布局
+     * @param text 消息弹窗提示文案
+     * @param time 显示弹窗时间
      */
-    public static void buildMessageBubble(AnchorPane anchorPane, String text, double time) {
+    public static void buildMessageBubble(Pane pane, String text, double time) {
         MessageBubble bubble = new MessageBubble(text);
-        anchorPane.getChildren().add(bubble);
-        // 列表中无法监控鼠标位置需要判断是否监控到鼠标移动
-        AtomicBoolean getMouseMoved = new AtomicBoolean(false);
-        anchorPane.addEventHandler(MouseEvent.MOUSE_MOVED, mouseEvent -> {
-            // 获取鼠标位置
-            getMouseMoved.set(true);
-            double mouseX = mouseEvent.getX();
-            double mouseY = mouseEvent.getY();
-            bubble.setLayoutX(mouseX + 30);
-            bubble.setLayoutY(mouseY);
+        pane.getChildren().add(bubble);
+        // 将事件处理器声明为变量
+        final EventHandler<MouseEvent> mouseMovedHandler = mouseEvent -> {
+            Point2D sceneCoords = new Point2D(mouseEvent.getSceneX(), mouseEvent.getSceneY());
+            Point2D localCoords = pane.sceneToLocal(sceneCoords);
+            bubble.setLayoutX(localCoords.getX() + 30);
+            bubble.setLayoutY(localCoords.getY() + 30);
+        };
+        // 使用变量添加监听
+        Scene scene = pane.getScene();
+        scene.addEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(time), ae -> {
+            pane.getChildren().remove(bubble);
+            // 使用保存的handler变量移除监听
+            scene.removeEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
         });
-        // 鼠标在列表时设置初位置
-        if (!getMouseMoved.get()) {
-            bubble.setLayoutX(anchorPane.getWidth() * 0.5);
-            bubble.setLayoutY(anchorPane.getHeight() * 0.5);
-        }
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(time), ae -> anchorPane.getChildren().remove(bubble));
         Timeline timeline = new Timeline(keyFrame);
         timeline.play();
     }
