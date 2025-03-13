@@ -3,7 +3,6 @@ package priv.koishi.pmc.Controller;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -24,6 +23,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import priv.koishi.pmc.Listener.MousePositionListener;
+import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
 import java.io.File;
@@ -46,7 +47,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2024-11-12
  * Time:下午4:51
  */
-public class SettingController {
+public class SettingController implements MousePositionUpdater {
 
     /**
      * 浮窗X坐标
@@ -159,6 +160,7 @@ public class SettingController {
         // 设置透明度
         rectangle.setOpacity(0.5);
         StackPane root = new StackPane();
+        root.setId("root_Set");
         root.setBackground(Background.fill(Color.TRANSPARENT));
         root.setStyle("-fx-cursor: hand");
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
@@ -201,35 +203,6 @@ public class SettingController {
         // 初始位置设置在主屏幕顶部居中
         floatingStage.setX(primaryBounds.getMinX() + (primaryBounds.getWidth() - floatingWidth) / 2);
         floatingStage.setY(primaryBounds.getMinY() - margin);
-    }
-
-    /**
-     * 获取鼠标坐标
-     */
-    private void getNowMousePosition() {
-        // 使用java.awt.MouseInfo获取鼠标的全局位置
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        Platform.runLater(() -> {
-            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
-                int offsetX = setDefaultIntValue(offsetX_Set, 30, null, null);
-                int offsetY = setDefaultIntValue(offsetY_Set, 30, null, null);
-                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-            }
-        });
-    }
-
-    /**
-     * 获取鼠标坐标监听器
-     */
-    private void moussePositionListener() {
-        // 启动定时器，实时获取鼠标位置
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                getNowMousePosition();
-            }
-        };
-        timer.start();
     }
 
     /**
@@ -432,10 +405,10 @@ public class SettingController {
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
-        // 获取鼠标坐标监听器
-        moussePositionListener();
         Platform.runLater(() -> {
             mainScene = anchorPane_Set.getScene();
+            // 获取鼠标坐标监听器
+            new MousePositionListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
         });
@@ -629,6 +602,21 @@ public class SettingController {
         if (floatingStage != null && floatingStage.isShowing()) {
             hideFloatingWindow();
         }
+    }
+
+    /**
+     * 根据鼠标位置调整ui
+     */
+    @Override
+    public void onMousePositionUpdate() {
+        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+        Platform.runLater(() -> {
+            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
+                int offsetX = setDefaultIntValue(offsetX_Set, 30, null, null);
+                int offsetY = setDefaultIntValue(offsetY_Set, 30, null, null);
+                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+            }
+        });
     }
 
 }

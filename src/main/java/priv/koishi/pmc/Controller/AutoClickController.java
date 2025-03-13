@@ -8,7 +8,6 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -40,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.EditingCell.EditingCell;
+import priv.koishi.pmc.Listener.MousePositionListener;
+import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Properties.CommonProperties;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
@@ -68,7 +69,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-02-17
  * Time:17:21
  */
-public class AutoClickController extends CommonProperties {
+public class AutoClickController extends CommonProperties implements MousePositionUpdater {
 
     /**
      * 导出文件路径
@@ -396,46 +397,6 @@ public class AutoClickController extends CommonProperties {
         defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
         defaultPreparationRecordTime = prop.getProperty(key_defaultPreparationRecordTime);
         input.close();
-    }
-
-    /**
-     * 获取鼠标坐标
-     */
-    private void getNowMousePosition() {
-        // 使用java.awt.MouseInfo获取鼠标的全局位置
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        int x = (int) mousePoint.getX();
-        int y = (int) mousePoint.getY();
-        String text = "当前鼠标位置为： X: " + x + " Y: " + y;
-        CheckBox mouseFloatingRun = (CheckBox) mainScene.lookup("#mouseFloatingRun_Set");
-        CheckBox mouseFloatingRecord = (CheckBox) mainScene.lookup("#mouseFloatingRecord_Set");
-        TextField offsetXTextField = (TextField) mainScene.lookup("#offsetX_Set");
-        int offsetX = setDefaultIntValue(offsetXTextField, 30, 0, null);
-        TextField offsetYTextField = (TextField) mainScene.lookup("#offsetY_Set");
-        int offsetY = setDefaultIntValue(offsetYTextField, 30, 0, null);
-        Platform.runLater(() -> {
-            floatingMousePosition.setText(text);
-            mousePosition_Click.setText(text);
-            if (floatingStage != null && floatingStage.isShowing()) {
-                if ((mouseFloatingRun.isSelected() && runClicking) || (mouseFloatingRecord.isSelected() && recordClicking)) {
-                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                }
-            }
-        });
-    }
-
-    /**
-     * 获取鼠标坐标监听器
-     */
-    private void moussePositionListener() {
-        // 启动定时器，实时获取鼠标位置
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                getNowMousePosition();
-            }
-        };
-        timer.start();
     }
 
     /**
@@ -1034,7 +995,7 @@ public class AutoClickController extends CommonProperties {
             mainScene = anchorPane_Click.getScene();
             mainStage = (Stage) mainScene.getWindow();
             // 获取鼠标坐标监听器
-            moussePositionListener();
+            new MousePositionListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
         });
@@ -1268,6 +1229,32 @@ public class AutoClickController extends CommonProperties {
                 recordTimeline.play();
             }
         }
+    }
+
+    /**
+     * 根据鼠标位置调整ui
+     */
+    @Override
+    public void onMousePositionUpdate() {
+        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+        int x = (int) mousePoint.getX();
+        int y = (int) mousePoint.getY();
+        String text = "当前鼠标位置为： X: " + x + " Y: " + y;
+        CheckBox mouseFloatingRun = (CheckBox) mainScene.lookup("#mouseFloatingRun_Set");
+        CheckBox mouseFloatingRecord = (CheckBox) mainScene.lookup("#mouseFloatingRecord_Set");
+        TextField offsetXTextField = (TextField) mainScene.lookup("#offsetX_Set");
+        int offsetX = setDefaultIntValue(offsetXTextField, 30, 0, null);
+        TextField offsetYTextField = (TextField) mainScene.lookup("#offsetY_Set");
+        int offsetY = setDefaultIntValue(offsetYTextField, 30, 0, null);
+        Platform.runLater(() -> {
+            floatingMousePosition.setText(text);
+            mousePosition_Click.setText(text);
+            if (floatingStage != null && floatingStage.isShowing()) {
+                if ((mouseFloatingRun.isSelected() && runClicking) || (mouseFloatingRecord.isSelected() && recordClicking)) {
+                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                }
+            }
+        });
     }
 
 }
