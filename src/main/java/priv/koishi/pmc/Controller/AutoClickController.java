@@ -40,7 +40,6 @@ import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.EditingCell.EditingCell;
 import priv.koishi.pmc.Listener.MousePositionListener;
-import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Properties.CommonProperties;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
@@ -69,7 +68,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-02-17
  * Time:17:21
  */
-public class AutoClickController extends CommonProperties implements MousePositionUpdater {
+public class AutoClickController extends CommonProperties {
 
     /**
      * 导出文件路径
@@ -470,12 +469,13 @@ public class AutoClickController extends CommonProperties implements MousePositi
      *
      * @param isRun 是否为运行自动操作
      */
-    private void showFloatingWindow(boolean isRun) {
+    private void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
         ColorPicker colorPicker = (ColorPicker) mainScene.lookup("#colorPicker_Set");
         Color color = colorPicker.getValue();
         floatingLabel.setTextFill(color);
         floatingMousePosition.setTextFill(color);
+        getConfig();
         floatingStage.setX(floatingX);
         floatingStage.setY(floatingY);
         // 获取浮窗的显示设置
@@ -507,7 +507,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      *
      * @param clickPositionBeans 自动操作流程
      */
-    private void launchClickTask(List<ClickPositionBean> clickPositionBeans) {
+    private void launchClickTask(List<ClickPositionBean> clickPositionBeans) throws IOException {
         if (!runClicking && !recordClicking) {
             runClicking = true;
             CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
@@ -643,7 +643,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
         menuItem.setOnAction(event -> {
             List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
-                launchClickTask(selectedItem);
+                try {
+                    launchClickTask(selectedItem);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -796,6 +800,31 @@ public class AutoClickController extends CommonProperties implements MousePositi
         addData(clickPositionBeans);
         updateLabel(log_Click, text_loadSuccess + inFilePath);
         log_Click.setTextFill(Color.GREEN);
+    }
+
+    /**
+     * 根据鼠标位置调整ui
+     */
+    private void onMousePositionUpdate() {
+        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+        int x = (int) mousePoint.getX();
+        int y = (int) mousePoint.getY();
+        String text = "当前鼠标位置为： X: " + x + " Y: " + y;
+        CheckBox mouseFloatingRun = (CheckBox) mainScene.lookup("#mouseFloatingRun_Set");
+        CheckBox mouseFloatingRecord = (CheckBox) mainScene.lookup("#mouseFloatingRecord_Set");
+        TextField offsetXTextField = (TextField) mainScene.lookup("#offsetX_Set");
+        int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
+        TextField offsetYTextField = (TextField) mainScene.lookup("#offsetY_Set");
+        int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
+        Platform.runLater(() -> {
+            floatingMousePosition.setText(text);
+            mousePosition_Click.setText(text);
+            if (floatingStage != null && floatingStage.isShowing()) {
+                if ((mouseFloatingRun.isSelected() && runClicking) || (mouseFloatingRecord.isSelected() && recordClicking)) {
+                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                }
+            }
+        });
     }
 
     /**
@@ -995,7 +1024,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             mainScene = anchorPane_Click.getScene();
             mainStage = (Stage) mainScene.getWindow();
             // 获取鼠标坐标监听器
-            new MousePositionListener(this);
+            new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件
             setDisableNodes();
         });
@@ -1030,7 +1059,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 点击测试按钮
      */
     @FXML
-    private void clickTest() {
+    private void clickTest() throws IOException {
         // 获取步骤设置
         List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
         ClickPositionBean clickPositionBean = getClickSetting(-1);
@@ -1178,7 +1207,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 录制自动操作按钮
      */
     @FXML
-    private void recordClick() {
+    private void recordClick() throws IOException {
         if (!runClicking && !recordClicking) {
             recordClicking = true;
             // 改变要防重复点击的组件状态
@@ -1229,32 +1258,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 recordTimeline.play();
             }
         }
-    }
-
-    /**
-     * 根据鼠标位置调整ui
-     */
-    @Override
-    public void onMousePositionUpdate() {
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        int x = (int) mousePoint.getX();
-        int y = (int) mousePoint.getY();
-        String text = "当前鼠标位置为： X: " + x + " Y: " + y;
-        CheckBox mouseFloatingRun = (CheckBox) mainScene.lookup("#mouseFloatingRun_Set");
-        CheckBox mouseFloatingRecord = (CheckBox) mainScene.lookup("#mouseFloatingRecord_Set");
-        TextField offsetXTextField = (TextField) mainScene.lookup("#offsetX_Set");
-        int offsetX = setDefaultIntValue(offsetXTextField, 30, 0, null);
-        TextField offsetYTextField = (TextField) mainScene.lookup("#offsetY_Set");
-        int offsetY = setDefaultIntValue(offsetYTextField, 30, 0, null);
-        Platform.runLater(() -> {
-            floatingMousePosition.setText(text);
-            mousePosition_Click.setText(text);
-            if (floatingStage != null && floatingStage.isShowing()) {
-                if ((mouseFloatingRun.isSelected() && runClicking) || (mouseFloatingRecord.isSelected() && recordClicking)) {
-                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                }
-            }
-        });
     }
 
 }

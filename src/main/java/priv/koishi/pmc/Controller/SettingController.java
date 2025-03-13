@@ -24,7 +24,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import priv.koishi.pmc.Listener.MousePositionListener;
-import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
 import java.io.File;
@@ -47,7 +46,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2024-11-12
  * Time:下午4:51
  */
-public class SettingController implements MousePositionUpdater {
+public class SettingController {
 
     /**
      * 浮窗X坐标
@@ -160,7 +159,6 @@ public class SettingController implements MousePositionUpdater {
         // 设置透明度
         rectangle.setOpacity(0.5);
         StackPane root = new StackPane();
-        root.setId("root_Set");
         root.setBackground(Background.fill(Color.TRANSPARENT));
         root.setStyle("-fx-cursor: hand");
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
@@ -328,6 +326,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_firstClick, firstClick_Set);
+        addToolTip(tip_colorPicker, colorPicker_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
@@ -389,6 +388,20 @@ public class SettingController implements MousePositionUpdater {
     }
 
     /**
+     * 根据鼠标位置调整ui
+     */
+    private void onMousePositionUpdate() {
+        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+        Platform.runLater(() -> {
+            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
+                int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, null, null);
+                int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, null, null);
+                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+            }
+        });
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
@@ -408,7 +421,7 @@ public class SettingController implements MousePositionUpdater {
         Platform.runLater(() -> {
             mainScene = anchorPane_Set.getScene();
             // 获取鼠标坐标监听器
-            new MousePositionListener(this);
+            new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件
             setDisableNodes();
         });
@@ -602,21 +615,6 @@ public class SettingController implements MousePositionUpdater {
         if (floatingStage != null && floatingStage.isShowing()) {
             hideFloatingWindow();
         }
-    }
-
-    /**
-     * 根据鼠标位置调整ui
-     */
-    @Override
-    public void onMousePositionUpdate() {
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        Platform.runLater(() -> {
-            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
-                int offsetX = setDefaultIntValue(offsetX_Set, 30, null, null);
-                int offsetY = setDefaultIntValue(offsetY_Set, 30, null, null);
-                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-            }
-        });
     }
 
 }

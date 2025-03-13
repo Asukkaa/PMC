@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
  */
 public class CommonUtils {
 
-
     /**
      * 正则表达式用于匹配指定范围的整数
      *

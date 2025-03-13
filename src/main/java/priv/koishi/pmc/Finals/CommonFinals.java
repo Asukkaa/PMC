@@ -2,7 +2,6 @@ package priv.koishi.pmc.Finals;
 
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
-import javafx.util.Duration;
 
 import java.io.File;
 import java.util.HashMap;
@@ -94,6 +93,8 @@ public class CommonFinals {
     public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为30";
 
     public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为30";
+
+    public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
 
     public static final String tip_recordClick = """
             点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
@@ -364,9 +365,14 @@ public class CommonFinals {
     public static final String Tools = "Tools" + File.separator;
 
     /**
-     * ToolTip统一显示时长
+     * 默认浮窗横轴偏移量
      */
-    public static final Duration showDuration = Duration.seconds(6000000);
+    public static final int defaultOffsetX = 30;
+
+    /**
+     * 默认浮纵轴窗偏移量
+     */
+    public static final int defaultOffsetY = 30;
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
