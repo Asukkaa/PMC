@@ -113,7 +113,7 @@ public class CommonFinals {
 
     public static final String tip_version = """
             version：1.1.0
-            2025年3月构建""";
+            2025年3月14日构建""";
 
     public static final String text_selectDirectory = "选择文件夹";
 
