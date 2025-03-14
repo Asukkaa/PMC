@@ -143,7 +143,7 @@ public class AutoClickService {
                     break;
                 }
             }
-            MouseButton mouseButton = clickTypeMap.get(clickPositionBean.getType());
+            MouseButton mouseButton = runClickTypeMap.get(clickPositionBean.getType());
             Platform.runLater(() -> {
                 robot.mouseMove(startX, startY);
                 if (mouseButton != NONE) {

@@ -786,7 +786,7 @@ public class AutoClickController extends CommonProperties {
                     || !isInIntegerRange(clickPositionBean.getEndX(), 0, null) || !isInIntegerRange(clickPositionBean.getEndY(), 0, null)
                     || !isInIntegerRange(clickPositionBean.getClickTime(), 0, null) || !isInIntegerRange(clickPositionBean.getClickNum(), 0, null)
                     || !isInIntegerRange(clickPositionBean.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionBean.getWaitTime(), 0, null)
-                    || !clickTypeMap.containsKey(clickPositionBean.getType())) {
+                    || !runClickTypeMap.containsKey(clickPositionBean.getType())) {
                 throw new IOException(text_LackKeyData);
             }
         }
@@ -929,13 +929,13 @@ public class AutoClickController extends CommonProperties {
                     clickBean = new ClickPositionBean();
                     clickBean.setName(text_step + dataSize + text_isRecord)
                             .setUuid(UUID.randomUUID().toString())
-                            .setType(typeClickMap.get(pressButton))
+                            .setType(recordClickTypeMap.get(pressButton))
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY));
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
-                        String log = text_recorded + typeClickMap.get(pressButton) + " 点击 (" + clickBean.getStartX() + "," + clickBean.getStartY() + ")";
+                        String log = text_recorded + recordClickTypeMap.get(pressButton) + " 点击 (" + clickBean.getStartX() + "," + clickBean.getStartY() + ")";
                         log_Click.setText(log);
                         floatingLabel.setText(text_cancelTask + text_recordClicking + "\n" + log);
                     });
@@ -966,7 +966,7 @@ public class AutoClickController extends CommonProperties {
                         addData(clickPositionBeans);
                         // 日志反馈
                         log_Click.setTextFill(Color.BLUE);
-                        String log = text_recorded + typeClickMap.get(pressButton) + " 松开 (" + clickBean.getEndX() + "," + clickBean.getEndY() + ")";
+                        String log = text_recorded + recordClickTypeMap.get(pressButton) + " 松开 (" + clickBean.getEndX() + "," + clickBean.getEndY() + ")";
                         log_Click.setText(log);
                         floatingLabel.setText(text_cancelTask + text_recordClicking + "\n" + log);
                     });
