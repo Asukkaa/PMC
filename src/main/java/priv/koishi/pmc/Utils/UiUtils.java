@@ -87,7 +87,7 @@ public class UiUtils {
     /**
      * 设置鼠标停留提示框参数
      *
-     * @param tip 提示文案
+     * @param tip      提示文案
      * @param duration 显示时长
      * @return 设置参数后的Tooltip对象
      */
@@ -413,6 +413,45 @@ public class UiUtils {
         }
         setPathLabel(pathLabel, selectedFilePath, false, anchorPane);
         return filePath;
+    }
+
+    /**
+     * 为列表添加右键菜单并设置可选择多行
+     *
+     * @param contextMenu 右键菜单
+     * @param tableView   要处理的列表
+     */
+    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView) {
+        setContextMenu(contextMenu, tableView, SelectionMode.MULTIPLE);
+    }
+
+    /**
+     * 为列表添加右键菜单
+     *
+     * @param contextMenu   右键菜单
+     * @param tableView     要处理的列表
+     * @param selectionMode 选中模式
+     */
+    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView, SelectionMode selectionMode) {
+        // 设置是否可以选中多行
+        tableView.getSelectionModel().setSelectionMode(selectionMode);
+        tableView.setOnMousePressed(event -> {
+            // 点击位置判断
+            Node source = event.getPickResult().getIntersectedNode();
+            while (source != null && !(source instanceof TableRow)) {
+                source = source.getParent();
+            }
+            if (source == null || ((TableRow<?>) source).isEmpty()) {
+                tableView.getSelectionModel().clearSelection();
+                tableView.setContextMenu(null);
+            } else if (event.isSecondaryButtonDown()) {
+                if (CollectionUtils.isNotEmpty(tableView.getSelectionModel().getSelectedItems())) {
+                    tableView.setContextMenu(contextMenu);
+                } else {
+                    tableView.setContextMenu(null);
+                }
+            }
+        });
     }
 
     /**

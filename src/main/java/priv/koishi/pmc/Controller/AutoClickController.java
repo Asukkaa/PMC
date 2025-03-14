@@ -657,8 +657,6 @@ public class AutoClickController extends CommonProperties {
      * 构建右键菜单
      */
     private void buildContextMenu() {
-        // 设置可以选中多行
-        tableView_Click.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 添加测试点击选项
@@ -671,12 +669,8 @@ public class AutoClickController extends CommonProperties {
         buildEditClickType(tableView_Click, contextMenu);
         // 删除所选数据选项
         buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);
-        tableView_Click.setContextMenu(contextMenu);
-        tableView_Click.setOnMousePressed(event -> {
-            if (event.isSecondaryButtonDown()) {
-                contextMenu.show(tableView_Click, event.getScreenX(), event.getScreenY());
-            }
-        });
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(contextMenu, tableView_Click);
     }
 
     /**
