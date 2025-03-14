@@ -1213,7 +1213,7 @@ public class AutoClickController extends CommonProperties {
             if (hideWindowRecord.isSelected()) {
                 mainStage.setIconified(true);
             }
-            // 开启键盘监听0
+            // 开启键盘监听
             startNativeKeyListener();
             // 设置浮窗文本显示准备时间
             floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
