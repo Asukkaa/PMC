@@ -388,7 +388,7 @@ public class CommonFinals {
     public static final int downAdd = 0;
 
     /**
-     * 向列表追加
+     * 向列表最后一行追加
      */
     public static final int append = -1;
 

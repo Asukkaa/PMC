@@ -838,6 +838,7 @@ public class AutoClickController extends CommonProperties {
         ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
         List<ClickPositionBean> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
         switch (addType) {
+            // 在列表所选行第一行上方插入
             case upAdd: {
                 // 获取首个选中行的索引
                 int selectedIndex = tableViewItems.indexOf(selectedItem.getFirst());
@@ -851,6 +852,7 @@ public class AutoClickController extends CommonProperties {
                 tableView_Click.getSelectionModel().selectIndices(selectedIndex, selectedIndex + clickPositionBeans.size());
                 break;
             }
+            // 在列表所选行最后一行下方插入
             case downAdd: {
                 // 获取最后一个选中行的索引
                 int selectedIndex = tableViewItems.indexOf(selectedItem.getLast()) + 1;
@@ -864,6 +866,7 @@ public class AutoClickController extends CommonProperties {
                 tableView_Click.getSelectionModel().selectIndices(selectedIndex, selectedIndex + clickPositionBeans.size() - 1);
                 break;
             }
+            // 向列表最后一行追加
             case append: {
                 tableViewItems.addAll(clickPositionBeans);
                 break;
