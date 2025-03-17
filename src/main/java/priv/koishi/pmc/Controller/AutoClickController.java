@@ -725,19 +725,11 @@ public class AutoClickController extends CommonProperties {
                     break;
                 }
                 case menuItem_recordUp: {
-                    try {
-                        startRecord(upAdd);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    startRecord(upAdd);
                     break;
                 }
                 case menuItem_recordDown: {
-                    try {
-                        startRecord(downAdd);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    startRecord(downAdd);
                     break;
                 }
             }
@@ -1085,7 +1077,7 @@ public class AutoClickController extends CommonProperties {
      *
      * @param addType 添加类型
      */
-    private void startRecord(int addType) throws IOException {
+    private void startRecord(int addType) {
         if (!runClicking && !recordClicking) {
             recordClicking = true;
             // 改变要防重复点击的组件状态
@@ -1102,7 +1094,11 @@ public class AutoClickController extends CommonProperties {
             // 设置浮窗文本显示准备时间
             floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
             // 显示浮窗
-            showFloatingWindow(false);
+            try {
+                showFloatingWindow(false);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             if (preparationTimeValue == 0) {
                 // 开启鼠标监听
                 startNativeMouseListener(addType);
