@@ -668,6 +668,10 @@ public class AutoClickController extends CommonProperties {
         buildEditClickTypeMenu(tableView_Click, contextMenu);
         // 插入数据选项
         insertDataMenu(tableView_Click, contextMenu);
+        // 复制数据选项
+        buildCopyDataMenu(tableView_Click, contextMenu, dataNumber_Click);
+        // 清空所选项选项
+        buildClearSelectedData(tableView_Click, contextMenu);
         // 删除所选数据选项
         buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);
         // 为列表添加右键菜单并设置可选择多行
@@ -687,13 +691,17 @@ public class AutoClickController extends CommonProperties {
         MenuItem insertDown = new MenuItem(menuItem_insertDown);
         MenuItem recordUp = new MenuItem(menuItem_recordUp);
         MenuItem recordDown = new MenuItem(menuItem_recordDown);
+        MenuItem insertTop = new MenuItem(menuItem_insertTop);
+        MenuItem recordTop = new MenuItem(menuItem_recordTop);
         // 为每个菜单项添加事件处理
         insertUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertUp));
         insertDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertDown));
         recordUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordUp));
         recordDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordDown));
+        insertTop.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertTop));
+        recordTop.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordTop));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(insertUp, insertDown, recordUp, recordDown);
+        menu.getItems().addAll(insertUp, insertDown, recordUp, recordDown, insertTop, recordTop);
         contextMenu.getItems().add(menu);
     }
 
@@ -721,6 +729,14 @@ public class AutoClickController extends CommonProperties {
                 }
                 case menuItem_recordDown: {
                     startRecord(downAdd);
+                    break;
+                }
+                case menuItem_insertTop: {
+                    addClick(topAdd);
+                    break;
+                }
+                case menuItem_recordTop: {
+                    startRecord(topAdd);
                     break;
                 }
             }

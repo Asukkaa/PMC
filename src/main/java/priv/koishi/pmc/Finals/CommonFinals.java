@@ -315,11 +315,17 @@ public class CommonFinals {
 
     public static final String menuItem_recordDown = "插入录制步骤到所选行最后一行下一行";
 
+    public static final String menuItem_insertTop = "插入设置步骤到列表顶部";
+
+    public static final String menuItem_recordTop = "插入录制步骤到列表顶部";
+
     public static final String menuItem_upCopy = "复制所选数据到所选行第一行上方";
 
     public static final String menuItem_downCopy = "复制所选数据到所选行最后一行下方";
 
     public static final String menuItem_appendCopy = "复制所选数据到列表最后一行";
+
+    public static final String menuItem_topCopy = "复制所选数据到列表顶部";
 
     public static final String mouseButton_primary = "鼠标左键点击";
 
@@ -411,12 +417,17 @@ public class CommonFinals {
     /**
      * 在列表所选行最后一行下方插入
      */
-    public static final int downAdd = 0;
+    public static final int downAdd = 2;
 
     /**
      * 向列表最后一行追加
      */
     public static final int append = -1;
+
+    /**
+     * 向列表第一行上方插入
+     */
+    public static final int topAdd = 0;
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

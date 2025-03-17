@@ -390,6 +390,14 @@ public class UiUtils {
                 tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + data.size() - 1);
                 break;
             }
+            // 向列表第一行上方插入
+            case topAdd: {
+                // 向列表第一行追加数据
+                tableView.getItems().addAll(0, data);
+                // 滚动到插入位置
+                tableView.scrollTo(0);
+                break;
+            }
             // 向列表最后一行追加
             case append: {
                 // 向列表最后一行追加数据
@@ -463,45 +471,6 @@ public class UiUtils {
         }
         setPathLabel(pathLabel, selectedFilePath, false, anchorPane);
         return filePath;
-    }
-
-    /**
-     * 为列表添加右键菜单并设置可选择多行
-     *
-     * @param contextMenu 右键菜单
-     * @param tableView   要处理的列表
-     */
-    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView) {
-        setContextMenu(contextMenu, tableView, SelectionMode.MULTIPLE);
-    }
-
-    /**
-     * 为列表添加右键菜单
-     *
-     * @param contextMenu   右键菜单
-     * @param tableView     要处理的列表
-     * @param selectionMode 选中模式
-     */
-    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView, SelectionMode selectionMode) {
-        // 设置是否可以选中多行
-        tableView.getSelectionModel().setSelectionMode(selectionMode);
-        tableView.setOnMousePressed(event -> {
-            // 点击位置判断
-            Node source = event.getPickResult().getIntersectedNode();
-            while (source != null && !(source instanceof TableRow)) {
-                source = source.getParent();
-            }
-            if (source == null || ((TableRow<?>) source).isEmpty()) {
-                tableView.getSelectionModel().clearSelection();
-                tableView.setContextMenu(null);
-            } else if (event.isSecondaryButtonDown()) {
-                if (CollectionUtils.isNotEmpty(tableView.getSelectionModel().getSelectedItems())) {
-                    tableView.setContextMenu(contextMenu);
-                } else {
-                    tableView.setContextMenu(null);
-                }
-            }
-        });
     }
 
     /**
@@ -623,38 +592,82 @@ public class UiUtils {
         }
     }
 
+    /**
+     * 复制所选数据选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     * @param dataNumber  列表数据数量文本框
+     */
     public static void buildCopyDataMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu, Label dataNumber) {
         Menu menu = new Menu("复制所选数据");
         // 创建二级菜单项
         MenuItem upCopy = new MenuItem(menuItem_upCopy);
         MenuItem downCopy = new MenuItem(menuItem_downCopy);
         MenuItem appendCopy = new MenuItem(menuItem_appendCopy);
+        MenuItem topCopy = new MenuItem(menuItem_topCopy);
         // 为每个菜单项添加事件处理
         upCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_upCopy, dataNumber));
         downCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_downCopy, dataNumber));
         appendCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_appendCopy, dataNumber));
+        topCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_topCopy, dataNumber));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(upCopy, downCopy, appendCopy);
+        menu.getItems().addAll(upCopy, downCopy, appendCopy, topCopy);
         contextMenu.getItems().add(menu);
     }
 
+    /**
+     * 复制所选数据二级菜单选项
+     *
+     * @param tableView  要处理的数据列表
+     * @param copyType   复制类型
+     * @param dataNumber 列表数据数量文本框
+     */
     private static void copyDataMenuItem(TableView<ClickPositionBean> tableView, String copyType, Label dataNumber) {
-        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
-
+        List<ClickPositionBean> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
         switch (copyType) {
             case menuItem_upCopy: {
-                addData(selectedItem, upAdd, tableView, dataNumber, text_process);
+                addData(copiedList, upAdd, tableView, dataNumber, text_process);
                 break;
             }
             case menuItem_downCopy: {
-                addData(selectedItem, downAdd, tableView, dataNumber, text_process);
+                addData(copiedList, downAdd, tableView, dataNumber, text_process);
                 break;
             }
             case menuItem_appendCopy: {
-                addData(selectedItem, append, tableView, dataNumber, text_process);
+                addData(copiedList, append, tableView, dataNumber, text_process);
+                break;
+            }
+            case menuItem_topCopy: {
+                addData(copiedList, topAdd, tableView, dataNumber, text_process);
                 break;
             }
         }
+    }
+
+    /**
+     * 获取复制的数据
+     *
+     * @param selectedItem 选中的数据
+     * @return 复制的数据
+     */
+    private static List<ClickPositionBean> getCopyList(List<ClickPositionBean> selectedItem) {
+        List<ClickPositionBean> copiedList = new ArrayList<>();
+        selectedItem.forEach(clickPositionBean -> {
+            ClickPositionBean copyClickPositionBean = new ClickPositionBean();
+            copyClickPositionBean.setName(clickPositionBean.getName())
+                    .setStartX(clickPositionBean.getStartX())
+                    .setStartY(clickPositionBean.getStartY())
+                    .setEndX(clickPositionBean.getEndX())
+                    .setEndY(clickPositionBean.getEndY())
+                    .setClickTime(clickPositionBean.getClickTime())
+                    .setClickNum(clickPositionBean.getClickNum())
+                    .setClickInterval(clickPositionBean.getClickInterval())
+                    .setWaitTime(clickPositionBean.getWaitTime())
+                    .setType(clickPositionBean.getType());
+            copiedList.add(copyClickPositionBean);
+        });
+        return copiedList;
     }
 
     /**
@@ -701,6 +714,18 @@ public class UiUtils {
     }
 
     /**
+     * 清空所选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
+        MenuItem clearSelectedDataMenuItem = new MenuItem("清空所选项");
+        clearSelectedDataMenuItem.setOnAction(event -> tableView.getSelectionModel().clearSelection());
+        contextMenu.getItems().add(clearSelectedDataMenuItem);
+    }
+
+    /**
      * 删除所选数据选项
      *
      * @param tableView   要添加右键菜单的列表
@@ -716,6 +741,45 @@ public class UiUtils {
             label.setText(text_allHave + items.size() + unit);
         });
         contextMenu.getItems().add(deleteDataMenuItem);
+    }
+
+    /**
+     * 为列表添加右键菜单并设置可选择多行
+     *
+     * @param contextMenu 右键菜单
+     * @param tableView   要处理的列表
+     */
+    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView) {
+        setContextMenu(contextMenu, tableView, SelectionMode.MULTIPLE);
+    }
+
+    /**
+     * 为列表添加右键菜单
+     *
+     * @param contextMenu   右键菜单
+     * @param tableView     要处理的列表
+     * @param selectionMode 选中模式
+     */
+    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView, SelectionMode selectionMode) {
+        // 设置是否可以选中多行
+        tableView.getSelectionModel().setSelectionMode(selectionMode);
+        tableView.setOnMousePressed(event -> {
+            // 点击位置判断
+            Node source = event.getPickResult().getIntersectedNode();
+            while (source != null && !(source instanceof TableRow)) {
+                source = source.getParent();
+            }
+            if (source == null || ((TableRow<?>) source).isEmpty()) {
+                tableView.getSelectionModel().clearSelection();
+                tableView.setContextMenu(null);
+            } else if (event.isSecondaryButtonDown()) {
+                if (CollectionUtils.isNotEmpty(tableView.getSelectionModel().getSelectedItems())) {
+                    tableView.setContextMenu(contextMenu);
+                } else {
+                    tableView.setContextMenu(null);
+                }
+            }
+        });
     }
 
     /**
