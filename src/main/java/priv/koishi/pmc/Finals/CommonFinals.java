@@ -377,18 +377,38 @@ public class CommonFinals {
      */
     public static final int defaultOffsetY = 30;
 
+    public static final String menuItem_insertUp = "插入设置步骤到所选行第一行上一行";
+
+    public static final String menuItem_insertDown = "插入设置步骤到所选行最后一行下一行";
+
+    public static final String menuItem_recordUp = "插入录制步骤到所选行第一行上一行";
+
+    public static final String menuItem_recordDown = "插入录制步骤到所选行最后一行下一行";
+
+    public static final String mouseButton_primary = "鼠标左键点击";
+
+    public static final String mouseButton_secondary = "鼠标右键点击";
+
+    public static final String mouseButton_middle = "鼠标中键点击";
+
+    public static final String mouseButton_forward = "鼠标前侧键点击";
+
+    public static final String mouseButton_back = "鼠标后侧键点击";
+
+    public static final String mouseButton_none = "鼠标仅移动";
+
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
      */
     public static final Map<String, MouseButton> runClickTypeMap = new HashMap<>();
 
     static {
-        runClickTypeMap.put("鼠标左键点击", MouseButton.PRIMARY);
-        runClickTypeMap.put("鼠标右键点击", MouseButton.SECONDARY);
-        runClickTypeMap.put("鼠标中键点击", MouseButton.MIDDLE);
-        runClickTypeMap.put("鼠标前侧键点击", MouseButton.FORWARD);
-        runClickTypeMap.put("鼠标后侧键点击", MouseButton.BACK);
-        runClickTypeMap.put("鼠标仅移动", MouseButton.NONE);
+        runClickTypeMap.put(mouseButton_primary, MouseButton.PRIMARY);
+        runClickTypeMap.put(mouseButton_secondary, MouseButton.SECONDARY);
+        runClickTypeMap.put(mouseButton_middle, MouseButton.MIDDLE);
+        runClickTypeMap.put(mouseButton_forward, MouseButton.FORWARD);
+        runClickTypeMap.put(mouseButton_back, MouseButton.BACK);
+        runClickTypeMap.put(mouseButton_none, MouseButton.NONE);
     }
 
     /**
@@ -397,11 +417,11 @@ public class CommonFinals {
     public static final Map<Integer, String> recordClickTypeMap = new HashMap<>();
 
     static {
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON1, "鼠标左键点击");
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON2, "鼠标右键点击");
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON3, "鼠标中键点击");
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON4, "鼠标后侧键点击");
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON5, "鼠标前侧键点击");
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON1, mouseButton_primary);
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON2, mouseButton_secondary);
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON3, mouseButton_middle);
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back);
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
     }
 
 }

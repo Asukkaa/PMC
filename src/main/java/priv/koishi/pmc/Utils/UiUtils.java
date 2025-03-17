@@ -564,6 +564,49 @@ public class UiUtils {
         contextMenu.getItems().add(menuItem);
     }
 
+    public static void insertDataMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu, List<ClickPositionBean> dataList) {
+        Menu menuItem = new Menu("插入数据");
+        // 创建二级菜单项
+        MenuItem insertUp = new MenuItem(menuItem_insertUp);
+        MenuItem insertDown = new MenuItem(menuItem_insertDown);
+        MenuItem recordUp = new MenuItem(menuItem_recordUp);
+        MenuItem recordDown = new MenuItem(menuItem_recordDown);
+        // 为每个菜单项添加事件处理
+        insertUp.setOnAction(event -> insertData(tableView, menuItem_insertUp, dataList));
+        insertDown.setOnAction(event -> insertData(tableView, menuItem_insertDown, dataList));
+        recordUp.setOnAction(event -> insertData(tableView, menuItem_recordUp, dataList));
+        recordDown.setOnAction(event -> insertData(tableView, menuItem_recordDown, dataList));
+        menuItem.getItems().addAll(insertUp, insertDown, recordUp, recordDown);
+        contextMenu.getItems().add(menuItem);
+    }
+
+    private static void insertData(TableView<ClickPositionBean> tableView, String insertType, List<ClickPositionBean> dataList) {
+        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        if (CollectionUtils.isNotEmpty(selectedItem)) {
+            switch (insertType) {
+                case menuItem_insertUp: {
+                    // 获取首个选中行的索引
+                    int selectedIndex = tableView.getItems().indexOf(selectedItem.getFirst());
+                    // 在选中行上方插入数据
+                    tableView.getItems().addAll(selectedIndex, dataList);
+                    // 滚动到插入位置
+                    tableView.scrollTo(selectedIndex);
+                    // 选中新插入的数据
+                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + dataList.size());
+                    // 插入后重新选中
+                    tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + dataList.size());
+                    break;
+                }
+                case menuItem_insertDown:
+                    break;
+                case menuItem_recordUp:
+                    break;
+                case menuItem_recordDown:
+                    break;
+            }
+        }
+    }
+
     /**
      * 修改操作类型
      *
@@ -573,19 +616,19 @@ public class UiUtils {
     public static void buildEditClickType(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
         Menu menuItem = new Menu("更改操作类型");
         // 创建二级菜单项
-        MenuItem primary = new MenuItem("鼠标左键点击");
-        MenuItem secondary = new MenuItem("鼠标右键点击");
-        MenuItem middle = new MenuItem("鼠标中键点击");
-        MenuItem forward = new MenuItem("鼠标前侧键点击");
-        MenuItem back = new MenuItem("鼠标后侧键点击");
-        MenuItem none = new MenuItem("鼠标仅移动");
+        MenuItem primary = new MenuItem(mouseButton_primary);
+        MenuItem secondary = new MenuItem(mouseButton_secondary);
+        MenuItem middle = new MenuItem(mouseButton_middle);
+        MenuItem forward = new MenuItem(mouseButton_forward);
+        MenuItem back = new MenuItem(mouseButton_back);
+        MenuItem none = new MenuItem(mouseButton_none);
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateClickType(tableView, "鼠标左键点击"));
-        secondary.setOnAction(event -> updateClickType(tableView, "鼠标右键点击"));
-        middle.setOnAction(event -> updateClickType(tableView, "鼠标中键点击"));
-        forward.setOnAction(event -> updateClickType(tableView, "鼠标前侧键点击"));
-        back.setOnAction(event -> updateClickType(tableView, "鼠标后侧键点击"));
-        none.setOnAction(event -> updateClickType(tableView, "鼠标仅移动"));
+        primary.setOnAction(event -> updateClickType(tableView, mouseButton_primary));
+        secondary.setOnAction(event -> updateClickType(tableView, mouseButton_secondary));
+        middle.setOnAction(event -> updateClickType(tableView, mouseButton_middle));
+        forward.setOnAction(event -> updateClickType(tableView, mouseButton_forward));
+        back.setOnAction(event -> updateClickType(tableView, mouseButton_back));
+        none.setOnAction(event -> updateClickType(tableView, mouseButton_none));
         menuItem.getItems().addAll(primary, secondary, middle, forward, back, none);
         contextMenu.getItems().add(menuItem);
     }

@@ -692,6 +692,9 @@ public class AutoClickController extends CommonProperties {
                 .setType(clickType_Click.getValue())
                 .setStartX(String.valueOf(startX))
                 .setStartY(String.valueOf(startY));
+        if (tableViewItemSize == -1) {
+            clickPositionBean.setName("测试步骤");
+        }
         return clickPositionBean;
     }
 
