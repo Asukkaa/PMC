@@ -662,10 +662,8 @@ public class AutoClickController extends CommonProperties {
         ContextMenu contextMenu = new ContextMenu();
         // 添加测试点击选项
         buildClickTestMenuItem(tableView_Click, contextMenu);
-        // 所选行上移一行选项
-        buildUpMoveDataMenuItem(tableView_Click, contextMenu);
-        // 所选行下移一行选项
-        buildDownMoveDataMenuItem(tableView_Click, contextMenu);
+        // 移动所选行选项
+        buildMoveDataMenuItem(tableView_Click, contextMenu);
         // 修改操作类型
         buildEditClickType(tableView_Click, contextMenu);
         // 插入数据选项
@@ -739,6 +737,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 获取点击步骤设置
      *
+     * @param tableViewItemSize 列表数据量（生成默认操作名称用）
      * @return clickPositionBean 自动操作步骤类
      */
     private ClickPositionBean getClickSetting(int tableViewItemSize) {

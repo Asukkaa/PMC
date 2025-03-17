@@ -502,62 +502,70 @@ public class UiUtils {
     }
 
     /**
-     * 所选行上移一行选项
+     * 移动所选行选项
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static <T> void buildUpMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem menuItem = new MenuItem("所选行上移一行");
-        menuItem.setOnAction(event -> {
-            // getSelectedCells处理上移操作有bug，通过getSelectedItems拿到的数据是实时变化的，需要一个新的list来存
-            List<T> selectionList = tableView.getSelectionModel().getSelectedItems();
-            List<T> selections = new ArrayList<>(selectionList);
-            List<T> fileList = tableView.getItems();
-            List<T> tempList = new ArrayList<>(fileList);
-            // 上移所选数据位置
-            for (int i = 0; i < selectionList.size(); i++) {
-                T t = selectionList.get(i);
-                int index = fileList.indexOf(t);
-                if (index - i > 0) {
-                    tempList.set(index, tempList.get(index - 1));
-                    tempList.set(index - 1, t);
-                }
-            }
-            fileList.clear();
-            fileList.addAll(tempList);
-            // 重新选中移动后的数据
-            for (T t : selections) {
-                int index = fileList.indexOf(t);
-                if (index != -1) {
-                    tableView.getSelectionModel().select(index);
-                }
-            }
-        });
+    public static <T> void buildMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
+        Menu menuItem = new Menu("移动所选数据");
+        // 创建二级菜单项
+        MenuItem up = new MenuItem("所选行上移一行");
+        MenuItem down = new MenuItem("所选行下移一行");
+        // 为每个菜单项添加事件处理
+        up.setOnAction(event -> buildUpMoveDataMenuItem(tableView));
+        down.setOnAction(event -> buildDownMoveDataMenuItem(tableView));
+        menuItem.getItems().addAll(up, down);
         contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 所选行上移一行选项
+     *
+     * @param tableView 要处理的数据列表
+     */
+    public static <T> void buildUpMoveDataMenuItem(TableView<T> tableView) {
+        // getSelectedCells处理上移操作有bug，通过getSelectedItems拿到的数据是实时变化的，需要一个新的list来存
+        List<T> selectionList = tableView.getSelectionModel().getSelectedItems();
+        List<T> selections = new ArrayList<>(selectionList);
+        List<T> fileList = tableView.getItems();
+        List<T> tempList = new ArrayList<>(fileList);
+        // 上移所选数据位置
+        for (int i = 0; i < selectionList.size(); i++) {
+            T t = selectionList.get(i);
+            int index = fileList.indexOf(t);
+            if (index - i > 0) {
+                tempList.set(index, tempList.get(index - 1));
+                tempList.set(index - 1, t);
+            }
+        }
+        fileList.clear();
+        fileList.addAll(tempList);
+        // 重新选中移动后的数据
+        for (T t : selections) {
+            int index = fileList.indexOf(t);
+            if (index != -1) {
+                tableView.getSelectionModel().select(index);
+            }
+        }
     }
 
     /**
      * 所选行下移一行选项
      *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
+     * @param tableView 要处理的数据列表
      */
-    public static <T> void buildDownMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem menuItem = new MenuItem("所选行下移一行");
-        menuItem.setOnAction(event -> {
-            var selectedCells = tableView.getSelectionModel().getSelectedCells();
-            int loopTime = 0;
-            for (int i = selectedCells.size(); i > 0; i--) {
-                int row = selectedCells.get(i - 1).getRow();
-                List<T> fileList = tableView.getItems();
-                loopTime++;
-                if (row + loopTime < fileList.size()) {
-                    fileList.add(row, fileList.remove(row + 1));
-                }
+    public static <T> void buildDownMoveDataMenuItem(TableView<T> tableView) {
+        var selectedCells = tableView.getSelectionModel().getSelectedCells();
+        int loopTime = 0;
+        for (int i = selectedCells.size(); i > 0; i--) {
+            int row = selectedCells.get(i - 1).getRow();
+            List<T> fileList = tableView.getItems();
+            loopTime++;
+            if (row + loopTime < fileList.size()) {
+                fileList.add(row, fileList.remove(row + 1));
             }
-        });
-        contextMenu.getItems().add(menuItem);
+        }
     }
 
     /**
