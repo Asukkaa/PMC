@@ -707,19 +707,11 @@ public class AutoClickController extends CommonProperties {
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             switch (insertType) {
                 case menuItem_insertUp: {
-                    ObservableList<ClickPositionBean> tableViewItems = tableView.getItems();
-                    List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
-                    ClickPositionBean clickPositionBean = getClickSetting(tableViewItems.size());
-                    clickPositionBeans.add(clickPositionBean);
-                    addData(clickPositionBeans, upAdd);
+                    addClick(upAdd);
                     break;
                 }
                 case menuItem_insertDown: {
-                    ObservableList<ClickPositionBean> tableViewItems = tableView.getItems();
-                    List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
-                    ClickPositionBean clickPositionBean = getClickSetting(tableViewItems.size());
-                    clickPositionBeans.add(clickPositionBean);
-                    addData(clickPositionBeans, downAdd);
+                    addClick(downAdd);
                     break;
                 }
                 case menuItem_recordUp: {
@@ -1134,11 +1126,31 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
+     * 获取操作设置并添加到列表中
+     *
+     * @param addType 添加类型
+     */
+    private void addClick(int addType) {
+        if (autoClickTask == null && !recordClicking) {
+            ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
+            // 获取点击步骤设置
+            ClickPositionBean clickPositionBean = getClickSetting(tableViewItems.size());
+            List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
+            clickPositionBeans.add(clickPositionBean);
+            // 向列表添加数据
+            addData(clickPositionBeans, addType);
+            // 初始化信息栏
+            updateLabel(log_Click, "");
+        }
+    }
+
+    /**
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
         disableNodes.add(runClick_Click);
         disableNodes.add(clickTest_Click);
+        disableNodes.add(tableView_Click);
         disableNodes.add(recordClick_Click);
         disableNodes.add(addPosition_Click);
         disableNodes.add(clearButton_Click);
@@ -1232,18 +1244,7 @@ public class AutoClickController extends CommonProperties {
      */
     @FXML
     private void addPosition() {
-        if (autoClickTask == null && !recordClicking) {
-            ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
-            int tableViewItemSize = tableViewItems.size();
-            // 获取点击步骤设置
-            ClickPositionBean clickPositionBean = getClickSetting(tableViewItemSize);
-            List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
-            clickPositionBeans.add(clickPositionBean);
-            // 向列表添加数据
-            addData(clickPositionBeans, append);
-            // 初始化信息栏
-            updateLabel(log_Click, "");
-        }
+        addClick(append);
     }
 
     /**
