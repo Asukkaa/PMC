@@ -1367,7 +1367,7 @@ public class AutoClickController extends CommonProperties {
      * 录制自动操作按钮
      */
     @FXML
-    private void recordClick() throws IOException {
+    private void recordClick() {
         startRecord(append);
     }
 
