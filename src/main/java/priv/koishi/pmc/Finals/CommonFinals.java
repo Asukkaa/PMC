@@ -307,6 +307,32 @@ public class CommonFinals {
 
     public static final String key_lastColorCustom = "lastColorCustom";
 
+    public static final String menuItem_insertUp = "插入设置步骤到所选行第一行上一行";
+
+    public static final String menuItem_insertDown = "插入设置步骤到所选行最后一行下一行";
+
+    public static final String menuItem_recordUp = "插入录制步骤到所选行第一行上一行";
+
+    public static final String menuItem_recordDown = "插入录制步骤到所选行最后一行下一行";
+
+    public static final String menuItem_upCopy = "复制所选数据到所选行第一行上方";
+
+    public static final String menuItem_downCopy = "复制所选数据到所选行最后一行下方";
+
+    public static final String menuItem_appendCopy = "复制所选数据到列表最后一行";
+
+    public static final String mouseButton_primary = "鼠标左键点击";
+
+    public static final String mouseButton_secondary = "鼠标右键点击";
+
+    public static final String mouseButton_middle = "鼠标中键点击";
+
+    public static final String mouseButton_forward = "鼠标前侧键点击";
+
+    public static final String mouseButton_back = "鼠标后侧键点击";
+
+    public static final String mouseButton_none = "鼠标仅移动";
+
     /**
      * 资源文件夹地址前缀
      */
@@ -391,26 +417,6 @@ public class CommonFinals {
      * 向列表最后一行追加
      */
     public static final int append = -1;
-
-    public static final String menuItem_insertUp = "插入设置步骤到所选行第一行上一行";
-
-    public static final String menuItem_insertDown = "插入设置步骤到所选行最后一行下一行";
-
-    public static final String menuItem_recordUp = "插入录制步骤到所选行第一行上一行";
-
-    public static final String menuItem_recordDown = "插入录制步骤到所选行最后一行下一行";
-
-    public static final String mouseButton_primary = "鼠标左键点击";
-
-    public static final String mouseButton_secondary = "鼠标右键点击";
-
-    public static final String mouseButton_middle = "鼠标中键点击";
-
-    public static final String mouseButton_forward = "鼠标前侧键点击";
-
-    public static final String mouseButton_back = "鼠标后侧键点击";
-
-    public static final String mouseButton_none = "鼠标仅移动";
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

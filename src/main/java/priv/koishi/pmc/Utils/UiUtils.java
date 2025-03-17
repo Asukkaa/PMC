@@ -350,6 +350,60 @@ public class UiUtils {
     }
 
     /**
+     * 向列表指定位置添加数据
+     *
+     * @param data           要添加的数据
+     * @param addType        添加位置类型
+     * @param tableView      要添加数据的列表
+     * @param dataNumber     用于展示列表数据数量的文本框
+     * @param dataNumberUnit 数据数量单位
+     */
+    public static <T> void addData(List<T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
+        ObservableList<T> tableViewItems = tableView.getItems();
+        List<T> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        switch (addType) {
+            // 在列表所选行第一行上方插入
+            case upAdd: {
+                // 获取首个选中行的索引
+                int selectedIndex = tableViewItems.indexOf(selectedItem.getFirst());
+                // 在选中行上方插入数据
+                tableView.getItems().addAll(selectedIndex, data);
+                // 滚动到插入位置
+                tableView.scrollTo(selectedIndex);
+                // 选中新插入的数据
+                tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                // 插入后重新选中
+                tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + data.size());
+                break;
+            }
+            // 在列表所选行最后一行下方插入
+            case downAdd: {
+                // 获取最后一个选中行的索引
+                int selectedIndex = tableViewItems.indexOf(selectedItem.getLast()) + 1;
+                // 在选中行下方插入数据
+                tableView.getItems().addAll(selectedIndex, data);
+                // 滚动到插入位置
+                tableView.scrollTo(selectedIndex);
+                // 选中新插入的数据
+                tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                // 插入后重新选中
+                tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + data.size() - 1);
+                break;
+            }
+            // 向列表最后一行追加
+            case append: {
+                // 向列表最后一行追加数据
+                tableViewItems.addAll(data);
+                // 滚动到插入位置
+                tableView.scrollTo(tableViewItems.size());
+                break;
+            }
+        }
+        // 同步表格数据量
+        dataNumber.setText(text_allHave + tableViewItems.size() + dataNumberUnit);
+    }
+
+    /**
      * 限制输入框只能输入指定范围内的整数
      *
      * @param textField 要处理的文本输入框
@@ -507,16 +561,17 @@ public class UiUtils {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static <T> void buildMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
-        Menu menuItem = new Menu("移动所选数据");
+    public static <T> void buildMoveDataMenu(TableView<T> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu("移动所选数据");
         // 创建二级菜单项
         MenuItem up = new MenuItem("所选行上移一行");
         MenuItem down = new MenuItem("所选行下移一行");
         // 为每个菜单项添加事件处理
-        up.setOnAction(event -> buildUpMoveDataMenuItem(tableView));
-        down.setOnAction(event -> buildDownMoveDataMenuItem(tableView));
-        menuItem.getItems().addAll(up, down);
-        contextMenu.getItems().add(menuItem);
+        up.setOnAction(event -> upMoveDataMenuItem(tableView));
+        down.setOnAction(event -> downMoveDataMenuItem(tableView));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(up, down);
+        contextMenu.getItems().add(menu);
     }
 
     /**
@@ -524,7 +579,7 @@ public class UiUtils {
      *
      * @param tableView 要处理的数据列表
      */
-    public static <T> void buildUpMoveDataMenuItem(TableView<T> tableView) {
+    private static <T> void upMoveDataMenuItem(TableView<T> tableView) {
         // getSelectedCells处理上移操作有bug，通过getSelectedItems拿到的数据是实时变化的，需要一个新的list来存
         List<T> selectionList = tableView.getSelectionModel().getSelectedItems();
         List<T> selections = new ArrayList<>(selectionList);
@@ -555,7 +610,7 @@ public class UiUtils {
      *
      * @param tableView 要处理的数据列表
      */
-    public static <T> void buildDownMoveDataMenuItem(TableView<T> tableView) {
+    private static <T> void downMoveDataMenuItem(TableView<T> tableView) {
         var selectedCells = tableView.getSelectionModel().getSelectedCells();
         int loopTime = 0;
         for (int i = selectedCells.size(); i > 0; i--) {
@@ -568,14 +623,48 @@ public class UiUtils {
         }
     }
 
+    public static void buildCopyDataMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu, Label dataNumber) {
+        Menu menu = new Menu("复制所选数据");
+        // 创建二级菜单项
+        MenuItem upCopy = new MenuItem(menuItem_upCopy);
+        MenuItem downCopy = new MenuItem(menuItem_downCopy);
+        MenuItem appendCopy = new MenuItem(menuItem_appendCopy);
+        // 为每个菜单项添加事件处理
+        upCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_upCopy, dataNumber));
+        downCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_downCopy, dataNumber));
+        appendCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_appendCopy, dataNumber));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(upCopy, downCopy, appendCopy);
+        contextMenu.getItems().add(menu);
+    }
+
+    private static void copyDataMenuItem(TableView<ClickPositionBean> tableView, String copyType, Label dataNumber) {
+        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
+
+        switch (copyType) {
+            case menuItem_upCopy: {
+                addData(selectedItem, upAdd, tableView, dataNumber, text_process);
+                break;
+            }
+            case menuItem_downCopy: {
+                addData(selectedItem, downAdd, tableView, dataNumber, text_process);
+                break;
+            }
+            case menuItem_appendCopy: {
+                addData(selectedItem, append, tableView, dataNumber, text_process);
+                break;
+            }
+        }
+    }
+
     /**
      * 修改操作类型
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildEditClickType(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
-        Menu menuItem = new Menu("更改操作类型");
+    public static void buildEditClickTypeMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu("更改操作类型");
         // 创建二级菜单项
         MenuItem primary = new MenuItem(mouseButton_primary);
         MenuItem secondary = new MenuItem(mouseButton_secondary);
@@ -584,14 +673,15 @@ public class UiUtils {
         MenuItem back = new MenuItem(mouseButton_back);
         MenuItem none = new MenuItem(mouseButton_none);
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateClickType(tableView, mouseButton_primary));
-        secondary.setOnAction(event -> updateClickType(tableView, mouseButton_secondary));
-        middle.setOnAction(event -> updateClickType(tableView, mouseButton_middle));
-        forward.setOnAction(event -> updateClickType(tableView, mouseButton_forward));
-        back.setOnAction(event -> updateClickType(tableView, mouseButton_back));
-        none.setOnAction(event -> updateClickType(tableView, mouseButton_none));
-        menuItem.getItems().addAll(primary, secondary, middle, forward, back, none);
-        contextMenu.getItems().add(menuItem);
+        primary.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_primary));
+        secondary.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_secondary));
+        middle.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_middle));
+        forward.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_forward));
+        back.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_back));
+        none.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_none));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(primary, secondary, middle, forward, back, none);
+        contextMenu.getItems().add(menu);
     }
 
     /**
@@ -600,7 +690,7 @@ public class UiUtils {
      * @param tableView 要添加右键菜单的列表
      * @param clickType 操作类型
      */
-    private static void updateClickType(TableView<ClickPositionBean> tableView, String clickType) {
+    private static void updateClickTypeMenuItem(TableView<ClickPositionBean> tableView, String clickType) {
         List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {

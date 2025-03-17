@@ -663,11 +663,11 @@ public class AutoClickController extends CommonProperties {
         // 添加测试点击选项
         buildClickTestMenuItem(tableView_Click, contextMenu);
         // 移动所选行选项
-        buildMoveDataMenuItem(tableView_Click, contextMenu);
+        buildMoveDataMenu(tableView_Click, contextMenu);
         // 修改操作类型
-        buildEditClickType(tableView_Click, contextMenu);
+        buildEditClickTypeMenu(tableView_Click, contextMenu);
         // 插入数据选项
-        insertDataMenuItem(tableView_Click, contextMenu);
+        insertDataMenu(tableView_Click, contextMenu);
         // 删除所选数据选项
         buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);
         // 为列表添加右键菜单并设置可选择多行
@@ -680,20 +680,21 @@ public class AutoClickController extends CommonProperties {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void insertDataMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
-        Menu menuItem = new Menu("插入数据");
+    private void insertDataMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu("插入数据");
         // 创建二级菜单项
         MenuItem insertUp = new MenuItem(menuItem_insertUp);
         MenuItem insertDown = new MenuItem(menuItem_insertDown);
         MenuItem recordUp = new MenuItem(menuItem_recordUp);
         MenuItem recordDown = new MenuItem(menuItem_recordDown);
         // 为每个菜单项添加事件处理
-        insertUp.setOnAction(event -> insertData(tableView, menuItem_insertUp));
-        insertDown.setOnAction(event -> insertData(tableView, menuItem_insertDown));
-        recordUp.setOnAction(event -> insertData(tableView, menuItem_recordUp));
-        recordDown.setOnAction(event -> insertData(tableView, menuItem_recordDown));
-        menuItem.getItems().addAll(insertUp, insertDown, recordUp, recordDown);
-        contextMenu.getItems().add(menuItem);
+        insertUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertUp));
+        insertDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertDown));
+        recordUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordUp));
+        recordDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordDown));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(insertUp, insertDown, recordUp, recordDown);
+        contextMenu.getItems().add(menu);
     }
 
     /**
@@ -702,7 +703,7 @@ public class AutoClickController extends CommonProperties {
      * @param tableView  要处理的数据列表
      * @param insertType 数据插入类型
      */
-    private void insertData(TableView<ClickPositionBean> tableView, String insertType) {
+    private void insertDataMenuItem(TableView<ClickPositionBean> tableView, String insertType) {
         List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             switch (insertType) {
@@ -812,54 +813,6 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
-     * 向列表添加数据
-     *
-     * @param clickPositionBeans 自动流程集合
-     * @param addType            添加类型
-     */
-    private void addData(List<ClickPositionBean> clickPositionBeans, int addType) {
-        ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
-        List<ClickPositionBean> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
-        switch (addType) {
-            // 在列表所选行第一行上方插入
-            case upAdd: {
-                // 获取首个选中行的索引
-                int selectedIndex = tableViewItems.indexOf(selectedItem.getFirst());
-                // 在选中行上方插入数据
-                tableView_Click.getItems().addAll(selectedIndex, clickPositionBeans);
-                // 滚动到插入位置
-                tableView_Click.scrollTo(selectedIndex);
-                // 选中新插入的数据
-                tableView_Click.getSelectionModel().selectRange(selectedIndex, selectedIndex + clickPositionBeans.size());
-                // 插入后重新选中
-                tableView_Click.getSelectionModel().selectIndices(selectedIndex, selectedIndex + clickPositionBeans.size());
-                break;
-            }
-            // 在列表所选行最后一行下方插入
-            case downAdd: {
-                // 获取最后一个选中行的索引
-                int selectedIndex = tableViewItems.indexOf(selectedItem.getLast()) + 1;
-                // 在选中行下方插入数据
-                tableView_Click.getItems().addAll(selectedIndex, clickPositionBeans);
-                // 滚动到插入位置
-                tableView_Click.scrollTo(selectedIndex);
-                // 选中新插入的数据
-                tableView_Click.getSelectionModel().selectRange(selectedIndex, selectedIndex + clickPositionBeans.size());
-                // 插入后重新选中
-                tableView_Click.getSelectionModel().selectIndices(selectedIndex, selectedIndex + clickPositionBeans.size() - 1);
-                break;
-            }
-            // 向列表最后一行追加
-            case append: {
-                tableViewItems.addAll(clickPositionBeans);
-                break;
-            }
-        }
-        // 同步表格数据量
-        dataNumber_Click.setText(text_allHave + tableViewItems.size() + text_process);
-    }
-
-    /**
      * 将自动流程添加到列表中
      *
      * @param clickPositionBeans 自动流程集合
@@ -876,7 +829,7 @@ public class AutoClickController extends CommonProperties {
             }
         }
         // 向列表添加数据
-        addData(clickPositionBeans, append);
+        addData(clickPositionBeans, append, tableView_Click, dataNumber_Click, text_process);
         updateLabel(log_Click, text_loadSuccess + inFilePath);
         log_Click.setTextFill(Color.GREEN);
     }
@@ -1050,7 +1003,7 @@ public class AutoClickController extends CommonProperties {
                         // 添加至表格
                         List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
                         clickPositionBeans.add(clickBean);
-                        addData(clickPositionBeans, addType);
+                        addData(clickPositionBeans, addType, tableView_Click, dataNumber_Click, text_process);
                         // 日志反馈
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_recorded + recordClickTypeMap.get(pressButton) + " 松开 (" + clickBean.getEndX() + "," + clickBean.getEndY() + ")";
@@ -1138,7 +1091,7 @@ public class AutoClickController extends CommonProperties {
             List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
             clickPositionBeans.add(clickPositionBean);
             // 向列表添加数据
-            addData(clickPositionBeans, addType);
+            addData(clickPositionBeans, addType, tableView_Click, dataNumber_Click, text_process);
             // 初始化信息栏
             updateLabel(log_Click, "");
         }
