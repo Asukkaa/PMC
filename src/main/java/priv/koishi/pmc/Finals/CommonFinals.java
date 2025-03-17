@@ -377,6 +377,21 @@ public class CommonFinals {
      */
     public static final int defaultOffsetY = 30;
 
+    /**
+     * 在列表所选行第一行上方插入
+     */
+    public static final int upAdd = 1;
+
+    /**
+     * 在列表所选行最后一行下方插入
+     */
+    public static final int downAdd = 0;
+
+    /**
+     * 向列表追加
+     */
+    public static final int append = -1;
+
     public static final String menuItem_insertUp = "插入设置步骤到所选行第一行上一行";
 
     public static final String menuItem_insertDown = "插入设置步骤到所选行最后一行下一行";

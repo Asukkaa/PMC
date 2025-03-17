@@ -20,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
@@ -667,10 +668,80 @@ public class AutoClickController extends CommonProperties {
         buildDownMoveDataMenuItem(tableView_Click, contextMenu);
         // 修改操作类型
         buildEditClickType(tableView_Click, contextMenu);
+        // 插入数据选项
+        insertDataMenuItem(tableView_Click, contextMenu);
         // 删除所选数据选项
         buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView_Click);
+    }
+
+    /**
+     * 插入数据选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    private void insertDataMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+        Menu menuItem = new Menu("插入数据");
+        // 创建二级菜单项
+        MenuItem insertUp = new MenuItem(menuItem_insertUp);
+        MenuItem insertDown = new MenuItem(menuItem_insertDown);
+        MenuItem recordUp = new MenuItem(menuItem_recordUp);
+        MenuItem recordDown = new MenuItem(menuItem_recordDown);
+        // 为每个菜单项添加事件处理
+        insertUp.setOnAction(event -> insertData(tableView, menuItem_insertUp));
+        insertDown.setOnAction(event -> insertData(tableView, menuItem_insertDown));
+        recordUp.setOnAction(event -> insertData(tableView, menuItem_recordUp));
+        recordDown.setOnAction(event -> insertData(tableView, menuItem_recordDown));
+        menuItem.getItems().addAll(insertUp, insertDown, recordUp, recordDown);
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 插入数据选项二级菜单选项
+     *
+     * @param tableView  要处理的数据列表
+     * @param insertType 数据插入类型
+     */
+    private void insertData(TableView<ClickPositionBean> tableView, String insertType) {
+        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        if (CollectionUtils.isNotEmpty(selectedItem)) {
+            switch (insertType) {
+                case menuItem_insertUp: {
+                    ObservableList<ClickPositionBean> tableViewItems = tableView.getItems();
+                    List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
+                    ClickPositionBean clickPositionBean = getClickSetting(tableViewItems.size());
+                    clickPositionBeans.add(clickPositionBean);
+                    addData(clickPositionBeans, upAdd);
+                    break;
+                }
+                case menuItem_insertDown: {
+                    ObservableList<ClickPositionBean> tableViewItems = tableView.getItems();
+                    List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
+                    ClickPositionBean clickPositionBean = getClickSetting(tableViewItems.size());
+                    clickPositionBeans.add(clickPositionBean);
+                    addData(clickPositionBeans, downAdd);
+                    break;
+                }
+                case menuItem_recordUp: {
+                    try {
+                        startRecord(upAdd);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                }
+                case menuItem_recordDown: {
+                    try {
+                        startRecord(downAdd);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -761,20 +832,45 @@ public class AutoClickController extends CommonProperties {
      * 向列表添加数据
      *
      * @param clickPositionBeans 自动流程集合
+     * @param addType            添加类型
      */
-    private void addData(List<ClickPositionBean> clickPositionBeans) {
+    private void addData(List<ClickPositionBean> clickPositionBeans, int addType) {
         ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
-        tableViewItems.addAll(clickPositionBeans);
-        // 自动填充javafx表格
-        autoBuildTableViewData(tableView_Click, tableViewItems, tabId);
+        List<ClickPositionBean> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
+        switch (addType) {
+            case upAdd: {
+                // 获取首个选中行的索引
+                int selectedIndex = tableViewItems.indexOf(selectedItem.getFirst());
+                // 在选中行上方插入数据
+                tableView_Click.getItems().addAll(selectedIndex, clickPositionBeans);
+                // 滚动到插入位置
+                tableView_Click.scrollTo(selectedIndex);
+                // 选中新插入的数据
+                tableView_Click.getSelectionModel().selectRange(selectedIndex, selectedIndex + clickPositionBeans.size());
+                // 插入后重新选中
+                tableView_Click.getSelectionModel().selectIndices(selectedIndex, selectedIndex + clickPositionBeans.size());
+                break;
+            }
+            case downAdd: {
+                // 获取最后一个选中行的索引
+                int selectedIndex = tableViewItems.indexOf(selectedItem.getLast()) + 1;
+                // 在选中行下方插入数据
+                tableView_Click.getItems().addAll(selectedIndex, clickPositionBeans);
+                // 滚动到插入位置
+                tableView_Click.scrollTo(selectedIndex);
+                // 选中新插入的数据
+                tableView_Click.getSelectionModel().selectRange(selectedIndex, selectedIndex + clickPositionBeans.size());
+                // 插入后重新选中
+                tableView_Click.getSelectionModel().selectIndices(selectedIndex, selectedIndex + clickPositionBeans.size() - 1);
+                break;
+            }
+            case append: {
+                tableViewItems.addAll(clickPositionBeans);
+                break;
+            }
+        }
         // 同步表格数据量
         dataNumber_Click.setText(text_allHave + tableViewItems.size() + text_process);
-        // 表格设置为可编辑
-        makeCellCanEdit();
-        // 设置列表通过拖拽排序行
-        tableViewDragRow(tableView_Click);
-        // 构建右键菜单
-        buildContextMenu();
     }
 
     /**
@@ -794,7 +890,7 @@ public class AutoClickController extends CommonProperties {
             }
         }
         // 向列表添加数据
-        addData(clickPositionBeans);
+        addData(clickPositionBeans, append);
         updateLabel(log_Click, text_loadSuccess + inFilePath);
         log_Click.setTextFill(Color.GREEN);
     }
@@ -896,8 +992,10 @@ public class AutoClickController extends CommonProperties {
 
     /**
      * 开启全局鼠标监听
+     *
+     * @param addType 添加类型
      */
-    private void startNativeMouseListener() {
+    private void startNativeMouseListener(int addType) {
         removeNativeListener(nativeMouseListener);
         // 鼠标监听器
         nativeMouseListener = new NativeMouseListener() {
@@ -966,7 +1064,7 @@ public class AutoClickController extends CommonProperties {
                         // 添加至表格
                         List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
                         clickPositionBeans.add(clickBean);
-                        addData(clickPositionBeans);
+                        addData(clickPositionBeans, addType);
                         // 日志反馈
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_recorded + recordClickTypeMap.get(pressButton) + " 松开 (" + clickBean.getEndX() + "," + clickBean.getEndY() + ")";
@@ -977,6 +1075,64 @@ public class AutoClickController extends CommonProperties {
             }
         };
         GlobalScreen.addNativeMouseListener(nativeMouseListener);
+    }
+
+    /**
+     * 开始录制
+     *
+     * @param addType 添加类型
+     */
+    private void startRecord(int addType) throws IOException {
+        if (!runClicking && !recordClicking) {
+            recordClicking = true;
+            // 改变要防重复点击的组件状态
+            changeDisableNodes(disableNodes, true);
+            // 获取准备时间值
+            int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click, Integer.parseInt(defaultPreparationRecordTime), 0, null);
+            // 开始录制
+            CheckBox hideWindowRecord = (CheckBox) mainScene.lookup("#hideWindowRecord_Set");
+            if (hideWindowRecord.isSelected()) {
+                mainStage.setIconified(true);
+            }
+            // 开启键盘监听
+            startNativeKeyListener();
+            // 设置浮窗文本显示准备时间
+            floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
+            // 显示浮窗
+            showFloatingWindow(false);
+            if (preparationTimeValue == 0) {
+                // 开启鼠标监听
+                startNativeMouseListener(addType);
+                // 录制开始时间
+                recordingStartTime = System.currentTimeMillis();
+                // 更新浮窗文本
+                floatingLabel.setText(text_cancelTask + text_recordClicking);
+            } else {
+                recordTimeline = new Timeline();
+                AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
+                // 创建 Timeline 来实现倒计时
+                Timeline finalTimeline = recordTimeline;
+                recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                    preparationTime.getAndDecrement();
+                    if (preparationTime.get() > 0) {
+                        floatingLabel.setText(text_cancelTask + preparationTime + text_preparation);
+                    } else {
+                        // 开启鼠标监听
+                        startNativeMouseListener(addType);
+                        // 录制开始时间
+                        recordingStartTime = System.currentTimeMillis();
+                        // 停止 Timeline
+                        finalTimeline.stop();
+                        // 更新浮窗文本
+                        floatingLabel.setText(text_cancelTask + text_recordClicking);
+                    }
+                }));
+                // 设置 Timeline 的循环次数
+                recordTimeline.setCycleCount(preparationTimeValue);
+                // 启动 Timeline
+                recordTimeline.play();
+            }
+        }
     }
 
     /**
@@ -1024,6 +1180,14 @@ public class AutoClickController extends CommonProperties {
             new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件
             setDisableNodes();
+            // 自动填充javafx表格
+            autoBuildTableViewData(tableView_Click, ClickPositionBean.class, tabId);
+            // 表格设置为可编辑
+            makeCellCanEdit();
+            // 设置列表通过拖拽排序行
+            tableViewDragRow(tableView_Click);
+            // 构建右键菜单
+            buildContextMenu();
         });
     }
 
@@ -1078,7 +1242,7 @@ public class AutoClickController extends CommonProperties {
             List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
             clickPositionBeans.add(clickPositionBean);
             // 向列表添加数据
-            addData(clickPositionBeans);
+            addData(clickPositionBeans, append);
             // 初始化信息栏
             updateLabel(log_Click, "");
         }
@@ -1205,56 +1369,7 @@ public class AutoClickController extends CommonProperties {
      */
     @FXML
     private void recordClick() throws IOException {
-        if (!runClicking && !recordClicking) {
-            recordClicking = true;
-            // 改变要防重复点击的组件状态
-            changeDisableNodes(disableNodes, true);
-            // 获取准备时间值
-            int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click, Integer.parseInt(defaultPreparationRecordTime), 0, null);
-            // 开始录制
-            CheckBox hideWindowRecord = (CheckBox) mainScene.lookup("#hideWindowRecord_Set");
-            if (hideWindowRecord.isSelected()) {
-                mainStage.setIconified(true);
-            }
-            // 开启键盘监听
-            startNativeKeyListener();
-            // 设置浮窗文本显示准备时间
-            floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
-            // 显示浮窗
-            showFloatingWindow(false);
-            if (preparationTimeValue == 0) {
-                // 开启鼠标监听
-                startNativeMouseListener();
-                // 录制开始时间
-                recordingStartTime = System.currentTimeMillis();
-                // 更新浮窗文本
-                floatingLabel.setText(text_cancelTask + text_recordClicking);
-            } else {
-                recordTimeline = new Timeline();
-                AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
-                // 创建 Timeline 来实现倒计时
-                Timeline finalTimeline = recordTimeline;
-                recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-                    preparationTime.getAndDecrement();
-                    if (preparationTime.get() > 0) {
-                        floatingLabel.setText(text_cancelTask + preparationTime + text_preparation);
-                    } else {
-                        // 开启鼠标监听
-                        startNativeMouseListener();
-                        // 录制开始时间
-                        recordingStartTime = System.currentTimeMillis();
-                        // 停止 Timeline
-                        finalTimeline.stop();
-                        // 更新浮窗文本
-                        floatingLabel.setText(text_cancelTask + text_recordClicking);
-                    }
-                }));
-                // 设置 Timeline 的循环次数
-                recordTimeline.setCycleCount(preparationTimeValue);
-                // 启动 Timeline
-                recordTimeline.play();
-            }
-        }
+        startRecord(append);
     }
 
 }

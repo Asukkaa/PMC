@@ -3,7 +3,6 @@ package priv.koishi.pmc.Utils;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -316,11 +315,10 @@ public class UiUtils {
      * 根据bean属性名自动填充javafx表格
      *
      * @param tableView 要处理的javafx表格
-     * @param dataList  javafx表格要展示的数据
+     * @param beanClass 要处理的javafx表格的数据bean类
      * @param tabId     用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
      */
-    public static <T> void autoBuildTableViewData(TableView<T> tableView, List<T> dataList, String tabId) {
-        Class<?> beanClass = dataList.getFirst().getClass();
+    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId) {
         // 获取对象的所有字段
         List<Field> fields = List.of(beanClass.getDeclaredFields());
         ObservableList<? extends TableColumn<?, ?>> columns = tableView.getColumns();
@@ -335,8 +333,6 @@ public class UiUtils {
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c -> c.getId().equals(finalFieldName)).findFirst();
             matched.ifPresent(m -> buildCellValue(m, fieldName));
         });
-        ObservableList<T> data = FXCollections.observableArrayList(dataList);
-        tableView.setItems(data);
     }
 
     /**
@@ -562,49 +558,6 @@ public class UiUtils {
             }
         });
         contextMenu.getItems().add(menuItem);
-    }
-
-    public static void insertDataMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu, List<ClickPositionBean> dataList) {
-        Menu menuItem = new Menu("插入数据");
-        // 创建二级菜单项
-        MenuItem insertUp = new MenuItem(menuItem_insertUp);
-        MenuItem insertDown = new MenuItem(menuItem_insertDown);
-        MenuItem recordUp = new MenuItem(menuItem_recordUp);
-        MenuItem recordDown = new MenuItem(menuItem_recordDown);
-        // 为每个菜单项添加事件处理
-        insertUp.setOnAction(event -> insertData(tableView, menuItem_insertUp, dataList));
-        insertDown.setOnAction(event -> insertData(tableView, menuItem_insertDown, dataList));
-        recordUp.setOnAction(event -> insertData(tableView, menuItem_recordUp, dataList));
-        recordDown.setOnAction(event -> insertData(tableView, menuItem_recordDown, dataList));
-        menuItem.getItems().addAll(insertUp, insertDown, recordUp, recordDown);
-        contextMenu.getItems().add(menuItem);
-    }
-
-    private static void insertData(TableView<ClickPositionBean> tableView, String insertType, List<ClickPositionBean> dataList) {
-        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
-        if (CollectionUtils.isNotEmpty(selectedItem)) {
-            switch (insertType) {
-                case menuItem_insertUp: {
-                    // 获取首个选中行的索引
-                    int selectedIndex = tableView.getItems().indexOf(selectedItem.getFirst());
-                    // 在选中行上方插入数据
-                    tableView.getItems().addAll(selectedIndex, dataList);
-                    // 滚动到插入位置
-                    tableView.scrollTo(selectedIndex);
-                    // 选中新插入的数据
-                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + dataList.size());
-                    // 插入后重新选中
-                    tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + dataList.size());
-                    break;
-                }
-                case menuItem_insertDown:
-                    break;
-                case menuItem_recordUp:
-                    break;
-                case menuItem_recordDown:
-                    break;
-            }
-        }
     }
 
     /**
