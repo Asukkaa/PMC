@@ -197,6 +197,11 @@ public class AutoClickController extends CommonProperties {
     private Label floatingMousePosition;
 
     /**
+     * 浮窗所在矩形
+     */
+    private Rectangle rectangle;
+
+    /**
      * 程序主场景
      */
     private Scene mainScene;
@@ -439,7 +444,7 @@ public class AutoClickController extends CommonProperties {
         Screen primaryScreen = Screen.getPrimary();
         Rectangle2D primaryBounds = primaryScreen.getBounds();
         // 创建一个矩形作为浮窗的内容
-        Rectangle rectangle = new Rectangle(floatingWidth, floatingHeight);
+        rectangle = new Rectangle(floatingWidth, floatingHeight);
         // 设置透明度
         rectangle.setOpacity(0);
         StackPane root = new StackPane();
@@ -483,6 +488,8 @@ public class AutoClickController extends CommonProperties {
         CheckBox floatingRun = (CheckBox) mainScene.lookup("#floatingRun_Set");
         CheckBox floatingRecord = (CheckBox) mainScene.lookup("#floatingRecord_Set");
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
+        Slider slider = (Slider) mainScene.lookup("#opacity_Set");
+        rectangle.setOpacity(slider.getValue());
         if (isShow) {
             Platform.runLater(() -> {
                 if (floatingStage != null && !floatingStage.isShowing()) {

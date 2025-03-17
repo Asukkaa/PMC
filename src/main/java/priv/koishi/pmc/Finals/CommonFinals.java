@@ -95,6 +95,11 @@ public class CommonFinals {
 
     public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
 
+    public static final String tip_opacity = """
+            滑动将会改变录制或运行自动操作时浮窗透明的
+            透明的为 0 时 Windows 下鼠标将会点击透过浮窗
+            macOS 暂时无法实现鼠标点击透过""";
+
     public static final String tip_recordClick = """
             点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
             每次鼠标点击并松开为一个步骤，每次点击间隔为操作前等待时间""";
@@ -133,7 +138,7 @@ public class CommonFinals {
 
     public static final String text_copySuccess = "复制成功";
 
-    public static final String text_nowValue = "当前所填值为 ";
+    public static final String text_nowValue = "当前设置值为 ";
 
     public static final String text_saveSuccess = "所有数据已导出到： ";
 
@@ -230,6 +235,8 @@ public class CommonFinals {
     public static final String key_floatingY = "floatingY";
 
     public static final String key_margin = "margin";
+
+    public static final String key_opacity = "opacity";
 
     public static final String key_mouseFloatingRun = "mouseFloatingRun";
 

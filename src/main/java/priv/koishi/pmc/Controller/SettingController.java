@@ -78,6 +78,11 @@ public class SettingController {
     private static final List<Node> disableNodes = new ArrayList<>();
 
     /**
+     * 浮窗所在矩形
+     */
+    private Rectangle rectangle;
+
+    /**
      * 浮窗Stage
      */
     private Stage floatingStage;
@@ -97,6 +102,9 @@ public class SettingController {
 
     @FXML
     private VBox vBox_Set;
+
+    @FXML
+    private Slider opacity_Set;
 
     @FXML
     private ColorPicker colorPicker_Set;
@@ -139,6 +147,8 @@ public class SettingController {
             prop.load(input);
             TextField floatingDistance = (TextField) scene.lookup("#floatingDistance_Set");
             prop.put(key_margin, floatingDistance.getText());
+            Slider opacity = (Slider) scene.lookup("#opacity_Set");
+            prop.put(key_opacity, String.valueOf(opacity.getValue()));
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
@@ -154,12 +164,13 @@ public class SettingController {
         Screen primaryScreen = Screen.getPrimary();
         Rectangle2D primaryBounds = primaryScreen.getBounds();
         // 创建一个矩形作为浮窗的内容
-        Rectangle rectangle = new Rectangle(floatingWidth, floatingHeight);
+        rectangle = new Rectangle(floatingWidth, floatingHeight);
+        // 描边设置
+        rectangle.setStroke(new Color(0, 0, 0, 1.0));
         // 设置透明度
-        rectangle.setOpacity(0.5);
+        rectangle.setFill(new Color(0, 0, 0, 0.5));
         StackPane root = new StackPane();
         root.setBackground(Background.fill(Color.TRANSPARENT));
-        root.setStyle("-fx-cursor: hand");
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
         // 添加拖拽事件处理器
         final double[] xOffset = new double[1];
@@ -206,10 +217,16 @@ public class SettingController {
      * 显示浮窗
      */
     private void showFloatingWindow() {
-        floatingLabel.setTextFill(colorPicker_Set.getValue());
-        floatingStage.setX(floatingX);
-        floatingStage.setY(floatingY);
         Platform.runLater(() -> {
+            floatingLabel.setTextFill(colorPicker_Set.getValue());
+            floatingStage.setX(floatingX);
+            floatingStage.setY(floatingY);
+            double opacity = opacity_Set.getValue();
+            if (opacity == 0) {
+                rectangle.setFill(new Color(0, 0, 0, 0.01));
+            } else {
+                rectangle.setFill(new Color(0, 0, 0, opacity));
+            }
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, true);
             if (mouseFloating_Set.isSelected()) {
@@ -301,6 +318,7 @@ public class SettingController {
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
         setControlLastConfig(offsetX_Set, prop, key_offsetX);
         setControlLastConfig(offsetY_Set, prop, key_offsetY);
+        setControlLastConfig(opacity_Set, prop, key_opacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
@@ -322,6 +340,7 @@ public class SettingController {
     private void setToolTip() {
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
+        addToolTip(tip_opacity, opacity_Set);
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_firstClick, firstClick_Set);
@@ -363,9 +382,44 @@ public class SettingController {
     }
 
     /**
-     * 给输入框添加内容变化监听
+     * 监听颜色选择器设置变化
      */
-    private void textFieldChangeListener() {
+    private void setColorsListener() {
+        colorPicker_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (floatingLabel != null) {
+                floatingLabel.setTextFill(newValue);
+            }
+        });
+    }
+
+    /**
+     * 监听数值滑动条内容变化
+     *
+     * @param slider 要监听的数值滑动条
+     */
+    private void sliderValueListener(Slider slider) {
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            double rounded = Math.round(newValue.doubleValue() * 10) / 10.0;
+            if (newValue.doubleValue() != rounded) {
+                slider.setValue(rounded);
+            }
+            if (rectangle != null) {
+                if (rounded == 0) {
+                    rectangle.setFill(new Color(0, 0, 0, 0.01));
+                } else {
+                    rectangle.setFill(new Color(0, 0, 0, rounded));
+                }
+            }
+            addValueToolTip(slider, tip_opacity, text_nowValue);
+        });
+    }
+
+    /**
+     * 给组件添加内容变化监听
+     */
+    private void nodeValueChangeListener() {
+        // 透明度滑块监听
+        sliderValueListener(opacity_Set);
         // 浮窗跟随鼠标时横轴偏移量输入框监听
         integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
@@ -409,14 +463,16 @@ public class SettingController {
     private void initialize() throws IOException {
         // 设置鼠标悬停提示
         setToolTip();
-        // 文本框输入监听
-        textFieldChangeListener();
+        // 给组件添加内容变化监听
+        nodeValueChangeListener();
         // 读取配置文件
         getConfig();
         // 初始化浮窗
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
+        // 监听颜色选择器设置变化
+        setColorsListener();
         Platform.runLater(() -> {
             mainScene = anchorPane_Set.getScene();
             // 获取鼠标坐标监听器

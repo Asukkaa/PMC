@@ -102,7 +102,7 @@ public class UiUtils {
     }
 
     /**
-     * 输入框鼠标停留提示输入值
+     * 文本输入框鼠标停留提示输入值
      *
      * @param textField 要添加提示的文本输入框
      * @param text      要展示的提示文案
@@ -121,6 +121,30 @@ public class UiUtils {
                 addToolTip(value, textField);
             } else {
                 textField.setTooltip(null);
+            }
+        }
+    }
+
+    /**
+     * 数值滑动条鼠标停留提示输入值
+     *
+     * @param slider    要添加提示的数值滑动条
+     * @param text      要展示的提示文案
+     * @param valueText 当前所填值提示文案
+     */
+    public static void addValueToolTip(Slider slider, String text, String valueText) {
+        String value = String.valueOf(slider.getValue());
+        if (StringUtils.isNotEmpty(text)) {
+            if (StringUtils.isNotEmpty(value)) {
+                addToolTip(text + "\n" + valueText + value, slider);
+            } else {
+                addToolTip(text, slider);
+            }
+        } else {
+            if (StringUtils.isNotEmpty(value)) {
+                addToolTip(value, slider);
+            } else {
+                slider.setTooltip(null);
             }
         }
     }
@@ -825,6 +849,8 @@ public class UiUtils {
                 label.setText(lastValue);
             } else if (control instanceof TextField textField) {
                 textField.setText(lastValue);
+            } else if (control instanceof Slider slider) {
+                slider.setValue(Double.parseDouble(lastValue));
             }
         }
     }
