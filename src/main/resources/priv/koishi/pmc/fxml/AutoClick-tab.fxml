@@ -6,7 +6,7 @@
 <?import java.lang.String?>
 <AnchorPane fx:id="anchorPane_Click" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AutoClickController">
-    <VBox fx:id="vbox_Click" spacing="10" AnchorPane.topAnchor="10">
+    <VBox fx:id="vbox_Click" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <HBox fx:id="cancelTipHBox_Click" spacing="10">
             <Label prefHeight="25" prefWidth="250" fx:id="mousePosition_Click"/>
 
@@ -105,11 +105,7 @@
             </placeholder>
 
             <columns>
-                <TableColumn fx:id="name_Click" text="操作名称" sortable="false"/>
-                <TableColumn fx:id="startX_Click" text="起始横(X)坐标" sortable="false"/>
-                <TableColumn fx:id="startY_Click" text="起始纵(Y)坐标" sortable="false"/>
-                <TableColumn fx:id="endX_Click" text="结束横(X)坐标" sortable="false"/>
-                <TableColumn fx:id="endY_Click" text="结束纵(Y)坐标" sortable="false"/>
+                <TableColumn fx:id="name_Click" text="步骤名称" sortable="false"/>
                 <TableColumn fx:id="clickTime_Click" text="操作时长(毫秒)" sortable="false"/>
                 <TableColumn fx:id="clickNum_Click" text="操作次数" sortable="false"/>
                 <TableColumn fx:id="clickInterval_Click" text="点击间隔(毫秒)" sortable="false"/>

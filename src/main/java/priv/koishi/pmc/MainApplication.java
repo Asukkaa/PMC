@@ -80,7 +80,7 @@ public class MainApplication extends Application {
             stage.setMaximized(true);
         }
         Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
-        stage.setTitle(prop.getProperty(appName));
+        stage.setTitle(appName);
         stage.setScene(scene);
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icon/PMC.png")).toExternalForm()));
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());

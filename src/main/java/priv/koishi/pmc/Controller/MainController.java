@@ -11,11 +11,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import static priv.koishi.pmc.Controller.AboutController.aboutAdaption;
 import static priv.koishi.pmc.Controller.AboutController.saveLogsNumSetting;
 import static priv.koishi.pmc.Controller.AutoClickController.autoClickAdaption;
 import static priv.koishi.pmc.Controller.AutoClickController.autoClickSaveLastConfig;
-import static priv.koishi.pmc.Controller.SettingController.settingAdaption;
 import static priv.koishi.pmc.Controller.SettingController.settingSaveLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
@@ -46,8 +44,7 @@ public class MainController {
         double stageHeight = stage.getHeight();
         TabPane tabPane = (TabPane) scene.lookup("#tabPane");
         tabPane.setStyle("-fx-pref-height: " + stageHeight + "px;");
-        settingAdaption(stage);
-        aboutAdaption(stage);
+        // 自动操作工具页设置组件宽度自适应
         autoClickAdaption(stage);
     }
 

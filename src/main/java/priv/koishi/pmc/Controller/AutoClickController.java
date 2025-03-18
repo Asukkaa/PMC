@@ -15,8 +15,10 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,16 +26,14 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.FileChooser;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +41,7 @@ import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.EditingCell.EditingCell;
 import priv.koishi.pmc.Listener.MousePositionListener;
+import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.Properties.CommonProperties;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
@@ -95,6 +96,16 @@ public class AutoClickController extends CommonProperties {
      * 默认运行准备时间
      */
     private static String defaultPreparationRunTime;
+
+    /**
+     * 详情页高度
+     */
+    private int detailHeight;
+
+    /**
+     * 详情页宽度
+     */
+    private int detailWidth;
 
     /**
      * 浮窗X坐标
@@ -245,8 +256,8 @@ public class AutoClickController extends CommonProperties {
     private TableView<ClickPositionBean> tableView_Click;
 
     @FXML
-    private TableColumn<ClickPositionBean, String> name_Click, startX_Click, startY_Click, endX_Click, endY_Click,
-            clickTime_Click, clickNum_Click, clickInterval_Click, waitTime_Click, type_Click;
+    private TableColumn<ClickPositionBean, String> name_Click, clickTime_Click, clickNum_Click,
+            clickInterval_Click, waitTime_Click, type_Click;
 
     /**
      * 组件自适应宽高
@@ -263,28 +274,18 @@ public class AutoClickController extends CommonProperties {
         double stageWidth = stage.getWidth();
         double tableWidth = stageWidth * 0.95;
         table.setMaxWidth(tableWidth);
-        Node settingVBox = scene.lookup("#vbox_Click");
-        settingVBox.setLayoutX(stageWidth * 0.03);
         Node name = scene.lookup("#name_Click");
-        name.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node startX = scene.lookup("#startX_Click");
-        startX.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node startY = scene.lookup("#startY_Click");
-        startY.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node endX = scene.lookup("#endX_Click");
-        endX.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node endY = scene.lookup("#endY_Click");
-        endY.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        name.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
         Node clickTime = scene.lookup("#clickTime_Click");
         clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node clickNum = scene.lookup("#clickNum_Click");
-        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
+        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node clickInterval = scene.lookup("#clickInterval_Click");
         clickInterval.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node waitTime = scene.lookup("#waitTime_Click");
-        waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.13 + "px;");
+        waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
         Node type = scene.lookup("#type_Click");
-        type.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        type.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
         Label dataNum = (Label) scene.lookup("#dataNumber_Click");
         HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Click");
         nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
@@ -295,7 +296,6 @@ public class AutoClickController extends CommonProperties {
         HBox cancelTipHBox = (HBox) scene.lookup("#cancelTipHBox_Click");
         nodeRightAlignment(cancelTipHBox, tableWidth, cancelTip);
     }
-
 
     /**
      * 保存最后一次配置的值
@@ -397,6 +397,8 @@ public class AutoClickController extends CommonProperties {
         defaultOutFileName = prop.getProperty(key_defaultOutFileName);
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
+        detailWidth = Integer.parseInt(prop.getProperty(key_detailWidth));
+        detailHeight = Integer.parseInt(prop.getProperty(key_detailHeight));
         floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
         defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
@@ -408,16 +410,12 @@ public class AutoClickController extends CommonProperties {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        startX_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        startY_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        endX_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        endY_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.3));
         clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
+        clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickInterval_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.13));
-        type_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.2));
+        type_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.2));
     }
 
     /**
@@ -426,14 +424,36 @@ public class AutoClickController extends CommonProperties {
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
         name_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setName));
-        startX_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setStartX, true, 0, null));
-        endX_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setEndX, true, 0, null));
-        startY_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setStartY, true, 0, null));
-        endY_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setEndY, true, 0, null));
         clickInterval_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setClickInterval, true, 0, null));
         waitTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setWaitTime, true, 0, null));
         clickTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setClickTime, true, 0, null));
         clickNum_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setClickNum, true, 0, null));
+    }
+
+    /**
+     * 显示详情页
+     *
+     * @throws IOException fxml加载异常
+     */
+    private void showDetail(ClickPositionBean item) throws IOException {
+        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("fxml/detail-view.fxml"));
+        Parent root = loader.load();
+        DetailController controller = loader.getController();
+        controller.initData(item);
+        // 设置保存后的回调
+        controller.setRefreshCallback(() -> {
+            // 刷新列表
+            tableView_Click.refresh();
+            dataNumber_Click.setText(text_allHave + tableView_Click.getItems().size() + text_process);
+        });
+        Stage detailStage = new Stage();
+        Scene scene = new Scene(root, detailWidth, detailHeight);
+        detailStage.setScene(scene);
+        detailStage.setTitle(item.getName() + " 步骤详情");
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        detailStage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource("icon/PMC.png")).toExternalForm()));
+        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.show();
     }
 
     /**
@@ -641,6 +661,53 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
+     * 构建右键菜单
+     */
+    private void buildContextMenu() {
+        // 添加右键菜单
+        ContextMenu contextMenu = new ContextMenu();
+        // 查看详情选项
+        buildDetailMenuItem(tableView_Click, contextMenu);
+        // 添加测试点击选项
+        buildClickTestMenuItem(tableView_Click, contextMenu);
+        // 移动所选行选项
+        buildMoveDataMenu(tableView_Click, contextMenu);
+        // 修改操作类型
+        buildEditClickTypeMenu(tableView_Click, contextMenu);
+        // 插入数据选项
+        insertDataMenu(tableView_Click, contextMenu);
+        // 复制数据选项
+        buildCopyDataMenu(tableView_Click, contextMenu, dataNumber_Click);
+        // 清空所选项选项
+        buildClearSelectedData(tableView_Click, contextMenu);
+        // 删除所选数据选项
+        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(contextMenu, tableView_Click);
+    }
+
+    /**
+     * 查看所选项第一行详情选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildDetailMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+        MenuItem detailItem = new MenuItem("查看所选项第一行详情");
+        detailItem.setOnAction(e -> {
+            ClickPositionBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
+            if (selected != null) {
+                try {
+                    showDetail(selected);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        contextMenu.getItems().add(detailItem);
+    }
+
+    /**
      * 执行选中的步骤选项
      *
      * @param tableView   要添加右键菜单的列表
@@ -659,30 +726,6 @@ public class AutoClickController extends CommonProperties {
             }
         });
         contextMenu.getItems().add(menuItem);
-    }
-
-    /**
-     * 构建右键菜单
-     */
-    private void buildContextMenu() {
-        // 添加右键菜单
-        ContextMenu contextMenu = new ContextMenu();
-        // 添加测试点击选项
-        buildClickTestMenuItem(tableView_Click, contextMenu);
-        // 移动所选行选项
-        buildMoveDataMenu(tableView_Click, contextMenu);
-        // 修改操作类型
-        buildEditClickTypeMenu(tableView_Click, contextMenu);
-        // 插入数据选项
-        insertDataMenu(tableView_Click, contextMenu);
-        // 复制数据选项
-        buildCopyDataMenu(tableView_Click, contextMenu, dataNumber_Click);
-        // 清空所选项选项
-        buildClearSelectedData(tableView_Click, contextMenu);
-        // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);
-        // 为列表添加右键菜单并设置可选择多行
-        setContextMenu(contextMenu, tableView_Click);
     }
 
     /**

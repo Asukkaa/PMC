@@ -121,19 +121,6 @@ public class SettingController {
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set;
 
     /**
-     * 组件自适应宽高
-     *
-     * @param stage 程序主舞台
-     */
-    public static void settingAdaption(Stage stage) {
-        Scene scene = stage.getScene();
-        // 设置组件宽度
-        double stageWidth = stage.getWidth();
-        Node settingVBox = scene.lookup("#vBox_Set");
-        settingVBox.setLayoutX(stageWidth * 0.03);
-    }
-
-    /**
      * 保存设置功能最后设置
      *
      * @param scene 程序主场景

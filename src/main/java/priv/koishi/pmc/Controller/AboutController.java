@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,7 +9,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -51,20 +49,8 @@ public class AboutController {
     private Label logsPath_Abt, mail_Abt, version_Abt, title_Abt;
 
     @FXML
-    private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt;
-
-    /**
-     * 组件自适应宽高
-     *
-     * @param stage 程序主舞台
-     */
-    public static void aboutAdaption(Stage stage) {
-        Scene scene = stage.getScene();
-        // 设置组件宽度
-        double stageWidth = stage.getWidth();
-        Node settingVBox = scene.lookup("#vBox_Abt");
-        settingVBox.setLayoutX(stageWidth * 0.03);
-    }
+    private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt,
+            openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt;
 
     /**
      * 读取配置文件

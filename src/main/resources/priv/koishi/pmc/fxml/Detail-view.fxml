@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="anchorPane_Det"
+            fx:controller="priv.koishi.pmc.Controller.DetailController">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="步骤名称:"/>
+                <TextField fx:id="clickName_Det"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="操作类型:"/>
+                <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="鼠标左键点击"/>
+                            <String fx:value="鼠标右键点击"/>
+                            <String fx:value="鼠标中键点击"/>
+                            <String fx:value="鼠标前侧键点击"/>
+                            <String fx:value="鼠标后侧键点击"/>
+                            <String fx:value="鼠标仅移动"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <String fx:value="鼠标左键点击"/>
+                    </value>
+                </ChoiceBox>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="鼠标点击起始横(X)坐标:"/>
+                <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="鼠标点击起始纵(Y)坐标:"/>
+                <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="鼠标点击结束横(X)坐标:"/>
+                <TextField fx:id="mouseEndX_Det" prefWidth="80"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="鼠标点击结束纵(Y)坐标:"/>
+                <TextField fx:id="mouseEndY_Det" prefWidth="80"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="每步执行前等待时间:"/>
+                <TextField fx:id="wait_Det" prefWidth="80"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="每步操作次数:"/>
+                <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="单次操作点击时长:"/>
+                <TextField fx:id="timeClick_Det" prefWidth="80"/>
+            </HBox>
+
+            <HBox spacing="5" prefWidth="240">
+                <Label prefHeight="25" text="单次操作点击间隔时间:"/>
+                <TextField fx:id="interval_Det" prefWidth="80"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <Button text="保存并关闭" onAction="#saveDetails"/>
+
+            <Button text="关闭详情页" onAction="#closeDetails"/>
+        </HBox>
+    </VBox>
+</AnchorPane>
