@@ -340,11 +340,9 @@ public class SettingController {
     private void setToolTip() {
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
-        addToolTip(tip_opacity, opacity_Set);
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_firstClick, firstClick_Set);
-        addToolTip(tip_colorPicker, colorPicker_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
@@ -356,6 +354,8 @@ public class SettingController {
         addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
+        addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(opacity_Set.getValue()));
+        addValueToolTip(colorPicker_Set, tip_colorPicker, text_nowValue, String.valueOf(colorPicker_Set.getValue()));
     }
 
     /**
@@ -389,19 +389,18 @@ public class SettingController {
             if (floatingLabel != null) {
                 floatingLabel.setTextFill(newValue);
             }
+            addValueToolTip(colorPicker_Set, tip_colorPicker, text_nowValue, String.valueOf(newValue));
         });
     }
 
     /**
      * 监听数值滑动条内容变化
-     *
-     * @param slider 要监听的数值滑动条
      */
-    private void sliderValueListener(Slider slider) {
-        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+    private void sliderValueListener() {
+        opacity_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
             double rounded = Math.round(newValue.doubleValue() * 10) / 10.0;
             if (newValue.doubleValue() != rounded) {
-                slider.setValue(rounded);
+                opacity_Set.setValue(rounded);
             }
             if (rectangle != null) {
                 if (rounded == 0) {
@@ -410,7 +409,7 @@ public class SettingController {
                     rectangle.setFill(new Color(0, 0, 0, rounded));
                 }
             }
-            addValueToolTip(slider, tip_opacity, text_nowValue);
+            addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(rounded));
         });
     }
 
@@ -418,8 +417,10 @@ public class SettingController {
      * 给组件添加内容变化监听
      */
     private void nodeValueChangeListener() {
+        // 监听颜色选择器设置变化
+        setColorsListener();
         // 透明度滑块监听
-        sliderValueListener(opacity_Set);
+        sliderValueListener();
         // 浮窗跟随鼠标时横轴偏移量输入框监听
         integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
@@ -471,8 +472,6 @@ public class SettingController {
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
-        // 监听颜色选择器设置变化
-        setColorsListener();
         Platform.runLater(() -> {
             mainScene = anchorPane_Set.getScene();
             // 获取鼠标坐标监听器

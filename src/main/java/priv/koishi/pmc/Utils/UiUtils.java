@@ -65,12 +65,11 @@ public class UiUtils {
      * 鼠标停留提示框
      *
      * @param nodes 需要显示提示框的组件
-     * @param tip      提示卡信息
+     * @param tip   提示卡信息
      */
     public static void addToolTip(String tip, Node... nodes) {
         for (Node node : nodes) {
-            Tooltip tooltip = creatTooltip(tip);
-            Tooltip.install(node, tooltip);
+            Tooltip.install(node, creatTooltip(tip));
         }
     }
 
@@ -111,41 +110,21 @@ public class UiUtils {
      */
     public static void addValueToolTip(TextField textField, String text, String valueText) {
         String value = textField.getText();
-        if (StringUtils.isNotEmpty(text)) {
-            if (StringUtils.isNotEmpty(value)) {
-                addToolTip(text + "\n" + valueText + value, textField);
-            } else {
-                addToolTip(text, textField);
-            }
-        } else {
-            if (StringUtils.isNotEmpty(value)) {
-                addToolTip(value, textField);
-            } else {
-                textField.setTooltip(null);
-            }
-        }
+        addValueToolTip(textField, text, valueText, value);
     }
 
-    /**
-     * 数值滑动条鼠标停留提示输入值
-     *
-     * @param slider    要添加提示的数值滑动条
-     * @param text      要展示的提示文案
-     * @param valueText 当前所填值提示文案
-     */
-    public static void addValueToolTip(Slider slider, String text, String valueText) {
-        String value = String.valueOf(slider.getValue());
+    public static void addValueToolTip(Node node, String text, String valueText, String value) {
         if (StringUtils.isNotEmpty(text)) {
             if (StringUtils.isNotEmpty(value)) {
-                addToolTip(text + "\n" + valueText + value, slider);
+                addToolTip(text + "\n" + valueText + value, node);
             } else {
-                addToolTip(text, slider);
+                addToolTip(text, node);
             }
         } else {
             if (StringUtils.isNotEmpty(value)) {
-                addToolTip(value, slider);
+                addToolTip(value, node);
             } else {
-                slider.setTooltip(null);
+                addToolTip(null, node);
             }
         }
     }
