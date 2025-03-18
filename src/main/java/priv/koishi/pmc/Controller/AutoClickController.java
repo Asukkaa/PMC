@@ -433,11 +433,16 @@ public class AutoClickController extends CommonProperties {
     /**
      * 显示详情页
      *
-     * @throws IOException fxml加载异常
+     * @param item 要显示详情的操作流程设置
      */
-    private void showDetail(ClickPositionBean item) throws IOException {
+    private void showDetail(ClickPositionBean item) {
         FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("fxml/detail-view.fxml"));
-        Parent root = loader.load();
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         DetailController controller = loader.getController();
         controller.initData(item);
         // 设置保存后的回调
@@ -482,6 +487,7 @@ public class AutoClickController extends CommonProperties {
         floatingStage = new Stage();
         // 设置透明样式
         floatingStage.initStyle(StageStyle.TRANSPARENT);
+        floatingStage.initOwner(mainStage);
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
@@ -697,11 +703,7 @@ public class AutoClickController extends CommonProperties {
         detailItem.setOnAction(e -> {
             ClickPositionBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
-                try {
-                    showDetail(selected);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                showDetail(selected);
             }
         });
         contextMenu.getItems().add(detailItem);
@@ -1148,6 +1150,8 @@ public class AutoClickController extends CommonProperties {
             addData(clickPositionBeans, addType, tableView_Click, dataNumber_Click, text_process);
             // 初始化信息栏
             updateLabel(log_Click, "");
+            // 显示详情
+            showDetail(clickPositionBean);
         }
     }
 
