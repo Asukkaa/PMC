@@ -941,18 +941,6 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
-     * 将程序窗口弹出
-     *
-     * @param stage 程序主舞台
-     */
-    private static void showStage(Stage stage) {
-        stage.setIconified(false);
-        stage.setAlwaysOnTop(true);
-        stage.setAlwaysOnTop(false);
-        stage.requestFocus();
-    }
-
-    /**
      * 开启全局鼠标监听
      *
      * @param addType 添加类型

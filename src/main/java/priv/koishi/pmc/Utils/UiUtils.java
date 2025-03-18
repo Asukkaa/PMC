@@ -1150,4 +1150,16 @@ public class UiUtils {
         floatingStage.setY(y);
     }
 
+    /**
+     * 将程序窗口弹出
+     *
+     * @param stage 程序主舞台
+     */
+    public static void showStage(Stage stage) {
+        stage.setIconified(false);
+        stage.setAlwaysOnTop(true);
+        stage.setAlwaysOnTop(false);
+        stage.requestFocus();
+    }
+
 }

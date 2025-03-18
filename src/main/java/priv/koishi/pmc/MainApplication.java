@@ -28,6 +28,7 @@ import static priv.koishi.pmc.Controller.MainController.saveLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
+import static priv.koishi.pmc.Utils.UiUtils.showStage;
 
 /**
  * 程序启动类
@@ -145,12 +146,14 @@ public class MainApplication extends Application {
             if ("aboutTab".equals(tab.getId())) {
                 tabPane.getSelectionModel().select(tab);
             }
+            showStage(primaryStage);
         }));
         MenuItem setting = new MenuItem("设置");
         setting.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
             if ("settingTab".equals(tab.getId())) {
                 tabPane.getSelectionModel().select(tab);
             }
+            showStage(primaryStage);
         }));
         MenuToolkit.toolkit(Locale.getDefault()).createAboutMenuItem(appName);
         MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
