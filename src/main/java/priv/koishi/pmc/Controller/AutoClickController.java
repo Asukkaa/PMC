@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -436,7 +437,8 @@ public class AutoClickController extends CommonProperties {
      * @param item 要显示详情的操作流程设置
      */
     private void showDetail(ClickPositionBean item) {
-        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("fxml/detail-view.fxml"));
+        URL fxmlLocation = getClass().getResource("/priv/koishi/pmc/fxml/Detail-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root;
         try {
             root = loader.load();
@@ -487,7 +489,6 @@ public class AutoClickController extends CommonProperties {
         floatingStage = new Stage();
         // 设置透明样式
         floatingStage.initStyle(StageStyle.TRANSPARENT);
-        floatingStage.initOwner(mainStage);
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
