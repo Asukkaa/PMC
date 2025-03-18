@@ -6,8 +6,14 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -89,7 +95,7 @@ public class MainApplication extends Application {
         }
         input.close();
         // 初始化macOS系统应用菜单
-        initMenu();
+        initMenu(tabPane);
         // 监听窗口面板宽度变化
         stage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
         // 监听窗口面板高度变化
@@ -139,16 +145,16 @@ public class MainApplication extends Application {
     /**
      * 初始化macOS系统应用菜单
      */
-    private void initMenu() {
+    private void initMenu(TabPane tabPane) {
         MenuItem about = new MenuItem("关于 " + appName);
-        TabPane tabPane = (TabPane) primaryStage.getScene().lookup("#tabPane");
         about.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
             if ("aboutTab".equals(tab.getId())) {
                 tabPane.getSelectionModel().select(tab);
             }
             showStage(primaryStage);
         }));
-        MenuItem setting = new MenuItem("设置");
+        MenuItem setting = new MenuItem("设置...");
+        setting.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
         setting.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
             if ("settingTab".equals(tab.getId())) {
                 tabPane.getSelectionModel().select(tab);
