@@ -95,6 +95,8 @@ public class CommonFinals {
 
     public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
 
+    public static final String tip_thanks = "感谢吧友 @拒绝神绮99次 提供的logo";
+
     public static final String tip_opacity = """
             滑动将会改变录制或运行自动操作时浮窗透明的
             透明的为 0 时 Windows 下鼠标将会点击透过浮窗
@@ -117,8 +119,8 @@ public class CommonFinals {
             建议 Windows 用户不要勾选， macOS 用户需要勾选""";
 
     public static final String tip_version = """
-            version：1.1.0
-            2025年3月14日构建""";
+            version：1.2.0
+            2025年3月构建""";
 
     public static final String text_selectDirectory = "选择文件夹";
 
@@ -217,18 +219,6 @@ public class CommonFinals {
     public static final String key_appWidth = "appWidth";
 
     public static final String key_appHeight = "appHeight";
-
-    public static final String key_appTitle = "appTitle";
-
-    public static final String key_baiduLink = "baiduLink";
-
-    public static final String key_quarkLink = "quarkLink";
-
-    public static final String key_xunleiLink = "xunleiLink";
-
-    public static final String key_githubLink = "githubLink";
-
-    public static final String key_giteeLink = "giteeLink";
 
     public static final String key_floatingX = "floatingX";
 
@@ -405,6 +395,31 @@ public class CommonFinals {
      * 程序名称
      */
     public static final String appName = "Perfect Mouse Control";
+
+    /**
+     * 百度网盘地址
+     */
+    public static final String baiduLink = "https://pan.baidu.com/s/1UbQx3XdUAtLBPJ6thd-H5A?pwd=3efe";
+
+    /**
+     * 夸克网盘地址
+     */
+    public static final String quarkLink = "https://pan.quark.cn/s/987130e1f360";
+
+    /**
+     * 迅雷网盘地址
+     */
+    public static final String xunleiLink = "https://pan.xunlei.com/s/VOKjQlqFxTDbJNN7yRA_DLVgA1?pwd=gx3q#";
+
+    /**
+     * github地址
+     */
+    public static final String githubLink = "https://github.com/Asukkaa/PMC";
+
+    /**
+     * gitee地址
+     */
+    public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
     /**
      * 默认浮窗横轴偏移量

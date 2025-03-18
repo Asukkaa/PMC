@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -34,16 +35,14 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  */
 public class AboutController {
 
-    /**
-     * 百度、夸克、迅雷、阿里网盘地址、github、gitee主页地址
-     */
-    private String baiduLink, quarkLink, xunleiLink, githubLink, giteeLink;
-
     @FXML
     private AnchorPane anchorPane_Abt;
 
     @FXML
     private VBox vBox_Abt;
+
+    @FXML
+    private ImageView logo_Abt;
 
     @FXML
     private TextField logsNum_Abt;
@@ -78,14 +77,8 @@ public class AboutController {
         prop.load(input);
         // 获取日志储存数量配置
         setControlLastConfig(logsNum_Abt, prop, key_logsNum);
-        // 获取网盘地址配置
-        baiduLink = prop.getProperty(key_baiduLink);
-        quarkLink = prop.getProperty(key_quarkLink);
-        giteeLink = prop.getProperty(key_giteeLink);
-        xunleiLink = prop.getProperty(key_xunleiLink);
-        githubLink = prop.getProperty(key_githubLink);
         title_Abt.setTextFill(Color.HOTPINK);
-        title_Abt.setText(prop.getProperty(key_appTitle));
+        title_Abt.setText(appName);
         input.close();
     }
 
@@ -153,6 +146,8 @@ public class AboutController {
         addToolTip(tip_openLink, openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
         // 给github、gitee跳转按钮添加鼠标悬停提示
         addToolTip(tip_openGitLink, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
+        // 给logo和应用名称添加鼠标悬停提示
+        addToolTip(tip_thanks, logo_Abt, title_Abt);
         // 版本号鼠标悬停提示
         addToolTip(tip_version, version_Abt);
     }

@@ -64,12 +64,13 @@ public class UiUtils {
     /**
      * 鼠标停留提示框
      *
-     * @param controls 需要显示提示框的组件
+     * @param nodes 需要显示提示框的组件
      * @param tip      提示卡信息
      */
-    public static void addToolTip(String tip, Control... controls) {
-        for (Control control : controls) {
-            control.setTooltip(creatTooltip(tip));
+    public static void addToolTip(String tip, Node... nodes) {
+        for (Node node : nodes) {
+            Tooltip tooltip = creatTooltip(tip);
+            Tooltip.install(node, tooltip);
         }
     }
 
