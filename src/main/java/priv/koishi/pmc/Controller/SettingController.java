@@ -97,6 +97,11 @@ public class SettingController {
      */
     private Scene mainScene;
 
+    /**
+     * 程序主舞台
+     */
+    private Stage mainStage;
+
     @FXML
     private AnchorPane anchorPane_Set;
 
@@ -192,6 +197,7 @@ public class SettingController {
         floatingStage = new Stage();
         // 设置透明样式
         floatingStage.initStyle(StageStyle.TRANSPARENT);
+        floatingStage.initOwner(mainStage);
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
@@ -461,6 +467,7 @@ public class SettingController {
         setCustomColorsListener();
         Platform.runLater(() -> {
             mainScene = anchorPane_Set.getScene();
+            mainStage = (Stage) mainScene.getWindow();
             // 获取鼠标坐标监听器
             new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件
