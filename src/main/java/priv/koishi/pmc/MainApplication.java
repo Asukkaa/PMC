@@ -6,10 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
@@ -65,8 +62,6 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
-        // 初始化系统菜单
-        initMenu();
         // 读取fxml页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"));
         Properties prop = new Properties();
@@ -92,6 +87,8 @@ public class MainApplication extends Application {
             });
         }
         input.close();
+        // 初始化macOS系统应用菜单
+        initMenu();
         // 监听窗口面板宽度变化
         stage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
         // 监听窗口面板高度变化
@@ -138,7 +135,24 @@ public class MainApplication extends Application {
         System.exit(0);
     }
 
-    private static void initMenu() {
+    /**
+     * 初始化macOS系统应用菜单
+     */
+    private void initMenu() {
+        MenuItem about = new MenuItem("关于 " + appName);
+        TabPane tabPane = (TabPane) primaryStage.getScene().lookup("#tabPane");
+        about.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
+            if ("aboutTab".equals(tab.getId())) {
+                tabPane.getSelectionModel().select(tab);
+            }
+        }));
+        MenuItem setting = new MenuItem("设置");
+        setting.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
+            if ("settingTab".equals(tab.getId())) {
+                tabPane.getSelectionModel().select(tab);
+            }
+        }));
+        MenuToolkit.toolkit(Locale.getDefault()).createAboutMenuItem(appName);
         MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
         hide.setText("隐藏 " + appName);
         MenuItem hideOthers = MenuToolkit.toolkit(Locale.getDefault()).createHideOthersMenuItem();
@@ -146,7 +160,7 @@ public class MainApplication extends Application {
         MenuItem quit = MenuToolkit.toolkit(Locale.getDefault()).createQuitMenuItem(appName);
         quit.setText("退出 " + appName);
         Menu menu = new Menu();
-        menu.getItems().addAll(new SeparatorMenuItem(), hide, hideOthers, new SeparatorMenuItem(), quit);
+        menu.getItems().addAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(), hide, hideOthers, new SeparatorMenuItem(), quit);
         MenuToolkit.toolkit(Locale.getDefault()).setApplicationMenu(menu);
     }
 
