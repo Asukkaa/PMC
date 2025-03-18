@@ -1,10 +1,14 @@
 package priv.koishi.pmc;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
+import de.jangassen.MenuToolkit;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -16,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -60,6 +65,8 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         primaryStage = stage;
+        // 初始化系统菜单
+        initMenu();
         // 读取fxml页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"));
         Properties prop = new Properties();
@@ -71,7 +78,7 @@ public class MainApplication extends Application {
             stage.setMaximized(true);
         }
         Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
-        stage.setTitle(prop.getProperty(key_appTitle));
+        stage.setTitle(prop.getProperty(appName));
         stage.setScene(scene);
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icon/PMC.png")).toExternalForm()));
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
@@ -129,6 +136,18 @@ public class MainApplication extends Application {
         saveLastConfig(primaryStage);
         GlobalScreen.unregisterNativeHook();
         System.exit(0);
+    }
+
+    private static void initMenu() {
+        MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
+        hide.setText("隐藏 " + appName);
+        MenuItem hideOthers = MenuToolkit.toolkit(Locale.getDefault()).createHideOthersMenuItem();
+        hideOthers.setText("隐藏其他");
+        MenuItem quit = MenuToolkit.toolkit(Locale.getDefault()).createQuitMenuItem(appName);
+        quit.setText("退出 " + appName);
+        Menu menu = new Menu();
+        menu.getItems().addAll(new SeparatorMenuItem(), hide, hideOthers, new SeparatorMenuItem(), quit);
+        MenuToolkit.toolkit(Locale.getDefault()).setApplicationMenu(menu);
     }
 
     /**

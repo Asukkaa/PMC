@@ -1,6 +1,4 @@
 module priv.koishi.pmc {
-    requires javafx.controls;
-    requires javafx.fxml;
 
     requires static lombok;
     requires org.apache.commons.collections4;
@@ -10,6 +8,9 @@ module priv.koishi.pmc {
     requires com.github.kwhat.jnativehook;
     requires com.fasterxml.jackson.databind;
     requires org.apache.commons.lang3;
+    requires nsmenufx;
+    requires javafx.controls;
+    requires javafx.fxml;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;
