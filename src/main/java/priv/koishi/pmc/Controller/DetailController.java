@@ -111,15 +111,17 @@ public class DetailController {
      */
     @FXML
     private void saveDetails() {
+        int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
+        int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
         selectedItem.setName(clickName_Det.getText());
-        selectedItem.setStartX(mouseStartX_Det.getText());
-        selectedItem.setStartY(mouseStartY_Det.getText());
-        selectedItem.setEndX(mouseEndX_Det.getText());
-        selectedItem.setEndY(mouseEndY_Det.getText());
-        selectedItem.setWaitTime(wait_Det.getText());
-        selectedItem.setClickNum(clickNumBer_Det.getText());
-        selectedItem.setClickTime(timeClick_Det.getText());
-        selectedItem.setClickInterval(interval_Det.getText());
+        selectedItem.setStartX(String.valueOf(mouseStartX));
+        selectedItem.setStartY(String.valueOf(mouseStartY));
+        selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));
+        selectedItem.setEndY(String.valueOf(setDefaultIntValue(mouseEndY_Det, mouseStartY, 0, null)));
+        selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
+        selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
+        selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
+        selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
         selectedItem.setType(clickType_Det.getValue());
         // 关闭当前窗口
         Stage stage = (Stage) anchorPane_Det.getScene().getWindow();

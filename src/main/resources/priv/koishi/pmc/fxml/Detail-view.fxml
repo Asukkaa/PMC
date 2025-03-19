@@ -78,8 +78,8 @@
         </HBox>
 
         <HBox spacing="10">
+            <Label prefWidth="400"/>
             <Button text="保存并关闭" onAction="#saveDetails"/>
-
             <Button text="关闭详情页" onAction="#closeDetails"/>
         </HBox>
     </VBox>

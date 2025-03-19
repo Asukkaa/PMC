@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.String?>
 <AnchorPane fx:id="anchorPane_Click" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AutoClickController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
@@ -14,56 +12,6 @@
 
             <Label fx:id="cancelTip_Click" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
                    text="运行或录制自动化任务时按下 esc 即可取消任务"/>
-        </HBox>
-
-        <HBox spacing="10">
-            <Label prefHeight="25" text="鼠标点击起始横(X)坐标："/>
-            <TextField fx:id="mouseStartX_Click" prefWidth="80"/>
-
-            <Label prefHeight="25" text="鼠标点击起始纵(Y)坐标："/>
-            <TextField fx:id="mouseStartY_Click" prefWidth="80"/>
-
-            <Label prefHeight="25" text="鼠标点击结束横(X)坐标："/>
-            <TextField fx:id="mouseEndX_Click" prefWidth="80"/>
-
-            <Label prefHeight="25" text="鼠标点击结束纵(Y)坐标："/>
-            <TextField fx:id="mouseEndY_Click" prefWidth="80"/>
-        </HBox>
-
-        <HBox spacing="10">
-            <Label prefHeight="25" text="每步执行前等待时间："/>
-            <TextField fx:id="wait_Click" prefWidth="80"/>
-
-            <Label prefHeight="25" text="每步操作次数："/>
-            <TextField fx:id="clickNumBer_Click" prefWidth="80"/>
-
-            <Label prefHeight="25" text="单次操作点击时长："/>
-            <TextField fx:id="timeClick_Click" prefWidth="80"/>
-
-            <Label prefHeight="25" text="单次操作点击间隔时间："/>
-            <TextField fx:id="interval_Click" prefWidth="80"/>
-        </HBox>
-
-        <HBox spacing="10">
-            <Label prefHeight="25" text="操作名称："/>
-            <TextField fx:id="clickName_Click" prefWidth="150"/>
-
-            <Label prefHeight="25" text="操作类型："/>
-            <ChoiceBox fx:id="clickType_Click" prefHeight="25" prefWidth="120">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="鼠标左键点击"/>
-                        <String fx:value="鼠标右键点击"/>
-                        <String fx:value="鼠标中键点击"/>
-                        <String fx:value="鼠标前侧键点击"/>
-                        <String fx:value="鼠标后侧键点击"/>
-                        <String fx:value="鼠标仅移动"/>
-                    </FXCollections>
-                </items>
-                <value>
-                    <String fx:value="鼠标左键点击"/>
-                </value>
-            </ChoiceBox>
         </HBox>
 
         <HBox spacing="10">
