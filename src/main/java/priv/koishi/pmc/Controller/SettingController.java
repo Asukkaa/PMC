@@ -17,7 +17,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
@@ -99,9 +98,6 @@ public class SettingController {
 
     @FXML
     private AnchorPane anchorPane_Set;
-
-    @FXML
-    private VBox vBox_Set;
 
     @FXML
     private Slider opacity_Set;

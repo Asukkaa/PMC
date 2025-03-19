@@ -6,7 +6,7 @@
 <?import java.lang.String?>
 <AnchorPane fx:id="anchorPane_Click" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AutoClickController">
-    <VBox fx:id="vbox_Click" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <HBox fx:id="cancelTipHBox_Click" spacing="10">
             <Label prefHeight="25" prefWidth="250" fx:id="mousePosition_Click"/>
 

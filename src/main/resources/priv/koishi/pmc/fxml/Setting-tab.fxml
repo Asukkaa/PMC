@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
-    <VBox fx:id="vBox_Set" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
 
         <Label prefHeight="25" text="基础设置："/>
 

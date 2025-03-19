@@ -227,9 +227,6 @@ public class AutoClickController extends CommonProperties {
     private AnchorPane anchorPane_Click;
 
     @FXML
-    private VBox vbox_Click;
-
-    @FXML
     private HBox fileNumberHBox_Click, tipHBox_Click, cancelTipHBox_Click;
 
     @FXML
