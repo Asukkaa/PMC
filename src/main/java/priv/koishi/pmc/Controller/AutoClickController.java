@@ -1239,7 +1239,7 @@ public class AutoClickController extends CommonProperties {
             }
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName);
             ObjectMapper objectMapper = new ObjectMapper();
-            String path = outFilePath + File.separator + fileName + PMC;
+            String path = notOverwritePath(outFilePath + File.separator + fileName + PMC);
             objectMapper.writeValue(new File(path), tableViewItems);
             updateLabel(log_Click, text_saveSuccess + path);
             log_Click.setTextFill(Color.GREEN);

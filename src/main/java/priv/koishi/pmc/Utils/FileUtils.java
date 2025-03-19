@@ -27,11 +27,11 @@ public class FileUtils {
      */
     public static String getFileType(File file) {
         if (file.isDirectory()) {
-            return "文件夹";
+            return extension_folder;
         }
         String filePath = file.getPath();
         if (filePath.lastIndexOf(".") == -1) {
-            return "文件";
+            return extension_file;
         }
         return filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
     }
@@ -235,6 +235,55 @@ public class FileUtils {
             return javaHome.substring(0, javaHome.indexOf(app) + app.length());
         }
         return javaHome;
+    }
+
+    /**
+     * 获取文件不带拓展名的名称或文件夹的名称
+     *
+     * @param file 要获取文件名的文件
+     * @return 文件夹或不带拓展名的文件名称
+     * @throws IOException 文件不存在
+     */
+    public static String getFileName(File file) throws IOException {
+        if (!file.exists()) {
+            throw new IOException(text_fileNotExists);
+        }
+        String fileName = file.getName();
+        if (!file.isDirectory() && fileName.contains(".")) {
+            return fileName.substring(0, fileName.lastIndexOf("."));
+        }
+        return fileName;
+    }
+
+    /**
+     * 文件重名不覆盖
+     *
+     * @param path 要判断的文件路径
+     * @return 不会重名文件路径
+     * @throws IOException 路径不能为空
+     */
+    public static String notOverwritePath(String path) throws IOException {
+        if (StringUtils.isBlank(path)) {
+            throw new IOException("路径不能为空");
+        }
+        File file = new File(path);
+        if (!file.exists()) {
+            return path;
+        }
+        String parentDir = file.getParent();
+        String fileName = getFileName(file);
+        String extension = getFileType(file);
+        if (extension_file.equals(extension) || extension_folder.equals(extension)) {
+            extension = "";
+        }
+        // 递归添加尾缀
+        int counter = 1;
+        while (file.exists()) {
+            path = parentDir + File.separator + fileName + "-" + counter + extension;
+            file = new File(path);
+            counter++;
+        }
+        return path;
     }
 
 }
