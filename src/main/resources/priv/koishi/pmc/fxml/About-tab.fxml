@@ -14,17 +14,17 @@
                 <Image url="@../icon/PMC.png"/>
             </ImageView>
 
-            <VBox>
+            <VBox spacing="10">
                 <HBox>
-                    <Label prefHeight="30" fx:id="title_Abt"/>
-                    <Label prefHeight="30" text=" 是一个由 javafx 实现的按照设置流程进行自动操作的开源工具。"/>
+                    <Label prefHeight="25" fx:id="title_Abt"/>
+                    <Label prefHeight="25" text=" 是一个由 javafx 实现的按照设置流程进行自动操作的开源工具。"/>
                 </HBox>
 
-                <Label prefHeight="30" text="自动操作功能目前支持鼠标左右键、鼠标中键、鼠标前后侧键点击长按或直线拖拽，可自己编辑操作流程或直接录制流程，自动流程可进行循环操作。"/>
+                <Label prefHeight="25" text="自动操作功能目前支持鼠标左右键、鼠标中键、鼠标前后侧键点击长按或直线拖拽，可自己编辑操作流程或直接录制流程，自动流程可进行循环操作。"/>
 
-                <Label prefHeight="30" text="目前软件正在继续开发中，仍有很多功能还未实现，问题肯定也不少，有问题或建议可以给下面邮箱发邮件反馈。"/>
+                <Label prefHeight="25" text="目前软件正在继续开发中，仍有很多功能还未实现，问题肯定也不少，有问题或建议可以给下面邮箱发邮件反馈。"/>
 
-                <Label prefHeight="30" text="如果遇到报错可到将 logs 文件夹压缩后发送给反馈邮件。"/>
+                <Label prefHeight="25" text="如果遇到报错可到将 logs 文件夹压缩后发送给反馈邮件。"/>
             </VBox>
         </HBox>
 
