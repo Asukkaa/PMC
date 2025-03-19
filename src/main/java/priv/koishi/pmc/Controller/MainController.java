@@ -78,8 +78,10 @@ public class MainController {
         TabPane tabPane = (TabPane) scene.lookup("#tabPane");
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         prop.put(key_lastTab, selectedTab.getId());
-        String fullWindow = stage.isMaximized() ? activation : unActivation;
+        String fullWindow = stage.isFullScreen() ? activation : unActivation;
         prop.put(key_lastFullWindow, fullWindow);
+        String maximize = stage.isMaximized() ? activation : unActivation;
+        prop.put(key_lastMaxWindow, maximize);
         OutputStream output = checkRunningOutputStream(configFile);
         prop.store(output, null);
         input.close();

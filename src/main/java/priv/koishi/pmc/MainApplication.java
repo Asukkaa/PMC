@@ -76,8 +76,10 @@ public class MainApplication extends Application {
         prop.load(input);
         double appWidth = Double.parseDouble(prop.getProperty(key_appWidth));
         double appHeight = Double.parseDouble(prop.getProperty(key_appHeight));
-        if (activation.equals(prop.getProperty(key_lastFullWindow)) && activation.equals(prop.getProperty(key_loadLastFullWindow))) {
+        if (activation.equals(prop.getProperty(key_lastMaxWindow)) && activation.equals(prop.getProperty(key_loadLastMaxWindow))) {
             stage.setMaximized(true);
+        } else if (activation.equals(prop.getProperty(key_lastFullWindow)) && activation.equals(prop.getProperty(key_loadLastFullWindow))) {
+            stage.setFullScreen(true);
         }
         Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
         stage.setTitle(appName);
@@ -183,13 +185,13 @@ public class MainApplication extends Application {
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
             String logsPath = getLogsPath();
-            System.setProperty("log.dir", logsPath);
             File logDirectory = new File(logsPath);
             if (!logDirectory.exists()) {
                 if (!logDirectory.mkdirs()) {
                     throw new IOException("日志文件夹创建失败： " + logsPath);
                 }
             }
+            System.setProperty("log.dir", logsPath);
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
         }

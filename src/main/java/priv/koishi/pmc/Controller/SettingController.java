@@ -118,7 +118,7 @@ public class SettingController {
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
-            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set;
+            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set;
 
     /**
      * 保存设置功能最后设置
@@ -294,8 +294,8 @@ public class SettingController {
         InputStream configFileInput = checkRunningInputStream(configFile);
         prop.load(configFileInput);
         setControlLastConfig(lastTab_Set, prop, key_loadLastConfig);
+        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow);
         setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow);
-        setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
@@ -318,6 +318,7 @@ public class SettingController {
         setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
         setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord);
+        setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         clickFileInput.close();
     }
 
@@ -326,6 +327,7 @@ public class SettingController {
      */
     private void setToolTip() {
         addToolTip(lastTab_Set.getText(), lastTab_Set);
+        addToolTip(maxWindow_Set.getText(), maxWindow_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
@@ -339,6 +341,7 @@ public class SettingController {
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
         addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
+        addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
         addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(opacity_Set.getValue()));
@@ -489,13 +492,23 @@ public class SettingController {
     }
 
     /**
-     * 记住窗口是否最大化设置
+     * 记住窗口是否全屏设置
      *
      * @throws IOException io异常
      */
     @FXML
     private void loadFullWindowAction() throws IOException {
         setLoadLastConfigCheckBox(fullWindow_Set, configFile, key_loadLastFullWindow);
+    }
+
+    /**
+     * 记住窗口是否最大化设置
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadMaxWindowAction() throws IOException {
+        setLoadLastConfigCheckBox(maxWindow_Set, configFile, key_loadLastMaxWindow);
     }
 
     /**

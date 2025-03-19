@@ -97,6 +97,8 @@ public class CommonFinals {
 
     public static final String tip_thanks = "感谢吧友 @拒绝神绮99次 提供的logo";
 
+    public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
+
     public static final String tip_opacity = """
             滑动将会改变录制或运行自动操作时浮窗透明的
             透明的为 0 时 Windows 下鼠标将会点击透过浮窗
@@ -250,6 +252,10 @@ public class CommonFinals {
 
     public static final String key_loadLastFullWindow = "loadLastFullWindow";
 
+    public static final String key_loadLastMaxWindow = "loadLastMaxWindow";
+
+    public static final String key_lastMaxWindow = "lastMaxWindow";
+
     public static final String key_lastOpenDirectory = "lastOpenDirectory";
 
     public static final String key_lastTab = "lastTab";
@@ -343,7 +349,12 @@ public class CommonFinals {
     /**
      * 资源文件夹地址前缀
      */
-    public static String resourcesPath = "src/main/resources/priv/koishi/pmc/";
+    public static String resourcePath = "/priv/koishi/pmc/";
+
+    /**
+     * 打包前资源文件夹地址前缀
+     */
+    public static String resourcesPath = "src/main/resources" + resourcePath;
 
     /**
      * jpackage打包后的资源文件路径

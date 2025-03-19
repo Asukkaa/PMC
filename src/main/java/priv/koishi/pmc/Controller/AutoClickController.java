@@ -437,7 +437,7 @@ public class AutoClickController extends CommonProperties {
      * @param item 要显示详情的操作流程设置
      */
     private void showDetail(ClickPositionBean item) {
-        URL fxmlLocation = getClass().getResource("/priv/koishi/pmc/fxml/Detail-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Detail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root;
         try {
