@@ -262,26 +262,6 @@ public class CommonFinals {
 
     public static final String key_lastFullWindow = "lastFullWindow";
 
-    public static final String key_lastMouseStartX = "lastMouseStartX";
-
-    public static final String key_lastMouseStartY = "lastMouseStartY";
-
-    public static final String key_lastMouseEndX = "lastMouseEndX";
-
-    public static final String key_lastMouseEndY = "lastMouseEndY";
-
-    public static final String key_lastWait = "lastWait";
-
-    public static final String key_lastClickNumBer = "lastClickNumBer";
-
-    public static final String key_lastTimeClick = "lastTimeClick";
-
-    public static final String key_lastInterval = "lastInterval";
-
-    public static final String key_lastClickName = "lastClickName";
-
-    public static final String key_lastClickType = "lastClickType";
-
     public static final String key_lastLoopTime = "lastLoopTime";
 
     public static final String key_lastFirstClick = "lastFirstClick";
