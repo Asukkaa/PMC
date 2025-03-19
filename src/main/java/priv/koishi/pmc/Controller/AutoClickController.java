@@ -682,7 +682,7 @@ public class AutoClickController extends CommonProperties {
         insertDataMenu(tableView_Click, contextMenu);
         // 复制数据选项
         buildCopyDataMenu(tableView_Click, contextMenu, dataNumber_Click);
-        // 清空所选项选项
+        // 取消选中选项
         buildClearSelectedData(tableView_Click, contextMenu);
         // 删除所选数据选项
         buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data);

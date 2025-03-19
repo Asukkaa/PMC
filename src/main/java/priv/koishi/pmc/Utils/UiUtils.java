@@ -726,13 +726,13 @@ public class UiUtils {
     }
 
     /**
-     * 清空所选项
+     * 取消选中选项
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
     public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem clearSelectedDataMenuItem = new MenuItem("清空所选项");
+        MenuItem clearSelectedDataMenuItem = new MenuItem("取消选中");
         clearSelectedDataMenuItem.setOnAction(event -> tableView.getSelectionModel().clearSelection());
         contextMenu.getItems().add(clearSelectedDataMenuItem);
     }
