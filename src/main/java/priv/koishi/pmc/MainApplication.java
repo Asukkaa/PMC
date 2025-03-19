@@ -146,6 +146,8 @@ public class MainApplication extends Application {
 
     /**
      * 初始化macOS系统应用菜单
+     *
+     * @param tabPane 程序页面基础布局
      */
     private void initMenu(TabPane tabPane) {
         MenuItem about = new MenuItem("关于 " + appName);
