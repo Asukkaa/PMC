@@ -11,6 +11,7 @@ module priv.koishi.pmc {
     requires nsmenufx;
     requires javafx.controls;
     requires javafx.fxml;
+    requires org.apache.commons.io;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;

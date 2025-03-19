@@ -27,6 +27,7 @@ import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -836,7 +837,7 @@ public class UiUtils {
      */
     public static void setControlLastConfig(Label label, Properties prop, String key, Pane pane) {
         String lastValue = prop.getProperty(key);
-        if (isValidPath(lastValue)) {
+        if (FilenameUtils.getPrefixLength(lastValue) != 0) {
             setPathLabel(label, lastValue, false, pane);
         }
     }

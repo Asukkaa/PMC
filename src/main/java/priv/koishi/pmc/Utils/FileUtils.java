@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -122,21 +121,6 @@ public class FileUtils {
         // 检查是否以空格或特殊字符开头
         char firstChar = fileName.charAt(0);
         return !Character.isSpaceChar(firstChar) && illegalChars.indexOf(firstChar) < 0;
-    }
-
-    /**
-     * 判断字符串是否为文件路径
-     *
-     * @param path 要校验的文件路径
-     * @return 如果是文件路径返回true，否则返回false
-     */
-    public static boolean isValidPath(String path) {
-        try {
-            Paths.get(path);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**
