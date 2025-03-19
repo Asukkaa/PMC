@@ -19,7 +19,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -203,22 +202,6 @@ public class UiUtils {
         int value = defaultValue;
         if (isInIntegerRange(valueStr, min, max)) {
             value = Integer.parseInt(valueStr);
-        }
-        return value;
-    }
-
-    /**
-     * 设置默认字符串值
-     *
-     * @param textField    要设置默认字符串的文本输入框
-     * @param defaultValue 默认字符串
-     * @return 文本输入框不为空则返回所填值，为空则为默认值
-     */
-    public static String setDefaultStrValue(TextField textField, String defaultValue) {
-        String valueStr = textField.getText();
-        String value = defaultValue;
-        if (StringUtils.isNotBlank(valueStr)) {
-            value = valueStr;
         }
         return value;
     }
@@ -471,17 +454,17 @@ public class UiUtils {
      * @param pathKey          配置文件中路径的key
      * @param pathLabel        要展示路径的文本框
      * @param configFile       要更新的配置文件
-     * @param anchorPane       组件所在布局
+     * @param pane             组件所在布局
      * @return 所选文件路径
      * @throws IOException io异常
      */
-    public static String updatePathLabel(String selectedFilePath, String filePath, String pathKey, Label pathLabel, String configFile, AnchorPane anchorPane) throws IOException {
+    public static String updatePathLabel(String selectedFilePath, String filePath, String pathKey, Label pathLabel, String configFile, Pane pane) throws IOException {
         // 只有跟上次选的路径不一样才更新
         if (StringUtils.isBlank(filePath) || !filePath.equals(selectedFilePath)) {
             updateProperties(configFile, pathKey, selectedFilePath);
             filePath = selectedFilePath;
         }
-        setPathLabel(pathLabel, selectedFilePath, false, anchorPane);
+        setPathLabel(pathLabel, selectedFilePath, false, pane);
         return filePath;
     }
 
@@ -846,30 +829,15 @@ public class UiUtils {
     /**
      * 为路径文本框设置上次配置值
      *
-     * @param label      需要处理的文本框
-     * @param prop       配置文件
-     * @param key        要读取的key
-     * @param anchorPane 组件所在布局
+     * @param label 需要处理的文本框
+     * @param prop  配置文件
+     * @param key   要读取的key
+     * @param pane  组件所在布局
      */
-    public static void setControlLastConfig(Label label, Properties prop, String key, AnchorPane anchorPane) {
+    public static void setControlLastConfig(Label label, Properties prop, String key, Pane pane) {
         String lastValue = prop.getProperty(key);
         if (isValidPath(lastValue)) {
-            setPathLabel(label, lastValue, false, anchorPane);
-        }
-    }
-
-    /**
-     * 为输入框设置上次配置值
-     *
-     * @param textField 需要处理的输入框
-     * @param prop      配置文件
-     * @param key       要读取的key
-     * @param canBlank  组件所填文本是否可为空格，ture可填写空格，false不可填写空格
-     */
-    public static void setControlLastConfig(TextField textField, Properties prop, String key, boolean canBlank) {
-        String lastValue = prop.getProperty(key);
-        if (StringUtils.isNotEmpty(lastValue) && canBlank) {
-            textField.setText(lastValue);
+            setPathLabel(label, lastValue, false, pane);
         }
     }
 
