@@ -1323,6 +1323,10 @@ public class AutoClickController extends CommonProperties {
     @FXML
     private void imgTest() {
         String imgPath = imgPath_Click.getText();
+        String testImgPath = outPath_Click.getText();
+        if (StringUtils.isNotBlank(testImgPath)) {
+            imgPath = testImgPath;
+        }
         if (StringUtils.isBlank(imgPath)) {
             throw new RuntimeException("请先选择图片");
         }

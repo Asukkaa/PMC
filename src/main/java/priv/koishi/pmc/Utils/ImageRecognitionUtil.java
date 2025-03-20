@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Utils;
 
 import org.bytedeco.javacpp.DoublePointer;
-import org.bytedeco.javacpp.Loader;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
@@ -25,11 +24,6 @@ import static org.bytedeco.opencv.global.opencv_imgproc.*;
  * Time 10:08:04
  */
 public class ImageRecognitionUtil {
-
-    static {
-        // 初始化时加载OpenCV本地库（通过JavaCV自动处理）
-        Loader.load(org.bytedeco.opencv.global.opencv_imgcodecs.class);
-    }
 
     public static Point findPosition(String templatePath) throws Exception {
         for (int i = 3; i > 0; i--) {  // 获取屏幕参数

@@ -1,5 +1,0 @@
-#!/bin/sh
-JLINK_VM_OPTIONS=
-DIR=`dirname $0`
-cd $DIR
-$DIR/java $JLINK_VM_OPTIONS -m priv.koishi.pmc/priv.koishi.pmc.MainApplication "$@"
