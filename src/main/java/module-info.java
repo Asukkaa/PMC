@@ -12,6 +12,8 @@ module priv.koishi.pmc {
     requires javafx.controls;
     requires javafx.fxml;
     requires org.apache.commons.io;
+    requires org.bytedeco.javacv;
+    requires org.bytedeco.opencv;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;

@@ -56,11 +56,13 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ImageRecognitionUtil.findPosition;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -233,14 +235,15 @@ public class AutoClickController extends CommonProperties {
     private ProgressBar progressBar_Click;
 
     @FXML
-    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click;
+    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click,
+            imgPath_Click;
 
     @FXML
     private CheckBox openDirectory_Click;
 
     @FXML
     private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
-            exportAutoClick_Click, addOutPath_Click, recordClick_Click;
+            exportAutoClick_Click, addOutPath_Click, recordClick_Click, testImg_Click;
 
     @FXML
     private TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
@@ -1315,6 +1318,34 @@ public class AutoClickController extends CommonProperties {
     @FXML
     private void recordClick() {
         startRecord(append);
+    }
+
+    @FXML
+    private void imgTest() {
+        String imgPath = imgPath_Click.getText();
+        if (StringUtils.isBlank(imgPath)) {
+            throw new RuntimeException("请先选择图片");
+        }
+        try (org.bytedeco.opencv.opencv_core.Point point = findPosition(imgPath)) {
+            System.out.println("鼠标移动到 " + point.x() + " " + point.y());
+            javafx.scene.robot.Robot robot = new javafx.scene.robot.Robot();
+            robot.mouseMove(point.x(), point.y());
+            robot.mousePress(PRIMARY);
+            robot.mouseRelease(PRIMARY);
+            robot.mousePress(PRIMARY);
+            robot.mouseRelease(PRIMARY);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    private void addImgPath(ActionEvent actionEvent) throws IOException {
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(new FileChooser.ExtensionFilter("图片", "*.png")));
+        File selectedFile = creatFileChooser(actionEvent, outFilePath, extensionFilters, "选择要识别的图片");
+        if (selectedFile != null) {
+            outFilePath = updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, imgPath_Click, configFile_Click, anchorPane_Click);
+        }
     }
 
 }

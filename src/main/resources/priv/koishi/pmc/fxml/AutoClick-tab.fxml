@@ -15,6 +15,12 @@
         </HBox>
 
         <HBox spacing="10">
+            <Button fx:id="testImg_Click" onAction="#addImgPath" style="-fx-cursor: hand" text="选择要识别的图片"/>
+            <Label fx:id="imgPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+            <Button onAction="#imgTest" style="-fx-cursor: hand" text="图像识别测试"/>
+        </HBox>
+
+        <HBox spacing="10">
             <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand" text="选择导出文件夹"/>
             <Label fx:id="outPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
 

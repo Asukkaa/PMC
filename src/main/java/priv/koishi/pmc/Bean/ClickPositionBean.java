@@ -71,4 +71,19 @@ public class ClickPositionBean {
      */
     String type;
 
+    /**
+     * 图像识别模板图片路径
+     */
+    String templatePath;
+
+    /**
+     * 匹配阈值
+     */
+    double matchThreshold;
+
+    /**
+     * 匹配最大时常（单位：秒）
+     */
+    String overtime;
+
 }
