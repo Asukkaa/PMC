@@ -1,12 +1,22 @@
 package priv.koishi.pmc.Controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -25,11 +35,19 @@ public class DetailController {
      */
     private ClickPositionBean selectedItem;
 
+    private String imgPath;
+
     @Setter
     private Runnable refreshCallback;
 
     @FXML
     private AnchorPane anchorPane_Det;
+
+    @FXML
+    private Label imgPath_Det;
+
+    @FXML
+    private Button removeImg_Det;
 
     @FXML
     private ChoiceBox<String> clickType_Det;
@@ -55,6 +73,12 @@ public class DetailController {
         timeClick_Det.setText(item.getClickTime());
         interval_Det.setText(item.getClickInterval());
         clickType_Det.setValue(item.getType());
+        String templatePath = item.getTemplatePath();
+        if (StringUtils.isNotBlank(templatePath)) {
+            imgPath = templatePath;
+            setPathLabel(imgPath_Det, templatePath, false);
+            removeImg_Det.setVisible(true);
+        }
     }
 
     /**
@@ -110,7 +134,7 @@ public class DetailController {
      * 保存更改并关闭详情页按钮
      */
     @FXML
-    private void saveDetails() {
+    private void saveDetail() {
         int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
         int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
         selectedItem.setName(clickName_Det.getText());
@@ -123,6 +147,7 @@ public class DetailController {
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
         selectedItem.setType(clickType_Det.getValue());
+        selectedItem.setTemplatePath(imgPath_Det.getText());
         // 关闭当前窗口
         Stage stage = (Stage) anchorPane_Det.getScene().getWindow();
         stage.close();
@@ -136,10 +161,39 @@ public class DetailController {
      * 关闭窗口按钮
      */
     @FXML
-    private void closeDetails() {
+    private void closeDetail() {
         // 关闭当前窗口
         Stage stage = (Stage) anchorPane_Det.getScene().getWindow();
         stage.close();
+    }
+
+    /**
+     * 选择要识别的图片
+     *
+     * @param actionEvent 点击事件
+     */
+    @FXML
+    private void addImgPath(ActionEvent actionEvent) throws IOException {
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+        extensionFilters.add(new FileChooser.ExtensionFilter("图片", allPng, allJpg, allJpeg));
+        extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
+        File selectedFile = creatFileChooser(actionEvent, imgPath, extensionFilters, text_selectTemplateImg);
+        if (selectedFile != null) {
+            // 更新所选文件路径显示
+            imgPath = updatePathLabel(selectedFile.getPath(), imgPath, key_imgPath, imgPath_Det, configFile_Click);
+            removeImg_Det.setVisible(true);
+        }
+    }
+
+    /**
+     * 删除要识别的图片
+     */
+    @FXML
+    public void removeTemplateImg() {
+        imgPath_Det.setText("");
+        removeImg_Det.setVisible(false);
     }
 
 }

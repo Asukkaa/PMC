@@ -72,7 +72,7 @@ public class ClickPositionBean {
     String type;
 
     /**
-     * 图像识别模板图片路径
+     * 图像识别图片路径
      */
     String templatePath;
 
@@ -85,5 +85,10 @@ public class ClickPositionBean {
      * 匹配最大时常（单位：秒）
      */
     String overtime;
+
+    /**
+     * 重试次数
+     */
+    int retryTimes;
 
 }

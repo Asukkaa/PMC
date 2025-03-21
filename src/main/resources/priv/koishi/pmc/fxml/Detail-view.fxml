@@ -2,18 +2,20 @@
 
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="anchorPane_Det"
-            fx:controller="priv.koishi.pmc.Controller.DetailController">
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.DetailController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
         <HBox spacing="10">
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="步骤名称:"/>
                 <TextField fx:id="clickName_Det"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="操作类型:"/>
                 <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120">
                     <items>
@@ -34,53 +36,67 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="鼠标点击起始横(X)坐标:"/>
                 <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="鼠标点击起始纵(Y)坐标:"/>
                 <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="鼠标点击结束横(X)坐标:"/>
                 <TextField fx:id="mouseEndX_Det" prefWidth="80"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="鼠标点击结束纵(Y)坐标:"/>
                 <TextField fx:id="mouseEndY_Det" prefWidth="80"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="每步执行前等待时间:"/>
                 <TextField fx:id="wait_Det" prefWidth="80"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="每步操作次数:"/>
                 <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="单次操作点击时长:"/>
                 <TextField fx:id="timeClick_Det" prefWidth="80"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="240">
+            <HBox styleClass="hBox-Detail-Style">
                 <Label prefHeight="25" text="单次操作点击间隔时间:"/>
                 <TextField fx:id="interval_Det" prefWidth="80"/>
             </HBox>
         </HBox>
 
+        <HBox spacing="5">
+            <Button onAction="#addImgPath" style="-fx-cursor: hand" text="选择要识别的图片"/>
+            <Label fx:id="imgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+
+            <Button fx:id="removeImg_Det" onAction="#removeTemplateImg" prefHeight="20"
+                    styleClass="delete-button-style" visible="false">
+                <graphic>
+                    <ImageView>
+                        <Image url="@../icon/trash.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+
         <HBox spacing="10">
             <Label prefWidth="400"/>
-            <Button text="保存并关闭" onAction="#saveDetails"/>
-            <Button text="关闭详情页" onAction="#closeDetails"/>
+            <Button text="保存并关闭" onAction="#saveDetail"/>
+            <Button text="关闭详情页" onAction="#closeDetail"/>
         </HBox>
     </VBox>
 </AnchorPane>

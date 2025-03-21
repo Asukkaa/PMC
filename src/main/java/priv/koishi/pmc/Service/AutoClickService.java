@@ -6,8 +6,11 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.robot.Robot;
+import org.apache.commons.lang3.StringUtils;
+import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Utils.ImageRecognitionUtil;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +36,7 @@ public class AutoClickService {
     public static Task<Void> autoClick(AutoClickTaskBean taskBean, Robot robot) {
         return new Task<>() {
             @Override
-            protected Void call() {
+            protected Void call() throws Exception {
                 Timeline timeline = taskBean.getRunTimeline();
                 if (timeline != null) {
                     timeline.stop();
@@ -79,7 +82,7 @@ public class AutoClickService {
             }
 
             // 执行点击任务
-            private void clicks(List<ClickPositionBean> tableViewItems, String loopTimeText) {
+            private void clicks(List<ClickPositionBean> tableViewItems, String loopTimeText) throws Exception {
                 int dataSize = tableViewItems.size();
                 Label floatingLabel = taskBean.getFloatingLabel();
                 updateProgress(0, dataSize);
@@ -123,13 +126,21 @@ public class AutoClickService {
      * @param clickPositionBean 操作设置
      * @param robot             Robot实例
      */
-    private static void click(ClickPositionBean clickPositionBean, Robot robot) {
+    private static void click(ClickPositionBean clickPositionBean, Robot robot) throws Exception {
         // 操作次数
         int clickNum = Integer.parseInt(clickPositionBean.getClickNum());
         double startX = Double.parseDouble(clickPositionBean.getStartX());
         double startY = Double.parseDouble(clickPositionBean.getStartY());
         double endX = Double.parseDouble(clickPositionBean.getEndX());
         double endY = Double.parseDouble(clickPositionBean.getEndY());
+        if (StringUtils.isNotBlank(clickPositionBean.getTemplatePath())) {
+            try (Point position = ImageRecognitionUtil.findPosition(clickPositionBean.getTemplatePath())) {
+                startX = position.x();
+                startY = position.y();
+                endX = position.x();
+                endY = position.y();
+            }
+        }
         long clickTime = Long.parseLong(clickPositionBean.getClickTime());
         long clickInterval = Long.parseLong(clickPositionBean.getClickInterval());
         // 按照操作次数执行
@@ -144,8 +155,10 @@ public class AutoClickService {
                 }
             }
             MouseButton mouseButton = runClickTypeMap.get(clickPositionBean.getType());
+            double finalStartX = startX;
+            double finalStartY = startY;
             Platform.runLater(() -> {
-                robot.mouseMove(startX, startY);
+                robot.mouseMove(finalStartX, finalStartY);
                 if (mouseButton != NONE) {
                     robot.mousePress(mouseButton);
                 }

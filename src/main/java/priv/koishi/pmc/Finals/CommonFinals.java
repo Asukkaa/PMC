@@ -126,6 +126,8 @@ public class CommonFinals {
 
     public static final String text_selectDirectory = "选择文件夹";
 
+    public static final String text_selectTemplateImg = "选择要识别的图片";
+
     public static final String text_dataListNull = "列表为空";
 
     public static final String text_outPathNull = "导出文件夹位置为空，需要先设置导出文件夹位置再继续";
@@ -217,6 +219,8 @@ public class CommonFinals {
     public static final String key_inFilePath = "inFilePath";
 
     public static final String key_outFilePath = "outFilePath";
+
+    public static final String key_imgPath = "imgPath";
 
     public static final String key_appWidth = "appWidth";
 
@@ -329,6 +333,18 @@ public class CommonFinals {
     public static String extension_file = "文件";
 
     public static final String extension_folder = "文件夹";
+
+    public static final String allPng = "*.png";
+
+    public static final String allJpg = "*.jpg";
+
+    public static final String allJpeg = "*.jpeg";
+
+    public static final String png = ".png";
+
+    public static final String jpg = ".jpg";
+
+    public static final String jpeg = ".jpeg";
 
     /**
      * 资源文件夹地址前缀

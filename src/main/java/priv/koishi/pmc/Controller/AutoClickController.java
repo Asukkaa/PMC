@@ -56,13 +56,11 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.ImageRecognitionUtil.findPosition;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -235,15 +233,14 @@ public class AutoClickController extends CommonProperties {
     private ProgressBar progressBar_Click;
 
     @FXML
-    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click,
-            imgPath_Click;
+    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click;
 
     @FXML
     private CheckBox openDirectory_Click;
 
     @FXML
     private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
-            exportAutoClick_Click, addOutPath_Click, recordClick_Click, testImg_Click;
+            exportAutoClick_Click, addOutPath_Click, recordClick_Click;
 
     @FXML
     private TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
@@ -335,10 +332,10 @@ public class AutoClickController extends CommonProperties {
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig))) {
+            setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory);
-            setControlLastConfig(outPath_Click, prop, key_outFilePath, anchorPane_Click);
             setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime);
             setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime);
         }
@@ -1199,6 +1196,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 导入操作流程按钮
      *
+     * @param actionEvent 点击事件
      * @throws IOException io异常
      */
     @FXML
@@ -1255,6 +1253,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 设置操作流程导出文件夹地址按钮
      *
+     * @param actionEvent 点击事件
      * @throws IOException io异常
      */
     @FXML
@@ -1263,7 +1262,7 @@ public class AutoClickController extends CommonProperties {
         File selectedFile = creatDirectoryChooser(actionEvent, outFilePath, text_selectDirectory);
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            outFilePath = updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click, anchorPane_Click);
+            outFilePath = updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click);
         }
     }
 
@@ -1318,38 +1317,6 @@ public class AutoClickController extends CommonProperties {
     @FXML
     private void recordClick() {
         startRecord(append);
-    }
-
-    @FXML
-    private void imgTest() {
-        String imgPath = imgPath_Click.getText();
-        String testImgPath = outPath_Click.getText();
-        if (StringUtils.isNotBlank(testImgPath)) {
-            imgPath = testImgPath;
-        }
-        if (StringUtils.isBlank(imgPath)) {
-            throw new RuntimeException("请先选择图片");
-        }
-        try (org.bytedeco.opencv.opencv_core.Point point = findPosition(imgPath)) {
-            System.out.println("鼠标移动到 " + point.x() + " " + point.y());
-            javafx.scene.robot.Robot robot = new javafx.scene.robot.Robot();
-            robot.mouseMove(point.x(), point.y());
-            robot.mousePress(PRIMARY);
-            robot.mouseRelease(PRIMARY);
-            robot.mousePress(PRIMARY);
-            robot.mouseRelease(PRIMARY);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @FXML
-    private void addImgPath(ActionEvent actionEvent) throws IOException {
-        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(new FileChooser.ExtensionFilter("图片", "*.png")));
-        File selectedFile = creatFileChooser(actionEvent, outFilePath, extensionFilters, "选择要识别的图片");
-        if (selectedFile != null) {
-            outFilePath = updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, imgPath_Click, configFile_Click, anchorPane_Click);
-        }
     }
 
 }
