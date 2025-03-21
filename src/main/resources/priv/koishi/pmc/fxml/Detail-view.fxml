@@ -79,24 +79,76 @@
             </HBox>
         </HBox>
 
-        <HBox spacing="5">
-            <Button onAction="#addImgPath" style="-fx-cursor: hand" text="选择要识别的图片"/>
-            <Label fx:id="imgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="490">
+                <Label prefHeight="25" text="要点击的图片识别匹配准确度:"/>
+                <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true" showTickMarks="true"
+                        snapToTicks="true" majorTickUnit="10"/>
+                <Label prefHeight="25" text="\%"/>
+            </HBox>
 
-            <Button fx:id="removeImg_Det" onAction="#removeTemplateImg" prefHeight="20"
-                    styleClass="delete-button-style" visible="false">
-                <graphic>
-                    <ImageView>
-                        <Image url="@../icon/trash.png"/>
-                    </ImageView>
-                </graphic>
-            </Button>
+            <HBox spacing="5">
+                <Label prefHeight="25" text="要点击的图片识别失败重试次数:"/>
+                <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="490">
+                <Label prefHeight="25" text="终止操作图片识别匹配准确度:"/>
+                <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true" showTickMarks="true"
+                        snapToTicks="true" majorTickUnit="10"/>
+                <Label prefHeight="25" text="\%"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="终止操作图片识别失败重试次数:"/>
+                <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <VBox spacing="10">
+                <HBox spacing="5">
+                    <Button onAction="#addClickImgPath" style="-fx-cursor: hand" text="选择要点击的图片"/>
+                    <Label fx:id="clickImgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+
+                    <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
+                            styleClass="delete-button-style" visible="false">
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../icon/trash.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <ImageView fx:id="clickImg_Det" fitWidth="128" fitHeight="128" preserveRatio="true"/>
+            </VBox>
+
+            <VBox spacing="10">
+                <HBox spacing="5">
+                    <Button onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的图片"/>
+                    <Label fx:id="stopImgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+
+                    <Button fx:id="removeStopImg_Det" onAction="#removeStopImg" prefHeight="20"
+                            styleClass="delete-button-style" visible="false">
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../icon/trash.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <ImageView fx:id="stopImg_Det" fitWidth="128" fitHeight="128" preserveRatio="true"/>
+            </VBox>
         </HBox>
 
         <HBox spacing="10">
             <Label prefWidth="400"/>
             <Button text="保存并关闭" onAction="#saveDetail"/>
-            <Button text="关闭详情页" onAction="#closeDetail"/>
+            <Button text="删除这个流程" onAction="#removeDetail"/>
         </HBox>
     </VBox>
 </AnchorPane>

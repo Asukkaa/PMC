@@ -72,23 +72,53 @@ public class ClickPositionBean {
     String type;
 
     /**
-     * 图像识别图片路径
+     * 要点击的图片路径
      */
-    String templatePath;
+    String clickImgPath;
 
     /**
-     * 匹配阈值
+     * 上次所选要点击的图片路径
      */
-    double matchThreshold;
+    String clickImgSelectPath;
 
     /**
-     * 匹配最大时常（单位：秒）
+     * 终止操作的图片路径
+     */
+    String stopImgPath;
+
+    /**
+     * 上次所选终止操作的图片路径
+     */
+    String stopImgSelectPath;
+
+    /**
+     * 要点击的图片识别匹配阈值
+     */
+    String clickMatchThreshold;
+
+    /**
+     * 终止操作的图片识别匹配阈值
+     */
+    String stopMatchThreshold;
+
+    /**
+     * 图像识别匹配最大时常（单位：秒）
      */
     String overtime;
 
     /**
-     * 重试次数
+     * 要点击的图片识别重试次数
      */
-    int retryTimes;
+    String clickRetryTimes;
+
+    /**
+     * 终止操作的图片识别重试次数
+     */
+    String stopRetryTimes;
+
+    /**
+     * 详情页删除标志
+     */
+    boolean remove;
 
 }

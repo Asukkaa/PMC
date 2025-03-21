@@ -133,8 +133,8 @@ public class AutoClickService {
         double startY = Double.parseDouble(clickPositionBean.getStartY());
         double endX = Double.parseDouble(clickPositionBean.getEndX());
         double endY = Double.parseDouble(clickPositionBean.getEndY());
-        if (StringUtils.isNotBlank(clickPositionBean.getTemplatePath())) {
-            try (Point position = ImageRecognitionUtil.findPosition(clickPositionBean.getTemplatePath())) {
+        if (StringUtils.isNotBlank(clickPositionBean.getClickImgPath())) {
+            try (Point position = ImageRecognitionUtil.findPosition(clickPositionBean.getClickImgPath())) {
                 startX = position.x();
                 startY = position.y();
                 endX = position.x();

@@ -84,6 +84,16 @@ public class AutoClickController extends CommonProperties {
     private static String inFilePath;
 
     /**
+     * 上次所选要点击的图片地址
+     */
+    private static String clickImgSelectPath;
+
+    /**
+     * 上次所选终止操作的图片地址
+     */
+    private static String stopImgSelectPath;
+
+    /**
      * 默认导出文件名称
      */
     private static String defaultOutFileName;
@@ -357,6 +367,8 @@ public class AutoClickController extends CommonProperties {
         }
         inFilePath = prop.getProperty(key_inFilePath);
         outFilePath = prop.getProperty(key_outFilePath);
+        stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
+        clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
         defaultOutFileName = prop.getProperty(key_defaultOutFileName);
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
@@ -408,9 +420,22 @@ public class AutoClickController extends CommonProperties {
             throw new RuntimeException(e);
         }
         DetailController controller = loader.getController();
+        item.setClickImgSelectPath(clickImgSelectPath);
+        item.setStopImgSelectPath(stopImgSelectPath);
         controller.initData(item);
         // 设置保存后的回调
         controller.setRefreshCallback(() -> {
+            String clickSelectPath = item.getClickImgSelectPath();
+            if (StringUtils.isNotBlank(clickSelectPath)) {
+                clickImgSelectPath = clickSelectPath;
+            }
+            String stopSelectPath = item.getStopImgSelectPath();
+            if (StringUtils.isNotBlank(stopSelectPath)) {
+                stopImgSelectPath = stopSelectPath;
+            }
+            if (item.isRemove()) {
+                tableView_Click.getItems().remove(item);
+            }
             // 刷新列表
             tableView_Click.refresh();
             dataNumber_Click.setText(text_allHave + tableView_Click.getItems().size() + text_process);

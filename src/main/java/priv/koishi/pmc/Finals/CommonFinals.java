@@ -99,6 +99,14 @@ public class CommonFinals {
 
     public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
 
+    public static final String tip_clickRetryNum = """
+            要点击的图片识别没有匹配项后将会按照设置次数再次识别
+            只能填自然数，不填默认为\s""";
+
+    public static final String tip_stopRetryNum = """
+            终止操作图片识别没有匹配项后将会按照设置次数再次识别
+            只能填自然数，不填默认为\s""";
+
     public static final String tip_opacity = """
             滑动将会改变录制或运行自动操作时浮窗透明的
             透明的为 0 时 Windows 下鼠标将会点击透过浮窗
@@ -220,7 +228,9 @@ public class CommonFinals {
 
     public static final String key_outFilePath = "outFilePath";
 
-    public static final String key_imgPath = "imgPath";
+    public static final String key_clickImgSelectPath = "clickImgSelectPath";
+
+    public static final String key_stopImgSelectPath = "stopImgSelectPath";
 
     public static final String key_appWidth = "appWidth";
 
@@ -293,6 +303,10 @@ public class CommonFinals {
     public static final String key_lastPreparationRunTime = "lastPreparationRunTime";
 
     public static final String key_defaultPreparationRunTime = "defaultPreparationRunTime";
+
+    public static final String key_defaultClickRetryNum = "defaultClickRetryNum";
+
+    public static final String key_defaultStopRetryNum = "defaultStopRetryNum";
 
     public static final String key_lastFloatingTextColor = "lastFloatingTextColor";
 
