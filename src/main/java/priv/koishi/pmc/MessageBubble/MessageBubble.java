@@ -30,6 +30,16 @@ public class MessageBubble extends Label {
     private final Stage bubbleStage;
 
     /**
+     * 消息气泡位置横轴偏移量（正数右移负数左移）
+     */
+    private final int offsetX = 30;
+
+    /**
+     * 消息气泡位置纵偏移量（正数下移负数上移）
+     */
+    private final int offsetY = 30;
+
+    /**
      * 消息气泡
      *
      * @param text 消息气泡要展示的消息
@@ -51,8 +61,8 @@ public class MessageBubble extends Label {
         bubbleStage.setScene(scene);
         // 设置初始位置
         Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        bubbleStage.setX(mousePoint.getX() + 30);
-        bubbleStage.setY(mousePoint.getY() + 30);
+        bubbleStage.setX(mousePoint.getX() + offsetX);
+        bubbleStage.setY(mousePoint.getY() + offsetY);
         // 获取鼠标坐标监听器
         MousePositionListener mousePositionListener = new MousePositionListener(this::onMousePositionUpdate);
         // 自动关闭
@@ -68,8 +78,8 @@ public class MessageBubble extends Label {
      */
     private void onMousePositionUpdate() {
         Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        bubbleStage.setX(mousePoint.getX());
-        bubbleStage.setY(mousePoint.getY());
+        bubbleStage.setX(mousePoint.getX() + offsetX);
+        bubbleStage.setY(mousePoint.getY() + offsetY);
     }
 
 }

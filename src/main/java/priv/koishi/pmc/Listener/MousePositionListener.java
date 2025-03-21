@@ -12,6 +12,9 @@ import javafx.application.Platform;
  */
 public class MousePositionListener {
 
+    /**
+     * 计时器
+     */
     AnimationTimer timer;
 
     /**
@@ -33,6 +36,9 @@ public class MousePositionListener {
         timer.start();
     }
 
+    /**
+     * 停止计时
+     */
     public void stop() {
         timer.stop();
     }

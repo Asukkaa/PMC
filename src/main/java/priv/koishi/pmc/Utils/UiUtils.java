@@ -980,8 +980,14 @@ public class UiUtils {
      */
     public static void setPathLabel(Label pathLabel, String path, boolean openFile) {
         pathLabel.setText(path);
-        pathLabel.getStyleClass().add("label-button-style");
         File file = new File(path);
+        String openText = "\n鼠标左键点击打开 ";
+        if (!file.exists()) {
+            pathLabel.getStyleClass().add("label-err-style");
+            openText = "\n文件不存在，鼠标左键点击打开 ";
+        } else {
+            pathLabel.getStyleClass().add("label-button-style");
+        }
         String openPath;
         // 判断是否打开文件
         if (!openFile && file.isFile()) {
@@ -1004,7 +1010,7 @@ public class UiUtils {
                 }
             }
         });
-        addToolTip(path + "\n鼠标左键点击打开 " + openPath, pathLabel);
+        addToolTip(path + openText + openPath, pathLabel);
         // 设置右键菜单
         setPathLabelContextMenu(pathLabel);
     }

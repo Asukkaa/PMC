@@ -3,6 +3,11 @@
     -fx-text-fill: #005880;
 }
 
+.label-err-style {
+    -fx-cursor: hand;
+    -fx-text-fill: red;
+}
+
 .tooltip-font-size {
     -fx-font-size: 12px;
 }
