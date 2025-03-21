@@ -1,27 +1,33 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Bean.ImgFileBean;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
+import static priv.koishi.pmc.Utils.FileUtils.getFileType;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -59,9 +65,14 @@ public class DetailController {
     private String defaultStopRetryNum;
 
     /**
+     * 页面标识符
+     */
+    private static final String tabId = "_Det";
+
+    /**
      * 详情页页面舞台
      */
-    Stage stage;
+    private Stage stage;
 
     /**
      * 更新数据用的回调函数
@@ -73,23 +84,44 @@ public class DetailController {
     private AnchorPane anchorPane_Det;
 
     @FXML
+    private HBox fileNumberHBox_Det;
+
+    @FXML
+    private ImageView clickImg_Det;
+
+    @FXML
+    private Button removeClickImg_Det;
+
+    @FXML
     private ChoiceBox<String> clickType_Det;
-
-    @FXML
-    private ImageView clickImg_Det, stopImg_Det;
-
-    @FXML
-    private Label clickImgPath_Det, stopImgPath_Det;
 
     @FXML
     private Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    private Button removeClickImg_Det, removeStopImg_Det;
+    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt;
 
     @FXML
     private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, mouseEndX_Det, mouseEndY_Det, wait_Det,
             clickNumBer_Det, timeClick_Det, interval_Det, clickRetryNum_Det, stopRetryNum_Det;
+
+    @FXML
+    private TableView<ImgFileBean> tableView_Det;
+
+    @FXML
+    private TableColumn<ImgFileBean, String> name_Det, path_Det, type_Det;
+
+    /**
+     * 组件宽高自适应
+     */
+    public void detailAdaption() {
+        double tableWidth = stage.getWidth() * 0.5;
+        tableView_Det.setMaxWidth(tableWidth);
+        tableView_Det.setPrefWidth(tableWidth);
+        tableView_Det.setPrefHeight(stage.getHeight() * 0.4);
+        nodeRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
+        nullLabel_Debt.setPrefWidth(stage.getWidth() * 0.4);
+    }
 
     /**
      * 初始化数据
@@ -116,28 +148,6 @@ public class DetailController {
             removeClickImg_Det.setVisible(true);
             clickImg_Det.setImage(new Image(new File(clickImgPath_Det.getText()).toURI().toString()));
         }
-        String stopImgPath = item.getStopImgPath();
-        if (StringUtils.isNotBlank(stopImgPath)) {
-            setPathLabel(stopImgPath_Det, stopImgPath, false);
-            stopImg_Det.setImage(new Image(new File(stopImgPath_Det.getText()).toURI().toString()));
-            removeStopImg_Det.setVisible(true);
-        }
-    }
-
-    /**
-     * 创建一个图片选择器（只支持png、jpg、jpeg格式）
-     *
-     * @param actionEvent       点击事件
-     * @param stopImgSelectPath 默认路径
-     * @return 选择的图片
-     */
-    private static File creatImgChooser(ActionEvent actionEvent, String stopImgSelectPath) {
-        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
-        extensionFilters.add(new FileChooser.ExtensionFilter("图片", allPng, allJpg, allJpeg));
-        extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
-        extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
-        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
-        return creatFileChooser(actionEvent, stopImgSelectPath, extensionFilters, text_selectTemplateImg);
     }
 
     /**
@@ -199,19 +209,58 @@ public class DetailController {
     }
 
     /**
+     * 设置javafx单元格宽度
+     */
+    private void bindPrefWidthProperty() {
+        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
+        path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.5));
+        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+    }
+
+    /**
+     * 构建右键菜单
+     */
+    private void buildContextMenu() {
+        // 添加右键菜单
+        ContextMenu contextMenu = new ContextMenu();
+        // 所选行上移一行选项
+        buildUpMoveDataMenuItem(tableView_Det, contextMenu);
+        // 所选行下移一行选项
+        buildDownMoveDataMenuItem(tableView_Det, contextMenu);
+        // 修改图片路径选项
+        buildEditImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
+        // 取消选中选项
+        buildClearSelectedData(tableView_Det, contextMenu);
+        // 删除所选数据选项
+        buildDeleteDataMenuItem(tableView_Det, dataNumber_Det, contextMenu, text_img);
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(contextMenu, tableView_Det);
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException io异常
      */
     @FXML
     private void initialize() throws IOException {
+        // 设置javafx单元格宽度
+        bindPrefWidthProperty();
         // 读取配置文件
         getConfig();
         // 设置鼠标悬停提示
         setToolTip();
         // 给输入框添加内容变化监听
         textFieldChangeListener();
-        Platform.runLater(() -> stage = (Stage) anchorPane_Det.getScene().getWindow());
+        Platform.runLater(() -> {
+            stage = (Stage) anchorPane_Det.getScene().getWindow();
+            // 自动填充javafx表格
+            autoBuildTableViewData(tableView_Det, ImgFileBean.class, tabId);
+            // 设置列表通过拖拽排序行
+            tableViewDragRow(tableView_Det);
+            // 构建右键菜单
+            buildContextMenu();
+        });
     }
 
     /**
@@ -222,19 +271,18 @@ public class DetailController {
         int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
         int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
         selectedItem.setName(clickName_Det.getText());
+        selectedItem.setType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));
         selectedItem.setStartY(String.valueOf(mouseStartY));
+        selectedItem.setStopImgSelectPath(stopImgSelectPath);
+        selectedItem.setClickImgSelectPath(clickImgSelectPath);
+        selectedItem.setClickImgPath(clickImgPath_Det.getText());
         selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));
         selectedItem.setEndY(String.valueOf(setDefaultIntValue(mouseEndY_Det, mouseStartY, 0, null)));
         selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
-        selectedItem.setType(clickType_Det.getValue());
-        selectedItem.setClickImgPath(clickImgPath_Det.getText());
-        selectedItem.setClickImgSelectPath(clickImgSelectPath);
-        selectedItem.setStopImgPath(stopImgPath_Det.getText());
-        selectedItem.setStopImgSelectPath(stopImgSelectPath);
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
@@ -262,7 +310,8 @@ public class DetailController {
      */
     @FXML
     private void addClickImgPath(ActionEvent actionEvent) throws IOException {
-        File selectedFile = creatImgChooser(actionEvent, clickImgSelectPath);
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        File selectedFile = creatImgChooser(window, clickImgSelectPath);
         if (selectedFile != null) {
             // 更新所选文件路径显示
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath, key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
@@ -278,12 +327,21 @@ public class DetailController {
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {
-        File selectedFile = creatImgChooser(actionEvent, stopImgSelectPath);
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        File selectedFile = creatImgChooser(window, stopImgSelectPath);
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, stopImgPath_Det, configFile_Click);
-            removeStopImg_Det.setVisible(true);
-            stopImg_Det.setImage(new Image(selectedFile.toURI().toString()));
+            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
+            ObservableList<ImgFileBean> items = tableView_Det.getItems();
+            boolean isExist = items.stream().anyMatch(bean -> selectedFile.getPath().equals(bean.getPath()));
+            ImgFileBean imgFileBean = new ImgFileBean();
+            if (!isExist) {
+                imgFileBean.setType(getFileType(selectedFile))
+                        .setName(selectedFile.getName())
+                        .setPath(selectedFile.getPath());
+                items.add(imgFileBean);
+            }
+            dataNumber_Det.setText(text_allHave + items.size() + text_img);
         }
     }
 
@@ -298,13 +356,49 @@ public class DetailController {
     }
 
     /**
-     * 删除终止操作的图片
+     * 拖拽释放行为
+     *
+     * @param dragEvent 拖拽事件
      */
     @FXML
-    private void removeStopImg() {
-        stopImgPath_Det.setText("");
-        removeStopImg_Det.setVisible(false);
-        stopImg_Det.setImage(null);
+    public void handleDrop(DragEvent dragEvent) {
+        List<File> files = dragEvent.getDragboard().getFiles();
+        ObservableList<ImgFileBean> items = tableView_Det.getItems();
+        files.forEach(file -> {
+            boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
+            if (!isExist) {
+                ImgFileBean imgFileBean = new ImgFileBean();
+                imgFileBean.setName(file.getName())
+                        .setType(getFileType(file))
+                        .setPath(file.getPath());
+                items.add(imgFileBean);
+            }
+        });
+    }
+
+    /**
+     * 拖拽中行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    public void acceptDrop(DragEvent dragEvent) {
+        List<File> files = dragEvent.getDragboard().getFiles();
+        files.forEach(file -> {
+            if (imageType.contains(getFileType(file))) {
+                // 接受拖放
+                dragEvent.acceptTransferModes(TransferMode.COPY);
+                dragEvent.consume();
+            }
+        });
+    }
+
+    /**
+     * 清空图片列表
+     */
+    @FXML
+    private void removeAll() {
+        removeTableViewData(tableView_Det, dataNumber_Det, null);
     }
 
 }

@@ -26,13 +26,13 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Window;
 import javafx.stage.*;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
@@ -274,8 +274,7 @@ public class AutoClickController extends CommonProperties {
         TableView<?> table = (TableView<?>) scene.lookup("#tableView_Click");
         table.setPrefHeight(stageHeight * 0.5);
         // 设置组件宽度
-        double stageWidth = stage.getWidth();
-        double tableWidth = stageWidth * 0.95;
+        double tableWidth = stage.getWidth() * 0.95;
         table.setMaxWidth(tableWidth);
         Node name = scene.lookup("#name_Click");
         name.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
@@ -445,7 +444,11 @@ public class AutoClickController extends CommonProperties {
         detailStage.setScene(scene);
         detailStage.setTitle(item.getName() + " 步骤详情");
         detailStage.initModality(Modality.APPLICATION_MODAL);
-        detailStage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource("icon/PMC.png")).toExternalForm()));
+        setWindLogo(detailStage, logoPath);
+        // 监听窗口面板宽度变化
+        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::detailAdaption));
+        // 监听窗口面板高度变化
+        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::detailAdaption));
         scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
         detailStage.show();
     }
@@ -1229,7 +1232,8 @@ public class AutoClickController extends CommonProperties {
         if (autoClickTask == null && !recordClicking) {
             getConfig();
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(new FileChooser.ExtensionFilter("Perfect Mouse Control", "*.pmc")));
-            File selectedFile = creatFileChooser(actionEvent, inFilePath, extensionFilters, text_selectAutoFile);
+            Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+            File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile);
             if (selectedFile != null) {
                 inFilePath = selectedFile.getPath();
                 updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
@@ -1284,7 +1288,8 @@ public class AutoClickController extends CommonProperties {
     @FXML
     private void addOutPath(ActionEvent actionEvent) throws IOException {
         getConfig();
-        File selectedFile = creatDirectoryChooser(actionEvent, outFilePath, text_selectDirectory);
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        File selectedFile = creatDirectoryChooser(window, outFilePath, text_selectDirectory);
         if (selectedFile != null) {
             // 更新所选文件路径显示
             outFilePath = updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click);

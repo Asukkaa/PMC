@@ -10,7 +10,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TabPane;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -33,8 +32,7 @@ import static priv.koishi.pmc.Controller.MainController.mainAdaption;
 import static priv.koishi.pmc.Controller.MainController.saveLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
-import static priv.koishi.pmc.Utils.UiUtils.showStage;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 程序启动类
@@ -84,7 +82,7 @@ public class MainApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
         stage.setTitle(appName);
         stage.setScene(scene);
-        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResource("icon/PMC.png")).toExternalForm()));
+        setWindLogo(stage, logoPath);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
         TabPane tabPane = (TabPane) scene.lookup("#tabPane");
         // 设置默认选中的Tab

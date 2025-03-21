@@ -2,9 +2,9 @@ package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -17,6 +17,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Window;
 import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -26,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
@@ -134,13 +136,13 @@ public class UiUtils {
     /**
      * 创建一个文件选择器
      *
-     * @param event            交互事件
+     * @param window           文件选择器窗口
      * @param path             文件选择器初始路径
      * @param extensionFilters 要过滤的文件格式
      * @param title            文件选择器标题
      * @return 文件选择器选择的文件
      */
-    public static File creatFileChooser(ActionEvent event, String path, List<FileChooser.ExtensionFilter> extensionFilters, String title) {
+    public static File creatFileChooser(Window window, String path, List<FileChooser.ExtensionFilter> extensionFilters, String title) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
         // 设置初始目录
@@ -160,18 +162,18 @@ public class UiUtils {
         if (CollectionUtils.isNotEmpty(extensionFilters)) {
             fileChooser.getExtensionFilters().addAll(extensionFilters);
         }
-        return fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+        return fileChooser.showOpenDialog(window);
     }
 
     /**
      * 创建一个文件夹选择器
      *
-     * @param event 交互事件
-     * @param path  文件夹选择器初始路径
-     * @param title 文件夹选择器标题
+     * @param window 文件夹选择器窗口
+     * @param path   文件夹选择器初始路径
+     * @param title  文件夹选择器标题
      * @return 文件夹选择器选择的文件夹
      */
-    public static File creatDirectoryChooser(ActionEvent event, String path, String title) {
+    public static File creatDirectoryChooser(Window window, String path, String title) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle(title);
         // 设置初始目录
@@ -180,7 +182,23 @@ public class UiUtils {
         } else {
             directoryChooser.setInitialDirectory(new File(path));
         }
-        return directoryChooser.showDialog(((Node) event.getSource()).getScene().getWindow());
+        return directoryChooser.showDialog(window);
+    }
+
+    /**
+     * 创建一个图片选择器（只支持png、jpg、jpeg格式）
+     *
+     * @param window            文件选择器窗口
+     * @param stopImgSelectPath 默认路径
+     * @return 选择的图片
+     */
+    public static File creatImgChooser(Window window, String stopImgSelectPath) {
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+        extensionFilters.add(new FileChooser.ExtensionFilter("图片", allImageType));
+        extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
+        return creatFileChooser(window, stopImgSelectPath, extensionFilters, text_selectTemplateImg);
     }
 
     /**
@@ -250,7 +268,7 @@ public class UiUtils {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("异常信息");
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource("icon/PMC.png")).toString()));
+        setWindLogo(stage, logoPath);
         // 创建展示异常信息的TextArea
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
@@ -262,6 +280,35 @@ public class UiUtils {
         details.getChildren().add(textArea);
         alert.getDialogPane().setExpandableContent(details);
         return alert;
+    }
+
+    /**
+     * 创建一个确认弹窗
+     *
+     * @param confirm 确认框文案
+     * @param ok      确认按钮文案
+     * @param cancel  取消按钮文案
+     * @return 被点击的按钮
+     */
+    public static ButtonType creatConfirmDialog(String confirm, String ok, String cancel) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setHeaderText(confirm);
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        setWindLogo(stage, logoPath);
+        ButtonType cancelButton = new ButtonType(cancel, ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType okButton = new ButtonType(ok, ButtonBar.ButtonData.APPLY);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
+        return dialog.showAndWait().orElse(cancelButton);
+    }
+
+    /**
+     * 给窗口设置logo
+     *
+     * @param stage 要设置logo的窗口
+     * @param path  logo路径
+     */
+    public static void setWindLogo(Stage stage, String path) {
+        stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource(path)).toString()));
     }
 
     /**
@@ -335,7 +382,9 @@ public class UiUtils {
     public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber, Label log) {
         tableView.getItems().clear();
         updateLabel(fileNumber, text_dataListNull);
-        updateLabel(log, "");
+        if (log != null) {
+            updateLabel(log, "");
+        }
         System.gc();
     }
 
@@ -458,7 +507,9 @@ public class UiUtils {
             updateProperties(configFile, pathKey, selectedFilePath);
             filePath = selectedFilePath;
         }
-        setPathLabel(pathLabel, selectedFilePath, false);
+        if (pathLabel != null) {
+            setPathLabel(pathLabel, selectedFilePath, false);
+        }
         return filePath;
     }
 
@@ -579,6 +630,30 @@ public class UiUtils {
                 fileList.add(row, fileList.remove(row + 1));
             }
         }
+    }
+
+    /**
+     * 所选行上移一行选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    public static <T> void buildUpMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem("所选行上移一行");
+        menuItem.setOnAction(event -> upMoveDataMenuItem(tableView));
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 所选行下移一行选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    public static <T> void buildDownMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem("所选行下移一行");
+        menuItem.setOnAction(event -> downMoveDataMenuItem(tableView));
+        contextMenu.getItems().add(menuItem);
     }
 
     /**
@@ -703,6 +778,44 @@ public class UiUtils {
     }
 
     /**
+     * 修改所选项图片地址
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     * @param dataNumber  列表数据数量文本框
+     * @param unit        列表数据数量单位
+     */
+    public static void buildEditImgPathMenu(TableView<ImgFileBean> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
+        MenuItem upMoveDataMenuItem = new MenuItem("更改第一行所选项的图片");
+        upMoveDataMenuItem.setOnAction(event -> {
+            ObservableList<ImgFileBean> selectedItems = tableView.getSelectionModel().getSelectedItems();
+            if (CollectionUtils.isNotEmpty(selectedItems)) {
+                ImgFileBean selectedItem = selectedItems.getFirst();
+                Window window = tableView.getScene().getWindow();
+                File file = creatImgChooser(window, selectedItem.getPath());
+                if (file != null) {
+                    List<ImgFileBean> allImg = tableView.getItems();
+                    List<ImgFileBean> checkList = new ArrayList<>(allImg);
+                    checkList.remove(selectedItem);
+                    boolean isExist = checkList.stream().anyMatch(bean ->
+                            file.getPath().equals(bean.getPath()));
+                    if (isExist) {
+                        ButtonType buttonType = creatConfirmDialog("图片已存在，是否删除这张选中图片？", "删除", "不删除");
+                        if (!buttonType.getButtonData().isCancelButton()) {
+                            tableView.getItems().remove(selectedItem);
+                        }
+                    } else {
+                        selectedItem.setPath(file.getPath());
+                    }
+                    tableView.refresh();
+                    dataNumber.setText(text_allHave + allImg.size() + unit);
+                }
+            }
+        });
+        contextMenu.getItems().add(upMoveDataMenuItem);
+    }
+
+    /**
      * 取消选中选项
      *
      * @param tableView   要添加右键菜单的列表
@@ -720,6 +833,7 @@ public class UiUtils {
      * @param tableView   要添加右键菜单的列表
      * @param label       列表对应的统计信息展示栏
      * @param contextMenu 右键菜单集合
+     * @param unit        统计信息展示栏数量单位
      */
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem("删除所选数据");

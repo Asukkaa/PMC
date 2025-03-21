@@ -3,7 +3,9 @@ package priv.koishi.pmc.Finals;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -148,6 +150,8 @@ public class CommonFinals {
 
     public static final String text_data = " 组数据";
 
+    public static final String text_img = " 张图片";
+
     public static final String text_process = " 步操作";
 
     public static final String text_copySuccess = "复制成功";
@@ -205,22 +209,6 @@ public class CommonFinals {
     public static final String text_isAdd = " (添加)";
 
     public static final String text_isRecord = " (录制)";
-
-    public static final String log = ".log";
-
-    public static final String PMC = ".pmc";
-
-    public static final String exe = ".exe";
-
-    public static final String app = ".app";
-
-    public static final String macos = "mac";
-
-    public static final String win = "win";
-
-    public static final String activation = "1";
-
-    public static final String unActivation = "0";
 
     public static final String key_logsNum = "logsNum";
 
@@ -344,21 +332,7 @@ public class CommonFinals {
 
     public static final String mouseButton_none = "鼠标仅移动";
 
-    public static String extension_file = "文件";
-
-    public static final String extension_folder = "文件夹";
-
-    public static final String allPng = "*.png";
-
-    public static final String allJpg = "*.jpg";
-
-    public static final String allJpeg = "*.jpeg";
-
-    public static final String png = ".png";
-
-    public static final String jpg = ".jpg";
-
-    public static final String jpeg = ".jpeg";
+    public static String logoPath = "icon/PMC.png";
 
     /**
      * 资源文件夹地址前缀
@@ -449,6 +423,42 @@ public class CommonFinals {
      * gitee地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
+
+    public static final String macos = "mac";
+
+    public static final String win = "win";
+
+    public static final String activation = "1";
+
+    public static final String unActivation = "0";
+
+    public static final String log = ".log";
+
+    public static final String PMC = ".pmc";
+
+    public static final String exe = ".exe";
+
+    public static final String app = ".app";
+
+    public static String extension_file = "文件";
+
+    public static final String extension_folder = "文件夹";
+
+    public static final String allPng = "*.png";
+
+    public static final String allJpg = "*.jpg";
+
+    public static final String allJpeg = "*.jpeg";
+
+    public static final String png = ".png";
+
+    public static final String jpg = ".jpg";
+
+    public static final String jpeg = ".jpeg";
+
+    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
+
+    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
 
     /**
      * 默认浮窗横轴偏移量

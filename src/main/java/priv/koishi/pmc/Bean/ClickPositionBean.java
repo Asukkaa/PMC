@@ -3,6 +3,7 @@ package priv.koishi.pmc.Bean;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -84,7 +85,7 @@ public class ClickPositionBean {
     /**
      * 终止操作的图片路径
      */
-    String stopImgPath;
+    List<String> stopImgPaths;
 
     /**
      * 上次所选终止操作的图片路径
@@ -102,7 +103,7 @@ public class ClickPositionBean {
     String stopMatchThreshold;
 
     /**
-     * 图像识别匹配最大时常（单位：秒）
+     * 图像识别匹配最大时长（单位：秒）
      */
     String overtime;
 
