@@ -79,7 +79,7 @@
 
             <HBox spacing="5">
                 <Label prefHeight="25" text="当前版本："/>
-                <Label fx:id="version_Abt" prefHeight="25" textFill="limegreen" text="1.2.0"/>
+                <Label fx:id="version_Abt" prefHeight="25" textFill="limegreen"/>
             </HBox>
         </VBox>
     </VBox>

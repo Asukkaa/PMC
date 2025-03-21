@@ -101,6 +101,14 @@ public class CommonFinals {
 
     public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
 
+    public static final String version = "2.0.0";
+
+    public static final String buildDate = "2025年3月";
+
+    public static final String tip_version = """
+    version：%s
+    %s构建""".formatted(version, buildDate);
+
     public static final String tip_clickRetryNum = """
             要点击的图片识别没有匹配项后将会按照设置次数再次识别
             只能填自然数，不填默认为\s""";
@@ -129,10 +137,6 @@ public class CommonFinals {
             如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作
             Windows 会直接点击对应窗口的对应坐标，macOS 需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
             建议 Windows 用户不要勾选， macOS 用户需要勾选""";
-
-    public static final String tip_version = """
-            version：1.2.0
-            2025年3月19日构建""";
 
     public static final String text_selectDirectory = "选择文件夹";
 

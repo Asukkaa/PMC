@@ -137,6 +137,8 @@ public class AboutController {
      */
     @FXML
     private void initialize() throws IOException {
+        // 设置版本号
+        version_Abt.setText(version);
         // 添加右键菜单
         setCopyValueContextMenu(mail_Abt, "复制反馈邮件");
         // log 文件保留数量输入监听
