@@ -1,15 +1,10 @@
 package priv.koishi.pmc.Utils;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -20,7 +15,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -455,17 +449,16 @@ public class UiUtils {
      * @param pathKey          配置文件中路径的key
      * @param pathLabel        要展示路径的文本框
      * @param configFile       要更新的配置文件
-     * @param pane             组件所在布局
      * @return 所选文件路径
      * @throws IOException io异常
      */
-    public static String updatePathLabel(String selectedFilePath, String filePath, String pathKey, Label pathLabel, String configFile, Pane pane) throws IOException {
+    public static String updatePathLabel(String selectedFilePath, String filePath, String pathKey, Label pathLabel, String configFile) throws IOException {
         // 只有跟上次选的路径不一样才更新
         if (StringUtils.isBlank(filePath) || !filePath.equals(selectedFilePath)) {
             updateProperties(configFile, pathKey, selectedFilePath);
             filePath = selectedFilePath;
         }
-        setPathLabel(pathLabel, selectedFilePath, false, pane);
+        setPathLabel(pathLabel, selectedFilePath, false);
         return filePath;
     }
 
@@ -833,12 +826,11 @@ public class UiUtils {
      * @param label 需要处理的文本框
      * @param prop  配置文件
      * @param key   要读取的key
-     * @param pane  组件所在布局
      */
-    public static void setControlLastConfig(Label label, Properties prop, String key, Pane pane) {
+    public static void setControlLastConfig(Label label, Properties prop, String key) {
         String lastValue = prop.getProperty(key);
         if (FilenameUtils.getPrefixLength(lastValue) != 0) {
-            setPathLabel(label, lastValue, false, pane);
+            setPathLabel(label, lastValue, false);
         }
     }
 
@@ -870,10 +862,9 @@ public class UiUtils {
      * @param pathLabel 文件路径文本栏
      * @param path      文件路径
      * @param openFile  点击是否打开文件，true打开文件，false打开文件所在文件夹
-     * @param pane      组件所在布局
      * @throws RuntimeException io异常
      */
-    public static void setPathLabel(Label pathLabel, String path, boolean openFile, Pane pane) {
+    public static void setPathLabel(Label pathLabel, String path, boolean openFile) {
         pathLabel.setText(path);
         pathLabel.getStyleClass().add("label-button-style");
         File file = new File(path);
@@ -901,17 +892,16 @@ public class UiUtils {
         });
         addToolTip(path + "\n鼠标左键点击打开 " + openPath, pathLabel);
         // 设置右键菜单
-        setPathLabelContextMenu(pathLabel, pane);
+        setPathLabelContextMenu(pathLabel);
     }
 
     /**
      * 给路径Label设置右键菜单
      *
      * @param valueLabel 要处理的文本栏
-     * @param pane       组件所在布局
      * @throws RuntimeException io异常
      */
-    public static void setPathLabelContextMenu(Label valueLabel, Pane pane) {
+    public static void setPathLabelContextMenu(Label valueLabel) {
         String path = valueLabel.getText();
         ContextMenu contextMenu = new ContextMenu();
         MenuItem openDirectoryMenuItem = new MenuItem("打开文件夹");
@@ -937,7 +927,7 @@ public class UiUtils {
         MenuItem copyValueMenuItem = new MenuItem("复制路径");
         contextMenu.getItems().add(copyValueMenuItem);
         valueLabel.setContextMenu(contextMenu);
-        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText(), pane));
+        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText()));
         valueLabel.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
                 contextMenu.show(valueLabel, event.getScreenX(), event.getScreenY());
@@ -950,9 +940,8 @@ public class UiUtils {
      *
      * @param valueLabel 要处理的文本栏
      * @param text       右键菜单文本
-     * @param pane       组件所在布局
      */
-    public static void setCopyValueContextMenu(Label valueLabel, String text, Pane pane) {
+    public static void setCopyValueContextMenu(Label valueLabel, String text) {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem copyValueMenuItem = new MenuItem(text);
         contextMenu.getItems().add(copyValueMenuItem);
@@ -963,16 +952,15 @@ public class UiUtils {
             }
         });
         // 设置右键菜单行为
-        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText(), pane));
+        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText()));
     }
 
     /**
      * 复制文本
      *
      * @param value 要复制的文本
-     * @param pane  组件所在布局
      */
-    public static void copyText(String value, Pane pane) {
+    public static void copyText(String value) {
         // 获取当前系统剪贴板
         Clipboard clipboard = Clipboard.getSystemClipboard();
         // 创建剪贴板内容对象
@@ -982,36 +970,7 @@ public class UiUtils {
         // 设置剪贴板内容
         clipboard.setContent(content);
         // 复制成功消息气泡
-        buildMessageBubble(pane, text_copySuccess, 2);
-    }
-
-    /**
-     * 创建消息弹窗
-     *
-     * @param pane 组件所在布局
-     * @param text 消息弹窗提示文案
-     * @param time 显示弹窗时间
-     */
-    public static void buildMessageBubble(Pane pane, String text, double time) {
-        MessageBubble bubble = new MessageBubble(text);
-        pane.getChildren().add(bubble);
-        // 将事件处理器声明为变量
-        final EventHandler<MouseEvent> mouseMovedHandler = mouseEvent -> {
-            Point2D sceneCoords = new Point2D(mouseEvent.getSceneX(), mouseEvent.getSceneY());
-            Point2D localCoords = pane.sceneToLocal(sceneCoords);
-            bubble.setLayoutX(localCoords.getX() + 30);
-            bubble.setLayoutY(localCoords.getY() + 30);
-        };
-        // 使用变量添加监听
-        Scene scene = pane.getScene();
-        scene.addEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(time), ae -> {
-            pane.getChildren().remove(bubble);
-            // 使用保存的handler变量移除监听
-            scene.removeEventFilter(MouseEvent.MOUSE_MOVED, mouseMovedHandler);
-        });
-        Timeline timeline = new Timeline(keyFrame);
-        timeline.play();
+        new MessageBubble(text_copySuccess, 2);
     }
 
     /**
