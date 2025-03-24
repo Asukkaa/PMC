@@ -19,6 +19,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.MessageBubble.MessageBubble;
 
 import java.io.File;
 import java.io.IOException;
@@ -361,6 +362,8 @@ public class DetailController {
                         .setPath(selectedFile.getPath())
                         .setTableView(tableView_Det);
                 items.add(imgFileBean);
+            } else {
+                new MessageBubble(text_imgExist, 2);
             }
             dataNumber_Det.setText(text_allHave + items.size() + text_img);
         }

@@ -108,8 +108,8 @@ public class CommonFinals {
     public static final String buildDate = "2025年3月";
 
     public static final String tip_version = """
-    version：%s
-    %s构建""".formatted(version, buildDate);
+            version：%s
+            %s构建""".formatted(version, buildDate);
 
     public static final String tip_clickRetryNum = """
             要点击的图片识别没有匹配项后将会按照设置次数再次识别
@@ -215,6 +215,8 @@ public class CommonFinals {
     public static final String text_isAdd = " (添加)";
 
     public static final String text_isRecord = " (录制)";
+
+    public static final String text_imgExist = "图片已存在";
 
     public static final String key_logsNum = "logsNum";
 
@@ -523,7 +525,9 @@ public class CommonFinals {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
     }
 
-    // 添加静态缓存
+    /**
+     * 列表缩略图缓存
+     */
     public static final Map<String, Image> THUMBNAIL_CACHE = new ConcurrentHashMap<>();
 
 }

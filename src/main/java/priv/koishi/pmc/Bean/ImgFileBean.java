@@ -41,27 +41,42 @@ public class ImgFileBean {
      */
     Image thumb;
 
+    /**
+     * 要显示缩略图的列表
+     */
     TableView<?> tableView;
 
+    /**
+     * 获取缩略图
+     *
+     * @return 当前图片表格的缩略图
+     */
     public Image getThumb() {
         if (THUMBNAIL_CACHE.containsKey(path)) {
             return THUMBNAIL_CACHE.get(path);
         }
-        if (thumb == null && StringUtils.isNotBlank(path)) {
+        if (thumb == null) {
             // 异步加载缩略图（防止阻塞UI）
-            loadThumbnailAsync();
+            loadThumbnailAsync(path);
         }
         return thumb;
     }
 
-    private void loadThumbnailAsync() {
+    /**
+     * 异步加载缩略图
+     */
+    private void loadThumbnailAsync(String path) {
         Service<Image> service = new Service<>() {
             @Override
             protected Task<Image> createTask() {
                 return new Task<>() {
                     @Override
                     protected Image call() {
-                        return new Image("file:" + path, 50, 50, true, true, true);
+                        if (StringUtils.isNotBlank(path)) {
+                            return new Image("file:" + path, 50, 50, true, true, true);
+                        } else {
+                            return null;
+                        }
                     }
                 };
             }
@@ -72,6 +87,14 @@ public class ImgFileBean {
             tableView.refresh();
         });
         service.start();
+    }
+
+    /**
+     * 更新缩略图
+     */
+    public void updateThumb() {
+        // 异步加载缩略图（防止阻塞UI）
+        loadThumbnailAsync(path);
     }
 
 }
