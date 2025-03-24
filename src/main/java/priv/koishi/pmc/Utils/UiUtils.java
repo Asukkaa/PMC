@@ -958,10 +958,8 @@ public class UiUtils {
                         }
                     } else {
                         selectedItem.setPath(file.getPath());
-                        selectedItem.updateThumb();
-                        selectedItem.setPath(file.getPath());
-                        selectedItem.updateThumb();
                     }
+                    selectedItem.updateThumb();
                     tableView.refresh();
                     dataNumber.setText(text_allHave + allImg.size() + unit);
                 }
