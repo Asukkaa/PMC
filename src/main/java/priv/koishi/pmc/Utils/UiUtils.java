@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Interface.UsedByReflection;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
 
@@ -40,8 +41,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.errToString;
@@ -372,12 +375,26 @@ public class UiUtils {
             } else {
                 finalFieldName = fieldName;
             }
-            Class<?> type = f.getType();
-            System.out.println(type);
-            Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c -> c.getId().equals(finalFieldName)).findFirst();
+            Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c ->
+                    c.getId().equals(finalFieldName)).findFirst();
             matched.ifPresent(m -> {
                 if (f.getType() == Image.class) {
-                    buildThumbnailCell((TableColumn<ImgFileBean, Image>) m);
+                    try {
+                        Method getter = beanClass.getMethod("getThumb");
+                        // 显式标记方法调用（解决IDE误报）
+                        if (getter.isAnnotationPresent(UsedByReflection.class)) {
+                            Function<T, Image> supplier = bean -> {
+                                try {
+                                    return (Image) getter.invoke(bean);
+                                } catch (Exception e) {
+                                    return null;
+                                }
+                            };
+                            buildThumbnailCell((TableColumn<T, Image>) m, supplier);
+                        }
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else {
                     buildCellValue(m, fieldName);
                 }
@@ -390,15 +407,15 @@ public class UiUtils {
      *
      * @param column 要创建图片表格的列
      */
-    public static void buildThumbnailCell(TableColumn<ImgFileBean, Image> column) {
+    public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<T, Image> thumbSupplier) {
         column.setCellValueFactory(cellData ->
-                new SimpleObjectProperty<>(cellData.getValue().getThumb()));
+                new SimpleObjectProperty<>(thumbSupplier.apply(cellData.getValue())));
         column.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
 
             {
-                imageView.setFitWidth(50);
-                imageView.setFitHeight(50);
+                imageView.setFitWidth(100);
+                imageView.setFitHeight(100);
                 imageView.setPreserveRatio(true);
             }
 
@@ -429,7 +446,8 @@ public class UiUtils {
                     @Override
                     protected Image call() {
                         if (StringUtils.isNotBlank(path)) {
-                            return new Image("file:" + path, 50, 50, true, true, true);
+                            System.out.println("tableViewImageService:" + path);
+                            return new Image("file:" + path, 200, 200, true, true, true);
                         } else {
                             return null;
                         }
@@ -939,6 +957,8 @@ public class UiUtils {
                             tableView.getItems().remove(selectedItem);
                         }
                     } else {
+                        selectedItem.setPath(file.getPath());
+                        selectedItem.updateThumb();
                         selectedItem.setPath(file.getPath());
                         selectedItem.updateThumb();
                     }

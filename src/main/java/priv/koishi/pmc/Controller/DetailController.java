@@ -154,6 +154,8 @@ public class DetailController {
         List<ImgFileBean> stopImgFileBeans = item.getStopImgFileBeans();
         if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
             tableView_Det.getItems().addAll(stopImgFileBeans);
+            item.updateThumb();
+            tableView_Det.refresh();
         }
         String clickImgPath = item.getClickImgPath();
         if (StringUtils.isNotBlank(clickImgPath)) {
@@ -237,12 +239,12 @@ public class DetailController {
     private void buildContextMenu() {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
+        // 修改图片路径选项
+        buildEditImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
         // 所选行上移一行选项
         buildUpMoveDataMenuItem(tableView_Det, contextMenu);
         // 所选行下移一行选项
         buildDownMoveDataMenuItem(tableView_Det, contextMenu);
-        // 修改图片路径选项
-        buildEditImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
         // 查看文件选项
         buildFilePathItem(tableView_Det, contextMenu);
         // 取消选中选项
@@ -365,6 +367,7 @@ public class DetailController {
             } else {
                 new MessageBubble(text_imgExist, 2);
             }
+            tableView_Det.refresh();
             dataNumber_Det.setText(text_allHave + items.size() + text_img);
         }
     }

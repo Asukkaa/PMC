@@ -290,6 +290,8 @@ public class AutoClickController extends CommonProperties {
         // 设置组件宽度
         double tableWidth = stage.getWidth() * 0.95;
         table.setMaxWidth(tableWidth);
+        Node thumb = scene.lookup("#thumb_Click");
+        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
         Node name = scene.lookup("#name_Click");
         name.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
         Node clickTime = scene.lookup("#clickTime_Click");
@@ -299,9 +301,9 @@ public class AutoClickController extends CommonProperties {
         Node clickInterval = scene.lookup("#clickInterval_Click");
         clickInterval.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node waitTime = scene.lookup("#waitTime_Click");
-        waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
+        waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node type = scene.lookup("#type_Click");
-        type.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
+        type.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Label dataNum = (Label) scene.lookup("#dataNumber_Click");
         HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Click");
         nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
@@ -400,12 +402,13 @@ public class AutoClickController extends CommonProperties {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
+        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.3));
         name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.3));
         clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickInterval_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.2));
-        type_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.2));
+        waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        type_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
     }
 
     /**
@@ -451,6 +454,8 @@ public class AutoClickController extends CommonProperties {
             if (item.isRemove()) {
                 tableView_Click.getItems().remove(item);
             }
+            // 更新缩略图
+            item.updateThumb();
             // 刷新列表
             tableView_Click.refresh();
             dataNumber_Click.setText(text_allHave + tableView_Click.getItems().size() + text_process);
@@ -811,9 +816,10 @@ public class AutoClickController extends CommonProperties {
     private ClickPositionBean getClickSetting(int tableViewItemSize) {
         ClickPositionBean clickPositionBean = new ClickPositionBean();
         clickPositionBean.setName(text_step + (tableViewItemSize + 1) + text_isAdd)
-                .setType(mouseButton_primary)
                 .setClickRetryTimes(defaultClickRetryNum)
                 .setStopRetryTimes(defaultStopRetryNum)
+                .setTableView(tableView_Click)
+                .setType(mouseButton_primary)
                 .setClickMatchThreshold("80")
                 .setStopMatchThreshold("80")
                 .setClickInterval("0")
