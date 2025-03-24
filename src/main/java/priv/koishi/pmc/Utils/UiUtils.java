@@ -374,8 +374,9 @@ public class UiUtils {
             matched.ifPresent(m -> {
                 if (("thumb" + tabId).equals(m.getId())) {
                     buildThumbnailCell((TableColumn<ImgFileBean, Image>) m);
+                } else {
+                    buildCellValue(m, fieldName);
                 }
-                buildCellValue(m, fieldName);
             });
         });
     }
@@ -385,11 +386,13 @@ public class UiUtils {
                 new SimpleObjectProperty<>(cellData.getValue().getThumb()));
         column.setCellFactory(col -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
+
             {
                 imageView.setFitWidth(50);
                 imageView.setFitHeight(50);
                 imageView.setPreserveRatio(true);
             }
+
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);

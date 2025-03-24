@@ -358,7 +358,8 @@ public class DetailController {
             if (!isExist) {
                 imgFileBean.setType(getFileType(selectedFile))
                         .setName(selectedFile.getName())
-                        .setPath(selectedFile.getPath());
+                        .setPath(selectedFile.getPath())
+                        .setTableView(tableView_Det);
                 items.add(imgFileBean);
             }
             dataNumber_Det.setText(text_allHave + items.size() + text_img);

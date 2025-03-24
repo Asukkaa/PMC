@@ -1,6 +1,8 @@
 package priv.koishi.pmc.Bean;
 
-import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -39,6 +41,8 @@ public class ImgFileBean {
      */
     Image thumb;
 
+    TableView<?> tableView;
+
     public Image getThumb() {
         if (THUMBNAIL_CACHE.containsKey(path)) {
             return THUMBNAIL_CACHE.get(path);
@@ -51,13 +55,23 @@ public class ImgFileBean {
     }
 
     private void loadThumbnailAsync() {
-        new Thread(() -> {
-            Image image = new Image("file:" + path, 50, 50, true, true, true);
-            Platform.runLater(() -> {
-                this.thumb = image;
-                THUMBNAIL_CACHE.put(path, thumb);
-            });
-        }).start();
+        Service<Image> service = new Service<>() {
+            @Override
+            protected Task<Image> createTask() {
+                return new Task<>() {
+                    @Override
+                    protected Image call() {
+                        return new Image("file:" + path, 50, 50, true, true, true);
+                    }
+                };
+            }
+        };
+        service.setOnSucceeded(e -> {
+            this.thumb = service.getValue();
+            THUMBNAIL_CACHE.put(path, thumb);
+            tableView.refresh();
+        });
+        service.start();
     }
 
 }
