@@ -686,6 +686,8 @@ public class AutoClickController extends CommonProperties {
         ContextMenu contextMenu = new ContextMenu();
         // 查看详情选项
         buildDetailMenuItem(tableView_Click, contextMenu);
+        // 修改所选项要点击的图片地址
+        buildEditClickImgPathMenu(tableView_Click, contextMenu);
         // 添加测试点击选项
         buildClickTestMenuItem(tableView_Click, contextMenu);
         // 移动所选行选项

@@ -523,9 +523,4 @@ public class CommonFinals {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
     }
 
-    /**
-     * 列表缩略图缓存
-     */
-//    public static final Map<String, Image> THUMBNAIL_CACHE = new ConcurrentHashMap<>();
-
 }

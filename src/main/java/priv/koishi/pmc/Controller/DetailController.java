@@ -153,10 +153,17 @@ public class DetailController {
         stopImgSelectPath = item.getStopImgSelectPath();
         List<ImgFileBean> stopImgFileBeans = item.getStopImgFileBeans();
         if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
-            tableView_Det.getItems().addAll(stopImgFileBeans);
-            item.updateThumb();
-            tableView_Det.refresh();
+            stopImgFileBeans.forEach(b -> {
+                // 必须重新创建对象才能正确属性列表图片
+                ImgFileBean imgFileBean = new ImgFileBean();
+                imgFileBean.setType(b.getType())
+                        .setName(b.getName())
+                        .setPath(b.getPath())
+                        .setTableView(tableView_Det);
+                tableView_Det.getItems().add(imgFileBean);
+            });
         }
+        tableView_Det.refresh();
         String clickImgPath = item.getClickImgPath();
         if (StringUtils.isNotBlank(clickImgPath)) {
             setPathLabel(clickImgPath_Det, clickImgPath, false);
@@ -240,7 +247,7 @@ public class DetailController {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
-        buildEditImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
+        buildEditStopImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
         // 所选行上移一行选项
         buildUpMoveDataMenuItem(tableView_Det, contextMenu);
         // 所选行下移一行选项

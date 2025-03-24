@@ -446,7 +446,6 @@ public class UiUtils {
                     @Override
                     protected Image call() {
                         if (StringUtils.isNotBlank(path)) {
-                            System.out.println("tableViewImageService:" + path);
                             return new Image("file:" + path, 200, 200, true, true, true);
                         } else {
                             return null;
@@ -930,14 +929,14 @@ public class UiUtils {
     }
 
     /**
-     * 修改所选项图片地址
+     * 修改所选项终止操作图片地址
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      * @param dataNumber  列表数据数量文本框
      * @param unit        列表数据数量单位
      */
-    public static void buildEditImgPathMenu(TableView<ImgFileBean> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
+    public static void buildEditStopImgPathMenu(TableView<ImgFileBean> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
         MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
         upMoveDataMenuItem.setOnAction(event -> {
             ObservableList<ImgFileBean> selectedItems = tableView.getSelectionModel().getSelectedItems();
@@ -960,8 +959,32 @@ public class UiUtils {
                         selectedItem.setPath(file.getPath());
                     }
                     selectedItem.updateThumb();
-                    tableView.refresh();
                     dataNumber.setText(text_allHave + allImg.size() + unit);
+                }
+            }
+        });
+        contextMenu.getItems().add(upMoveDataMenuItem);
+    }
+
+    /**
+     * 修改所选项要点击的图片地址
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     * @param dataNumber  列表数据数量文本框
+     * @param unit        列表数据数量单位
+     */
+    public static void buildEditClickImgPathMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+        MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
+        upMoveDataMenuItem.setOnAction(event -> {
+            ObservableList<ClickPositionBean> selectedItems = tableView.getSelectionModel().getSelectedItems();
+            if (CollectionUtils.isNotEmpty(selectedItems)) {
+                ClickPositionBean selectedItem = selectedItems.getFirst();
+                Window window = tableView.getScene().getWindow();
+                File file = creatImgChooser(window, selectedItem.getClickImgPath());
+                if (file != null) {
+                    selectedItem.setClickImgPath(file.getAbsolutePath());
+                    selectedItem.updateThumb();
                 }
             }
         });
