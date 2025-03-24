@@ -1,14 +1,13 @@
 package priv.koishi.pmc.Bean;
 
 import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.StringUtils;
 
 import static priv.koishi.pmc.Finals.CommonFinals.THUMBNAIL_CACHE;
+import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
 
 /**
  * 图片文件信息类
@@ -63,24 +62,10 @@ public class ImgFileBean {
     }
 
     /**
-     * 异步加载缩略图
+     * 异步加载并更新缩略图
      */
     private void loadThumbnailAsync(String path) {
-        Service<Image> service = new Service<>() {
-            @Override
-            protected Task<Image> createTask() {
-                return new Task<>() {
-                    @Override
-                    protected Image call() {
-                        if (StringUtils.isNotBlank(path)) {
-                            return new Image("file:" + path, 50, 50, true, true, true);
-                        } else {
-                            return null;
-                        }
-                    }
-                };
-            }
-        };
+        Service<Image> service = tableViewImageService(path);
         service.setOnSucceeded(e -> {
             this.thumb = service.getValue();
             THUMBNAIL_CACHE.put(path, thumb);

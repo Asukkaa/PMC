@@ -26,6 +26,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
@@ -271,6 +272,9 @@ public class AutoClickController extends CommonProperties {
     @FXML
     private TableColumn<ClickPositionBean, String> name_Click, clickTime_Click, clickNum_Click,
             clickInterval_Click, waitTime_Click, type_Click;
+
+    @FXML
+    private TableColumn<ClickPositionBean, ImageView> thumb_Click;
 
     /**
      * 组件自适应宽高

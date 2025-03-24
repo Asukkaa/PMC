@@ -3,6 +3,8 @@ package priv.koishi.pmc.Utils;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Dialog;
@@ -370,9 +372,11 @@ public class UiUtils {
             } else {
                 finalFieldName = fieldName;
             }
+            Class<?> type = f.getType();
+            System.out.println(type);
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c -> c.getId().equals(finalFieldName)).findFirst();
             matched.ifPresent(m -> {
-                if (("thumb" + tabId).equals(m.getId())) {
+                if (f.getType() == Image.class) {
                     buildThumbnailCell((TableColumn<ImgFileBean, Image>) m);
                 } else {
                     buildCellValue(m, fieldName);
@@ -381,6 +385,11 @@ public class UiUtils {
         });
     }
 
+    /**
+     * 创建图片表格
+     *
+     * @param column 要创建图片表格的列
+     */
     public static void buildThumbnailCell(TableColumn<ImgFileBean, Image> column) {
         column.setCellValueFactory(cellData ->
                 new SimpleObjectProperty<>(cellData.getValue().getThumb()));
@@ -404,6 +413,30 @@ public class UiUtils {
                 }
             }
         });
+    }
+
+    /**
+     * 获取表格中的缩略图
+     *
+     * @param path 缩略图路径
+     * @return 表格中的缩略图对象
+     */
+    public static Service<Image> tableViewImageService(String path) {
+        return new Service<>() {
+            @Override
+            protected Task<Image> createTask() {
+                return new Task<>() {
+                    @Override
+                    protected Image call() {
+                        if (StringUtils.isNotBlank(path)) {
+                            return new Image("file:" + path, 50, 50, true, true, true);
+                        } else {
+                            return null;
+                        }
+                    }
+                };
+            }
+        };
     }
 
     /**

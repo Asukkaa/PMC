@@ -53,6 +53,7 @@
             </placeholder>
 
             <columns>
+                <TableColumn fx:id="thumb_Click" text="步骤名称" sortable="false"/>
                 <TableColumn fx:id="name_Click" text="步骤名称" sortable="false"/>
                 <TableColumn fx:id="clickTime_Click" text="操作时长(毫秒)" sortable="false"/>
                 <TableColumn fx:id="clickNum_Click" text="操作次数" sortable="false"/>
