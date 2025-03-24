@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
@@ -109,6 +110,9 @@ public class DetailController {
     private TableView<ImgFileBean> tableView_Det;
 
     @FXML
+    private TableColumn<ImgFileBean, ImageView> thumb_Det;
+
+    @FXML
     private TableColumn<ImgFileBean, String> name_Det, path_Det, type_Det;
 
     /**
@@ -140,8 +144,16 @@ public class DetailController {
         timeClick_Det.setText(item.getClickTime());
         interval_Det.setText(item.getClickInterval());
         clickType_Det.setValue(item.getType());
+        clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
+        stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
+        clickRetryNum_Det.setText(item.getClickRetryTimes());
+        stopRetryNum_Det.setText(item.getStopRetryTimes());
         clickImgSelectPath = item.getClickImgSelectPath();
         stopImgSelectPath = item.getStopImgSelectPath();
+        List<ImgFileBean> stopImgFileBeans = item.getStopImgFileBeans();
+        if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
+            tableView_Det.getItems().addAll(stopImgFileBeans);
+        }
         String clickImgPath = item.getClickImgPath();
         if (StringUtils.isNotBlank(clickImgPath)) {
             setPathLabel(clickImgPath_Det, clickImgPath, false);
@@ -212,9 +224,10 @@ public class DetailController {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
-        path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.5));
-        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
+        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.25));
+        path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
+        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.15));
     }
 
     /**
@@ -229,6 +242,8 @@ public class DetailController {
         buildDownMoveDataMenuItem(tableView_Det, contextMenu);
         // 修改图片路径选项
         buildEditImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
+        // 查看文件选项
+        buildFilePathItem(tableView_Det, contextMenu);
         // 取消选中选项
         buildClearSelectedData(tableView_Det, contextMenu);
         // 删除所选数据选项
@@ -283,6 +298,11 @@ public class DetailController {
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
+        selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
+        selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(defaultStopRetryNum), 0, null)));
+        selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
+        selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
+        selectedItem.setStopImgFileBeans(tableView_Det.getItems());
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {

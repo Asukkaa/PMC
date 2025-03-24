@@ -109,6 +109,16 @@ public class AutoClickController extends CommonProperties {
     private static String defaultPreparationRunTime;
 
     /**
+     * 默认要点击的图片识别重试次数
+     */
+    private String defaultClickRetryNum;
+
+    /**
+     * 默认终止操作图片识别重试次数
+     */
+    private String defaultStopRetryNum;
+
+    /**
      * 详情页高度
      */
     private int detailHeight;
@@ -377,6 +387,8 @@ public class AutoClickController extends CommonProperties {
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
         defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
         defaultPreparationRecordTime = prop.getProperty(key_defaultPreparationRecordTime);
+        defaultStopRetryNum = prop.getProperty(key_defaultStopRetryNum);
+        defaultClickRetryNum = prop.getProperty(key_defaultClickRetryNum);
         input.close();
     }
 
@@ -796,6 +808,10 @@ public class AutoClickController extends CommonProperties {
         ClickPositionBean clickPositionBean = new ClickPositionBean();
         clickPositionBean.setName(text_step + (tableViewItemSize + 1) + text_isAdd)
                 .setType(mouseButton_primary)
+                .setClickRetryTimes(defaultClickRetryNum)
+                .setStopRetryTimes(defaultStopRetryNum)
+                .setClickMatchThreshold("80")
+                .setStopMatchThreshold("80")
                 .setClickInterval("0")
                 .setClickTime("0")
                 .setClickNum("1")

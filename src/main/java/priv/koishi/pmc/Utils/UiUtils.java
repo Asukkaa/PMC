@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -13,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -355,6 +357,7 @@ public class UiUtils {
      * @param beanClass 要处理的javafx表格的数据bean类
      * @param tabId     用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
      */
+    @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId) {
         // 获取对象的所有字段
         List<Field> fields = List.of(beanClass.getDeclaredFields());
@@ -368,7 +371,35 @@ public class UiUtils {
                 finalFieldName = fieldName;
             }
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c -> c.getId().equals(finalFieldName)).findFirst();
-            matched.ifPresent(m -> buildCellValue(m, fieldName));
+            matched.ifPresent(m -> {
+                if (("thumb" + tabId).equals(m.getId())) {
+                    buildThumbnailCell((TableColumn<ImgFileBean, Image>) m);
+                }
+                buildCellValue(m, fieldName);
+            });
+        });
+    }
+
+    public static void buildThumbnailCell(TableColumn<ImgFileBean, Image> column) {
+        column.setCellValueFactory(cellData ->
+                new SimpleObjectProperty<>(cellData.getValue().getThumb()));
+        column.setCellFactory(col -> new TableCell<>() {
+            private final ImageView imageView = new ImageView();
+            {
+                imageView.setFitWidth(50);
+                imageView.setFitHeight(50);
+                imageView.setPreserveRatio(true);
+            }
+            @Override
+            protected void updateItem(Image image, boolean empty) {
+                super.updateItem(image, empty);
+                if (empty || image == null) {
+                    setGraphic(null);
+                } else {
+                    imageView.setImage(image);
+                    setGraphic(imageView);
+                }
+            }
         });
     }
 
@@ -657,6 +688,73 @@ public class UiUtils {
     }
 
     /**
+     * 查看文件选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    public static void buildFilePathItem(TableView<ImgFileBean> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu("查看文件");
+        // 创建二级菜单项
+        MenuItem openFile = new MenuItem("打开所选文件");
+        MenuItem openDirector = new MenuItem("打开所选文件所在文件夹");
+        MenuItem copyFilePath = new MenuItem("复制文件路径");
+        // 为每个菜单项添加事件处理
+        openFile.setOnAction(event -> openFileMenuItem(tableView));
+        openDirector.setOnAction(event -> openDirectorMenuItem(tableView));
+        copyFilePath.setOnAction(event -> copyFilePathItem(tableView));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(openFile, openDirector, copyFilePath);
+        contextMenu.getItems().add(menu);
+    }
+
+
+    /**
+     * 打开所选文件选项
+     *
+     * @param tableView 文件列表
+     * @throws RuntimeException io异常
+     */
+    private static void openFileMenuItem(TableView<ImgFileBean> tableView) {
+        List<ImgFileBean> fileBeans = tableView.getSelectionModel().getSelectedItems();
+        fileBeans.forEach(fileBean -> {
+            try {
+                openFile(fileBean.getPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * 打开所选文件所在文件夹选项
+     *
+     * @param tableView 要添加右键菜单的列表
+     * @throws RuntimeException io异常
+     */
+    private static void openDirectorMenuItem(TableView<ImgFileBean> tableView) {
+        List<ImgFileBean> fileBeans = tableView.getSelectionModel().getSelectedItems();
+        List<String> pathList = fileBeans.stream().map(ImgFileBean::getPath).distinct().toList();
+        pathList.forEach(path -> {
+            try {
+                openDirectory(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * 复制文件路径选项
+     *
+     * @param tableView 要添加右键菜单的列表
+     */
+    private static void copyFilePathItem(TableView<ImgFileBean> tableView) {
+        ImgFileBean fileBean = tableView.getSelectionModel().getSelectedItem();
+        copyText(fileBean.getPath());
+    }
+
+    /**
      * 复制所选数据选项
      *
      * @param tableView   要添加右键菜单的列表
@@ -786,7 +884,7 @@ public class UiUtils {
      * @param unit        列表数据数量单位
      */
     public static void buildEditImgPathMenu(TableView<ImgFileBean> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
-        MenuItem upMoveDataMenuItem = new MenuItem("更改第一行所选项的图片");
+        MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
         upMoveDataMenuItem.setOnAction(event -> {
             ObservableList<ImgFileBean> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {

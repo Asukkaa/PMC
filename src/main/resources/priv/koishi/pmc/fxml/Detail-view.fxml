@@ -123,6 +123,7 @@
                         </placeholder>
 
                         <columns>
+                            <TableColumn fx:id="thumb_Det" text="缩略图" sortable="false"/>
                             <TableColumn fx:id="name_Det" text="图片名称" sortable="false"/>
                             <TableColumn fx:id="path_Det" text="图片地址" sortable="false"/>
                             <TableColumn fx:id="type_Det" text="图片类型" sortable="false"/>

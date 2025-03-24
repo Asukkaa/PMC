@@ -83,9 +83,9 @@ public class ClickPositionBean {
     String clickImgSelectPath;
 
     /**
-     * 终止操作的图片路径
+     * 终止操作的图片
      */
-    List<String> stopImgPaths;
+    List<ImgFileBean> stopImgFileBeans;
 
     /**
      * 上次所选终止操作的图片路径

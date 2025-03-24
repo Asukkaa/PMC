@@ -1,12 +1,14 @@
 package priv.koishi.pmc.Finals;
 
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 通用常量类
@@ -520,5 +522,8 @@ public class CommonFinals {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back);
         recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
     }
+
+    // 添加静态缓存
+    public static final Map<String, Image> THUMBNAIL_CACHE = new ConcurrentHashMap<>();
 
 }
