@@ -971,8 +971,6 @@ public class UiUtils {
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
-     * @param dataNumber  列表数据数量文本框
-     * @param unit        列表数据数量单位
      */
     public static void buildEditClickImgPathMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
         MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
