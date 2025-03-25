@@ -6,6 +6,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Interface.UsedByReflection;
 
 import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
@@ -46,6 +47,9 @@ public class ImgFileBean {
      */
     TableView<ImgFileBean> tableView;
 
+    /**
+     * 加载缩略图线程
+     */
     private transient Service<Image> currentThumbService;
 
     /**
@@ -55,7 +59,7 @@ public class ImgFileBean {
      */
     @UsedByReflection
     public Image getThumb() {
-        if (thumb == null) {
+        if (thumb == null && StringUtils.isNotBlank(path)) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync(path);
         }

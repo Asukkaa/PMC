@@ -105,6 +105,16 @@ public class CommonFinals {
 
     public static final String tip_stopOpacity = "滑块将会改变当前步骤所有终止操作图像识别匹配度，建议设置 80% 以上";
 
+    public static final String tip_stopImgBtn = "点击后可添加用来终止当前步骤的图片，建议不要添加太多影响图像识别效率";
+
+    public static final String tip_clickImgBtn = "点击后可添加需要点击的图片，建议选择特征明显范围较小的图片";
+
+    public static final String tip_removeClickImgBtn = "删除需要点击的图片";
+
+    public static final String tip_removeStopImgBtn = "删除列表所有终止操作图片";
+
+    public static final String tip_updateClickNameBtn = "将当前步骤的步骤名称更改为要点击的图片名称";
+
     public static final String version = "2.0.0";
 
     public static final String buildDate = "2025年3月";

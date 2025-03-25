@@ -34,6 +34,22 @@
                         </value>
                     </ChoiceBox>
                 </HBox>
+
+                <HBox spacing="10">
+                    <Label prefHeight="25" text="要点击的图像识别重试逻辑:"/>
+                    <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="200">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="重试直到图像出现"/>
+                                <String fx:value="按设置次数重试后点击设置位置"/>
+                                <String fx:value="按设置次数重试后终止操作"/>
+                            </FXCollections>
+                        </items>
+                        <value>
+                            <String fx:value="按设置次数重试后终止操作"/>
+                        </value>
+                    </ChoiceBox>
+                </HBox>
             </HBox>
 
             <HBox spacing="10">
@@ -111,8 +127,8 @@
             <HBox spacing="20">
                 <VBox spacing="10">
                     <HBox fx:id="fileNumberHBox_Det" spacing="10">
-                        <Button onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的图片"/>
-                        <Button onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
+                        <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的图片"/>
+                        <Button fx:id="removeAll_Det" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
 
                         <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
                     </HBox>
@@ -133,7 +149,7 @@
 
                 <VBox spacing="10">
                     <HBox spacing="5">
-                        <Button onAction="#addClickImgPath" style="-fx-cursor: hand" text="选择要点击的图片"/>
+                        <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath" style="-fx-cursor: hand" text="选择要点击的图片"/>
                         <Label fx:id="clickImgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
 
                         <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
@@ -146,14 +162,23 @@
                         </Button>
                     </HBox>
 
-                    <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200" preserveRatio="true"/>
+                    <VBox fx:id="clickImgVBox_Det" visible="false" spacing="10">
+                        <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200" preserveRatio="true"/>
+
+                        <HBox spacing="10">
+                            <Label maxHeight="25" text="图片名称:"/>
+                            <Label maxHeight="25" textFill="#005880" fx:id="clickImgName_Det"/>
+                            <Button fx:id="updateClickName_Det" onAction="#updateClickName" text="更新步骤名称"
+                                    style="-fx-cursor: hand"/>
+                        </HBox>
+                    </VBox>
                 </VBox>
             </HBox>
 
             <HBox spacing="10">
                 <Label fx:id="nullLabel_Debt"/>
-                <Button text="保存并关闭" onAction="#saveDetail"/>
-                <Button text="删除这个流程" onAction="#removeDetail"/>
+                <Button text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
+                <Button text="删除这个流程" style="-fx-cursor: hand" onAction="#removeDetail"/>
             </HBox>
         </VBox>
     </AnchorPane>

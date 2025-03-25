@@ -6,6 +6,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Interface.UsedByReflection;
 
 import java.util.List;
@@ -135,10 +136,18 @@ public class ClickPositionBean {
     Image thumb;
 
     /**
+     * 要点击的图像识别重试设置
+     */
+    String retryType;
+
+    /**
      * 要显示缩略图的列表
      */
     TableView<ClickPositionBean> tableView;
 
+    /**
+     * 加载缩略图线程
+     */
     private transient Service<Image> currentThumbService;
 
     /**
@@ -148,7 +157,7 @@ public class ClickPositionBean {
      */
     @UsedByReflection
     public Image getThumb() {
-        if (thumb == null) {
+        if (thumb == null && StringUtils.isNotBlank(clickImgPath)) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync(clickImgPath);
         }

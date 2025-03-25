@@ -12,6 +12,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
@@ -28,8 +29,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.FileUtils.getFileType;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
@@ -90,19 +90,22 @@ public class DetailController {
     private HBox fileNumberHBox_Det;
 
     @FXML
+    private VBox clickImgVBox_Det;
+
+    @FXML
     private ImageView clickImg_Det;
-
-    @FXML
-    private Button removeClickImg_Det;
-
-    @FXML
-    private ChoiceBox<String> clickType_Det;
 
     @FXML
     private Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt;
+    private ChoiceBox<String> clickType_Det, retryType_Det;
+
+    @FXML
+    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det;
+
+    @FXML
+    private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
 
     @FXML
     private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, mouseEndX_Det, mouseEndY_Det, wait_Det,
@@ -134,7 +137,7 @@ public class DetailController {
      *
      * @param item 列表选中的数据
      */
-    public void initData(ClickPositionBean item) {
+    public void initData(ClickPositionBean item) throws IOException {
         this.selectedItem = item;
         clickName_Det.setText(item.getName());
         mouseStartX_Det.setText(item.getStartX());
@@ -152,6 +155,10 @@ public class DetailController {
         stopRetryNum_Det.setText(item.getStopRetryTimes());
         clickImgSelectPath = item.getClickImgSelectPath();
         stopImgSelectPath = item.getStopImgSelectPath();
+        String retryType = item.getRetryType();
+        if (StringUtils.isNotBlank(retryType)) {
+            retryType_Det.setValue(item.getRetryType());
+        }
         List<ImgFileBean> stopImgFileBeans = item.getStopImgFileBeans();
         if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
             stopImgFileBeans.forEach(b -> {
@@ -165,11 +172,30 @@ public class DetailController {
             });
         }
         tableView_Det.refresh();
-        String clickImgPath = item.getClickImgPath();
+        showClickImg(item.getClickImgPath());
+    }
+
+    /**
+     * 展示要点击的图片
+     *
+     * @param clickImgPath 要点击的图片路径
+     * @throws IOException 文件不存在
+     */
+    private void showClickImg(String clickImgPath) throws IOException {
         if (StringUtils.isNotBlank(clickImgPath)) {
-            setPathLabel(clickImgPath_Det, clickImgPath, false);
+            File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath, false);
             removeClickImg_Det.setVisible(true);
-            clickImg_Det.setImage(new Image(new File(clickImgPath_Det.getText()).toURI().toString()));
+            clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));
+            String imgName = getFileName(clickImgFile);
+            clickImgName_Det.setText(imgName);
+            addToolTip(imgName, clickImgName_Det);
+            clickImgVBox_Det.setVisible(true);
+        } else {
+            clickImgPath_Det.setText("");
+            removeClickImg_Det.setVisible(false);
+            clickImg_Det.setImage(null);
+            clickImgName_Det.setText("");
+            clickImgVBox_Det.setVisible(false);
         }
     }
 
@@ -178,9 +204,9 @@ public class DetailController {
      */
     private void nodeChangeListener() {
         // 停止操作图像识别准确度设置监听
-        sliderValueListener(stopOpacity_Det, tip_stopOpacity);
+        integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
         // 要点击的图像识别准确度设置监听
-        sliderValueListener(clickOpacity_Det, tip_clickOpacity);
+        integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
         // 操作名称文本输入框鼠标悬停提示
         textFieldValueListener(clickName_Det, tip_clickName);
         // 限制单次操作点击间隔文本输入框内容
@@ -213,10 +239,15 @@ public class DetailController {
         addToolTip(tip_clickType, clickType_Det);
         addToolTip(tip_clickTime, timeClick_Det);
         addToolTip(tip_clickName, clickName_Det);
+        addToolTip(tip_stopImgBtn, stopImgBtn_Det);
         addToolTip(tip_clickInterval, interval_Det);
+        addToolTip(tip_clickImgBtn, clickImgBtn_Det);
         addToolTip(tip_clickNumBer, clickNumBer_Det);
         addToolTip(tip_mouseStartX, mouseStartX_Det);
         addToolTip(tip_mouseStartY, mouseStartY_Det);
+        addToolTip(tip_removeStopImgBtn, removeAll_Det);
+        addToolTip(tip_removeClickImgBtn, removeClickImg_Det);
+        addToolTip(tip_updateClickNameBtn, updateClickName_Det);
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Det);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Det);
         addValueToolTip(stopOpacity_Det, tip_stopOpacity, text_nowValue, String.valueOf((int) stopOpacity_Det.getValue()));
@@ -320,6 +351,7 @@ public class DetailController {
         selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
         selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
         selectedItem.setStopImgFileBeans(tableView_Det.getItems());
+        selectedItem.setRetryType(retryType_Det.getValue());
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
@@ -328,7 +360,7 @@ public class DetailController {
     }
 
     /**
-     * 关闭窗口按钮
+     * 删除当前步骤按钮
      */
     @FXML
     private void removeDetail() {
@@ -352,8 +384,7 @@ public class DetailController {
         if (selectedFile != null) {
             // 更新所选文件路径显示
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath, key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
-            removeClickImg_Det.setVisible(true);
-            clickImg_Det.setImage(new Image(selectedFile.toURI().toString()));
+            showClickImg(clickImgSelectPath);
         }
     }
 
@@ -390,10 +421,9 @@ public class DetailController {
      * 删除要点击的图片
      */
     @FXML
-    public void removeClickImg() {
+    public void removeClickImg() throws IOException {
         clickImgPath_Det.setText("");
-        removeClickImg_Det.setVisible(false);
-        clickImg_Det.setImage(null);
+        showClickImg(null);
     }
 
     /**
@@ -440,6 +470,14 @@ public class DetailController {
     @FXML
     private void removeAll() {
         removeTableViewData(tableView_Det, dataNumber_Det, null);
+    }
+
+    /**
+     * 将当前步骤名称更新为图片名称
+     */
+    @FXML
+    private void updateClickName() {
+        clickName_Det.setText(clickImgName_Det.getText());
     }
 
 }

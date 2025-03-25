@@ -440,7 +440,11 @@ public class AutoClickController extends CommonProperties {
         DetailController controller = loader.getController();
         item.setClickImgSelectPath(clickImgSelectPath);
         item.setStopImgSelectPath(stopImgSelectPath);
-        controller.initData(item);
+        try {
+            controller.initData(item);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // 设置保存后的回调
         controller.setRefreshCallback(() -> {
             String clickSelectPath = item.getClickImgSelectPath();
@@ -1015,11 +1019,15 @@ public class AutoClickController extends CommonProperties {
                     int startY = (int) mousePoint.getY();
                     clickBean = new ClickPositionBean();
                     clickBean.setName(text_step + dataSize + text_isRecord)
-                            .setUuid(UUID.randomUUID().toString())
                             .setType(recordClickTypeMap.get(pressButton))
+                            .setClickRetryTimes(defaultClickRetryNum)
+                            .setStopRetryTimes(defaultStopRetryNum)
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY));
+                            .setStartY(String.valueOf(startY))
+                            .setTableView(tableView_Click)
+                            .setClickMatchThreshold("80")
+                            .setStopMatchThreshold("80");
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_recorded + recordClickTypeMap.get(pressButton) + " 点击 (" + clickBean.getStartX() + "," + clickBean.getStartY() + ")";

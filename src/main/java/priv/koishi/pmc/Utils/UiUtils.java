@@ -534,7 +534,13 @@ public class UiUtils {
         dataNumber.setText(text_allHave + tableViewItems.size() + dataNumberUnit);
     }
 
-    public static void sliderValueListener(Slider slider, String tip) {
+    /**
+     * 限制滑动条只能输入整数
+     *
+     * @param slider 要处理的滑动条
+     * @param tip    鼠标悬停提示文案
+     */
+    public static void integerSliderValueListener(Slider slider, String tip) {
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             int rounded = newValue.intValue();
             slider.setValue(rounded);
@@ -887,7 +893,17 @@ public class UiUtils {
                     .setClickNum(clickPositionBean.getClickNum())
                     .setClickInterval(clickPositionBean.getClickInterval())
                     .setWaitTime(clickPositionBean.getWaitTime())
-                    .setType(clickPositionBean.getType());
+                    .setType(clickPositionBean.getType())
+                    .setClickImgPath(clickPositionBean.getClickImgPath())
+                    .setClickImgSelectPath(clickPositionBean.getClickImgSelectPath())
+                    .setStopImgFileBeans(clickPositionBean.getStopImgFileBeans())
+                    .setStopImgSelectPath(clickPositionBean.getStopImgSelectPath())
+                    .setClickMatchThreshold(clickPositionBean.getClickMatchThreshold())
+                    .setStopMatchThreshold(clickPositionBean.getStopMatchThreshold())
+                    .setClickRetryTimes(clickPositionBean.getClickRetryTimes())
+                    .setStopRetryTimes(clickPositionBean.getStopRetryTimes())
+                    .setTableView(clickPositionBean.getTableView())
+                    .setRetryType(clickPositionBean.getRetryType());
             copiedList.add(copyClickPositionBean);
         });
         return copiedList;
@@ -1158,9 +1174,10 @@ public class UiUtils {
      * @param pathLabel 文件路径文本栏
      * @param path      文件路径
      * @param openFile  点击是否打开文件，true打开文件，false打开文件所在文件夹
+     * @return 要展示路径的文件
      * @throws RuntimeException io异常
      */
-    public static void setPathLabel(Label pathLabel, String path, boolean openFile) {
+    public static File setPathLabel(Label pathLabel, String path, boolean openFile) {
         pathLabel.setText(path);
         File file = new File(path);
         String openText = "\n鼠标左键点击打开 ";
@@ -1195,6 +1212,7 @@ public class UiUtils {
         addToolTip(path + openText + openPath, pathLabel);
         // 设置右键菜单
         setPathLabelContextMenu(pathLabel);
+        return file;
     }
 
     /**
