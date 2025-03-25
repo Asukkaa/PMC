@@ -101,6 +101,10 @@ public class CommonFinals {
 
     public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
 
+    public static final String tip_clickOpacity = "滑块将会改变当前步骤要点及的图像识别匹配度，建议设置 80% 以上";
+
+    public static final String tip_stopOpacity = "滑块将会改变当前步骤所有终止操作图像识别匹配度，建议设置 80% 以上";
+
     public static final String version = "2.0.0";
 
     public static final String buildDate = "2025年3月";

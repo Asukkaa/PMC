@@ -31,6 +31,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.getFileType;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
 /**
  * 操作步骤详情页控制器
@@ -173,9 +174,13 @@ public class DetailController {
     }
 
     /**
-     * 给输入框添加内容变化监听
+     * 给组件添加内容变化监听
      */
-    private void textFieldChangeListener() {
+    private void nodeChangeListener() {
+        // 停止操作图像识别准确度设置监听
+        sliderValueListener(stopOpacity_Det, tip_stopOpacity);
+        // 要点击的图像识别准确度设置监听
+        sliderValueListener(clickOpacity_Det, tip_clickOpacity);
         // 操作名称文本输入框鼠标悬停提示
         textFieldValueListener(clickName_Det, tip_clickName);
         // 限制单次操作点击间隔文本输入框内容
@@ -214,6 +219,8 @@ public class DetailController {
         addToolTip(tip_mouseStartY, mouseStartY_Det);
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Det);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Det);
+        addValueToolTip(stopOpacity_Det, tip_stopOpacity, text_nowValue, String.valueOf((int) stopOpacity_Det.getValue()));
+        addValueToolTip(clickOpacity_Det, tip_clickOpacity, text_nowValue, String.valueOf((int) clickOpacity_Det.getValue()));
     }
 
     /**
@@ -276,7 +283,7 @@ public class DetailController {
         // 设置鼠标悬停提示
         setToolTip();
         // 给输入框添加内容变化监听
-        textFieldChangeListener();
+        nodeChangeListener();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
             // 自动填充javafx表格

@@ -82,7 +82,7 @@
 
             <HBox spacing="10">
                 <HBox spacing="5" prefWidth="490">
-                    <Label prefHeight="25" text="要点击的图片识别匹配准确度:"/>
+                    <Label prefHeight="25" text="要点击的图片识别匹配匹配度:"/>
                     <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                     <Label prefHeight="25" text="\%"/>
@@ -96,7 +96,7 @@
 
             <HBox spacing="10">
                 <HBox spacing="5" prefWidth="490">
-                    <Label prefHeight="25" text="终止操作图片识别匹配准确度:"/>
+                    <Label prefHeight="25" text="终止操作图片识别匹配匹配度:"/>
                     <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                     <Label prefHeight="25" text="\%"/>

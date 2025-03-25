@@ -534,6 +534,14 @@ public class UiUtils {
         dataNumber.setText(text_allHave + tableViewItems.size() + dataNumberUnit);
     }
 
+    public static void sliderValueListener(Slider slider, String tip) {
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int rounded = newValue.intValue();
+            slider.setValue(rounded);
+            addValueToolTip(slider, tip, text_nowValue, String.valueOf(rounded));
+        });
+    }
+
     /**
      * 限制输入框只能输入指定范围内的整数
      *
