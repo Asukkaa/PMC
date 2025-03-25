@@ -10,6 +10,7 @@ import org.bytedeco.opencv.opencv_core.Size;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.IMREAD_COLOR;
@@ -79,16 +80,17 @@ public class ImageRecognitionUtil {
             Mat screenGray = new Mat(), templateGray = new Mat();
             cvtColor(screenMat, screenGray, COLOR_BGR2GRAY);
             cvtColor(templateMat, templateGray, COLOR_BGR2GRAY);
-            // 步骤1：DPI缩放补偿（仅执行一次）
+            // DPI缩放补偿（仅执行一次）
             Mat dpiAdjustedTemplate = new Mat();
             resize(templateGray, dpiAdjustedTemplate,
                     new Size((int) (templateGray.cols() / dpiScale),
                             (int) (templateGray.rows() / dpiScale)));
-            // 步骤2：多尺度匹配（基于DPI调整后的模板）
-            double bestVal = -1;
+            // 多尺度匹配（基于DPI调整后的模板）
+            final double[] bestVal = {-1};
             Point bestLoc = new Point(0, 0);
             double[] scales = {0.8, 0.9, 1.0, 1.1, 1.2};
-            for (double scale : scales) {
+            Arrays.stream(scales).parallel().forEach(scale -> {
+                // 匹配计算逻辑
                 Mat resizedTemplate = new Mat();
                 resize(dpiAdjustedTemplate, resizedTemplate,
                         new Size((int) (dpiAdjustedTemplate.cols() * scale),
@@ -98,8 +100,8 @@ public class ImageRecognitionUtil {
                 try (Point maxLoc = new Point()) {
                     DoublePointer maxVal = new DoublePointer(1);
                     minMaxLoc(result, null, maxVal, null, maxLoc, null);
-                    if (maxVal.get() > bestVal) {
-                        bestVal = maxVal.get();
+                    if (maxVal.get() > bestVal[0]) {
+                        bestVal[0] = maxVal.get();
                         // 换算公式：物理坐标 = (匹配坐标 + 模板宽度/2) / scale
                         int x = (int) ((maxLoc.x() + (double) resizedTemplate.cols() / 2) / scale);
                         int y = (int) ((maxLoc.y() + (double) resizedTemplate.rows() / 2) / scale);
@@ -110,8 +112,8 @@ public class ImageRecognitionUtil {
                         bestLoc.y(y);
                     }
                 }
-            }
-            if (bestVal >= matchThreshold / 100) {
+            });
+            if (bestVal[0] >= matchThreshold / 100) {
                 return bestLoc;
             }
             // 匹配度不足时等待1秒

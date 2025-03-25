@@ -130,7 +130,7 @@ public class AutoClickService {
                         }
                     }
                     // 执行自动流程
-                    click(clickPositionBean, robot, floatingLabel);
+                    click(clickPositionBean, robot, floatingLabel, loopTimeText);
                 }
             }
         };
@@ -142,7 +142,7 @@ public class AutoClickService {
      * @param clickPositionBean 操作设置
      * @param robot             Robot实例
      */
-    private static void click(ClickPositionBean clickPositionBean, Robot robot, Label floatingLabel) throws Exception {
+    private static void click(ClickPositionBean clickPositionBean, Robot robot, Label floatingLabel, String loopTimeText) throws Exception {
         // 操作次数
         int clickNum = Integer.parseInt(clickPositionBean.getClickNum());
         double startX = Double.parseDouble(clickPositionBean.getStartX());
@@ -152,11 +152,12 @@ public class AutoClickService {
         // 匹配终止操作图像
         List<ImgFileBean> stopImgFileBeans = clickPositionBean.getStopImgFileBeans();
         if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
-            for (ImgFileBean stopImgFileBean : stopImgFileBeans) {
+            stopImgFileBeans.stream().parallel().forEach(stopImgFileBean -> {
                 String stopPath = stopImgFileBean.getPath();
                 Platform.runLater(() -> {
                     try {
-                        floatingLabel.setText(text_cancelTask + "正在识别终止操作图像：" + getFileName(new File(stopPath)));
+                        floatingLabel.setText(text_cancelTask + loopTimeText +
+                                "\n正在识别终止操作图像：" + getFileName(new File(stopPath)));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -168,15 +169,18 @@ public class AutoClickService {
                     if (position != null) {
                         throw new Exception("匹配到终止操作图片，操作已终止");
                     }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            }
+            });
         }
         // 匹配要点击的图像
         String clickPath = clickPositionBean.getClickImgPath();
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
                 try {
-                    floatingLabel.setText(text_cancelTask + "正在识别图像：" + getFileName(new File(clickPath)));
+                    floatingLabel.setText(text_cancelTask + loopTimeText +
+                            "\n正在识别图像：" + getFileName(new File(clickPath)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
