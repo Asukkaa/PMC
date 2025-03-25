@@ -352,6 +352,10 @@ public class CommonFinals {
 
     public static final String mouseButton_none = "鼠标仅移动";
 
+    public static final String retryType_continuously = "重试直到图像出现";
+
+    public static final String retryType_stop = "按设置次数重试后终止操作";
+
     public static String logoPath = "icon/PMC.png";
 
     /**

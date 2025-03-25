@@ -6,18 +6,23 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.robot.Robot;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
-import priv.koishi.pmc.Utils.ImageRecognitionUtil;
+import priv.koishi.pmc.Bean.ImgFileBean;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static javafx.scene.input.MouseButton.NONE;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Utils.FileUtils.getFileName;
+import static priv.koishi.pmc.Utils.ImageRecognitionUtil.findPosition;
 
 /**
  * 自动点击线程任务类
@@ -96,12 +101,23 @@ public class AutoClickService {
                     String waitTime = clickPositionBean.getWaitTime();
                     String clickTime = clickPositionBean.getClickTime();
                     String name = clickPositionBean.getName();
-                    String clickNum = clickPositionBean.getClickNum();
+                    int clickNum = Integer.parseInt(clickPositionBean.getClickNum()) - 1;
                     Platform.runLater(() -> {
                         String text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
                                 "\n操作内容：" + clickPositionBean.getType() + " X：" + startX + " Y：" + startY +
                                 "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
-                                "\n每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒，共 " + clickNum + " 次";
+                                "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒";
+                        if (StringUtils.isNotBlank(clickPositionBean.getClickImgPath())) {
+                            try {
+                                text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
+                                        "\n操作内容：" + clickPositionBean.getType() + " 要识别的图片：" +
+                                        "\n" + getFileName(new File(clickPositionBean.getClickImgPath())) +
+                                        "\n单次点击" + clickTime + " 毫秒" +
+                                        "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒";
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
                         updateMessage(text);
                         floatingLabel.setText(text_cancelTask + text);
                     });
@@ -114,7 +130,7 @@ public class AutoClickService {
                         }
                     }
                     // 执行自动流程
-                    click(clickPositionBean, robot);
+                    click(clickPositionBean, robot, floatingLabel);
                 }
             }
         };
@@ -126,19 +142,58 @@ public class AutoClickService {
      * @param clickPositionBean 操作设置
      * @param robot             Robot实例
      */
-    private static void click(ClickPositionBean clickPositionBean, Robot robot) throws Exception {
+    private static void click(ClickPositionBean clickPositionBean, Robot robot, Label floatingLabel) throws Exception {
         // 操作次数
         int clickNum = Integer.parseInt(clickPositionBean.getClickNum());
         double startX = Double.parseDouble(clickPositionBean.getStartX());
         double startY = Double.parseDouble(clickPositionBean.getStartY());
         double endX = Double.parseDouble(clickPositionBean.getEndX());
         double endY = Double.parseDouble(clickPositionBean.getEndY());
-        if (StringUtils.isNotBlank(clickPositionBean.getClickImgPath())) {
-            try (Point position = ImageRecognitionUtil.findPosition(clickPositionBean.getClickImgPath())) {
-                startX = position.x();
-                startY = position.y();
-                endX = position.x();
-                endY = position.y();
+        // 匹配终止操作图像
+        List<ImgFileBean> stopImgFileBeans = clickPositionBean.getStopImgFileBeans();
+        if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
+            for (ImgFileBean stopImgFileBean : stopImgFileBeans) {
+                String stopPath = stopImgFileBean.getPath();
+                Platform.runLater(() -> {
+                    try {
+                        floatingLabel.setText(text_cancelTask + "正在识别终止操作图像：" + getFileName(new File(stopPath)));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                try (Point position = findPosition(stopPath,
+                        Integer.parseInt(clickPositionBean.getStopRetryTimes()),
+                        Double.parseDouble(clickPositionBean.getStopMatchThreshold()),
+                        false)) {
+                    if (position != null) {
+                        throw new Exception("匹配到终止操作图片，操作已终止");
+                    }
+                }
+            }
+        }
+        // 匹配要点击的图像
+        String clickPath = clickPositionBean.getClickImgPath();
+        if (StringUtils.isNotBlank(clickPath)) {
+            Platform.runLater(() -> {
+                try {
+                    floatingLabel.setText(text_cancelTask + "正在识别图像：" + getFileName(new File(clickPath)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            String retryType = clickPositionBean.getRetryType();
+            try (Point position = findPosition(clickPath,
+                    Integer.parseInt(clickPositionBean.getClickRetryTimes()),
+                    Double.parseDouble(clickPositionBean.getClickMatchThreshold()),
+                    retryType_continuously.equals(retryType))) {
+                if (position != null) {
+                    startX = position.x();
+                    startY = position.y();
+                    endX = position.x();
+                    endY = position.y();
+                } else if (retryType_stop.equals(retryType)) {
+                    throw new Exception("未找到匹配图像，超过最大重试次数");
+                }
             }
         }
         long clickTime = Long.parseLong(clickPositionBean.getClickTime());
