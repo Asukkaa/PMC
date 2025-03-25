@@ -6,6 +6,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -14,14 +15,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Listener.MousePositionListener;
 
 import java.awt.*;
@@ -32,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -67,6 +73,11 @@ public class SettingController {
     private int floatingHeight;
 
     /**
+     * 页面标识符
+     */
+    private final String tabId = "_Set";
+
+    /**
      * 全局键盘监听器
      */
     private NativeKeyListener nativeKeyListener;
@@ -100,21 +111,63 @@ public class SettingController {
     private AnchorPane anchorPane_Set;
 
     @FXML
-    private Slider opacity_Set;
+    private HBox fileNumberHBox_Set;
 
     @FXML
     private ColorPicker colorPicker_Set;
 
     @FXML
-    private Button setFloatingCoordinate_Set;
+    private Label dataNumber_Set;
 
     @FXML
-    private TextField floatingDistance_Set, offsetX_Set, offsetY_Set;
+    private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
+
+    @FXML
+    private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set;
+
+    @FXML
+    private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set;
+
+    @FXML
+    private TableView<ImgFileBean> tableView_Set;
+
+    @FXML
+    private TableColumn<ImgFileBean, ImageView> thumb_Set;
+
+    @FXML
+    private TableColumn<ImgFileBean, String> name_Set, type_Set, path_Set;
+
+    /**
+     * 组件自适应宽高
+     *
+     * @param stage 程序主舞台
+     */
+    public static void settingAdaption(Stage stage) {
+        Scene scene = stage.getScene();
+        // 设置组件高度
+        double stageHeight = stage.getHeight();
+        TableView<?> table = (TableView<?>) scene.lookup("#tableView_Set");
+        table.setPrefHeight(stageHeight * 0.3);
+        // 设置组件宽度
+        double tableWidth = stage.getWidth() * 0.9;
+        table.setMaxWidth(tableWidth);
+        Node thumb = scene.lookup("#thumb_Set");
+        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
+        Node name = scene.lookup("#name_Set");
+        name.setStyle("-fx-pref-width: " + tableWidth * 0.25 + "px;");
+        Node clickTime = scene.lookup("#path_Set");
+        clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
+        Node clickNum = scene.lookup("#type_Set");
+        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
+        Label dataNum = (Label) scene.lookup("#dataNumber_Set");
+        HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Set");
+        nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
+    }
 
     /**
      * 保存设置功能最后设置
@@ -330,9 +383,11 @@ public class SettingController {
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
+        addToolTip(tip_removeStopImgBtn, removeAll_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
         addToolTip(tip_hideWindowRun, hideWindowRun_Set);
         addToolTip(tip_showWindowRun, showWindowRun_Set);
+        addToolTip(tip_defaultStopImgBtn, stopImgBtn_Set);
         addToolTip(tip_floatingRecord, floatingRecord_Set);
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
@@ -442,12 +497,24 @@ public class SettingController {
     }
 
     /**
+     * 设置javafx单元格宽度
+     */
+    private void bindPrefWidthProperty() {
+        thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.3));
+        name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.25));
+        path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.3));
+        type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.15));
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
      */
     @FXML
     private void initialize() throws IOException {
+        // 设置javafx单元格宽度
+        bindPrefWidthProperty();
         // 设置鼠标悬停提示
         setToolTip();
         // 给组件添加内容变化监听
@@ -464,6 +531,12 @@ public class SettingController {
             new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件
             setDisableNodes();
+            // 自动填充javafx表格
+            autoBuildTableViewData(tableView_Set, ImgFileBean.class, tabId);
+            // 设置列表通过拖拽排序行
+            tableViewDragRow(tableView_Set);
+            // 构建右键菜单
+            buildContextMenu(tableView_Set, dataNumber_Set);
         });
     }
 
@@ -659,6 +732,44 @@ public class SettingController {
         if (floatingStage != null && floatingStage.isShowing()) {
             hideFloatingWindow();
         }
+    }
+
+    /**
+     * 选择终止操作的图片
+     *
+     * @param actionEvent 点击事件
+     */
+    @FXML
+    private void addStopImgPath(ActionEvent actionEvent) throws IOException {
+        stopImgSelectPath = addStopImgPaths(actionEvent, tableView_Set, dataNumber_Set, stopImgSelectPath);
+    }
+
+    /**
+     * 清空图片列表
+     */
+    @FXML
+    private void removeAll() {
+        removeTableViewData(tableView_Set, dataNumber_Set, null);
+    }
+
+    /**
+     * 拖拽释放行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    public void handleDrop(DragEvent dragEvent) {
+        handleDropImg(dragEvent, tableView_Set);
+    }
+
+    /**
+     * 拖拽中行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    public void acceptDrop(DragEvent dragEvent) {
+        acceptDropImg(dragEvent);
     }
 
 }

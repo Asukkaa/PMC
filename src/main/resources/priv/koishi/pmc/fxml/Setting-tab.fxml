@@ -103,8 +103,64 @@
 
         <Separator/>
 
+        <Label prefHeight="25" text="图像识别设置："/>
+
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="490">
+                <Label prefHeight="25" text="要点击的图片默认识别匹配匹配度:"/>
+                <Slider fx:id="clickOpacity_Set" prefWidth="220" value="80" showTickLabels="true"
+                        showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
+                <Label prefHeight="25" text="\%"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="要点击的图片默认识别失败重试次数:"/>
+                <TextField fx:id="clickRetryNum_Set" prefWidth="80"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="490">
+                <Label prefHeight="25" text="终止操作图片默认识别匹配匹配度:"/>
+                <Slider fx:id="stopOpacity_Set" prefWidth="220" value="80" showTickLabels="true"
+                        showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
+                <Label prefHeight="25" text="\%"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="终止操作图片默认识别失败重试次数:"/>
+                <TextField fx:id="stopRetryNum_Set" prefWidth="80"/>
+            </HBox>
+        </HBox>
+
+        <VBox spacing="10">
+            <HBox fx:id="fileNumberHBox_Set" spacing="10">
+                <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的默认图片"/>
+                <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
+
+                <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+            </HBox>
+
+            <TableView fx:id="tableView_Set" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+                <placeholder>
+                    <Label text="拖拽图片文件或点击选择终止操作的图片即可追加止操作的图片"/>
+                </placeholder>
+
+                <columns>
+                    <TableColumn fx:id="thumb_Set" text="缩略图" sortable="false"/>
+                    <TableColumn fx:id="name_Set" text="图片名称" sortable="false"/>
+                    <TableColumn fx:id="path_Set" text="图片地址" sortable="false"/>
+                    <TableColumn fx:id="type_Set" text="图片类型" sortable="false"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <Separator/>
+
         <Label prefHeight="25" text="重启程序："/>
 
         <Button text="重启程序" onAction="#reLaunch" />
+
+        <Separator/>
     </VBox>
 </AnchorPane>

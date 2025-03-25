@@ -107,6 +107,8 @@ public class CommonFinals {
 
     public static final String tip_stopImgBtn = "点击后可添加用来终止当前步骤的图片，建议不要添加太多影响图像识别效率";
 
+    public static final String tip_defaultStopImgBtn = "创建新的操作步骤时会自动将列表中的图片加入对应步骤中，建议不要添加太多影响图像识别效率";
+
     public static final String tip_clickImgBtn = "点击后可添加需要点击的图片，建议选择特征明显范围较小的图片";
 
     public static final String tip_removeClickImgBtn = "删除需要点击的图片";

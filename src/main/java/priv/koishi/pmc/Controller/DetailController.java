@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -9,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -20,7 +18,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
-import priv.koishi.pmc.MessageBubble.MessageBubble;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +26,9 @@ import java.util.List;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
+import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
 /**
  * 操作步骤详情页控制器
@@ -55,7 +52,7 @@ public class DetailController {
     /**
      * 上次所选终止操作的图片地址
      */
-    private String stopImgSelectPath;
+    public String stopImgSelectPath;
 
     /**
      * 默认要点击的图片识别重试次数
@@ -279,28 +276,6 @@ public class DetailController {
     }
 
     /**
-     * 构建右键菜单
-     */
-    private void buildContextMenu() {
-        // 添加右键菜单
-        ContextMenu contextMenu = new ContextMenu();
-        // 修改图片路径选项
-        buildEditStopImgPathMenu(tableView_Det, contextMenu, dataNumber_Det, text_img);
-        // 所选行上移一行选项
-        buildUpMoveDataMenuItem(tableView_Det, contextMenu);
-        // 所选行下移一行选项
-        buildDownMoveDataMenuItem(tableView_Det, contextMenu);
-        // 查看文件选项
-        buildFilePathItem(tableView_Det, contextMenu);
-        // 取消选中选项
-        buildClearSelectedData(tableView_Det, contextMenu);
-        // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView_Det, dataNumber_Det, contextMenu, text_img);
-        // 为列表添加右键菜单并设置可选择多行
-        setContextMenu(contextMenu, tableView_Det);
-    }
-
-    /**
      * 页面初始化
      *
      * @throws IOException io异常
@@ -322,7 +297,7 @@ public class DetailController {
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             // 构建右键菜单
-            buildContextMenu();
+            buildContextMenu(tableView_Det, dataNumber_Det);
         });
     }
 
@@ -395,26 +370,7 @@ public class DetailController {
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {
-        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-        File selectedFile = creatImgChooser(window, stopImgSelectPath);
-        if (selectedFile != null) {
-            // 更新所选文件路径显示
-            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
-            ObservableList<ImgFileBean> items = tableView_Det.getItems();
-            boolean isExist = items.stream().anyMatch(bean -> selectedFile.getPath().equals(bean.getPath()));
-            ImgFileBean imgFileBean = new ImgFileBean();
-            if (!isExist) {
-                imgFileBean.setType(getFileType(selectedFile))
-                        .setName(selectedFile.getName())
-                        .setPath(selectedFile.getPath())
-                        .setTableView(tableView_Det);
-                items.add(imgFileBean);
-            } else {
-                new MessageBubble(text_imgExist, 2);
-            }
-            tableView_Det.refresh();
-            dataNumber_Det.setText(text_allHave + items.size() + text_img);
-        }
+        stopImgSelectPath = addStopImgPaths(actionEvent, tableView_Det, dataNumber_Det, stopImgSelectPath);
     }
 
     /**
@@ -433,18 +389,7 @@ public class DetailController {
      */
     @FXML
     public void handleDrop(DragEvent dragEvent) {
-        List<File> files = dragEvent.getDragboard().getFiles();
-        ObservableList<ImgFileBean> items = tableView_Det.getItems();
-        files.forEach(file -> {
-            boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
-            if (!isExist) {
-                ImgFileBean imgFileBean = new ImgFileBean();
-                imgFileBean.setName(file.getName())
-                        .setType(getFileType(file))
-                        .setPath(file.getPath());
-                items.add(imgFileBean);
-            }
-        });
+        handleDropImg(dragEvent, tableView_Det);
     }
 
     /**
@@ -454,14 +399,7 @@ public class DetailController {
      */
     @FXML
     public void acceptDrop(DragEvent dragEvent) {
-        List<File> files = dragEvent.getDragboard().getFiles();
-        files.forEach(file -> {
-            if (imageType.contains(getFileType(file))) {
-                // 接受拖放
-                dragEvent.acceptTransferModes(TransferMode.COPY);
-                dragEvent.consume();
-            }
-        });
+        acceptDropImg(dragEvent);
     }
 
     /**

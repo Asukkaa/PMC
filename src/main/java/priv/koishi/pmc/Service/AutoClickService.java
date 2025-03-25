@@ -180,7 +180,7 @@ public class AutoClickService {
             Platform.runLater(() -> {
                 try {
                     floatingLabel.setText(text_cancelTask + loopTimeText +
-                            "\n正在识别图像：" + getFileName(new File(clickPath)));
+                            "\n正在识别要点击的图像：" + getFileName(new File(clickPath)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

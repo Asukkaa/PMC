@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Dialog;
@@ -895,9 +896,7 @@ public class UiUtils {
                     .setWaitTime(clickPositionBean.getWaitTime())
                     .setType(clickPositionBean.getType())
                     .setClickImgPath(clickPositionBean.getClickImgPath())
-                    .setClickImgSelectPath(clickPositionBean.getClickImgSelectPath())
                     .setStopImgFileBeans(clickPositionBean.getStopImgFileBeans())
-                    .setStopImgSelectPath(clickPositionBean.getStopImgSelectPath())
                     .setClickMatchThreshold(clickPositionBean.getClickMatchThreshold())
                     .setStopMatchThreshold(clickPositionBean.getStopMatchThreshold())
                     .setClickRetryTimes(clickPositionBean.getClickRetryTimes())
@@ -1396,6 +1395,98 @@ public class UiUtils {
         stage.setAlwaysOnTop(true);
         stage.setAlwaysOnTop(false);
         stage.requestFocus();
+    }
+
+    /**
+     * 选择终止操作的图片
+     *
+     * @param actionEvent       点击事件
+     * @param tableView         终止操作图片列表
+     * @param dataNumber        图片数量信息栏
+     * @param stopImgSelectPath 文件选择器初始路径
+     * @return 选择的文件路径
+     */
+    public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileBean> tableView, Label dataNumber, String stopImgSelectPath) throws IOException {
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        File selectedFile = creatImgChooser(window, stopImgSelectPath);
+        if (selectedFile != null) {
+            // 更新所选文件路径显示
+            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
+            ObservableList<ImgFileBean> items = tableView.getItems();
+            boolean isExist = items.stream().anyMatch(bean -> selectedFile.getPath().equals(bean.getPath()));
+            ImgFileBean imgFileBean = new ImgFileBean();
+            if (!isExist) {
+                imgFileBean.setType(getFileType(selectedFile))
+                        .setName(selectedFile.getName())
+                        .setPath(selectedFile.getPath())
+                        .setTableView(tableView);
+                items.add(imgFileBean);
+            } else {
+                new MessageBubble(text_imgExist, 2);
+            }
+            tableView.refresh();
+            dataNumber.setText(text_allHave + items.size() + text_img);
+        }
+        return stopImgSelectPath;
+    }
+
+    /**
+     * 图片列表拖拽释放行为
+     *
+     * @param dragEvent 拖拽事件
+     * @param tableView 图片列表
+     */
+    public static void handleDropImg(DragEvent dragEvent, TableView<ImgFileBean> tableView) {
+        List<File> files = dragEvent.getDragboard().getFiles();
+        ObservableList<ImgFileBean> items = tableView.getItems();
+        files.forEach(file -> {
+            boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
+            if (!isExist) {
+                ImgFileBean imgFileBean = new ImgFileBean();
+                imgFileBean.setName(file.getName())
+                        .setType(getFileType(file))
+                        .setPath(file.getPath());
+                items.add(imgFileBean);
+            }
+        });
+    }
+
+    /**
+     * 图片列表拖拽中行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    public static void acceptDropImg(DragEvent dragEvent) {
+        List<File> files = dragEvent.getDragboard().getFiles();
+        files.forEach(file -> {
+            if (imageType.contains(getFileType(file))) {
+                // 接受拖放
+                dragEvent.acceptTransferModes(TransferMode.COPY);
+                dragEvent.consume();
+            }
+        });
+    }
+
+    /**
+     * 构建右键菜单
+     */
+    public static void buildContextMenu(TableView<ImgFileBean> tableView, Label dataNumber) {
+        // 添加右键菜单
+        ContextMenu contextMenu = new ContextMenu();
+        // 修改图片路径选项
+        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, text_img);
+        // 所选行上移一行选项
+        buildUpMoveDataMenuItem(tableView, contextMenu);
+        // 所选行下移一行选项
+        buildDownMoveDataMenuItem(tableView, contextMenu);
+        // 查看文件选项
+        buildFilePathItem(tableView, contextMenu);
+        // 取消选中选项
+        buildClearSelectedData(tableView, contextMenu);
+        // 删除所选数据选项
+        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, text_img);
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(contextMenu, tableView);
     }
 
 }

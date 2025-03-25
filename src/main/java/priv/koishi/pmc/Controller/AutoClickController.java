@@ -92,7 +92,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 上次所选终止操作的图片地址
      */
-    private static String stopImgSelectPath;
+    static String stopImgSelectPath;
 
     /**
      * 默认导出文件名称
