@@ -61,7 +61,9 @@ public class CommonFinals {
 
     public static final String tip_exportAutoClick = "点击即可按照设置导出文件夹与文件名导出列表中的操作流程";
 
-    public static final String tip_hideWindowRun = "勾选后运行或测试自动操作开始前将会隐藏本程序的窗口";
+    public static final String tip_hideWindowRun = """
+            勾选后运行或测试自动操作开始前将会隐藏本程序的窗口
+            如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度""";
 
     public static final String tip_showWindowRun = "勾选后运行或测试自动操作结束后将会弹出本程序的窗口";
 
@@ -258,6 +260,10 @@ public class CommonFinals {
 
     public static final String key_opacity = "opacity";
 
+    public static final String key_stopOpacity = "stopOpacity";
+
+    public static final String key_clickOpacity = "clickOpacity";
+
     public static final String key_mouseFloatingRun = "mouseFloatingRun";
 
     public static final String key_mouseFloatingRecord = "mouseFloatingRecord";
@@ -317,6 +323,8 @@ public class CommonFinals {
     public static final String key_defaultClickRetryNum = "defaultClickRetryNum";
 
     public static final String key_defaultStopRetryNum = "defaultStopRetryNum";
+
+    public static final String key_defaultStopImg = "defaultStopImg";
 
     public static final String key_lastFloatingTextColor = "lastFloatingTextColor";
 
@@ -515,6 +523,16 @@ public class CommonFinals {
      * 向列表第一行上方插入
      */
     public static final int topAdd = 0;
+
+    /**
+     * 默认要点击的图片识别重试次数
+     */
+    public static final String defaultClickRetryNum = "3";
+
+    /**
+     * 默认终止操作图片识别重试次数
+     */
+    public static final String defaultStopRetryNum = "0";
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

@@ -199,7 +199,7 @@ public class DetailController {
     /**
      * 给组件添加内容变化监听
      */
-    private void nodeChangeListener() {
+    private void nodeValueChangeListener() {
         // 停止操作图像识别准确度设置监听
         integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
         // 要点击的图像识别准确度设置监听
@@ -289,7 +289,7 @@ public class DetailController {
         // 设置鼠标悬停提示
         setToolTip();
         // 给输入框添加内容变化监听
-        nodeChangeListener();
+        nodeValueChangeListener();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
             // 自动填充javafx表格
@@ -312,21 +312,21 @@ public class DetailController {
         selectedItem.setType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));
         selectedItem.setStartY(String.valueOf(mouseStartY));
+        selectedItem.setRetryType(retryType_Det.getValue());
         selectedItem.setStopImgSelectPath(stopImgSelectPath);
         selectedItem.setClickImgSelectPath(clickImgSelectPath);
         selectedItem.setClickImgPath(clickImgPath_Det.getText());
+        selectedItem.setStopImgFileBeans(tableView_Det.getItems());
+        selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
+        selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
         selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));
         selectedItem.setEndY(String.valueOf(setDefaultIntValue(mouseEndY_Det, mouseStartY, 0, null)));
         selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
-        selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
         selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(defaultStopRetryNum), 0, null)));
-        selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
-        selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
-        selectedItem.setStopImgFileBeans(tableView_Det.getItems());
-        selectedItem.setRetryType(retryType_Det.getValue());
+        selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {

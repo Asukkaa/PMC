@@ -40,6 +40,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.EditingCell.EditingCell;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.MainApplication;
@@ -92,7 +93,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 上次所选终止操作的图片地址
      */
-    static String stopImgSelectPath;
+    public static String stopImgSelectPath;
 
     /**
      * 默认导出文件名称
@@ -112,12 +113,27 @@ public class AutoClickController extends CommonProperties {
     /**
      * 默认要点击的图片识别重试次数
      */
-    private String defaultClickRetryNum;
+    private String clickRetryNum;
 
     /**
      * 默认终止操作图片识别重试次数
      */
-    private String defaultStopRetryNum;
+    private String stopRetryNum;
+
+    /**
+     * 默认要点击的图片识别匹配度
+     */
+    private String defaultClickOpacity;
+
+    /**
+     * 默认终止操作图片识别匹配度
+     */
+    private String defaultStopOpacity;
+
+    /**
+     * 默认终止操作图片
+     */
+    private List<ImgFileBean> defaultStopImgFileBeans;
 
     /**
      * 详情页高度
@@ -380,6 +396,16 @@ public class AutoClickController extends CommonProperties {
         if (StringUtils.isNotBlank(marginStr)) {
             margin = Integer.parseInt(marginStr);
         }
+        Slider clickOpacity = (Slider) mainScene.lookup("#clickOpacity_Set");
+        defaultClickOpacity = String.valueOf(clickOpacity.getValue());
+        Slider stopOpacity = (Slider) mainScene.lookup("#stopOpacity_Set");
+        defaultStopOpacity = String.valueOf(stopOpacity.getValue());
+        TextField clickRetryNumTextField = (TextField) mainScene.lookup("#clickRetryNum_Set");
+        clickRetryNum = clickRetryNumTextField.getText() == null ? defaultStopRetryNum : clickRetryNumTextField.getText();
+        TextField stopRetryNumTextField = (TextField) mainScene.lookup("#stopRetryNum_Set");
+        stopRetryNum = stopRetryNumTextField.getText() == null ? defaultStopRetryNum : stopRetryNumTextField.getText();
+        TableView<?> tableView = (TableView<?>) mainScene.lookup("#tableView_Set");
+        defaultStopImgFileBeans = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
         inFilePath = prop.getProperty(key_inFilePath);
         outFilePath = prop.getProperty(key_outFilePath);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
@@ -393,8 +419,6 @@ public class AutoClickController extends CommonProperties {
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
         defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
         defaultPreparationRecordTime = prop.getProperty(key_defaultPreparationRecordTime);
-        defaultStopRetryNum = prop.getProperty(key_defaultStopRetryNum);
-        defaultClickRetryNum = prop.getProperty(key_defaultClickRetryNum);
         input.close();
     }
 
@@ -820,14 +844,20 @@ public class AutoClickController extends CommonProperties {
      * @return clickPositionBean 自动操作步骤类
      */
     private ClickPositionBean getClickSetting(int tableViewItemSize) {
+        try {
+            getConfig();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         ClickPositionBean clickPositionBean = new ClickPositionBean();
         clickPositionBean.setName(text_step + (tableViewItemSize + 1) + text_isAdd)
-                .setClickRetryTimes(defaultClickRetryNum)
-                .setStopRetryTimes(defaultStopRetryNum)
+                .setStopImgFileBeans(defaultStopImgFileBeans)
+                .setClickMatchThreshold(defaultClickOpacity)
+                .setStopMatchThreshold(defaultStopOpacity)
+                .setClickRetryTimes(clickRetryNum)
+                .setStopRetryTimes(stopRetryNum)
                 .setTableView(tableView_Click)
                 .setType(mouseButton_primary)
-                .setClickMatchThreshold("80")
-                .setStopMatchThreshold("80")
                 .setClickInterval("0")
                 .setClickTime("0")
                 .setClickNum("1")
@@ -987,6 +1017,11 @@ public class AutoClickController extends CommonProperties {
      */
     private void startNativeMouseListener(int addType) {
         removeNativeListener(nativeMouseListener);
+        try {
+            getConfig();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
         // 鼠标监听器
         nativeMouseListener = new NativeMouseListener() {
             // 记录点击时刻
@@ -1019,15 +1054,16 @@ public class AutoClickController extends CommonProperties {
                     int startY = (int) mousePoint.getY();
                     clickBean = new ClickPositionBean();
                     clickBean.setName(text_step + dataSize + text_isRecord)
+                            .setStopImgFileBeans(defaultStopImgFileBeans)
                             .setType(recordClickTypeMap.get(pressButton))
-                            .setClickRetryTimes(defaultClickRetryNum)
-                            .setStopRetryTimes(defaultStopRetryNum)
+                            .setClickMatchThreshold(defaultClickOpacity)
+                            .setStopMatchThreshold(defaultStopOpacity)
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
-                            .setTableView(tableView_Click)
-                            .setClickMatchThreshold("80")
-                            .setStopMatchThreshold("80");
+                            .setClickRetryTimes(clickRetryNum)
+                            .setStopRetryTimes(stopRetryNum)
+                            .setTableView(tableView_Click);
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_recorded + recordClickTypeMap.get(pressButton) + " 点击 (" + clickBean.getStartX() + "," + clickBean.getStartY() + ")";
@@ -1176,26 +1212,28 @@ public class AutoClickController extends CommonProperties {
 
     /**
      * 页面初始化
-     *
-     * @throws IOException 配置文件读取失败
      */
     @FXML
-    private void initialize() throws IOException {
-        // 设置javafx单元格宽度
-        bindPrefWidthProperty();
-        // 读取配置文件
-        getConfig();
-        // 初始化浮窗
-        initFloatingWindow();
-        // 设置鼠标悬停提示
-        setToolTip();
-        // 给输入框添加内容变化监听
-        textFieldChangeListener();
-        // 设置初始配置值为上次配置值
-        setLastConfig();
+    private void initialize() {
         Platform.runLater(() -> {
             mainScene = anchorPane_Click.getScene();
             mainStage = (Stage) mainScene.getWindow();
+            try {
+                // 读取配置文件
+                getConfig();
+                // 给输入框添加内容变化监听
+                textFieldChangeListener();
+                // 设置初始配置值为上次配置值
+                setLastConfig();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            // 设置javafx单元格宽度
+            bindPrefWidthProperty();
+            // 初始化浮窗
+            initFloatingWindow();
+            // 设置鼠标悬停提示
+            setToolTip();
             // 获取鼠标坐标监听器
             new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件

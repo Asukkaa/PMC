@@ -1132,6 +1132,33 @@ public class UiUtils {
     }
 
     /**
+     * 为终止操作列表配置上次设置的图片
+     *
+     * @param tableView 需要处理的列表
+     * @param prop      配置文件
+     * @param key       要读取的key
+     */
+    public static void setControlLastConfig(TableView<ImgFileBean> tableView, Properties prop, String key) throws IOException {
+        int index = 0;
+        while (true) {
+            String path = prop.getProperty(key + index);
+            if (path == null) {
+                break;
+            }
+            File file = new File(path);
+            if (isImgFile(file)) {
+                ImgFileBean bean = new ImgFileBean();
+                bean.setName(getFileName(file))
+                        .setType(getFileType(file))
+                        .setTableView(tableView)
+                        .setPath(path);
+                tableView.getItems().add(bean);
+            }
+            index++;
+        }
+    }
+
+    /**
      * 为路径文本框设置上次配置值
      *
      * @param label 需要处理的文本框

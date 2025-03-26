@@ -42,6 +42,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -185,6 +186,20 @@ public class SettingController {
             prop.put(key_margin, floatingDistance.getText());
             Slider opacity = (Slider) scene.lookup("#opacity_Set");
             prop.put(key_opacity, String.valueOf(opacity.getValue()));
+            Slider clickOpacity = (Slider) scene.lookup("#clickOpacity_Set");
+            prop.put(key_clickOpacity, String.valueOf(clickOpacity.getValue()));
+            Slider stopOpacity = (Slider) scene.lookup("#stopOpacity_Set");
+            prop.put(key_stopOpacity, String.valueOf(stopOpacity.getValue()));
+            TextField clickRetryNum = (TextField) scene.lookup("#clickRetryNum_Set");
+            prop.put(key_defaultClickRetryNum, clickRetryNum.getText());
+            TextField stopRetryNum = (TextField) scene.lookup("#stopRetryNum_Set");
+            prop.put(key_defaultStopRetryNum, stopRetryNum.getText());
+            TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
+            List<ImgFileBean> list = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
+            for (int i = 0; i < list.size(); i++) {
+                ImgFileBean bean = list.get(i);
+                prop.put(key_defaultStopImg + i, bean.getPath());
+            }
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
@@ -355,15 +370,20 @@ public class SettingController {
         setControlLastConfig(offsetX_Set, prop, key_offsetX);
         setControlLastConfig(offsetY_Set, prop, key_offsetY);
         setControlLastConfig(opacity_Set, prop, key_opacity);
+        setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
+        setControlLastConfig(tableView_Set, prop, key_defaultStopImg);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
+        setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig);
         setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun);
         setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun);
+        setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum);
         setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord);
         setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun);
+        setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum);
         setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
         setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord);
@@ -395,8 +415,12 @@ public class SettingController {
         addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
+        addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
+        addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
         addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(opacity_Set.getValue()));
         addValueToolTip(colorPicker_Set, tip_colorPicker, text_nowValue, String.valueOf(colorPicker_Set.getValue()));
+        addValueToolTip(stopOpacity_Set, tip_stopOpacity, text_nowValue, String.valueOf((int) stopOpacity_Set.getValue()));
+        addValueToolTip(clickOpacity_Set, tip_clickOpacity, text_nowValue, String.valueOf((int) clickOpacity_Set.getValue()));
     }
 
     /**
@@ -462,12 +486,20 @@ public class SettingController {
         setColorsListener();
         // 透明度滑块监听
         sliderValueListener();
+        // 停止操作图像识别准确度设置监听
+        integerSliderValueListener(stopOpacity_Set, tip_stopOpacity);
+        // 要点击的图像识别准确度设置监听
+        integerSliderValueListener(clickOpacity_Set, tip_clickOpacity);
         // 浮窗跟随鼠标时横轴偏移量输入框监听
         integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
         integerRangeTextField(offsetY_Set, null, null, tip_offsetY);
         // 浮窗离屏幕边界距离输入框监听
         integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
+        // 限制终止操作识别失败重试次数文本输入框内容
+        integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum + defaultStopRetryNum);
+        // 限制要点击的图片识别失败重试次数文本输入框内容
+        integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum + defaultClickRetryNum);
     }
 
     /**
@@ -513,14 +545,14 @@ public class SettingController {
      */
     @FXML
     private void initialize() throws IOException {
+        // 读取配置文件
+        getConfig();
         // 设置javafx单元格宽度
         bindPrefWidthProperty();
         // 设置鼠标悬停提示
         setToolTip();
         // 给组件添加内容变化监听
         nodeValueChangeListener();
-        // 读取配置文件
-        getConfig();
         // 初始化浮窗
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色

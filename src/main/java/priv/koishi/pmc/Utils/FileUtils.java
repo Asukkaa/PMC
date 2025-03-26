@@ -36,6 +36,19 @@ public class FileUtils {
     }
 
     /**
+     * 校验文件是否为图片
+     *
+     * @param file 要校验的文件
+     * @return true为图片，false为非图片
+     */
+    public static boolean isImgFile(File file) {
+        if (!file.exists()) {
+            return false;
+        }
+        return imageType.contains(getFileType(file));
+    }
+
+    /**
      * 更新配置文件
      *
      * @param properties 要更新的配置文件
