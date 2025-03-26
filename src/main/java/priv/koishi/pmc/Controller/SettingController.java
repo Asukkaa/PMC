@@ -372,7 +372,6 @@ public class SettingController {
         setControlLastConfig(opacity_Set, prop, key_opacity);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
-        setControlLastConfig(tableView_Set, prop, key_defaultStopImg);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
         setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
@@ -387,6 +386,7 @@ public class SettingController {
         setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
         setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord);
+        setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         clickFileInput.close();
     }

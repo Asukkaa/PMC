@@ -167,7 +167,7 @@
 
                         <HBox spacing="10">
                             <Label maxHeight="25" text="图片名称:"/>
-                            <Label maxHeight="25" textFill="#005880" fx:id="clickImgName_Det"/>
+                            <Label maxHeight="25" fx:id="clickImgName_Det"/>
                             <Button fx:id="updateClickName_Det" onAction="#updateClickName" text="更新步骤名称"
                                     style="-fx-cursor: hand"/>
                         </HBox>

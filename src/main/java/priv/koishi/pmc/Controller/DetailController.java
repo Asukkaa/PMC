@@ -11,6 +11,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
@@ -167,6 +168,7 @@ public class DetailController {
                         .setTableView(tableView_Det);
                 tableView_Det.getItems().add(imgFileBean);
             });
+            dataNumber_Det.setText(text_allHave + stopImgFileBeans.size() + text_img);
         }
         tableView_Det.refresh();
         showClickImg(item.getClickImgPath());
@@ -182,8 +184,14 @@ public class DetailController {
         if (StringUtils.isNotBlank(clickImgPath)) {
             File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath, false);
             removeClickImg_Det.setVisible(true);
-            clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));
-            String imgName = getFileName(clickImgFile);
+            if (clickImgFile.exists()) {
+                clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));
+                clickImgName_Det.setTextFill(Color.rgb(0, 88, 128));
+            } else {
+                clickImg_Det.setImage(null);
+                clickImgName_Det.setTextFill(Color.RED);
+            }
+            String imgName = getFileName(clickImgFile.getPath());
             clickImgName_Det.setText(imgName);
             addToolTip(imgName, clickImgName_Det);
             clickImgVBox_Det.setVisible(true);

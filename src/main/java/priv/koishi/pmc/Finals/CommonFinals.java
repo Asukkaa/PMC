@@ -136,7 +136,7 @@ public class CommonFinals {
             只能填自然数，不填默认为\s""";
 
     public static final String tip_opacity = """
-            滑动将会改变录制或运行自动操作时浮窗透明的
+            滑动将会改变录制或运行自动操作时浮窗透明度
             透明的为 0 时 Windows 下鼠标将会点击透过浮窗
             macOS 暂时无法实现鼠标点击透过""";
 
@@ -427,6 +427,11 @@ public class CommonFinals {
      * 用户目录
      */
     public static final String userHome = System.getProperty("user.home");
+
+    /**
+     * 文件选择器默认路径
+     */
+    public static final String defaultFileChooserPath = userHome;
 
     /**
      * 程序名称

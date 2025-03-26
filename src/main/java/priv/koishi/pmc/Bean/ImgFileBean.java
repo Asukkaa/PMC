@@ -9,6 +9,9 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Interface.UsedByReflection;
 
+import java.io.File;
+
+import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
 
 /**
@@ -61,35 +64,41 @@ public class ImgFileBean {
     public Image getThumb() {
         if (thumb == null && StringUtils.isNotBlank(path)) {
             // 异步加载缩略图（防止阻塞UI）
-            loadThumbnailAsync(path);
+            loadThumbnailAsync();
         }
         return thumb;
     }
 
     /**
      * 异步加载并更新缩略图
-     *
-     * @param path 缩略图路径
      */
-    private void loadThumbnailAsync(String path) {
-        // 终止进行中的服务
-        if (currentThumbService != null && currentThumbService.isRunning()) {
-            currentThumbService.cancel();
-        }
-        currentThumbService = tableViewImageService(path);
-        currentThumbService.setOnSucceeded(e -> {
-            this.thumb = currentThumbService.getValue();
+    private void loadThumbnailAsync() {
+        // 文件不是图片时会实时刷新列表缩略图
+        if (isImgFile(new File(path))) {
+            // 终止进行中的服务
+            if (currentThumbService != null && currentThumbService.isRunning()) {
+                currentThumbService.cancel();
+            }
+            currentThumbService = tableViewImageService(path);
+            currentThumbService.setOnSucceeded(e -> {
+                this.thumb = currentThumbService.getValue();
+                Platform.runLater(() -> tableView.refresh());
+            });
+            currentThumbService.start();
+        } else {
+            this.thumb = null;
             Platform.runLater(() -> tableView.refresh());
-        });
-        currentThumbService.start();
+        }
     }
 
     /**
      * 更新缩略图
      */
     public void updateThumb() {
-        // 异步加载缩略图（防止阻塞UI）
-        loadThumbnailAsync(path);
+        if (StringUtils.isNotBlank(path)) {
+            // 异步加载缩略图（防止阻塞UI）
+            loadThumbnailAsync();
+        }
     }
 
 }

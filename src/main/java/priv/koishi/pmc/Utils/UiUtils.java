@@ -154,17 +154,13 @@ public class UiUtils {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
         // 设置初始目录
-        if (StringUtils.isBlank(path)) {
-            fileChooser.setInitialDirectory(new File(userHome));
-        } else {
-            File file = new File(path);
-            // 设置初始目录
-            if (file.isDirectory()) {
-                fileChooser.setInitialDirectory(file);
-            } else if (file.isFile()) {
-                file = new File(file.getParent());
-                fileChooser.setInitialDirectory(file);
-            }
+        File file = getExistsFile(path);
+        // 设置初始目录
+        if (file.isDirectory()) {
+            fileChooser.setInitialDirectory(file);
+        } else if (file.isFile()) {
+            file = new File(file.getParent());
+            fileChooser.setInitialDirectory(file);
         }
         // 设置过滤条件
         if (CollectionUtils.isNotEmpty(extensionFilters)) {
@@ -184,12 +180,12 @@ public class UiUtils {
     public static File creatDirectoryChooser(Window window, String path, String title) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle(title);
+        File file = getExistsFile(path);
         // 设置初始目录
-        if (StringUtils.isBlank(path) || !new File(path).isDirectory()) {
-            directoryChooser.setInitialDirectory(new File(userHome));
-        } else {
-            directoryChooser.setInitialDirectory(new File(path));
+        if (!file.isDirectory()) {
+            file = file.getParentFile();
         }
+        directoryChooser.setInitialDirectory(file);
         return directoryChooser.showDialog(window);
     }
 
@@ -423,12 +419,39 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
-                if (empty || image == null) {
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else if (image == null) {
+                    TableRow<T> tableRow = getTableRow();
+                    if (isRedText(tableRow)) {
+                        setText("图片文件缺失或损坏");
+                        setTextFill(Color.RED);
+                    } else {
+                        setText("无图片");
+                    }
                     setGraphic(null);
                 } else {
+                    setText(null);
                     imageView.setImage(image);
                     setGraphic(imageView);
                 }
+            }
+
+            // 判断字体是否变红，true 变红，false 不变红
+            private boolean isRedText(TableRow<T> tableRow) {
+                T bean = tableRow.getItem();
+                String imgPath = null;
+                if (bean instanceof ImgFileBean imgFileBean) {
+                    imgPath = imgFileBean.getPath();
+                } else if (bean instanceof ClickPositionBean clickPositionBean) {
+                    imgPath = clickPositionBean.getClickImgPath();
+                }
+                // 只有在有图片路径但图片不存在时，才让缩略图提示文字变红
+                if (StringUtils.isBlank(imgPath)) {
+                    return false;
+                }
+                return !new File(imgPath).exists();
             }
         });
     }
@@ -1134,11 +1157,12 @@ public class UiUtils {
     /**
      * 为终止操作列表配置上次设置的图片
      *
-     * @param tableView 需要处理的列表
-     * @param prop      配置文件
-     * @param key       要读取的key
+     * @param tableView  需要处理的列表
+     * @param prop       配置文件
+     * @param key        要读取的key
+     * @param dataNumber 列表数据数量
      */
-    public static void setControlLastConfig(TableView<ImgFileBean> tableView, Properties prop, String key) throws IOException {
+    public static void setControlLastConfig(TableView<ImgFileBean> tableView, Properties prop, String key, Label dataNumber) throws IOException {
         int index = 0;
         while (true) {
             String path = prop.getProperty(key + index);
@@ -1146,16 +1170,15 @@ public class UiUtils {
                 break;
             }
             File file = new File(path);
-            if (isImgFile(file)) {
-                ImgFileBean bean = new ImgFileBean();
-                bean.setName(getFileName(file))
-                        .setType(getFileType(file))
-                        .setTableView(tableView)
-                        .setPath(path);
-                tableView.getItems().add(bean);
-            }
+            ImgFileBean bean = new ImgFileBean();
+            bean.setName(getFileName(path))
+                    .setType(getFileType(file))
+                    .setTableView(tableView)
+                    .setPath(path);
+            tableView.getItems().add(bean);
             index++;
         }
+        dataNumber.setText(text_allHave + tableView.getItems().size() + text_img);
     }
 
     /**
@@ -1167,7 +1190,7 @@ public class UiUtils {
      */
     public static void setControlLastConfig(Label label, Properties prop, String key) {
         String lastValue = prop.getProperty(key);
-        if (FilenameUtils.getPrefixLength(lastValue) != 0) {
+        if (FilenameUtils.getPrefixLength(lastValue) != -1) {
             setPathLabel(label, lastValue, false);
         }
     }

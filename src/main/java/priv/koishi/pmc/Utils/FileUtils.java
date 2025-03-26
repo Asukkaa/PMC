@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Utils;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
@@ -241,7 +242,7 @@ public class FileUtils {
      * @return 文件夹或不带拓展名的文件名称
      * @throws IOException 文件不存在
      */
-    public static String getFileName(File file) throws IOException {
+    public static String getExistsFileName(File file) throws IOException {
         if (!file.exists()) {
             throw new IOException(text_fileNotExists);
         }
@@ -250,6 +251,52 @@ public class FileUtils {
             return fileName.substring(0, fileName.lastIndexOf("."));
         }
         return fileName;
+    }
+
+    /**
+     * 获取文件不带拓展名的名称或文件夹的名称 (文件可不存在)
+     *
+     * @param path 要获取文件名的文件路径
+     * @return 文件夹或不带拓展名的文件名称
+     * @throws IOException 路径不能为空、路径格式不正确
+     */
+    public static String getFileName(String path) throws IOException {
+        if (StringUtils.isBlank(path)) {
+            throw new IOException("路径不能为空");
+        }
+        if (FilenameUtils.getPrefixLength(path) != -1) {
+            if (path.lastIndexOf(".") != -1) {
+                return path.substring(path.lastIndexOf(File.separator) + 1, path.lastIndexOf("."));
+            } else {
+                return path.substring(path.lastIndexOf(File.separator) + 1);
+            }
+        }
+        throw new IOException("路径格式不正确");
+    }
+
+    /**
+     * 递归寻找存在的文件或上级文件
+     *
+     * @param path 要寻找的文件路径
+     * @return 存在的文件或上级文件
+     */
+    public static File getExistsFile(String path) {
+        File defaultFile = new File(defaultFileChooserPath);
+        // 验证输入有效性
+        if (StringUtils.isBlank(path)) {
+            return defaultFile;
+        }
+        File currentFile = new File(path);
+        // 直接验证文件存在性
+        if (currentFile.exists()) {
+            return currentFile;
+        }
+        // 获取父目录并验证递归终止条件
+        File parentFile = currentFile.getParentFile();
+        if (parentFile == null || parentFile.getPath().equals(currentFile.getPath())) {
+            return defaultFile;
+        }
+        return getExistsFile(parentFile.getPath());
     }
 
     /**
@@ -268,7 +315,7 @@ public class FileUtils {
             return path;
         }
         String parentDir = file.getParent();
-        String fileName = getFileName(file);
+        String fileName = getExistsFileName(file);
         String extension = getFileType(file);
         if (extension_file.equals(extension) || extension_folder.equals(extension)) {
             extension = "";

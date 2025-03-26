@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import static javafx.scene.input.MouseButton.NONE;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.FileUtils.getFileName;
+import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 import static priv.koishi.pmc.Utils.ImageRecognitionUtil.findPosition;
 
 /**
@@ -111,7 +111,7 @@ public class AutoClickService {
                             try {
                                 text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
                                         "\n操作内容：" + clickPositionBean.getType() + " 要识别的图片：" +
-                                        "\n" + getFileName(new File(clickPositionBean.getClickImgPath())) +
+                                        "\n" + getExistsFileName(new File(clickPositionBean.getClickImgPath())) +
                                         "\n单次点击" + clickTime + " 毫秒" +
                                         "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒";
                             } catch (IOException e) {
@@ -157,7 +157,7 @@ public class AutoClickService {
                 Platform.runLater(() -> {
                     try {
                         floatingLabel.setText(text_cancelTask + loopTimeText +
-                                "\n正在识别终止操作图像：" + getFileName(new File(stopPath)));
+                                "\n正在识别终止操作图像：" + getExistsFileName(new File(stopPath)));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -180,7 +180,7 @@ public class AutoClickService {
             Platform.runLater(() -> {
                 try {
                     floatingLabel.setText(text_cancelTask + loopTimeText +
-                            "\n正在识别要点击的图像：" + getFileName(new File(clickPath)));
+                            "\n正在识别要点击的图像：" + getExistsFileName(new File(clickPath)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
