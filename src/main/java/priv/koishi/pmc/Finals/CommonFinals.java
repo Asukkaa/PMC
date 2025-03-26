@@ -168,6 +168,10 @@ public class CommonFinals {
 
     public static final String text_fileNotExists = "文件不存在";
 
+    public static final String text_nullPath = "路径不能为空";
+
+    public static final String text_errPathFormat = "路径格式不正确";
+
     public static final String text_allHave = "共有 ";
 
     public static final String text_data = " 组数据";

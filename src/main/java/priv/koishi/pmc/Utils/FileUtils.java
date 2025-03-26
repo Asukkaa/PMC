@@ -262,7 +262,7 @@ public class FileUtils {
      */
     public static String getFileName(String path) throws IOException {
         if (StringUtils.isBlank(path)) {
-            throw new IOException("路径不能为空");
+            throw new IOException(text_nullPath);
         }
         if (FilenameUtils.getPrefixLength(path) != -1) {
             if (path.lastIndexOf(".") != -1) {
@@ -271,7 +271,7 @@ public class FileUtils {
                 return path.substring(path.lastIndexOf(File.separator) + 1);
             }
         }
-        throw new IOException("路径格式不正确");
+        throw new IOException(text_errPathFormat);
     }
 
     /**
@@ -308,7 +308,7 @@ public class FileUtils {
      */
     public static String notOverwritePath(String path) throws IOException {
         if (StringUtils.isBlank(path)) {
-            throw new IOException("路径不能为空");
+            throw new IOException(text_nullPath);
         }
         File file = new File(path);
         if (!file.exists()) {
