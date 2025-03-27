@@ -103,8 +103,11 @@
 
         <Separator/>
 
-        <Label prefHeight="25" text="图像识别设置："/>
-
+        <HBox fx:id="findImgSetting_Set">
+            <Label prefHeight="25" text="图像识别设置："/>
+            <Label fx:id="tip_Set" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
+                   text="更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
+        </HBox>
 
         <HBox spacing="10">
             <HBox spacing="5" prefWidth="490">

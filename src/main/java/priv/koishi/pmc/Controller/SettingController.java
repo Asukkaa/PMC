@@ -43,7 +43,6 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -113,13 +112,13 @@ public class SettingController {
     private AnchorPane anchorPane_Set;
 
     @FXML
-    private HBox fileNumberHBox_Set;
+    private HBox fileNumberHBox_Set, findImgSetting_Set;
 
     @FXML
     private ColorPicker colorPicker_Set;
 
     @FXML
-    private Label dataNumber_Set;
+    private Label dataNumber_Set, tip_Set;
 
     @FXML
     private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
@@ -170,6 +169,9 @@ public class SettingController {
         Label dataNum = (Label) scene.lookup("#dataNumber_Set");
         HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Set");
         nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
+        Label tip = (Label) scene.lookup("#tip_Set");
+        HBox findImgSetting = (HBox) scene.lookup("#findImgSetting_Set");
+        nodeRightAlignment(findImgSetting, tableWidth, tip);
     }
 
     /**
