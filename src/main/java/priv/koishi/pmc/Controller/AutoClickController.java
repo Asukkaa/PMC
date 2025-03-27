@@ -59,11 +59,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.ImageRecognitionUtil.refreshScreenParameters;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 

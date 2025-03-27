@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Utils;
+package priv.koishi.pmc.Finals;
 
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacv.Frame;
@@ -7,6 +7,7 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
+import priv.koishi.pmc.Bean.FindPositionConfig;
 import priv.koishi.pmc.Bean.MatchPoint;
 
 import java.awt.*;
@@ -26,7 +27,7 @@ import static org.bytedeco.opencv.global.opencv_imgproc.*;
  * Date 2022/04/08
  * Time 10:08:04
  */
-public class ImageRecognitionUtil {
+public class ImageRecognitionService {
 
     /**
      * 多尺度并行匹配缩放比例
@@ -48,11 +49,6 @@ public class ImageRecognitionUtil {
      */
     private static double dpiScale;
 
-    // 静态初始化屏幕参数
-    static {
-        refreshScreenParameters();
-    }
-
     /**
      * 屏幕参数刷新方法
      */
@@ -67,16 +63,15 @@ public class ImageRecognitionUtil {
     /**
      * 根据本地图片寻找屏幕坐标
      *
-     * @param templatePath   要识别的图片路径
-     * @param maxRetry       最大重试次数
-     * @param matchThreshold 匹配阈值
-     * @param continuously   是否持续匹配
+     * @param config 匹配配置
      * @return Javacv Point对象
      * @throws Exception 匹配失败时抛出异常
      */
-    public static MatchPoint findPosition(String templatePath, int maxRetry, double matchThreshold, boolean continuously, long millis) throws Exception {
+    public static MatchPoint findPosition(FindPositionConfig config) throws Exception {
         MatchPoint bestLoc = new MatchPoint();
-        if (continuously) {
+        double matchThreshold = config.getMatchThreshold();
+        String templatePath = config.getTemplatePath();
+        if (config.isContinuously()) {
             while (true) {
                 bestLoc = getPoint(templatePath, matchThreshold);
                 if (bestLoc.getPoint() != null) {
@@ -84,13 +79,13 @@ public class ImageRecognitionUtil {
                 }
             }
         } else {
-            for (int i = maxRetry + 1; i > 0; i--) {
+            for (int i = config.getMaxRetry() + 1; i > 0; i--) {
                 bestLoc = getPoint(templatePath, matchThreshold);
                 if (bestLoc.getPoint() != null) {
                     return bestLoc;
                 }
                 // 匹配失败后等待指定事件再重试
-                Thread.sleep(millis);
+                Thread.sleep(config.getRetryWait());
             }
             return bestLoc;
         }
@@ -105,9 +100,6 @@ public class ImageRecognitionUtil {
      * @throws Exception 匹配失败时抛出异常
      */
     private static MatchPoint getPoint(String templatePath, double matchThreshold) throws Exception {
-        System.out.println(screenWidth);
-        System.out.println(screenHeight);
-        System.out.println(dpiScale);
         // 获取屏幕当前画面
         BufferedImage screenImg;
         try {
@@ -164,8 +156,6 @@ public class ImageRecognitionUtil {
             if (bestVal.get() >= matchThreshold / 100) {
                 matchPoint.setPoint(bestLocRef.get())
                         .setMatchThreshold((int) (bestVal.get() * 100));
-                System.out.println("X" + bestLocRef.get().x());
-                System.out.println("Y" + bestLocRef.get().y());
                 return matchPoint;
             }
         }

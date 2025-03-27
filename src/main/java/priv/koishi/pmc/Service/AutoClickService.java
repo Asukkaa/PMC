@@ -10,10 +10,7 @@ import javafx.scene.robot.Robot;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
-import priv.koishi.pmc.Bean.AutoClickTaskBean;
-import priv.koishi.pmc.Bean.ClickPositionBean;
-import priv.koishi.pmc.Bean.ImgFileBean;
-import priv.koishi.pmc.Bean.MatchPoint;
+import priv.koishi.pmc.Bean.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,8 +20,8 @@ import java.util.concurrent.CompletableFuture;
 import static javafx.scene.input.MouseButton.NONE;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.ImageRecognitionService.findPosition;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
-import static priv.koishi.pmc.Utils.ImageRecognitionUtil.findPosition;
 import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
 
 /**
@@ -153,8 +150,10 @@ public class AutoClickService {
         double endX = Double.parseDouble(clickPositionBean.getEndX());
         double endY = Double.parseDouble(clickPositionBean.getEndY());
         TextField retrySecond = (TextField) clickPositionBean.getTableView().getScene().lookup("#retrySecond_Set");
-        int retrySecondValue = setDefaultIntValue(retrySecond,1,0,null);
+        int retrySecondValue = setDefaultIntValue(retrySecond, 1, 0, null);
         long millis = retrySecondValue * 1000L;
+        TextField overTime = (TextField) clickPositionBean.getTableView().getScene().lookup("#overtime_Set");
+        int overTimeValue = setDefaultIntValue(overTime, 0, 1, null);
         // 匹配终止操作图像
         List<ImgFileBean> stopImgFileBeans = clickPositionBean.getStopImgFileBeans();
         if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
@@ -163,15 +162,19 @@ public class AutoClickService {
                 Platform.runLater(() -> {
                     try {
                         floatingLabel.setText(text_cancelTask + loopTimeText +
-                                "\n正在识别终止操作图像：" + getExistsFileName(new File(stopPath)));
+                                "\n正在识别终止操作图像：\n" + getExistsFileName(new File(stopPath)));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
-                try (Point position = findPosition(stopPath,
-                        Integer.parseInt(clickPositionBean.getStopRetryTimes()),
-                        Double.parseDouble(clickPositionBean.getStopMatchThreshold()),
-                        false, millis).getPoint()) {
+                FindPositionConfig findPositionConfig = new FindPositionConfig();
+                findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionBean.getStopMatchThreshold()))
+                        .setMaxRetry(Integer.parseInt(clickPositionBean.getStopRetryTimes()))
+                        .setOverTime(overTimeValue)
+                        .setTemplatePath(stopPath)
+                        .setContinuously(false)
+                        .setRetryWait(millis);
+                try (Point position = findPosition(findPositionConfig).getPoint()) {
                     if (position != null) {
                         throw new Exception("匹配到终止操作图片，操作已终止");
                     }
@@ -186,16 +189,20 @@ public class AutoClickService {
             Platform.runLater(() -> {
                 try {
                     floatingLabel.setText(text_cancelTask + loopTimeText +
-                            "\n正在识别要点击的图像：" + getExistsFileName(new File(clickPath)));
+                            "\n正在识别要点击的图像：\n" + getExistsFileName(new File(clickPath)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             });
             String retryType = clickPositionBean.getRetryType();
-            MatchPoint matchPoint = findPosition(clickPath,
-                    Integer.parseInt(clickPositionBean.getClickRetryTimes()),
-                    Double.parseDouble(clickPositionBean.getClickMatchThreshold()),
-                    retryType_continuously.equals(retryType), millis);
+            FindPositionConfig findPositionConfig = new FindPositionConfig();
+            findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionBean.getClickMatchThreshold()))
+                    .setMaxRetry(Integer.parseInt(clickPositionBean.getClickRetryTimes()))
+                    .setContinuously(retryType_continuously.equals(retryType))
+                    .setOverTime(overTimeValue)
+                    .setTemplatePath(clickPath)
+                    .setRetryWait(millis);
+            MatchPoint matchPoint = findPosition(findPositionConfig);
             try (Point position = matchPoint.getPoint()) {
                 if (position != null) {
                     // 匹配成功后跳过操作
