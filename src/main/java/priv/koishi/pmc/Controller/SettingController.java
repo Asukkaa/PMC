@@ -128,7 +128,8 @@ public class SettingController {
     private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set;
 
     @FXML
-    private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set;
+    private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
+            retrySecond_Set, overtime_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,

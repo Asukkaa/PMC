@@ -63,6 +63,7 @@ import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ImageRecognitionUtil.refreshScreenParameters;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -599,6 +600,8 @@ public class AutoClickController extends CommonProperties {
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
             }
+            // 刷新屏幕参数
+            refreshScreenParameters();
             // 开启键盘监听
             startNativeKeyListener();
             // 创建一个Robot实例

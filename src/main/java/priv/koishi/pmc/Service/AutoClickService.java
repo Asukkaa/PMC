@@ -4,6 +4,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.robot.Robot;
 import org.apache.commons.collections4.CollectionUtils;
@@ -12,6 +13,7 @@ import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.MatchPoint;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 import static priv.koishi.pmc.Utils.ImageRecognitionUtil.findPosition;
+import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
 
 /**
  * 自动点击线程任务类
@@ -149,6 +152,9 @@ public class AutoClickService {
         double startY = Double.parseDouble(clickPositionBean.getStartY());
         double endX = Double.parseDouble(clickPositionBean.getEndX());
         double endY = Double.parseDouble(clickPositionBean.getEndY());
+        TextField retrySecond = (TextField) clickPositionBean.getTableView().getScene().lookup("#retrySecond_Set");
+        int retrySecondValue = setDefaultIntValue(retrySecond,1,0,null);
+        long millis = retrySecondValue * 1000L;
         // 匹配终止操作图像
         List<ImgFileBean> stopImgFileBeans = clickPositionBean.getStopImgFileBeans();
         if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
@@ -165,7 +171,7 @@ public class AutoClickService {
                 try (Point position = findPosition(stopPath,
                         Integer.parseInt(clickPositionBean.getStopRetryTimes()),
                         Double.parseDouble(clickPositionBean.getStopMatchThreshold()),
-                        false)) {
+                        false, millis).getPoint()) {
                     if (position != null) {
                         throw new Exception("匹配到终止操作图片，操作已终止");
                     }
@@ -186,10 +192,11 @@ public class AutoClickService {
                 }
             });
             String retryType = clickPositionBean.getRetryType();
-            try (Point position = findPosition(clickPath,
+            MatchPoint matchPoint = findPosition(clickPath,
                     Integer.parseInt(clickPositionBean.getClickRetryTimes()),
                     Double.parseDouble(clickPositionBean.getClickMatchThreshold()),
-                    retryType_continuously.equals(retryType))) {
+                    retryType_continuously.equals(retryType), millis);
+            try (Point position = matchPoint.getPoint()) {
                 if (position != null) {
                     // 匹配成功后跳过操作
                     if (clickPositionBean.isSkip()) {
@@ -200,7 +207,7 @@ public class AutoClickService {
                     endX = position.x();
                     endY = position.y();
                 } else if (retryType_stop.equals(retryType)) {
-                    throw new Exception("未找到匹配图像，超过最大重试次数");
+                    throw new Exception("未找到匹配图像，超过最大重试次数，最后一次匹配度为：" + matchPoint.getMatchThreshold() + " %");
                 }
             }
         }

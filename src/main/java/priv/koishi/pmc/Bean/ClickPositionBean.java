@@ -113,11 +113,6 @@ public class ClickPositionBean {
     String stopMatchThreshold;
 
     /**
-     * 图像识别匹配最大时长（单位：秒）
-     */
-    String overtime;
-
-    /**
      * 要点击的图片识别重试次数
      */
     String clickRetryTimes;
