@@ -151,7 +151,6 @@ public class AutoClickService {
         double endY = Double.parseDouble(clickPositionBean.getEndY());
         TextField retrySecond = (TextField) clickPositionBean.getTableView().getScene().lookup("#retrySecond_Set");
         int retrySecondValue = setDefaultIntValue(retrySecond, 1, 0, null);
-        long millis = retrySecondValue * 1000L;
         TextField overTime = (TextField) clickPositionBean.getTableView().getScene().lookup("#overtime_Set");
         int overTimeValue = setDefaultIntValue(overTime, 0, 1, null);
         // 匹配终止操作图像
@@ -170,10 +169,10 @@ public class AutoClickService {
                 FindPositionConfig findPositionConfig = new FindPositionConfig();
                 findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionBean.getStopMatchThreshold()))
                         .setMaxRetry(Integer.parseInt(clickPositionBean.getStopRetryTimes()))
+                        .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
                         .setTemplatePath(stopPath)
-                        .setContinuously(false)
-                        .setRetryWait(millis);
+                        .setContinuously(false);
                 try (Point position = findPosition(findPositionConfig).getPoint()) {
                     if (position != null) {
                         throw new Exception("匹配到终止操作图片，操作已终止");
@@ -199,9 +198,9 @@ public class AutoClickService {
             findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionBean.getClickMatchThreshold()))
                     .setMaxRetry(Integer.parseInt(clickPositionBean.getClickRetryTimes()))
                     .setContinuously(retryType_continuously.equals(retryType))
+                    .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
-                    .setTemplatePath(clickPath)
-                    .setRetryWait(millis);
+                    .setTemplatePath(clickPath);
             MatchPoint matchPoint = findPosition(findPositionConfig);
             try (Point position = matchPoint.getPoint()) {
                 if (position != null) {

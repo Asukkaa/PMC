@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Finals;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
@@ -12,13 +13,16 @@ import priv.koishi.pmc.Bean.MatchPoint;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Arrays;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.IMREAD_COLOR;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
+import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
  * 图像识别工具类
@@ -68,26 +72,80 @@ public class ImageRecognitionService {
      * @throws Exception 匹配失败时抛出异常
      */
     public static MatchPoint findPosition(FindPositionConfig config) throws Exception {
-        MatchPoint bestLoc = new MatchPoint();
         double matchThreshold = config.getMatchThreshold();
         String templatePath = config.getTemplatePath();
-        if (config.isContinuously()) {
-            while (true) {
-                bestLoc = getPoint(templatePath, matchThreshold);
-                if (bestLoc.getPoint() != null) {
-                    return bestLoc;
+        int overTime = config.getOverTime();
+        File file = new File(templatePath);
+        String fileName = getFileName(templatePath);
+        if (StringUtils.isBlank(templatePath)) {
+            throw new Exception("图片 " + fileName + " 路径为空");
+        }
+        if (!file.exists()) {
+            throw new Exception("图片 " + fileName + " 不存在");
+        }
+        try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
+            // 创建带名称的线程池（便于问题排查）
+            try (ExecutorService executor = Executors.newCachedThreadPool(r -> {
+                Thread t = new Thread(r, "ImageRecognitionWorker");
+                // 设置为守护线程
+                t.setDaemon(true);
+                return t;
+            })) {
+                try {
+                    String timeOutErr = "图片 " + fileName + " 匹配超时";
+                    if (config.isContinuously()) {
+                        while (true) {
+                            Future<MatchPoint> future = executor.submit(() ->
+                                    getPoint(templatePath, matchThreshold));
+                            try {
+                                MatchPoint result;
+                                if (overTime > 0) {
+                                    result = future.get(overTime, TimeUnit.SECONDS);
+                                } else {
+                                    result = future.get();
+                                }
+                                if (result.getPoint() != null) {
+                                    return result;
+                                }
+                            } catch (TimeoutException e) {
+                                // 中断当前识别
+                                future.cancel(true);
+                                throw new Exception(timeOutErr);
+                            }
+                            // 等待重试间隔（不计算在超时时间内）
+                            scheduler.schedule(() -> {
+                            }, config.getRetryWait(), TimeUnit.SECONDS).get();
+                        }
+                    } else {
+                        for (int i = 0; i <= config.getMaxRetry(); i++) {
+                            Future<MatchPoint> future = executor.submit(() ->
+                                    getPoint(templatePath, matchThreshold));
+                            try {
+                                MatchPoint result;
+                                if (overTime > 0) {
+                                    result = future.get(overTime, TimeUnit.SECONDS);
+                                } else {
+                                    result = future.get();
+                                }
+                                if (result.getPoint() != null) {
+                                    return result;
+                                }
+                            } catch (TimeoutException e) {
+                                future.cancel(true);
+                                throw new Exception(timeOutErr);
+                            }
+                            if (i < config.getMaxRetry()) {
+                                // 等待重试间隔（不计算在超时时间内）
+                                scheduler.schedule(() -> {
+                                }, config.getRetryWait(), TimeUnit.SECONDS).get();
+                            }
+                        }
+                        throw new Exception("超过最大重试次数仍未找到匹配图片" + fileName);
+                    }
+                } finally {
+                    executor.shutdownNow();
                 }
             }
-        } else {
-            for (int i = config.getMaxRetry() + 1; i > 0; i--) {
-                bestLoc = getPoint(templatePath, matchThreshold);
-                if (bestLoc.getPoint() != null) {
-                    return bestLoc;
-                }
-                // 匹配失败后等待指定事件再重试
-                Thread.sleep(config.getRetryWait());
-            }
-            return bestLoc;
         }
     }
 
@@ -100,6 +158,7 @@ public class ImageRecognitionService {
      * @throws Exception 匹配失败时抛出异常
      */
     private static MatchPoint getPoint(String templatePath, double matchThreshold) throws Exception {
+        checkInterruption();
         // 获取屏幕当前画面
         BufferedImage screenImg;
         try {
@@ -108,6 +167,7 @@ public class ImageRecognitionService {
         } catch (AWTException e) {
             throw new Exception("屏幕图像获取失败: " + e.getMessage(), e);
         }
+        checkInterruption();
         // 初始化匹配结果存储变量
         MatchPoint matchPoint = new MatchPoint();
         AtomicReference<Double> bestVal = new AtomicReference<>(-1.0);
@@ -126,6 +186,7 @@ public class ImageRecognitionService {
                     // 多尺度并行匹配：在不同缩放比例下寻找最佳匹配
                     Arrays.stream(scales).parallel().forEach(scale -> {
                         try (Mat resizedTemplate = new Mat(); Mat result = new Mat()) {
+                            checkInterruption();
                             resize(dpiAdjustedTemplate, resizedTemplate,
                                     new Size((int) (dpiAdjustedTemplate.cols() * scale),
                                             (int) (dpiAdjustedTemplate.rows() * scale)));
@@ -148,6 +209,8 @@ public class ImageRecognitionService {
                                     }
                                 }
                             }
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
                     });
                 }
@@ -189,5 +252,17 @@ public class ImageRecognitionService {
             return matConverter.convertToMat(frame).clone();
         }
     }
+
+    /**
+     * 中断检查
+     *
+     * @throws InterruptedException 操作被用户取消
+     */
+    private static void checkInterruption() throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException("操作被用户取消");
+        }
+    }
+
 
 }

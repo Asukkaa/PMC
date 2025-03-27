@@ -37,7 +37,7 @@ public class FindPositionConfig {
     /**
      * 匹配失败后重试时间间隔
      */
-    long retryWait;
+    int retryWait;
 
     /**
      * 单次匹配最大时间
