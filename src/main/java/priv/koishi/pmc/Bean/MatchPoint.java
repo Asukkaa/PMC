@@ -5,16 +5,24 @@ import lombok.experimental.Accessors;
 import org.bytedeco.opencv.opencv_core.Point;
 
 /**
-* @author KOISHI
-* Date:2025-03-27
-* Time:17:00
-*/
+ * 图像识别匹配结果类
+ *
+ * @author KOISHI
+ * Date:2025-03-27
+ * Time:17:00
+ */
 @Data
 @Accessors(chain = true)
 public class MatchPoint {
 
+    /**
+     * 图像识别匹配的坐标
+     */
     Point point;
 
+    /**
+     * 图像识别匹配值
+     */
     int matchThreshold;
 
 }
