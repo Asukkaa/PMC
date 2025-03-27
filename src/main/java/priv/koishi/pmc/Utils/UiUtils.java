@@ -925,7 +925,8 @@ public class UiUtils {
                     .setClickRetryTimes(clickPositionBean.getClickRetryTimes())
                     .setStopRetryTimes(clickPositionBean.getStopRetryTimes())
                     .setTableView(clickPositionBean.getTableView())
-                    .setRetryType(clickPositionBean.getRetryType());
+                    .setRetryType(clickPositionBean.getRetryType())
+                    .setSkip(clickPositionBean.isSkip());
             copiedList.add(copyClickPositionBean);
         });
         return copiedList;

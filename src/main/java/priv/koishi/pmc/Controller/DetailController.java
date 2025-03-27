@@ -94,6 +94,9 @@ public class DetailController {
     private ImageView clickImg_Det;
 
     @FXML
+    private CheckBox skip_Det;
+
+    @FXML
     private Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
@@ -151,6 +154,7 @@ public class DetailController {
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         clickRetryNum_Det.setText(item.getClickRetryTimes());
         stopRetryNum_Det.setText(item.getStopRetryTimes());
+        skip_Det.setSelected(item.isSkip());
         clickImgSelectPath = item.getClickImgSelectPath();
         stopImgSelectPath = item.getStopImgSelectPath();
         String retryType = item.getRetryType();
@@ -316,6 +320,7 @@ public class DetailController {
     private void saveDetail() {
         int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
         int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
+        selectedItem.setSkip(skip_Det.isSelected());
         selectedItem.setName(clickName_Det.getText());
         selectedItem.setType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));

@@ -153,6 +153,11 @@ public class ClickPositionBean {
     private transient Service<Image> currentThumbService;
 
     /**
+     * 匹配到图像后直接进行下一个操作步骤
+     */
+    boolean skip;
+
+    /**
      * 获取缩略图
      *
      * @return 当前图片表格的缩略图

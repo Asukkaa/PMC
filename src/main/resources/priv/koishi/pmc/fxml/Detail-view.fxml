@@ -108,6 +108,8 @@
                     <Label prefHeight="25" text="要点击的图片识别失败重试次数:"/>
                     <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
                 </HBox>
+
+                <CheckBox fx:id="skip_Det" prefHeight="25" text="匹配到图像后直接进行下一个操作步骤"/>
             </HBox>
 
             <HBox spacing="10">

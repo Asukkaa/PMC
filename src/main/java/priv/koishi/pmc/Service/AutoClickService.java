@@ -191,6 +191,10 @@ public class AutoClickService {
                     Double.parseDouble(clickPositionBean.getClickMatchThreshold()),
                     retryType_continuously.equals(retryType))) {
                 if (position != null) {
+                    // 匹配成功后跳过操作
+                    if (clickPositionBean.isSkip()) {
+                        return;
+                    }
                     startX = position.x();
                     startY = position.y();
                     endX = position.x();
