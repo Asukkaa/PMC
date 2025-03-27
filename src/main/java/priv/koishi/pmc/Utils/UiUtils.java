@@ -1179,7 +1179,12 @@ public class UiUtils {
             tableView.getItems().add(bean);
             index++;
         }
-        dataNumber.setText(text_allHave + tableView.getItems().size() + text_img);
+        int size = tableView.getItems().size();
+        if (size > 0) {
+            dataNumber.setText(text_allHave + size + text_img);
+        } else {
+            dataNumber.setText(text_dataListNull);
+        }
     }
 
     /**
