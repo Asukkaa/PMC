@@ -121,6 +121,12 @@ public class CommonFinals {
 
     public static final String tip_skip = "勾选后如果配置的有要点击的图片则在匹配成功后会直接执行下一个操作步骤";
 
+    public static final String tip_overtime = "只能填正整数，单位秒，不填默认为不限制，每张图片识别如果使用时间超过设置值将会直接终止操作";
+
+    public static final String tip_retrySecond = "只能填自然整数，单位秒，不填默认为 1，每张图片识别失败后将会等着当前设置值后再重试";
+
+    public static final String tip_reLaunch = "点击将会重启本程序并保存设置项";
+
     public static final String version = "2.0.0";
 
     public static final String buildDate = "2025年3月";
@@ -269,6 +275,10 @@ public class CommonFinals {
     public static final String key_stopOpacity = "stopOpacity";
 
     public static final String key_clickOpacity = "clickOpacity";
+
+    public static final String key_retrySecond = "retrySecond";
+
+    public static final String key_overtime = "overtime";
 
     public static final String key_mouseFloatingRun = "mouseFloatingRun";
 

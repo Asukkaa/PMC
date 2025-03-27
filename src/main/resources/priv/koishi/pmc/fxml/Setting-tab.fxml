@@ -105,6 +105,21 @@
 
         <Label prefHeight="25" text="图像识别设置："/>
 
+
+        <HBox spacing="10">
+            <HBox spacing="5" prefWidth="490">
+                <Label prefHeight="25" text="匹配失败重试间隔时间:"/>
+                <TextField fx:id="retrySecond_Set" prefWidth="80"/>
+                <Label prefHeight="25" text="秒"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="每张图片最大匹配时间:"/>
+                <TextField fx:id="overtime_Set" prefWidth="80"/>
+                <Label prefHeight="25" text="秒"/>
+            </HBox>
+        </HBox>
+
         <HBox spacing="10">
             <HBox spacing="5" prefWidth="490">
                 <Label prefHeight="25" text="要点击的图片默认识别匹配匹配度:"/>
@@ -159,7 +174,7 @@
 
         <Label prefHeight="25" text="重启程序："/>
 
-        <Button text="重启程序" onAction="#reLaunch" />
+        <Button fx:id="reLaunch_Set" text="重启程序" onAction="#reLaunch" />
 
         <Separator/>
     </VBox>

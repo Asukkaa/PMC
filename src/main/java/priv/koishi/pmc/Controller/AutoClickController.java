@@ -1224,6 +1224,8 @@ public class AutoClickController extends CommonProperties {
             try {
                 // 读取配置文件
                 getConfig();
+                // 设置鼠标悬停提示
+                setToolTip();
                 // 给输入框添加内容变化监听
                 textFieldChangeListener();
                 // 设置初始配置值为上次配置值
@@ -1235,8 +1237,6 @@ public class AutoClickController extends CommonProperties {
             bindPrefWidthProperty();
             // 初始化浮窗
             initFloatingWindow();
-            // 设置鼠标悬停提示
-            setToolTip();
             // 获取鼠标坐标监听器
             new MousePositionListener(this::onMousePositionUpdate);
             // 设置要防重复点击的组件

@@ -125,7 +125,7 @@ public class SettingController {
     private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
 
     @FXML
-    private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set;
+    private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
 
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
@@ -196,6 +196,10 @@ public class SettingController {
             prop.put(key_defaultClickRetryNum, clickRetryNum.getText());
             TextField stopRetryNum = (TextField) scene.lookup("#stopRetryNum_Set");
             prop.put(key_defaultStopRetryNum, stopRetryNum.getText());
+            TextField retrySecond = (TextField) scene.lookup("#retrySecond_Set");
+            prop.put(key_retrySecond, retrySecond.getText());
+            TextField overtime = (TextField) scene.lookup("#overtime_Set");
+            prop.put(key_overtime, overtime.getText());
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
             List<ImgFileBean> list = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
             if (CollectionUtils.isEmpty(list)) {
@@ -380,6 +384,8 @@ public class SettingController {
         setControlLastConfig(offsetX_Set, prop, key_offsetX);
         setControlLastConfig(offsetY_Set, prop, key_offsetY);
         setControlLastConfig(opacity_Set, prop, key_opacity);
+        setControlLastConfig(overtime_Set, prop, key_overtime);
+        setControlLastConfig(retrySecond_Set, prop, key_retrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
@@ -410,6 +416,7 @@ public class SettingController {
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
+        addToolTip(tip_reLaunch, reLaunch_Set);
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
@@ -425,8 +432,10 @@ public class SettingController {
         addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
+        addValueToolTip(overtime_Set, tip_overtime, overtime_Set.getText());
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
+        addValueToolTip(retrySecond_Set, tip_retrySecond, retrySecond_Set.getText());
         addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(opacity_Set.getValue()));
         addValueToolTip(colorPicker_Set, tip_colorPicker, text_nowValue, String.valueOf(colorPicker_Set.getValue()));
         addValueToolTip(stopOpacity_Set, tip_stopOpacity, text_nowValue, String.valueOf((int) stopOpacity_Set.getValue()));
@@ -500,10 +509,14 @@ public class SettingController {
         integerSliderValueListener(stopOpacity_Set, tip_stopOpacity);
         // 要点击的图像识别准确度设置监听
         integerSliderValueListener(clickOpacity_Set, tip_clickOpacity);
+        // 每张图片最大匹配时间输入框监听
+        integerRangeTextField(overtime_Set, 1, null, tip_overtime);
         // 浮窗跟随鼠标时横轴偏移量输入框监听
         integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
         integerRangeTextField(offsetY_Set, null, null, tip_offsetY);
+        // 匹配失败重试间隔时间输入框监听
+        integerRangeTextField(retrySecond_Set, 0, null, tip_retrySecond);
         // 浮窗离屏幕边界距离输入框监听
         integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
         // 限制终止操作识别失败重试次数文本输入框内容
@@ -555,14 +568,14 @@ public class SettingController {
      */
     @FXML
     private void initialize() throws IOException {
-        // 读取配置文件
-        getConfig();
         // 设置javafx单元格宽度
         bindPrefWidthProperty();
         // 设置鼠标悬停提示
         setToolTip();
         // 给组件添加内容变化监听
         nodeValueChangeListener();
+        // 读取配置文件
+        getConfig();
         // 初始化浮窗
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
