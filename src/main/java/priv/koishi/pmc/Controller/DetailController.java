@@ -242,6 +242,7 @@ public class DetailController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_skip, skip_Det);
         addToolTip(tip_wait, wait_Det);
         addToolTip(tip_mouseEndX, mouseEndX_Det);
         addToolTip(tip_mouseEndY, mouseEndY_Det);

@@ -119,6 +119,8 @@ public class CommonFinals {
 
     public static final String tip_updateClickNameBtn = "将当前步骤的步骤名称更改为要点击的图片名称";
 
+    public static final String tip_skip = "勾选后如果配置的有要点击的图片则在匹配成功后会直接执行下一个操作步骤";
+
     public static final String version = "2.0.0";
 
     public static final String buildDate = "2025年3月";
