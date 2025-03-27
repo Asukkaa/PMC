@@ -123,7 +123,7 @@
                 <HBox spacing="5">
                     <Label prefHeight="25" text="终止操作图片识别失败重试次数:"/>
                     <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
-                    <Label textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
+                    <Label textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行识别"/>
                 </HBox>
             </HBox>
 
