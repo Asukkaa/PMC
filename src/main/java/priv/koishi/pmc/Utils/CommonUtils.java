@@ -7,7 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -85,6 +88,72 @@ public class CommonUtils {
                 GlobalScreen.removeNativeMouseListener((NativeMouseListener) listener);
             } else if (listener instanceof NativeKeyListener) {
                 GlobalScreen.removeNativeKeyListener((NativeKeyListener) listener);
+            }
+        }
+    }
+
+    /**
+     * 自动复制同名属性（包含父类）
+     *
+     * @param source 源对象
+     * @param target 目标对象
+     * @throws IllegalArgumentException 如果源对象和目标对象类型不匹配，则抛出此异常
+     */
+    public static void copyProperties(Object source, Object target) throws IllegalAccessException {
+        Class<?> sourceClass = source.getClass();
+        Class<?> targetClass = target.getClass();
+        // 遍历源对象继承链
+        for (Class<?> clazz = sourceClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (Field sourceField : clazz.getDeclaredFields()) {
+                try {
+                    // 遍历目标对象继承链查找同名字段
+                    Field targetField = findFieldInHierarchy(targetClass, sourceField.getName());
+                    copyFieldValue(source, target, sourceField, targetField);
+                } catch (NoSuchFieldException e) {
+                    // 忽略目标类不存在的字段
+                }
+            }
+        }
+    }
+
+    /**
+     * 在类继承链中递归查找指定字段
+     *
+     * @param targetClass 查找字段的起始目标类
+     * @param fieldName   需要查找的字段名称
+     * @return 查找到的字段对象
+     * @throws NoSuchFieldException 若整个继承链中均未找到字段时抛出
+     */
+    private static Field findFieldInHierarchy(Class<?> targetClass, String fieldName) throws NoSuchFieldException {
+        for (Class<?> clazz = targetClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            try {
+                return clazz.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException e) {
+                // 继续向上查找父类
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
+    }
+
+    /**
+     * 复制字段值
+     *
+     * @param source      源对象，从中获取字段值
+     * @param target      目标对象，将值设置到该对象
+     * @param sourceField 源对象中需要复制的字段
+     * @param targetField 目标对象中需要设置的字段
+     * @throws IllegalAccessException 当字段访问权限不足时抛出
+     */
+    private static void copyFieldValue(Object source, Object target, Field sourceField, Field targetField) throws IllegalAccessException {
+        sourceField.setAccessible(true);
+        targetField.setAccessible(true);
+        Object value = sourceField.get(source);
+        if (value != null) {
+            // 处理集合类型深拷贝
+            if (value instanceof List) {
+                targetField.set(target, new ArrayList<>((List<?>) value));
+            } else {
+                targetField.set(target, value);
             }
         }
     }

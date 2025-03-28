@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.github.kwhat.jnativehook.GlobalScreen;
@@ -39,6 +40,7 @@ import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
+import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.EditingCell.EditingCell;
@@ -61,8 +63,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
-import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
-import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
+import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -909,6 +910,44 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
+     * 导入自动操作流程文件
+     *
+     * @param filePath 文件路径
+     * @throws IOException 导入自动化流程文件内容格式不正确
+     */
+    private void loadPMCFile(String filePath) throws IOException {
+        // 读取 JSON 文件并转换为 List<ClickPositionBean>
+        ObjectMapper objectMapper = new ObjectMapper();
+        File jsonFile = new File(filePath);
+        List<ClickPositionBean> clickPositionBeans;
+        try {
+            clickPositionBeans = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
+        } catch (MismatchedInputException | JsonParseException e) {
+            throw new IOException(text_loadAutoClick + filePath + text_formatError);
+        }
+        if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
+            List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+            clickPositionBeans.forEach(bean -> {
+                ClickPositionVO vo = new ClickPositionVO();
+                try {
+                    // 自动拷贝父类中的属性
+                    copyProperties(bean, vo);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                // 初始化子类特有属性
+                vo.setTableView(tableView_Click)
+                        .setRemove(false)
+                        .setUuid(UUID.randomUUID().toString());
+
+                clickPositionVOS.add(vo);
+            });
+            // 将自动流程添加到列表中
+            addAutoClickPositions(clickPositionVOS);
+        }
+    }
+
+    /**
      * 将自动流程添加到列表中
      *
      * @param clickPositionVOS 自动流程集合
@@ -1314,17 +1353,7 @@ public class AutoClickController extends CommonProperties {
             if (selectedFile != null) {
                 inFilePath = selectedFile.getPath();
                 updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
-                // 读取 JSON 文件并转换为 List<ClickPositionBean>
-                ObjectMapper objectMapper = new ObjectMapper();
-                File jsonFile = new File(inFilePath);
-                List<ClickPositionVO> clickPositionVOS;
-                try {
-                    clickPositionVOS = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionVO.class));
-                } catch (MismatchedInputException | JsonParseException e) {
-                    throw new IOException(text_loadAutoClick + inFilePath + text_formatError);
-                }
-                // 将自动流程添加到列表中
-                addAutoClickPositions(clickPositionVOS);
+                loadPMCFile(inFilePath);
             }
         }
     }
@@ -1337,7 +1366,7 @@ public class AutoClickController extends CommonProperties {
     @FXML
     public void exportAutoClick() throws Exception {
         if (autoClickTask == null && !recordClicking) {
-            ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
+            List<ClickPositionBean> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isEmpty(tableViewItems)) {
                 throw new Exception(text_noAutoClickList);
             }
@@ -1347,7 +1376,10 @@ public class AutoClickController extends CommonProperties {
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName);
             ObjectMapper objectMapper = new ObjectMapper();
             String path = notOverwritePath(outFilePath + File.separator + fileName + PMC);
-            objectMapper.writeValue(new File(path), tableViewItems);
+            // 构建基类类型信息
+            JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
+            // 使用基类类型进行序列化
+            objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
             updateLabel(log_Click, text_saveSuccess + path);
             log_Click.setTextFill(Color.GREEN);
             if (openDirectory_Click.isSelected()) {
@@ -1383,19 +1415,9 @@ public class AutoClickController extends CommonProperties {
     private void handleDrop(DragEvent dragEvent) throws IOException {
         if (autoClickTask == null && !recordClicking) {
             List<File> files = dragEvent.getDragboard().getFiles();
-            List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
             for (File file : files) {
-                // 读取 JSON 文件并转换为 List<ClickPositionBean>
-                ObjectMapper objectMapper = new ObjectMapper();
-                File jsonFile = new File(file.getPath());
-                try {
-                    clickPositionVOS.addAll(objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionVO.class)));
-                } catch (IOException e) {
-                    throw new IOException(text_loadAutoClick + inFilePath + text_formatError);
-                }
+                loadPMCFile(file.getPath());
             }
-            // 将自动流程添加到列表中
-            addAutoClickPositions(clickPositionVOS);
         }
     }
 

@@ -48,8 +48,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.CommonUtils.errToString;
-import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
+import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
@@ -923,25 +922,12 @@ public class UiUtils {
         List<ClickPositionVO> copiedList = new ArrayList<>();
         selectedItem.forEach(clickPositionBean -> {
             ClickPositionVO copyClickPositionVO = new ClickPositionVO();
-            copyClickPositionVO.setTableView(clickPositionBean.getTableView())
-                    .setName(clickPositionBean.getName())
-                    .setStartX(clickPositionBean.getStartX())
-                    .setStartY(clickPositionBean.getStartY())
-                    .setEndX(clickPositionBean.getEndX())
-                    .setEndY(clickPositionBean.getEndY())
-                    .setClickTime(clickPositionBean.getClickTime())
-                    .setClickNum(clickPositionBean.getClickNum())
-                    .setClickInterval(clickPositionBean.getClickInterval())
-                    .setWaitTime(clickPositionBean.getWaitTime())
-                    .setType(clickPositionBean.getType())
-                    .setClickImgPath(clickPositionBean.getClickImgPath())
-                    .setStopImgFiles(clickPositionBean.getStopImgFiles())
-                    .setClickMatchThreshold(clickPositionBean.getClickMatchThreshold())
-                    .setStopMatchThreshold(clickPositionBean.getStopMatchThreshold())
-                    .setClickRetryTimes(clickPositionBean.getClickRetryTimes())
-                    .setStopRetryTimes(clickPositionBean.getStopRetryTimes())
-                    .setRetryType(clickPositionBean.getRetryType())
-                    .setSkip(clickPositionBean.isSkip());
+            try {
+                copyProperties(clickPositionBean, copyClickPositionVO);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            copyClickPositionVO.setUuid(UUID.randomUUID().toString());
             copiedList.add(copyClickPositionVO);
         });
         return copiedList;

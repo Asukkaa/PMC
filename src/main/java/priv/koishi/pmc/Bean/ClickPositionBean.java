@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Bean;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -80,6 +81,7 @@ public class ClickPositionBean {
     /**
      * 终止操作的图片
      */
+    @JsonSerialize(contentAs = ImgFileBean.class)
     List<ImgFileBean> stopImgFiles;
 
     /**
