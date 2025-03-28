@@ -114,5 +114,4 @@ public class ClickPositionBean {
      */
     boolean skip;
 
-
 }
