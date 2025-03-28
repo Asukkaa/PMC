@@ -813,7 +813,6 @@ public class UiUtils {
         contextMenu.getItems().add(menu);
     }
 
-
     /**
      * 打开所选文件选项
      *
@@ -1238,9 +1237,11 @@ public class UiUtils {
         File file = new File(path);
         String openText = "\n鼠标左键点击打开 ";
         if (!file.exists()) {
+            pathLabel.getStyleClass().remove("label-button-style");
             pathLabel.getStyleClass().add("label-err-style");
             openText = "\n文件不存在，鼠标左键点击打开 ";
         } else {
+            pathLabel.getStyleClass().remove("label-err-style");
             pathLabel.getStyleClass().add("label-button-style");
         }
         String openPath;
