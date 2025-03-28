@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import static javafx.scene.input.MouseButton.NONE;
 import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.ImageRecognitionService.findPosition;
+import static priv.koishi.pmc.Service.ImageRecognitionService.findPosition;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
 
