@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -17,12 +18,14 @@ import javafx.stage.Window;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Bean.VO.ImgFileVO;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,7 +46,7 @@ public class DetailController {
     /**
      * 页面数据对象
      */
-    private ClickPositionBean selectedItem;
+    private ClickPositionVO selectedItem;
 
     /**
      * 上次所选要点击的图片地址
@@ -113,13 +116,13 @@ public class DetailController {
             clickNumBer_Det, timeClick_Det, interval_Det, clickRetryNum_Det, stopRetryNum_Det;
 
     @FXML
-    private TableView<ImgFileBean> tableView_Det;
+    private TableView<ImgFileVO> tableView_Det;
 
     @FXML
-    private TableColumn<ImgFileBean, ImageView> thumb_Det;
+    private TableColumn<ImgFileVO, ImageView> thumb_Det;
 
     @FXML
-    private TableColumn<ImgFileBean, String> name_Det, path_Det, type_Det;
+    private TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
 
     /**
      * 组件宽高自适应
@@ -138,7 +141,7 @@ public class DetailController {
      *
      * @param item 列表选中的数据
      */
-    public void initData(ClickPositionBean item) throws IOException {
+    public void initData(ClickPositionVO item) throws IOException {
         this.selectedItem = item;
         clickName_Det.setText(item.getName());
         mouseStartX_Det.setText(item.getStartX());
@@ -161,18 +164,19 @@ public class DetailController {
         if (StringUtils.isNotBlank(retryType)) {
             retryType_Det.setValue(item.getRetryType());
         }
-        List<ImgFileBean> stopImgFileBeans = item.getStopImgFileBeans();
-        if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
-            stopImgFileBeans.forEach(b -> {
+        List<ImgFileBean> imgFileBeans = item.getStopImgFiles();
+        ObservableList<ImgFileVO> items = tableView_Det.getItems();
+        if (CollectionUtils.isNotEmpty(imgFileBeans)) {
+            imgFileBeans.forEach(b -> {
                 // 必须重新创建对象才能正确属性列表图片
-                ImgFileBean imgFileBean = new ImgFileBean();
-                imgFileBean.setType(b.getType())
+                ImgFileVO imgFileVO = new ImgFileVO();
+                imgFileVO.setTableView(tableView_Det)
+                        .setType(b.getType())
                         .setName(b.getName())
-                        .setPath(b.getPath())
-                        .setTableView(tableView_Det);
-                tableView_Det.getItems().add(imgFileBean);
+                        .setPath(b.getPath());
+                items.add(imgFileVO);
             });
-            dataNumber_Det.setText(text_allHave + stopImgFileBeans.size() + text_img);
+            dataNumber_Det.setText(text_allHave + items.size() + text_img);
         }
         tableView_Det.refresh();
         showClickImg(item.getClickImgPath());
@@ -306,7 +310,7 @@ public class DetailController {
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
             // 自动填充javafx表格
-            autoBuildTableViewData(tableView_Det, ImgFileBean.class, tabId);
+            autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             // 构建右键菜单
@@ -330,7 +334,7 @@ public class DetailController {
         selectedItem.setStopImgSelectPath(stopImgSelectPath);
         selectedItem.setClickImgSelectPath(clickImgSelectPath);
         selectedItem.setClickImgPath(clickImgPath_Det.getText());
-        selectedItem.setStopImgFileBeans(tableView_Det.getItems());
+        selectedItem.setStopImgFiles(new ArrayList<>(tableView_Det.getItems()));
         selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
         selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
         selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));

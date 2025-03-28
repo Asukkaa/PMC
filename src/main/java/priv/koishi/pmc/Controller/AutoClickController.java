@@ -39,8 +39,8 @@ import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
-import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.EditingCell.EditingCell;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.MainApplication;
@@ -134,7 +134,7 @@ public class AutoClickController extends CommonProperties {
     /**
      * 默认终止操作图片
      */
-    private List<ImgFileBean> defaultStopImgFileBeans;
+    private List<ImgFileBean> defaultStopImgFiles;
 
     /**
      * 详情页高度
@@ -284,14 +284,14 @@ public class AutoClickController extends CommonProperties {
     private TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
 
     @FXML
-    private TableView<ClickPositionBean> tableView_Click;
+    private TableView<ClickPositionVO> tableView_Click;
 
     @FXML
-    private TableColumn<ClickPositionBean, String> name_Click, clickTime_Click, clickNum_Click,
+    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click,
             clickInterval_Click, waitTime_Click, type_Click;
 
     @FXML
-    private TableColumn<ClickPositionBean, ImageView> thumb_Click;
+    private TableColumn<ClickPositionVO, ImageView> thumb_Click;
 
     /**
      * 组件自适应宽高
@@ -406,7 +406,7 @@ public class AutoClickController extends CommonProperties {
         TextField stopRetryNumTextField = (TextField) mainScene.lookup("#stopRetryNum_Set");
         stopRetryNum = stopRetryNumTextField.getText() == null ? defaultStopRetryNum : stopRetryNumTextField.getText();
         TableView<?> tableView = (TableView<?>) mainScene.lookup("#tableView_Set");
-        defaultStopImgFileBeans = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
+        defaultStopImgFiles = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
         inFilePath = prop.getProperty(key_inFilePath);
         outFilePath = prop.getProperty(key_outFilePath);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
@@ -441,11 +441,11 @@ public class AutoClickController extends CommonProperties {
      */
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
-        name_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setName));
-        clickInterval_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setClickInterval, true, 0, null));
-        waitTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setWaitTime, true, 0, null));
-        clickTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setClickTime, true, 0, null));
-        clickNum_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionBean::setClickNum, true, 0, null));
+        name_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setName));
+        clickInterval_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickInterval, true, 0, null));
+        waitTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
+        clickTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
+        clickNum_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
     }
 
     /**
@@ -453,7 +453,7 @@ public class AutoClickController extends CommonProperties {
      *
      * @param item 要显示详情的操作流程设置
      */
-    private void showDetail(ClickPositionBean item) {
+    private void showDetail(ClickPositionVO item) {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Detail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root;
@@ -580,9 +580,9 @@ public class AutoClickController extends CommonProperties {
     /**
      * 启动自动操作流程
      *
-     * @param clickPositionBeans 自动操作流程
+     * @param clickPositionVOS 自动操作流程
      */
-    private void launchClickTask(List<ClickPositionBean> clickPositionBeans) throws IOException {
+    private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
         if (!runClicking && !recordClicking) {
             runClicking = true;
             CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
@@ -593,7 +593,7 @@ public class AutoClickController extends CommonProperties {
                     .setRunTimeline(runTimeline)
                     .setDisableNodes(disableNodes)
                     .setProgressBar(progressBar_Click)
-                    .setBeanList(clickPositionBeans)
+                    .setBeanList(clickPositionVOS)
                     .setMassageLabel(log_Click);
             updateLabel(log_Click, "");
             CheckBox hideWindowRun = (CheckBox) mainScene.lookup("#hideWindowRun_Set");
@@ -743,10 +743,10 @@ public class AutoClickController extends CommonProperties {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void buildDetailMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+    private void buildDetailMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem("查看所选项第一行详情");
         detailItem.setOnAction(e -> {
-            ClickPositionBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
+            ClickPositionVO selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 showDetail(selected);
             }
@@ -760,10 +760,10 @@ public class AutoClickController extends CommonProperties {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void buildClickTestMenuItem(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+    private void buildClickTestMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem menuItem = new MenuItem("执行选中的步骤");
         menuItem.setOnAction(event -> {
-            List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
+            List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
                 try {
                     launchClickTask(selectedItem);
@@ -781,7 +781,7 @@ public class AutoClickController extends CommonProperties {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void insertDataMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+    private void insertDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu("插入数据");
         // 创建二级菜单项
         MenuItem insertUp = new MenuItem(menuItem_insertUp);
@@ -808,8 +808,8 @@ public class AutoClickController extends CommonProperties {
      * @param tableView  要处理的数据列表
      * @param insertType 数据插入类型
      */
-    private void insertDataMenuItem(TableView<ClickPositionBean> tableView, String insertType) {
-        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
+    private void insertDataMenuItem(TableView<ClickPositionVO> tableView, String insertType) {
+        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             switch (insertType) {
                 case menuItem_insertUp: {
@@ -846,20 +846,20 @@ public class AutoClickController extends CommonProperties {
      * @param tableViewItemSize 列表数据量（生成默认操作名称用）
      * @return clickPositionBean 自动操作步骤类
      */
-    private ClickPositionBean getClickSetting(int tableViewItemSize) {
+    private ClickPositionVO getClickSetting(int tableViewItemSize) {
         try {
             getConfig();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ClickPositionBean clickPositionBean = new ClickPositionBean();
-        clickPositionBean.setName(text_step + (tableViewItemSize + 1) + text_isAdd)
-                .setStopImgFileBeans(defaultStopImgFileBeans)
+        ClickPositionVO clickPositionVO = new ClickPositionVO();
+        clickPositionVO.setTableView(tableView_Click)
+                .setName(text_step + (tableViewItemSize + 1) + text_isAdd)
+                .setStopImgFiles(defaultStopImgFiles)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setClickRetryTimes(clickRetryNum)
                 .setStopRetryTimes(stopRetryNum)
-                .setTableView(tableView_Click)
                 .setType(mouseButton_primary)
                 .setClickInterval("0")
                 .setClickTime("0")
@@ -870,9 +870,9 @@ public class AutoClickController extends CommonProperties {
                 .setEndX("0")
                 .setEndY("0");
         if (tableViewItemSize == -1) {
-            clickPositionBean.setName("测试步骤");
+            clickPositionVO.setName("测试步骤");
         }
-        return clickPositionBean;
+        return clickPositionVO;
     }
 
     /**
@@ -911,21 +911,21 @@ public class AutoClickController extends CommonProperties {
     /**
      * 将自动流程添加到列表中
      *
-     * @param clickPositionBeans 自动流程集合
+     * @param clickPositionVOS 自动流程集合
      */
-    private void addAutoClickPositions(List<ClickPositionBean> clickPositionBeans) throws IOException {
-        for (ClickPositionBean clickPositionBean : clickPositionBeans) {
-            clickPositionBean.setUuid(UUID.randomUUID().toString());
-            if (!isInIntegerRange(clickPositionBean.getStartX(), 0, null) || !isInIntegerRange(clickPositionBean.getStartY(), 0, null)
-                    || !isInIntegerRange(clickPositionBean.getEndX(), 0, null) || !isInIntegerRange(clickPositionBean.getEndY(), 0, null)
-                    || !isInIntegerRange(clickPositionBean.getClickTime(), 0, null) || !isInIntegerRange(clickPositionBean.getClickNum(), 0, null)
-                    || !isInIntegerRange(clickPositionBean.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionBean.getWaitTime(), 0, null)
-                    || !runClickTypeMap.containsKey(clickPositionBean.getType())) {
+    private void addAutoClickPositions(List<ClickPositionVO> clickPositionVOS) throws IOException {
+        for (ClickPositionVO clickPositionVO : clickPositionVOS) {
+            clickPositionVO.setUuid(UUID.randomUUID().toString());
+            if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null) || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getEndX(), 0, null) || !isInIntegerRange(clickPositionVO.getEndY(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null) || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
+                    || !runClickTypeMap.containsKey(clickPositionVO.getType())) {
                 throw new IOException(text_LackKeyData);
             }
         }
         // 向列表添加数据
-        addData(clickPositionBeans, append, tableView_Click, dataNumber_Click, text_process);
+        addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, text_process);
         updateLabel(log_Click, text_loadSuccess + inFilePath);
         log_Click.setTextFill(Color.GREEN);
     }
@@ -1036,7 +1036,7 @@ public class AutoClickController extends CommonProperties {
             // 首次点击标记
             private boolean isFirstClick = true;
             // 记录点击信息
-            ClickPositionBean clickBean;
+            ClickPositionVO clickBean;
 
             // 监听鼠标按下
             @Override
@@ -1055,9 +1055,10 @@ public class AutoClickController extends CommonProperties {
                     Point mousePoint = MouseInfo.getPointerInfo().getLocation();
                     int startX = (int) mousePoint.getX();
                     int startY = (int) mousePoint.getY();
-                    clickBean = new ClickPositionBean();
-                    clickBean.setName(text_step + dataSize + text_isRecord)
-                            .setStopImgFileBeans(defaultStopImgFileBeans)
+                    clickBean = new ClickPositionVO();
+                    clickBean.setTableView(tableView_Click)
+                            .setName(text_step + dataSize + text_isRecord)
+                            .setStopImgFiles(defaultStopImgFiles)
                             .setType(recordClickTypeMap.get(pressButton))
                             .setClickMatchThreshold(defaultClickOpacity)
                             .setStopMatchThreshold(defaultStopOpacity)
@@ -1065,8 +1066,7 @@ public class AutoClickController extends CommonProperties {
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
                             .setClickRetryTimes(clickRetryNum)
-                            .setStopRetryTimes(stopRetryNum)
-                            .setTableView(tableView_Click);
+                            .setStopRetryTimes(stopRetryNum);
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_recorded + recordClickTypeMap.get(pressButton) + " 点击 (" + clickBean.getStartX() + "," + clickBean.getStartY() + ")";
@@ -1095,9 +1095,9 @@ public class AutoClickController extends CommonProperties {
                             .setClickNum("1");
                     Platform.runLater(() -> {
                         // 添加至表格
-                        List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
-                        clickPositionBeans.add(clickBean);
-                        addData(clickPositionBeans, addType, tableView_Click, dataNumber_Click, text_process);
+                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                        clickPositionVOS.add(clickBean);
+                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
                         // 日志反馈
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_recorded + recordClickTypeMap.get(pressButton) + " 松开 (" + clickBean.getEndX() + "," + clickBean.getEndY() + ")";
@@ -1179,17 +1179,17 @@ public class AutoClickController extends CommonProperties {
      */
     private void addClick(int addType) {
         if (autoClickTask == null && !recordClicking) {
-            ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
+            ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
             // 获取点击步骤设置
-            ClickPositionBean clickPositionBean = getClickSetting(tableViewItems.size());
-            List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
-            clickPositionBeans.add(clickPositionBean);
+            ClickPositionVO clickPositionVO = getClickSetting(tableViewItems.size());
+            List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+            clickPositionVOS.add(clickPositionVO);
             // 向列表添加数据
-            addData(clickPositionBeans, addType, tableView_Click, dataNumber_Click, text_process);
+            addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
             // 初始化信息栏
             updateLabel(log_Click, "");
             // 显示详情
-            showDetail(clickPositionBean);
+            showDetail(clickPositionVO);
         }
     }
 
@@ -1242,7 +1242,7 @@ public class AutoClickController extends CommonProperties {
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格
-            autoBuildTableViewData(tableView_Click, ClickPositionBean.class, tabId);
+            autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId);
             // 表格设置为可编辑
             makeCellCanEdit();
             // 设置列表通过拖拽排序行
@@ -1259,7 +1259,7 @@ public class AutoClickController extends CommonProperties {
      */
     @FXML
     public void runClick() throws Exception {
-        ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
+        ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new Exception(text_noAutoClickToRun);
         }
@@ -1283,11 +1283,11 @@ public class AutoClickController extends CommonProperties {
     @FXML
     private void clickTest() throws IOException {
         // 获取步骤设置
-        List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
-        ClickPositionBean clickPositionBean = getClickSetting(-1);
-        clickPositionBeans.add(clickPositionBean);
+        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+        ClickPositionVO clickPositionVO = getClickSetting(-1);
+        clickPositionVOS.add(clickPositionVO);
         // 启动自动操作流程
-        launchClickTask(clickPositionBeans);
+        launchClickTask(clickPositionVOS);
     }
 
     /**
@@ -1317,14 +1317,14 @@ public class AutoClickController extends CommonProperties {
                 // 读取 JSON 文件并转换为 List<ClickPositionBean>
                 ObjectMapper objectMapper = new ObjectMapper();
                 File jsonFile = new File(inFilePath);
-                List<ClickPositionBean> clickPositionBeans;
+                List<ClickPositionVO> clickPositionVOS;
                 try {
-                    clickPositionBeans = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
+                    clickPositionVOS = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionVO.class));
                 } catch (MismatchedInputException | JsonParseException e) {
                     throw new IOException(text_loadAutoClick + inFilePath + text_formatError);
                 }
                 // 将自动流程添加到列表中
-                addAutoClickPositions(clickPositionBeans);
+                addAutoClickPositions(clickPositionVOS);
             }
         }
     }
@@ -1337,7 +1337,7 @@ public class AutoClickController extends CommonProperties {
     @FXML
     public void exportAutoClick() throws Exception {
         if (autoClickTask == null && !recordClicking) {
-            ObservableList<ClickPositionBean> tableViewItems = tableView_Click.getItems();
+            ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
             if (CollectionUtils.isEmpty(tableViewItems)) {
                 throw new Exception(text_noAutoClickList);
             }
@@ -1383,19 +1383,19 @@ public class AutoClickController extends CommonProperties {
     private void handleDrop(DragEvent dragEvent) throws IOException {
         if (autoClickTask == null && !recordClicking) {
             List<File> files = dragEvent.getDragboard().getFiles();
-            List<ClickPositionBean> clickPositionBeans = new ArrayList<>();
+            List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
             for (File file : files) {
                 // 读取 JSON 文件并转换为 List<ClickPositionBean>
                 ObjectMapper objectMapper = new ObjectMapper();
                 File jsonFile = new File(file.getPath());
                 try {
-                    clickPositionBeans.addAll(objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class)));
+                    clickPositionVOS.addAll(objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionVO.class)));
                 } catch (IOException e) {
                     throw new IOException(text_loadAutoClick + inFilePath + text_formatError);
                 }
             }
             // 将自动流程添加到列表中
-            addAutoClickPositions(clickPositionBeans);
+            addAutoClickPositions(clickPositionVOS);
         }
     }
 

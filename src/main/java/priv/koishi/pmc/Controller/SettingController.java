@@ -27,7 +27,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.collections4.CollectionUtils;
-import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Listener.MousePositionListener;
 
 import java.awt.*;
@@ -136,13 +136,13 @@ public class SettingController {
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set;
 
     @FXML
-    private TableView<ImgFileBean> tableView_Set;
+    private TableView<ImgFileVO> tableView_Set;
 
     @FXML
-    private TableColumn<ImgFileBean, ImageView> thumb_Set;
+    private TableColumn<ImgFileVO, ImageView> thumb_Set;
 
     @FXML
-    private TableColumn<ImgFileBean, String> name_Set, type_Set, path_Set;
+    private TableColumn<ImgFileVO, String> name_Set, type_Set, path_Set;
 
     /**
      * 组件自适应宽高
@@ -203,7 +203,7 @@ public class SettingController {
             TextField overtime = (TextField) scene.lookup("#overtime_Set");
             prop.put(key_overtime, overtime.getText());
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
-            List<ImgFileBean> list = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
+            List<ImgFileVO> list = tableView.getItems().stream().map(o -> (ImgFileVO) o).toList();
             if (CollectionUtils.isEmpty(list)) {
                 int index = 0;
                 while (index < 10) {
@@ -212,7 +212,7 @@ public class SettingController {
                 }
             } else {
                 for (int i = 0; i < list.size(); i++) {
-                    ImgFileBean bean = list.get(i);
+                    ImgFileVO bean = list.get(i);
                     prop.put(key_defaultStopImg + i, bean.getPath());
                 }
             }
@@ -589,7 +589,7 @@ public class SettingController {
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格
-            autoBuildTableViewData(tableView_Set, ImgFileBean.class, tabId);
+            autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
             // 构建右键菜单

@@ -10,7 +10,11 @@ import javafx.scene.robot.Robot;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
-import priv.koishi.pmc.Bean.*;
+import priv.koishi.pmc.Bean.AutoClickTaskBean;
+import priv.koishi.pmc.Bean.FindPositionConfig;
+import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.MatchPoint;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,13 +50,13 @@ public class AutoClickService {
                 if (timeline != null) {
                     timeline.stop();
                 }
-                List<ClickPositionBean> tableViewItems = taskBean.getBeanList();
+                List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
                 Label floatingLabel = taskBean.getFloatingLabel();
                 // 执行自动流程前点击第一个起始坐标
                 if (taskBean.isFirstClick()) {
-                    ClickPositionBean clickPositionBean = tableViewItems.getFirst();
-                    double x = Double.parseDouble(clickPositionBean.getStartX());
-                    double y = Double.parseDouble(clickPositionBean.getStartY());
+                    ClickPositionVO clickPositionVO = tableViewItems.getFirst();
+                    double x = Double.parseDouble(clickPositionVO.getStartX());
+                    double y = Double.parseDouble(clickPositionVO.getStartY());
                     Platform.runLater(() -> {
                         robot.mouseMove(x, y);
                         robot.mousePress(PRIMARY);
@@ -87,33 +91,33 @@ public class AutoClickService {
             }
 
             // 执行点击任务
-            private void clicks(List<ClickPositionBean> tableViewItems, String loopTimeText) throws Exception {
+            private void clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
                 int dataSize = tableViewItems.size();
                 Label floatingLabel = taskBean.getFloatingLabel();
                 updateProgress(0, dataSize);
                 for (int j = 0; j < dataSize; j++) {
                     updateProgress(j + 1, dataSize);
-                    ClickPositionBean clickPositionBean = tableViewItems.get(j);
-                    int startX = Integer.parseInt((clickPositionBean.getStartX()));
-                    int startY = Integer.parseInt((clickPositionBean.getStartY()));
-                    int endX = Integer.parseInt((clickPositionBean.getEndX()));
-                    int endY = Integer.parseInt((clickPositionBean.getEndY()));
-                    String waitTime = clickPositionBean.getWaitTime();
-                    String clickTime = clickPositionBean.getClickTime();
-                    String name = clickPositionBean.getName();
-                    int clickNum = Integer.parseInt(clickPositionBean.getClickNum()) - 1;
+                    ClickPositionVO clickPositionVO = tableViewItems.get(j);
+                    int startX = Integer.parseInt((clickPositionVO.getStartX()));
+                    int startY = Integer.parseInt((clickPositionVO.getStartY()));
+                    int endX = Integer.parseInt((clickPositionVO.getEndX()));
+                    int endY = Integer.parseInt((clickPositionVO.getEndY()));
+                    String waitTime = clickPositionVO.getWaitTime();
+                    String clickTime = clickPositionVO.getClickTime();
+                    String name = clickPositionVO.getName();
+                    int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     Platform.runLater(() -> {
                         String text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                "\n操作内容：" + clickPositionBean.getType() + " X：" + startX + " Y：" + startY +
+                                "\n操作内容：" + clickPositionVO.getType() + " X：" + startX + " Y：" + startY +
                                 "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
-                                "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒";
-                        if (StringUtils.isNotBlank(clickPositionBean.getClickImgPath())) {
+                                "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
+                        if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
                             try {
                                 text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                        "\n操作内容：" + clickPositionBean.getType() + " 要识别的图片：" +
-                                        "\n" + getExistsFileName(new File(clickPositionBean.getClickImgPath())) +
+                                        "\n操作内容：" + clickPositionVO.getType() + " 要识别的图片：" +
+                                        "\n" + getExistsFileName(new File(clickPositionVO.getClickImgPath())) +
                                         "\n单次点击" + clickTime + " 毫秒" +
-                                        "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionBean.getClickInterval() + " 毫秒";
+                                        "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -130,7 +134,7 @@ public class AutoClickService {
                         }
                     }
                     // 执行自动流程
-                    click(clickPositionBean, robot, floatingLabel, loopTimeText);
+                    click(clickPositionVO, robot, floatingLabel, loopTimeText);
                 }
             }
         };
@@ -139,24 +143,24 @@ public class AutoClickService {
     /**
      * 按照操作设置执行操作
      *
-     * @param clickPositionBean 操作设置
+     * @param clickPositionVO 操作设置
      * @param robot             Robot实例
      */
-    private static void click(ClickPositionBean clickPositionBean, Robot robot, Label floatingLabel, String loopTimeText) throws Exception {
+    private static void click(ClickPositionVO clickPositionVO, Robot robot, Label floatingLabel, String loopTimeText) throws Exception {
         // 操作次数
-        int clickNum = Integer.parseInt(clickPositionBean.getClickNum());
-        double startX = Double.parseDouble(clickPositionBean.getStartX());
-        double startY = Double.parseDouble(clickPositionBean.getStartY());
-        double endX = Double.parseDouble(clickPositionBean.getEndX());
-        double endY = Double.parseDouble(clickPositionBean.getEndY());
-        TextField retrySecond = (TextField) clickPositionBean.getTableView().getScene().lookup("#retrySecond_Set");
+        int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
+        double startX = Double.parseDouble(clickPositionVO.getStartX());
+        double startY = Double.parseDouble(clickPositionVO.getStartY());
+        double endX = Double.parseDouble(clickPositionVO.getEndX());
+        double endY = Double.parseDouble(clickPositionVO.getEndY());
+        TextField retrySecond = (TextField) clickPositionVO.getTableView().getScene().lookup("#retrySecond_Set");
         int retrySecondValue = setDefaultIntValue(retrySecond, 1, 0, null);
-        TextField overTime = (TextField) clickPositionBean.getTableView().getScene().lookup("#overtime_Set");
+        TextField overTime = (TextField) clickPositionVO.getTableView().getScene().lookup("#overtime_Set");
         int overTimeValue = setDefaultIntValue(overTime, 0, 1, null);
         // 匹配终止操作图像
-        List<ImgFileBean> stopImgFileBeans = clickPositionBean.getStopImgFileBeans();
-        if (CollectionUtils.isNotEmpty(stopImgFileBeans)) {
-            stopImgFileBeans.stream().parallel().forEach(stopImgFileBean -> {
+        List<ImgFileBean> stopImgFileVOS = clickPositionVO.getStopImgFiles();
+        if (CollectionUtils.isNotEmpty(stopImgFileVOS)) {
+            stopImgFileVOS.stream().parallel().forEach(stopImgFileBean -> {
                 String stopPath = stopImgFileBean.getPath();
                 Platform.runLater(() -> {
                     try {
@@ -167,8 +171,8 @@ public class AutoClickService {
                     }
                 });
                 FindPositionConfig findPositionConfig = new FindPositionConfig();
-                findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionBean.getStopMatchThreshold()))
-                        .setMaxRetry(Integer.parseInt(clickPositionBean.getStopRetryTimes()))
+                findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionVO.getStopMatchThreshold()))
+                        .setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
                         .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
                         .setTemplatePath(stopPath)
@@ -183,7 +187,7 @@ public class AutoClickService {
             });
         }
         // 匹配要点击的图像
-        String clickPath = clickPositionBean.getClickImgPath();
+        String clickPath = clickPositionVO.getClickImgPath();
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
                 try {
@@ -193,10 +197,10 @@ public class AutoClickService {
                     throw new RuntimeException(e);
                 }
             });
-            String retryType = clickPositionBean.getRetryType();
+            String retryType = clickPositionVO.getRetryType();
             FindPositionConfig findPositionConfig = new FindPositionConfig();
-            findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionBean.getClickMatchThreshold()))
-                    .setMaxRetry(Integer.parseInt(clickPositionBean.getClickRetryTimes()))
+            findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionVO.getClickMatchThreshold()))
+                    .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(retryType_continuously.equals(retryType))
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
@@ -205,7 +209,7 @@ public class AutoClickService {
             try (Point position = matchPoint.getPoint()) {
                 if (position != null) {
                     // 匹配成功后跳过操作
-                    if (clickPositionBean.isSkip()) {
+                    if (clickPositionVO.isSkip()) {
                         return;
                     }
                     startX = position.x();
@@ -217,8 +221,8 @@ public class AutoClickService {
                 }
             }
         }
-        long clickTime = Long.parseLong(clickPositionBean.getClickTime());
-        long clickInterval = Long.parseLong(clickPositionBean.getClickInterval());
+        long clickTime = Long.parseLong(clickPositionVO.getClickTime());
+        long clickInterval = Long.parseLong(clickPositionVO.getClickInterval());
         // 按照操作次数执行
         for (int i = 0; i < clickNum; i++) {
             // 每次操作的间隔时间
@@ -230,7 +234,7 @@ public class AutoClickService {
                     break;
                 }
             }
-            MouseButton mouseButton = runClickTypeMap.get(clickPositionBean.getType());
+            MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getType());
             double finalStartX = startX;
             double finalStartY = startY;
             Platform.runLater(() -> {

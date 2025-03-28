@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 
 /**
  * 自动操作工具多线程任务所需设置类
@@ -16,7 +17,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class AutoClickTaskBean extends TaskBean<ClickPositionBean> {
+public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
 
     /**
      * 自动点击任务循环次数

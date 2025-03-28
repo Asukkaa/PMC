@@ -27,4 +27,6 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.Service;
     opens priv.koishi.pmc.Service to javafx.fxml;
     opens priv.koishi.pmc.Finals to javafx.fxml;
+    exports priv.koishi.pmc.Bean.VO;
+    opens priv.koishi.pmc.Bean.VO to javafx.fxml;
 }

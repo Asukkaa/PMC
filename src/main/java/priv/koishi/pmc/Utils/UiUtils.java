@@ -31,8 +31,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import priv.koishi.pmc.Bean.ClickPositionBean;
-import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Interface.UsedByReflection;
 import priv.koishi.pmc.MainApplication;
@@ -361,8 +361,8 @@ public class UiUtils {
      */
     @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId) {
-        // 获取对象的所有字段
-        List<Field> fields = List.of(beanClass.getDeclaredFields());
+        // 递归获取类及其父类的所有字段
+        List<Field> fields = getAllFields(beanClass);
         ObservableList<? extends TableColumn<?, ?>> columns = tableView.getColumns();
         fields.forEach(f -> {
             String fieldName = f.getName();
@@ -397,6 +397,21 @@ public class UiUtils {
                 }
             });
         });
+    }
+
+    /**
+     * 递归获取类及其父类的所有字段
+     *
+     * @param clazz 要获取字段的类
+     * @return 当前类和父类所有字段
+     */
+    private static List<Field> getAllFields(Class<?> clazz) {
+        List<Field> fields = new ArrayList<>();
+        while (clazz != null && clazz != Object.class) {
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
+        return fields;
     }
 
     /**
@@ -442,10 +457,10 @@ public class UiUtils {
             private boolean isRedText(TableRow<T> tableRow) {
                 T bean = tableRow.getItem();
                 String imgPath = null;
-                if (bean instanceof ImgFileBean imgFileBean) {
-                    imgPath = imgFileBean.getPath();
-                } else if (bean instanceof ClickPositionBean clickPositionBean) {
-                    imgPath = clickPositionBean.getClickImgPath();
+                if (bean instanceof ImgFileVO imgFileVO) {
+                    imgPath = imgFileVO.getPath();
+                } else if (bean instanceof ClickPositionVO clickPositionVO) {
+                    imgPath = clickPositionVO.getClickImgPath();
                 }
                 // 只有在有图片路径但图片不存在时，才让缩略图提示文字变红
                 if (StringUtils.isBlank(imgPath)) {
@@ -784,7 +799,7 @@ public class UiUtils {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildFilePathItem(TableView<ImgFileBean> tableView, ContextMenu contextMenu) {
+    public static void buildFilePathItem(TableView<ImgFileVO> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu("查看文件");
         // 创建二级菜单项
         MenuItem openFile = new MenuItem("打开所选文件");
@@ -806,8 +821,8 @@ public class UiUtils {
      * @param tableView 文件列表
      * @throws RuntimeException io异常
      */
-    private static void openFileMenuItem(TableView<ImgFileBean> tableView) {
-        List<ImgFileBean> fileBeans = tableView.getSelectionModel().getSelectedItems();
+    private static void openFileMenuItem(TableView<ImgFileVO> tableView) {
+        List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
         fileBeans.forEach(fileBean -> {
             try {
                 openFile(fileBean.getPath());
@@ -823,9 +838,9 @@ public class UiUtils {
      * @param tableView 要添加右键菜单的列表
      * @throws RuntimeException io异常
      */
-    private static void openDirectorMenuItem(TableView<ImgFileBean> tableView) {
-        List<ImgFileBean> fileBeans = tableView.getSelectionModel().getSelectedItems();
-        List<String> pathList = fileBeans.stream().map(ImgFileBean::getPath).distinct().toList();
+    private static void openDirectorMenuItem(TableView<ImgFileVO> tableView) {
+        List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
+        List<String> pathList = fileBeans.stream().map(ImgFileVO::getPath).distinct().toList();
         pathList.forEach(path -> {
             try {
                 openDirectory(path);
@@ -840,8 +855,8 @@ public class UiUtils {
      *
      * @param tableView 要添加右键菜单的列表
      */
-    private static void copyFilePathItem(TableView<ImgFileBean> tableView) {
-        ImgFileBean fileBean = tableView.getSelectionModel().getSelectedItem();
+    private static void copyFilePathItem(TableView<ImgFileVO> tableView) {
+        ImgFileVO fileBean = tableView.getSelectionModel().getSelectedItem();
         copyText(fileBean.getPath());
     }
 
@@ -852,7 +867,7 @@ public class UiUtils {
      * @param contextMenu 右键菜单集合
      * @param dataNumber  列表数据数量文本框
      */
-    public static void buildCopyDataMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu, Label dataNumber) {
+    public static void buildCopyDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu, Label dataNumber) {
         Menu menu = new Menu("复制所选数据");
         // 创建二级菜单项
         MenuItem upCopy = new MenuItem(menuItem_upCopy);
@@ -876,8 +891,8 @@ public class UiUtils {
      * @param copyType   复制类型
      * @param dataNumber 列表数据数量文本框
      */
-    private static void copyDataMenuItem(TableView<ClickPositionBean> tableView, String copyType, Label dataNumber) {
-        List<ClickPositionBean> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
+    private static void copyDataMenuItem(TableView<ClickPositionVO> tableView, String copyType, Label dataNumber) {
+        List<ClickPositionVO> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
         switch (copyType) {
             case menuItem_upCopy: {
                 addData(copiedList, upAdd, tableView, dataNumber, text_process);
@@ -904,11 +919,12 @@ public class UiUtils {
      * @param selectedItem 选中的数据
      * @return 复制的数据
      */
-    private static List<ClickPositionBean> getCopyList(List<ClickPositionBean> selectedItem) {
-        List<ClickPositionBean> copiedList = new ArrayList<>();
+    private static List<ClickPositionVO> getCopyList(List<ClickPositionVO> selectedItem) {
+        List<ClickPositionVO> copiedList = new ArrayList<>();
         selectedItem.forEach(clickPositionBean -> {
-            ClickPositionBean copyClickPositionBean = new ClickPositionBean();
-            copyClickPositionBean.setName(clickPositionBean.getName())
+            ClickPositionVO copyClickPositionVO = new ClickPositionVO();
+            copyClickPositionVO.setTableView(clickPositionBean.getTableView())
+                    .setName(clickPositionBean.getName())
                     .setStartX(clickPositionBean.getStartX())
                     .setStartY(clickPositionBean.getStartY())
                     .setEndX(clickPositionBean.getEndX())
@@ -919,15 +935,14 @@ public class UiUtils {
                     .setWaitTime(clickPositionBean.getWaitTime())
                     .setType(clickPositionBean.getType())
                     .setClickImgPath(clickPositionBean.getClickImgPath())
-                    .setStopImgFileBeans(clickPositionBean.getStopImgFileBeans())
+                    .setStopImgFiles(clickPositionBean.getStopImgFiles())
                     .setClickMatchThreshold(clickPositionBean.getClickMatchThreshold())
                     .setStopMatchThreshold(clickPositionBean.getStopMatchThreshold())
                     .setClickRetryTimes(clickPositionBean.getClickRetryTimes())
                     .setStopRetryTimes(clickPositionBean.getStopRetryTimes())
-                    .setTableView(clickPositionBean.getTableView())
                     .setRetryType(clickPositionBean.getRetryType())
                     .setSkip(clickPositionBean.isSkip());
-            copiedList.add(copyClickPositionBean);
+            copiedList.add(copyClickPositionVO);
         });
         return copiedList;
     }
@@ -938,7 +953,7 @@ public class UiUtils {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildEditClickTypeMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+    public static void buildEditClickTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu("更改操作类型");
         // 创建二级菜单项
         MenuItem primary = new MenuItem(mouseButton_primary);
@@ -965,8 +980,8 @@ public class UiUtils {
      * @param tableView 要添加右键菜单的列表
      * @param clickType 操作类型
      */
-    private static void updateClickTypeMenuItem(TableView<ClickPositionBean> tableView, String clickType) {
-        List<ClickPositionBean> selectedItem = tableView.getSelectionModel().getSelectedItems();
+    private static void updateClickTypeMenuItem(TableView<ClickPositionVO> tableView, String clickType) {
+        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
                 bean.setType(clickType);
@@ -983,17 +998,17 @@ public class UiUtils {
      * @param dataNumber  列表数据数量文本框
      * @param unit        列表数据数量单位
      */
-    public static void buildEditStopImgPathMenu(TableView<ImgFileBean> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
+    public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
         MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
         upMoveDataMenuItem.setOnAction(event -> {
-            ObservableList<ImgFileBean> selectedItems = tableView.getSelectionModel().getSelectedItems();
+            ObservableList<ImgFileVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
-                ImgFileBean selectedItem = selectedItems.getFirst();
+                ImgFileVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
                 File file = creatImgChooser(window, selectedItem.getPath());
                 if (file != null) {
-                    List<ImgFileBean> allImg = tableView.getItems();
-                    List<ImgFileBean> checkList = new ArrayList<>(allImg);
+                    List<ImgFileVO> allImg = tableView.getItems();
+                    List<ImgFileVO> checkList = new ArrayList<>(allImg);
                     checkList.remove(selectedItem);
                     boolean isExist = checkList.stream().anyMatch(bean ->
                             file.getPath().equals(bean.getPath()));
@@ -1019,12 +1034,12 @@ public class UiUtils {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildEditClickImgPathMenu(TableView<ClickPositionBean> tableView, ContextMenu contextMenu) {
+    public static void buildEditClickImgPathMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
         upMoveDataMenuItem.setOnAction(event -> {
-            ObservableList<ClickPositionBean> selectedItems = tableView.getSelectionModel().getSelectedItems();
+            ObservableList<ClickPositionVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
-                ClickPositionBean selectedItem = selectedItems.getFirst();
+                ClickPositionVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
                 File file = creatImgChooser(window, selectedItem.getClickImgPath());
                 if (file != null) {
@@ -1163,7 +1178,7 @@ public class UiUtils {
      * @param key        要读取的key
      * @param dataNumber 列表数据数量
      */
-    public static void setControlLastConfig(TableView<ImgFileBean> tableView, Properties prop, String key, Label dataNumber) throws IOException {
+    public static void setControlLastConfig(TableView<ImgFileVO> tableView, Properties prop, String key, Label dataNumber) throws IOException {
         int index = 0;
         while (true) {
             String path = prop.getProperty(key + index);
@@ -1171,10 +1186,10 @@ public class UiUtils {
                 break;
             }
             File file = new File(path);
-            ImgFileBean bean = new ImgFileBean();
-            bean.setName(getFileName(path))
+            ImgFileVO bean = new ImgFileVO();
+            bean.setTableView(tableView)
+                    .setName(getFileName(path))
                     .setType(getFileType(file))
-                    .setTableView(tableView)
                     .setPath(path);
             tableView.getItems().add(bean);
             index++;
@@ -1462,21 +1477,21 @@ public class UiUtils {
      * @param stopImgSelectPath 文件选择器初始路径
      * @return 选择的文件路径
      */
-    public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileBean> tableView, Label dataNumber, String stopImgSelectPath) throws IOException {
+    public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileVO> tableView, Label dataNumber, String stopImgSelectPath) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         File selectedFile = creatImgChooser(window, stopImgSelectPath);
         if (selectedFile != null) {
             // 更新所选文件路径显示
             stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
-            ObservableList<ImgFileBean> items = tableView.getItems();
+            ObservableList<ImgFileVO> items = tableView.getItems();
             boolean isExist = items.stream().anyMatch(bean -> selectedFile.getPath().equals(bean.getPath()));
-            ImgFileBean imgFileBean = new ImgFileBean();
+            ImgFileVO imgFileVO = new ImgFileVO();
             if (!isExist) {
-                imgFileBean.setType(getFileType(selectedFile))
+                imgFileVO.setTableView(tableView)
+                        .setType(getFileType(selectedFile))
                         .setName(selectedFile.getName())
-                        .setPath(selectedFile.getPath())
-                        .setTableView(tableView);
-                items.add(imgFileBean);
+                        .setPath(selectedFile.getPath());
+                items.add(imgFileVO);
             } else {
                 new MessageBubble(text_imgExist, 2);
             }
@@ -1492,17 +1507,17 @@ public class UiUtils {
      * @param dragEvent 拖拽事件
      * @param tableView 图片列表
      */
-    public static void handleDropImg(DragEvent dragEvent, TableView<ImgFileBean> tableView) {
+    public static void handleDropImg(DragEvent dragEvent, TableView<ImgFileVO> tableView) {
         List<File> files = dragEvent.getDragboard().getFiles();
-        ObservableList<ImgFileBean> items = tableView.getItems();
+        ObservableList<ImgFileVO> items = tableView.getItems();
         files.forEach(file -> {
             boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
             if (!isExist) {
-                ImgFileBean imgFileBean = new ImgFileBean();
-                imgFileBean.setName(file.getName())
+                ImgFileVO imgFileVO = new ImgFileVO();
+                imgFileVO.setName(file.getName())
                         .setType(getFileType(file))
                         .setPath(file.getPath());
-                items.add(imgFileBean);
+                items.add(imgFileVO);
             }
         });
     }
@@ -1526,7 +1541,7 @@ public class UiUtils {
     /**
      * 构建右键菜单
      */
-    public static void buildContextMenu(TableView<ImgFileBean> tableView, Label dataNumber) {
+    public static void buildContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
