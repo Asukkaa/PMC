@@ -117,11 +117,11 @@ public class ImageRecognitionService {
                             }, config.getRetryWait(), TimeUnit.SECONDS).get();
                         }
                     } else {
+                        MatchPoint result = new MatchPoint();
                         for (int i = 0; i <= config.getMaxRetry(); i++) {
                             Future<MatchPoint> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
-                                MatchPoint result;
                                 if (overTime > 0) {
                                     result = future.get(overTime, TimeUnit.SECONDS);
                                 } else {
@@ -140,11 +140,13 @@ public class ImageRecognitionService {
                                 }, config.getRetryWait(), TimeUnit.SECONDS).get();
                             }
                         }
-                        throw new Exception("超过最大重试次数仍未找到匹配图片" + fileName);
+                        return result;
                     }
                 } finally {
                     executor.shutdownNow();
                 }
+            } finally {
+                scheduler.shutdownNow();
             }
         }
     }
