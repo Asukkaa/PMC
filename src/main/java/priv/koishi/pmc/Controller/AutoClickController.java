@@ -542,6 +542,7 @@ public class AutoClickController extends CommonProperties {
      * 显示浮窗
      *
      * @param isRun 是否为运行自动操作
+     * @throws IOException io异常
      */
     private void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
@@ -582,6 +583,7 @@ public class AutoClickController extends CommonProperties {
      * 启动自动操作流程
      *
      * @param clickPositionVOS 自动操作流程
+     * @throws IOException io异常
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
         if (!runClicking && !recordClicking) {
@@ -1318,6 +1320,8 @@ public class AutoClickController extends CommonProperties {
 
     /**
      * 点击测试按钮
+     *
+     * @throws IOException io异常
      */
     @FXML
     private void clickTest() throws IOException {
