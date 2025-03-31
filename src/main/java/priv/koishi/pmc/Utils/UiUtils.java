@@ -939,7 +939,7 @@ public class UiUtils {
      * @param contextMenu 右键菜单集合
      */
     public static void buildEditClickTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("更改操作类型");
+        Menu menu = new Menu("更改点击类型");
         // 创建二级菜单项
         MenuItem primary = new MenuItem(mouseButton_primary);
         MenuItem secondary = new MenuItem(mouseButton_secondary);
@@ -970,6 +970,45 @@ public class UiUtils {
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
                 bean.setClickType(clickType);
+                tableView.refresh();
+            });
+        }
+    }
+
+    /**
+     * 更改重试类型
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    public static void buildEditRetryTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu("更改重试类型");
+        // 创建二级菜单项
+        MenuItem primary = new MenuItem(retryType_continuously);
+        MenuItem secondary = new MenuItem(retryType_click);
+        MenuItem middle = new MenuItem(retryType_stop);
+        MenuItem forward = new MenuItem(retryType_break);
+        // 为每个菜单项添加事件处理
+        primary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_continuously));
+        secondary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_click));
+        middle.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_stop));
+        forward.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_break));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(primary, secondary, middle, forward);
+        contextMenu.getItems().add(menu);
+    }
+
+    /**
+     * 更改重试类型二级菜单选项
+     *
+     * @param tableView 要添加右键菜单的列表
+     * @param retryType 操作类型
+     */
+    private static void updateRetryTypeMenuItem(TableView<ClickPositionVO> tableView, String retryType) {
+        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        if (CollectionUtils.isNotEmpty(selectedItem)) {
+            selectedItem.forEach(bean -> {
+                bean.setRetryType(retryType);
                 tableView.refresh();
             });
         }

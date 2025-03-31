@@ -380,6 +380,8 @@ public class CommonFinals {
 
     public static final String retryType_continuously = "重试直到图像出现";
 
+    public static final String retryType_click = "按设置次数重试后点击设置位置";
+
     public static final String retryType_stop = "按设置次数重试后终止操作";
 
     public static final String retryType_break = "按设置次数重试后跳过本次操作";

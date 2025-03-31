@@ -731,6 +731,8 @@ public class AutoClickController extends CommonProperties {
         buildMoveDataMenu(tableView_Click, contextMenu);
         // 修改操作类型
         buildEditClickTypeMenu(tableView_Click, contextMenu);
+        // 修改重试类型
+        buildEditRetryTypeMenu(tableView_Click, contextMenu);
         // 插入数据选项
         insertDataMenu(tableView_Click, contextMenu);
         // 复制数据选项
