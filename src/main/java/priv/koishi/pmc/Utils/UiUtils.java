@@ -535,8 +535,6 @@ public class UiUtils {
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
                 tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
-                // 插入后重新选中
-                tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + data.size());
                 break;
             }
             // 在列表所选行最后一行下方插入
@@ -549,8 +547,6 @@ public class UiUtils {
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
                 tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
-                // 插入后重新选中
-                tableView.getSelectionModel().selectIndices(selectedIndex, selectedIndex + data.size() - 1);
                 break;
             }
             // 向列表第一行上方插入
@@ -559,14 +555,17 @@ public class UiUtils {
                 tableView.getItems().addAll(0, data);
                 // 滚动到插入位置
                 tableView.scrollTo(0);
+                tableView.getSelectionModel().selectRange(0, data.size());
                 break;
             }
             // 向列表最后一行追加
             case append: {
+                int lastIndex = tableViewItems.size();
                 // 向列表最后一行追加数据
                 tableViewItems.addAll(data);
                 // 滚动到插入位置
                 tableView.scrollTo(tableViewItems.size());
+                tableView.getSelectionModel().selectRange(lastIndex, lastIndex + data.size());
                 break;
             }
         }
@@ -718,7 +717,7 @@ public class UiUtils {
      * 计算调整后的插入位置
      *
      * @param draggedIndices 被拖拽行的原始索引列表（需保证有序）
-     * @param dropIndex 拖拽操作的目标放置位置原始索引
+     * @param dropIndex      拖拽操作的目标放置位置原始索引
      * @return 调整后的有效插入位置，返回-1表示无效拖拽位置
      */
     private static int calculateAdjustedIndex(List<Integer> draggedIndices, int dropIndex) {
@@ -730,13 +729,14 @@ public class UiUtils {
         }
         return (dropIndex > lastDragged) ? dropIndex - draggedIndices.size() : dropIndex;
     }
+
     /**
      * 批量移动行数据
      *
-     * @param tableView 目标表格视图对象
-     * @param indices 需要移动的行索引列表（需保证有序）
+     * @param tableView   目标表格视图对象
+     * @param indices     需要移动的行索引列表（需保证有序）
      * @param targetIndex 移动的目标插入位置（经过调整后的有效位置）
-     * @param <T> 表格数据项类型
+     * @param <T>         表格数据项类型
      */
     private static <T> void moveRows(TableView<T> tableView, List<Integer> indices, int targetIndex) {
         ObservableList<T> items = tableView.getItems();
@@ -749,10 +749,10 @@ public class UiUtils {
     /**
      * 重新选中移动后的行
      *
-     * @param tableView 目标表格视图对象
+     * @param tableView       目标表格视图对象
      * @param originalIndices 移动前的原始行索引列表
-     * @param targetIndex 移动后的起始插入位置
-     * @param <T> 表格数据项类型
+     * @param targetIndex     移动后的起始插入位置
+     * @param <T>             表格数据项类型
      */
     private static <T> void selectMovedRows(TableView<T> tableView, List<Integer> originalIndices, int targetIndex) {
         tableView.getSelectionModel().clearSelection();
@@ -851,9 +851,7 @@ public class UiUtils {
             tableView.refresh();
             // 重新选中被移动的项
             tableView.getSelectionModel().clearSelection();
-            for (int i = 0; i < selectedItems.size(); i++) {
-                tableView.getSelectionModel().select(i);
-            }
+            tableView.getSelectionModel().selectRange(0, selectedItems.size());
         }
     }
 
@@ -875,8 +873,9 @@ public class UiUtils {
             // 重新选中被移动的项
             tableView.getSelectionModel().clearSelection();
             int lastIndex = items.size() - 1;
-            for (int i = 0; i < selectedItems.size(); i++) {
-                tableView.getSelectionModel().select(lastIndex - i);
+            int startIndex = lastIndex - selectedItems.size() + 1;
+            if (startIndex >= 0 && lastIndex >= startIndex) {
+                tableView.getSelectionModel().selectRange(startIndex, lastIndex + 1);
             }
         }
     }
