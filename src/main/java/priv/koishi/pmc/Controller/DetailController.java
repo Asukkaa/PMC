@@ -152,7 +152,7 @@ public class DetailController {
         clickNumBer_Det.setText(item.getClickNum());
         timeClick_Det.setText(item.getClickTime());
         interval_Det.setText(item.getClickInterval());
-        clickType_Det.setValue(item.getType());
+        clickType_Det.setValue(item.getClickType());
         clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         clickRetryNum_Det.setText(item.getClickRetryTimes());
@@ -327,7 +327,7 @@ public class DetailController {
         int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
         selectedItem.setSkip(skip_Det.isSelected());
         selectedItem.setName(clickName_Det.getText());
-        selectedItem.setType(clickType_Det.getValue());
+        selectedItem.setClickType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));
         selectedItem.setStartY(String.valueOf(mouseStartY));
         selectedItem.setRetryType(retryType_Det.getValue());

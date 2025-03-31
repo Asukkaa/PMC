@@ -969,7 +969,7 @@ public class UiUtils {
         List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
-                bean.setType(clickType);
+                bean.setClickType(clickType);
                 tableView.refresh();
             });
         }

@@ -71,7 +71,7 @@ public class ClickPositionBean {
     /**
      * 操作类型
      */
-    String type;
+    String clickType;
 
     /**
      * 要点击的图片路径

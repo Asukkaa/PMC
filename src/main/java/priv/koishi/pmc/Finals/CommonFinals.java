@@ -382,6 +382,8 @@ public class CommonFinals {
 
     public static final String retryType_stop = "按设置次数重试后终止操作";
 
+    public static final String retryType_break = "按设置次数重试后跳过本次操作";
+
     public static String logoPath = "icon/PMC.png";
 
     /**

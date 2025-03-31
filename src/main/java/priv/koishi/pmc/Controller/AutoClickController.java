@@ -289,7 +289,7 @@ public class AutoClickController extends CommonProperties {
 
     @FXML
     private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click,
-            clickInterval_Click, waitTime_Click, type_Click;
+            clickInterval_Click, waitTime_Click, clickType_Click, retryType_Click;
 
     @FXML
     private TableColumn<ClickPositionVO, ImageView> thumb_Click;
@@ -309,9 +309,9 @@ public class AutoClickController extends CommonProperties {
         double tableWidth = stage.getWidth() * 0.95;
         table.setMaxWidth(tableWidth);
         Node thumb = scene.lookup("#thumb_Click");
-        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
+        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
         Node name = scene.lookup("#name_Click");
-        name.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
+        name.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
         Node clickTime = scene.lookup("#clickTime_Click");
         clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node clickNum = scene.lookup("#clickNum_Click");
@@ -320,8 +320,10 @@ public class AutoClickController extends CommonProperties {
         clickInterval.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node waitTime = scene.lookup("#waitTime_Click");
         waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node type = scene.lookup("#type_Click");
-        type.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        Node clickType = scene.lookup("#clickType_Click");
+        clickType.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        Node retryType = scene.lookup("#retryType_Click");
+        retryType.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
         Label dataNum = (Label) scene.lookup("#dataNumber_Click");
         HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Click");
         nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
@@ -428,13 +430,14 @@ public class AutoClickController extends CommonProperties {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.3));
-        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.3));
+        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.15));
+        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.15));
         clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickInterval_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        type_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        clickType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        retryType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.2));
     }
 
     /**
@@ -863,7 +866,7 @@ public class AutoClickController extends CommonProperties {
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setClickRetryTimes(clickRetryNum)
                 .setStopRetryTimes(stopRetryNum)
-                .setType(mouseButton_primary)
+                .setClickType(mouseButton_primary)
                 .setClickInterval("0")
                 .setClickTime("0")
                 .setClickNum("1")
@@ -961,7 +964,7 @@ public class AutoClickController extends CommonProperties {
                     || !isInIntegerRange(clickPositionVO.getEndX(), 0, null) || !isInIntegerRange(clickPositionVO.getEndY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null) || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
-                    || !runClickTypeMap.containsKey(clickPositionVO.getType())) {
+                    || !runClickTypeMap.containsKey(clickPositionVO.getClickType())) {
                 throw new IOException(text_LackKeyData);
             }
         }
@@ -1100,7 +1103,7 @@ public class AutoClickController extends CommonProperties {
                     clickBean.setTableView(tableView_Click)
                             .setName(text_step + dataSize + text_isRecord)
                             .setStopImgFiles(defaultStopImgFiles)
-                            .setType(recordClickTypeMap.get(pressButton))
+                            .setClickType(recordClickTypeMap.get(pressButton))
                             .setClickMatchThreshold(defaultClickOpacity)
                             .setStopMatchThreshold(defaultStopOpacity)
                             .setWaitTime(String.valueOf(waitTime))

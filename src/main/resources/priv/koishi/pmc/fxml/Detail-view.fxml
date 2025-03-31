@@ -17,7 +17,7 @@
                 </HBox>
 
                 <HBox styleClass="hBox-Detail-Style">
-                    <Label prefHeight="25" text="操作类型:"/>
+                    <Label prefHeight="25" text="点击类型:"/>
                     <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
@@ -36,13 +36,14 @@
                 </HBox>
 
                 <HBox spacing="10">
-                    <Label prefHeight="25" text="要点击的图像识别重试逻辑:"/>
+                    <Label prefHeight="25" text="要识别的图像识别重试逻辑:"/>
                     <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="200">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
                                 <String fx:value="重试直到图像出现"/>
                                 <String fx:value="按设置次数重试后点击设置位置"/>
                                 <String fx:value="按设置次数重试后终止操作"/>
+                                <String fx:value="按设置次数重试后跳过本次操作"/>
                             </FXCollections>
                         </items>
                         <value>
@@ -98,14 +99,14 @@
 
             <HBox spacing="10">
                 <HBox spacing="5" prefWidth="490">
-                    <Label prefHeight="25" text="要点击的图片识别匹配匹配度:"/>
+                    <Label prefHeight="25" text="要识别的图像识别匹配匹配度:"/>
                     <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                     <Label prefHeight="25" text="\%"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="要点击的图片识别失败重试次数:"/>
+                    <Label prefHeight="25" text="要识别的图像识别失败重试次数:"/>
                     <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
                 </HBox>
 
@@ -114,14 +115,14 @@
 
             <HBox spacing="10">
                 <HBox spacing="5" prefWidth="490">
-                    <Label prefHeight="25" text="终止操作图片识别匹配匹配度:"/>
+                    <Label prefHeight="25" text="终止操作图像识别匹配匹配度:"/>
                     <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                     <Label prefHeight="25" text="\%"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="终止操作图片识别失败重试次数:"/>
+                    <Label prefHeight="25" text="终止操作图像识别失败重试次数:"/>
                     <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
                     <Label textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
                 </HBox>
