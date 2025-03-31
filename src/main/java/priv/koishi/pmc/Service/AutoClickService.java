@@ -108,13 +108,13 @@ public class AutoClickService {
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     Platform.runLater(() -> {
                         String text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                "\n操作内容：" + clickPositionVO.getType() + " X：" + startX + " Y：" + startY +
+                                "\n操作内容：" + clickPositionVO.getClickType() + " X：" + startX + " Y：" + startY +
                                 "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
                                 "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
                         if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
                             try {
                                 text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                        "\n操作内容：" + clickPositionVO.getType() + " 要识别的图片：" +
+                                        "\n操作内容：" + clickPositionVO.getClickType() + " 要识别的图片：" +
                                         "\n" + getExistsFileName(new File(clickPositionVO.getClickImgPath())) +
                                         "\n单次点击" + clickTime + " 毫秒" +
                                         "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
@@ -144,7 +144,7 @@ public class AutoClickService {
      * 按照操作设置执行操作
      *
      * @param clickPositionVO 操作设置
-     * @param robot             Robot实例
+     * @param robot           Robot实例
      */
     private static void click(ClickPositionVO clickPositionVO, Robot robot, Label floatingLabel, String loopTimeText) throws Exception {
         // 操作次数
@@ -218,6 +218,8 @@ public class AutoClickService {
                     endY = position.y();
                 } else if (retryType_stop.equals(retryType)) {
                     throw new Exception("未找到匹配图像，超过最大重试次数，最后一次匹配度为：" + matchPoint.getMatchThreshold() + " %");
+                } else if (retryType_break.equals(retryType)) {
+                    return;
                 }
             }
         }
@@ -234,7 +236,7 @@ public class AutoClickService {
                     break;
                 }
             }
-            MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getType());
+            MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickType());
             double finalStartX = startX;
             double finalStartY = startY;
             Platform.runLater(() -> {
