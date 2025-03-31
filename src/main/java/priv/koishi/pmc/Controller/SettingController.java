@@ -26,7 +26,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Listener.MousePositionListener;
 
@@ -204,17 +203,14 @@ public class SettingController {
             prop.put(key_overtime, overtime.getText());
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
             List<ImgFileVO> list = tableView.getItems().stream().map(o -> (ImgFileVO) o).toList();
-            if (CollectionUtils.isEmpty(list)) {
-                int index = 0;
-                while (index < 10) {
-                    prop.remove(key_defaultStopImg + index);
-                    index++;
-                }
-            } else {
-                for (int i = 0; i < list.size(); i++) {
-                    ImgFileVO bean = list.get(i);
-                    prop.put(key_defaultStopImg + i, bean.getPath());
-                }
+            int index = 0;
+            while (index < 10) {
+                prop.remove(key_defaultStopImg + index);
+                index++;
+            }
+            for (int i = 0; i < list.size(); i++) {
+                ImgFileVO bean = list.get(i);
+                prop.put(key_defaultStopImg + i, bean.getPath());
             }
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
