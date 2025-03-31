@@ -20,9 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static javafx.scene.input.MouseButton.NONE;
-import static javafx.scene.input.MouseButton.PRIMARY;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.findPosition;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
@@ -38,6 +38,11 @@ import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
 public class AutoClickService {
 
     /**
+     * 执行自动流程前点击第一个起始坐标标识
+     */
+    private static final AtomicBoolean firstClick = new AtomicBoolean();
+
+    /**
      * 自动点击
      *
      * @param taskBean 线程任务参数
@@ -51,20 +56,6 @@ public class AutoClickService {
                     timeline.stop();
                 }
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
-                Label floatingLabel = taskBean.getFloatingLabel();
-                // 执行自动流程前点击第一个起始坐标
-                if (taskBean.isFirstClick()) {
-                    ClickPositionVO clickPositionVO = tableViewItems.getFirst();
-                    double x = Double.parseDouble(clickPositionVO.getStartX());
-                    double y = Double.parseDouble(clickPositionVO.getStartY());
-                    Platform.runLater(() -> {
-                        robot.mouseMove(x, y);
-                        robot.mousePress(PRIMARY);
-                        robot.mouseRelease(PRIMARY);
-                        updateMessage(text_changeWindow);
-                        floatingLabel.setText(text_cancelTask + text_changeWindow);
-                    });
-                }
                 int loopTime = taskBean.getLoopTime();
                 if (loopTime == 0) {
                     int i = 0;
@@ -94,6 +85,7 @@ public class AutoClickService {
             private void clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
                 int dataSize = tableViewItems.size();
                 Label floatingLabel = taskBean.getFloatingLabel();
+                firstClick.set(taskBean.isFirstClick());
                 updateProgress(0, dataSize);
                 for (int j = 0; j < dataSize; j++) {
                     updateProgress(j + 1, dataSize);
@@ -192,7 +184,7 @@ public class AutoClickService {
             Platform.runLater(() -> {
                 try {
                     floatingLabel.setText(text_cancelTask + loopTimeText +
-                            "\n正在识别要点击的图像：\n" + getExistsFileName(new File(clickPath)));
+                            "\n正在识别目标图像：\n" + getExistsFileName(new File(clickPath)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -241,6 +233,11 @@ public class AutoClickService {
             double finalStartY = startY;
             Platform.runLater(() -> {
                 robot.mouseMove(finalStartX, finalStartY);
+                // 执行自动流程前点击第一个起始坐标
+                if (firstClick.compareAndSet(true, false)) {
+                    robot.mousePress(mouseButton);
+                    robot.mouseRelease(mouseButton);
+                }
                 if (mouseButton != NONE) {
                     robot.mousePress(mouseButton);
                 }
