@@ -2,6 +2,7 @@ package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -31,9 +32,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
-import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Interface.UsedByReflection;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
@@ -46,6 +47,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
@@ -654,50 +656,110 @@ public class UiUtils {
      *
      * @param tableView 要处理的列表
      */
+    @SuppressWarnings("unchecked")
     public static <T> void tableViewDragRow(TableView<T> tableView) {
         tableView.setRowFactory(tv -> {
             TableRow<T> row = new TableRow<>();
-            // 拖拽-检测
+            final ObservableList<Integer> draggedIndices = FXCollections.observableArrayList();
+            // 拖拽检测
             row.setOnDragDetected(e -> {
                 if (!row.isEmpty()) {
-                    Integer index = row.getIndex();
-                    Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
-                    db.setDragView(row.snapshot(null, null));
-                    ClipboardContent cc = new ClipboardContent();
-                    cc.put(dataFormat, index);
-                    db.setContent(cc);
-                    e.consume();
-                }
-            });
-            // 释放-验证
-            row.setOnDragOver(e -> {
-                Dragboard db = e.getDragboard();
-                if (db.hasContent(dataFormat)) {
-                    if (row.getIndex() != (Integer) db.getContent(dataFormat) && row.getIndex() < tableView.getItems().size()) {
-                        e.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                    // 获取所有选中的行索引
+                    draggedIndices.setAll(tableView.getSelectionModel().getSelectedIndices().stream().sorted().collect(Collectors.toList()));
+                    // 只允许非空且选中多行时拖拽
+                    if (!draggedIndices.isEmpty()) {
+                        Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+                        db.setDragView(row.snapshot(null, null));
+
+                        // 使用自定义数据格式存储多个索引
+                        ClipboardContent cc = new ClipboardContent();
+                        cc.put(dataFormat, new ArrayList<>(draggedIndices));
+                        db.setContent(cc);
                         e.consume();
                     }
                 }
             });
-            // 释放-执行
+            // 拖拽悬停验证
+            row.setOnDragOver(e -> {
+                Dragboard db = e.getDragboard();
+                if (db.hasContent(dataFormat)) {
+                    // 禁止拖拽到选中行内部
+                    List<?> indices = (List<?>) db.getContent(dataFormat);
+                    int dropIndex = row.isEmpty() ? tableView.getItems().size() : row.getIndex();
+                    if (!indices.contains(dropIndex)) {
+                        e.acceptTransferModes(TransferMode.MOVE);
+                        e.consume();
+                    }
+                }
+            });
+            // 拖拽释放处理
             row.setOnDragDropped(e -> {
                 Dragboard db = e.getDragboard();
                 if (db.hasContent(dataFormat)) {
-                    int draggedIndex = (Integer) db.getContent(dataFormat);
-                    int dropIndex;
-                    if (row.isEmpty()) {
-                        dropIndex = tableView.getItems().size();
-                    } else {
-                        dropIndex = row.getIndex();
+                    List<Integer> indices = (List<Integer>) db.getContent(dataFormat);
+                    int dropIndex = row.isEmpty() ? tableView.getItems().size() : row.getIndex();
+                    // 计算有效插入位置
+                    int adjustedDropIndex = calculateAdjustedIndex(indices, dropIndex);
+                    if (adjustedDropIndex != -1) {
+                        // 批量移动数据
+                        moveRows(tableView, indices, adjustedDropIndex);
+                        // 更新选中状态
+                        selectMovedRows(tableView, indices, adjustedDropIndex);
+                        e.setDropCompleted(true);
+                        e.consume();
                     }
-                    tableView.getItems().add(dropIndex, tableView.getItems().remove(draggedIndex));
-                    e.setDropCompleted(true);
-                    tableView.getSelectionModel().select(dropIndex);
-                    e.consume();
                 }
             });
             return row;
         });
+    }
+
+    /**
+     * 计算调整后的插入位置
+     *
+     * @param draggedIndices 被拖拽行的原始索引列表（需保证有序）
+     * @param dropIndex 拖拽操作的目标放置位置原始索引
+     * @return 调整后的有效插入位置，返回-1表示无效拖拽位置
+     */
+    private static int calculateAdjustedIndex(List<Integer> draggedIndices, int dropIndex) {
+        int firstDragged = draggedIndices.getFirst();
+        int lastDragged = draggedIndices.getLast();
+        // 排除无效拖拽位置
+        if (dropIndex > firstDragged && dropIndex <= lastDragged + 1) {
+            return -1;
+        }
+        return (dropIndex > lastDragged) ? dropIndex - draggedIndices.size() : dropIndex;
+    }
+    /**
+     * 批量移动行数据
+     *
+     * @param tableView 目标表格视图对象
+     * @param indices 需要移动的行索引列表（需保证有序）
+     * @param targetIndex 移动的目标插入位置（经过调整后的有效位置）
+     * @param <T> 表格数据项类型
+     */
+    private static <T> void moveRows(TableView<T> tableView, List<Integer> indices, int targetIndex) {
+        ObservableList<T> items = tableView.getItems();
+        List<T> movedItems = indices.stream().map(items::get).toList();
+        // 批量操作减少刷新次数
+        items.removeAll(movedItems);
+        items.addAll(targetIndex, movedItems);
+    }
+
+    /**
+     * 重新选中移动后的行
+     *
+     * @param tableView 目标表格视图对象
+     * @param originalIndices 移动前的原始行索引列表
+     * @param targetIndex 移动后的起始插入位置
+     * @param <T> 表格数据项类型
+     */
+    private static <T> void selectMovedRows(TableView<T> tableView, List<Integer> originalIndices, int targetIndex) {
+        tableView.getSelectionModel().clearSelection();
+        for (int i = 0; i < originalIndices.size(); i++) {
+            tableView.getSelectionModel().select(targetIndex + i);
+        }
+        tableView.scrollTo(targetIndex);
     }
 
     /**
