@@ -56,4 +56,9 @@ public class TaskBean<T> {
      */
     List<Node> disableNodes;
 
+    /**
+     * 是否绑定线程信息栏（true 绑定，false 不绑定）
+     */
+    boolean bindingMassageLabel;
+
 }

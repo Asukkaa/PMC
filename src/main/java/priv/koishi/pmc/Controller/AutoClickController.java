@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
@@ -597,8 +598,9 @@ public class AutoClickController extends CommonProperties {
                     .setFirstClick(firstClick.isSelected())
                     .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
-                    .setDisableNodes(disableNodes)
                     .setProgressBar(progressBar_Click)
+                    .setBindingMassageLabel(false)
+                    .setDisableNodes(disableNodes)
                     .setBeanList(clickPositionVOS)
                     .setMassageLabel(log_Click);
             updateLabel(log_Click, "");
@@ -614,12 +616,11 @@ public class AutoClickController extends CommonProperties {
             Robot robot = new Robot();
             autoClickTask = autoClick(taskBean, robot);
             // 绑定带进度条的线程
-            bindingProgressBarTask(autoClickTask, taskBean);
-            Label massageLabel = taskBean.getMassageLabel();
+            bindingTaskNode(autoClickTask, taskBean);
             autoClickTask.setOnSucceeded(event -> {
                 taskUnbind(taskBean);
-                massageLabel.setTextFill(Color.GREEN);
-                massageLabel.setText(text_taskFinished);
+                log_Click.setTextFill(Color.GREEN);
+                log_Click.setText(text_taskFinished);
                 hideFloatingWindow();
                 CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
                 if (showWindowRun.isSelected()) {
@@ -670,7 +671,9 @@ public class AutoClickController extends CommonProperties {
                 // 获取准备时间值
                 int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
-                floatingLabel.setText(text_cancelTask + preparationTimeValue + text_run);
+                String text = text_cancelTask + preparationTimeValue + text_run;
+                floatingLabel.setText(text);
+                log_Click.setText(text);
                 showFloatingWindow(true);
                 // 延时执行任务
                 runTimeline = executeRunTimeLine(preparationTimeValue);
@@ -699,7 +702,9 @@ public class AutoClickController extends CommonProperties {
         runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             preparationTime.getAndDecrement();
             if (preparationTime.get() > 0) {
-                floatingLabel.setText(text_cancelTask + preparationTime + text_run);
+                String text = text_cancelTask + preparationTime + text_run;
+                floatingLabel.setText(text);
+                log_Click.setText(text);
             } else {
                 // 停止 Timeline
                 finalTimeline.stop();
@@ -863,12 +868,13 @@ public class AutoClickController extends CommonProperties {
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setName(text_step + (tableViewItemSize + 1) + text_isAdd)
-                .setStopImgFiles(defaultStopImgFiles)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setStopMatchThreshold(defaultStopOpacity)
+                .setStopImgFiles(defaultStopImgFiles)
+                .setClickType(mouseButton_primary)
                 .setClickRetryTimes(clickRetryNum)
                 .setStopRetryTimes(stopRetryNum)
-                .setClickType(mouseButton_primary)
+                .setRetryType(retryType_stop)
                 .setClickInterval("0")
                 .setClickTime("0")
                 .setClickNum("1")
@@ -1103,21 +1109,24 @@ public class AutoClickController extends CommonProperties {
                     int startY = (int) mousePoint.getY();
                     clickBean = new ClickPositionVO();
                     clickBean.setTableView(tableView_Click)
-                            .setName(text_step + dataSize + text_isRecord)
-                            .setStopImgFiles(defaultStopImgFiles)
                             .setClickType(recordClickTypeMap.get(pressButton))
+                            .setName(text_step + dataSize + text_isRecord)
                             .setClickMatchThreshold(defaultClickOpacity)
                             .setStopMatchThreshold(defaultStopOpacity)
                             .setWaitTime(String.valueOf(waitTime))
+                            .setStopImgFiles(defaultStopImgFiles)
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
                             .setClickRetryTimes(clickRetryNum)
-                            .setStopRetryTimes(stopRetryNum);
+                            .setStopRetryTimes(stopRetryNum)
+                            .setRetryType(retryType_stop);
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
-                        String log = text_recorded + recordClickTypeMap.get(pressButton) + " 点击 (" + clickBean.getStartX() + "," + clickBean.getStartY() + ")";
+                        String log = text_cancelTask + text_recordClicking + "\n" +
+                                text_recorded + recordClickTypeMap.get(pressButton) +
+                                " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
                         log_Click.setText(log);
-                        floatingLabel.setText(text_cancelTask + text_recordClicking + "\n" + log);
+                        floatingLabel.setText(log);
                     });
                 }
             }
@@ -1144,11 +1153,11 @@ public class AutoClickController extends CommonProperties {
                         List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                         clickPositionVOS.add(clickBean);
                         addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
-                        // 日志反馈
-                        log_Click.setTextFill(Color.BLUE);
-                        String log = text_recorded + recordClickTypeMap.get(pressButton) + " 松开 (" + clickBean.getEndX() + "," + clickBean.getEndY() + ")";
+                        String log = text_cancelTask + text_recordClicking + "\n" +
+                                text_recorded + recordClickTypeMap.get(pressButton) +
+                                "松开 X：" + clickBean.getEndX() + " Y：" + clickBean.getEndY();
                         log_Click.setText(log);
-                        floatingLabel.setText(text_cancelTask + text_recordClicking + "\n" + log);
+                        floatingLabel.setText(log);
                     });
                 }
             }
@@ -1176,7 +1185,9 @@ public class AutoClickController extends CommonProperties {
             // 开启键盘监听
             startNativeKeyListener();
             // 设置浮窗文本显示准备时间
-            floatingLabel.setText(text_cancelTask + preparationTimeValue + text_preparation);
+            AtomicReference<String> text = new AtomicReference<>(text_cancelTask + preparationTimeValue + text_preparation);
+            floatingLabel.setText(text.get());
+            updateLabel(log_Click, text.get());
             // 显示浮窗
             try {
                 showFloatingWindow(false);
@@ -1189,7 +1200,9 @@ public class AutoClickController extends CommonProperties {
                 // 录制开始时间
                 recordingStartTime = System.currentTimeMillis();
                 // 更新浮窗文本
-                floatingLabel.setText(text_cancelTask + text_recordClicking);
+                text.set(text_cancelTask + text_recordClicking);
+                floatingLabel.setText(text.get());
+                log_Click.setText(text.get());
             } else {
                 recordTimeline = new Timeline();
                 AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
@@ -1198,7 +1211,7 @@ public class AutoClickController extends CommonProperties {
                 recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
                     preparationTime.getAndDecrement();
                     if (preparationTime.get() > 0) {
-                        floatingLabel.setText(text_cancelTask + preparationTime + text_preparation);
+                        text.set(text_cancelTask + preparationTime + text_preparation);
                     } else {
                         // 开启鼠标监听
                         startNativeMouseListener(addType);
@@ -1207,8 +1220,10 @@ public class AutoClickController extends CommonProperties {
                         // 停止 Timeline
                         finalTimeline.stop();
                         // 更新浮窗文本
-                        floatingLabel.setText(text_cancelTask + text_recordClicking);
+                        text.set(text_cancelTask + text_recordClicking);
                     }
+                    floatingLabel.setText(text.get());
+                    log_Click.setText(text.get());
                 }));
                 // 设置 Timeline 的循环次数
                 recordTimeline.setCycleCount(preparationTimeValue);
@@ -1343,6 +1358,7 @@ public class AutoClickController extends CommonProperties {
      */
     @FXML
     private void addPosition() {
+        tableView_Click.getSelectionModel().clearSelection();
         addClick(append);
     }
 

@@ -24,9 +24,8 @@ public class TaskUtils {
      * @param task     要绑定的线程任务
      * @param taskBean 绑定线程任务所需参数
      */
-    public static void bindingProgressBarTask(Task<?> task, TaskBean<?> taskBean) {
+    public static void bindingTaskNode(Task<?> task, TaskBean<?> taskBean) {
         ProgressBar progressBar = taskBean.getProgressBar();
-        Label massageLabel = taskBean.getMassageLabel();
         if (progressBar != null) {
             // 绑定进度条的值属性
             progressBar.progressProperty().unbind();
@@ -35,13 +34,13 @@ public class TaskUtils {
             progressBar.setProgress(0);
             progressBar.progressProperty().bind(task.progressProperty());
         }
-        if (massageLabel != null) {
+        Label massageLabel = taskBean.getMassageLabel();
+        if (massageLabel != null && taskBean.isBindingMassageLabel()) {
             // 绑定TextField的值属性
             massageLabel.textProperty().unbind();
             massageLabel.textProperty().bind(task.messageProperty());
         }
         throwTaskException(task, taskBean);
-        System.gc();
     }
 
     /**
@@ -52,10 +51,12 @@ public class TaskUtils {
      * @throws RuntimeException 线程的异常
      */
     public static void throwTaskException(Task<?> task, TaskBean<?> taskBean) {
+        System.gc();
         task.setOnFailed(event -> {
             taskNotSuccess(taskBean, text_taskFailed);
             // 获取抛出的异常
             Throwable ex = task.getException();
+            System.gc();
             throw new RuntimeException(ex);
         });
     }

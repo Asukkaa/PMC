@@ -43,7 +43,17 @@ public class AutoClickService {
     private static final AtomicBoolean firstClick = new AtomicBoolean();
 
     /**
-     * 自动点击
+     * 浮窗信息栏
+     */
+    private static Label floatingLabel;
+
+    /**
+     * 程序界面信息栏
+     */
+    private static Label massageLabel;
+
+    /**
+     * 自动点击任务线程
      *
      * @param taskBean 线程任务参数
      */
@@ -65,7 +75,7 @@ public class AutoClickService {
                         if (isCancelled()) {
                             break;
                         }
-                        // 执行点击任务
+                        // 执行操作流程
                         clicks(tableViewItems, loopTimeText);
                     }
                 } else {
@@ -74,17 +84,18 @@ public class AutoClickService {
                         if (isCancelled()) {
                             break;
                         }
-                        // 执行点击任务
+                        // 执行操作流程
                         clicks(tableViewItems, loopTimeText);
                     }
                 }
                 return null;
             }
 
-            // 执行点击任务
+            // 执行操作流程
             private void clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
                 int dataSize = tableViewItems.size();
-                Label floatingLabel = taskBean.getFloatingLabel();
+                floatingLabel = taskBean.getFloatingLabel();
+                massageLabel = taskBean.getMassageLabel();
                 firstClick.set(taskBean.isFirstClick());
                 updateProgress(0, dataSize);
                 for (int j = 0; j < dataSize; j++) {
@@ -99,13 +110,13 @@ public class AutoClickService {
                     String name = clickPositionVO.getName();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     Platform.runLater(() -> {
-                        String text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
+                        String text = text_cancelTask + loopTimeText + waitTime + " 毫秒后将执行: " + name +
                                 "\n操作内容：" + clickPositionVO.getClickType() + " X：" + startX + " Y：" + startY +
                                 "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
                                 "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
                         if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
                             try {
-                                text = loopTimeText + waitTime + " 毫秒后将执行: " + name +
+                                text = text_cancelTask + loopTimeText + waitTime + " 毫秒后将执行: " + name +
                                         "\n操作内容：" + clickPositionVO.getClickType() + " 要识别的图片：" +
                                         "\n" + getExistsFileName(new File(clickPositionVO.getClickImgPath())) +
                                         "\n单次点击" + clickTime + " 毫秒" +
@@ -114,8 +125,8 @@ public class AutoClickService {
                                 throw new RuntimeException(e);
                             }
                         }
-                        updateMessage(text);
-                        floatingLabel.setText(text_cancelTask + text);
+                        massageLabel.setText(text);
+                        floatingLabel.setText(text);
                     });
                     // 执行前等待时间
                     try {
@@ -126,7 +137,7 @@ public class AutoClickService {
                         }
                     }
                     // 执行自动流程
-                    click(clickPositionVO, robot, floatingLabel, loopTimeText);
+                    click(clickPositionVO, robot, loopTimeText);
                 }
             }
         };
@@ -138,7 +149,7 @@ public class AutoClickService {
      * @param clickPositionVO 操作设置
      * @param robot           Robot实例
      */
-    private static void click(ClickPositionVO clickPositionVO, Robot robot, Label floatingLabel, String loopTimeText) throws Exception {
+    private static void click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText) throws Exception {
         // 操作次数
         int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
         double startX = Double.parseDouble(clickPositionVO.getStartX());
@@ -156,8 +167,9 @@ public class AutoClickService {
                 String stopPath = stopImgFileBean.getPath();
                 Platform.runLater(() -> {
                     try {
-                        floatingLabel.setText(text_cancelTask + loopTimeText +
-                                "\n正在识别终止操作图像：\n" + getExistsFileName(new File(stopPath)));
+                        String text = text_cancelTask + loopTimeText + "\n正在识别终止操作图像：\n" + getExistsFileName(new File(stopPath));
+                        floatingLabel.setText(text);
+                        massageLabel.setText(text);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -183,8 +195,9 @@ public class AutoClickService {
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
                 try {
-                    floatingLabel.setText(text_cancelTask + loopTimeText +
-                            "\n正在识别目标图像：\n" + getExistsFileName(new File(clickPath)));
+                    String text = text_cancelTask + loopTimeText + "\n正在识别目标图像：\n" + getExistsFileName(new File(clickPath));
+                    floatingLabel.setText(text);
+                    massageLabel.setText(text);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
