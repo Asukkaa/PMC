@@ -711,11 +711,15 @@ public class UiUtils {
         // 创建二级菜单项
         MenuItem up = new MenuItem("所选行上移一行");
         MenuItem down = new MenuItem("所选行下移一行");
+        MenuItem top = new MenuItem("所选行置顶");
+        MenuItem bottom = new MenuItem("所选行置底");
         // 为每个菜单项添加事件处理
         up.setOnAction(event -> upMoveDataMenuItem(tableView));
         down.setOnAction(event -> downMoveDataMenuItem(tableView));
+        top.setOnAction(event -> topMoveDataMenuItem(tableView));
+        bottom.setOnAction(event -> bottomMoveDataMenuItem(tableView));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(up, down);
+        menu.getItems().addAll(up, down, top, bottom);
         contextMenu.getItems().add(menu);
     }
 
@@ -769,27 +773,50 @@ public class UiUtils {
     }
 
     /**
-     * 所选行上移一行选项
+     * 所选行置顶
      *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
+     * @param tableView 要处理的数据列表
      */
-    public static <T> void buildUpMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem menuItem = new MenuItem("所选行上移一行");
-        menuItem.setOnAction(event -> upMoveDataMenuItem(tableView));
-        contextMenu.getItems().add(menuItem);
+    private static <T> void topMoveDataMenuItem(TableView<T> tableView) {
+        ObservableList<T> items = tableView.getItems();
+        List<T> selectedItems = new ArrayList<>(tableView.getSelectionModel().getSelectedItems());
+        if (!selectedItems.isEmpty()) {
+            // 移除所有选中项
+            items.removeAll(selectedItems);
+            // 插入到列表顶部（保持原有顺序）
+            items.addAll(0, selectedItems);
+            // 刷新表格显示
+            tableView.refresh();
+            // 重新选中被移动的项
+            tableView.getSelectionModel().clearSelection();
+            for (int i = 0; i < selectedItems.size(); i++) {
+                tableView.getSelectionModel().select(i);
+            }
+        }
     }
 
     /**
-     * 所选行下移一行选项
+     * 所选行置底
      *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
+     * @param tableView 要处理的数据列表
      */
-    public static <T> void buildDownMoveDataMenuItem(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem menuItem = new MenuItem("所选行下移一行");
-        menuItem.setOnAction(event -> downMoveDataMenuItem(tableView));
-        contextMenu.getItems().add(menuItem);
+    private static <T> void bottomMoveDataMenuItem(TableView<T> tableView) {
+        ObservableList<T> items = tableView.getItems();
+        List<T> selectedItems = new ArrayList<>(tableView.getSelectionModel().getSelectedItems());
+        if (!selectedItems.isEmpty()) {
+            // 移除所有选中项
+            items.removeAll(selectedItems);
+            // 插入到列表末尾（保持原有顺序）
+            items.addAll(selectedItems);
+            // 刷新表格显示
+            tableView.refresh();
+            // 重新选中被移动的项
+            tableView.getSelectionModel().clearSelection();
+            int lastIndex = items.size() - 1;
+            for (int i = 0; i < selectedItems.size(); i++) {
+                tableView.getSelectionModel().select(lastIndex - i);
+            }
+        }
     }
 
     /**
@@ -1572,10 +1599,8 @@ public class UiUtils {
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
         buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, text_img);
-        // 所选行上移一行选项
-        buildUpMoveDataMenuItem(tableView, contextMenu);
-        // 所选行下移一行选项
-        buildDownMoveDataMenuItem(tableView, contextMenu);
+        // 移动所选行选项
+        buildMoveDataMenu(tableView, contextMenu);
         // 查看文件选项
         buildFilePathItem(tableView, contextMenu);
         // 取消选中选项
