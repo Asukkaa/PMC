@@ -1,8 +1,10 @@
 package priv.koishi.pmc.Bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +23,7 @@ public class ClickPositionBean {
     /**
      * 唯一标识符
      */
+    @JsonIgnore
     String uuid = UUID.randomUUID().toString();
 
     /**
@@ -87,11 +90,13 @@ public class ClickPositionBean {
     /**
      * 要点击的图片识别匹配阈值
      */
+    @JsonSerialize(using = DoubleStringToIntSerializer.class)
     String clickMatchThreshold;
 
     /**
      * 终止操作的图片识别匹配阈值
      */
+    @JsonSerialize(using = DoubleStringToIntSerializer.class)
     String stopMatchThreshold;
 
     /**

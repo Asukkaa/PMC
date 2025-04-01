@@ -972,7 +972,9 @@ public class AutoClickController extends CommonProperties {
                     || !isInIntegerRange(clickPositionVO.getEndX(), 0, null) || !isInIntegerRange(clickPositionVO.getEndY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null) || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
-                    || !runClickTypeMap.containsKey(clickPositionVO.getClickType())) {
+                    || !isInIntegerRange(clickPositionVO.getClickRetryTimes(), 0, null) || !isInIntegerRange(clickPositionVO.getStopRetryTimes(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100) || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
+                    || !runClickTypeMap.containsKey(clickPositionVO.getClickType()) || !retryTypeList.contains(clickPositionVO.getRetryType())) {
                 throw new IOException(text_LackKeyData);
             }
         }
