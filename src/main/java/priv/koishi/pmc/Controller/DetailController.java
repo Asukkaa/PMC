@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
@@ -67,6 +69,11 @@ public class DetailController {
      * 默认终止操作图片识别重试次数
      */
     private String defaultStopRetryNum;
+
+    /**
+     * 页面是否修改标志
+     */
+    private boolean isModified = false;
 
     /**
      * 页面标识符
@@ -143,6 +150,7 @@ public class DetailController {
      */
     public void initData(ClickPositionVO item) throws IOException {
         this.selectedItem = item;
+        isModified = false;
         clickName_Det.setText(item.getName());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());
@@ -213,6 +221,53 @@ public class DetailController {
     }
 
     /**
+     * 监听页面组件内容是否改动
+     */
+    private void addModificationListeners() {
+        // 通用内容变化监听
+        Consumer<Object> modificationListener = o -> isModified = true;
+        // 绑定所有输入控件
+        bindModificationListener(clickName_Det.textProperty(), modificationListener);
+        bindModificationListener(mouseStartX_Det.textProperty(), modificationListener);
+        bindModificationListener(mouseStartY_Det.textProperty(), modificationListener);
+        bindModificationListener(mouseEndX_Det.textProperty(), modificationListener);
+        bindModificationListener(mouseEndY_Det.textProperty(), modificationListener);
+        bindModificationListener(wait_Det.textProperty(), modificationListener);
+        bindModificationListener(clickNumBer_Det.textProperty(), modificationListener);
+        bindModificationListener(timeClick_Det.textProperty(), modificationListener);
+        bindModificationListener(interval_Det.textProperty(), modificationListener);
+        bindModificationListener(clickRetryNum_Det.textProperty(), modificationListener);
+        bindModificationListener(stopRetryNum_Det.textProperty(), modificationListener);
+        bindModificationListener(clickImgPath_Det.textProperty(), modificationListener);
+        clickType_Det.getSelectionModel().selectedItemProperty()
+                .addListener((obs, old, newVal) -> isModified = true);
+        retryType_Det.getSelectionModel().selectedItemProperty()
+                .addListener((obs, old, newVal) -> isModified = true);
+        skip_Det.selectedProperty().addListener((obs, old, newVal) -> isModified = true);
+        clickOpacity_Det.valueProperty().addListener((obs, old, newVal) ->
+                isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold()));
+        stopOpacity_Det.valueProperty().addListener((obs, old, newVal) ->
+                isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getStopMatchThreshold()));
+        // 监听表格内容变化
+        tableView_Det.getItems().forEach(item ->
+                item.pathProperty().addListener((obs, oldVal, newVal) ->
+                        isModified = true));
+        // 监听表格结构变化
+        tableView_Det.getItems().addListener((ListChangeListener<ImgFileVO>) c -> {
+            while (c.next()) {
+                if (c.wasAdded() || c.wasReplaced()) {
+                    c.getAddedSubList().forEach(item ->
+                            item.pathProperty().addListener((obs, oldVal, newVal) ->
+                                    isModified = true));
+                }
+                if (c.wasUpdated() || c.wasRemoved() || c.wasAdded() || c.wasReplaced()) {
+                    isModified = true;
+                }
+            }
+        });
+    }
+
+    /**
      * 给组件添加内容变化监听
      */
     private void nodeValueChangeListener() {
@@ -222,7 +277,7 @@ public class DetailController {
         integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
         // 操作名称文本输入框鼠标悬停提示
         textFieldValueListener(clickName_Det, tip_clickName);
-        // 限制单次操作点击间隔文本输入框内容
+        // 限制每步操作执行前等待时间文本输入框内容
         integerRangeTextField(wait_Det, 0, null, tip_wait);
         // 限制操作时长文本输入内容
         integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
@@ -230,6 +285,8 @@ public class DetailController {
         integerRangeTextField(mouseEndX_Det, 0, null, tip_mouseEndX);
         // 限制鼠标结束位置纵(Y)坐标文本输入框内容
         integerRangeTextField(mouseEndY_Det, 0, null, tip_mouseEndY);
+        // 限制操作间隔文本输入框内容
+        integerRangeTextField(interval_Det, 0, null, tip_clickInterval);
         // 限制鼠标起始位置横(X)坐标文本输入框内容
         integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX);
         // 限制鼠标起始位置纵(Y)坐标文本输入框内容
@@ -309,6 +366,23 @@ public class DetailController {
         nodeValueChangeListener();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
+            // 添加关闭请求监听
+            stage.setOnCloseRequest(e -> {
+                if (isModified) {
+                    ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
+                            "保存并关闭", "直接关闭");
+                    ButtonBar.ButtonData buttonData = result.getButtonData();
+                    if (!buttonData.isCancelButton()) {
+                        // 保存并关闭
+                        saveDetail();
+                    } else {
+                        // 直接关闭
+                        stage.close();
+                    }
+                }
+            });
+            // 添加控件监听
+            addModificationListeners();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId);
             // 设置列表通过拖拽排序行

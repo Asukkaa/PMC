@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,6 +47,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -295,13 +297,14 @@ public class UiUtils {
      * @param cancel  取消按钮文案
      * @return 被点击的按钮
      */
-    public static ButtonType creatConfirmDialog(String confirm, String ok, String cancel) {
+    public static ButtonType creatConfirmDialog(String title, String confirm, String ok, String cancel) {
         Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(title);
         dialog.setHeaderText(confirm);
         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
         setWindLogo(stage, logoPath);
-        ButtonType cancelButton = new ButtonType(cancel, ButtonBar.ButtonData.CANCEL_CLOSE);
         ButtonType okButton = new ButtonType(ok, ButtonBar.ButtonData.APPLY);
+        ButtonType cancelButton = new ButtonType(cancel, ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
         return dialog.showAndWait().orElse(cancelButton);
     }
@@ -394,7 +397,13 @@ public class UiUtils {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    buildCellValue(m, fieldName);
+                    if (beanClass == ImgFileVO.class && fieldName.equals("path")) {
+                        TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
+                        pathColumn.setCellValueFactory(cellData ->
+                                cellData.getValue().pathProperty());
+                    } else {
+                        buildCellValue(m, fieldName);
+                    }
                 }
             });
         });
@@ -1125,12 +1134,19 @@ public class UiUtils {
                     boolean isExist = checkList.stream().anyMatch(bean ->
                             file.getPath().equals(bean.getPath()));
                     if (isExist) {
-                        ButtonType buttonType = creatConfirmDialog("图片已存在，是否删除这张选中图片？", "删除", "不删除");
+                        ButtonType buttonType = creatConfirmDialog("图片已存在", "图片已存在，是否删除这张选中图片？",
+                                "删除", "不删除");
                         if (!buttonType.getButtonData().isCancelButton()) {
                             tableView.getItems().remove(selectedItem);
                         }
                     } else {
                         selectedItem.setPath(file.getPath());
+                        selectedItem.setType(getFileType(file));
+                        try {
+                            selectedItem.setName(getExistsFileName(file));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                     selectedItem.updateThumb();
                     dataNumber.setText(text_allHave + allImg.size() + unit);
@@ -1670,6 +1686,14 @@ public class UiUtils {
         buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, text_img);
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView);
+    }
+
+    public static <T> void bindModificationListener(Property<T> property, Consumer<Object> listener) {
+        property.addListener((obs, oldVal, newVal) -> {
+            if (!Objects.equals(oldVal, newVal)) {
+                listener.accept(newVal);
+            }
+        });
     }
 
 }

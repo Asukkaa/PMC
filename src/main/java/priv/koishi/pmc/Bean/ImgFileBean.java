@@ -1,5 +1,7 @@
 package priv.koishi.pmc.Bean;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -20,13 +22,25 @@ public class ImgFileBean {
     String name;
 
     /**
-     * 文件地址
-     */
-    String path;
-
-    /**
      * 文件类型
      */
     String type;
+
+    /**
+     * 文件地址
+     */
+    StringProperty path = new SimpleStringProperty();
+
+    public StringProperty pathProperty() {
+        return this.path;
+    }
+
+    public String getPath() {
+        return path.get();
+    }
+
+    public void setPath(String path) {
+        this.path.set(path);
+    }
 
 }
