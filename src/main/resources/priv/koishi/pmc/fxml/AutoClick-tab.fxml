@@ -22,6 +22,8 @@
             <TextField fx:id="outFileName_Click" prefWidth="140"/>
 
             <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand" text="导出后打开文件夹"/>
+
+            <CheckBox fx:id="autoSave_Click" prefHeight="25" selected="true" style="-fx-cursor: hand" text="关闭程序时自动保存列表操作步骤"/>
         </HBox>
 
         <HBox spacing="10">

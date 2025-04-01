@@ -3,6 +3,7 @@ package priv.koishi.pmc.Utils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
@@ -328,6 +329,12 @@ public class FileUtils {
             counter++;
         }
         return path;
+    }
+
+    public static String getDesktopPath() {
+        FileSystemView fsv = FileSystemView.getFileSystemView();
+        File desktop = fsv.getHomeDirectory();
+        return desktop.getAbsolutePath();
     }
 
 }

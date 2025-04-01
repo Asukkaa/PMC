@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
+
 /**
  * 通用常量类
  *
@@ -164,6 +166,10 @@ public class CommonFinals {
             Windows 会直接点击对应窗口的对应坐标，macOS 需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
             建议 Windows 用户不要勾选， macOS 用户需要勾选""";
 
+    public static final String tip_autoSave = """
+            勾选后在程序关闭时如果列表不为空将会保存列表的所有操作步骤
+            自动保存路径为导出文件夹路径，文件名为：""";
+
     public static final String text_selectDirectory = "选择文件夹";
 
     public static final String text_selectTemplateImg = "选择要识别的图片";
@@ -291,6 +297,10 @@ public class CommonFinals {
     public static final String key_floatingWidth = "floatingWidth";
 
     public static final String key_floatingHeight = "floatingHeight";
+
+    public static final String key_autoSaveFileName = "autoSaveFileName";
+
+    public static final String key_autoSave = "autoSave";
 
     public static final String key_loadLastConfig = "loadLastConfig";
 
@@ -445,14 +455,14 @@ public class CommonFinals {
     public static final String systemName = System.getProperty("os.name").toLowerCase();
 
     /**
-     * 用户目录
+     * 桌面目录
      */
-    public static final String userHome = System.getProperty("user.home");
+    public static final String desktopPath = getDesktopPath();
 
     /**
      * 文件选择器默认路径
      */
-    public static final String defaultFileChooserPath = userHome;
+    public static final String defaultFileChooserPath = desktopPath;
 
     /**
      * 程序名称

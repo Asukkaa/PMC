@@ -89,6 +89,11 @@ public class AutoClickController extends CommonProperties {
     private static String inFilePath;
 
     /**
+     * 自动保存文件名
+     */
+    private static String autoSaveFileName;
+
+    /**
      * 上次所选要点击的图片地址
      */
     private static String clickImgSelectPath;
@@ -276,7 +281,7 @@ public class AutoClickController extends CommonProperties {
     private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click;
 
     @FXML
-    private CheckBox openDirectory_Click;
+    private CheckBox openDirectory_Click, autoSave_Click;
 
     @FXML
     private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
@@ -361,10 +366,37 @@ public class AutoClickController extends CommonProperties {
             prop.put(key_lastPreparationRunTime, preparationRunTime.getText());
             Label outPath = (Label) scene.lookup("#outPath_Click");
             prop.put(key_outFilePath, outPath.getText());
+            CheckBox autoSave = (CheckBox) scene.lookup("#autoSave_Click");
+            String lastAutoSaveValue = autoSave.isSelected() ? activation : unActivation;
+            prop.put(key_autoSave, lastAutoSaveValue);
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
             output.close();
+            TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Click");
+            // 自动保存
+            autoSave(autoSave, tableView);
+        }
+    }
+
+    /**
+     * 自动保存操作流程
+     *
+     * @param autoSave  自动保存开关
+     * @param tableView 操作流程列表
+     * @throws IOException io异常
+     */
+    private static void autoSave(CheckBox autoSave, TableView<?> tableView) throws IOException {
+        if (autoSave.isSelected()) {
+            List<?> tableViewItems = new ArrayList<>(tableView.getItems());
+            if (CollectionUtils.isNotEmpty(tableViewItems)) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String path = notOverwritePath(outFilePath + File.separator + autoSaveFileName + PMC);
+                // 构建基类类型信息
+                JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
+                // 使用基类类型进行序列化
+                objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
+            }
         }
     }
 
@@ -378,12 +410,17 @@ public class AutoClickController extends CommonProperties {
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig))) {
+            setControlLastConfig(autoSave_Click, prop, key_autoSave);
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory);
             setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime);
             setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime);
+        }
+        if (StringUtils.isBlank(outPath_Click.getText())) {
+            outPath_Click.setText(defaultFileChooserPath);
+            outFilePath = defaultFileChooserPath;
         }
         input.close();
     }
@@ -413,6 +450,7 @@ public class AutoClickController extends CommonProperties {
         defaultStopImgFiles = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
         inFilePath = prop.getProperty(key_inFilePath);
         outFilePath = prop.getProperty(key_outFilePath);
+        autoSaveFileName = prop.getProperty(key_autoSaveFileName);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
         defaultOutFileName = prop.getProperty(key_defaultOutFileName);
@@ -917,6 +955,7 @@ public class AutoClickController extends CommonProperties {
         addToolTip(tip_openDirectory, openDirectory_Click);
         addToolTip(tip_loadAutoClick, loadAutoClick_Click);
         addToolTip(tip_exportAutoClick, exportAutoClick_Click);
+        addToolTip(tip_autoSave + autoSaveFileName, autoSave_Click);
         addToolTip(tip_autoClickFileName + defaultOutFileName, outFileName_Click);
         addToolTip(tip_preparationRunTime + defaultPreparationRunTime, preparationRunTime_Click);
         addToolTip(tip_preparationRecordTime + defaultPreparationRecordTime, preparationRecordTime_Click);
