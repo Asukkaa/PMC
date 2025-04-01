@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static javafx.scene.input.MouseButton.NONE;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -165,9 +166,11 @@ public class AutoClickService {
         if (CollectionUtils.isNotEmpty(stopImgFileVOS)) {
             stopImgFileVOS.stream().parallel().forEach(stopImgFileBean -> {
                 String stopPath = stopImgFileBean.getPath();
+                AtomicReference<String> fileName = new AtomicReference<>();
                 Platform.runLater(() -> {
                     try {
-                        String text = text_cancelTask + loopTimeText + "\n正在识别终止操作图像：\n" + getExistsFileName(new File(stopPath));
+                        fileName.set(getExistsFileName(new File(stopPath)));
+                        String text = text_cancelTask + loopTimeText + "\n正在识别终止操作图像：\n" + fileName.get();
                         floatingLabel.setText(text);
                         massageLabel.setText(text);
                     } catch (IOException e) {
@@ -181,9 +184,18 @@ public class AutoClickService {
                         .setOverTime(overTimeValue)
                         .setTemplatePath(stopPath)
                         .setContinuously(false);
-                try (Point position = findPosition(findPositionConfig).getPoint()) {
-                    if (position != null) {
-                        throw new Exception("匹配到终止操作图片，操作已终止");
+                MatchPoint matchPoint;
+                try {
+                    matchPoint = findPosition(findPositionConfig);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                try (Point position = matchPoint.getPoint()) {
+                    if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
+                        throw new Exception("操作已终止" +
+                                "\n匹配到终止操作图像：" + fileName.get() +
+                                "\n匹配度为：" + matchPoint.getMatchThreshold() + " %" +
+                                "\n坐标 X：" + position.x() + " Y：" + position.y());
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -192,10 +204,12 @@ public class AutoClickService {
         }
         // 匹配要点击的图像
         String clickPath = clickPositionVO.getClickImgPath();
+        AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
                 try {
-                    String text = text_cancelTask + loopTimeText + "\n正在识别目标图像：\n" + getExistsFileName(new File(clickPath));
+                    fileName.set(getExistsFileName(new File(clickPath)));
+                    String text = text_cancelTask + loopTimeText + "\n正在识别目标图像：\n" + fileName.get();
                     floatingLabel.setText(text);
                     massageLabel.setText(text);
                 } catch (IOException e) {
@@ -212,7 +226,7 @@ public class AutoClickService {
                     .setTemplatePath(clickPath);
             MatchPoint matchPoint = findPosition(findPositionConfig);
             try (Point position = matchPoint.getPoint()) {
-                if (position != null) {
+                if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
                     // 匹配成功后跳过操作
                     if (clickPositionVO.isSkip()) {
                         return;
@@ -222,7 +236,14 @@ public class AutoClickService {
                     endX = position.x();
                     endY = position.y();
                 } else if (retryType_stop.equals(retryType)) {
-                    throw new Exception("未找到匹配图像，超过最大重试次数，最后一次匹配度为：" + matchPoint.getMatchThreshold() + " %");
+                    try {
+                        throw new Exception("已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
+                                "\n未找到匹配图像：" + fileName.get() +
+                                "\n最接近的图像匹配度为：" + matchPoint.getMatchThreshold() + " %" +
+                                "\n坐标 X：" + position.x() + " Y：" + position.y());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 } else if (retryType_break.equals(retryType)) {
                     return;
                 }

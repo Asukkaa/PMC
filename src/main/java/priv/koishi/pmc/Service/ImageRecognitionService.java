@@ -104,7 +104,7 @@ public class ImageRecognitionService {
                                 } else {
                                     result = future.get();
                                 }
-                                if (result.getPoint() != null) {
+                                if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
                             } catch (TimeoutException e) {
@@ -127,7 +127,7 @@ public class ImageRecognitionService {
                                 } else {
                                     result = future.get();
                                 }
-                                if (result.getPoint() != null) {
+                                if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
                             } catch (TimeoutException e) {
@@ -217,14 +217,13 @@ public class ImageRecognitionService {
                     });
                 }
             }
+            matchPoint.setPoint(bestLocRef.get())
+                    .setMatchThreshold((int) (bestVal.get() * 100));
             // 匹配成功返回匹配坐标和匹配度，否则只返回匹配度
             if (bestVal.get() >= matchThreshold / 100) {
-                matchPoint.setPoint(bestLocRef.get())
-                        .setMatchThreshold((int) (bestVal.get() * 100));
                 return matchPoint;
             }
         }
-        matchPoint.setMatchThreshold((int) (bestVal.get() * 100));
         return matchPoint;
     }
 
