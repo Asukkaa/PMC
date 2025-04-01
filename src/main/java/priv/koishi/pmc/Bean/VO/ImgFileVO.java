@@ -50,7 +50,10 @@ public class ImgFileVO extends ImgFileBean {
      */
     @UsedByReflection
     public Image getThumb() {
-        if (thumb == null && StringUtils.isNotBlank(this.getPath())) {
+        if (StringUtils.isBlank(this.getPath())) {
+            return null;
+        }
+        if (thumb == null) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();
         }
