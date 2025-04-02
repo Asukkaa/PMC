@@ -92,12 +92,12 @@ public class AboutController {
      *
      * @throws RuntimeException 删除日志文件失败
      */
-    private void deleteLogs() {
+    private void deleteLogs() throws IOException {
         File[] files = new File(logsPath_Abt.getText()).listFiles();
         if (files != null) {
             List<File> logList = new ArrayList<>();
             for (File file : files) {
-                if (log.equals(getFileType(file))) {
+                if (log.equals(getExistsFileType(file))) {
                     logList.add(file);
                 }
             }

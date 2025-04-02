@@ -25,8 +25,12 @@ public class FileUtils {
      *
      * @param file 文件
      * @return 文件类型
+     * @throws IOException 文件不存在
      */
-    public static String getFileType(File file) {
+    public static String getExistsFileType(File file) throws IOException {
+        if (!file.exists()) {
+            throw new IOException(text_fileNotExists);
+        }
         if (file.isDirectory()) {
             return extension_folder;
         }
@@ -38,16 +42,36 @@ public class FileUtils {
     }
 
     /**
+     * 获取文件类型（文件不存在时可用）
+     *
+     * @param path 文件路径
+     * @return 文件类型
+     * @throws IOException 路径不能为空、路径格式不正确
+     */
+    public static String getFileType(String path) throws IOException {
+        if (StringUtils.isBlank(path)) {
+            throw new IOException(text_nullPath);
+        }
+        if (FilenameUtils.getPrefixLength(path) == -1) {
+            throw new IOException(text_errPathFormat);
+        }
+        if (path.lastIndexOf(".") == -1) {
+            return extension_fileOrFolder;
+        }
+        return path.substring(path.lastIndexOf(".")).toLowerCase();
+    }
+
+    /**
      * 校验文件是否为图片
      *
      * @param file 要校验的文件
      * @return true为图片，false为非图片
      */
-    public static boolean isImgFile(File file) {
+    public static boolean isImgFile(File file) throws IOException {
         if (!file.exists()) {
             return false;
         }
-        return imageType.contains(getFileType(file));
+        return imageType.contains(getExistsFileType(file));
     }
 
     /**
@@ -317,7 +341,7 @@ public class FileUtils {
         }
         String parentDir = file.getParent();
         String fileName = getExistsFileName(file);
-        String extension = getFileType(file);
+        String extension = getExistsFileType(file);
         if (extension_file.equals(extension) || extension_folder.equals(extension)) {
             extension = "";
         }

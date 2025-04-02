@@ -385,7 +385,7 @@ public class UiUtils {
                 finalFieldName = fieldName;
             }
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c ->
-                    c.getId().equals(finalFieldName)).findFirst();
+                    finalFieldName.equals(c.getId())).findFirst();
             matched.ifPresent(m -> {
                 if (f.getType() == Image.class) {
                     try {
@@ -409,6 +409,7 @@ public class UiUtils {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());
+                        addTableColumnToolTip(pathColumn);
                     } else {
                         buildCellValue(m, fieldName);
                     }
@@ -458,16 +459,19 @@ public class UiUtils {
                 } else if (image == null) {
                     TableRow<T> tableRow = getTableRow();
                     if (isRedText(tableRow)) {
-                        setText("图片文件缺失或损坏");
+                        setText(text_badImg);
                         setTextFill(Color.RED);
+                        setTooltip(creatTooltip(text_badImg));
                     } else {
-                        setText("无图片");
+                        setText(text_noImg);
+                        setTooltip(creatTooltip(text_noImg));
                     }
                     setGraphic(null);
                 } else {
                     setText(null);
                     imageView.setImage(image);
                     setGraphic(imageView);
+                    setTooltip(creatTooltip(image.getUrl().replace("file:", "图片地址：")));
                 }
             }
 
@@ -1158,8 +1162,8 @@ public class UiUtils {
                         }
                     } else {
                         selectedItem.setPath(file.getPath());
-                        selectedItem.setType(getFileType(file));
                         try {
+                            selectedItem.setType(getExistsFileType(file));
                             selectedItem.setName(getExistsFileName(file));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -1334,7 +1338,7 @@ public class UiUtils {
             ImgFileVO bean = new ImgFileVO();
             bean.setTableView(tableView)
                     .setName(getFileName(path))
-                    .setType(getFileType(file))
+                    .setType(getExistsFileType(file))
                     .setPath(path);
             tableView.getItems().add(bean);
             index++;
@@ -1635,7 +1639,7 @@ public class UiUtils {
             ImgFileVO imgFileVO = new ImgFileVO();
             if (!isExist) {
                 imgFileVO.setTableView(tableView)
-                        .setType(getFileType(selectedFile))
+                        .setType(getExistsFileType(selectedFile))
                         .setName(selectedFile.getName())
                         .setPath(selectedFile.getPath());
                 items.add(imgFileVO);
@@ -1661,9 +1665,13 @@ public class UiUtils {
             boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
             if (!isExist) {
                 ImgFileVO imgFileVO = new ImgFileVO();
-                imgFileVO.setName(file.getName())
-                        .setType(getFileType(file))
-                        .setPath(file.getPath());
+                try {
+                    imgFileVO.setName(file.getName())
+                            .setType(getExistsFileType(file))
+                            .setPath(file.getPath());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 items.add(imgFileVO);
             }
         });
@@ -1677,10 +1685,14 @@ public class UiUtils {
     public static void acceptDropImg(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         files.forEach(file -> {
-            if (imageType.contains(getFileType(file))) {
-                // 接受拖放
-                dragEvent.acceptTransferModes(TransferMode.COPY);
-                dragEvent.consume();
+            try {
+                if (imageType.contains(getExistsFileType(file))) {
+                    // 接受拖放
+                    dragEvent.acceptTransferModes(TransferMode.COPY);
+                    dragEvent.consume();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }

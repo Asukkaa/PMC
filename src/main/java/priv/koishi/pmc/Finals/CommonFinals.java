@@ -250,6 +250,10 @@ public class CommonFinals {
 
     public static final String text_imgExist = "图片已存在";
 
+    public static final String text_noImg = "无图片";
+
+    public static final String text_badImg = "图片文件缺失或损坏";
+
     public static final String key_logsNum = "logsNum";
 
     public static final String key_inFilePath = "inFilePath";
@@ -510,9 +514,11 @@ public class CommonFinals {
 
     public static final String app = ".app";
 
-    public static String extension_file = "文件";
+    public static final String extension_file = "文件";
 
     public static final String extension_folder = "文件夹";
+
+    public static final String extension_fileOrFolder = "文件或文件夹";
 
     public static final String allPng = "*.png";
 

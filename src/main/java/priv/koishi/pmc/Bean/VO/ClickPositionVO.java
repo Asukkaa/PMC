@@ -12,6 +12,7 @@ import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Interface.UsedByReflection;
 
 import java.io.File;
+import java.io.IOException;
 
 import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
@@ -80,20 +81,24 @@ public class ClickPositionVO extends ClickPositionBean {
      */
     private void loadThumbnailAsync() {
         // 文件不是图片时会实时刷新列表缩略图
-        if (isImgFile(new File(this.getClickImgPath()))) {
-            // 终止进行中的服务
-            if (currentThumbService != null && currentThumbService.isRunning()) {
-                currentThumbService.cancel();
-            }
-            currentThumbService = tableViewImageService(this.getClickImgPath());
-            currentThumbService.setOnSucceeded(e -> {
-                this.thumb = currentThumbService.getValue();
+        try {
+            if (isImgFile(new File(this.getClickImgPath()))) {
+                // 终止进行中的服务
+                if (currentThumbService != null && currentThumbService.isRunning()) {
+                    currentThumbService.cancel();
+                }
+                currentThumbService = tableViewImageService(this.getClickImgPath());
+                currentThumbService.setOnSucceeded(e -> {
+                    this.thumb = currentThumbService.getValue();
+                    Platform.runLater(() -> tableView.refresh());
+                });
+                currentThumbService.start();
+            } else {
+                this.thumb = null;
                 Platform.runLater(() -> tableView.refresh());
-            });
-            currentThumbService.start();
-        } else {
-            this.thumb = null;
-            Platform.runLater(() -> tableView.refresh());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

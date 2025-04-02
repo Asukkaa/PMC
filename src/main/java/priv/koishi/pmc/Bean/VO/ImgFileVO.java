@@ -12,6 +12,7 @@ import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Interface.UsedByReflection;
 
 import java.io.File;
+import java.io.IOException;
 
 import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
@@ -65,27 +66,31 @@ public class ImgFileVO extends ImgFileBean {
      */
     private void loadThumbnailAsync() {
         // 文件不是图片时会实时刷新列表缩略图
-        if (isImgFile(new File(this.getPath()))) {
-            // 终止进行中的服务
-            if (currentThumbService != null && currentThumbService.isRunning()) {
-                currentThumbService.cancel();
-            }
-            currentThumbService = tableViewImageService(this.getPath());
-            currentThumbService.setOnSucceeded(e -> {
-                this.thumb = currentThumbService.getValue();
+        try {
+            if (isImgFile(new File(this.getPath()))) {
+                // 终止进行中的服务
+                if (currentThumbService != null && currentThumbService.isRunning()) {
+                    currentThumbService.cancel();
+                }
+                currentThumbService = tableViewImageService(this.getPath());
+                currentThumbService.setOnSucceeded(e -> {
+                    this.thumb = currentThumbService.getValue();
+                    Platform.runLater(() -> tableView.refresh());
+                });
+                currentThumbService.start();
+            } else {
+                this.thumb = null;
                 Platform.runLater(() -> tableView.refresh());
-            });
-            currentThumbService.start();
-        } else {
-            this.thumb = null;
-            Platform.runLater(() -> tableView.refresh());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     /**
      * 更新缩略图
      */
-    public void updateThumb() {
+    public void updateThumb()  {
         if (StringUtils.isNotBlank(this.getPath())) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();

@@ -2,6 +2,7 @@ package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -34,8 +35,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.FileUtils.getFileName;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -135,7 +135,7 @@ public class DetailController {
     private ChoiceBox<String> clickType_Det, retryType_Det;
 
     @FXML
-    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det;
+    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det;
 
     @FXML
     private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
@@ -151,7 +151,10 @@ public class DetailController {
     private TableColumn<ImgFileVO, ImageView> thumb_Det;
 
     @FXML
-    private TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
+    private TableColumn<ImgFileVO, StringProperty> path_Det;
+
+    @FXML
+    private TableColumn<ImgFileVO, String> name_Det, type_Det;
 
     /**
      * 组件宽高自适应
@@ -224,20 +227,27 @@ public class DetailController {
             removeClickImg_Det.setVisible(true);
             if (clickImgFile.exists()) {
                 clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));
-                clickImgName_Det.setTextFill(Color.rgb(0, 88, 128));
+                Color rgb = Color.rgb(0, 88, 128);
+                clickImgName_Det.setTextFill(rgb);
+                clickImgType_Det.setTextFill(rgb);
             } else {
                 clickImg_Det.setImage(null);
                 clickImgName_Det.setTextFill(Color.RED);
+                clickImgType_Det.setTextFill(Color.RED);
             }
             String imgName = getFileName(clickImgFile.getPath());
             clickImgName_Det.setText(imgName);
             addToolTip(imgName, clickImgName_Det);
+            String imgType = getFileType(clickImgFile.getPath());
+            clickImgType_Det.setText(imgType);
+            addToolTip(imgType, clickImgType_Det);
             clickImgVBox_Det.setVisible(true);
         } else {
             clickImgPath_Det.setText("");
             removeClickImg_Det.setVisible(false);
             clickImg_Det.setImage(null);
             clickImgName_Det.setText("");
+            clickImgType_Det.setText("");
             clickImgVBox_Det.setVisible(false);
         }
     }
