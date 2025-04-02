@@ -2,7 +2,6 @@ package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -148,13 +147,13 @@ public class DetailController {
     private TableView<ImgFileVO> tableView_Det;
 
     @FXML
+    private TableColumn<ImgFileVO, Integer> index_Det;
+
+    @FXML
     private TableColumn<ImgFileVO, ImageView> thumb_Det;
 
     @FXML
-    private TableColumn<ImgFileVO, StringProperty> path_Det;
-
-    @FXML
-    private TableColumn<ImgFileVO, String> name_Det, type_Det;
+    private TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
 
     /**
      * 组件宽高自适应
@@ -481,7 +480,8 @@ public class DetailController {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
+        index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.05));
+        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.25));
         name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.25));
         path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
         type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.15));
@@ -523,7 +523,7 @@ public class DetailController {
             // 添加控件监听
             addModificationListeners();
             // 自动填充javafx表格
-            autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId);
+            autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId, index_Det);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             // 构建右键菜单

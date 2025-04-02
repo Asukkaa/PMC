@@ -165,6 +165,7 @@
                 </placeholder>
 
                 <columns>
+                    <TableColumn fx:id="index_Set" text="序号" sortable="false"/>
                     <TableColumn fx:id="thumb_Set" text="缩略图" sortable="false"/>
                     <TableColumn fx:id="name_Set" text="图片名称" sortable="false"/>
                     <TableColumn fx:id="path_Set" text="图片地址" sortable="false"/>

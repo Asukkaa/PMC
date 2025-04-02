@@ -138,6 +138,9 @@ public class SettingController {
     private TableView<ImgFileVO> tableView_Set;
 
     @FXML
+    private TableColumn<ImgFileVO, Integer> index_Set;
+
+    @FXML
     private TableColumn<ImgFileVO, ImageView> thumb_Set;
 
     @FXML
@@ -157,14 +160,16 @@ public class SettingController {
         // 设置组件宽度
         double tableWidth = stage.getWidth() * 0.9;
         table.setMaxWidth(tableWidth);
+        Node index = scene.lookup("#index_Set");
+        index.setStyle("-fx-pref-width: " + tableWidth * 0.05 + "px;");
         Node thumb = scene.lookup("#thumb_Set");
-        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
+        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
         Node name = scene.lookup("#name_Set");
         name.setStyle("-fx-pref-width: " + tableWidth * 0.25 + "px;");
-        Node clickTime = scene.lookup("#path_Set");
-        clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
-        Node clickNum = scene.lookup("#type_Set");
-        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
+        Node path = scene.lookup("#path_Set");
+        path.setStyle("-fx-pref-width: " + tableWidth * 0.4 + "px;");
+        Node type = scene.lookup("#type_Set");
+        type.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Label dataNum = (Label) scene.lookup("#dataNumber_Set");
         HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Set");
         nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
@@ -553,10 +558,11 @@ public class SettingController {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.3));
+        index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.05));
+        thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
         name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.25));
-        path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.3));
-        type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.15));
+        path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.4));
+        type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
     }
 
     /**
@@ -585,7 +591,7 @@ public class SettingController {
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格
-            autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId);
+            autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId, index_Set);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
             // 构建右键菜单

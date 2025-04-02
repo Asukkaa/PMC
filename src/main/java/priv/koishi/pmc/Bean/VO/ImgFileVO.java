@@ -30,6 +30,11 @@ import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
 public class ImgFileVO extends ImgFileBean {
 
     /**
+     * 序号
+     */
+    Integer index;
+
+    /**
      * 缩略图
      */
     Image thumb;
@@ -90,7 +95,7 @@ public class ImgFileVO extends ImgFileBean {
     /**
      * 更新缩略图
      */
-    public void updateThumb()  {
+    public void updateThumb() {
         if (StringUtils.isNotBlank(this.getPath())) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();

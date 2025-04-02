@@ -55,6 +55,7 @@
             </placeholder>
 
             <columns>
+                <TableColumn fx:id="index_Click" text="序号" sortable="false"/>
                 <TableColumn fx:id="thumb_Click" text="要识别的图像" sortable="false"/>
                 <TableColumn fx:id="name_Click" text="步骤名称" sortable="false"/>
                 <TableColumn fx:id="clickTime_Click" text="操作时长" sortable="false"/>

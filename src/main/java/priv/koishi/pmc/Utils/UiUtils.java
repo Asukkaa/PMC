@@ -44,6 +44,7 @@ import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Interface.UsedByReflection;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
+import priv.koishi.pmc.RowNumberCellFactory.RowNumberCellFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -367,12 +368,13 @@ public class UiUtils {
     /**
      * 根据bean属性名自动填充javafx表格
      *
-     * @param tableView 要处理的javafx表格
-     * @param beanClass 要处理的javafx表格的数据bean类
-     * @param tabId     用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
+     * @param tableView   要处理的javafx表格
+     * @param beanClass   要处理的javafx表格的数据bean类
+     * @param tabId       用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
+     * @param indexColumn 序号列
      */
     @SuppressWarnings("unchecked")
-    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId) {
+    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
         // 递归获取类及其父类的所有字段
         List<Field> fields = getAllFields(beanClass);
         ObservableList<? extends TableColumn<?, ?>> columns = tableView.getColumns();
@@ -405,7 +407,9 @@ public class UiUtils {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    if (beanClass == ImgFileVO.class && fieldName.equals("path")) {
+                    if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
+                        indexColumn.setCellFactory(new RowNumberCellFactory<>());
+                    } else if (beanClass == ImgFileVO.class && fieldName.equals("path")) {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());

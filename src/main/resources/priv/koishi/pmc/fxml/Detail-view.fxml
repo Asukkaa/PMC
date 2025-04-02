@@ -143,6 +143,7 @@
                         </placeholder>
 
                         <columns>
+                            <TableColumn fx:id="index_Det" text="序号" sortable="false"/>
                             <TableColumn fx:id="thumb_Det" text="缩略图" sortable="false"/>
                             <TableColumn fx:id="name_Det" text="图片名称" sortable="false"/>
                             <TableColumn fx:id="path_Det" text="图片地址" sortable="false"/>

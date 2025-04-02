@@ -294,11 +294,14 @@ public class AutoClickController extends CommonProperties {
     private TableView<ClickPositionVO> tableView_Click;
 
     @FXML
-    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click,
-            clickInterval_Click, waitTime_Click, clickType_Click, retryType_Click;
+    private TableColumn<ClickPositionVO, Integer> index_Click;
 
     @FXML
     private TableColumn<ClickPositionVO, ImageView> thumb_Click;
+
+    @FXML
+    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click,
+            clickInterval_Click, waitTime_Click, clickType_Click, retryType_Click;
 
     /**
      * 组件自适应宽高
@@ -314,8 +317,10 @@ public class AutoClickController extends CommonProperties {
         // 设置组件宽度
         double tableWidth = stage.getWidth() * 0.95;
         table.setMaxWidth(tableWidth);
+        Node index = scene.lookup("#index_Click");
+        index.setStyle("-fx-pref-width: " + tableWidth * 0.05 + "px;");
         Node thumb = scene.lookup("#thumb_Click");
-        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
+        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node name = scene.lookup("#name_Click");
         name.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
         Node clickTime = scene.lookup("#clickTime_Click");
@@ -469,7 +474,8 @@ public class AutoClickController extends CommonProperties {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.15));
+        index_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.05));
+        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.15));
         clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
@@ -1344,7 +1350,7 @@ public class AutoClickController extends CommonProperties {
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格
-            autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId);
+            autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
             // 表格设置为可编辑
             makeCellCanEdit();
             // 设置列表通过拖拽排序行

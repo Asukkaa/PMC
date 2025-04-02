@@ -30,6 +30,11 @@ import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
 public class ClickPositionVO extends ClickPositionBean {
 
     /**
+     * 序号
+     */
+    Integer index;
+
+    /**
      * 上次所选要点击的图片路径
      */
     String clickImgSelectPath;
