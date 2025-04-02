@@ -1,5 +1,6 @@
 package priv.koishi.pmc.EditingCell;
 
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -51,13 +52,22 @@ public class EditingCell<T> extends TableCell<T, String> {
     private boolean integerRange = false;
 
     /**
+     * 输入框文本改变监听器
+     */
+    private ChangeListener<String> textChangeListener;
+
+    /**
+     * 输入框失去焦点时,提交编辑监听器
+     */
+    private ChangeListener<? super Boolean> textFocusedPropertyListener;
+
+    /**
      * 构造EditingCell对象,并且明确将该cell的值保存进相应的JavaBean的属性值的方法
      *
      * @param itemConsumer 用于引入lambda表达式的对象
      */
     public EditingCell(ItemConsumer<T> itemConsumer) {
         this.itemConsumer = itemConsumer;
-        setTooltip(creatTooltip(tip));
     }
 
     /**
@@ -73,7 +83,6 @@ public class EditingCell<T> extends TableCell<T, String> {
         this.integerRange = integerRange;
         this.min = min;
         this.max = max;
-        setTooltip(creatTooltip(tip));
     }
 
     @Override
@@ -102,9 +111,18 @@ public class EditingCell<T> extends TableCell<T, String> {
     public void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
         if (empty) {
+            if (textField != null && textChangeListener != null) {
+                textField.textProperty().removeListener(textChangeListener);
+                textField.focusedProperty().removeListener(textFocusedPropertyListener);
+                textChangeListener = null;
+                textFocusedPropertyListener = null;
+            }
+            textField = null;
+            setTooltip(null);
             setText(null);
             setGraphic(null);
         } else {
+            setTooltip(creatTooltip(tip + getTableColumn().getText() + "\n" + getString()));
             if (isEditing()) {
                 if (textField != null) {
                     textField.setText(getString());
@@ -146,18 +164,20 @@ public class EditingCell<T> extends TableCell<T, String> {
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         // 限制只能输入整数
         if (integerRange) {
-            textField.textProperty().addListener((observable, oldValue, newValue) -> {
-                // 这里处理文本变化的逻辑
+            textChangeListener = (observable, oldValue, newValue) -> {
                 if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
                     textField.setText(oldValue);
                 }
-            });
+            };
+            textField.textProperty().addListener(textChangeListener);
         }
-        textField.focusedProperty().addListener((ob, old, now) -> {
+        // 输入框失去焦点时,提交编辑
+        textFocusedPropertyListener = (ob, old, now) -> {
             if (!now) {
                 commitEdit(textField.getText());
             }
-        });
+        };
+        textField.focusedProperty().addListener(textFocusedPropertyListener);
         addValueToolTip(textField, tip + tableColumnText, text_nowValue);
     }
 

@@ -355,6 +355,11 @@ public class FileUtils {
         return path;
     }
 
+    /**
+     * 获取用户桌面路径
+     *
+     * @return 用户桌面路径
+     */
     public static String getDesktopPath() {
         FileSystemView fsv = FileSystemView.getFileSystemView();
         File desktop = fsv.getHomeDirectory();

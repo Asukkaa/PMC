@@ -44,7 +44,6 @@ import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Interface.UsedByReflection;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
-import priv.koishi.pmc.RowNumberCellFactory.RowNumberCellFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -343,6 +342,8 @@ public class UiUtils {
      * 自定义单元格工厂，为单元格添加Tooltip
      *
      * @param column 要处理的javafx表格单元格
+     * @param <S>    表格单元格数据类型
+     * @param <T>    表格单元格类型
      */
     public static <S, T> void addTableColumnToolTip(TableColumn<S, T> column) {
         column.setCellFactory(new Callback<>() {
@@ -372,6 +373,7 @@ public class UiUtils {
      * @param beanClass   要处理的javafx表格的数据bean类
      * @param tabId       用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
      * @param indexColumn 序号列
+     * @param <T>         要处理的javafx表格的数据bean类
      */
     @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
@@ -408,7 +410,7 @@ public class UiUtils {
                     }
                 } else {
                     if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
-                        indexColumn.setCellFactory(new RowNumberCellFactory<>());
+                        buildIndexCellValue(indexColumn);
                     } else if (beanClass == ImgFileVO.class && fieldName.equals("path")) {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
@@ -419,6 +421,34 @@ public class UiUtils {
                     }
                 }
             });
+        });
+    }
+
+    /**
+     * 设置列为序号列
+     *
+     * @param column 要处理的列
+     * @param <T>    列对应的数据类型
+     */
+    public static <T> void buildIndexCellValue(TableColumn<T, Integer> column) {
+        column.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<T, Integer> call(TableColumn<T, Integer> param) {
+                return new TableCell<>() {
+                    @Override
+                    protected void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setText(null);
+                        } else {
+                            // 获取当前行的索引并加1（行号从1开始）
+                            int rowIndex = getIndex() + 1;
+                            setText(String.valueOf(rowIndex));
+                            setTooltip(creatTooltip(String.valueOf(rowIndex)));
+                        }
+                    }
+                };
+            }
         });
     }
 
@@ -441,6 +471,7 @@ public class UiUtils {
      * 创建图片表格
      *
      * @param column 要创建图片表格的列
+     * @param <T>    列对应的数据类型
      */
     public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<T, Image> thumbSupplier) {
         column.setCellValueFactory(cellData ->
@@ -527,6 +558,7 @@ public class UiUtils {
      * @param tableView  要清空的javafx列表
      * @param fileNumber 用于展示列表数据数量的文本框
      * @param log        用于展示任务消息的文本框
+     * @param <T>        数据类型
      */
     public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber, Label log) {
         tableView.getItems().clear();
@@ -545,6 +577,7 @@ public class UiUtils {
      * @param tableView      要添加数据的列表
      * @param dataNumber     用于展示列表数据数量的文本框
      * @param dataNumberUnit 数据数量单位
+     * @param <T>            数据类型
      */
     public static <T> void addData(List<T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
         ObservableList<T> tableViewItems = tableView.getItems();
@@ -688,6 +721,7 @@ public class UiUtils {
      * 设置列表通过拖拽排序行
      *
      * @param tableView 要处理的列表
+     * @param <T>       列表数据类型
      */
     @SuppressWarnings("unchecked")
     public static <T> void tableViewDragRow(TableView<T> tableView) {
@@ -801,6 +835,7 @@ public class UiUtils {
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
+     * @param <T>         表格数据项类型
      */
     public static <T> void buildMoveDataMenu(TableView<T> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu("移动所选数据");
@@ -823,6 +858,7 @@ public class UiUtils {
      * 所选行上移一行选项
      *
      * @param tableView 要处理的数据列表
+     * @param <T>       表格数据项类型
      */
     private static <T> void upMoveDataMenuItem(TableView<T> tableView) {
         // getSelectedCells处理上移操作有bug，通过getSelectedItems拿到的数据是实时变化的，需要一个新的list来存
@@ -854,6 +890,7 @@ public class UiUtils {
      * 所选行下移一行选项
      *
      * @param tableView 要处理的数据列表
+     * @param <T>       表格数据项类型
      */
     private static <T> void downMoveDataMenuItem(TableView<T> tableView) {
         var selectedCells = tableView.getSelectionModel().getSelectedCells();
@@ -872,6 +909,7 @@ public class UiUtils {
      * 所选行置顶
      *
      * @param tableView 要处理的数据列表
+     * @param <T>       表格数据项类型
      */
     private static <T> void topMoveDataMenuItem(TableView<T> tableView) {
         ObservableList<T> items = tableView.getItems();
@@ -893,6 +931,7 @@ public class UiUtils {
      * 所选行置底
      *
      * @param tableView 要处理的数据列表
+     * @param <T>       表格数据项类型
      */
     private static <T> void bottomMoveDataMenuItem(TableView<T> tableView) {
         ObservableList<T> items = tableView.getItems();
@@ -1209,6 +1248,7 @@ public class UiUtils {
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
+     * @param <T>         列表数据类型
      */
     public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
         MenuItem clearSelectedDataMenuItem = new MenuItem("取消选中");
@@ -1223,6 +1263,7 @@ public class UiUtils {
      * @param label       列表对应的统计信息展示栏
      * @param contextMenu 右键菜单集合
      * @param unit        统计信息展示栏数量单位
+     * @param <T>         列表数据类型
      */
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem("删除所选数据");
@@ -1240,6 +1281,7 @@ public class UiUtils {
      *
      * @param contextMenu 右键菜单
      * @param tableView   要处理的列表
+     * @param <T>         列表数据类型
      */
     public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView) {
         setContextMenu(contextMenu, tableView, SelectionMode.MULTIPLE);
@@ -1251,6 +1293,7 @@ public class UiUtils {
      * @param contextMenu   右键菜单
      * @param tableView     要处理的列表
      * @param selectionMode 选中模式
+     * @param <T>           列表数据类型
      */
     public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView, SelectionMode selectionMode) {
         // 设置是否可以选中多行
