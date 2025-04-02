@@ -1,8 +1,11 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -26,10 +29,9 @@ import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.function.Consumer;
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
@@ -74,6 +76,26 @@ public class DetailController {
      * 页面是否修改标志
      */
     private boolean isModified = false;
+
+    /**
+     * 修改内容变化标志监听器
+     */
+    private final Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners = new WeakHashMap<>();
+
+    /**
+     * 修改内容变化标志监听器（滑块组件专用）
+     */
+    private final Map<Object, WeakReference<InvalidationListener>> weakInvalidationListeners = new WeakHashMap<>();
+
+    /**
+     * 带鼠标悬停提示的内容变化监听器
+     */
+    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+
+    /**
+     * 表格结构变化监听器
+     */
+    private ListChangeListener<ImgFileVO> tableListener;
 
     /**
      * 页面标识符
@@ -221,50 +243,143 @@ public class DetailController {
     }
 
     /**
+     * 移除所有监听器
+     */
+    @SuppressWarnings("unchecked")
+    private void removeAllListeners() {
+        // 处理失效监听器集合，遍历所有entry，根据不同类型移除对应的属性监听器
+        weakInvalidationListeners.entrySet().removeIf(entry -> {
+            Object key = entry.getKey();
+            WeakReference<InvalidationListener> ref = entry.getValue();
+            InvalidationListener listener = ref.get();
+            if (key instanceof ImgFileVO imgFileVO) {
+                if (listener != null) {
+                    imgFileVO.pathProperty().removeListener(listener);
+                }
+                return true;
+            } else if (key instanceof TextInputControl textInput) {
+                if (listener != null) {
+                    textInput.textProperty().removeListener(listener);
+                }
+                return true;
+            }
+            return false;
+        });
+        weakInvalidationListeners.clear();
+        // 处理变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
+        weakChangeListeners.forEach((key, ref) -> {
+            ChangeListener<?> listener = ref.get();
+            if (listener == null) {
+                return;
+            }
+            if (key instanceof ChoiceBox<?> choiceBox) {
+                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
+            } else if (key instanceof Slider slider) {
+                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
+            }
+        });
+        weakChangeListeners.clear();
+        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
+        changeListeners.forEach((key, listener) -> {
+            if (key instanceof ChoiceBox<?> choiceBox) {
+                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
+            } else if (key instanceof Slider slider) {
+                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
+            } else if (key instanceof TextInputControl textInput) {
+                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
+            } else if (key instanceof CheckBox checkBox) {
+                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
+            }
+        });
+        changeListeners.clear();
+        // 处理表格监听器引用
+        tableListener = null;
+    }
+
+    /**
      * 监听页面组件内容是否改动
      */
     private void addModificationListeners() {
         // 通用内容变化监听
-        Consumer<Object> modificationListener = o -> isModified = true;
+        InvalidationListener invalidationListener = obs -> isModified = true;
         // 绑定所有输入控件
-        bindModificationListener(clickName_Det.textProperty(), modificationListener);
-        bindModificationListener(mouseStartX_Det.textProperty(), modificationListener);
-        bindModificationListener(mouseStartY_Det.textProperty(), modificationListener);
-        bindModificationListener(mouseEndX_Det.textProperty(), modificationListener);
-        bindModificationListener(mouseEndY_Det.textProperty(), modificationListener);
-        bindModificationListener(wait_Det.textProperty(), modificationListener);
-        bindModificationListener(clickNumBer_Det.textProperty(), modificationListener);
-        bindModificationListener(timeClick_Det.textProperty(), modificationListener);
-        bindModificationListener(interval_Det.textProperty(), modificationListener);
-        bindModificationListener(clickRetryNum_Det.textProperty(), modificationListener);
-        bindModificationListener(stopRetryNum_Det.textProperty(), modificationListener);
-        bindModificationListener(clickImgPath_Det.textProperty(), modificationListener);
-        clickType_Det.getSelectionModel().selectedItemProperty()
-                .addListener((obs, old, newVal) -> isModified = true);
-        retryType_Det.getSelectionModel().selectedItemProperty()
-                .addListener((obs, old, newVal) -> isModified = true);
-        skip_Det.selectedProperty().addListener((obs, old, newVal) -> isModified = true);
-        clickOpacity_Det.valueProperty().addListener((obs, old, newVal) ->
-                isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold()));
-        stopOpacity_Det.valueProperty().addListener((obs, old, newVal) ->
-                isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getStopMatchThreshold()));
+        registerWeakInvalidationListener(clickName_Det, clickName_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(mouseStartX_Det, mouseStartX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(mouseStartY_Det, mouseStartY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(mouseEndX_Det, mouseEndX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(mouseEndY_Det, mouseEndY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickNumBer_Det, clickNumBer_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(timeClick_Det, timeClick_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(skip_Det, skip_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
+        // 监听滑块改变
+        ChangeListener<Number> clickOpacityListener = (obs, oldVal, newVal) -> isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold());
+        registerWeakListener(clickOpacity_Det, clickOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
+        registerWeakListener(stopOpacity_Det, stopOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
         // 监听表格内容变化
         tableView_Det.getItems().forEach(item ->
-                item.pathProperty().addListener((obs, oldVal, newVal) ->
-                        isModified = true));
+                registerWeakInvalidationListener(item, item.pathProperty(), invalidationListener, weakInvalidationListeners));
         // 监听表格结构变化
-        tableView_Det.getItems().addListener((ListChangeListener<ImgFileVO>) c -> {
+        tableListener = buildTableChangeListener(invalidationListener);
+        tableView_Det.getItems().addListener(new WeakListChangeListener<>(tableListener));
+    }
+
+    /**
+     * 构建表格结构变化监听器
+     *
+     * @param invalidationListener 内容变化监听器
+     * @return 表格结构变化监听器
+     */
+    private ListChangeListener<ImgFileVO> buildTableChangeListener(InvalidationListener invalidationListener) {
+        return c -> {
             while (c.next()) {
+                // 处理添加与替换事件中的新增元素
                 if (c.wasAdded() || c.wasReplaced()) {
                     c.getAddedSubList().forEach(item ->
-                            item.pathProperty().addListener((obs, oldVal, newVal) ->
-                                    isModified = true));
+                            registerWeakInvalidationListener(item, item.pathProperty(),
+                                    invalidationListener, weakInvalidationListeners));
                 }
-                if (c.wasUpdated() || c.wasRemoved() || c.wasAdded() || c.wasReplaced()) {
-                    isModified = true;
+                // 处理删除与替换事件中的移除元素
+                if (c.wasRemoved() || c.wasReplaced()) {
+                    c.getRemoved().forEach(item -> {
+                        WeakReference<InvalidationListener> ref = weakInvalidationListeners.get(item);
+                        if (ref != null) {
+                            InvalidationListener listener = ref.get();
+                            if (listener != null) {
+                                item.pathProperty().removeListener(listener);
+                            }
+                            weakInvalidationListeners.remove(item);
+                        }
+                    });
                 }
+                // 处理纯更新事件（元素属性变化）
+                if (c.wasUpdated()) {
+                    IntStream.range(c.getFrom(), c.getTo())
+                            .mapToObj(i -> c.getList().get(i))
+                            .forEach(item -> {
+                                // 先清理旧监听器
+                                WeakReference<InvalidationListener> ref = weakInvalidationListeners.get(item);
+                                if (ref != null) {
+                                    InvalidationListener oldListener = ref.get();
+                                    if (oldListener != null) {
+                                        item.pathProperty().removeListener(oldListener);
+                                    }
+                                    weakInvalidationListeners.remove(item);
+                                }
+                                // 注册新监听器
+                                registerWeakInvalidationListener(item, item.pathProperty(),
+                                        invalidationListener, weakInvalidationListeners);
+                            });
+                }
+                isModified = true;
             }
-        });
+        };
     }
 
     /**
@@ -272,31 +387,44 @@ public class DetailController {
      */
     private void nodeValueChangeListener() {
         // 停止操作图像识别准确度设置监听
-        integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
+        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
+        changeListeners.put(stopOpacity_Det, stopOpacityListener);
         // 要点击的图像识别准确度设置监听
-        integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
+        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
+        changeListeners.put(clickOpacity_Det, clickOpacityListener);
         // 操作名称文本输入框鼠标悬停提示
-        textFieldValueListener(clickName_Det, tip_clickName);
+        ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName);
+        changeListeners.put(clickName_Det, clickNameListener);
         // 限制每步操作执行前等待时间文本输入框内容
-        integerRangeTextField(wait_Det, 0, null, tip_wait);
+        ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait);
+        changeListeners.put(wait_Det, waitListener);
         // 限制操作时长文本输入内容
-        integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
+        ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
+        changeListeners.put(timeClick_Det, timeClickListener);
         // 限制鼠标结束位置横(X)坐标文本输入框内容
-        integerRangeTextField(mouseEndX_Det, 0, null, tip_mouseEndX);
+        ChangeListener<String> mouseEndXListener = integerRangeTextField(mouseEndX_Det, 0, null, tip_mouseEndX);
+        changeListeners.put(mouseEndX_Det, mouseEndXListener);
         // 限制鼠标结束位置纵(Y)坐标文本输入框内容
-        integerRangeTextField(mouseEndY_Det, 0, null, tip_mouseEndY);
+        ChangeListener<String> mouseEndYListener = integerRangeTextField(mouseEndY_Det, 0, null, tip_mouseEndY);
+        changeListeners.put(mouseEndY_Det, mouseEndYListener);
         // 限制操作间隔文本输入框内容
-        integerRangeTextField(interval_Det, 0, null, tip_clickInterval);
+        ChangeListener<String> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval);
+        changeListeners.put(interval_Det, intervalListener);
         // 限制鼠标起始位置横(X)坐标文本输入框内容
-        integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX);
+        ChangeListener<String> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX);
+        changeListeners.put(mouseStartX_Det, mouseStartXListener);
         // 限制鼠标起始位置纵(Y)坐标文本输入框内容
-        integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY);
+        ChangeListener<String> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY);
+        changeListeners.put(mouseStartY_Det, mouseStartYListener);
         // 限制点击次数文本输入框内容
-        integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer);
+        ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer);
+        changeListeners.put(clickNumBer_Det, clickNumBerListener);
         // 限制终止操作识别失败重试次数文本输入框内容
-        integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum + defaultStopRetryNum);
+        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum + defaultStopRetryNum);
+        changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum + defaultClickRetryNum);
+        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum + defaultClickRetryNum);
+        changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
     }
 
     /**
@@ -380,6 +508,7 @@ public class DetailController {
                         stage.close();
                     }
                 }
+                removeAllListeners();
             });
             // 添加控件监听
             addModificationListeners();

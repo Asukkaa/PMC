@@ -1,8 +1,13 @@
 package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -43,11 +48,11 @@ import priv.koishi.pmc.MessageBubble.MessageBubble;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -251,7 +256,10 @@ public class UiUtils {
     public static void showExceptionAlert(Throwable ex) {
         logger.error(ex, ex);
         Alert alert = creatErrorAlert(errToString(ex));
-        Throwable cause = ex.getCause().getCause();
+        Throwable cause = ex.getCause();
+        if (cause != null) {
+            cause = cause.getCause();
+        }
         if (cause != null) {
             if (cause instanceof Exception) {
                 alert.setHeaderText(cause.getMessage());
@@ -587,13 +595,16 @@ public class UiUtils {
      *
      * @param slider 要处理的滑动条
      * @param tip    鼠标悬停提示文案
+     * @return 监听器
      */
-    public static void integerSliderValueListener(Slider slider, String tip) {
-        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+    public static ChangeListener<Number> integerSliderValueListener(Slider slider, String tip) {
+        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
             int rounded = newValue.intValue();
             slider.setValue(rounded);
             addValueToolTip(slider, tip, text_nowValue, String.valueOf(rounded));
-        });
+        };
+        slider.valueProperty().addListener(listener);
+        return listener;
     }
 
     /**
@@ -603,15 +614,18 @@ public class UiUtils {
      * @param min       可输入的最小值，为空则不限制
      * @param max       可输入的最大值，为空则不限制
      * @param tip       鼠标悬停提示文案
+     * @return 监听器
      */
-    public static void integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+    public static ChangeListener<String> integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
+        ChangeListener<String> listener = (observable, oldValue, newValue) -> {
             // 这里处理文本变化的逻辑
             if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
                 textField.setText(oldValue);
             }
             addValueToolTip(textField, tip, text_nowValue);
-        });
+        };
+        textField.textProperty().addListener(listener);
+        return listener;
     }
 
     /**
@@ -619,9 +633,12 @@ public class UiUtils {
      *
      * @param textField 要监听的文本输入框
      * @param tip       鼠标悬停提示文案
+     * @return 监听器
      */
-    public static void textFieldValueListener(TextField textField, String tip) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> addValueToolTip(textField, tip, text_nowValue));
+    public static ChangeListener<String> textFieldValueListener(TextField textField, String tip) {
+        ChangeListener<String> listener = (observable, oldValue, newValue) -> addValueToolTip(textField, tip, text_nowValue);
+        textField.textProperty().addListener(listener);
+        return listener;
     }
 
     /**
@@ -1688,12 +1705,39 @@ public class UiUtils {
         setContextMenu(contextMenu, tableView);
     }
 
-    public static <T> void bindModificationListener(Property<T> property, Consumer<Object> listener) {
-        property.addListener((obs, oldVal, newVal) -> {
-            if (!Objects.equals(oldVal, newVal)) {
-                listener.accept(newVal);
-            }
-        });
+    /**
+     * 注册一个弱引用的属性变更监听器，避免因监听器未被释放而导致的内存泄漏。
+     *
+     * @param key                 用于标识监听器的唯一键值，通常使用持有监听器的对象作为键
+     * @param property            需要监听的属性对象，监听器将绑定到该属性上
+     * @param listener            原始的属性变更监听器，将被包装为弱引用版本
+     * @param weakChangeListeners 存储弱引用监听器的映射表，用于维护监听器的弱引用关系
+     * @param <T>                 属性值的泛型类型
+     */
+    public static <T> void registerWeakListener(Object key, Property<T> property, ChangeListener<? super T> listener,
+                                                Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners) {
+        // 将原始监听器包装为弱引用版本，确保不影响垃圾回收
+        ChangeListener<? super T> weakListener = new WeakChangeListener<>(listener);
+        property.addListener(weakListener);
+        // 存储弱引用监听器以便后续管理
+        weakChangeListeners.put(key, new WeakReference<>(weakListener));
+    }
+
+    /**
+     * 注册一个弱引用的失效事件监听器，防止因监听器持有导致的对象无法回收（处理滑块用）
+     *
+     * @param key                       用于标识监听器的唯一键值，建议使用监听器持有者对象
+     * @param observable                被监听的可观察值对象
+     * @param listener                  原始的失效事件监听器，将被弱引用包装
+     * @param weakInvalidationListeners 维护弱引用监听器的存储映射表
+     */
+    public static void registerWeakInvalidationListener(Object key, ObservableValue<?> observable, InvalidationListener listener,
+                                                        Map<Object, WeakReference<InvalidationListener>> weakInvalidationListeners) {
+        // 创建弱引用包装器，解除对原始监听器的强引用
+        InvalidationListener weakListener = new WeakInvalidationListener(listener);
+        observable.addListener(weakListener);
+        // 记录弱引用监听器用于后续清理操作
+        weakInvalidationListeners.put(key, new WeakReference<>(weakListener));
     }
 
 }
