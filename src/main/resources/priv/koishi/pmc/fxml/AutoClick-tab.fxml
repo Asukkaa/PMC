@@ -21,14 +21,16 @@
             <Label prefHeight="25" text="导出自动流程文件名称："/>
             <TextField fx:id="outFileName_Click" prefWidth="140"/>
 
-            <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand" text="导出后打开文件夹"/>
+            <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand"
+                      text="导出后打开文件夹"/>
         </HBox>
 
         <HBox spacing="10">
             <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand" text="添加操作流程"/>
             <Button fx:id="clickTest_Click" onAction="#clickTest" style="-fx-cursor: hand" text="测试操作流程"/>
             <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
-            <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand" text="导出操作流程"/>
+            <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand"
+                    text="导出操作流程"/>
             <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
         </HBox>
 
@@ -71,6 +73,9 @@
                    text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整操作，双击单元格可进行编辑"/>
         </HBox>
 
-        <Label fx:id="log_Click"/>
+        <HBox fx:id="logHBox_Click" spacing="10">
+            <Label fx:id="log_Click"/>
+            <Label fx:id="err_Click" textFill="red" alignment="CENTER_RIGHT"/>
+        </HBox>
     </VBox>
 </AnchorPane>

@@ -19,6 +19,183 @@ import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
  */
 public class CommonFinals {
 
+    /**
+     * 程序名称
+     */
+    public static final String appName = "Perfect Mouse Control";
+
+    public static String logoPath = "icon/PMC.png";
+
+    /**
+     * 资源文件夹地址前缀
+     */
+    public static String resourcePath = "/priv/koishi/pmc/";
+
+    /**
+     * 打包前资源文件夹地址前缀
+     */
+    public static String resourcesPath = "src/main/resources" + resourcePath;
+
+    /**
+     * jpackage打包后的资源文件路径
+     */
+    public static String packagePath = "runtime/bin/";
+
+    /**
+     * log4j配置文件名称
+     */
+    public static String log4j2 = "log4j2.xml";
+
+    /**
+     * app配置文件路径
+     */
+    public static final String configFile = "config/config.properties";
+
+    /**
+     * 读取自动操作工具功能配置文件路径
+     */
+    public static final String configFile_Click = "config/autoClickConfig.properties";
+
+    /**
+     * log文件夹目录
+     */
+    public static final String logsDir = "/bin/logs";
+
+    /**
+     * log文件夹名称
+     */
+    public static final String logs = "logs";
+
+    /**
+     * 当前程序运行位置
+     */
+    public static final String userDir = System.getProperty("user.dir");
+
+    /**
+     * java home目录
+     */
+    public static final String javaHome = System.getProperty("java.home");
+
+    /**
+     * 当前程序运行操作系统
+     */
+    public static final String systemName = System.getProperty("os.name").toLowerCase();
+
+    /**
+     * 桌面目录
+     */
+    public static final String desktopPath = getDesktopPath();
+
+    /**
+     * 文件选择器默认路径
+     */
+    public static final String defaultFileChooserPath = desktopPath;
+
+    /**
+     * 百度网盘地址
+     */
+    public static final String baiduLink = "https://pan.baidu.com/s/1UbQx3XdUAtLBPJ6thd-H5A?pwd=3efe";
+
+    /**
+     * 夸克网盘地址
+     */
+    public static final String quarkLink = "https://pan.quark.cn/s/987130e1f360";
+
+    /**
+     * 迅雷网盘地址
+     */
+    public static final String xunleiLink = "https://pan.xunlei.com/s/VOKjQlqFxTDbJNN7yRA_DLVgA1?pwd=gx3q#";
+
+    /**
+     * github地址
+     */
+    public static final String githubLink = "https://github.com/Asukkaa/PMC";
+
+    /**
+     * gitee地址
+     */
+    public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
+
+    public static final String desktop = "Desktop";
+
+    public static final String macos = "mac";
+
+    public static final String win = "win";
+
+    public static final String activation = "1";
+
+    public static final String unActivation = "0";
+
+    public static final String log = ".log";
+
+    public static final String PMC = ".pmc";
+
+    public static final String exe = ".exe";
+
+    public static final String app = ".app";
+
+    public static final String extension_file = "文件";
+
+    public static final String extension_folder = "文件夹";
+
+    public static final String extension_fileOrFolder = "文件或文件夹";
+
+    public static final String allPng = "*.png";
+
+    public static final String allJpg = "*.jpg";
+
+    public static final String allJpeg = "*.jpeg";
+
+    public static final String png = ".png";
+
+    public static final String jpg = ".jpg";
+
+    public static final String jpeg = ".jpeg";
+
+    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
+
+    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    /**
+     * 默认浮窗横轴偏移量
+     */
+    public static final int defaultOffsetX = 30;
+
+    /**
+     * 默认浮纵轴窗偏移量
+     */
+    public static final int defaultOffsetY = 30;
+
+    /**
+     * 在列表所选行第一行上方插入
+     */
+    public static final int upAdd = 1;
+
+    /**
+     * 在列表所选行最后一行下方插入
+     */
+    public static final int downAdd = 2;
+
+    /**
+     * 向列表最后一行追加
+     */
+    public static final int append = -1;
+
+    /**
+     * 向列表第一行上方插入
+     */
+    public static final int topAdd = 0;
+
+    /**
+     * 默认要点击的图片识别重试次数
+     */
+    public static final String defaultClickRetryNum = "3";
+
+    /**
+     * 默认终止操作图片识别重试次数
+     */
+    public static final String defaultStopRetryNum = "0";
+
     public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志";
 
     public static final String tip_learButton = "点击将会清空列表中的数据";
@@ -171,6 +348,17 @@ public class CommonFinals {
     public static final String tip_hideWindowRun = """
             勾选后运行或测试自动操作开始前将会隐藏本程序的窗口
             如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度""";
+
+    public static final String tip_NativeHookException = """
+            需要在macOS系统设置中启用辅助设备权限：
+            1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
+            2. 在左侧列表选择「辅助功能」
+            3. 点击🔒解锁设置
+            4. 删除列表中的\s""" + appName + app + """
+             （如果有的话）
+            5. 将\s""" + appName + app + """
+             添加到允许列表中
+            6. 重启\s""" + appName + app;
 
     public static final String text_selectDirectory = "选择文件夹";
 
@@ -404,183 +592,6 @@ public class CommonFinals {
 
     public static final List<String> retryTypeList = Arrays.asList(retryType_continuously, retryType_click,
             retryType_stop, retryType_break);
-
-    public static String logoPath = "icon/PMC.png";
-
-    /**
-     * 资源文件夹地址前缀
-     */
-    public static String resourcePath = "/priv/koishi/pmc/";
-
-    /**
-     * 打包前资源文件夹地址前缀
-     */
-    public static String resourcesPath = "src/main/resources" + resourcePath;
-
-    /**
-     * jpackage打包后的资源文件路径
-     */
-    public static String packagePath = "runtime/bin/";
-
-    /**
-     * log4j配置文件名称
-     */
-    public static String log4j2 = "log4j2.xml";
-
-    /**
-     * app配置文件路径
-     */
-    public static final String configFile = "config/config.properties";
-
-    /**
-     * 读取自动操作工具功能配置文件路径
-     */
-    public static final String configFile_Click = "config/autoClickConfig.properties";
-
-    /**
-     * log文件夹目录
-     */
-    public static final String logsDir = "/bin/logs";
-
-    /**
-     * log文件夹名称
-     */
-    public static final String logs = "logs";
-
-    /**
-     * 当前程序运行位置
-     */
-    public static final String userDir = System.getProperty("user.dir");
-
-    /**
-     * java home目录
-     */
-    public static final String javaHome = System.getProperty("java.home");
-
-    /**
-     * 当前程序运行操作系统
-     */
-    public static final String systemName = System.getProperty("os.name").toLowerCase();
-
-    /**
-     * 桌面目录
-     */
-    public static final String desktopPath = getDesktopPath();
-
-    /**
-     * 文件选择器默认路径
-     */
-    public static final String defaultFileChooserPath = desktopPath;
-
-    /**
-     * 程序名称
-     */
-    public static final String appName = "Perfect Mouse Control";
-
-    /**
-     * 百度网盘地址
-     */
-    public static final String baiduLink = "https://pan.baidu.com/s/1UbQx3XdUAtLBPJ6thd-H5A?pwd=3efe";
-
-    /**
-     * 夸克网盘地址
-     */
-    public static final String quarkLink = "https://pan.quark.cn/s/987130e1f360";
-
-    /**
-     * 迅雷网盘地址
-     */
-    public static final String xunleiLink = "https://pan.xunlei.com/s/VOKjQlqFxTDbJNN7yRA_DLVgA1?pwd=gx3q#";
-
-    /**
-     * github地址
-     */
-    public static final String githubLink = "https://github.com/Asukkaa/PMC";
-
-    /**
-     * gitee地址
-     */
-    public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
-
-    public static final String desktop = "Desktop";
-
-    public static final String macos = "mac";
-
-    public static final String win = "win";
-
-    public static final String activation = "1";
-
-    public static final String unActivation = "0";
-
-    public static final String log = ".log";
-
-    public static final String PMC = ".pmc";
-
-    public static final String exe = ".exe";
-
-    public static final String app = ".app";
-
-    public static final String extension_file = "文件";
-
-    public static final String extension_folder = "文件夹";
-
-    public static final String extension_fileOrFolder = "文件或文件夹";
-
-    public static final String allPng = "*.png";
-
-    public static final String allJpg = "*.jpg";
-
-    public static final String allJpeg = "*.jpeg";
-
-    public static final String png = ".png";
-
-    public static final String jpg = ".jpg";
-
-    public static final String jpeg = ".jpeg";
-
-    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
-
-    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
-
-    /**
-     * 默认浮窗横轴偏移量
-     */
-    public static final int defaultOffsetX = 30;
-
-    /**
-     * 默认浮纵轴窗偏移量
-     */
-    public static final int defaultOffsetY = 30;
-
-    /**
-     * 在列表所选行第一行上方插入
-     */
-    public static final int upAdd = 1;
-
-    /**
-     * 在列表所选行最后一行下方插入
-     */
-    public static final int downAdd = 2;
-
-    /**
-     * 向列表最后一行追加
-     */
-    public static final int append = -1;
-
-    /**
-     * 向列表第一行上方插入
-     */
-    public static final int topAdd = 0;
-
-    /**
-     * 默认要点击的图片识别重试次数
-     */
-    public static final String defaultClickRetryNum = "3";
-
-    /**
-     * 默认终止操作图片识别重试次数
-     */
-    public static final String defaultStopRetryNum = "0";
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

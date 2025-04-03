@@ -100,8 +100,6 @@ public class MainApplication extends Application {
         stage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
         // 监听窗口面板高度变化
         stage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
-        // 注册全局输入监听器
-        GlobalScreen.registerNativeHook();
         stage.setOnCloseRequest(event -> {
             try {
                 stop();

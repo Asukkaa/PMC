@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
@@ -62,8 +63,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
+import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -272,13 +273,14 @@ public class AutoClickController extends CommonProperties {
     private AnchorPane anchorPane_Click;
 
     @FXML
-    private HBox fileNumberHBox_Click, tipHBox_Click, cancelTipHBox_Click;
+    private HBox fileNumberHBox_Click, tipHBox_Click, cancelTipHBox_Click, logHBox_Click;
 
     @FXML
     private ProgressBar progressBar_Click;
 
     @FXML
-    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click;
+    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click,
+            err_Click;
 
     @FXML
     private CheckBox openDirectory_Click;
@@ -344,6 +346,9 @@ public class AutoClickController extends CommonProperties {
         Label cancelTip = (Label) scene.lookup("#cancelTip_Click");
         HBox cancelTipHBox = (HBox) scene.lookup("#cancelTipHBox_Click");
         nodeRightAlignment(cancelTipHBox, tableWidth, cancelTip);
+        Label err = (Label) scene.lookup("#err_Click");
+        HBox logHBox = (HBox) scene.lookup("#logHBox_Click");
+        nodeRightAlignment(logHBox, tableWidth, err);
     }
 
     /**
@@ -1318,6 +1323,23 @@ public class AutoClickController extends CommonProperties {
     }
 
     /**
+     * 禁用需要辅助控制权限的组件
+     */
+    private void setNativeHookExceptionLog() {
+        runClick_Click.setDisable(true);
+        recordClick_Click.setDisable(true);
+        clickTest_Click.setDisable(true);
+        Button saveButton = (Button) mainScene.lookup("#setFloatingCoordinate_Set");
+        saveButton.setDisable(true);
+        String errorMessage = appName + " 缺少必要系统权限";
+        if (systemName.contains(macos)) {
+            errorMessage = tip_NativeHookException;
+        }
+        err_Click.setText(errorMessage);
+        err_Click.setTooltip(creatTooltip(tip_NativeHookException));
+    }
+
+    /**
      * 页面初始化
      */
     @FXML
@@ -1334,8 +1356,12 @@ public class AutoClickController extends CommonProperties {
                 textFieldChangeListener();
                 // 设置初始配置值为上次配置值
                 setLastConfig();
+                // 注册全局输入监听器
+                GlobalScreen.registerNativeHook();
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } catch (NativeHookException e) {
+                setNativeHookExceptionLog();
             }
             // 设置javafx单元格宽度
             bindPrefWidthProperty();
