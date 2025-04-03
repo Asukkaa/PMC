@@ -502,7 +502,7 @@ public class CommonFinals {
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
-    public static final String desktop = "desktop";
+    public static final String desktop = "Desktop";
 
     public static final String macos = "mac";
 
