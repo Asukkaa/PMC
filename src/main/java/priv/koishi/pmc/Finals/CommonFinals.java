@@ -63,10 +63,6 @@ public class CommonFinals {
 
     public static final String tip_exportAutoClick = "点击即可按照设置导出文件夹与文件名导出列表中的操作流程";
 
-    public static final String tip_hideWindowRun = """
-            勾选后运行或测试自动操作开始前将会隐藏本程序的窗口
-            如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度""";
-
     public static final String tip_showWindowRun = "勾选后运行或测试自动操作结束后将会弹出本程序的窗口";
 
     public static final String tip_hideWindowRecord = "勾选后录制自动操作开始前将会隐藏本程序的窗口";
@@ -171,6 +167,10 @@ public class CommonFinals {
     public static final String tip_autoSave = """
             勾选后在程序关闭时如果列表不为空将会保存列表的所有操作步骤
             自动保存路径为导出文件夹路径，文件名为：""";
+
+    public static final String tip_hideWindowRun = """
+            勾选后运行或测试自动操作开始前将会隐藏本程序的窗口
+            如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度""";
 
     public static final String text_selectDirectory = "选择文件夹";
 
@@ -501,6 +501,8 @@ public class CommonFinals {
      * gitee地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
+
+    public static final String desktop = "desktop";
 
     public static final String macos = "mac";
 

@@ -362,8 +362,15 @@ public class FileUtils {
      */
     public static String getDesktopPath() {
         FileSystemView fsv = FileSystemView.getFileSystemView();
-        File desktop = fsv.getHomeDirectory();
-        return desktop.getAbsolutePath();
+        File desktopFile = fsv.getHomeDirectory();
+        String path = desktopFile.getAbsolutePath();
+        if (!path.contains(desktop)) {
+            String desktopPath = path + File.separator + desktop;
+            if (new File(desktopPath).exists()) {
+                return desktopPath;
+            }
+        }
+        return path;
     }
 
 }
