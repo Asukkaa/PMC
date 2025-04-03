@@ -421,7 +421,7 @@ public class AutoClickController extends CommonProperties {
             setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime);
         }
         if (StringUtils.isBlank(outPath_Click.getText())) {
-            outPath_Click.setText(defaultFileChooserPath);
+            setPathLabel(outPath_Click, defaultFileChooserPath, false);
             outFilePath = defaultFileChooserPath;
         }
         input.close();
