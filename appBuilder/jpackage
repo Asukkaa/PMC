@@ -1,5 +1,5 @@
 win:
-jpackage --name 'Perfect Mouse Control'  --type app-image -m priv.koishi.pmc/priv.koishi.pmc.MainApplication --runtime-image app --icon PMC.ico --app-version 1.2.0
+jpackage --name 'Perfect Mouse Control'  --type app-image -m priv.koishi.pmc/priv.koishi.pmc.MainApplication --runtime-image app --icon PMC.ico --app-version 2.0.0
 
 mac:
-jpackage --name 'Perfect Mouse Control'  --type app-image -m priv.koishi.pmc/priv.koishi.pmc.MainApplication --runtime-image app --icon PMC.icns --app-version 1.2.0
+jpackage --name 'Perfect Mouse Control'  --type app-image -m priv.koishi.pmc/priv.koishi.pmc.MainApplication --runtime-image app --icon PMC.icns --app-version 2.0.0
