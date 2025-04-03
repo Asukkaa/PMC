@@ -73,6 +73,11 @@ public class SettingController {
     private int floatingHeight;
 
     /**
+     * 自动保存文件名
+     */
+    private static String autoSaveFileName;
+
+    /**
      * 页面标识符
      */
     private final String tabId = "_Set";
@@ -132,7 +137,8 @@ public class SettingController {
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
-            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set;
+            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindSave_Set,
+            autoSave_Set;
 
     @FXML
     private TableView<ImgFileVO> tableView_Set;
@@ -380,6 +386,7 @@ public class SettingController {
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
+        autoSaveFileName = prop.getProperty(key_autoSaveFileName);
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
         floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
@@ -388,6 +395,8 @@ public class SettingController {
         setControlLastConfig(offsetY_Set, prop, key_offsetY);
         setControlLastConfig(opacity_Set, prop, key_opacity);
         setControlLastConfig(overtime_Set, prop, key_overtime);
+        setControlLastConfig(autoSave_Set, prop, key_autoSave);
+        setControlLastConfig(remindSave_Set, prop, key_remindSave);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
@@ -414,25 +423,27 @@ public class SettingController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(lastTab_Set.getText(), lastTab_Set);
-        addToolTip(maxWindow_Set.getText(), maxWindow_Set);
-        addToolTip(fullWindow_Set.getText(), fullWindow_Set);
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_reLaunch, reLaunch_Set);
+        addToolTip(tip_remindSave, remindSave_Set);
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
+        addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(tip_removeStopImgBtn, removeAll_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
         addToolTip(tip_hideWindowRun, hideWindowRun_Set);
         addToolTip(tip_showWindowRun, showWindowRun_Set);
         addToolTip(tip_defaultStopImgBtn, stopImgBtn_Set);
         addToolTip(tip_floatingRecord, floatingRecord_Set);
+        addToolTip(maxWindow_Set.getText(), maxWindow_Set);
+        addToolTip(fullWindow_Set.getText(), fullWindow_Set);
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
         addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
         addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
+        addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
         addValueToolTip(overtime_Set, tip_overtime, overtime_Set.getText());
@@ -572,14 +583,14 @@ public class SettingController {
      */
     @FXML
     private void initialize() throws IOException {
+        // 读取配置文件
+        getConfig();
         // 设置javafx单元格宽度
         bindPrefWidthProperty();
         // 设置鼠标悬停提示
         setToolTip();
         // 给组件添加内容变化监听
         nodeValueChangeListener();
-        // 读取配置文件
-        getConfig();
         // 初始化浮窗
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
@@ -607,6 +618,26 @@ public class SettingController {
     @FXML
     private void loadAutoClickAction() throws IOException {
         setLoadLastConfigCheckBox(loadAutoClick_Set, configFile_Click, key_loadLastConfig);
+    }
+
+    /**
+     * 操作步骤详情页修改后未保存提示
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadRemindSaveAction() throws IOException {
+        setLoadLastConfigCheckBox(remindSave_Set, configFile_Click, key_remindSave);
+    }
+
+    /**
+     * 关闭程序时自动保存列表操作步骤
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadAutoSaveAction() throws IOException {
+        setLoadLastConfigCheckBox(autoSave_Set, configFile_Click, key_autoSave);
     }
 
     /**

@@ -101,7 +101,7 @@ public class CommonFinals {
 
     public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
 
-    public static final String tip_thanks = "感谢吧友 @拒绝神绮99次 提供的logo";
+    public static final String tip_thanks = "感谢吧友 @拒绝神绮99次 设计的 logo";
 
     public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
 
@@ -129,9 +129,11 @@ public class CommonFinals {
 
     public static final String tip_reLaunch = "点击将会重启本程序并保存设置项";
 
+    public static final String tip_remindSave = "勾选后如果修改过操作步骤详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框";
+
     public static final String version = "2.0.0";
 
-    public static final String buildDate = "2025年3月";
+    public static final String buildDate = "2025年4月";
 
     public static final String tip_version = """
             version：%s
@@ -287,6 +289,8 @@ public class CommonFinals {
     public static final String key_retrySecond = "retrySecond";
 
     public static final String key_overtime = "overtime";
+
+    public static final String key_remindSave = "remindSave";
 
     public static final String key_mouseFloatingRun = "mouseFloatingRun";
 

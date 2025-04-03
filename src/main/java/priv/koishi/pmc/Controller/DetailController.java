@@ -102,6 +102,11 @@ public class DetailController {
     private static final String tabId = "_Det";
 
     /**
+     * 上级页面舞台
+     */
+    private Stage parentStage;
+
+    /**
      * 详情页页面舞台
      */
     private Stage stage;
@@ -172,7 +177,8 @@ public class DetailController {
      *
      * @param item 列表选中的数据
      */
-    public void initData(ClickPositionVO item) throws IOException {
+    public void initData(ClickPositionVO item, Stage parentStage) throws IOException {
+        this.parentStage = parentStage;
         this.selectedItem = item;
         isModified = false;
         clickName_Det.setText(item.getName());
@@ -328,7 +334,8 @@ public class DetailController {
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         // 监听滑块改变
-        ChangeListener<Number> clickOpacityListener = (obs, oldVal, newVal) -> isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold());
+        ChangeListener<Number> clickOpacityListener = (obs, oldVal, newVal) ->
+                isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold());
         registerWeakListener(clickOpacity_Det, clickOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
         registerWeakListener(stopOpacity_Det, stopOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
         // 监听表格内容变化
@@ -504,22 +511,25 @@ public class DetailController {
         nodeValueChangeListener();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
+            CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindSave_Set");
             // 添加关闭请求监听
-            stage.setOnCloseRequest(e -> {
-                if (isModified) {
-                    ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
-                            "保存并关闭", "直接关闭");
-                    ButtonBar.ButtonData buttonData = result.getButtonData();
-                    if (!buttonData.isCancelButton()) {
-                        // 保存并关闭
-                        saveDetail();
-                    } else {
-                        // 直接关闭
-                        stage.close();
+            if (remindSave != null && remindSave.isSelected()) {
+                stage.setOnCloseRequest(e -> {
+                    if (isModified) {
+                        ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
+                                "保存并关闭", "直接关闭");
+                        ButtonBar.ButtonData buttonData = result.getButtonData();
+                        if (!buttonData.isCancelButton()) {
+                            // 保存并关闭
+                            saveDetail();
+                        } else {
+                            // 直接关闭
+                            stage.close();
+                        }
                     }
-                }
-                removeAllListeners();
-            });
+                    removeAllListeners();
+                });
+            }
             // 添加控件监听
             addModificationListeners();
             // 自动填充javafx表格

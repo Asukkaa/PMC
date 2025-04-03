@@ -281,7 +281,7 @@ public class AutoClickController extends CommonProperties {
     private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click;
 
     @FXML
-    private CheckBox openDirectory_Click, autoSave_Click;
+    private CheckBox openDirectory_Click;
 
     @FXML
     private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
@@ -371,13 +371,11 @@ public class AutoClickController extends CommonProperties {
             prop.put(key_lastPreparationRunTime, preparationRunTime.getText());
             Label outPath = (Label) scene.lookup("#outPath_Click");
             prop.put(key_outFilePath, outPath.getText());
-            CheckBox autoSave = (CheckBox) scene.lookup("#autoSave_Click");
-            String lastAutoSaveValue = autoSave.isSelected() ? activation : unActivation;
-            prop.put(key_autoSave, lastAutoSaveValue);
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
             output.close();
+            CheckBox autoSave = (CheckBox) scene.lookup("#autoSave_Set");
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Click");
             // 自动保存
             autoSave(autoSave, tableView);
@@ -415,7 +413,6 @@ public class AutoClickController extends CommonProperties {
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig))) {
-            setControlLastConfig(autoSave_Click, prop, key_autoSave);
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName);
@@ -515,7 +512,7 @@ public class AutoClickController extends CommonProperties {
         item.setClickImgSelectPath(clickImgSelectPath);
         item.setStopImgSelectPath(stopImgSelectPath);
         try {
-            controller.initData(item);
+            controller.initData(item, mainStage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -961,7 +958,6 @@ public class AutoClickController extends CommonProperties {
         addToolTip(tip_openDirectory, openDirectory_Click);
         addToolTip(tip_loadAutoClick, loadAutoClick_Click);
         addToolTip(tip_exportAutoClick, exportAutoClick_Click);
-        addToolTip(tip_autoSave + autoSaveFileName, autoSave_Click);
         addToolTip(tip_autoClickFileName + defaultOutFileName, outFileName_Click);
         addToolTip(tip_preparationRunTime + defaultPreparationRunTime, preparationRunTime_Click);
         addToolTip(tip_preparationRecordTime + defaultPreparationRecordTime, preparationRecordTime_Click);
