@@ -348,8 +348,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
         HBox cancelTipHBox = (HBox) scene.lookup("#cancelTipHBox_Click");
         nodeRightAlignment(cancelTipHBox, tableWidth, cancelTip);
         Label err = (Label) scene.lookup("#err_Click");
-        HBox logHBox = (HBox) scene.lookup("#logHBox_Click");
-        nodeRightAlignment(logHBox, tableWidth, err);
+        if (err != null) {
+            HBox logHBox = (HBox) scene.lookup("#logHBox_Click");
+            nodeRightAlignment(logHBox, tableWidth, err);
+        }
     }
 
     /**
@@ -1363,6 +1365,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 throw new RuntimeException(e);
             } catch (NativeHookException e) {
                 setNativeHookExceptionLog();
+            }
+            if (StringUtils.isBlank(err_Click.getText())) {
+                logHBox_Click.getChildren().remove(err_Click);
             }
             // 设置javafx单元格宽度
             bindPrefWidthProperty();
