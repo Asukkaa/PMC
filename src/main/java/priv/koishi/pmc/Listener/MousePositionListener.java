@@ -2,6 +2,7 @@ package priv.koishi.pmc.Listener;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import lombok.Getter;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -29,7 +30,8 @@ public class MousePositionListener {
     /**
      * 当前鼠标位置坐标
      */
-    private Point currentMousePoint;
+    @Getter
+    private static Point mousePoint;
 
     /**
      * 私有构造函数，初始化鼠标位置监听定时器
@@ -52,9 +54,9 @@ public class MousePositionListener {
              * 先获取系统级鼠标位置，然后遍历回调所有监听器
              */
             private void notifyListeners() {
-                currentMousePoint = MouseInfo.getPointerInfo().getLocation();
+                mousePoint = MouseInfo.getPointerInfo().getLocation();
                 for (MousePositionUpdater updater : listeners) {
-                    updater.onMousePositionUpdate(currentMousePoint);
+                    updater.onMousePositionUpdate(mousePoint);
                 }
             }
         };

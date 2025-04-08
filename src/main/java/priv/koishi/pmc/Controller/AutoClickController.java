@@ -1153,7 +1153,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     }
                     int dataSize = tableView_Click.getItems().size() + 1;
                     pressButton = e.getButton();
-                    Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+                    Point mousePoint = MousePositionListener.getMousePoint();
                     int startX = (int) mousePoint.getX();
                     int startY = (int) mousePoint.getY();
                     clickBean = new ClickPositionVO();
@@ -1188,7 +1188,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     releasedTime = System.currentTimeMillis();
                     // 计算点击持续时间（毫秒）
                     long duration = releasedTime - pressTime;
-                    Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+                    Point mousePoint = MousePositionListener.getMousePoint();
                     int endX = (int) mousePoint.getX();
                     int endY = (int) mousePoint.getY();
                     // 创建点击步骤对象

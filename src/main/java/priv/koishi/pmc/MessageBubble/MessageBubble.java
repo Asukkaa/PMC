@@ -60,12 +60,12 @@ public class MessageBubble extends Label implements MousePositionUpdater {
         Scene scene = new Scene(stackPane);
         scene.setFill(Color.TRANSPARENT);
         bubbleStage.setScene(scene);
-        // 设置初始位置
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        bubbleStage.setX(mousePoint.getX() + offsetX);
-        bubbleStage.setY(mousePoint.getY() + offsetY);
         // 获取鼠标坐标监听器
         MousePositionListener.getInstance().addListener(this);
+        // 设置初始位置
+        Point mousePoint = MousePositionListener.getMousePoint();
+        bubbleStage.setX(mousePoint.getX() + offsetX);
+        bubbleStage.setY(mousePoint.getY() + offsetY);
         // 自动关闭
         new Timeline(new KeyFrame(Duration.seconds(time), e -> bubbleStage.close())).play();
         bubbleStage.show();
