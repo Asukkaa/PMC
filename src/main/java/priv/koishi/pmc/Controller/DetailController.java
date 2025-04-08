@@ -139,10 +139,11 @@ public class DetailController {
     private ChoiceBox<String> clickType_Det, retryType_Det;
 
     @FXML
-    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det;
+    private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
 
     @FXML
-    private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
+    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det, clickIndex_Det;
+
 
     @FXML
     private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, mouseEndX_Det, mouseEndY_Det, wait_Det,
@@ -181,6 +182,8 @@ public class DetailController {
         this.parentStage = parentStage;
         this.selectedItem = item;
         isModified = false;
+        clickIndex_Det.setText(String.valueOf(item.getIndex()));
+        addToolTip(clickIndex_Det.getText(), clickIndex_Det);
         clickName_Det.setText(item.getName());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());

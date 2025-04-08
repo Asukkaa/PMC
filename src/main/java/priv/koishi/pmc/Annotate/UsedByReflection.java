@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Interface;
+package priv.koishi.pmc.Annotate;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

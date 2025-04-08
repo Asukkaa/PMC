@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
-import priv.koishi.pmc.Interface.UsedByReflection;
+import priv.koishi.pmc.Annotate.UsedByReflection;
 
 import java.io.File;
 import java.io.IOException;

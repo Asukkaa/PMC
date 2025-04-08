@@ -11,6 +11,11 @@
     <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
+                <HBox spacing="10" prefWidth="120">
+                    <Label prefHeight="25" text="步骤序号:"/>
+                    <Label prefHeight="25" fx:id="clickIndex_Det"/>
+                </HBox>
+
                 <HBox styleClass="hBox-Detail-Style">
                     <Label prefHeight="25" text="步骤名称:"/>
                     <TextField fx:id="clickName_Det"/>
@@ -34,23 +39,23 @@
                         </value>
                     </ChoiceBox>
                 </HBox>
+            </HBox>
 
-                <HBox spacing="10">
-                    <Label prefHeight="25" text="要识别的图像识别重试逻辑:"/>
-                    <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="200">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="重试直到图像出现"/>
-                                <String fx:value="按设置次数重试后点击设置位置"/>
-                                <String fx:value="按设置次数重试后终止操作"/>
-                                <String fx:value="按设置次数重试后跳过本次操作"/>
-                            </FXCollections>
-                        </items>
-                        <value>
+            <HBox spacing="10">
+                <Label prefHeight="25" text="要识别的图像识别重试逻辑:"/>
+                <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="200">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="重试直到图像出现"/>
+                            <String fx:value="按设置次数重试后点击设置位置"/>
                             <String fx:value="按设置次数重试后终止操作"/>
-                        </value>
-                    </ChoiceBox>
-                </HBox>
+                            <String fx:value="按设置次数重试后跳过本次操作"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <String fx:value="按设置次数重试后终止操作"/>
+                    </value>
+                </ChoiceBox>
             </HBox>
 
             <HBox spacing="10">
