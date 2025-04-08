@@ -46,6 +46,7 @@ import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.EditingCell.EditingCell;
 import priv.koishi.pmc.Listener.MousePositionListener;
+import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.Properties.CommonProperties;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
@@ -77,7 +78,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-02-17
  * Time:17:21
  */
-public class AutoClickController extends CommonProperties {
+public class AutoClickController extends CommonProperties implements MousePositionUpdater {
 
     /**
      * 导出文件路径
@@ -1033,8 +1034,8 @@ public class AutoClickController extends CommonProperties {
     /**
      * 根据鼠标位置调整ui
      */
-    private void onMousePositionUpdate() {
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+    @Override
+    public void onMousePositionUpdate(Point mousePoint) {
         int x = (int) mousePoint.getX();
         int y = (int) mousePoint.getY();
         String text = "当前鼠标位置为： X: " + x + " Y: " + y;
@@ -1368,7 +1369,7 @@ public class AutoClickController extends CommonProperties {
             // 初始化浮窗
             initFloatingWindow();
             // 获取鼠标坐标监听器
-            new MousePositionListener(this::onMousePositionUpdate);
+            MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格

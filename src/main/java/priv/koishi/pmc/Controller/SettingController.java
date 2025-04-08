@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Listener.MousePositionListener;
+import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
 import java.io.IOException;
@@ -50,7 +51,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2024-11-12
  * Time:下午4:51
  */
-public class SettingController {
+public class SettingController implements MousePositionUpdater {
 
     /**
      * 浮窗X坐标
@@ -554,8 +555,8 @@ public class SettingController {
     /**
      * 根据鼠标位置调整ui
      */
-    private void onMousePositionUpdate() {
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+    @Override
+    public void onMousePositionUpdate(Point mousePoint) {
         Platform.runLater(() -> {
             if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
                 int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, null, null);
@@ -598,7 +599,7 @@ public class SettingController {
         Platform.runLater(() -> {
             mainScene = anchorPane_Set.getScene();
             // 获取鼠标坐标监听器
-            new MousePositionListener(this::onMousePositionUpdate);
+            MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格

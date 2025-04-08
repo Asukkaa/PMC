@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import priv.koishi.pmc.Listener.MousePositionListener;
+import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
 
@@ -22,7 +23,7 @@ import java.awt.*;
  * Date:2024-11-28
  * Time:下午5:49
  */
-public class MessageBubble extends Label {
+public class MessageBubble extends Label implements MousePositionUpdater {
 
     /**
      * 消息气泡所在舞台
@@ -64,20 +65,17 @@ public class MessageBubble extends Label {
         bubbleStage.setX(mousePoint.getX() + offsetX);
         bubbleStage.setY(mousePoint.getY() + offsetY);
         // 获取鼠标坐标监听器
-        MousePositionListener mousePositionListener = new MousePositionListener(this::onMousePositionUpdate);
+        MousePositionListener.getInstance().addListener(this);
         // 自动关闭
-        new Timeline(new KeyFrame(Duration.seconds(time), e -> {
-            bubbleStage.close();
-            mousePositionListener.stop();
-        })).play();
+        new Timeline(new KeyFrame(Duration.seconds(time), e -> bubbleStage.close())).play();
         bubbleStage.show();
     }
 
     /**
      * 根据鼠标位置调整ui
      */
-    private void onMousePositionUpdate() {
-        Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+    @Override
+    public void onMousePositionUpdate(Point mousePoint) {
         bubbleStage.setX(mousePoint.getX() + offsetX);
         bubbleStage.setY(mousePoint.getY() + offsetY);
     }

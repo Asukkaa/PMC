@@ -1,5 +1,7 @@
 package priv.koishi.pmc.Listener;
 
+import java.awt.Point;
+
 /**
  * 根据鼠标位置更新ui
  *
@@ -12,6 +14,6 @@ public interface MousePositionUpdater {
     /**
      * 根据鼠标位置调整ui接口
      */
-    void onMousePositionUpdate();
+    void onMousePositionUpdate(Point mousePoint);
 
 }
