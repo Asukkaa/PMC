@@ -304,7 +304,7 @@ public class CommonFinals {
 
     public static final String tip_remindSave = "勾选后如果修改过操作步骤详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框";
 
-    public static final String version = "2.0.0";
+    public static final String version = "2.1.0";
 
     public static final String buildDate = "2025年4月3日";
 
