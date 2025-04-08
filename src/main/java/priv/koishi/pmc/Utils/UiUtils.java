@@ -41,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Bean.VO.Indexable;
 import priv.koishi.pmc.Interface.UsedByReflection;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
@@ -443,6 +444,10 @@ public class UiUtils {
                         } else {
                             // 获取当前行的索引并加1（行号从1开始）
                             int rowIndex = getIndex() + 1;
+                            T itemData = getTableRow().getItem();
+                            if (itemData instanceof Indexable indexable) {
+                                indexable.setIndex(rowIndex);
+                            }
                             setText(String.valueOf(rowIndex));
                             setTooltip(creatTooltip(String.valueOf(rowIndex)));
                         }

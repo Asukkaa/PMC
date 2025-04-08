@@ -27,7 +27,7 @@ import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class ImgFileVO extends ImgFileBean {
+public class ImgFileVO extends ImgFileBean implements Indexable {
 
     /**
      * 序号
@@ -100,6 +100,16 @@ public class ImgFileVO extends ImgFileBean {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();
         }
+    }
+
+    /**
+     * 为列表数据设置序号接口
+     *
+     * @param index 要设置的序号
+     */
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
     }
 
 }
