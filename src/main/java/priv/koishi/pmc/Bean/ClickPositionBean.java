@@ -77,7 +77,7 @@ public class ClickPositionBean {
     String clickType;
 
     /**
-     * 要点击的图片路径
+     * 要识别的图片路径
      */
     String clickImgPath;
 
@@ -88,7 +88,7 @@ public class ClickPositionBean {
     List<ImgFileBean> stopImgFiles;
 
     /**
-     * 要点击的图片识别匹配阈值
+     * 要识别的图片识别匹配阈值
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
     String clickMatchThreshold;
@@ -100,7 +100,7 @@ public class ClickPositionBean {
     String stopMatchThreshold;
 
     /**
-     * 要点击的图片识别重试次数
+     * 要识别的图片识别重试次数
      */
     String clickRetryTimes;
 
@@ -110,13 +110,33 @@ public class ClickPositionBean {
     String stopRetryTimes;
 
     /**
-     * 要点击的图像识别重试设置
+     * 要识别的图像识别重试设置
      */
     String retryType;
 
     /**
-     * 匹配到图像后直接进行下一个操作步骤
+     * 要识别的图像识别失败后要跳转的步骤序号
      */
-    boolean skip;
+    String retryStep;
+
+    /**
+     * 要识别的图像匹配成功后的逻辑
+     */
+    String clickMatched;
+
+    /**
+     * 要识别的图像匹配成功后要跳转的步骤序号
+     */
+    String clickMatchedStep;
+
+    /**
+     * 终止操作图像识别成功后的逻辑
+     */
+    String stopMatched;
+
+    /**
+     * 终止操作图像识别成功后要跳转的步骤序号
+     */
+    String stopMatchedStep;
 
 }

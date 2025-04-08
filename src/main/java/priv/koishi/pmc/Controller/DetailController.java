@@ -36,6 +36,7 @@ import java.util.stream.IntStream;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
 /**
  * 操作步骤详情页控制器
@@ -121,33 +122,31 @@ public class DetailController {
     private AnchorPane anchorPane_Det;
 
     @FXML
-    private HBox fileNumberHBox_Det;
+    private VBox clickImgVBox_Det;
 
     @FXML
-    private VBox clickImgVBox_Det;
+    private HBox fileNumberHBox_Det, retryStepHBox_Det, clickMatchedStepHBox_Det, stopMatchedStepHBox_Det;
 
     @FXML
     private ImageView clickImg_Det;
 
     @FXML
-    private CheckBox skip_Det;
-
-    @FXML
     private Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    private ChoiceBox<String> clickType_Det, retryType_Det;
+    private ChoiceBox<String> clickType_Det, retryType_Det, clickMatched_Det, stopMatched_Det;
 
     @FXML
     private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
 
     @FXML
-    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det, clickIndex_Det;
-
+    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det, clickIndex_Det,
+            tableViewSize_Det;
 
     @FXML
     private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, mouseEndX_Det, mouseEndY_Det, wait_Det,
-            clickNumBer_Det, timeClick_Det, interval_Det, clickRetryNum_Det, stopRetryNum_Det;
+            clickNumBer_Det, timeClick_Det, interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det,
+            clickMatchedStep_Det, stopMatchedStep_Det;
 
     @FXML
     private TableView<ImgFileVO> tableView_Det;
@@ -182,8 +181,13 @@ public class DetailController {
         this.parentStage = parentStage;
         this.selectedItem = item;
         isModified = false;
-        clickIndex_Det.setText(String.valueOf(item.getIndex()));
-        addToolTip(clickIndex_Det.getText(), clickIndex_Det);
+        String index = String.valueOf(item.getIndex());
+        clickIndex_Det.setText(index);
+        addToolTip(tip_clickIndex + index, clickIndex_Det);
+        TableView<ClickPositionVO> tableView = item.getTableView();
+        String tableViewSize = String.valueOf(tableView.getItems().size());
+        tableViewSize_Det.setText(tableViewSize);
+        addToolTip(tip_tableViewSize + tableViewSize, tableViewSize_Det);
         clickName_Det.setText(item.getName());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());
@@ -198,13 +202,14 @@ public class DetailController {
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         clickRetryNum_Det.setText(item.getClickRetryTimes());
         stopRetryNum_Det.setText(item.getStopRetryTimes());
-        skip_Det.setSelected(item.isSkip());
+        stopMatched_Det.setValue(item.getStopMatched());
+        clickMatched_Det.setValue(item.getClickMatched());
+        retryStep_Det.setText(item.getRetryStep());
+        clickMatchedStep_Det.setText(item.getClickMatchedStep());
+        stopMatchedStep_Det.setText(item.getStopMatchedStep());
         clickImgSelectPath = item.getClickImgSelectPath();
         stopImgSelectPath = item.getStopImgSelectPath();
-        String retryType = item.getRetryType();
-        if (StringUtils.isNotBlank(retryType)) {
-            retryType_Det.setValue(item.getRetryType());
-        }
+        retryType_Det.setValue(item.getRetryType());
         List<ImgFileBean> imgFileBeans = item.getStopImgFiles();
         ObservableList<ImgFileVO> items = tableView_Det.getItems();
         if (CollectionUtils.isNotEmpty(imgFileBeans)) {
@@ -333,7 +338,6 @@ public class DetailController {
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(skip_Det, skip_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         // 监听滑块改变
@@ -450,7 +454,6 @@ public class DetailController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(tip_skip, skip_Det);
         addToolTip(tip_wait, wait_Det);
         addToolTip(tip_mouseEndX, mouseEndX_Det);
         addToolTip(tip_mouseEndY, mouseEndY_Det);
@@ -551,7 +554,6 @@ public class DetailController {
     private void saveDetail() {
         int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
         int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
-        selectedItem.setSkip(skip_Det.isSelected());
         selectedItem.setName(clickName_Det.getText());
         selectedItem.setClickType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));
@@ -559,16 +561,21 @@ public class DetailController {
         selectedItem.setRetryType(retryType_Det.getValue());
         selectedItem.setStopImgSelectPath(stopImgSelectPath);
         selectedItem.setClickImgSelectPath(clickImgSelectPath);
+        selectedItem.setStopMatched(stopMatched_Det.getValue());
         selectedItem.setClickImgPath(clickImgPath_Det.getText());
+        selectedItem.setClickMatched(clickMatched_Det.getValue());
         selectedItem.setStopImgFiles(new ArrayList<>(tableView_Det.getItems()));
         selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
         selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
         selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));
         selectedItem.setEndY(String.valueOf(setDefaultIntValue(mouseEndY_Det, mouseStartY, 0, null)));
         selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
+        selectedItem.setRetryStep(String.valueOf(setDefaultIntValue(retryStep_Det, 0, 1, null)));
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
+        selectedItem.setStopMatchedStep(String.valueOf(setDefaultIntValue(stopMatchedStep_Det, 0, 1, null)));
+        selectedItem.setClickMatchedStep(String.valueOf(setDefaultIntValue(clickMatchedStep_Det, 0, 1, null)));
         selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(defaultStopRetryNum), 0, null)));
         selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
         stage.close();

@@ -554,6 +554,8 @@ public class SettingController implements MousePositionUpdater {
 
     /**
      * 根据鼠标位置调整ui
+     *
+     * @param mousePoint 鼠标位置
      */
     @Override
     public void onMousePositionUpdate(Point mousePoint) {

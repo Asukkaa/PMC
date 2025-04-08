@@ -914,14 +914,29 @@ public class AutoClickController extends CommonProperties implements MousePositi
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        ClickPositionVO clickPositionVO = createClickPositionVO();
+        clickPositionVO.setName(text_step + (tableViewItemSize + 1) + text_isAdd);
+        if (tableViewItemSize == -1) {
+            clickPositionVO.setName("测试步骤");
+        }
+        return clickPositionVO;
+    }
+
+    /**
+     * 创建一个具有默认值的自动操作步骤类
+     *
+     * @return clickPositionVO 具有默认值的自动操作步骤类
+     */
+    private ClickPositionVO createClickPositionVO() {
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
-                .setName(text_step + (tableViewItemSize + 1) + text_isAdd)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setStopImgFiles(defaultStopImgFiles)
+                .setClickMatched(clickMatched_click)
                 .setClickType(mouseButton_primary)
                 .setClickRetryTimes(clickRetryNum)
+                .setStopMatched(stopMatched_stop)
                 .setStopRetryTimes(stopRetryNum)
                 .setRetryType(retryType_stop)
                 .setClickInterval("0")
@@ -932,9 +947,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 .setStartY("0")
                 .setEndX("0")
                 .setEndY("0");
-        if (tableViewItemSize == -1) {
-            clickPositionVO.setName("测试步骤");
-        }
         return clickPositionVO;
     }
 
@@ -1023,6 +1035,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickRetryTimes(), 0, null) || !isInIntegerRange(clickPositionVO.getStopRetryTimes(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100) || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
+                    || !clickMatchedList.contains(clickPositionVO.getClickMatched()) || !stopMatchedList.contains(clickPositionVO.getStopMatched())
                     || !runClickTypeMap.containsKey(clickPositionVO.getClickType()) || !retryTypeList.contains(clickPositionVO.getRetryType())) {
                 throw new IOException(text_LackKeyData);
             }
@@ -1035,6 +1048,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
 
     /**
      * 根据鼠标位置调整ui
+     *
+     * @param mousePoint 鼠标位置
      */
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
@@ -1158,19 +1173,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     Point mousePoint = MousePositionListener.getMousePoint();
                     int startX = (int) mousePoint.getX();
                     int startY = (int) mousePoint.getY();
-                    clickBean = new ClickPositionVO();
-                    clickBean.setTableView(tableView_Click)
-                            .setClickType(recordClickTypeMap.get(pressButton))
+                    clickBean = createClickPositionVO();
+                    clickBean.setClickType(recordClickTypeMap.get(pressButton))
                             .setName(text_step + dataSize + text_isRecord)
-                            .setClickMatchThreshold(defaultClickOpacity)
-                            .setStopMatchThreshold(defaultStopOpacity)
                             .setWaitTime(String.valueOf(waitTime))
-                            .setStopImgFiles(defaultStopImgFiles)
                             .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .setClickRetryTimes(clickRetryNum)
-                            .setStopRetryTimes(stopRetryNum)
-                            .setRetryType(retryType_stop);
+                            .setStartY(String.valueOf(startY));
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_cancelTask + text_recordClicking + "\n" +
@@ -1196,9 +1204,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     // 创建点击步骤对象
                     clickBean.setClickTime(String.valueOf(duration))
                             .setEndX(String.valueOf(endX))
-                            .setEndY(String.valueOf(endY))
-                            .setClickInterval("0")
-                            .setClickNum("1");
+                            .setEndY(String.valueOf(endY));
                     Platform.runLater(() -> {
                         // 添加至表格
                         List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
@@ -1447,7 +1453,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
     public void loadAutoClick(ActionEvent actionEvent) throws IOException {
         if (autoClickTask == null && !recordClicking) {
             getConfig();
-            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(new FileChooser.ExtensionFilter("Perfect Mouse Control", "*.pmc")));
+            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
+            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
             File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile);
             if (selectedFile != null) {

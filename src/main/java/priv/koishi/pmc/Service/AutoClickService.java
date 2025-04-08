@@ -228,7 +228,7 @@ public class AutoClickService {
             try (Point position = matchPoint.getPoint()) {
                 if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
                     // 匹配成功后跳过操作
-                    if (clickPositionVO.isSkip()) {
+                    if (clickMatched_break.equals(clickPositionVO.getClickMatched())) {
                         return;
                     }
                     startX = position.x();

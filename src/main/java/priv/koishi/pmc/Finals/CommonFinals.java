@@ -128,6 +128,8 @@ public class CommonFinals {
 
     public static final String log = ".log";
 
+    public static final String allPMC = "*.pmc";
+
     public static final String PMC = ".pmc";
 
     public static final String exe = ".exe";
@@ -294,8 +296,6 @@ public class CommonFinals {
 
     public static final String tip_updateClickNameBtn = "将当前步骤的步骤名称更改为要点击的图片名称";
 
-    public static final String tip_skip = "勾选后如果配置的有要点击的图片则在匹配成功后会直接执行下一个操作步骤";
-
     public static final String tip_overtime = "只能填正整数，单位秒，不填默认为不限制，每张图片识别如果使用时间超过设置值将会直接终止操作";
 
     public static final String tip_retrySecond = "只能填自然整数，单位秒，不填默认为 1，每张图片识别失败后将会等着当前设置值后再重试";
@@ -303,6 +303,10 @@ public class CommonFinals {
     public static final String tip_reLaunch = "点击将会重启本程序并保存设置项";
 
     public static final String tip_remindSave = "勾选后如果修改过操作步骤详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框";
+
+    public static final String tip_clickIndex = "当前步骤序号为：";
+
+    public static final String tip_tableViewSize = "当前共有操作步骤数量为：";
 
     public static final String version = "2.1.0";
 
@@ -570,6 +574,43 @@ public class CommonFinals {
 
     public static final String menuItem_topCopy = "复制所选数据到列表顶部";
 
+    public static final String retryType_continuously = "重试直到图像出现";
+
+    public static final String retryType_click = "按设置次数重试后点击设置位置";
+
+    public static final String retryType_stop = "按设置次数重试后终止操作";
+
+    public static final String retryType_break = "按设置次数重试后跳过本次操作";
+
+    public static final String retryType_Step = "按设置次数重试后跳转到指定步骤";
+
+    /**
+     * 重试逻辑下拉框选项
+     */
+    public static final List<String> retryTypeList = Arrays.asList(retryType_continuously, retryType_click,
+            retryType_stop, retryType_break, retryType_Step);
+
+    public static final String clickMatched_click = "点击匹配的图像";
+
+    public static final String clickMatched_break = "直接执行下一个操作步骤";
+
+    public static final String clickMatched_Step = "跳转到指定操作步骤";
+
+    /**
+     * 要识别的图像识别匹配后逻辑下拉框选项
+     */
+    public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click, clickMatched_break,
+            clickMatched_Step);
+
+    public static final String stopMatched_stop = "终止操作";
+
+    public static final String stopMatched_Step = "跳转到指定操作步骤";
+
+    /**
+     * 终止操作图像识别匹配后逻辑下拉框选项
+     */
+    public static final List<String> stopMatchedList = Arrays.asList(stopMatched_stop, stopMatched_Step);
+
     public static final String mouseButton_primary = "鼠标左键点击";
 
     public static final String mouseButton_secondary = "鼠标右键点击";
@@ -581,17 +622,6 @@ public class CommonFinals {
     public static final String mouseButton_back = "鼠标后侧键点击";
 
     public static final String mouseButton_none = "鼠标仅移动";
-
-    public static final String retryType_continuously = "重试直到图像出现";
-
-    public static final String retryType_click = "按设置次数重试后点击设置位置";
-
-    public static final String retryType_stop = "按设置次数重试后终止操作";
-
-    public static final String retryType_break = "按设置次数重试后跳过本次操作";
-
-    public static final List<String> retryTypeList = Arrays.asList(retryType_continuously, retryType_click,
-            retryType_stop, retryType_break);
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

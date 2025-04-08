@@ -11,9 +11,14 @@
     <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
-                <HBox spacing="10" prefWidth="120">
+                <HBox spacing="10" prefWidth="150">
                     <Label prefHeight="25" text="步骤序号:"/>
                     <Label prefHeight="25" fx:id="clickIndex_Det"/>
+                </HBox>
+
+                <HBox spacing="10" prefWidth="180">
+                    <Label prefHeight="25" text="列表操作步骤数量:"/>
+                    <Label prefHeight="25" fx:id="tableViewSize_Det"/>
                 </HBox>
 
                 <HBox styleClass="hBox-Detail-Style">
@@ -39,23 +44,8 @@
                         </value>
                     </ChoiceBox>
                 </HBox>
-            </HBox>
 
-            <HBox spacing="10">
-                <Label prefHeight="25" text="要识别的图像识别重试逻辑:"/>
-                <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="200">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="重试直到图像出现"/>
-                            <String fx:value="按设置次数重试后点击设置位置"/>
-                            <String fx:value="按设置次数重试后终止操作"/>
-                            <String fx:value="按设置次数重试后跳过本次操作"/>
-                        </FXCollections>
-                    </items>
-                    <value>
-                        <String fx:value="按设置次数重试后终止操作"/>
-                    </value>
-                </ChoiceBox>
+                <Label textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
             </HBox>
 
             <HBox spacing="10">
@@ -114,8 +104,54 @@
                     <Label prefHeight="25" text="要识别的图像识别失败重试次数:"/>
                     <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
                 </HBox>
+            </HBox>
 
-                <CheckBox fx:id="skip_Det" prefHeight="25" text="匹配到图像后直接进行下一个操作步骤"/>
+            <HBox spacing="10">
+                <HBox prefWidth="490" spacing="10">
+                    <HBox spacing="10">
+                        <Label prefHeight="25" text="识别匹配后逻辑:"/>
+                        <ChoiceBox fx:id="clickMatched_Det" prefHeight="25" prefWidth="160">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="点击匹配的图像"/>
+                                    <String fx:value="直接执行下一个操作步骤"/>
+                                    <String fx:value="跳转到指定操作步骤"/>
+                                </FXCollections>
+                            </items>
+                            <value>
+                                <String fx:value="点击匹配的图像"/>
+                            </value>
+                        </ChoiceBox>
+                    </HBox>
+
+                    <HBox fx:id="clickMatchedStepHBox_Det" spacing="10">
+                        <Label prefHeight="25" text="要跳转的步骤序号:"/>
+                        <TextField fx:id="clickMatchedStep_Det" prefWidth="80"/>
+                    </HBox>
+                </HBox>
+
+                <HBox prefWidth="490" spacing="10">
+                    <Label prefHeight="25" text="重试逻辑:"/>
+                    <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="重试直到图像出现"/>
+                                <String fx:value="按设置次数重试后点击设置位置"/>
+                                <String fx:value="按设置次数重试后终止操作"/>
+                                <String fx:value="按设置次数重试后跳过本次操作"/>
+                                <String fx:value="按设置次数重试后跳转到指定步骤"/>
+                            </FXCollections>
+                        </items>
+                        <value>
+                            <String fx:value="按设置次数重试后终止操作"/>
+                        </value>
+                    </ChoiceBox>
+
+                    <HBox fx:id="retryStepHBox_Det" spacing="10">
+                        <Label prefHeight="25" text="要跳转的步骤序号:"/>
+                        <TextField fx:id="retryStep_Det" prefWidth="80"/>
+                    </HBox>
+                </HBox>
             </HBox>
 
             <HBox spacing="10">
@@ -129,7 +165,26 @@
                 <HBox spacing="5">
                     <Label prefHeight="25" text="终止操作图像识别失败重试次数:"/>
                     <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
-                    <Label textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
+                </HBox>
+            </HBox>
+
+            <HBox spacing="10">
+                <Label prefHeight="25" text="识别匹配后逻辑:"/>
+                <ChoiceBox fx:id="stopMatched_Det" prefHeight="25" prefWidth="160">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="终止操作"/>
+                            <String fx:value="跳转到指定操作步骤"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <String fx:value="终止操作"/>
+                    </value>
+                </ChoiceBox>
+
+                <HBox fx:id="stopMatchedStepHBox_Det" spacing="10">
+                    <Label prefHeight="25" text="要跳转的步骤序号:"/>
+                    <TextField fx:id="stopMatchedStep_Det" prefWidth="80"/>
                 </HBox>
             </HBox>
 
