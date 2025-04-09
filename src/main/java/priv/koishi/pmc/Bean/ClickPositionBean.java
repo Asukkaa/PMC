@@ -122,21 +122,11 @@ public class ClickPositionBean {
     /**
      * 要识别的图像匹配成功后的逻辑
      */
-    String clickMatched;
+    String matchedType;
 
     /**
      * 要识别的图像匹配成功后要跳转的步骤序号
      */
-    String clickMatchedStep;
-
-    /**
-     * 终止操作图像识别成功后的逻辑
-     */
-    String stopMatched;
-
-    /**
-     * 终止操作图像识别成功后要跳转的步骤序号
-     */
-    String stopMatchedStep;
+    String matchedStep;
 
 }

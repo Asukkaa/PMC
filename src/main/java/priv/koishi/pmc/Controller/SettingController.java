@@ -373,11 +373,9 @@ public class SettingController implements MousePositionUpdater {
     }
 
     /**
-     * 读取配置文件
-     *
-     * @throws IOException io异常
+     * 为组件加载上次设置信息
      */
-    private void getConfig() throws IOException {
+    private void loadControlLastConfig() throws IOException {
         Properties prop = new Properties();
         InputStream configFileInput = checkRunningInputStream(configFile);
         prop.load(configFileInput);
@@ -387,11 +385,6 @@ public class SettingController implements MousePositionUpdater {
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        autoSaveFileName = prop.getProperty(key_autoSaveFileName);
-        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
         setControlLastConfig(offsetX_Set, prop, key_offsetX);
         setControlLastConfig(offsetY_Set, prop, key_offsetY);
         setControlLastConfig(opacity_Set, prop, key_opacity);
@@ -421,16 +414,35 @@ public class SettingController implements MousePositionUpdater {
     }
 
     /**
+     * 读取配置文件
+     *
+     * @throws IOException io异常
+     */
+    private void getConfig() throws IOException {
+        Properties prop = new Properties();
+        InputStream clickFileInput = checkRunningInputStream(configFile_Click);
+        prop.load(clickFileInput);
+        autoSaveFileName = prop.getProperty(key_autoSaveFileName);
+        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
+        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
+        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
+        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
+        clickFileInput.close();
+    }
+
+    /**
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
         addToolTip(tip_offsetX, offsetX_Set);
         addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_reLaunch, reLaunch_Set);
+        addToolTip(tip_overtime, overtime_Set);
         addToolTip(tip_remindSave, remindSave_Set);
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
+        addToolTip(tip_retrySecond, retrySecond_Set);
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(tip_removeStopImgBtn, removeAll_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
@@ -444,17 +456,15 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
         addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
         addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
-        addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
+        addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
-        addValueToolTip(overtime_Set, tip_overtime, overtime_Set.getText());
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
-        addValueToolTip(retrySecond_Set, tip_retrySecond, retrySecond_Set.getText());
-        addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(opacity_Set.getValue()));
-        addValueToolTip(colorPicker_Set, tip_colorPicker, text_nowValue, String.valueOf(colorPicker_Set.getValue()));
-        addValueToolTip(stopOpacity_Set, tip_stopOpacity, text_nowValue, String.valueOf((int) stopOpacity_Set.getValue()));
-        addValueToolTip(clickOpacity_Set, tip_clickOpacity, text_nowValue, String.valueOf((int) clickOpacity_Set.getValue()));
+        addValueToolTip(opacity_Set, tip_opacity, String.valueOf(opacity_Set.getValue()));
+        addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(colorPicker_Set.getValue()));
+        addValueToolTip(stopOpacity_Set, tip_stopOpacity, String.valueOf((int) stopOpacity_Set.getValue()));
+        addValueToolTip(clickOpacity_Set, tip_clickOpacity, String.valueOf((int) clickOpacity_Set.getValue()));
     }
 
     /**
@@ -488,7 +498,7 @@ public class SettingController implements MousePositionUpdater {
             if (floatingLabel != null) {
                 floatingLabel.setTextFill(newValue);
             }
-            addValueToolTip(colorPicker_Set, tip_colorPicker, text_nowValue, String.valueOf(newValue));
+            addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(newValue));
         });
     }
 
@@ -508,7 +518,7 @@ public class SettingController implements MousePositionUpdater {
                     rectangle.setFill(new Color(0, 0, 0, rounded));
                 }
             }
-            addValueToolTip(opacity_Set, tip_opacity, text_nowValue, String.valueOf(rounded));
+            addValueToolTip(opacity_Set, tip_opacity, String.valueOf(rounded));
         });
     }
 
@@ -594,6 +604,8 @@ public class SettingController implements MousePositionUpdater {
         setToolTip();
         // 给组件添加内容变化监听
         nodeValueChangeListener();
+        // 加载上次设置信息
+        loadControlLastConfig();
         // 初始化浮窗
         initFloatingWindow();
         // 监听并保存颜色选择器自定义颜色
@@ -749,7 +761,7 @@ public class SettingController implements MousePositionUpdater {
      * @throws IOException io异常
      */
     @FXML
-    private void loadColorAction() throws IOException {
+    private void colorAction() throws IOException {
         updateProperties(configFile_Click, key_lastFloatingTextColor, String.valueOf(colorPicker_Set.getValue()));
     }
 

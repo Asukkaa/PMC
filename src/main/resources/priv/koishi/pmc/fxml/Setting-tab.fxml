@@ -78,7 +78,7 @@
         <HBox spacing="10">
             <HBox spacing="10" prefWidth="250">
                 <Label prefHeight="25" text="浮窗字体颜色:"/>
-                <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#loadColorAction"/>
+                <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#colorAction"/>
             </HBox>
 
             <HBox spacing="10" prefWidth="250">

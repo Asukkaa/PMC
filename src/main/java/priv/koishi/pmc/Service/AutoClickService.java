@@ -89,6 +89,7 @@ public class AutoClickService {
                         clicks(tableViewItems, loopTimeText);
                     }
                 }
+                clearReferences();
                 return null;
             }
 
@@ -99,9 +100,10 @@ public class AutoClickService {
                 massageLabel = taskBean.getMassageLabel();
                 firstClick.set(taskBean.isFirstClick());
                 updateProgress(0, dataSize);
-                for (int j = 0; j < dataSize; j++) {
-                    updateProgress(j + 1, dataSize);
-                    ClickPositionVO clickPositionVO = tableViewItems.get(j);
+                int currentStep = 0;
+                while (currentStep < dataSize) {
+                    updateProgress(currentStep + 1, dataSize);
+                    ClickPositionVO clickPositionVO = tableViewItems.get(currentStep);
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
                     int endX = Integer.parseInt((clickPositionVO.getEndX()));
@@ -138,7 +140,13 @@ public class AutoClickService {
                         }
                     }
                     // 执行自动流程
-                    click(clickPositionVO, robot, loopTimeText);
+                    int stepIndex = click(clickPositionVO, robot, loopTimeText);
+                    // 跳转到指定步骤
+                    if (stepIndex > 0) {
+                        currentStep = stepIndex - 1;
+                        continue;
+                    }
+                    currentStep++;
                 }
             }
         };
@@ -149,9 +157,10 @@ public class AutoClickService {
      *
      * @param clickPositionVO 操作设置
      * @param robot           Robot实例
+     * @return 跳转的步骤索引，0为不跳转
      */
-    private static void click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText) throws Exception {
-        // 操作次数
+    private static int click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText) throws Exception {
+        int gotoStep = 0;
         int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
         double startX = Double.parseDouble(clickPositionVO.getStartX());
         double startY = Double.parseDouble(clickPositionVO.getStartY());
@@ -227,14 +236,22 @@ public class AutoClickService {
             MatchPoint matchPoint = findPosition(findPositionConfig);
             try (Point position = matchPoint.getPoint()) {
                 if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
+                    String matchedType = clickPositionVO.getMatchedType();
                     // 匹配成功后跳过操作
-                    if (clickMatched_break.equals(clickPositionVO.getClickMatched())) {
-                        return;
+                    if (clickMatched_break.equals(matchedType)) {
+                        return gotoStep;
+                        // 匹配成功后执行指定步骤
+                    } else if (clickMatched_Step.equals(matchedType)) {
+                        return Integer.parseInt(clickPositionVO.getMatchedStep());
+                        // 匹配成功后点击匹配图像并执行指定步骤
+                    } else if (clickMatched_ClickStep.equals(matchedType)) {
+                        gotoStep = Integer.parseInt(clickPositionVO.getMatchedStep());
                     }
                     startX = position.x();
                     startY = position.y();
                     endX = position.x();
                     endY = position.y();
+                    // 匹配失败后终止操作
                 } else if (retryType_stop.equals(retryType)) {
                     try {
                         throw new Exception("已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
@@ -244,8 +261,12 @@ public class AutoClickService {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
+                    // 匹配失败后跳过本次操作
                 } else if (retryType_break.equals(retryType)) {
-                    return;
+                    return gotoStep;
+                    // 匹配失败后执行指定步骤
+                } else if (retryType_Step.equals(retryType)) {
+                    return Integer.parseInt(clickPositionVO.getRetryStep());
                 }
             }
         }
@@ -319,6 +340,15 @@ public class AutoClickService {
                 break;
             }
         }
+        return gotoStep;
+    }
+
+    /**
+     * 解除组件引用
+     */
+    public static void clearReferences() {
+        floatingLabel = null;
+        massageLabel = null;
     }
 
 }

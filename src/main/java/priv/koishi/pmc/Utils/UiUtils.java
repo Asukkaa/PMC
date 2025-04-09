@@ -119,11 +119,32 @@ public class UiUtils {
      *
      * @param textField 要添加提示的文本输入框
      * @param text      要展示的提示文案
+     */
+    public static void addValueToolTip(TextField textField, String text) {
+        addValueToolTip(textField, text, text_nowValue);
+    }
+
+    /**
+     * 文本输入框鼠标停留提示输入值
+     *
+     * @param textField 要添加提示的文本输入框
+     * @param text      要展示的提示文案
      * @param valueText 当前所填值提示文案
      */
     public static void addValueToolTip(TextField textField, String text, String valueText) {
         String value = textField.getText();
         addValueToolTip(textField, text, valueText, value);
+    }
+
+    /**
+     * 为组件添加鼠标悬停提示框
+     *
+     * @param node  要添加提示的组件
+     * @param text  提示文案
+     * @param value 当前所填值
+     */
+    public static void addValueToolTip(Node node, String text, String value) {
+        addValueToolTip(node, text, text_nowValue, value);
     }
 
     /**
@@ -647,7 +668,7 @@ public class UiUtils {
         ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
             int rounded = newValue.intValue();
             slider.setValue(rounded);
-            addValueToolTip(slider, tip, text_nowValue, String.valueOf(rounded));
+            addValueToolTip(slider, tip, String.valueOf(rounded));
         };
         slider.valueProperty().addListener(listener);
         return listener;
@@ -668,7 +689,7 @@ public class UiUtils {
             if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
                 textField.setText(oldValue);
             }
-            addValueToolTip(textField, tip, text_nowValue);
+            addValueToolTip(textField, tip);
         };
         textField.textProperty().addListener(listener);
         return listener;
@@ -682,7 +703,7 @@ public class UiUtils {
      * @return 监听器
      */
     public static ChangeListener<String> textFieldValueListener(TextField textField, String tip) {
-        ChangeListener<String> listener = (observable, oldValue, newValue) -> addValueToolTip(textField, tip, text_nowValue);
+        ChangeListener<String> listener = (observable, oldValue, newValue) -> addValueToolTip(textField, tip);
         textField.textProperty().addListener(listener);
         return listener;
     }

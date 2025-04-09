@@ -36,7 +36,6 @@ import java.util.stream.IntStream;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
 /**
  * 操作步骤详情页控制器
@@ -71,6 +70,11 @@ public class DetailController {
      * 默认终止操作图片识别重试次数
      */
     private String defaultStopRetryNum;
+
+    /**
+     * 操作列表步骤数量（操作步骤最大跳转序号）
+     */
+    private int maxIndex;
 
     /**
      * 页面是否修改标志
@@ -125,7 +129,7 @@ public class DetailController {
     private VBox clickImgVBox_Det;
 
     @FXML
-    private HBox fileNumberHBox_Det, retryStepHBox_Det, clickMatchedStepHBox_Det, stopMatchedStepHBox_Det;
+    private HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det;
 
     @FXML
     private ImageView clickImg_Det;
@@ -134,7 +138,7 @@ public class DetailController {
     private Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    private ChoiceBox<String> clickType_Det, retryType_Det, clickMatched_Det, stopMatched_Det;
+    private ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det;
 
     @FXML
     private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
@@ -146,7 +150,7 @@ public class DetailController {
     @FXML
     private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, mouseEndX_Det, mouseEndY_Det, wait_Det,
             clickNumBer_Det, timeClick_Det, interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det,
-            clickMatchedStep_Det, stopMatchedStep_Det;
+            matchedStep_Det;
 
     @FXML
     private TableView<ImgFileVO> tableView_Det;
@@ -181,13 +185,18 @@ public class DetailController {
         this.parentStage = parentStage;
         this.selectedItem = item;
         isModified = false;
-        String index = String.valueOf(item.getIndex());
-        clickIndex_Det.setText(index);
-        addToolTip(tip_clickIndex + index, clickIndex_Det);
-        TableView<ClickPositionVO> tableView = item.getTableView();
-        String tableViewSize = String.valueOf(tableView.getItems().size());
+        maxIndex = selectedItem.getTableView().getItems().size();
+        clickIndex_Det.setText(String.valueOf(item.getIndex()));
+        if (maxIndex == 1) {
+            retryType_Det.getItems().remove(retryType_Step);
+            matchedType_Det.getItems().removeAll(clickMatched_Step, clickMatched_ClickStep);
+        }
+        String tableViewSize = String.valueOf(maxIndex);
         tableViewSize_Det.setText(tableViewSize);
-        addToolTip(tip_tableViewSize + tableViewSize, tableViewSize_Det);
+        // 设置鼠标悬停提示
+        setToolTip();
+        // 给输入框添加内容变化监听
+        nodeValueChangeListener();
         clickName_Det.setText(item.getName());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());
@@ -202,14 +211,14 @@ public class DetailController {
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         clickRetryNum_Det.setText(item.getClickRetryTimes());
         stopRetryNum_Det.setText(item.getStopRetryTimes());
-        stopMatched_Det.setValue(item.getStopMatched());
-        clickMatched_Det.setValue(item.getClickMatched());
-        retryStep_Det.setText(item.getRetryStep());
-        clickMatchedStep_Det.setText(item.getClickMatchedStep());
-        stopMatchedStep_Det.setText(item.getStopMatchedStep());
+        retryType_Det.setValue(item.getRetryType());
+        String retryStep = "0".equals(item.getRetryStep()) ? "" : item.getRetryStep();
+        retryStep_Det.setText(retryStep);
+        matchedType_Det.setValue(item.getMatchedType());
+        String matchedStep = "0".equals(item.getMatchedStep()) ? "" : item.getMatchedStep();
+        matchedStep_Det.setText(matchedStep);
         clickImgSelectPath = item.getClickImgSelectPath();
         stopImgSelectPath = item.getStopImgSelectPath();
-        retryType_Det.setValue(item.getRetryType());
         List<ImgFileBean> imgFileBeans = item.getStopImgFiles();
         ObservableList<ImgFileVO> items = tableView_Det.getItems();
         if (CollectionUtils.isNotEmpty(imgFileBeans)) {
@@ -326,25 +335,28 @@ public class DetailController {
         // 通用内容变化监听
         InvalidationListener invalidationListener = obs -> isModified = true;
         // 绑定所有输入控件
+        registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(timeClick_Det, timeClick_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickName_Det, clickName_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(mouseStartX_Det, mouseStartX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(mouseStartY_Det, mouseStartY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(mouseEndX_Det, mouseEndX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(mouseEndY_Det, mouseEndY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(retryStep_Det, retryStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(mouseStartX_Det, mouseStartX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(mouseStartY_Det, mouseStartY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickNumBer_Det, clickNumBer_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(timeClick_Det, timeClick_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(matchedStep_Det, matchedStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         // 监听滑块改变
         ChangeListener<Number> clickOpacityListener = (obs, oldVal, newVal) ->
                 isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold());
-        registerWeakListener(clickOpacity_Det, clickOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
         registerWeakListener(stopOpacity_Det, stopOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
+        registerWeakListener(clickOpacity_Det, clickOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
         // 监听表格内容变化
         tableView_Det.getItems().forEach(item ->
                 registerWeakInvalidationListener(item, item.pathProperty(), invalidationListener, weakInvalidationListeners));
@@ -409,18 +421,24 @@ public class DetailController {
      * 给组件添加内容变化监听
      */
     private void nodeValueChangeListener() {
-        // 停止操作图像识别准确度设置监听
-        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
-        changeListeners.put(stopOpacity_Det, stopOpacityListener);
-        // 要点击的图像识别准确度设置监听
-        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
-        changeListeners.put(clickOpacity_Det, clickOpacityListener);
         // 操作名称文本输入框鼠标悬停提示
         ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName);
         changeListeners.put(clickName_Det, clickNameListener);
         // 限制每步操作执行前等待时间文本输入框内容
         ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait);
         changeListeners.put(wait_Det, waitListener);
+        // 停止操作图像识别准确度设置监听
+        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
+        changeListeners.put(stopOpacity_Det, stopOpacityListener);
+        // 限制重试后要跳转的步骤序号文本输入框内容
+        ChangeListener<String> retryStepListener = integerRangeTextField(retryStep_Det, 1, maxIndex, tip_Step);
+        changeListeners.put(retryStep_Det, retryStepListener);
+        // 要点击的图像识别准确度设置监听
+        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
+        changeListeners.put(clickOpacity_Det, clickOpacityListener);
+        // 限制识别匹配后要跳转的步骤序号文本输入框内容
+        ChangeListener<String> matchedStepListener = integerRangeTextField(matchedStep_Det, 1, maxIndex, tip_Step);
+        changeListeners.put(matchedStep_Det, matchedStepListener);
         // 限制操作时长文本输入内容
         ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
         changeListeners.put(timeClick_Det, timeClickListener);
@@ -467,12 +485,17 @@ public class DetailController {
         addToolTip(tip_mouseStartX, mouseStartX_Det);
         addToolTip(tip_mouseStartY, mouseStartY_Det);
         addToolTip(tip_removeStopImgBtn, removeAll_Det);
+        addToolTip(tip_Step, matchedStep_Det, retryStep_Det);
         addToolTip(tip_removeClickImgBtn, removeClickImg_Det);
         addToolTip(tip_updateClickNameBtn, updateClickName_Det);
+        addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Det);
+        addToolTip(tip_clickIndex + clickIndex_Det.getText(), clickIndex_Det);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Det);
-        addValueToolTip(stopOpacity_Det, tip_stopOpacity, text_nowValue, String.valueOf((int) stopOpacity_Det.getValue()));
-        addValueToolTip(clickOpacity_Det, tip_clickOpacity, text_nowValue, String.valueOf((int) clickOpacity_Det.getValue()));
+        addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
+        addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
+        addValueToolTip(stopOpacity_Det, tip_stopOpacity, String.valueOf((int) stopOpacity_Det.getValue()));
+        addValueToolTip(clickOpacity_Det, tip_clickOpacity, String.valueOf((int) clickOpacity_Det.getValue()));
     }
 
     /**
@@ -501,6 +524,31 @@ public class DetailController {
     }
 
     /**
+     * 添加确认关闭确认框
+     */
+    private void addCloseConfirm() {
+        CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindSave_Set");
+        // 添加关闭请求监听
+        if (remindSave != null && remindSave.isSelected()) {
+            stage.setOnCloseRequest(e -> {
+                if (isModified) {
+                    ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
+                            "保存并关闭", "直接关闭");
+                    ButtonBar.ButtonData buttonData = result.getButtonData();
+                    if (!buttonData.isCancelButton()) {
+                        // 保存并关闭
+                        saveDetail();
+                    } else {
+                        // 直接关闭
+                        stage.close();
+                    }
+                }
+                removeAllListeners();
+            });
+        }
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException io异常
@@ -511,31 +559,10 @@ public class DetailController {
         bindPrefWidthProperty();
         // 读取配置文件
         getConfig();
-        // 设置鼠标悬停提示
-        setToolTip();
-        // 给输入框添加内容变化监听
-        nodeValueChangeListener();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
-            CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindSave_Set");
-            // 添加关闭请求监听
-            if (remindSave != null && remindSave.isSelected()) {
-                stage.setOnCloseRequest(e -> {
-                    if (isModified) {
-                        ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
-                                "保存并关闭", "直接关闭");
-                        ButtonBar.ButtonData buttonData = result.getButtonData();
-                        if (!buttonData.isCancelButton()) {
-                            // 保存并关闭
-                            saveDetail();
-                        } else {
-                            // 直接关闭
-                            stage.close();
-                        }
-                    }
-                    removeAllListeners();
-                });
-            }
+            // 添加确认关闭确认框
+            addCloseConfirm();
             // 添加控件监听
             addModificationListeners();
             // 自动填充javafx表格
@@ -558,26 +585,51 @@ public class DetailController {
         selectedItem.setClickType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));
         selectedItem.setStartY(String.valueOf(mouseStartY));
-        selectedItem.setRetryType(retryType_Det.getValue());
         selectedItem.setStopImgSelectPath(stopImgSelectPath);
         selectedItem.setClickImgSelectPath(clickImgSelectPath);
-        selectedItem.setStopMatched(stopMatched_Det.getValue());
         selectedItem.setClickImgPath(clickImgPath_Det.getText());
-        selectedItem.setClickMatched(clickMatched_Det.getValue());
         selectedItem.setStopImgFiles(new ArrayList<>(tableView_Det.getItems()));
         selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
         selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
         selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));
         selectedItem.setEndY(String.valueOf(setDefaultIntValue(mouseEndY_Det, mouseStartY, 0, null)));
         selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
-        selectedItem.setRetryStep(String.valueOf(setDefaultIntValue(retryStep_Det, 0, 1, null)));
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
-        selectedItem.setStopMatchedStep(String.valueOf(setDefaultIntValue(stopMatchedStep_Det, 0, 1, null)));
-        selectedItem.setClickMatchedStep(String.valueOf(setDefaultIntValue(clickMatchedStep_Det, 0, 1, null)));
         selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(defaultStopRetryNum), 0, null)));
         selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
+        int selectIndex = selectedItem.getIndex();
+        String matchedType = matchedType_Det.getValue();
+        selectedItem.setMatchedType(matchedType);
+        if (clickMatched_Step.equals(matchedType) || clickMatched_ClickStep.equals(matchedType)) {
+            String matchedStep = matchedStep_Det.getText();
+            if (StringUtils.isBlank(matchedStep)) {
+                throw new RuntimeException(text_matchedStepIsNull);
+            }
+            if (Integer.parseInt(matchedStep) > maxIndex) {
+                throw new RuntimeException(text_matchedStepGreaterMax);
+            }
+            if (Integer.parseInt(matchedStep) == selectIndex) {
+                throw new RuntimeException(text_matchedStepEqualIndex);
+            }
+            selectedItem.setMatchedStep(matchedStep);
+        }
+        String retryType = retryType_Det.getValue();
+        selectedItem.setRetryType(retryType);
+        if (retryType_Step.equals(retryType)) {
+            String retryStep = retryStep_Det.getText();
+            if (StringUtils.isBlank(retryStep)) {
+                throw new RuntimeException(text_retryStepIsNull);
+            }
+            if (Integer.parseInt(retryStep) > maxIndex) {
+                throw new RuntimeException(text_retryStepGreaterMax);
+            }
+            if (Integer.parseInt(retryStep) == selectIndex) {
+                throw new RuntimeException(text_retryStepEqualIndex);
+            }
+            selectedItem.setRetryStep(retryStep);
+        }
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
@@ -667,6 +719,26 @@ public class DetailController {
     @FXML
     private void updateClickName() {
         clickName_Det.setText(clickImgName_Det.getText());
+    }
+
+    /**
+     * 要匹配的图像重试逻辑下拉框
+     */
+    @FXML
+    private void retryTypeChange() {
+        retryStep_Det.setText("");
+        retryStepHBox_Det.setVisible(retryType_Step.equals(retryType_Det.getValue()));
+        addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
+    }
+
+    /**
+     * 识别匹配后逻辑下拉框
+     */
+    @FXML
+    private void matchedTypeChange() {
+        matchedStep_Det.setText("");
+        matchedStepHBox_Det.setVisible(clickMatched_Step.equals(matchedType_Det.getValue()) || clickMatched_ClickStep.equals(matchedType_Det.getValue()));
+        addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
     }
 
 }

@@ -11,12 +11,12 @@
     <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
-                <HBox spacing="10" prefWidth="150">
+                <HBox styleClass="hBox-Detail-Style">
                     <Label prefHeight="25" text="步骤序号:"/>
                     <Label prefHeight="25" fx:id="clickIndex_Det"/>
                 </HBox>
 
-                <HBox spacing="10" prefWidth="180">
+                <HBox styleClass="hBox-Detail-Style">
                     <Label prefHeight="25" text="列表操作步骤数量:"/>
                     <Label prefHeight="25" fx:id="tableViewSize_Det"/>
                 </HBox>
@@ -44,8 +44,6 @@
                         </value>
                     </ChoiceBox>
                 </HBox>
-
-                <Label textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
             </HBox>
 
             <HBox spacing="10">
@@ -104,18 +102,22 @@
                     <Label prefHeight="25" text="要识别的图像识别失败重试次数:"/>
                     <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
                 </HBox>
+
+                <Label prefHeight="25" textFill="red" text=" 更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
             </HBox>
 
             <HBox spacing="10">
                 <HBox prefWidth="490" spacing="10">
                     <HBox spacing="10">
                         <Label prefHeight="25" text="识别匹配后逻辑:"/>
-                        <ChoiceBox fx:id="clickMatched_Det" prefHeight="25" prefWidth="160">
+                        <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="185"
+                                   onAction="#matchedTypeChange">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="点击匹配的图像"/>
                                     <String fx:value="直接执行下一个操作步骤"/>
                                     <String fx:value="跳转到指定操作步骤"/>
+                                    <String fx:value="点击匹配图像后跳转指定步骤"/>
                                 </FXCollections>
                             </items>
                             <value>
@@ -124,32 +126,34 @@
                         </ChoiceBox>
                     </HBox>
 
-                    <HBox fx:id="clickMatchedStepHBox_Det" spacing="10">
+                    <HBox fx:id="matchedStepHBox_Det" spacing="10">
                         <Label prefHeight="25" text="要跳转的步骤序号:"/>
-                        <TextField fx:id="clickMatchedStep_Det" prefWidth="80"/>
+                        <TextField fx:id="matchedStep_Det" prefWidth="60"/>
                     </HBox>
                 </HBox>
 
-                <HBox prefWidth="490" spacing="10">
-                    <Label prefHeight="25" text="重试逻辑:"/>
-                    <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="重试直到图像出现"/>
-                                <String fx:value="按设置次数重试后点击设置位置"/>
+                <HBox spacing="10">
+                    <HBox spacing="10">
+                        <Label prefHeight="25" text="要匹配的图像重试逻辑:"/>
+                        <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="195" onAction="#retryTypeChange">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="重试直到图像出现"/>
+                                    <String fx:value="按设置次数重试后点击设置位置"/>
+                                    <String fx:value="按设置次数重试后终止操作"/>
+                                    <String fx:value="按设置次数重试后跳过本次操作"/>
+                                    <String fx:value="按设置次数重试后跳转指定步骤"/>
+                                </FXCollections>
+                            </items>
+                            <value>
                                 <String fx:value="按设置次数重试后终止操作"/>
-                                <String fx:value="按设置次数重试后跳过本次操作"/>
-                                <String fx:value="按设置次数重试后跳转到指定步骤"/>
-                            </FXCollections>
-                        </items>
-                        <value>
-                            <String fx:value="按设置次数重试后终止操作"/>
-                        </value>
-                    </ChoiceBox>
+                            </value>
+                        </ChoiceBox>
+                    </HBox>
 
-                    <HBox fx:id="retryStepHBox_Det" spacing="10">
+                    <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">
                         <Label prefHeight="25" text="要跳转的步骤序号:"/>
-                        <TextField fx:id="retryStep_Det" prefWidth="80"/>
+                        <TextField fx:id="retryStep_Det" prefWidth="60"/>
                     </HBox>
                 </HBox>
             </HBox>
@@ -165,26 +169,6 @@
                 <HBox spacing="5">
                     <Label prefHeight="25" text="终止操作图像识别失败重试次数:"/>
                     <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <Label prefHeight="25" text="识别匹配后逻辑:"/>
-                <ChoiceBox fx:id="stopMatched_Det" prefHeight="25" prefWidth="160">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="终止操作"/>
-                            <String fx:value="跳转到指定操作步骤"/>
-                        </FXCollections>
-                    </items>
-                    <value>
-                        <String fx:value="终止操作"/>
-                    </value>
-                </ChoiceBox>
-
-                <HBox fx:id="stopMatchedStepHBox_Det" spacing="10">
-                    <Label prefHeight="25" text="要跳转的步骤序号:"/>
-                    <TextField fx:id="stopMatchedStep_Det" prefWidth="80"/>
                 </HBox>
             </HBox>
 

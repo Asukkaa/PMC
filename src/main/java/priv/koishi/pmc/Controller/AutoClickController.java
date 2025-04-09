@@ -65,6 +65,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
+import static priv.koishi.pmc.Service.AutoClickService.clearReferences;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -641,6 +642,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
         if (!runClicking && !recordClicking) {
             runClicking = true;
+            // 检查跳转逻辑参数设置是否合理
+            checkGotoSetting(clickPositionVOS);
             CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
@@ -699,6 +702,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 Throwable ex = autoClickTask.getException();
                 autoClickTask = null;
                 runClicking = false;
+                clearReferences();
                 throw new RuntimeException(ex);
             });
             autoClickTask.setOnCancelled(event -> {
@@ -713,6 +717,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 autoClickTask = null;
                 runTimeline = null;
                 runClicking = false;
+                clearReferences();
             });
             if (runTimeline == null) {
                 // 改变要防重复点击的组件状态
@@ -728,6 +733,35 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 runTimeline = executeRunTimeLine(preparationTimeValue);
             }
         }
+    }
+
+    /**
+     * 检查跳转逻辑参数设置是否合理
+     */
+    private static void checkGotoSetting(List<ClickPositionVO> clickPositionVOS) {
+        int maxIndex = clickPositionVOS.size();
+        clickPositionVOS.stream().parallel().forEach(clickPositionVO -> {
+            int index = clickPositionVO.getIndex();
+            String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
+            if (clickMatched_ClickStep.equals(clickPositionVO.getMatchedType())) {
+                int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
+                if (matchStep > maxIndex) {
+                    throw new RuntimeException(err + text_matchedStepGreaterMax);
+                }
+                if (matchStep == index) {
+                    throw new RuntimeException(err + text_matchedStepEqualIndex);
+                }
+            }
+            if (retryType_Step.equals(clickPositionVO.getRetryStep())) {
+                int retryStep = Integer.parseInt(clickPositionVO.getMatchedStep());
+                if (retryStep > maxIndex) {
+                    throw new RuntimeException(err + text_retryStepGreaterMax);
+                }
+                if (retryStep == index) {
+                    throw new RuntimeException(err + text_retryStepEqualIndex);
+                }
+            }
+        });
     }
 
     /**
@@ -933,10 +967,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setStopImgFiles(defaultStopImgFiles)
-                .setClickMatched(clickMatched_click)
+                .setMatchedType(clickMatched_click)
                 .setClickType(mouseButton_primary)
                 .setClickRetryTimes(clickRetryNum)
-                .setStopMatched(stopMatched_stop)
                 .setStopRetryTimes(stopRetryNum)
                 .setRetryType(retryType_stop)
                 .setClickInterval("0")
@@ -1029,14 +1062,21 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void addAutoClickPositions(List<ClickPositionVO> clickPositionVOS) throws IOException {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
             clickPositionVO.setUuid(UUID.randomUUID().toString());
-            if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null) || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getEndX(), 0, null) || !isInIntegerRange(clickPositionVO.getEndY(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null) || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null) || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickRetryTimes(), 0, null) || !isInIntegerRange(clickPositionVO.getStopRetryTimes(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100) || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
-                    || !clickMatchedList.contains(clickPositionVO.getClickMatched()) || !stopMatchedList.contains(clickPositionVO.getStopMatched())
-                    || !runClickTypeMap.containsKey(clickPositionVO.getClickType()) || !retryTypeList.contains(clickPositionVO.getRetryType())) {
+            if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getEndX(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getEndY(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickRetryTimes(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getStopRetryTimes(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100)
+                    || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
+                    || !clickMatchedList.contains(clickPositionVO.getMatchedType())
+                    || !runClickTypeMap.containsKey(clickPositionVO.getClickType())
+                    || !retryTypeList.contains(clickPositionVO.getRetryType())) {
                 throw new IOException(text_LackKeyData);
             }
         }

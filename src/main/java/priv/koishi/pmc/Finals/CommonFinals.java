@@ -306,7 +306,13 @@ public class CommonFinals {
 
     public static final String tip_clickIndex = "当前步骤序号为：";
 
-    public static final String tip_tableViewSize = "当前共有操作步骤数量为：";
+    public static final String tip_tableViewSize = "当前操作步骤列表共有操作步骤数量为：";
+
+    public static final String tip_Step = "只能填正整数，不可为空，不可大于操作步骤列表中步骤总数，不可填当前步骤序号，目标序号变更后需重新设置";
+
+    public static final String tip_matchedType = "要识别的图像匹配成功后将会根据选项进行不同的操作";
+
+    public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
 
     public static final String version = "2.1.0";
 
@@ -390,7 +396,7 @@ public class CommonFinals {
 
     public static final String text_copySuccess = "复制成功";
 
-    public static final String text_nowValue = "当前设置值为 ";
+    public static final String text_nowValue = "当前设置值为： ";
 
     public static final String text_saveSuccess = "所有数据已导出到： ";
 
@@ -447,6 +453,18 @@ public class CommonFinals {
     public static final String text_noImg = "无图片";
 
     public static final String text_badImg = "图片文件缺失或损坏";
+
+    public static final String text_retryStepGreaterMax = "重试后要跳转的步骤序号不能大于列表步骤数量";
+
+    public static final String text_retryStepEqualIndex = "重试后要跳转的步骤序号不能等于当前步骤序号";
+
+    public static final String text_retryStepIsNull = "重试后要跳转的步骤序号不能为空";
+
+    public static final String text_matchedStepGreaterMax = "匹配后要跳转的步骤序号不能大于列表步骤数量";
+
+    public static final String text_matchedStepEqualIndex = "匹配后要跳转的步骤序号不能等于当前步骤序号";
+
+    public static final String text_matchedStepIsNull = "匹配后要跳转的步骤序号不能为空";
 
     public static final String key_logsNum = "logsNum";
 
@@ -582,7 +600,7 @@ public class CommonFinals {
 
     public static final String retryType_break = "按设置次数重试后跳过本次操作";
 
-    public static final String retryType_Step = "按设置次数重试后跳转到指定步骤";
+    public static final String retryType_Step = "按设置次数重试后跳转指定步骤";
 
     /**
      * 重试逻辑下拉框选项
@@ -596,20 +614,13 @@ public class CommonFinals {
 
     public static final String clickMatched_Step = "跳转到指定操作步骤";
 
+    public static final String clickMatched_ClickStep = "点击匹配图像后跳转指定步骤";
+
     /**
      * 要识别的图像识别匹配后逻辑下拉框选项
      */
     public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click, clickMatched_break,
-            clickMatched_Step);
-
-    public static final String stopMatched_stop = "终止操作";
-
-    public static final String stopMatched_Step = "跳转到指定操作步骤";
-
-    /**
-     * 终止操作图像识别匹配后逻辑下拉框选项
-     */
-    public static final List<String> stopMatchedList = Arrays.asList(stopMatched_stop, stopMatched_Step);
+            clickMatched_Step, clickMatched_ClickStep);
 
     public static final String mouseButton_primary = "鼠标左键点击";
 

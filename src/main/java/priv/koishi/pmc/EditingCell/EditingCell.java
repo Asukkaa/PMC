@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
-import static priv.koishi.pmc.Finals.CommonFinals.text_nowValue;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -178,7 +177,7 @@ public class EditingCell<T> extends TableCell<T, String> {
             }
         };
         textField.focusedProperty().addListener(textFocusedPropertyListener);
-        addValueToolTip(textField, tip + tableColumnText, text_nowValue);
+        addValueToolTip(textField, tip + tableColumnText);
     }
 
     /**
