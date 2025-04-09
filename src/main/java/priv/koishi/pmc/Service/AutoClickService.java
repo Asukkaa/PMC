@@ -115,6 +115,7 @@ public class AutoClickService {
                     String clickType = clickPositionVO.getClickType();
                     String interval = clickPositionVO.getClickInterval();
                     String clickImgPath = clickPositionVO.getClickImgPath();
+                    String matchType = clickPositionVO.getMatchedType();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     Platform.runLater(() -> {
                         String text = loopTimeText +
@@ -128,10 +129,9 @@ public class AutoClickService {
                                 text = loopTimeText +
                                         "\n本轮进度：" + progress + "/" + dataSize +
                                         "\n将在 " + waitTime + " 毫秒后将执行: " + name +
-                                        "\n操作内容：" + clickType + " 要识别的图片：" +
+                                        "\n操作内容：识别目标图像：" +
                                         "\n" + getExistsFileName(new File(clickImgPath)) +
-                                        "\n单次点击" + clickTime + " 毫秒" +
-                                        "\n重复 " + clickNum + " 次，每次操作间隔：" + interval + " 毫秒";
+                                        "\n图像匹配后 " + matchType;
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
