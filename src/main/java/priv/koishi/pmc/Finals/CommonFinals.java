@@ -402,7 +402,7 @@ public class CommonFinals {
 
     public static final String text_loadSuccess = "已导入自动操作流程：";
 
-    public static final String text_executionTime = " 轮操作\n";
+    public static final String text_executionTime = " 轮操作";
 
     public static final String text_execution = "正在执行第 ";
 

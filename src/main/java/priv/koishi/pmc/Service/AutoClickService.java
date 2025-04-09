@@ -72,7 +72,7 @@ public class AutoClickService {
                     int i = 0;
                     while (!isCancelled()) {
                         i++;
-                        String loopTimeText = text_execution + i + " / ∞" + text_executionTime;
+                        String loopTimeText = text_cancelTask + text_execution + i + " / ∞" + text_executionTime;
                         if (isCancelled()) {
                             break;
                         }
@@ -81,7 +81,7 @@ public class AutoClickService {
                     }
                 } else {
                     for (int i = 0; i < loopTime && !isCancelled(); i++) {
-                        String loopTimeText = text_execution + (i + 1) + " / " + loopTime + text_executionTime;
+                        String loopTimeText = text_cancelTask + text_execution + (i + 1) + " / " + loopTime + text_executionTime;
                         if (isCancelled()) {
                             break;
                         }
@@ -102,7 +102,8 @@ public class AutoClickService {
                 updateProgress(0, dataSize);
                 int currentStep = 0;
                 while (currentStep < dataSize) {
-                    updateProgress(currentStep + 1, dataSize);
+                    int progress = currentStep + 1;
+                    updateProgress(progress, dataSize);
                     ClickPositionVO clickPositionVO = tableViewItems.get(currentStep);
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
@@ -111,19 +112,26 @@ public class AutoClickService {
                     String waitTime = clickPositionVO.getWaitTime();
                     String clickTime = clickPositionVO.getClickTime();
                     String name = clickPositionVO.getName();
+                    String clickType = clickPositionVO.getClickType();
+                    String interval = clickPositionVO.getClickInterval();
+                    String clickImgPath = clickPositionVO.getClickImgPath();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     Platform.runLater(() -> {
-                        String text = text_cancelTask + loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                "\n操作内容：" + clickPositionVO.getClickType() + " X：" + startX + " Y：" + startY +
+                        String text = loopTimeText +
+                                "\n本轮进度：" + progress + "/" + dataSize +
+                                "\n将在 " + waitTime + " 毫秒后将执行: " + name +
+                                "\n操作内容：" + clickType + " X：" + startX + " Y：" + startY +
                                 "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
-                                "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
-                        if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
+                                "\n重复 " + clickNum + " 次，每次操作间隔：" + interval + " 毫秒";
+                        if (StringUtils.isNotBlank(clickImgPath)) {
                             try {
-                                text = text_cancelTask + loopTimeText + waitTime + " 毫秒后将执行: " + name +
-                                        "\n操作内容：" + clickPositionVO.getClickType() + " 要识别的图片：" +
-                                        "\n" + getExistsFileName(new File(clickPositionVO.getClickImgPath())) +
+                                text = loopTimeText +
+                                        "\n本轮进度：" + progress + "/" + dataSize +
+                                        "\n将在 " + waitTime + " 毫秒后将执行: " + name +
+                                        "\n操作内容：" + clickType + " 要识别的图片：" +
+                                        "\n" + getExistsFileName(new File(clickImgPath)) +
                                         "\n单次点击" + clickTime + " 毫秒" +
-                                        "\n重复 " + clickNum + " 次，每次操作间隔：" + clickPositionVO.getClickInterval() + " 毫秒";
+                                        "\n重复 " + clickNum + " 次，每次操作间隔：" + interval + " 毫秒";
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -179,7 +187,7 @@ public class AutoClickService {
                 Platform.runLater(() -> {
                     try {
                         fileName.set(getExistsFileName(new File(stopPath)));
-                        String text = text_cancelTask + loopTimeText + "\n正在识别终止操作图像：\n" + fileName.get();
+                        String text = loopTimeText + "\n正在识别终止操作图像：\n" + fileName.get();
                         floatingLabel.setText(text);
                         massageLabel.setText(text);
                     } catch (IOException e) {
@@ -201,7 +209,7 @@ public class AutoClickService {
                 }
                 try (Point position = matchPoint.getPoint()) {
                     if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
-                        throw new Exception("操作已终止" +
+                        throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时终止操作" +
                                 "\n匹配到终止操作图像：" + fileName.get() +
                                 "\n匹配度为：" + matchPoint.getMatchThreshold() + " %" +
                                 "\n坐标 X：" + position.x() + " Y：" + position.y());
@@ -218,7 +226,7 @@ public class AutoClickService {
             Platform.runLater(() -> {
                 try {
                     fileName.set(getExistsFileName(new File(clickPath)));
-                    String text = text_cancelTask + loopTimeText + "\n正在识别目标图像：\n" + fileName.get();
+                    String text = loopTimeText + "\n正在识别目标图像：\n" + fileName.get();
                     floatingLabel.setText(text);
                     massageLabel.setText(text);
                 } catch (IOException e) {
@@ -254,7 +262,8 @@ public class AutoClickService {
                     // 匹配失败后终止操作
                 } else if (retryType_stop.equals(retryType)) {
                     try {
-                        throw new Exception("已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
+                        throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时发生异常" +
+                                "\n已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
                                 "\n未找到匹配图像：" + fileName.get() +
                                 "\n最接近的图像匹配度为：" + matchPoint.getMatchThreshold() + " %" +
                                 "\n坐标 X：" + position.x() + " Y：" + position.y());
