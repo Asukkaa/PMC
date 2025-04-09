@@ -82,11 +82,6 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class AutoClickController extends CommonProperties implements MousePositionUpdater {
 
     /**
-     * 导出文件路径
-     */
-    private static String outFilePath;
-
-    /**
      * 导入文件路径
      */
     private static String inFilePath;
@@ -379,7 +374,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
             TextField preparationRunTime = (TextField) scene.lookup("#preparationRunTime_Click");
             prop.put(key_lastPreparationRunTime, preparationRunTime.getText());
             Label outPath = (Label) scene.lookup("#outPath_Click");
-            prop.put(key_outFilePath, outPath.getText());
+            String outPathValue = outPath.getText();
+            prop.put(key_outFilePath, outPathValue);
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
@@ -387,7 +383,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             CheckBox autoSave = (CheckBox) scene.lookup("#autoSave_Set");
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Click");
             // 自动保存
-            autoSave(autoSave, tableView);
+            autoSave(autoSave, tableView, outPathValue);
         }
     }
 
@@ -398,12 +394,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param tableView 操作流程列表
      * @throws IOException io异常
      */
-    private static void autoSave(CheckBox autoSave, TableView<?> tableView) throws IOException {
+    private static void autoSave(CheckBox autoSave, TableView<?> tableView, String outPath) throws IOException {
         if (autoSave.isSelected()) {
             List<?> tableViewItems = new ArrayList<>(tableView.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                String path = notOverwritePath(outFilePath + File.separator + autoSaveFileName + PMC);
+                String path = notOverwritePath(outPath + File.separator + autoSaveFileName + PMC);
                 // 构建基类类型信息
                 JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
                 // 使用基类类型进行序列化
@@ -431,7 +427,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
         }
         if (StringUtils.isBlank(outPath_Click.getText())) {
             setPathLabel(outPath_Click, defaultFileChooserPath, false);
-            outFilePath = defaultFileChooserPath;
         }
         input.close();
     }
@@ -460,7 +455,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
         TableView<?> tableView = (TableView<?>) mainScene.lookup("#tableView_Set");
         defaultStopImgFiles = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
         inFilePath = prop.getProperty(key_inFilePath);
-        outFilePath = prop.getProperty(key_outFilePath);
         autoSaveFileName = prop.getProperty(key_autoSaveFileName);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
@@ -1517,6 +1511,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             if (CollectionUtils.isEmpty(tableViewItems)) {
                 throw new Exception(text_noAutoClickList);
             }
+            String outFilePath = outPath_Click.getText();
             if (StringUtils.isBlank(outFilePath)) {
                 throw new Exception(text_outPathNull);
             }
@@ -1545,10 +1540,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void addOutPath(ActionEvent actionEvent) throws IOException {
         getConfig();
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        String outFilePath = outPath_Click.getText();
         File selectedFile = creatDirectoryChooser(window, outFilePath, text_selectDirectory);
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            outFilePath = updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click);
+            updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click);
         }
     }
 
