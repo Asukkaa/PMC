@@ -316,7 +316,7 @@ public class CommonFinals {
 
     public static final String version = "2.1.0";
 
-    public static final String buildDate = "2025年4月";
+    public static final String buildDate = "2025年4月9日";
 
     public static final String tip_version = """
             version：%s
