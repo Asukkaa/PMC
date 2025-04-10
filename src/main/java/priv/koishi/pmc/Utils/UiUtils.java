@@ -789,15 +789,21 @@ public class UiUtils {
                 Dragboard db = e.getDragboard();
                 if (db.hasContent(dataFormat)) {
                     List<Integer> indices = (List<Integer>) db.getContent(dataFormat);
-                    int dropIndex = row.isEmpty() ? tableView.getItems().size() : row.getIndex();
+                    int maxIndex = tableView.getItems().size();
+                    int dropIndex = row.isEmpty() ? maxIndex : row.getIndex();
                     // 计算有效插入位置
-                    int adjustedDropIndex = calculateAdjustedIndex(indices, dropIndex);
+                    int adjustedDropIndex = calculateAdjustedIndex(indices, dropIndex, maxIndex);
                     if (adjustedDropIndex != -1) {
                         // 批量移动数据
                         moveRows(tableView, indices, adjustedDropIndex);
                         // 更新选中状态
                         selectMovedRows(tableView, indices, adjustedDropIndex);
                         e.setDropCompleted(true);
+                        e.consume();
+                    } else {
+                        // 确保拖拽失败
+                        e.setDropCompleted(false);
+                        // 消费事件以避免进一步传播
                         e.consume();
                     }
                 }
@@ -811,16 +817,19 @@ public class UiUtils {
      *
      * @param draggedIndices 被拖拽行的原始索引列表（需保证有序）
      * @param dropIndex      拖拽操作的目标放置位置原始索引
+     * @param maxIndex       表格数据项总数
      * @return 调整后的有效插入位置，返回-1表示无效拖拽位置
      */
-    private static int calculateAdjustedIndex(List<Integer> draggedIndices, int dropIndex) {
+    private static int calculateAdjustedIndex(List<Integer> draggedIndices, int dropIndex, int maxIndex) {
         int firstDragged = draggedIndices.getFirst();
         int lastDragged = draggedIndices.getLast();
-        // 排除无效拖拽位置
-        if (dropIndex > firstDragged && dropIndex <= lastDragged + 1) {
+        if (dropIndex + 1 >= maxIndex) {
+            return maxIndex - draggedIndices.size();
+        }
+        if (dropIndex >= firstDragged && dropIndex <= lastDragged) {
             return -1;
         }
-        return (dropIndex > lastDragged) ? dropIndex - draggedIndices.size() : dropIndex;
+        return dropIndex;
     }
 
     /**
