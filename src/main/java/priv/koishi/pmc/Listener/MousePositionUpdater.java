@@ -13,6 +13,8 @@ public interface MousePositionUpdater {
 
     /**
      * 根据鼠标位置调整ui接口
+     *
+     * @param mousePoint 鼠标位置
      */
     void onMousePositionUpdate(Point mousePoint);
 
