@@ -1,21 +1,41 @@
 @echo off
+
 set "source=win"
-set "bin=..\target\app\bin"
 set "target=..\target"
+set "bin=%target%\app\bin"
+set "appIcon=..\appBuilder\PMC.ico"
 set "appName=Perfect Mouse Control"
 set "appVersion=2.1.0"
-set "appIcon=..\appBuilder\PMC.ico"
 set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 set "runtimeImage=app"
 
-xcopy /E /I /Y "%source%\*" "%bin%\"
-echo 已复制 [%source%] 及其子目录内容到 [%bin%]
+:: 处理ZIP文件
+for /r "%source%" %%F in (*.zip) do (
+    set "zipPath=%%F"
+    set "relPath=%%~pF"
+    setlocal enabledelayedexpansion
+    set "relPath=!relPath:%source%\=!"
 
+    mkdir "%bin%\!relPath!" >nul 2>&1
+    tar -xf "!zipPath!" -C "%bin%\!relPath!"
+
+    rmdir /s /q "%bin%\!relPath!__MACOSX" 2>nul
+    echo 已解压 [%%F] 到 [%bin%\!relPath!]
+    endlocal
+)
+
+:: 复制其他非ZIP文件
+robocopy "%source%" "%bin%" /E /XF *.zip
+echo 已复制非ZIP文件到 [%bin%]
+
+:: 清理旧构建
 pushd "%target%"
 if exist "%appName%" (
     echo 发现已存在的 [%appName%] 目录，正在清理...
     rmdir /s /q "%appName%"
 )
+
+:: 执行打包
 jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%"
 echo 已完成 jpackage 打包
 
