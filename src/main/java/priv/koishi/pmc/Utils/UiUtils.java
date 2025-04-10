@@ -763,7 +763,6 @@ public class UiUtils {
                     if (!draggedIndices.isEmpty()) {
                         Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
                         db.setDragView(row.snapshot(null, null));
-
                         // 使用自定义数据格式存储多个索引
                         ClipboardContent cc = new ClipboardContent();
                         cc.put(dataFormat, new ArrayList<>(draggedIndices));
@@ -853,7 +852,6 @@ public class UiUtils {
         for (int i = 0; i < originalIndices.size(); i++) {
             tableView.getSelectionModel().select(targetIndex + i);
         }
-        tableView.scrollTo(targetIndex);
     }
 
     /**
