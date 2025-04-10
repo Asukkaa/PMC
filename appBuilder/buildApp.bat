@@ -12,15 +12,9 @@ set "runtimeImage=app"
 :: 处理ZIP文件
 for /r "%source%" %%F in (*.zip) do (
     set "zipPath=%%F"
-    set "relPath=%%~pF"
     setlocal enabledelayedexpansion
-    set "relPath=!relPath:%source%\=!"
-
-    mkdir "%bin%\!relPath!" >nul 2>&1
-    tar -xf "!zipPath!" -C "%bin%\!relPath!"
-
-    rmdir /s /q "%bin%\!relPath!__MACOSX" 2>nul
-    echo 已解压 [%%F] 到 [%bin%\!relPath!]
+    :: 使用绝对路径解压
+    tar -xf "!zipPath!" -C "%bin%" --exclude="__MACOSX"
     endlocal
 )
 

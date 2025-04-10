@@ -41,6 +41,8 @@ macOS 依赖文件中的 libopenblas_nolapack.0.dylib 因文件太大所以进�
 
 如果打包后 macOS 的文件选择器 ui 为英文则需修改 Info.plist 将 CFBundleDevelopmentRegion 属性的值改为 zh_CN 。
 
+jlink 打包后的操作都已写在 buildApp 脚本中，使用 jlink 打包后直接运行对应操作系统的 buildApp 脚本文件即可生成可执行文件。
+
 # 项目地址
 GitHub：https://github.com/Asukkaa/PMC
 

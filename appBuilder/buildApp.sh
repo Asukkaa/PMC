@@ -26,7 +26,6 @@ find "$source" -type f -name "*.zip" -exec sh -c '
     target_dir="$2/$rel_path"
     mkdir -p "$target_dir"
     unzip -oq "$zip_file" -d "$target_dir"
-    # 新增删除 __MACOSX 逻辑
     rm -rf "$target_dir"/__MACOSX 2>/dev/null
     echo "已解压 [$zip_file] 到 [$target_dir]"
 ' {} "$source" "$bin" \;
