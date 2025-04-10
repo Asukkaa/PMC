@@ -299,8 +299,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private TableColumn<ClickPositionVO, ImageView> thumb_Click;
 
     @FXML
-    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click,
-            clickInterval_Click, waitTime_Click, clickType_Click, retryType_Click;
+    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickInterval_Click,
+            waitTime_Click, clickType_Click, retryType_Click;
 
     /**
      * 组件自适应宽高
