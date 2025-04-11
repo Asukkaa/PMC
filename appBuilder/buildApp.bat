@@ -5,7 +5,7 @@ set "target=..\target"
 set "bin=%target%\app\bin"
 set "appIcon=..\appBuilder\PMC.ico"
 set "appName=Perfect Mouse Control"
-set "appVersion=2.1.0"
+set "appVersion=2.1.1"
 set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 set "runtimeImage=app"
 
