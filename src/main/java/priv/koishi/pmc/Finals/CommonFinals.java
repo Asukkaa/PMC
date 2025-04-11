@@ -24,6 +24,9 @@ public class CommonFinals {
      */
     public static final String appName = "Perfect Mouse Control";
 
+    /**
+     * 程序logo
+     */
     public static String logoPath = "icon/PMC.png";
 
     /**
@@ -122,10 +125,6 @@ public class CommonFinals {
 
     public static final String win = "win";
 
-    public static final String activation = "1";
-
-    public static final String unActivation = "0";
-
     public static final String log = ".log";
 
     public static final String allPMC = "*.pmc";
@@ -157,6 +156,16 @@ public class CommonFinals {
     public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
 
     public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    /**
+     * 启用
+     */
+    public static final String activation = "1";
+
+    /**
+     * 禁用
+     */
+    public static final String unActivation = "0";
 
     /**
      * 默认浮窗横轴偏移量
