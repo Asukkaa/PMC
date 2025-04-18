@@ -742,7 +742,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         clickPositionVOS.stream().parallel().forEach(clickPositionVO -> {
             int index = clickPositionVO.getIndex();
             String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
-            if (clickMatched_ClickStep.equals(clickPositionVO.getMatchedType())) {
+            if (clickMatched_clickStep.equals(clickPositionVO.getMatchedType())) {
                 int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
                 if (matchStep > maxIndex) {
                     throw new RuntimeException(err + text_matchedStepGreaterMax);

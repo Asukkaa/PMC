@@ -149,8 +149,11 @@ public class AutoClickService {
                     }
                     // 执行自动流程
                     int stepIndex = click(clickPositionVO, robot, loopTimeText);
-                    // 跳转到指定步骤
-                    if (stepIndex > 0) {
+                    // 点击匹配图像直到图像不存在
+                    if (stepIndex == -1) {
+                        continue;
+                        // 跳转到指定步骤
+                    } else if (stepIndex > 0) {
                         currentStep = stepIndex - 1;
                         continue;
                     }
@@ -165,7 +168,7 @@ public class AutoClickService {
      *
      * @param clickPositionVO 操作设置
      * @param robot           Robot实例
-     * @return 跳转的步骤索引，0为不跳转
+     * @return 跳转的步骤索引，0为不跳转，-1为再次执行
      */
     private static int click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText) throws Exception {
         int gotoStep = 0;
@@ -243,24 +246,31 @@ public class AutoClickService {
                     .setTemplatePath(clickPath);
             MatchPoint matchPoint = findPosition(findPositionConfig);
             try (Point position = matchPoint.getPoint()) {
+                String matchedType = clickPositionVO.getMatchedType();
                 if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
-                    String matchedType = clickPositionVO.getMatchedType();
                     // 匹配成功后跳过操作
                     if (clickMatched_break.equals(matchedType)) {
                         return gotoStep;
                         // 匹配成功后执行指定步骤
-                    } else if (clickMatched_Step.equals(matchedType)) {
+                    } else if (clickMatched_step.equals(matchedType)) {
                         return Integer.parseInt(clickPositionVO.getMatchedStep());
                         // 匹配成功后点击匹配图像并执行指定步骤
-                    } else if (clickMatched_ClickStep.equals(matchedType)) {
+                    } else if (clickMatched_clickStep.equals(matchedType)) {
                         gotoStep = Integer.parseInt(clickPositionVO.getMatchedStep());
+                        // 点击匹配图像直到图像不存在
+                    } else if (clickMatched_clickWhile.equals(matchedType)) {
+                        gotoStep = -1;
                     }
                     startX = position.x();
                     startY = position.y();
                     endX = position.x();
                     endY = position.y();
-                    // 匹配失败后终止操作
-                } else if (retryType_stop.equals(retryType)) {
+                    // 匹配失败后或图像识别匹配逻辑为点击匹配图像直到图像不存在跳过本次操作
+                } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
+                    return gotoStep;
+                }
+                // 匹配失败后终止操作
+                else if (retryType_stop.equals(retryType)) {
                     try {
                         throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时发生异常" +
                                 "\n已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
@@ -270,9 +280,6 @@ public class AutoClickService {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                    // 匹配失败后跳过本次操作
-                } else if (retryType_break.equals(retryType)) {
-                    return gotoStep;
                     // 匹配失败后执行指定步骤
                 } else if (retryType_Step.equals(retryType)) {
                     return Integer.parseInt(clickPositionVO.getRetryStep());

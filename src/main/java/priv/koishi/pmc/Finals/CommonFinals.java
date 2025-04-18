@@ -323,7 +323,7 @@ public class CommonFinals {
 
     public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
 
-    public static final String version = "2.1.1";
+    public static final String version = "2.1.2";
 
     public static final String buildDate = "2025年4月11日";
 
@@ -621,15 +621,17 @@ public class CommonFinals {
 
     public static final String clickMatched_break = "直接执行下一个操作步骤";
 
-    public static final String clickMatched_Step = "跳转到指定操作步骤";
+    public static final String clickMatched_step = "跳转到指定操作步骤";
 
-    public static final String clickMatched_ClickStep = "点击匹配图像后跳转指定步骤";
+    public static final String clickMatched_clickStep = "点击匹配图像后跳转指定步骤";
+
+    public static final String clickMatched_clickWhile = "点击匹配图像直到图像不存在";
 
     /**
      * 要识别的图像识别匹配后逻辑下拉框选项
      */
     public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click, clickMatched_break,
-            clickMatched_Step, clickMatched_ClickStep);
+            clickMatched_step, clickMatched_clickStep);
 
     public static final String mouseButton_primary = "鼠标左键点击";
 

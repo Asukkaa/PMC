@@ -189,7 +189,7 @@ public class DetailController {
         clickIndex_Det.setText(String.valueOf(item.getIndex()));
         if (maxIndex == 1) {
             retryType_Det.getItems().remove(retryType_Step);
-            matchedType_Det.getItems().removeAll(clickMatched_Step, clickMatched_ClickStep);
+            matchedType_Det.getItems().removeAll(clickMatched_step, clickMatched_clickStep);
         }
         String tableViewSize = String.valueOf(maxIndex);
         tableViewSize_Det.setText(tableViewSize);
@@ -602,7 +602,7 @@ public class DetailController {
         int selectIndex = selectedItem.getIndex();
         String matchedType = matchedType_Det.getValue();
         selectedItem.setMatchedType(matchedType);
-        if (clickMatched_Step.equals(matchedType) || clickMatched_ClickStep.equals(matchedType)) {
+        if (clickMatched_step.equals(matchedType) || clickMatched_clickStep.equals(matchedType)) {
             String matchedStep = matchedStep_Det.getText();
             if (StringUtils.isBlank(matchedStep)) {
                 throw new RuntimeException(text_matchedStepIsNull);
@@ -737,7 +737,7 @@ public class DetailController {
     @FXML
     private void matchedTypeChange() {
         matchedStep_Det.setText("");
-        matchedStepHBox_Det.setVisible(clickMatched_Step.equals(matchedType_Det.getValue()) || clickMatched_ClickStep.equals(matchedType_Det.getValue()));
+        matchedStepHBox_Det.setVisible(clickMatched_step.equals(matchedType_Det.getValue()) || clickMatched_clickStep.equals(matchedType_Det.getValue()));
         addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
     }
 

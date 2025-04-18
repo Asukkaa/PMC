@@ -120,7 +120,7 @@ public class ClickPositionBean {
     String retryStep;
 
     /**
-     * 要识别的图像匹配成功后的逻辑
+     * 图像识别匹配逻辑
      */
     String matchedType;
 

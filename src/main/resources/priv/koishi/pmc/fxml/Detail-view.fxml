@@ -109,13 +109,14 @@
             <HBox spacing="10">
                 <HBox prefWidth="490" spacing="10">
                     <HBox spacing="10">
-                        <Label prefHeight="25" text="识别匹配后逻辑:"/>
+                        <Label prefHeight="25" text="图像识别匹配逻辑:"/>
                         <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="185"
                                    onAction="#matchedTypeChange">
                             <items>
                                 <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="点击匹配的图像"/>
                                     <String fx:value="直接执行下一个操作步骤"/>
+                                    <String fx:value="点击匹配图像直到图像不存在"/>
                                     <String fx:value="跳转到指定操作步骤"/>
                                     <String fx:value="点击匹配图像后跳转指定步骤"/>
                                 </FXCollections>
