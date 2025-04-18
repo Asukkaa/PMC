@@ -18,9 +18,14 @@
     -fx-pref-width: 250;
 }
 
-.hBox-Detail-Style {
+.hBox-Detail-Short {
     -fx-spacing: 5;
-    -fx-pref-width: 240;
+    -fx-pref-width: 270;
+}
+
+.hBox-Detail-Long {
+    -fx-spacing: 5;
+    -fx-pref-width: 550;
 }
 
 .delete-button-style {

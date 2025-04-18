@@ -257,7 +257,7 @@ public class AutoClickService {
                         // 匹配成功后点击匹配图像并执行指定步骤
                     } else if (clickMatched_clickStep.equals(matchedType)) {
                         gotoStep = Integer.parseInt(clickPositionVO.getMatchedStep());
-                        // 点击匹配图像直到图像不存在
+                        // 匹配图像存在则重复点击
                     } else if (clickMatched_clickWhile.equals(matchedType)) {
                         gotoStep = -1;
                     }
@@ -265,7 +265,7 @@ public class AutoClickService {
                     startY = position.y();
                     endX = position.x();
                     endY = position.y();
-                    // 匹配失败后或图像识别匹配逻辑为点击匹配图像直到图像不存在跳过本次操作
+                    // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
                 } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
                     return gotoStep;
                 }

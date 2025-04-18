@@ -625,7 +625,7 @@ public class CommonFinals {
 
     public static final String clickMatched_clickStep = "点击匹配图像后跳转指定步骤";
 
-    public static final String clickMatched_clickWhile = "点击匹配图像直到图像不存在";
+    public static final String clickMatched_clickWhile = "匹配图像存在则重复点击";
 
     /**
      * 要识别的图像识别匹配后逻辑下拉框选项
