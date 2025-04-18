@@ -300,7 +300,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
 
     @FXML
     private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickInterval_Click,
-            waitTime_Click, clickType_Click, retryType_Click;
+            waitTime_Click, clickType_Click, matchedType_Click, retryType_Click;
 
     /**
      * 组件自适应宽高
@@ -321,19 +321,21 @@ public class AutoClickController extends CommonProperties implements MousePositi
         Node thumb = scene.lookup("#thumb_Click");
         thumb.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node name = scene.lookup("#name_Click");
-        name.setStyle("-fx-pref-width: " + tableWidth * 0.15 + "px;");
+        name.setStyle("-fx-pref-width: " + tableWidth * 0.13 + "px;");
         Node clickTime = scene.lookup("#clickTime_Click");
-        clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
         Node clickNum = scene.lookup("#clickNum_Click");
-        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
         Node clickInterval = scene.lookup("#clickInterval_Click");
-        clickInterval.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        clickInterval.setStyle("-fx-pref-width: " + tableWidth * 0.08 + "px;");
         Node waitTime = scene.lookup("#waitTime_Click");
         waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node clickType = scene.lookup("#clickType_Click");
-        clickType.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
+        clickType.setStyle("-fx-pref-width: " + tableWidth * 0.08 + "px;");
+        Node matchedType = scene.lookup("#matchedType_Click");
+        matchedType.setStyle("-fx-pref-width: " + tableWidth * 0.16 + "px;");
         Node retryType = scene.lookup("#retryType_Click");
-        retryType.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
+        retryType.setStyle("-fx-pref-width: " + tableWidth * 0.16 + "px;");
         Label dataNum = (Label) scene.lookup("#dataNumber_Click");
         HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Click");
         nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
@@ -476,13 +478,14 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void bindPrefWidthProperty() {
         index_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.05));
         thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.15));
-        clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        clickInterval_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.13));
+        clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
+        clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
+        clickInterval_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
         waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        clickType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        retryType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.2));
+        clickType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
+        matchedType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
+        retryType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
     }
 
     /**
