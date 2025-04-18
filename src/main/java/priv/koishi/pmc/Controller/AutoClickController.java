@@ -536,12 +536,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
             item.updateThumb();
             // 刷新列表
             tableView_Click.refresh();
-            int tableSize = tableView_Click.getItems().size();
-            if (tableSize > 0) {
-                dataNumber_Click.setText(text_allHave + tableSize + text_process);
-            } else {
-                dataNumber_Click.setText(text_dataListNull);
-            }
+            // 更新列表数量
+            updateTableViewSizeText(tableView_Click, dataNumber_Click, text_process);
         });
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, detailWidth, detailHeight);

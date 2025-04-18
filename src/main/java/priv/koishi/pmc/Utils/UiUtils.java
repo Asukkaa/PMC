@@ -357,7 +357,8 @@ public class UiUtils {
      */
     public static void buildCellValue(TableColumn<?, ?> tableColumn, String param) {
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(param));
-        addTableColumnToolTip(tableColumn);
+        // 为javafx单元格和表头添加鼠标悬停提示
+        addTableCellToolTip(tableColumn);
     }
 
     /**
@@ -367,7 +368,7 @@ public class UiUtils {
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
-    public static <S, T> void addTableColumnToolTip(TableColumn<S, T> column) {
+    public static <S, T> void addTableCellToolTip(TableColumn<S, T> column) {
         column.setCellFactory(new Callback<>() {
             @Override
             public TableCell<S, T> call(TableColumn<S, T> param) {
@@ -386,6 +387,36 @@ public class UiUtils {
                 };
             }
         });
+    }
+
+    /**
+     * 为表头添加鼠标悬停提示
+     *
+     * @param column 要处理的javafx表格列
+     * @param <S>    表格单元格数据类型
+     * @param <T>    表格单元格类型
+     */
+    public static <S, T> void addTableColumnToolTip(TableColumn<S, T> column) {
+        addTableColumnToolTip(column, column.getText());
+    }
+
+    /**
+     * 为表头添加鼠标悬停提示
+     *
+     * @param column  要处理的javafx表格列
+     * @param tooltip 要展示的提示文案
+     * @param <S>     表格单元格数据类型
+     * @param <T>     表格单元格类型
+     */
+    public static <S, T> void addTableColumnToolTip(TableColumn<S, T> column, String tooltip) {
+        String columnText = column.getText();
+        if (StringUtils.isNotBlank(columnText)) {
+            Label label = new Label(columnText);
+            label.setPrefWidth(column.getPrefWidth());
+            addToolTip(tooltip, label);
+            column.setGraphic(label);
+            column.setText(null);
+        }
     }
 
     /**
@@ -413,6 +444,8 @@ public class UiUtils {
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c ->
                     finalFieldName.equals(c.getId())).findFirst();
             matched.ifPresent(m -> {
+                // 添加列名Tooltip
+                addTableColumnToolTip(m);
                 if (f.getType() == Image.class) {
                     try {
                         Method getter = beanClass.getMethod("getThumb");
@@ -425,6 +458,7 @@ public class UiUtils {
                                     return null;
                                 }
                             };
+                            // 创建图片表格
                             buildThumbnailCell((TableColumn<T, Image>) m, supplier);
                         }
                     } catch (NoSuchMethodException e) {
@@ -432,13 +466,16 @@ public class UiUtils {
                     }
                 } else {
                     if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
+                        // 设置列为序号列
                         buildIndexCellValue(indexColumn);
                     } else if (beanClass == ImgFileVO.class && fieldName.equals("path")) {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());
-                        addTableColumnToolTip(pathColumn);
+                        // 为javafx单元格和表头添加鼠标悬停提示
+                        addTableCellToolTip(pathColumn);
                     } else {
+                        // 为javafx单元格赋值并添加鼠标悬停提示
                         buildCellValue(m, fieldName);
                     }
                 }
@@ -654,7 +691,7 @@ public class UiUtils {
             }
         }
         // 同步表格数据量
-        dataNumber.setText(text_allHave + tableViewItems.size() + dataNumberUnit);
+        updateTableViewSizeText(tableView, dataNumber, dataNumberUnit);
     }
 
     /**
@@ -1246,7 +1283,7 @@ public class UiUtils {
                         }
                     }
                     selectedItem.updateThumb();
-                    dataNumber.setText(text_allHave + allImg.size() + unit);
+                    updateTableViewSizeText(tableView, dataNumber, unit);
                 }
             }
         });
@@ -1304,7 +1341,7 @@ public class UiUtils {
             List<T> ts = tableView.getSelectionModel().getSelectedItems();
             ObservableList<T> items = tableView.getItems();
             items.removeAll(ts);
-            label.setText(text_allHave + items.size() + unit);
+            updateTableViewSizeText(tableView, label, unit);
         });
         contextMenu.getItems().add(deleteDataMenuItem);
     }
@@ -1423,12 +1460,7 @@ public class UiUtils {
             tableView.getItems().add(bean);
             index++;
         }
-        int size = tableView.getItems().size();
-        if (size > 0) {
-            dataNumber.setText(text_allHave + size + text_img);
-        } else {
-            dataNumber.setText(text_dataListNull);
-        }
+       updateTableViewSizeText(tableView, dataNumber, text_img);
     }
 
     /**
@@ -1727,7 +1759,7 @@ public class UiUtils {
                 new MessageBubble(text_imgExist, 2);
             }
             tableView.refresh();
-            dataNumber.setText(text_allHave + items.size() + text_img);
+            updateTableViewSizeText(tableView, dataNumber, text_img);
         }
         return stopImgSelectPath;
     }
@@ -1830,6 +1862,23 @@ public class UiUtils {
         observable.addListener(weakListener);
         // 记录弱引用监听器用于后续清理操作
         weakInvalidationListeners.put(key, new WeakReference<>(weakListener));
+    }
+
+    /**
+     * 更新列表数据数量提示框
+     *
+     * @param tableView      列表对象
+     * @param dataNumber     提示框对象
+     * @param dataNumberUnit 数据单位
+     * @param <T>            列表数据类型
+     */
+    public static <T> void updateTableViewSizeText(TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
+        int tableSize = tableView.getItems().size();
+        if (tableSize > 0) {
+            dataNumber.setText(text_allHave + tableSize + dataNumberUnit);
+        } else {
+            dataNumber.setText(text_dataListNull);
+        }
     }
 
 }

@@ -231,7 +231,7 @@ public class DetailController {
                         .setPath(b.getPath());
                 items.add(imgFileVO);
             });
-            dataNumber_Det.setText(text_allHave + items.size() + text_img);
+            updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img);
         }
         tableView_Det.refresh();
         showClickImg(item.getClickImgPath());
@@ -516,11 +516,11 @@ public class DetailController {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.05));
-        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.25));
-        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.25));
+        index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.1));
+        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
-        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.15));
+        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
     }
 
     /**
