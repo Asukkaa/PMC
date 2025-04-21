@@ -2,10 +2,25 @@
 
 set "source=win"
 set "target=..\target"
+set "src=..\src"
 set "bin=%target%\app\bin"
 set "appIcon=..\appBuilder\PMC.ico"
 set "appName=Perfect Mouse Control"
-set "appVersion=2.1.3"
+
+:: 新增版本解析逻辑
+set "javaFile=%src%\main\java\priv\koishi\pmc\Finals\CommonFinals.java"
+for /f "delims=" %%i in ('powershell -Command "(Select-String -Path '%javaFile%' -Pattern 'public static final String version = \x22(.*?)\x22;').Matches.Groups[1].Value"') do (
+    set "appVersion=%%i"
+)
+
+:: 验证结果
+if "%appVersion%" == "" (
+    echo 解析失败，使用默认版本号
+    exit /b 1
+)
+
+echo 版本号：%appVersion%
+
 set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 set "runtimeImage=app"
 
