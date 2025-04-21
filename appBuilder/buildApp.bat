@@ -5,7 +5,7 @@ set "target=..\target"
 set "bin=%target%\app\bin"
 set "appIcon=..\appBuilder\PMC.ico"
 set "appName=Perfect Mouse Control"
-set "appVersion=2.1.2"
+set "appVersion=2.1.3"
 set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 set "runtimeImage=app"
 
@@ -32,5 +32,13 @@ if exist "%appName%" (
 :: 执行打包
 jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%"
 echo 已完成 jpackage 打包
+
+:: 打开目录并选中生成的应用程序文件夹
+set "appPath=%target%\%appName%"
+if exist "%appPath%" (
+    explorer /select,"%appPath%"
+) else (
+    echo 错误：生成的应用程序目录不存在
+)
 
 pause

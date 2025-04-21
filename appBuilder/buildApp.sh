@@ -9,11 +9,12 @@ appIcon="$script_dir/PMC.icns"
 bin="$target/app/bin"
 appName="Perfect Mouse Control"
 appFile="$appName.app"
-appContents="$target/$appFile/Contents"
+app_full_path="$target/$appFile"
+appContents="$app_full_path/Contents"
 app="$appContents/app"
 appBin="$appContents/runtime/Contents/Home/bin"
 InfoPlist="$appContents/Info.plist"
-appVersion="2.1.2"
+appVersion="2.1.3"
 appMainClass="priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 runtimeImage="app"
 language="zh_CN"
@@ -58,5 +59,14 @@ if [ -f "$InfoPlist" ]; then
     echo "已更新 [$InfoPlist] 的 CFBundleDevelopmentRegion 为 $language"
 else
     echo "错误：找不到 Info.plist 文件" >&2
+    exit 1
+fi
+
+# 自动打开Finder并选中生成的APP文件 (macOS only)
+if [ -d "$app_full_path" ]; then
+    echo "正在打开构建目录：$app_full_path"
+    open -R "$app_full_path"
+else
+    echo "错误：生成的APP文件不存在" >&2
     exit 1
 fi
