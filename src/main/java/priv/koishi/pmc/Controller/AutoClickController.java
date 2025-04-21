@@ -64,6 +64,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Service.AutoClickService.clearReferences;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
@@ -202,14 +203,24 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private static final String tabId = "_Click";
 
     /**
+     * 无辅助功能权限
+     */
+    private boolean isNativeHookException = false;
+
+    /**
+     * 无录屏与录音权限
+     */
+    private boolean noScreenCapturePermission = false;
+
+    /**
      * 正在录制标识
      */
-    boolean recordClicking;
+    private boolean recordClicking;
 
     /**
      * 正在运行自动操作标识
      */
-    boolean runClicking;
+    private boolean runClicking;
 
     /**
      * 录制时间线
@@ -811,8 +822,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
         buildDetailMenuItem(tableView_Click, contextMenu);
         // 修改所选项要点击的图片地址
         buildEditClickImgPathMenu(tableView_Click, contextMenu);
-        // 添加测试点击选项
-        buildClickTestMenuItem(tableView_Click, contextMenu);
+        // 测试点击选项
+        MenuItem menuItem = buildClickTestMenuItem(tableView_Click, contextMenu);
+        // 没有运行必要权限则无法点击
+        if (isNativeHookException || noScreenCapturePermission) {
+            menuItem.setDisable(true);
+        }
         // 移动所选行选项
         buildMoveDataMenu(tableView_Click, contextMenu);
         // 修改操作类型
@@ -854,7 +869,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void buildClickTestMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+    private MenuItem buildClickTestMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem menuItem = new MenuItem("执行选中的步骤");
         menuItem.setOnAction(event -> {
             List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
@@ -867,6 +882,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             }
         });
         contextMenu.getItems().add(menuItem);
+        return menuItem;
     }
 
     /**
@@ -1373,9 +1389,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 禁用需要辅助控制权限的组件
      */
     private void setNativeHookExceptionLog() {
+        isNativeHookException = true;
         runClick_Click.setDisable(true);
-        recordClick_Click.setDisable(true);
         clickTest_Click.setDisable(true);
+        recordClick_Click.setDisable(true);
         Button saveButton = (Button) mainScene.lookup("#setFloatingCoordinate_Set");
         saveButton.setDisable(true);
         String errorMessage = appName + " 缺少必要系统权限";
@@ -1384,6 +1401,17 @@ public class AutoClickController extends CommonProperties implements MousePositi
         }
         err_Click.setText(errorMessage);
         err_Click.setTooltip(creatTooltip(tip_NativeHookException));
+    }
+
+    /**
+     * 禁用需要截屏相关权限的组件
+     */
+    private void setNoScreenCapturePermissionLog() {
+        noScreenCapturePermission = true;
+        runClick_Click.setDisable(true);
+        clickTest_Click.setDisable(true);
+        err_Click.setText(tip_noScreenCapturePermission);
+        err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission));
     }
 
     /**
@@ -1403,6 +1431,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 textFieldChangeListener();
                 // 设置初始配置值为上次配置值
                 setLastConfig();
+                if (!hasScreenCapturePermission()) {
+                    setNoScreenCapturePermissionLog();
+                }
                 // 注册全局输入监听器
                 GlobalScreen.registerNativeHook();
             } catch (IOException e) {

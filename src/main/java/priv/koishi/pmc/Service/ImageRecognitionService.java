@@ -28,8 +28,8 @@ import static priv.koishi.pmc.Utils.FileUtils.getFileName;
  * 图像识别工具类
  *
  * @author koishi
- * Date 2022/04/08
- * Time 10:08:04
+ * Date 2025/04/08
+ * Time 10:08
  */
 public class ImageRecognitionService {
 
@@ -164,8 +164,7 @@ public class ImageRecognitionService {
         // 获取屏幕当前画面
         BufferedImage screenImg;
         try {
-            screenImg = new Robot().createScreenCapture(
-                    new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
+            screenImg = new Robot().createScreenCapture(new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
         } catch (AWTException e) {
             throw new Exception("屏幕图像获取失败: " + e.getMessage(), e);
         }
@@ -265,5 +264,19 @@ public class ImageRecognitionService {
         }
     }
 
+    /**
+     * 检查是否能正常截图
+     *
+     * @return true: 可以截图，false: 无法截图
+     */
+    public static boolean checkScreenCapturePermission() {
+        refreshScreenParameters();
+        try {
+            new Robot().createScreenCapture(new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
+            return true;
+        } catch (SecurityException | AWTException e) {
+            return false;
+        }
+    }
 
 }

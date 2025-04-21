@@ -323,9 +323,9 @@ public class CommonFinals {
 
     public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
 
-    public static final String version = "2.1.2";
+    public static final String version = "2.1.3";
 
-    public static final String buildDate = "2025年4月18日";
+    public static final String buildDate = "2025年4月21日";
 
     public static final String tip_version = """
             version：%s
@@ -372,6 +372,17 @@ public class CommonFinals {
             需要在macOS系统设置中启用辅助设备权限：
             1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
             2. 在左侧列表选择「辅助功能」
+            3. 点击🔒解锁设置
+            4. 删除列表中的\s""" + appName + app + """
+             （如果有的话）
+            5. 将\s""" + appName + app + """
+             添加到允许列表中
+            6. 重启\s""" + appName + app;
+
+    public static final String tip_noScreenCapturePermission = """
+            需要在macOS系统设置中启用录屏与系统录音权限：
+            1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
+            2. 在左侧列表选择「录屏与系统录音」
             3. 点击🔒解锁设置
             4. 删除列表中的\s""" + appName + app + """
              （如果有的话）
