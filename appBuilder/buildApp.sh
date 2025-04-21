@@ -9,15 +9,35 @@ appIcon="$script_dir/PMC.icns"
 bin="$target/app/bin"
 appName="Perfect Mouse Control"
 appFile="$appName.app"
-app_full_path="$target/$appFile"
-appContents="$app_full_path/Contents"
+appFullPath="$target/$appFile"
+appContents="$appFullPath/Contents"
 app="$appContents/app"
 appBin="$appContents/runtime/Contents/Home/bin"
 InfoPlist="$appContents/Info.plist"
-appVersion="2.1.3"
 appMainClass="priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 runtimeImage="app"
 language="zh_CN"
+
+# 从 Java 文件提取版本号
+src="$script_dir/../src"
+javaFile="$src/main/java/priv/koishi/pmc/Finals/CommonFinals.java"
+
+# 检查含有版本号信息的Java文件存在性
+if [ ! -f "$javaFile" ]; then
+    echo "错误：Java文件不存在于路径 [$javaFile]" >&2
+    exit 1
+fi
+
+# 使用 sed 方案提取版本号（兼容 macOS BSD sed）
+appVersion=$(sed -E -n 's/.*public[[:space:]]+static[[:space:]]+final[[:space:]]+String[[:space:]]+version[[:space:]]*=[[:space:]]*"([^"]*)".*/\1/p' "$javaFile")
+
+# 错误检查
+if [ -z "$appVersion" ]; then
+    echo "错误：无法从 $javaFile 中提取版本号" >&2
+    echo "请确认版本号声明格式为：public static final String version = \"x.x.x\";" >&2
+    exit 1
+fi
+echo "已提取版本号：$appVersion"
 
 # 复制文件并处理zip压缩包
 mkdir -p "$bin"
@@ -63,9 +83,9 @@ else
 fi
 
 # 自动打开Finder并选中生成的APP文件 (macOS only)
-if [ -d "$app_full_path" ]; then
-    echo "正在打开构建目录：$app_full_path"
-    open -R "$app_full_path"
+if [ -d "$appFullPath" ]; then
+    echo "正在打开构建目录：$appFullPath"
+    open -R "$appFullPath"
 else
     echo "错误：生成的APP文件不存在" >&2
     exit 1
