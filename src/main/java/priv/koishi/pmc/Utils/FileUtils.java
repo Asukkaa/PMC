@@ -223,7 +223,7 @@ public class FileUtils {
     public static String getAppResourcePath(String path) {
         String resourcePath = packagePath + path;
         // 处理macos打包成.app文件后的路径
-        if (systemName.contains(macos)) {
+        if (systemName.contains(mac)) {
             resourcePath = javaHome + "/bin/" + path;
         }
         if (!new File(resourcePath).exists()) {
@@ -240,7 +240,7 @@ public class FileUtils {
     public static String getLogsPath() {
         String logsPath = userDir + File.separator + logs;
         // 处理macos打包成.app文件后的路径
-        if (systemName.contains(macos) && !isRunningFromJar()) {
+        if (systemName.contains(mac) && !isRunningFromJar()) {
             logsPath = javaHome + logsDir;
         }
         return logsPath;
@@ -254,7 +254,7 @@ public class FileUtils {
     public static String getAppPath() {
         if (systemName.contains(win)) {
             return new File(javaHome).getParent() + File.separator + appName + exe;
-        } else if (systemName.contains(macos)) {
+        } else if (systemName.contains(mac)) {
             return javaHome.substring(0, javaHome.indexOf(app) + app.length());
         }
         return javaHome;

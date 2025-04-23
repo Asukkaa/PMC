@@ -817,7 +817,7 @@ public class SettingController implements MousePositionUpdater {
             ProcessBuilder processBuilder = new ProcessBuilder();
             if (systemName.contains(win)) {
                 processBuilder.command(getAppPath());
-            } else if (systemName.contains(macos)) {
+            } else if (systemName.contains(mac)) {
                 processBuilder.command("open", "-n", getAppPath());
             }
             processBuilder.start();

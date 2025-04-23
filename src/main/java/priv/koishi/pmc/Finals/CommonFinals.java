@@ -121,7 +121,7 @@ public class CommonFinals {
 
     public static final String desktop = "Desktop";
 
-    public static final String macos = "mac";
+    public static final String mac = "mac";
 
     public static final String win = "win";
 

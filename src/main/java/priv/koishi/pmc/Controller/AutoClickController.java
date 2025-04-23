@@ -1396,7 +1396,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         Button saveButton = (Button) mainScene.lookup("#setFloatingCoordinate_Set");
         saveButton.setDisable(true);
         String errorMessage = appName + " 缺少必要系统权限";
-        if (systemName.contains(macos)) {
+        if (systemName.contains(mac)) {
             errorMessage = tip_NativeHookException;
         }
         err_Click.setText(errorMessage);
