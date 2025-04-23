@@ -4,7 +4,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 /**
- * macOS屏幕录制权限检查接口
+ * 调用macOS图形相关接口
  *
  * @author koishi
  * Date 2025/04/21
@@ -18,7 +18,7 @@ public interface CoreGraphics extends Library {
     CoreGraphics INSTANCE = Native.load("CoreGraphics", CoreGraphics.class);
 
     /**
-     * macOS 10.15+ 专用API
+     * macOS 10.15+ 检测屏幕录制权限专用API
      */
     byte CGPreflightScreenCaptureAccess();
 
