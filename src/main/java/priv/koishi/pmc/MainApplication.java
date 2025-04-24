@@ -14,8 +14,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
+import priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard;
 import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
 import java.io.File;
@@ -192,6 +195,12 @@ public class MainApplication extends Application {
             System.setProperty("log.dir", logsPath);
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
+        }
+        Logger logger = LogManager.getLogger(MainApplication.class);
+        // 启动时检查是否已经启动
+        if (SingleInstanceGuard.checkRunning()) {
+            logger.error("程序已启动");
+            System.exit(0);
         }
         launch();
     }

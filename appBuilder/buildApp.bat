@@ -52,6 +52,8 @@ if exist "%appPath%" (
     :: 压缩打包生成的文件
     echo 正在生成压缩包: %zipName%
     powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath \"%target%\%zipName%\" -Force"
+    echo 压缩完成
+    echo 正在打开目录: %appPath%
     :: 打开目录并选中生成的应用程序文件夹
     explorer /select,"%appPath%"
 ) else (
