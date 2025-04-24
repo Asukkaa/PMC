@@ -1778,8 +1778,9 @@ public class UiUtils {
             if (!isExist) {
                 ImgFileVO imgFileVO = new ImgFileVO();
                 try {
-                    imgFileVO.setName(file.getName())
+                    imgFileVO.setTableView(tableView)
                             .setType(getExistsFileType(file))
+                            .setName(file.getName())
                             .setPath(file.getPath());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
