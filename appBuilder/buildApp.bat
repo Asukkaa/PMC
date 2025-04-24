@@ -6,23 +6,21 @@ set "src=..\src"
 set "bin=%target%\app\bin"
 set "appIcon=..\appBuilder\PMC.ico"
 set "appName=Perfect Mouse Control"
+set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
+set "runtimeImage=app"
+set "appPath=%target%\%appName%"
 
-:: 新增版本解析逻辑
+:: 解析版本号
 set "javaFile=%src%\main\java\priv\koishi\pmc\Finals\CommonFinals.java"
 for /f "delims=" %%i in ('powershell -Command "(Select-String -Path '%javaFile%' -Pattern 'public static final String version = \x22(.*?)\x22;').Matches.Groups[1].Value"') do (
     set "appVersion=%%i"
 )
-
-:: 验证结果
+:: 验证解析的版本号
 if "%appVersion%" == "" (
-    echo 解析失败，使用默认版本号
+    echo 版本号解析失败
     exit /b 1
 )
-
 echo 版本号：%appVersion%
-
-set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
-set "runtimeImage=app"
 
 :: 处理ZIP文件
 for /r "%source%" %%F in (*.zip) do (
@@ -48,9 +46,13 @@ if exist "%appName%" (
 jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%"
 echo 已完成 jpackage 打包
 
-:: 打开目录并选中生成的应用程序文件夹
-set "appPath=%target%\%appName%"
+:: 生成压缩包后打开目录并选中生成的应用程序文件夹
+set "zipName=%appName% %appVersion%.zip"
 if exist "%appPath%" (
+    :: 压缩打包生成的文件
+    echo 正在生成压缩包: %zipName%
+    powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath \"%target%\%zipName%\" -Force"
+    :: 打开目录并选中生成的应用程序文件夹
     explorer /select,"%appPath%"
 ) else (
     echo 错误：生成的应用程序目录不存在
