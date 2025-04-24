@@ -11,7 +11,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.10.2</junit.version>
         <lombok.version>1.18.38</lombok.version>
         <javafx.version>21.0.7</javafx.version>
     </properties>
