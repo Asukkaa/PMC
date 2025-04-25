@@ -1731,10 +1731,12 @@ public class UiUtils {
      * @param stage 程序主舞台
      */
     public static void showStage(Stage stage) {
+        stage.setAlwaysOnTop(true);
         stage.setIconified(false);
         stage.show();
         stage.toFront();
         stage.requestFocus();
+        stage.setAlwaysOnTop(false);
     }
 
     /**
