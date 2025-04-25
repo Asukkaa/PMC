@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.BindException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
@@ -44,9 +47,19 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class MainApplication extends Application {
 
     /**
+     * 日志记录器
+     */
+    private static Logger logger;
+
+    /**
      * 程序主舞台
      */
     private static Stage primaryStage;
+
+    /**
+     * 用来激活已运行的窗口的Socket服务
+     */
+    private static ServerSocket serverSocket;
 
     /**
      * 加载fxml页面
@@ -98,6 +111,7 @@ public class MainApplication extends Application {
             }
         });
         stage.show();
+        logger.info("--------------程序启动成功-------------------");
     }
 
     /**
@@ -121,6 +135,11 @@ public class MainApplication extends Application {
     public void stop() throws Exception {
         saveLastConfig(primaryStage);
         GlobalScreen.unregisterNativeHook();
+        // 关闭Socket服务
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            serverSocket.close();
+        }
+        logger.info("==============程序退出中====================");
         System.exit(0);
     }
 
@@ -158,6 +177,35 @@ public class MainApplication extends Application {
     }
 
     /**
+     * 激活已运行的程序窗口
+     *
+     * @param port 激活信号端口
+     */
+    private static void startActivationServer(int port) {
+        new Thread(() -> {
+            try {
+                serverSocket = new ServerSocket(port);
+                while (!serverSocket.isClosed()) {
+                    Socket socket = serverSocket.accept();
+                    Platform.runLater(() -> {
+                        // 弹出程序窗口
+                        if (primaryStage != null) {
+                            showStage(primaryStage);
+                        }
+                    });
+                    socket.close();
+                }
+            } catch (BindException e) {
+                logger.error("端口{}已被占用，无法启动激活服务", port);
+            } catch (IOException e) {
+                if (serverSocket != null && !serverSocket.isClosed()) {
+                    logger.error("激活窗口服务异常", e);
+                }
+            }
+        }, "Activation-Server").start();
+    }
+
+    /**
      * 启动程序
      *
      * @param args 启动参数
@@ -177,12 +225,19 @@ public class MainApplication extends Application {
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
         }
-        Logger logger = LogManager.getLogger(MainApplication.class);
+        logger = LogManager.getLogger(MainApplication.class);
+        logger.info("==============程序启动中====================");
+        Properties prop = new Properties();
+        InputStream input = checkRunningInputStream(configFile);
+        prop.load(input);
+        int port = Integer.parseInt(prop.getProperty(key_appPort));
+        input.close();
         // 启动时检查是否已经启动
-        if (SingleInstanceGuard.checkRunning()) {
-            logger.error("程序已启动");
+        if (SingleInstanceGuard.checkRunning(port)) {
             System.exit(0);
         }
+        // 启动激活监听服务
+        startActivationServer(port);
         launch();
     }
 

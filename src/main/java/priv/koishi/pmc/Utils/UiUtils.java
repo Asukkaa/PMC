@@ -70,8 +70,14 @@ import static priv.koishi.pmc.Utils.FileUtils.*;
  */
 public class UiUtils {
 
+    /**
+     * 拖拽数据格式
+     */
     private static final DataFormat dataFormat = new DataFormat("application/x-java-serialized-object");
 
+    /**
+     * 日志记录器
+     */
     private static final Logger logger = LogManager.getLogger(UiUtils.class);
 
     /**
@@ -1460,7 +1466,7 @@ public class UiUtils {
             tableView.getItems().add(bean);
             index++;
         }
-       updateTableViewSizeText(tableView, dataNumber, text_img);
+        updateTableViewSizeText(tableView, dataNumber, text_img);
     }
 
     /**
@@ -1726,8 +1732,8 @@ public class UiUtils {
      */
     public static void showStage(Stage stage) {
         stage.setIconified(false);
-        stage.setAlwaysOnTop(true);
-        stage.setAlwaysOnTop(false);
+        stage.show();
+        stage.toFront();
         stage.requestFocus();
     }
 

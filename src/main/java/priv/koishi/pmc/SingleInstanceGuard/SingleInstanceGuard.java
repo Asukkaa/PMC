@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
@@ -26,6 +27,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class SingleInstanceGuard {
 
+    /**
+     * 日志记录器
+     */
     private static final Logger logger = LogManager.getLogger(SingleInstanceGuard.class);
 
     /**
@@ -39,16 +43,14 @@ public class SingleInstanceGuard {
     /**
      * 心跳间隔时间（单位：毫秒）
      *
-     * <p>定时向文件锁发送心跳信号的时间间隔，
-     * 默认30秒(30,000毫秒)，用于维持文件锁有效性</p>
+     * <p>定时向文件锁发送心跳信号的时间间隔，用于维持文件锁有效性</p>
      */
     private static final long HEARTBEAT_INTERVAL = 30_000;
 
     /**
      * 锁超时时间（单位：毫秒）
      *
-     * <p>文件锁的最大持有时间，默认2分钟(120,000毫秒)，
-     * 超过该时间未收到心跳则认为实例已失效</p>
+     * <p>文件锁的最大持有时间，超过该时间未收到心跳则认为实例已失效</p>
      */
     private static final long LOCK_TIMEOUT = 120_000;
 
@@ -79,9 +81,10 @@ public class SingleInstanceGuard {
     /**
      * 检查应用实例是否已运行
      *
+     * @param port 激活信号端口
      * @return true表示已有实例运行，false表示当前是首个实例
      */
-    public static boolean checkRunning() {
+    public static boolean checkRunning(int port) {
         try {
             // 获取锁文件路径
             Path lockPath = getLockFilePath();
@@ -93,12 +96,10 @@ public class SingleInstanceGuard {
                     StandardOpenOption.READ,
                     StandardOpenOption.WRITE);
             fileLock = lockChannel.tryLock();
-            if (fileLock == null) {
-                releaseResources();
-                return true;
-            }
-            // 启动心跳守护线程
-            if (!startHeartbeat()) {
+            // 若文件已锁定或心跳守护线程启动失败则返回true
+            if (fileLock == null || !startHeartbeat()) {
+                // 发送激活窗口信号
+                sendActivationSignal(port);
                 // 释放文件锁资源
                 releaseResources();
                 return true;
@@ -183,7 +184,6 @@ public class SingleInstanceGuard {
                             lockChannel.force(true);
                             // 更新文件最后修改时间
                             Files.setLastModifiedTime(path, FileTime.fromMillis(System.currentTimeMillis()));
-                            logger.info("心跳写入成功");
                         }
                     } catch (ClosedChannelException e) {
                         logger.warn("通道已关闭，终止心跳");
@@ -246,6 +246,19 @@ public class SingleInstanceGuard {
         } finally {
             fileLock = null;
             lockChannel = null;
+        }
+    }
+
+    /**
+     * 发送激活正在运行的程序窗口信号
+     *
+     * @param port 端口号
+     */
+    private static void sendActivationSignal(int port) {
+        try (Socket ignored = new Socket("localhost", port)) {
+            logger.info("程序正在运行，将发送弹出程序窗口的信号");
+        } catch (IOException e) {
+            logger.error("激活信号发送失败，可能主程序未启动完成", e);
         }
     }
 

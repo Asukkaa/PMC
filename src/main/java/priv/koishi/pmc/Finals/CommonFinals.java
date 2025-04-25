@@ -500,6 +500,8 @@ public class CommonFinals {
 
     public static final String key_appHeight = "appHeight";
 
+    public static final String key_appPort = "appPort";
+
     public static final String key_detailWidth = "detailWidth";
 
     public static final String key_detailHeight = "detailHeight";
