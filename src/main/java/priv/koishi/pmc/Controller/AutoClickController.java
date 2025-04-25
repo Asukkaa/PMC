@@ -392,10 +392,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Click");
             // 自动保存
             autoSave(autoSave, tableView, outPathValue);
-            // 关闭线程池
-            if (executorService != null) {
-                executorService.shutdownNow();
-            }
+        }
+        // 关闭线程池
+        if (executorService != null) {
+            executorService.shutdownNow();
         }
     }
 
