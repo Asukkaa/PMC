@@ -40,8 +40,6 @@ import javafx.stage.*;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
@@ -62,7 +60,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -84,8 +81,6 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Time:17:21
  */
 public class AutoClickController extends CommonProperties implements MousePositionUpdater {
-
-    Logger logger = LogManager.getLogger(AutoClickController.class);
 
     /**
      * 导入文件路径
@@ -188,14 +183,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private static final List<Node> disableNodes = new ArrayList<>();
 
     /**
-     * 线程池
-     */
-    private static final CommonThreadPoolExecutor commonThreadPoolExecutor = new CommonThreadPoolExecutor();
-
-    /**
      * 线程池实例
      */
-    private static final ExecutorService executorService = commonThreadPoolExecutor.createNewThreadPool();
+    private static final ExecutorService executorService = new CommonThreadPoolExecutor().createNewThreadPool();
 
     /**
      * 自动点击任务
@@ -1428,21 +1418,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     @FXML
     private void initialize() {
-        // 注册JVM关闭钩子，用于在应用终止时关闭线程池资源
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (executorService != null && !executorService.isShutdown()) {
-                executorService.shutdownNow();
-                try {
-                    // 设置最大等待时间防止无限阻塞
-                    if (!executorService.awaitTermination(1, TimeUnit.SECONDS)) {
-                        logger.warn("线程池强制终止");
-                    }
-                } catch (InterruptedException ex) {
-                    // 恢复中断状态保持线程中断语义
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }));
         Platform.runLater(() -> {
             mainScene = anchorPane_Click.getScene();
             mainStage = (Stage) mainScene.getWindow();
