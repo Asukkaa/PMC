@@ -323,9 +323,9 @@ public class CommonFinals {
 
     public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
 
-    public static final String version = "2.1.4";
+    public static final String version = "2.1.5";
 
-    public static final String buildDate = "2025年4月24日";
+    public static final String buildDate = "2025年4月25日";
 
     public static final String tip_version = """
             version：%s
