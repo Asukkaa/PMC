@@ -19,7 +19,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard;
-import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,8 +27,6 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static priv.koishi.pmc.Controller.MainController.mainAdaption;
 import static priv.koishi.pmc.Controller.MainController.saveLastConfig;
@@ -49,17 +46,7 @@ public class MainApplication extends Application {
     /**
      * 程序主舞台
      */
-    private Stage primaryStage;
-
-    /**
-     * 线程池
-     */
-    private final CommonThreadPoolExecutor commonThreadPoolExecutor = new CommonThreadPoolExecutor();
-
-    /**
-     * 线程池实例
-     */
-    private final ExecutorService executorService = commonThreadPoolExecutor.createNewThreadPool();
+    private static Stage primaryStage;
 
     /**
      * 加载fxml页面
@@ -132,12 +119,6 @@ public class MainApplication extends Application {
      */
     @Override
     public void stop() throws Exception {
-        if (executorService != null) {
-            executorService.shutdown();
-            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        }
         saveLastConfig(primaryStage);
         GlobalScreen.unregisterNativeHook();
         System.exit(0);
