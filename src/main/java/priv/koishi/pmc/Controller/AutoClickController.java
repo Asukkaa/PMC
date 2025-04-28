@@ -769,23 +769,22 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private static void checkSetting(List<ClickPositionVO> clickPositionVOS) {
         int maxIndex = clickPositionVOS.size();
         // 新增按键状态跟踪Map
-        Map<String, Boolean> keyPressMap = new HashMap<>();
+        Map<String, Boolean> keyPressMap = new ConcurrentHashMap<>();
         clickPositionVOS.forEach(clickPositionVO -> {
             String clickKey = clickPositionVO.getClickKey();
             int index = clickPositionVO.getIndex();
             String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
             String clickType = clickPositionVO.getClickType();
             // 处理点击事件
-            if (clickType_press.equals(clickType)) {
+            if (clickType_press.equals(clickType) || clickType_drag.equals(clickType)) {
                 if (keyPressMap.getOrDefault(clickKey, false)) {
-                    throw new RuntimeException(err + "检测到重复的 " + clickKey + " 点击事件");
+                    throw new RuntimeException(err + "检测到重复的 " + clickKey + " 点击或拖拽事件");
                 }
                 keyPressMap.put(clickKey, true);
-            }
-            // 处理松开事件
-            else if (clickType_release.equals(clickType)) {
+                // 处理松开事件
+            } else if (clickType_release.equals(clickType)) {
                 if (!keyPressMap.getOrDefault(clickKey, false)) {
-                    throw new RuntimeException(err + "缺少对应的 " + clickKey + " 点击事件");
+                    throw new RuntimeException(err + "缺少对应的 " + clickKey + " 点击或拖拽事件");
                 }
                 keyPressMap.put(clickKey, false);
             }
@@ -1258,6 +1257,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 addMoveTrajectory(dataSize, startX, startY);
             }
             removeNativeListener(moveMotionListener);
+            tableView_Click.refresh();
         }
 
         // 鼠标拖拽监听器
