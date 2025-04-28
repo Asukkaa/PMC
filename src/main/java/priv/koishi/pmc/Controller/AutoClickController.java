@@ -1219,6 +1219,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         // 鼠标移动轨迹记录器
         public TrajectoryRecorder moveTrajectoryRecorder;
 
+        // 停止鼠标轨迹记录
         public void stopRecording() {
             if (dragTrajectoryRecorder != null) {
                 dragTrajectoryRecorder.stopRecording();
@@ -1226,6 +1227,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
             removeNativeListener(dragMotionListener);
             if (moveTrajectoryRecorder != null) {
                 moveTrajectoryRecorder.stopRecording();
+                Point mousePoint = MousePositionListener.getMousePoint();
+                int startX = (int) mousePoint.getX();
+                int startY = (int) mousePoint.getY();
+                int dataSize = tableView_Click.getItems().size() + 1;
+                // 添加移动轨迹到表格
+                addMoveTrajectory(dataSize, startX, startY);
             }
             removeNativeListener(moveMotionListener);
         }
@@ -1306,24 +1313,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 int startX = (int) mousePoint.getX();
                 int startY = (int) mousePoint.getY();
                 int dataSize = tableView_Click.getItems().size() + 1;
-                // 移动轨迹添加到表格
-                if (recordMove) {
-                    Platform.runLater(() -> {
-                        log_Click.setTextFill(Color.BLUE);
-                        // 添加至表格
-                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                        movePoint.setName(text_step + dataSize + text_isRecord)
-                                .setStartX(String.valueOf(startX))
-                                .setStartY(String.valueOf(startY))
-                                .setClickType(clickType_move);
-                        clickPositionVOS.add(movePoint);
-                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
-                        String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + "鼠标移动轨迹";
-                        log_Click.setText(log);
-                        floatingLabel.setText(log);
-                    });
-                }
+                // 添加移动轨迹到表格
+                addMoveTrajectory(dataSize, startX, startY);
                 ClickPositionVO clickBean = createClickPositionVO();
                 // 记录拖拽轨迹
                 if (recordDrag) {
@@ -1345,6 +1336,27 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     String log = text_cancelTask + text_recordClicking + "\n" +
                             text_recorded + clickBean.getClickKey() +
                             " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
+                    log_Click.setText(log);
+                    floatingLabel.setText(log);
+                });
+            }
+        }
+
+        // 添加移动轨迹到表格
+        private void addMoveTrajectory(int dataSize, int startX, int startY) {
+            if (recordMove) {
+                Platform.runLater(() -> {
+                    log_Click.setTextFill(Color.BLUE);
+                    // 添加至表格
+                    List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                    movePoint.setName(text_step + dataSize + text_isRecord)
+                            .setStartX(String.valueOf(startX))
+                            .setStartY(String.valueOf(startY))
+                            .setClickType(clickType_move);
+                    clickPositionVOS.add(movePoint);
+                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
+                    String log = text_cancelTask + text_recordClicking + "\n" +
+                            text_recorded + "鼠标移动轨迹";
                     log_Click.setText(log);
                     floatingLabel.setText(log);
                 });
