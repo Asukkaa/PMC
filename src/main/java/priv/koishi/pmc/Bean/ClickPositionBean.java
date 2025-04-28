@@ -152,7 +152,7 @@ public class ClickPositionBean {
             TrajectoryPoint last = moveTrajectory.getLast();
             double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
             // 最小像素距离阈值
-            if (distance < 5) {
+            if (distance < 1) {
                 return;
             }
         }

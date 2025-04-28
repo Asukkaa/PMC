@@ -231,6 +231,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private boolean recordClicking;
 
     /**
+     * 正在录制标识（准备时间结束）
+     */
+    private boolean isRecordClicking;
+
+    /**
      * 正在运行自动操作标识
      */
     private boolean runClicking;
@@ -1184,6 +1189,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     if (recordClicking || runClicking) {
                         // 检测快捷键 esc
                         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                            if (nativeMouseListener instanceof CustomMouseListener cmListener) {
+                                // 停止轨迹记录
+                                cmListener.stopRecording();
+                            }
+                            // 移除鼠标监听器
+                            removeNativeListener(nativeMouseListener);
                             // 停止自动操作
                             if (autoClickTask != null && autoClickTask.isRunning()) {
                                 autoClickTask.cancel();
@@ -1193,8 +1204,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
                             if (recordTimeline != null) {
                                 recordTimeline.stop();
                                 recordTimeline = null;
-                                log_Click.setTextFill(Color.BLUE);
-                                log_Click.setText("录制已结束");
+                                Platform.runLater(() -> {
+                                    log_Click.setTextFill(Color.BLUE);
+                                    log_Click.setText("录制已结束");
+                                });
                             }
                             // 停止运行计时
                             if (runTimeline != null) {
@@ -1208,12 +1221,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                             }
                             // 改变要防重复点击的组件状态
                             changeDisableNodes(disableNodes, false);
-                            if (nativeMouseListener instanceof CustomMouseListener cmListener) {
-                                // 停止轨迹记录
-                                cmListener.stopRecording();
-                            }
-                            // 移除鼠标监听器
-                            removeNativeListener(nativeMouseListener);
                             hideFloatingWindow();
                             // 弹出程序主窗口
                             CheckBox showWindowRecord = (CheckBox) mainScene.lookup("#showWindowRecord_Set");
@@ -1224,6 +1231,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                             removeNativeListener(nativeKeyListener);
                             recordClicking = false;
                             runClicking = false;
+                            isRecordClicking = false;
                         }
                     }
                 });
@@ -1249,15 +1257,21 @@ public class AutoClickController extends CommonProperties implements MousePositi
             removeNativeListener(dragMotionListener);
             if (moveTrajectoryRecorder != null) {
                 moveTrajectoryRecorder.stopRecording();
-                Point mousePoint = MousePositionListener.getMousePoint();
-                int startX = (int) mousePoint.getX();
-                int startY = (int) mousePoint.getY();
-                int dataSize = tableView_Click.getItems().size() + 1;
-                // 添加移动轨迹到表格
-                addMoveTrajectory(dataSize, startX, startY);
+                if (isRecordClicking) {
+                    Point mousePoint = MousePositionListener.getMousePoint();
+                    int startX = (int) mousePoint.getX();
+                    int startY = (int) mousePoint.getY();
+                    int dataSize = tableView_Click.getItems().size() + 1;
+                    // 添加移动轨迹到表格
+                    addMoveTrajectory(dataSize, startX, startY);
+                }
             }
             removeNativeListener(moveMotionListener);
-            tableView_Click.refresh();
+            Platform.runLater(() -> {
+                log_Click.setTextFill(Color.BLUE);
+                log_Click.setText("录制已结束");
+                tableView_Click.refresh();
+            });
         }
 
         // 鼠标拖拽监听器
@@ -1309,7 +1323,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         // 监听鼠标按下
         @Override
         public void nativeMousePressed(NativeMouseEvent e) {
-            if (recordClicking) {
+            if (isRecordClicking) {
                 // 停止移动轨迹记录
                 if (recordMove) {
                     moveTrajectoryRecorder.stopRecording();
@@ -1389,7 +1403,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         // 监听鼠标松开
         @Override
         public void nativeMouseReleased(NativeMouseEvent e) {
-            if (recordClicking) {
+            if (isRecordClicking) {
                 // 停止拖拽轨迹记录
                 if (recordDrag) {
                     dragTrajectoryRecorder.stopRecording();
@@ -1502,6 +1516,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     if (preparationTime.get() > 0) {
                         text.set(text_cancelTask + preparationTime + text_preparation);
                     } else {
+                        isRecordClicking = true;
                         // 开启鼠标监听
                         startNativeMouseListener(addType);
                         // 录制开始时间
