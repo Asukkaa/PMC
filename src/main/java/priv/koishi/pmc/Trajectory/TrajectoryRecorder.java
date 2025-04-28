@@ -31,18 +31,6 @@ public class TrajectoryRecorder {
     }
 
     /**
-     * 添加拖拽点
-     *
-     * @param x x坐标
-     * @param y y坐标
-     */
-    public void recordDragPoint(int x, int y) {
-        if (isRecording) {
-            clickBean.addDragPoint(x, y);
-        }
-    }
-
-    /**
      * 添加移动点
      *
      * @param x x坐标

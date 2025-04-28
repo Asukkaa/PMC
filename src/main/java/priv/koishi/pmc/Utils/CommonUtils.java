@@ -3,6 +3,7 @@ package priv.koishi.pmc.Utils;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
@@ -81,14 +82,34 @@ public class CommonUtils {
      * 移除全局输入监听
      *
      * @param listener 要移除的监听器
+     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
      */
     public static void removeNativeListener(EventListener listener) {
         if (listener != null) {
-            if (listener instanceof NativeMouseListener) {
-                GlobalScreen.removeNativeMouseListener((NativeMouseListener) listener);
-            } else if (listener instanceof NativeKeyListener) {
-                GlobalScreen.removeNativeKeyListener((NativeKeyListener) listener);
+            switch (listener) {
+                case NativeMouseListener nativeMouseListener ->
+                        GlobalScreen.removeNativeMouseListener(nativeMouseListener);
+                case NativeMouseMotionListener nativeMouseMotionListener ->
+                        GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
+                case NativeKeyListener nativeKeyListener -> GlobalScreen.removeNativeKeyListener(nativeKeyListener);
+                default -> throw new IllegalArgumentException("未知监听类型");
             }
+        }
+    }
+
+    /**
+     * 添加全局输入监听
+     *
+     * @param listener 要添加的监听器
+     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
+     */
+    public static void addNativeListener(EventListener listener) {
+        switch (listener) {
+            case NativeMouseListener nativeMouseListener -> GlobalScreen.addNativeMouseListener(nativeMouseListener);
+            case NativeMouseMotionListener nativeMouseMotionListener ->
+                    GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
+            case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
+            default -> throw new IllegalArgumentException("未知监听类型");
         }
     }
 

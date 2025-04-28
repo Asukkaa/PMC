@@ -43,6 +43,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -133,13 +134,13 @@ public class SettingController implements MousePositionUpdater {
 
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
-            retrySecond_Set, overtime_Set;
+            retrySecond_Set, overtime_Set, sampleInterval_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindSave_Set,
-            autoSave_Set;
+            autoSave_Set, recordDrag_Set, recordMove_Set;
 
     @FXML
     private TableView<ImgFileVO> tableView_Set;
@@ -213,6 +214,8 @@ public class SettingController implements MousePositionUpdater {
             prop.put(key_retrySecond, retrySecond.getText());
             TextField overtime = (TextField) scene.lookup("#overtime_Set");
             prop.put(key_overtime, overtime.getText());
+            TextField sampleInterval = (TextField) scene.lookup("#sampleInterval_Set");
+            prop.put(key_sampleInterval, sampleInterval.getText());
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
             List<ImgFileVO> list = tableView.getItems().stream().map(o -> (ImgFileVO) o).toList();
             int index = 0;
@@ -391,6 +394,8 @@ public class SettingController implements MousePositionUpdater {
         setControlLastConfig(overtime_Set, prop, key_overtime);
         setControlLastConfig(autoSave_Set, prop, key_autoSave);
         setControlLastConfig(remindSave_Set, prop, key_remindSave);
+        setControlLastConfig(recordDrag_Set, prop, key_recordDrag);
+        setControlLastConfig(recordMove_Set, prop, key_recordMove);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
@@ -399,6 +404,7 @@ public class SettingController implements MousePositionUpdater {
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig);
+        setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval);
         setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun);
         setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum);
@@ -440,6 +446,8 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_overtime, overtime_Set);
         addToolTip(tip_remindSave, remindSave_Set);
         addToolTip(tip_firstClick, firstClick_Set);
+        addToolTip(tip_recordDrag, recordDrag_Set);
+        addToolTip(tip_recordMove, recordMove_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
         addToolTip(tip_retrySecond, retrySecond_Set);
@@ -461,6 +469,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
+        addToolTip(tip_sampleInterval + defaultSampleInterval, sampleInterval_Set);
         addValueToolTip(opacity_Set, tip_opacity, String.valueOf(opacity_Set.getValue()));
         addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(colorPicker_Set.getValue()));
         addValueToolTip(stopOpacity_Set, tip_stopOpacity, String.valueOf((int) stopOpacity_Set.getValue()));
@@ -548,6 +557,8 @@ public class SettingController implements MousePositionUpdater {
         integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum + defaultStopRetryNum);
         // 限制要点击的图片识别失败重试次数文本输入框内容
         integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum + defaultClickRetryNum);
+        // 限制鼠标轨迹采样间隔文本输入框内容
+        integerRangeTextField(sampleInterval_Set, 0, null, tip_sampleInterval + defaultSampleInterval);
     }
 
     /**
@@ -783,6 +794,26 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private void loadMouseFloatingRecordAction() throws IOException {
         setLoadLastConfigCheckBox(mouseFloatingRecord_Set, configFile_Click, key_mouseFloatingRecord);
+    }
+
+    /**
+     * 录制时记录拖鼠标拽轨迹
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void recordDrag() throws IOException {
+        setLoadLastConfigCheckBox(recordDrag_Set, configFile_Click, key_recordDrag);
+    }
+
+    /**
+     * 录制时记录鼠标移动轨迹
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void recordMove() throws IOException {
+        setLoadLastConfigCheckBox(recordMove_Set, configFile_Click, key_recordMove);
     }
 
     /**

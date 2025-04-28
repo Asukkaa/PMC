@@ -55,6 +55,18 @@
         <HBox spacing="10">
             <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-setting-style"
                       text="运行自动流程前点击第一个起始坐标"/>
+
+            <CheckBox fx:id="recordDrag_Set" onAction="#recordDrag" styleClass="checkBox-setting-style"
+                      text="录制时记录拖鼠标拽轨迹"/>
+
+            <CheckBox fx:id="recordMove_Set" onAction="#recordMove" styleClass="checkBox-setting-style"
+                      text="录制时记录鼠标移动轨迹"/>
+
+            <HBox spacing="10" prefWidth="250">
+                <Label prefHeight="25" text="鼠标轨迹采样间隔:"/>
+                <TextField fx:id="sampleInterval_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="毫秒"/>
+            </HBox>
         </HBox>
 
         <Separator/>

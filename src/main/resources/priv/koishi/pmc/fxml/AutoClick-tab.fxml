@@ -62,7 +62,7 @@
                 <TableColumn fx:id="clickNum_Click" text="操作次数" sortable="false"/>
                 <TableColumn fx:id="waitTime_Click" text="执行前等待时间" sortable="false"/>
                 <TableColumn fx:id="clickKey_Click" text="点击按键" sortable="false"/>
-                <TableColumn fx:id="clickType_Click" text="点击类型" sortable="false"/>
+                <TableColumn fx:id="clickType_Click" text="操作类型" sortable="false"/>
                 <TableColumn fx:id="matchedType_Click" text="图像识别匹配逻辑" sortable="false"/>
                 <TableColumn fx:id="retryType_Click" text="图像识别重试逻辑" sortable="false"/>
             </columns>

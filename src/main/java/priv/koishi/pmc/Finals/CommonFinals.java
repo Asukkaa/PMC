@@ -198,6 +198,11 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 默认鼠标轨迹采样间隔
+     */
+    public static final String defaultSampleInterval = "10";
+
+    /**
      * 默认要点击的图片识别重试次数
      */
     public static final String defaultClickRetryNum = "3";
@@ -321,6 +326,10 @@ public class CommonFinals {
 
     public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
 
+    public static final String tip_recordMove = "勾选后将会在录制自动操作时记录鼠标没有拖拽时的移动轨迹";
+
+    public static final String tip_recordDrag = "勾选后将会在录制自动操作时记录鼠标拖拽状态时的移动轨迹";
+
     public static final String version = "2.2.0";
 
     public static final String buildDate = "2025年4月";
@@ -328,6 +337,10 @@ public class CommonFinals {
     public static final String tip_version = """
             version：%s
             %s构建""".formatted(version, buildDate);
+
+    public static final String tip_sampleInterval = """
+            在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
+            只能填自然数，单位为毫秒，数字越小越接近录制轨迹，不填默认为\s""";
 
     public static final String tip_clickRetryNum = """
             要点击的图片识别没有匹配项后将会按照设置次数再次识别
@@ -540,6 +553,12 @@ public class CommonFinals {
 
     public static final String key_autoSave = "autoSave";
 
+    public static final String key_recordDrag = "recordDrag";
+
+    public static final String key_recordMove = "recordMove";
+
+    public static final String key_sampleInterval = "sampleInterval";
+
     public static final String key_loadLastConfig = "loadLastConfig";
 
     public static final String key_loadLastFullWindow = "loadLastFullWindow";
@@ -689,5 +708,13 @@ public class CommonFinals {
     public static final String clickType_click = "点击后松开";
 
     public static final String clickType_drag = "拖拽";
+
+    public static final String clickType_moveTo = "移动到设置坐标";
+
+    /**
+     * 自动操作的操作类型选项
+     */
+    public static final List<String> clickTypeList = Arrays.asList(clickType_press, clickType_release, clickType_move,
+            clickType_click, clickType_drag, clickType_moveTo);
 
 }

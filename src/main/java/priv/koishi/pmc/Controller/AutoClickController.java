@@ -181,6 +181,21 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private int floatingHeight;
 
     /**
+     * 鼠标轨迹采样间隔
+     */
+    private String sampleInterval;
+
+    /**
+     * 记录鼠标移动轨迹
+     */
+    private boolean recordMove;
+
+    /**
+     * 记录鼠标拖拽轨迹
+     */
+    private boolean recordDrag;
+
+    /**
      * 要防重复点击的组件
      */
     private static final List<Node> disableNodes = new ArrayList<>();
@@ -463,8 +478,14 @@ public class AutoClickController extends CommonProperties implements MousePositi
         clickRetryNum = clickRetryNumTextField.getText() == null ? defaultStopRetryNum : clickRetryNumTextField.getText();
         TextField stopRetryNumTextField = (TextField) mainScene.lookup("#stopRetryNum_Set");
         stopRetryNum = stopRetryNumTextField.getText() == null ? defaultStopRetryNum : stopRetryNumTextField.getText();
+        TextField sampleIntervalTextField = (TextField) mainScene.lookup("#sampleInterval_Set");
+        sampleInterval = sampleIntervalTextField.getText() == null ? defaultSampleInterval : sampleIntervalTextField.getText();
         TableView<?> tableView = (TableView<?>) mainScene.lookup("#tableView_Set");
         defaultStopImgFiles = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
+        CheckBox recordMoveCheckBox = (CheckBox) mainScene.lookup("#recordMove_Set");
+        recordMove = recordMoveCheckBox.isSelected();
+        CheckBox recordDragCheckBox = (CheckBox) mainScene.lookup("#recordDrag_Set");
+        recordDrag = recordDragCheckBox.isSelected();
         inFilePath = prop.getProperty(key_inFilePath);
         autoSaveFileName = prop.getProperty(key_autoSaveFileName);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
@@ -553,7 +574,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
-        detailStage.setTitle(item.getName() + " 步骤详情");
+        String title = item.getName() == null ? "" : item.getName();
+        detailStage.setTitle(title + " 步骤详情");
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
@@ -975,6 +997,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private ClickPositionVO createClickPositionVO() {
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
+                .setSampleInterval(Integer.parseInt(sampleInterval))
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setStopImgFiles(defaultStopImgFiles)
@@ -984,7 +1007,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 .setStopRetryTimes(stopRetryNum)
                 .setClickType(clickType_click)
                 .setRetryType(retryType_stop)
-                .setSampleInterval(20)
                 .setClickInterval("0")
                 .setClickTime("0")
                 .setClickNum("1")
@@ -1057,7 +1079,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 vo.setTableView(tableView_Click)
                         .setRemove(false)
                         .setUuid(UUID.randomUUID().toString());
-
                 clickPositionVOS.add(vo);
             });
             // 将自动流程添加到列表中
@@ -1072,7 +1093,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private void addAutoClickPositions(List<ClickPositionVO> clickPositionVOS) throws IOException {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
-            clickPositionVO.setUuid(UUID.randomUUID().toString());
+            String clickType = clickPositionVO.getClickType();
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null)
@@ -1085,8 +1106,13 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
                     || !clickMatchedList.contains(clickPositionVO.getMatchedType())
                     || !runClickTypeMap.containsKey(clickPositionVO.getClickKey())
-                    || !retryTypeList.contains(clickPositionVO.getRetryType())) {
+                    || !retryTypeList.contains(clickPositionVO.getRetryType())
+                    || !clickTypeList.contains(clickType)) {
                 throw new IOException(text_LackKeyData);
+            }
+            clickPositionVO.setUuid(UUID.randomUUID().toString());
+            if (clickType_drag.equals(clickType)) {
+                clickPositionVO.setDragOperation(true);
             }
         }
         // 向列表添加数据
@@ -1160,6 +1186,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
                             }
                             // 改变要防重复点击的组件状态
                             changeDisableNodes(disableNodes, false);
+                            if (nativeMouseListener instanceof CustomMouseListener cmListener) {
+                                // 停止轨迹记录
+                                cmListener.stopRecording();
+                            }
                             // 移除鼠标监听器
                             removeNativeListener(nativeMouseListener);
                             hideFloatingWindow();
@@ -1177,7 +1207,196 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 });
             }
         };
-        GlobalScreen.addNativeKeyListener(nativeKeyListener);
+        addNativeListener(nativeKeyListener);
+    }
+
+    /**
+     * 鼠标监听器
+     */
+    private class CustomMouseListener implements NativeMouseListener {
+        // 鼠标拖拽轨迹记录器
+        public TrajectoryRecorder dragTrajectoryRecorder;
+        // 鼠标移动轨迹记录器
+        public TrajectoryRecorder moveTrajectoryRecorder;
+
+        public void stopRecording() {
+            if (dragTrajectoryRecorder != null) {
+                dragTrajectoryRecorder.stopRecording();
+            }
+            removeNativeListener(dragMotionListener);
+            if (moveTrajectoryRecorder != null) {
+                moveTrajectoryRecorder.stopRecording();
+            }
+            removeNativeListener(moveMotionListener);
+        }
+
+        // 鼠标拖拽监听器
+        public final NativeMouseMotionListener dragMotionListener = new NativeMouseMotionListener() {
+            @Override
+            public void nativeMouseDragged(NativeMouseEvent e) {
+                if (recordClicking && recordDrag) {
+                    Point mousePoint = MousePositionListener.getMousePoint();
+                    int x = (int) mousePoint.getX();
+                    int y = (int) mousePoint.getY();
+                    dragTrajectoryRecorder.recordMovePoint(x, y);
+                    pressClickBeans.forEach((key, value) -> value.setDragOperation(true)
+                            .setClickType(clickType_drag));
+                }
+            }
+        };
+
+        // 鼠标移动监听器
+        public final NativeMouseMotionListener moveMotionListener = new NativeMouseMotionListener() {
+            @Override
+            public void nativeMouseMoved(NativeMouseEvent e) {
+                if (recordClicking && recordMove) {
+                    Point mousePoint = MousePositionListener.getMousePoint();
+                    int x = (int) mousePoint.getX();
+                    int y = (int) mousePoint.getY();
+                    moveTrajectoryRecorder.recordMovePoint(x, y);
+                }
+            }
+        };
+
+        // 记录点击时刻
+        private long pressTime;
+        // 记录松开时刻
+        private long releasedTime;
+        // 首次点击标记
+        private boolean isFirstClick = true;
+        // 鼠标点击记录器
+        private final Map<Integer, ClickPositionVO> pressClickBeans = new ConcurrentHashMap<>();
+        // 添加类型
+        private final int addType;
+        // 鼠标移动记录器
+        public ClickPositionVO movePoint = createClickPositionVO();
+
+        // 构造器
+        public CustomMouseListener(int addType) {
+            this.addType = addType;
+        }
+
+        // 监听鼠标按下
+        @Override
+        public void nativeMousePressed(NativeMouseEvent e) {
+            if (recordClicking) {
+                // 停止移动轨迹记录
+                if (recordMove) {
+                    moveTrajectoryRecorder.stopRecording();
+                    removeNativeListener(moveMotionListener);
+                }
+                // 开始拖拽轨迹记录
+                if (recordDrag) {
+                    addNativeListener(dragMotionListener);
+                }
+                // 记录按下时刻的时间戳
+                pressTime = System.currentTimeMillis();
+                long waitTime;
+                // 记录移动轨迹时因为点击和移动是分开的两个步骤，所以点击不用再等待一次移动的时间
+                if (recordMove) {
+                    waitTime = 0;
+                } else {
+                    waitTime = isFirstClick ?
+                            pressTime - recordingStartTime :
+                            pressTime - releasedTime;
+                }
+                int pressButton = e.getButton();
+                // 记录按下的坐标
+                Point mousePoint = MousePositionListener.getMousePoint();
+                int startX = (int) mousePoint.getX();
+                int startY = (int) mousePoint.getY();
+                int dataSize = tableView_Click.getItems().size() + 1;
+                // 移动轨迹添加到表格
+                if (recordMove) {
+                    Platform.runLater(() -> {
+                        log_Click.setTextFill(Color.BLUE);
+                        // 添加至表格
+                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                        movePoint.setName(text_step + dataSize + text_isRecord)
+                                .setStartX(String.valueOf(startX))
+                                .setStartY(String.valueOf(startY))
+                                .setClickType(clickType_move);
+                        clickPositionVOS.add(movePoint);
+                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
+                        String log = text_cancelTask + text_recordClicking + "\n" +
+                                text_recorded + "鼠标移动轨迹";
+                        log_Click.setText(log);
+                        floatingLabel.setText(log);
+                    });
+                }
+                ClickPositionVO clickBean = createClickPositionVO();
+                // 记录拖拽轨迹
+                if (recordDrag) {
+                    dragTrajectoryRecorder = new TrajectoryRecorder(clickBean);
+                }
+                clickBean.setClickKey(recordClickTypeMap.get(pressButton))
+                        .setName(text_step + dataSize + text_isRecord)
+                        .setWaitTime(String.valueOf(waitTime))
+                        .setStartX(String.valueOf(startX))
+                        .setStartY(String.valueOf(startY))
+                        .setClickType(clickType_press);
+                pressClickBeans.put(pressButton, clickBean);
+                Platform.runLater(() -> {
+                    log_Click.setTextFill(Color.BLUE);
+                    // 添加至表格
+                    List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                    clickPositionVOS.add(clickBean);
+                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
+                    String log = text_cancelTask + text_recordClicking + "\n" +
+                            text_recorded + clickBean.getClickKey() +
+                            " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
+                    log_Click.setText(log);
+                    floatingLabel.setText(log);
+                });
+            }
+        }
+
+        // 监听鼠标松开
+        @Override
+        public void nativeMouseReleased(NativeMouseEvent e) {
+            if (recordClicking) {
+                // 停止拖拽轨迹记录
+                if (recordDrag) {
+                    dragTrajectoryRecorder.stopRecording();
+                    removeNativeListener(dragMotionListener);
+                }
+                // 开始移动轨迹记录
+                if (recordMove) {
+                    addNativeListener(moveMotionListener);
+                }
+                isFirstClick = false;
+                releasedTime = System.currentTimeMillis();
+                // 计算点击持续时间（毫秒）
+                long duration = releasedTime - pressTime;
+                Point mousePoint = MousePositionListener.getMousePoint();
+                int endX = (int) mousePoint.getX();
+                int endY = (int) mousePoint.getY();
+                int dataSize = tableView_Click.getItems().size() + 1;
+                // 记录移动轨迹
+                if (recordMove) {
+                    movePoint = createClickPositionVO();
+                    moveTrajectoryRecorder = new TrajectoryRecorder(movePoint);
+                }
+                ClickPositionVO clickBean = createClickPositionVO();
+                pressClickBeans.remove(e.getButton());
+                // 创建点击步骤对象
+                clickBean.setClickKey(recordClickTypeMap.get(e.getButton()))
+                        .setName(text_step + dataSize + text_isRecord)
+                        .setWaitTime(String.valueOf(duration))
+                        .setClickType(clickType_release);
+                Platform.runLater(() -> {
+                    // 添加至表格
+                    List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                    clickPositionVOS.add(clickBean);
+                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
+                    String log = text_cancelTask + text_recordClicking + "\n" +
+                            text_recorded + clickBean.getClickKey() +
+                            "松开 X：" + endX + " Y：" + endY;
+                    log_Click.setText(log);
+                    floatingLabel.setText(log);
+                });
+            }
+        }
     }
 
     /**
@@ -1192,122 +1411,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        // 鼠标监听器
-        nativeMouseListener = new NativeMouseListener() {
-            // 记录点击时刻
-            private long pressTime;
-            // 记录松开时刻
-            private long releasedTime;
-            // 首次点击标记
-            private boolean isFirstClick = true;
-            // 鼠标点击记录器
-            private final Map<Integer, ClickPositionVO> pressClickBeans = new ConcurrentHashMap<>();
-            // 鼠标轨迹记录器
-            private TrajectoryRecorder trajectoryRecorder;
-
-            // 新增鼠标移动监听逻辑
-            private final NativeMouseMotionListener motionListener = new NativeMouseMotionListener() {
-                // 鼠标移动监听逻辑
-                @Override
-                public void nativeMouseMoved(NativeMouseEvent e) {
-                    if (recordClicking) {
-                        Point mousePoint = MousePositionListener.getMousePoint();
-                        int x = (int) mousePoint.getX();
-                        int y = (int) mousePoint.getY();
-                        trajectoryRecorder.recordMovePoint(x, y);
-                    }
-                }
-
-                // 鼠标拖拽监听逻辑
-                @Override
-                public void nativeMouseDragged(NativeMouseEvent e) {
-                    if (recordClicking) {
-                        Point mousePoint = MousePositionListener.getMousePoint();
-                        int x = (int) mousePoint.getX();
-                        int y = (int) mousePoint.getY();
-                        trajectoryRecorder.recordDragPoint(x, y);
-                        pressClickBeans.forEach((key, value) -> value.setDragOperation(true)
-                                .setClickType(clickType_drag));
-                    }
-                }
-            };
-
-            // 监听鼠标按下
-            @Override
-            public void nativeMousePressed(NativeMouseEvent e) {
-                if (recordClicking) {
-                    // 记录按下时刻的时间戳
-                    pressTime = System.currentTimeMillis();
-                    long waitTime = isFirstClick ?
-                            pressTime - recordingStartTime :
-                            pressTime - releasedTime;
-                    int dataSize = tableView_Click.getItems().size() + 1;
-                    int pressButton = e.getButton();
-                    // 记录按下的坐标
-                    Point mousePoint = MousePositionListener.getMousePoint();
-                    int startX = (int) mousePoint.getX();
-                    int startY = (int) mousePoint.getY();
-                    ClickPositionVO clickBean = createClickPositionVO();
-                    trajectoryRecorder = new TrajectoryRecorder(clickBean);
-                    GlobalScreen.addNativeMouseMotionListener(motionListener);
-                    clickBean.setClickKey(recordClickTypeMap.get(pressButton))
-                            .setName(text_step + dataSize + text_isRecord)
-                            .setWaitTime(String.valueOf(waitTime))
-                            .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .setClickType(clickType_press);
-                    pressClickBeans.put(pressButton, clickBean);
-                    Platform.runLater(() -> {
-                        log_Click.setTextFill(Color.BLUE);
-                        // 添加至表格
-                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                        clickPositionVOS.add(clickBean);
-                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
-                        String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + clickBean.getClickKey() +
-                                " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
-                        log_Click.setText(log);
-                        floatingLabel.setText(log);
-                    });
-                }
-            }
-
-            // 监听鼠标松开
-            @Override
-            public void nativeMouseReleased(NativeMouseEvent e) {
-                if (recordClicking) {
-                    isFirstClick = false;
-                    releasedTime = System.currentTimeMillis();
-                    // 计算点击持续时间（毫秒）
-                    long duration = releasedTime - pressTime;
-                    Point mousePoint = MousePositionListener.getMousePoint();
-                    int endX = (int) mousePoint.getX();
-                    int endY = (int) mousePoint.getY();
-                    trajectoryRecorder.stopRecording();
-                    GlobalScreen.removeNativeMouseMotionListener(motionListener);
-                    int dataSize = tableView_Click.getItems().size() + 1;
-                    ClickPositionVO clickBean = createClickPositionVO();
-                    pressClickBeans.remove(e.getButton());
-                    // 创建点击步骤对象
-                    clickBean.setClickKey(recordClickTypeMap.get(e.getButton()))
-                            .setName(text_step + dataSize + text_isRecord)
-                            .setWaitTime(String.valueOf(duration))
-                            .setClickType(clickType_release);
-                    Platform.runLater(() -> {
-                        // 添加至表格
-                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                        clickPositionVOS.add(clickBean);
-                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
-                        String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + clickBean.getClickKey() +
-                                "松开 X：" + endX + " Y：" + endY;
-                        log_Click.setText(log);
-                        floatingLabel.setText(log);
-                    });
-                }
-            }
-        };
-        GlobalScreen.addNativeMouseListener(nativeMouseListener);
+        CustomMouseListener listener = new CustomMouseListener(addType);
+        listener.moveTrajectoryRecorder = new TrajectoryRecorder(listener.movePoint);
+        nativeMouseListener = listener;
+        // 注册监听器
+        addNativeListener(listener);
+        addNativeListener(listener.moveMotionListener);
     }
 
     /**
@@ -1339,6 +1448,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            recordTimeline = new Timeline();
             if (preparationTimeValue == 0) {
                 // 开启鼠标监听
                 startNativeMouseListener(addType);
@@ -1349,7 +1459,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 floatingLabel.setText(text.get());
                 log_Click.setText(text.get());
             } else {
-                recordTimeline = new Timeline();
                 AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
                 // 创建 Timeline 来实现倒计时
                 Timeline finalTimeline = recordTimeline;

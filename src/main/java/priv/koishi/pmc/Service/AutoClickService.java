@@ -330,7 +330,7 @@ public class AutoClickService {
                 return gotoStep;
             }
             // 计算鼠标移动的轨迹
-            if (!clickPositionVO.isDragOperation()) {
+            if (!clickType_drag.equals(clickType) && !clickType_move.equals(clickType)) {
                 // 单次操作时间
                 try {
                     Thread.sleep(clickTime);
@@ -368,12 +368,15 @@ public class AutoClickService {
      * @throws Exception 当轨迹执行过程中出现异常时抛出
      */
     private static void executeTrajectory(Robot robot, ClickPositionVO clickPositionVO) throws Exception {
-        if (!clickPositionVO.getDragTrajectory().isEmpty()) {
-            // 执行拖拽轨迹
-            executeDragTrajectory(robot, clickPositionVO);
-        } else if (!clickPositionVO.getMoveTrajectory().isEmpty()) {
-            // 执行普通移动轨迹
-            executeMoveTrajectory(robot, clickPositionVO);
+        if (CollectionUtils.isNotEmpty(clickPositionVO.getMoveTrajectory())) {
+            String clickType = clickPositionVO.getClickType();
+            if (clickType_drag.equals(clickType)) {
+                // 执行拖拽轨迹
+                executeDragTrajectory(robot, clickPositionVO);
+            } else if (clickType_move.equals(clickType)) {
+                // 执行普通移动轨迹
+                executeMoveTrajectory(robot, clickPositionVO);
+            }
         }
     }
 
@@ -385,7 +388,7 @@ public class AutoClickService {
      * @throws Exception 当轨迹执行过程中出现异常时抛出
      */
     private static void executeDragTrajectory(Robot robot, ClickPositionVO vo) throws Exception {
-        List<TrajectoryPoint> points = vo.getDragTrajectory();
+        List<TrajectoryPoint> points = vo.getMoveTrajectory();
         // 按下鼠标开始拖拽
         MouseButton button = runClickTypeMap.get(vo.getClickKey());
         Platform.runLater(() -> robot.mousePress(button));

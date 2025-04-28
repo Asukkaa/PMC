@@ -121,23 +121,21 @@ public class ClickPositionBean {
     String matchedStep;
 
     /**
-     * 拖拽轨迹
+     * 移动轨迹
      */
-    List<TrajectoryPoint> dragTrajectory = new ArrayList<>();
-
-    /**
-     * 自由移动轨迹
-     */
+    @JsonSerialize(contentAs = TrajectoryPoint.class)
     List<TrajectoryPoint> moveTrajectory = new ArrayList<>();
 
     /**
      * 轨迹采样间隔配置（单位：ms）
      */
+    @JsonIgnore
     int sampleInterval;
 
     /**
      * 是否为拖拽操作
      */
+    @JsonIgnore
     boolean dragOperation;
 
     /**
@@ -146,32 +144,18 @@ public class ClickPositionBean {
     String clickType;
 
     /**
-     * 添加拖拽轨迹
+     * 添加移动轨迹
      */
-    public void addDragPoint(int x, int y) {
+    public void addMovePoint(int x, int y) {
         long timestamp = System.currentTimeMillis();
-        if (!dragTrajectory.isEmpty()) {
-            TrajectoryPoint last = dragTrajectory.getLast();
+        if (!moveTrajectory.isEmpty()) {
+            TrajectoryPoint last = moveTrajectory.getLast();
             double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
             // 最小像素距离阈值
             if (distance < 5) {
                 return;
             }
         }
-        if (dragTrajectory.isEmpty() || timestamp - dragTrajectory.getLast().getTimestamp() >= sampleInterval) {
-            TrajectoryPoint trajectoryPoint = new TrajectoryPoint();
-            trajectoryPoint.setTimestamp(timestamp)
-                    .setX(x)
-                    .setY(y);
-            dragTrajectory.add(trajectoryPoint);
-        }
-    }
-
-    /**
-     * 添加移动轨迹
-     */
-    public void addMovePoint(int x, int y) {
-        long timestamp = System.currentTimeMillis();
         if (moveTrajectory.isEmpty() || timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval) {
             TrajectoryPoint trajectoryPoint = new TrajectoryPoint();
             trajectoryPoint.setTimestamp(timestamp)

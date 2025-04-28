@@ -212,9 +212,10 @@ public class DetailController {
         clickRetryNum_Det.setText(item.getClickRetryTimes());
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
-        clickType_Det.setValue(item.getClickType());
-        if (item.isDragOperation()) {
-            clickType_Det.getItems().add(clickType_drag);
+        String clickType = item.getClickType();
+        clickType_Det.setValue(clickType);
+        if (clickType_drag.equals(clickType) || clickType_move.equals(clickType)) {
+            clickType_Det.getItems().add(clickType);
             clickType_Det.setDisable(true);
             mouseStartX_Det.setDisable(true);
             mouseStartY_Det.setDisable(true);
