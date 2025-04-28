@@ -64,9 +64,9 @@
                         <items>
                             <FXCollections fx:factory="observableArrayList">
                                 <String fx:value="点击后松开"/>
+                                <String fx:value="移动到设置坐标"/>
                                 <String fx:value="点击"/>
                                 <String fx:value="松开"/>
-                                <String fx:value="移动到设置坐标"/>
                             </FXCollections>
                         </items>
                         <value>

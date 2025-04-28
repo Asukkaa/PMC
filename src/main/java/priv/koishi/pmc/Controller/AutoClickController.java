@@ -669,9 +669,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
         if (!runClicking && !recordClicking) {
+            // 检查跳转逻辑参数与操作类型设置是否合理
+            checkSetting(clickPositionVOS);
             runClicking = true;
-            // 检查跳转逻辑参数设置是否合理
-            checkGotoSetting(clickPositionVOS);
             CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
@@ -764,13 +764,31 @@ public class AutoClickController extends CommonProperties implements MousePositi
     }
 
     /**
-     * 检查跳转逻辑参数设置是否合理
+     * 检查跳转逻辑参数与操作类型设置是否合理
      */
-    private static void checkGotoSetting(List<ClickPositionVO> clickPositionVOS) {
+    private static void checkSetting(List<ClickPositionVO> clickPositionVOS) {
         int maxIndex = clickPositionVOS.size();
-        clickPositionVOS.stream().parallel().forEach(clickPositionVO -> {
+        // 新增按键状态跟踪Map
+        Map<String, Boolean> keyPressMap = new HashMap<>();
+        clickPositionVOS.forEach(clickPositionVO -> {
+            String clickKey = clickPositionVO.getClickKey();
             int index = clickPositionVO.getIndex();
             String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
+            String clickType = clickPositionVO.getClickType();
+            // 处理点击事件
+            if (clickType_press.equals(clickType)) {
+                if (keyPressMap.getOrDefault(clickKey, false)) {
+                    throw new RuntimeException(err + "检测到重复的 " + clickKey + " 点击事件");
+                }
+                keyPressMap.put(clickKey, true);
+            }
+            // 处理松开事件
+            else if (clickType_release.equals(clickType)) {
+                if (!keyPressMap.getOrDefault(clickKey, false)) {
+                    throw new RuntimeException(err + "缺少对应的 " + clickKey + " 点击事件");
+                }
+                keyPressMap.put(clickKey, false);
+            }
             if (clickMatched_clickStep.equals(clickPositionVO.getMatchedType())) {
                 int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
                 if (matchStep > maxIndex) {
@@ -788,6 +806,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 if (retryStep == index) {
                     throw new RuntimeException(err + text_retryStepEqualIndex);
                 }
+            }
+        });
+        keyPressMap.forEach((key, pressed) -> {
+            if (pressed) {
+                throw new RuntimeException("存在未松开的按键：" + key);
             }
         });
     }

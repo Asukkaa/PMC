@@ -214,8 +214,9 @@ public class DetailController {
         clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
+        ObservableList<String> clickTypeItems = clickType_Det.getItems();
         if (clickType_drag.equals(clickType) || clickType_move.equals(clickType)) {
-            clickType_Det.getItems().add(clickType);
+            clickTypeItems.add(clickType);
             clickType_Det.setDisable(true);
             mouseStartX_Det.setDisable(true);
             mouseStartY_Det.setDisable(true);
@@ -239,7 +240,18 @@ public class DetailController {
             updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img);
         }
         tableView_Det.refresh();
-        showClickImg(item.getClickImgPath());
+        String clickImgPath = item.getClickImgPath();
+        if (StringUtils.isNotBlank(clickImgPath)) {
+            clickTypeItems.removeAll(clickType_press, clickType_release);
+        } else {
+            if (!clickTypeItems.contains(clickType_press)) {
+                clickTypeItems.add(clickType_press);
+            }
+            if (!clickTypeItems.contains(clickType_release)) {
+                clickTypeItems.add(clickType_release);
+            }
+        }
+        showClickImg(clickImgPath);
     }
 
     /**
@@ -660,7 +672,7 @@ public class DetailController {
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath, key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
             showClickImg(clickImgSelectPath);
             clickType_Det.setValue(clickType_click);
-            clickType_Det.setDisable(true);
+            clickType_Det.getItems().removeAll(clickType_press, clickType_release);
             clickTypeHBox_Det.setVisible(true);
         }
     }
@@ -681,6 +693,13 @@ public class DetailController {
     @FXML
     public void removeClickImg() throws IOException {
         clickImgPath_Det.setText("");
+        ObservableList<String> clickTypeItems = clickType_Det.getItems();
+        if (!clickTypeItems.contains(clickType_press)) {
+            clickTypeItems.add(clickType_press);
+        }
+        if (!clickTypeItems.contains(clickType_release)) {
+            clickTypeItems.add(clickType_release);
+        }
         showClickImg(null);
         clickType_Det.setDisable(false);
     }

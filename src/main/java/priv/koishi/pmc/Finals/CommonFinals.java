@@ -240,7 +240,7 @@ public class CommonFinals {
 
     public static final String tip_clickKey = "每步操作需要按下的键";
 
-    public static final String tip_clickType = "操作列表中点击加拖拽必须与松开操作数量一致，设置点击图像后只能选择点击后松开";
+    public static final String tip_clickType = "操作列表中点击加拖拽数量必须与松开操作数量一致\n设置点击图像后只能选择点击后松开或移动到设置坐标";
 
     public static final String tip_clickTime = "每步操作中，单次操作的点击时长，单位为毫秒，只能填自然数，不填默认为 0";
 
