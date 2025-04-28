@@ -96,7 +96,7 @@ public class EditingCell<T> extends TableCell<T, String> {
         if (!isEmpty()) {
             super.startEdit();
             if (Objects.isNull(textField)) {
-                createTextField(tableColumnText);
+                createTextField();
             }
             setText(null);
             setGraphic(textField);
@@ -172,10 +172,8 @@ public class EditingCell<T> extends TableCell<T, String> {
 
     /**
      * 在单元格中创建输入框
-     *
-     * @param tableColumnText 表格列名
      */
-    private void createTextField(String tableColumnText) {
+    private void createTextField() {
         textField = new TextField(getString());
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         // 限制只能输入整数
