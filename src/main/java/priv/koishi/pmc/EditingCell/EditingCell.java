@@ -1,6 +1,8 @@
 package priv.koishi.pmc.EditingCell;
 
 import javafx.beans.value.ChangeListener;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -61,6 +63,11 @@ public class EditingCell<T> extends TableCell<T, String> {
     private ChangeListener<? super Boolean> textFocusedPropertyListener;
 
     /**
+     * 单元格列名
+     */
+    private String tableColumnText;
+
+    /**
      * 构造EditingCell对象,并且明确将该cell的值保存进相应的JavaBean的属性值的方法
      *
      * @param itemConsumer 用于引入lambda表达式的对象
@@ -89,7 +96,7 @@ public class EditingCell<T> extends TableCell<T, String> {
         if (!isEmpty()) {
             super.startEdit();
             if (Objects.isNull(textField)) {
-                createTextField(getTableColumn().getText());
+                createTextField(tableColumnText);
             }
             setText(null);
             setGraphic(textField);
@@ -121,7 +128,17 @@ public class EditingCell<T> extends TableCell<T, String> {
             setText(null);
             setGraphic(null);
         } else {
-            setTooltip(creatTooltip(tip + getTableColumn().getText() + "\n" + getString()));
+            tableColumnText = getTableColumn().getText();
+            Node graphic = getTableColumn().getGraphic();
+            if (graphic != null) {
+                if (graphic instanceof Label label) {
+                    tableColumnText = label.getText();
+                }
+            }
+            if (tableColumnText == null) {
+                tableColumnText = "";
+            }
+            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getString()));
             if (isEditing()) {
                 if (textField != null) {
                     textField.setText(getString());
