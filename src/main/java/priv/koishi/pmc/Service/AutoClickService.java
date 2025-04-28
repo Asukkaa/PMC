@@ -10,16 +10,14 @@ import javafx.scene.robot.Robot;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
-import priv.koishi.pmc.Bean.AutoClickTaskBean;
-import priv.koishi.pmc.Bean.FindPositionConfig;
-import priv.koishi.pmc.Bean.ImgFileBean;
-import priv.koishi.pmc.Bean.MatchPoint;
+import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -175,8 +173,7 @@ public class AutoClickService {
         int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
         double startX = Double.parseDouble(clickPositionVO.getStartX());
         double startY = Double.parseDouble(clickPositionVO.getStartY());
-        double endX = Double.parseDouble(clickPositionVO.getEndX());
-        double endY = Double.parseDouble(clickPositionVO.getEndY());
+
         TextField retrySecond = (TextField) clickPositionVO.getTableView().getScene().lookup("#retrySecond_Set");
         int retrySecondValue = setDefaultIntValue(retrySecond, 1, 0, null);
         TextField overTime = (TextField) clickPositionVO.getTableView().getScene().lookup("#overtime_Set");
@@ -263,8 +260,7 @@ public class AutoClickService {
                     }
                     startX = position.x();
                     startY = position.y();
-                    endX = position.x();
-                    endY = position.y();
+
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
                 } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
                     return gotoStep;
@@ -314,49 +310,113 @@ public class AutoClickService {
                 }
             });
             // 计算鼠标移动的轨迹
-            double deltaX = endX - startX;
-            double deltaY = endY - startY;
-            int steps = 10;
-            long stepDuration = clickTime / steps;
-            for (int j = 1; j <= steps; j++) {
-                double x = startX + deltaX * j / steps;
-                double y = startY + deltaY * j / steps;
-                CompletableFuture<Void> moveFuture = new CompletableFuture<>();
-                Platform.runLater(() -> {
-                    robot.mouseMove(x, y);
-                    moveFuture.complete(null);
-                });
-                // 等待任务完成
-                try {
-                    moveFuture.get();
-                } catch (Exception e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
+            if (!clickPositionVO.isDragOperation()) {
                 // 单次操作时间
                 try {
-                    Thread.sleep(stepDuration);
+                    Thread.sleep(clickTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
                 }
-            }
-            CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
-            Platform.runLater(() -> {
-                if (mouseButton != NONE) {
-                    robot.mouseRelease(mouseButton);
+                CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
+                Platform.runLater(() -> {
+                    if (mouseButton != NONE) {
+                        robot.mouseRelease(mouseButton);
+                    }
+                    releaseFuture.complete(null);
+                });
+                // 等待任务完成
+                try {
+                    releaseFuture.get();
+                } catch (Exception e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
-                releaseFuture.complete(null);
-            });
-            // 等待任务完成
-            try {
-                releaseFuture.get();
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-                break;
+            } else {
+                // 执行拖拽轨迹
+                executeTrajectory(robot, clickPositionVO);
             }
         }
         return gotoStep;
+    }
+
+    /**
+     * 根据轨迹类型执行不同的鼠标操作（拖拽/普通移动）
+     *
+     * @param robot           机器人操作实例
+     * @param clickPositionVO 包含轨迹数据和操作类型的值对象
+     * @throws Exception 当轨迹执行过程中出现异常时抛出
+     */
+    private static void executeTrajectory(Robot robot, ClickPositionVO clickPositionVO) throws Exception {
+        if (!clickPositionVO.getDragTrajectory().isEmpty()) {
+            // 执行拖拽轨迹
+            executeDragTrajectory(robot, clickPositionVO);
+        } else if (!clickPositionVO.getMoveTrajectory().isEmpty()) {
+            // 执行普通移动轨迹
+            executeMoveTrajectory(robot, clickPositionVO);
+        }
+    }
+
+    /**
+     * 执行拖拽轨迹操作（包含鼠标按下/释放的生命周期管理）
+     *
+     * @param robot 机器人操作实例
+     * @param vo    包含拖拽轨迹数据的值对象
+     * @throws Exception 当轨迹执行过程中出现异常时抛出
+     */
+    private static void executeDragTrajectory(Robot robot, ClickPositionVO vo) throws Exception {
+        List<TrajectoryPoint> points = vo.getDragTrajectory();
+        // 按下鼠标开始拖拽
+        MouseButton button = runClickTypeMap.get(vo.getClickType());
+        Platform.runLater(() -> robot.mousePress(button));
+        try {
+            executeTrajectoryPoints(robot, points);
+        } finally {
+            // 确保释放鼠标
+            Platform.runLater(() -> robot.mouseRelease(button));
+        }
+    }
+
+    /**
+     * 执行普通移动轨迹操作
+     *
+     * @param robot 机器人操作实例
+     * @param vo    包含移动轨迹数据的值对象
+     * @throws Exception 当轨迹执行过程中出现异常时抛出
+     */
+    private static void executeMoveTrajectory(Robot robot, ClickPositionVO vo) throws Exception {
+        List<TrajectoryPoint> points = vo.getMoveTrajectory();
+        executeTrajectoryPoints(robot, points);
+    }
+
+    /**
+     * 精确执行轨迹点移动序列
+     *
+     * @param robot  机器人操作实例
+     * @param points 轨迹点集合
+     * @throws Exception 当移动超时或线程中断时抛出
+     */
+    private static void executeTrajectoryPoints(Robot robot, List<TrajectoryPoint> points) throws Exception {
+        if (!points.isEmpty()) {
+            TrajectoryPoint lastPoint = null;
+            for (TrajectoryPoint point : points) {
+                long remaining = 0;
+                if (lastPoint != null) {
+                    remaining = point.getTimestamp() - lastPoint.getTimestamp();
+                }
+                lastPoint = point;
+                CompletableFuture<Void> moveFuture = new CompletableFuture<>();
+                Platform.runLater(() -> {
+                    robot.mouseMove(point.getX(), point.getY());
+                    moveFuture.complete(null);
+                });
+                // 精确控制时间间隔
+                moveFuture.get(remaining + 500, TimeUnit.MILLISECONDS);
+                if (remaining > 0) {
+                    Thread.sleep(remaining);
+                }
+            }
+        }
     }
 
     /**

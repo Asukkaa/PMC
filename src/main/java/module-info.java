@@ -31,4 +31,6 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.Bean.VO;
     opens priv.koishi.pmc.Bean.VO to javafx.fxml;
     exports priv.koishi.pmc.Serializer to com.fasterxml.jackson.databind;
+    exports priv.koishi.pmc.Trajectory;
+    opens priv.koishi.pmc.Trajectory to javafx.fxml;
 }

@@ -10,6 +10,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -50,6 +51,7 @@ import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.Properties.CommonProperties;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
+import priv.koishi.pmc.Trajectory.TrajectoryRecorder;
 
 import java.awt.*;
 import java.io.File;
@@ -59,6 +61,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -981,6 +984,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 .setClickRetryTimes(clickRetryNum)
                 .setStopRetryTimes(stopRetryNum)
                 .setRetryType(retryType_stop)
+                .setSampleInterval(20)
                 .setClickInterval("0")
                 .setClickTime("0")
                 .setClickNum("1")
@@ -1198,40 +1202,67 @@ public class AutoClickController extends CommonProperties implements MousePositi
             private long pressTime;
             // 记录松开时刻
             private long releasedTime;
-            // 记录鼠标按钮
-            private int pressButton;
             // 首次点击标记
             private boolean isFirstClick = true;
-            // 记录点击信息
-            ClickPositionVO clickBean;
+            // 鼠标点击记录器
+            private final Map<Integer, ClickPositionVO> clickBeans = new ConcurrentHashMap<>();
+            // 鼠标轨迹记录器
+            private TrajectoryRecorder trajectoryRecorder;
+
+            // 新增鼠标移动监听逻辑
+            private final NativeMouseMotionListener motionListener = new NativeMouseMotionListener() {
+                // 鼠标移动监听逻辑
+                @Override
+                public void nativeMouseMoved(NativeMouseEvent e) {
+                    if (recordClicking) {
+                        Point mousePoint = MousePositionListener.getMousePoint();
+                        int x = (int) mousePoint.getX();
+                        int y = (int) mousePoint.getY();
+                        trajectoryRecorder.recordMovePoint(x, y);
+                    }
+                }
+
+                // 鼠标拖拽监听逻辑
+                @Override
+                public void nativeMouseDragged(NativeMouseEvent e) {
+                    if (recordClicking) {
+                        Point mousePoint = MousePositionListener.getMousePoint();
+                        int x = (int) mousePoint.getX();
+                        int y = (int) mousePoint.getY();
+                        trajectoryRecorder.recordDragPoint(x, y);
+                        clickBeans.get(e.getButton()).setDragOperation(true);
+                    }
+                }
+            };
 
             // 监听鼠标按下
             @Override
             public void nativeMousePressed(NativeMouseEvent e) {
                 if (recordClicking) {
-                    // 记录按下时刻的时间戳和坐标
+                    // 记录按下时刻的时间戳
                     pressTime = System.currentTimeMillis();
-                    long waitTime;
-                    if (isFirstClick) {
-                        waitTime = pressTime - recordingStartTime;
-                    } else {
-                        waitTime = pressTime - releasedTime;
-                    }
+                    long waitTime = isFirstClick ?
+                            pressTime - recordingStartTime :
+                            pressTime - releasedTime;
                     int dataSize = tableView_Click.getItems().size() + 1;
-                    pressButton = e.getButton();
+                    int pressButton = e.getButton();
+                    // 记录按下的坐标
                     Point mousePoint = MousePositionListener.getMousePoint();
                     int startX = (int) mousePoint.getX();
                     int startY = (int) mousePoint.getY();
-                    clickBean = createClickPositionVO();
+                    ClickPositionVO clickBean = createClickPositionVO();
+                    trajectoryRecorder = new TrajectoryRecorder(clickBean);
+                    GlobalScreen.addNativeMouseMotionListener(motionListener);
                     clickBean.setClickType(recordClickTypeMap.get(pressButton))
                             .setName(text_step + dataSize + text_isRecord)
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY));
+                    clickBeans.put(pressButton, clickBean);
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
                         String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + recordClickTypeMap.get(pressButton) +
+                                text_recorded + clickBean.getClickType() +
                                 " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
                         log_Click.setText(log);
                         floatingLabel.setText(log);
@@ -1242,7 +1273,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             // 监听鼠标松开
             @Override
             public void nativeMouseReleased(NativeMouseEvent e) {
-                if (recordClicking && pressButton == e.getButton()) {
+                if (recordClicking) {
                     isFirstClick = false;
                     releasedTime = System.currentTimeMillis();
                     // 计算点击持续时间（毫秒）
@@ -1250,6 +1281,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     Point mousePoint = MousePositionListener.getMousePoint();
                     int endX = (int) mousePoint.getX();
                     int endY = (int) mousePoint.getY();
+                    trajectoryRecorder.stopRecording();
+                    GlobalScreen.removeNativeMouseMotionListener(motionListener);
+                    ClickPositionVO clickBean = clickBeans.get(e.getButton());
                     // 创建点击步骤对象
                     clickBean.setClickTime(String.valueOf(duration))
                             .setEndX(String.valueOf(endX))
@@ -1260,7 +1294,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                         clickPositionVOS.add(clickBean);
                         addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
                         String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + recordClickTypeMap.get(pressButton) +
+                                text_recorded + clickBean.getClickType() +
                                 "松开 X：" + clickBean.getEndX() + " Y：" + clickBean.getEndY();
                         log_Click.setText(log);
                         floatingLabel.setText(log);

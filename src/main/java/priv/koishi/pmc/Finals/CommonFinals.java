@@ -646,15 +646,15 @@ public class CommonFinals {
     public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click, clickMatched_break,
             clickMatched_step, clickMatched_clickStep);
 
-    public static final String mouseButton_primary = "鼠标左键点击";
+    public static final String mouseButton_primary = "鼠标左键";
 
-    public static final String mouseButton_secondary = "鼠标右键点击";
+    public static final String mouseButton_secondary = "鼠标右键";
 
-    public static final String mouseButton_middle = "鼠标中键点击";
+    public static final String mouseButton_middle = "鼠标中键";
 
-    public static final String mouseButton_forward = "鼠标前侧键点击";
+    public static final String mouseButton_forward = "鼠标前侧键";
 
-    public static final String mouseButton_back = "鼠标后侧键点击";
+    public static final String mouseButton_back = "鼠标后侧键";
 
     public static final String mouseButton_none = "鼠标仅移动";
 

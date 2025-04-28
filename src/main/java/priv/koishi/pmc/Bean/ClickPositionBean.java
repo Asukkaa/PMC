@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -128,5 +129,61 @@ public class ClickPositionBean {
      * 要识别的图像匹配成功后要跳转的步骤序号
      */
     String matchedStep;
+
+    /**
+     * 拖拽轨迹
+     */
+    List<TrajectoryPoint> dragTrajectory = new ArrayList<>();
+
+    /**
+     * 自由移动轨迹
+     */
+    List<TrajectoryPoint> moveTrajectory = new ArrayList<>();
+
+    /**
+     * 轨迹采样间隔配置（单位：ms）
+     */
+    int sampleInterval;
+
+    /**
+     * 是否为拖拽操作
+     */
+    boolean dragOperation;
+
+    /**
+     * 添加拖拽轨迹
+     */
+    public void addDragPoint(int x, int y) {
+        long timestamp = System.currentTimeMillis();
+        if (!dragTrajectory.isEmpty()) {
+            TrajectoryPoint last = dragTrajectory.getLast();
+            double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
+            // 最小像素距离阈值
+            if (distance < 5) {
+                return;
+            }
+        }
+        if (dragTrajectory.isEmpty() || timestamp - dragTrajectory.getLast().getTimestamp() >= sampleInterval) {
+            TrajectoryPoint trajectoryPoint = new TrajectoryPoint();
+            trajectoryPoint.setTimestamp(timestamp)
+                    .setX(x)
+                    .setY(y);
+            dragTrajectory.add(trajectoryPoint);
+        }
+    }
+
+    /**
+     * 添加移动轨迹
+     */
+    public void addMovePoint(int x, int y) {
+        long timestamp = System.currentTimeMillis();
+        if (moveTrajectory.isEmpty() || timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval) {
+            TrajectoryPoint trajectoryPoint = new TrajectoryPoint();
+            trajectoryPoint.setTimestamp(timestamp)
+                    .setX(x)
+                    .setY(y);
+            moveTrajectory.add(trajectoryPoint);
+        }
+    }
 
 }
