@@ -40,7 +40,7 @@
                             </FXCollections>
                         </items>
                         <value>
-                            <String fx:value="鼠标左键点击"/>
+                            <String fx:value="鼠标左键"/>
                         </value>
                     </ChoiceBox>
                 </HBox>
