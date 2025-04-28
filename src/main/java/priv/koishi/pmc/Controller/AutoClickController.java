@@ -313,7 +313,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      *
      * @param stage 程序主舞台
      */
-    public static void autoClickAdaption(Stage stage) {
+    public static void adaption(Stage stage) {
         Scene scene = stage.getScene();
         // 设置组件高度
         double stageHeight = stage.getHeight();
@@ -364,7 +364,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param scene 程序主场景
      * @throws IOException io异常
      */
-    public static void autoClickSaveLastConfig(Scene scene) throws IOException {
+    public static void saveLastConfig(Scene scene) throws IOException {
         AnchorPane anchorPane = (AnchorPane) scene.lookup("#anchorPane_Click");
         if (anchorPane != null) {
             InputStream input = checkRunningInputStream(configFile_Click);
@@ -559,9 +559,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::detailAdaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::detailAdaption));
+        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
         scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
         detailStage.show();
     }

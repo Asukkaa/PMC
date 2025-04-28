@@ -74,7 +74,7 @@ public class AboutController {
      * @param scene 程序主场景
      * @throws IOException io异常
      */
-    public static void saveLogsNumSetting(Scene scene) throws IOException {
+    public static void saveLastConfig(Scene scene) throws IOException {
         InputStream input = checkRunningInputStream(configFile);
         Properties prop = new Properties();
         prop.load(input);

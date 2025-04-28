@@ -11,11 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import static priv.koishi.pmc.Controller.AboutController.saveLogsNumSetting;
-import static priv.koishi.pmc.Controller.AutoClickController.autoClickAdaption;
-import static priv.koishi.pmc.Controller.AutoClickController.autoClickSaveLastConfig;
-import static priv.koishi.pmc.Controller.SettingController.settingAdaption;
-import static priv.koishi.pmc.Controller.SettingController.settingSaveLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
@@ -46,9 +41,9 @@ public class MainController {
         TabPane tabPane = (TabPane) scene.lookup("#tabPane");
         tabPane.setStyle("-fx-pref-height: " + stageHeight + "px;");
         // 自动操作工具页设置组件宽度自适应
-        autoClickAdaption(stage);
+        AutoClickController.adaption(stage);
         // 设置页组件宽度自适应
-        settingAdaption(stage);
+        SettingController.adaption(stage);
     }
 
     /**
@@ -56,16 +51,16 @@ public class MainController {
      *
      * @throws IOException io异常
      */
-    public static void saveLastConfig(Stage stage) throws IOException {
+    public static void saveAllLastConfig(Stage stage) throws IOException {
         Scene scene = stage.getScene();
         // 保存自动操作工具功能最后设置
-        autoClickSaveLastConfig(scene);
+        AutoClickController.saveLastConfig(scene);
         // 保存设置功能最后设置
-        settingSaveLastConfig(scene);
+        SettingController.saveLastConfig(scene);
         // 保存关程序闭前页面状态设置
-        mainSavaLastConfig(stage);
+        MainController.saveLastConfig(stage);
         // 保存日志文件数量设置
-        saveLogsNumSetting(scene);
+        AboutController.saveLastConfig(scene);
     }
 
     /**
@@ -73,7 +68,7 @@ public class MainController {
      *
      * @throws IOException io异常
      */
-    private static void mainSavaLastConfig(Stage stage) throws IOException {
+    private static void saveLastConfig(Stage stage) throws IOException {
         InputStream input = checkRunningInputStream(configFile);
         Properties prop = new Properties();
         prop.load(input);

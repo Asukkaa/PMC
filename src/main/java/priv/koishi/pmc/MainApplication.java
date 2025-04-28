@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Controller.MainController.mainAdaption;
-import static priv.koishi.pmc.Controller.MainController.saveLastConfig;
+import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -133,7 +133,7 @@ public class MainApplication extends Application {
      */
     @Override
     public void stop() throws Exception {
-        saveLastConfig(primaryStage);
+        saveAllLastConfig(primaryStage);
         GlobalScreen.unregisterNativeHook();
         // 关闭Socket服务
         if (serverSocket != null && !serverSocket.isClosed()) {

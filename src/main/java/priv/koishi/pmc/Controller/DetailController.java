@@ -167,7 +167,7 @@ public class DetailController {
     /**
      * 组件宽高自适应
      */
-    public void detailAdaption() {
+    public void adaption() {
         double tableWidth = stage.getWidth() * 0.5;
         tableView_Det.setMaxWidth(tableWidth);
         tableView_Det.setPrefWidth(tableWidth);

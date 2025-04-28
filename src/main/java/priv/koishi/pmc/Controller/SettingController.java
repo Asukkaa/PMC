@@ -158,7 +158,7 @@ public class SettingController implements MousePositionUpdater {
      *
      * @param stage 程序主舞台
      */
-    public static void settingAdaption(Stage stage) {
+    public static void adaption(Stage stage) {
         Scene scene = stage.getScene();
         // 设置组件高度
         double stageHeight = stage.getHeight();
@@ -191,7 +191,7 @@ public class SettingController implements MousePositionUpdater {
      * @param scene 程序主场景
      * @throws IOException io异常
      */
-    public static void settingSaveLastConfig(Scene scene) throws IOException {
+    public static void saveLastConfig(Scene scene) throws IOException {
         AnchorPane anchorPane = (AnchorPane) scene.lookup("#anchorPane_Set");
         if (anchorPane != null) {
             InputStream input = checkRunningInputStream(configFile_Click);
