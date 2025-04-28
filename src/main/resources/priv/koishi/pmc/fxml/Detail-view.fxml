@@ -31,11 +31,11 @@
                     <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="鼠标左键点击"/>
-                                <String fx:value="鼠标右键点击"/>
-                                <String fx:value="鼠标中键点击"/>
-                                <String fx:value="鼠标前侧键点击"/>
-                                <String fx:value="鼠标后侧键点击"/>
+                                <String fx:value="鼠标左键"/>
+                                <String fx:value="鼠标右键"/>
+                                <String fx:value="鼠标中键"/>
+                                <String fx:value="鼠标前侧键"/>
+                                <String fx:value="鼠标后侧键"/>
                                 <String fx:value="鼠标仅移动"/>
                             </FXCollections>
                         </items>
