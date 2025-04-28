@@ -129,7 +129,7 @@ public class DetailController {
     private VBox clickImgVBox_Det;
 
     @FXML
-    private HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det;
+    private HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det;
 
     @FXML
     private ImageView clickImg_Det;
@@ -138,19 +138,18 @@ public class DetailController {
     private Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    private ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det;
+    private ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det;
 
     @FXML
     private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
 
     @FXML
     private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det, clickIndex_Det,
-            tableViewSize_Det;
+            tableViewSize_Det, clickTypeText_Det;
 
     @FXML
-    private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, mouseEndX_Det, mouseEndY_Det, wait_Det,
-            clickNumBer_Det, timeClick_Det, interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det,
-            matchedStep_Det;
+    private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
+            interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det;
 
     @FXML
     private TableView<ImgFileVO> tableView_Det;
@@ -197,28 +196,33 @@ public class DetailController {
         setToolTip();
         // 给输入框添加内容变化监听
         nodeValueChangeListener();
+        wait_Det.setText(item.getWaitTime());
         clickName_Det.setText(item.getName());
+        clickKey_Det.setValue(item.getClickKey());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());
-        mouseEndX_Det.setText(item.getEndX());
-        mouseEndY_Det.setText(item.getEndY());
-        wait_Det.setText(item.getWaitTime());
-        clickNumBer_Det.setText(item.getClickNum());
         timeClick_Det.setText(item.getClickTime());
-        interval_Det.setText(item.getClickInterval());
-        clickType_Det.setValue(item.getClickType());
-        clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
-        stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
-        clickRetryNum_Det.setText(item.getClickRetryTimes());
-        stopRetryNum_Det.setText(item.getStopRetryTimes());
+        clickNumBer_Det.setText(item.getClickNum());
         retryType_Det.setValue(item.getRetryType());
+        interval_Det.setText(item.getClickInterval());
+        matchedType_Det.setValue(item.getMatchedType());
+        stopImgSelectPath = item.getStopImgSelectPath();
+        clickImgSelectPath = item.getClickImgSelectPath();
+        stopRetryNum_Det.setText(item.getStopRetryTimes());
+        clickRetryNum_Det.setText(item.getClickRetryTimes());
+        stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
+        clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
+        clickType_Det.setValue(item.getClickType());
+        if (item.isDragOperation()) {
+            clickType_Det.getItems().add(clickType_drag);
+            clickType_Det.setDisable(true);
+            mouseStartX_Det.setDisable(true);
+            mouseStartY_Det.setDisable(true);
+        }
         String retryStep = "0".equals(item.getRetryStep()) ? "" : item.getRetryStep();
         retryStep_Det.setText(retryStep);
-        matchedType_Det.setValue(item.getMatchedType());
         String matchedStep = "0".equals(item.getMatchedStep()) ? "" : item.getMatchedStep();
         matchedStep_Det.setText(matchedStep);
-        clickImgSelectPath = item.getClickImgSelectPath();
-        stopImgSelectPath = item.getStopImgSelectPath();
         List<ImgFileBean> imgFileBeans = item.getStopImgFiles();
         ObservableList<ImgFileVO> items = tableView_Det.getItems();
         if (CollectionUtils.isNotEmpty(imgFileBeans)) {
@@ -339,8 +343,6 @@ public class DetailController {
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(timeClick_Det, timeClick_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickName_Det, clickName_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(mouseEndX_Det, mouseEndX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(mouseEndY_Det, mouseEndY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryStep_Det, retryStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(mouseStartX_Det, mouseStartX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(mouseStartY_Det, mouseStartY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -442,12 +444,6 @@ public class DetailController {
         // 限制操作时长文本输入内容
         ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
         changeListeners.put(timeClick_Det, timeClickListener);
-        // 限制鼠标结束位置横(X)坐标文本输入框内容
-        ChangeListener<String> mouseEndXListener = integerRangeTextField(mouseEndX_Det, 0, null, tip_mouseEndX);
-        changeListeners.put(mouseEndX_Det, mouseEndXListener);
-        // 限制鼠标结束位置纵(Y)坐标文本输入框内容
-        ChangeListener<String> mouseEndYListener = integerRangeTextField(mouseEndY_Det, 0, null, tip_mouseEndY);
-        changeListeners.put(mouseEndY_Det, mouseEndYListener);
         // 限制操作间隔文本输入框内容
         ChangeListener<String> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval);
         changeListeners.put(interval_Det, intervalListener);
@@ -473,9 +469,6 @@ public class DetailController {
      */
     private void setToolTip() {
         addToolTip(tip_wait, wait_Det);
-        addToolTip(tip_mouseEndX, mouseEndX_Det);
-        addToolTip(tip_mouseEndY, mouseEndY_Det);
-        addToolTip(tip_clickType, clickType_Det);
         addToolTip(tip_clickTime, timeClick_Det);
         addToolTip(tip_clickName, clickName_Det);
         addToolTip(tip_stopImgBtn, stopImgBtn_Det);
@@ -488,9 +481,12 @@ public class DetailController {
         addToolTip(tip_Step, matchedStep_Det, retryStep_Det);
         addToolTip(tip_removeClickImgBtn, removeClickImg_Det);
         addToolTip(tip_updateClickNameBtn, updateClickName_Det);
+        addValueToolTip(clickKey_Det, tip_clickKey, clickKey_Det.getValue());
+        addValueToolTip(clickType_Det, tip_clickType, clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Det);
         addToolTip(tip_clickIndex + clickIndex_Det.getText(), clickIndex_Det);
+        addValueToolTip(clickTypeText_Det, tip_clickType, clickType_Det.getValue());
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Det);
         addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
         addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
@@ -582,6 +578,7 @@ public class DetailController {
         int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
         int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
         selectedItem.setName(clickName_Det.getText());
+        selectedItem.setClickKey(clickKey_Det.getValue());
         selectedItem.setClickType(clickType_Det.getValue());
         selectedItem.setStartX(String.valueOf(mouseStartX));
         selectedItem.setStartY(String.valueOf(mouseStartY));
@@ -591,8 +588,6 @@ public class DetailController {
         selectedItem.setStopImgFiles(new ArrayList<>(tableView_Det.getItems()));
         selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
         selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
-        selectedItem.setEndX(String.valueOf(setDefaultIntValue(mouseEndX_Det, mouseStartX, 0, null)));
-        selectedItem.setEndY(String.valueOf(setDefaultIntValue(mouseEndY_Det, mouseStartY, 0, null)));
         selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
@@ -663,6 +658,9 @@ public class DetailController {
             // 更新所选文件路径显示
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath, key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
             showClickImg(clickImgSelectPath);
+            clickType_Det.setValue(clickType_click);
+            clickType_Det.setDisable(true);
+            clickTypeHBox_Det.setVisible(true);
         }
     }
 
@@ -683,6 +681,7 @@ public class DetailController {
     public void removeClickImg() throws IOException {
         clickImgPath_Det.setText("");
         showClickImg(null);
+        clickType_Det.setDisable(false);
     }
 
     /**
@@ -722,7 +721,7 @@ public class DetailController {
     }
 
     /**
-     * 要匹配的图像重试逻辑下拉框
+     * 要匹配的图像重试逻辑下拉框变化
      */
     @FXML
     private void retryTypeChange() {
@@ -732,13 +731,31 @@ public class DetailController {
     }
 
     /**
-     * 识别匹配后逻辑下拉框
+     * 识别匹配后逻辑下拉框变化
      */
     @FXML
     private void matchedTypeChange() {
         matchedStep_Det.setText("");
         matchedStepHBox_Det.setVisible(clickMatched_step.equals(matchedType_Det.getValue()) || clickMatched_clickStep.equals(matchedType_Det.getValue()));
         addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
+    }
+
+    /**
+     * 操作类型下拉框变化
+     */
+    @FXML
+    private void clickTypeChange() {
+        clickTypeHBox_Det.setVisible(clickType_click.equals(clickType_Det.getValue()));
+        addValueToolTip(clickType_Det, tip_clickType, clickType_Det.getValue());
+        addValueToolTip(clickTypeText_Det, tip_clickType, clickType_Det.getValue());
+    }
+
+    /**
+     * 点击按键下拉框变化
+     */
+    @FXML
+    private void clickKeyChange() {
+        addValueToolTip(clickKey_Det, tip_clickKey, clickKey_Det.getValue());
     }
 
 }

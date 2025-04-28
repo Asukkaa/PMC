@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static javafx.scene.input.MouseButton.NONE;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.findPosition;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
@@ -105,23 +104,28 @@ public class AutoClickService {
                     ClickPositionVO clickPositionVO = tableViewItems.get(currentStep);
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
-                    int endX = Integer.parseInt((clickPositionVO.getEndX()));
-                    int endY = Integer.parseInt((clickPositionVO.getEndY()));
                     String waitTime = clickPositionVO.getWaitTime();
                     String clickTime = clickPositionVO.getClickTime();
                     String name = clickPositionVO.getName();
+                    String clickKey = clickPositionVO.getClickKey();
                     String clickType = clickPositionVO.getClickType();
                     String interval = clickPositionVO.getClickInterval();
                     String clickImgPath = clickPositionVO.getClickImgPath();
                     String matchType = clickPositionVO.getMatchedType();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
+                    String clickText;
+                    if (clickType_move.equalsIgnoreCase(clickType)) {
+                        clickText = "";
+                    } else {
+                        clickText = "\n操作内容：" + clickKey + clickType;
+                    }
                     Platform.runLater(() -> {
                         String text = loopTimeText +
                                 "\n本轮进度：" + progress + "/" + dataSize +
                                 "\n将在 " + waitTime + " 毫秒后将执行: " + name +
-                                "\n操作内容：" + clickType + " X：" + startX + " Y：" + startY +
-                                "\n在 " + clickTime + " 毫秒内移动到 X：" + endX + " Y：" + endY +
-                                "\n重复 " + clickNum + " 次，每次操作间隔：" + interval + " 毫秒";
+                                "\n目标坐标：" + " X：" + startX + " Y：" + startY + clickText +
+                                "\n单次操作时间：" + clickTime + " 毫秒" +
+                                "\n重复：" + clickNum + " 次，每次操作间隔：" + interval + " 毫秒";
                         if (StringUtils.isNotBlank(clickImgPath)) {
                             try {
                                 text = loopTimeText +
@@ -173,7 +177,6 @@ public class AutoClickService {
         int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
         double startX = Double.parseDouble(clickPositionVO.getStartX());
         double startY = Double.parseDouble(clickPositionVO.getStartY());
-
         TextField retrySecond = (TextField) clickPositionVO.getTableView().getScene().lookup("#retrySecond_Set");
         int retrySecondValue = setDefaultIntValue(retrySecond, 1, 0, null);
         TextField overTime = (TextField) clickPositionVO.getTableView().getScene().lookup("#overtime_Set");
@@ -260,7 +263,6 @@ public class AutoClickService {
                     }
                     startX = position.x();
                     startY = position.y();
-
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
                 } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
                     return gotoStep;
@@ -284,6 +286,7 @@ public class AutoClickService {
         }
         long clickTime = Long.parseLong(clickPositionVO.getClickTime());
         long clickInterval = Long.parseLong(clickPositionVO.getClickInterval());
+        String clickType = clickPositionVO.getClickType();
         // 按照操作次数执行
         for (int i = 0; i < clickNum; i++) {
             // 每次操作的间隔时间
@@ -295,20 +298,37 @@ public class AutoClickService {
                     break;
                 }
             }
-            MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickType());
+            MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickKey());
             double finalStartX = startX;
             double finalStartY = startY;
+            CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
-                robot.mouseMove(finalStartX, finalStartY);
-                // 执行自动流程前点击第一个起始坐标
-                if (firstClick.compareAndSet(true, false)) {
-                    robot.mousePress(mouseButton);
+                if (clickType_release.equals(clickType)) {
                     robot.mouseRelease(mouseButton);
+                } else {
+                    robot.mouseMove(finalStartX, finalStartY);
+                    // 执行自动流程前点击第一个起始坐标
+                    if (firstClick.compareAndSet(true, false)) {
+                        robot.mousePress(mouseButton);
+                        robot.mouseRelease(mouseButton);
+                    }
+                    if (clickType_press.equals(clickType) || clickType_click.equals(clickType) || clickType_drag.equals(clickType)) {
+                        robot.mousePress(mouseButton);
+                    }
                 }
-                if (mouseButton != NONE) {
-                    robot.mousePress(mouseButton);
-                }
+                actionFuture.complete(null);
             });
+            // 等待任务完成
+            try {
+                actionFuture.get();
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+            // 如果是松开操作直接结束当前步骤
+            if (clickType_release.equals(clickType)) {
+                return gotoStep;
+            }
             // 计算鼠标移动的轨迹
             if (!clickPositionVO.isDragOperation()) {
                 // 单次操作时间
@@ -320,7 +340,7 @@ public class AutoClickService {
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
-                    if (mouseButton != NONE) {
+                    if (clickType_click.equals(clickType)) {
                         robot.mouseRelease(mouseButton);
                     }
                     releaseFuture.complete(null);
@@ -367,14 +387,9 @@ public class AutoClickService {
     private static void executeDragTrajectory(Robot robot, ClickPositionVO vo) throws Exception {
         List<TrajectoryPoint> points = vo.getDragTrajectory();
         // 按下鼠标开始拖拽
-        MouseButton button = runClickTypeMap.get(vo.getClickType());
+        MouseButton button = runClickTypeMap.get(vo.getClickKey());
         Platform.runLater(() -> robot.mousePress(button));
-        try {
-            executeTrajectoryPoints(robot, points);
-        } finally {
-            // 确保释放鼠标
-            Platform.runLater(() -> robot.mouseRelease(button));
-        }
+        executeTrajectoryPoints(robot, points);
     }
 
     /**

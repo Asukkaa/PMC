@@ -1170,43 +1170,41 @@ public class UiUtils {
     }
 
     /**
-     * 修改操作类型
+     * 更改点击按键
      *
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildEditClickTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("更改点击类型");
+    public static void buildEditClickKeyMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu("更改点击按键");
         // 创建二级菜单项
         MenuItem primary = new MenuItem(mouseButton_primary);
         MenuItem secondary = new MenuItem(mouseButton_secondary);
         MenuItem middle = new MenuItem(mouseButton_middle);
         MenuItem forward = new MenuItem(mouseButton_forward);
         MenuItem back = new MenuItem(mouseButton_back);
-        MenuItem none = new MenuItem(mouseButton_none);
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_primary));
-        secondary.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_secondary));
-        middle.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_middle));
-        forward.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_forward));
-        back.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_back));
-        none.setOnAction(event -> updateClickTypeMenuItem(tableView, mouseButton_none));
+        primary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_primary));
+        secondary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_secondary));
+        middle.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_middle));
+        forward.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_forward));
+        back.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_back));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(primary, secondary, middle, forward, back, none);
+        menu.getItems().addAll(primary, secondary, middle, forward, back);
         contextMenu.getItems().add(menu);
     }
 
     /**
-     * 修改操作类型二级菜单选项
+     * 修改点击按键二级菜单选项
      *
      * @param tableView 要添加右键菜单的列表
-     * @param clickType 操作类型
+     * @param clickKey 点击按键
      */
-    private static void updateClickTypeMenuItem(TableView<ClickPositionVO> tableView, String clickType) {
+    private static void updateClickKeyMenuItem(TableView<ClickPositionVO> tableView, String clickKey) {
         List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
-                bean.setClickType(clickType);
+                bean.setClickKey(clickKey);
                 tableView.refresh();
             });
         }

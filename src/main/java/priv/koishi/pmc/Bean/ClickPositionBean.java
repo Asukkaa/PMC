@@ -43,16 +43,6 @@ public class ClickPositionBean {
     String startY;
 
     /**
-     * 结束横（X）坐标
-     */
-    String endX;
-
-    /**
-     * 结束纵（Y）坐标
-     */
-    String endY;
-
-    /**
      * 点击时长（单位：毫秒）
      */
     String clickTime;
@@ -73,9 +63,9 @@ public class ClickPositionBean {
     String waitTime;
 
     /**
-     * 操作类型
+     * 操作按键
      */
-    String clickType;
+    String clickKey;
 
     /**
      * 要识别的图片路径
@@ -149,6 +139,11 @@ public class ClickPositionBean {
      * 是否为拖拽操作
      */
     boolean dragOperation;
+
+    /**
+     * 操作类型
+     */
+    String clickType;
 
     /**
      * 添加拖拽轨迹

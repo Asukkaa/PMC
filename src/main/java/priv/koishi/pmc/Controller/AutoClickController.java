@@ -308,7 +308,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private TableColumn<ClickPositionVO, ImageView> thumb_Click;
 
     @FXML
-    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickInterval_Click,
+    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickKey_Click,
             waitTime_Click, clickType_Click, matchedType_Click, retryType_Click;
 
     /**
@@ -335,8 +335,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
         Node clickNum = scene.lookup("#clickNum_Click");
         clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
-        Node clickInterval = scene.lookup("#clickInterval_Click");
-        clickInterval.setStyle("-fx-pref-width: " + tableWidth * 0.08 + "px;");
+        Node clickKey = scene.lookup("#clickKey_Click");
+        clickKey.setStyle("-fx-pref-width: " + tableWidth * 0.08 + "px;");
         Node waitTime = scene.lookup("#waitTime_Click");
         waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
         Node clickType = scene.lookup("#clickType_Click");
@@ -490,7 +490,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.13));
         clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
         clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
-        clickInterval_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
+        clickKey_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
         waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
         clickType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
         matchedType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
@@ -503,7 +503,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
         name_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setName));
-        clickInterval_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickInterval, true, 0, null));
         waitTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
         clickTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
         clickNum_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
@@ -828,8 +827,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         }
         // 移动所选行选项
         buildMoveDataMenu(tableView_Click, contextMenu);
-        // 修改操作类型
-        buildEditClickTypeMenu(tableView_Click, contextMenu);
+        // 修改点击按键
+        buildEditClickKeyMenu(tableView_Click, contextMenu);
         // 修改重试类型
         buildEditRetryTypeMenu(tableView_Click, contextMenu);
         // 插入数据选项
@@ -980,9 +979,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setStopImgFiles(defaultStopImgFiles)
                 .setMatchedType(clickMatched_click)
-                .setClickType(mouseButton_primary)
                 .setClickRetryTimes(clickRetryNum)
+                .setClickKey(mouseButton_primary)
                 .setStopRetryTimes(stopRetryNum)
+                .setClickType(clickType_click)
                 .setRetryType(retryType_stop)
                 .setSampleInterval(20)
                 .setClickInterval("0")
@@ -990,9 +990,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 .setClickNum("1")
                 .setWaitTime("0")
                 .setStartX("0")
-                .setStartY("0")
-                .setEndX("0")
-                .setEndY("0");
+                .setStartY("0");
         return clickPositionVO;
     }
 
@@ -1077,8 +1075,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
             clickPositionVO.setUuid(UUID.randomUUID().toString());
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getEndX(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getEndY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null)
@@ -1088,7 +1084,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100)
                     || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
                     || !clickMatchedList.contains(clickPositionVO.getMatchedType())
-                    || !runClickTypeMap.containsKey(clickPositionVO.getClickType())
+                    || !runClickTypeMap.containsKey(clickPositionVO.getClickKey())
                     || !retryTypeList.contains(clickPositionVO.getRetryType())) {
                 throw new IOException(text_LackKeyData);
             }
@@ -1205,7 +1201,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             // 首次点击标记
             private boolean isFirstClick = true;
             // 鼠标点击记录器
-            private final Map<Integer, ClickPositionVO> clickBeans = new ConcurrentHashMap<>();
+            private final Map<Integer, ClickPositionVO> pressClickBeans = new ConcurrentHashMap<>();
             // 鼠标轨迹记录器
             private TrajectoryRecorder trajectoryRecorder;
 
@@ -1230,7 +1226,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
                         int x = (int) mousePoint.getX();
                         int y = (int) mousePoint.getY();
                         trajectoryRecorder.recordDragPoint(x, y);
-                        clickBeans.get(e.getButton()).setDragOperation(true);
+                        pressClickBeans.forEach((key, value) -> value.setDragOperation(true)
+                                .setClickType(clickType_drag));
                     }
                 }
             };
@@ -1253,16 +1250,21 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     ClickPositionVO clickBean = createClickPositionVO();
                     trajectoryRecorder = new TrajectoryRecorder(clickBean);
                     GlobalScreen.addNativeMouseMotionListener(motionListener);
-                    clickBean.setClickType(recordClickTypeMap.get(pressButton))
+                    clickBean.setClickKey(recordClickTypeMap.get(pressButton))
                             .setName(text_step + dataSize + text_isRecord)
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY));
-                    clickBeans.put(pressButton, clickBean);
+                            .setStartY(String.valueOf(startY))
+                            .setClickType(clickType_press);
+                    pressClickBeans.put(pressButton, clickBean);
                     Platform.runLater(() -> {
                         log_Click.setTextFill(Color.BLUE);
+                        // 添加至表格
+                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                        clickPositionVOS.add(clickBean);
+                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
                         String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + clickBean.getClickType() +
+                                text_recorded + clickBean.getClickKey() +
                                 " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
                         log_Click.setText(log);
                         floatingLabel.setText(log);
@@ -1283,19 +1285,22 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     int endY = (int) mousePoint.getY();
                     trajectoryRecorder.stopRecording();
                     GlobalScreen.removeNativeMouseMotionListener(motionListener);
-                    ClickPositionVO clickBean = clickBeans.get(e.getButton());
+                    int dataSize = tableView_Click.getItems().size() + 1;
+                    ClickPositionVO clickBean = createClickPositionVO();
+                    pressClickBeans.remove(e.getButton());
                     // 创建点击步骤对象
-                    clickBean.setClickTime(String.valueOf(duration))
-                            .setEndX(String.valueOf(endX))
-                            .setEndY(String.valueOf(endY));
+                    clickBean.setClickKey(recordClickTypeMap.get(e.getButton()))
+                            .setName(text_step + dataSize + text_isRecord)
+                            .setWaitTime(String.valueOf(duration))
+                            .setClickType(clickType_release);
                     Platform.runLater(() -> {
                         // 添加至表格
                         List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                         clickPositionVOS.add(clickBean);
                         addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
                         String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + clickBean.getClickType() +
-                                "松开 X：" + clickBean.getEndX() + " Y：" + clickBean.getEndY();
+                                text_recorded + clickBean.getClickKey() +
+                                "松开 X：" + endX + " Y：" + endY;
                         log_Click.setText(log);
                         floatingLabel.setText(log);
                     });
