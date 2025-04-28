@@ -219,13 +219,9 @@ public class CommonFinals {
 
     public static final String tip_wait = "每步操作执行前等待时间，单位为毫秒，只能填自然数，不填默认为 0";
 
-    public static final String tip_mouseStartX = "鼠标点击位置起始横坐标，与结束位置横坐标不同则执行拖拽操作，只能填自然数，不填默认为 0";
+    public static final String tip_mouseStartX = "鼠标点击位置起始横坐标，只能填自然数，不填默认为 0";
 
-    public static final String tip_mouseStartY = "鼠标点击位置起始纵坐标，与结束位置纵坐标不同则执行拖拽操作，只能填自然数，不填默认为 0";
-
-    public static final String tip_mouseEndX = "鼠标点击位置结束横坐标，与起始位置横坐标不同则执行拖拽操作，只能填自然数，不填默认为 起始横坐标";
-
-    public static final String tip_mouseEndY = "鼠标点击位置结束纵坐标，与起始位置纵坐标不同则执行拖拽操作，只能填自然数，不填默认为 起始纵坐标";
+    public static final String tip_mouseStartY = "鼠标点击位置起始纵坐标，只能填自然数，不填默认为 0";
 
     public static final String tip_runClick = "点击后将会按照列表中的步骤执行自动操作，执行自动化任务时按下 esc 即可取消任务";
 
@@ -235,9 +231,11 @@ public class CommonFinals {
 
     public static final String tip_loopTime = "自动操作循环次数，只能填自然数，不填默认为 1，填 0 为无限循环";
 
-    public static final String tip_clickNumBer = "每步操作执行次数，点击为多次点击，长按为多次长按，拖拽为多次拖拽，只能填自然数，不填默认为 1";
+    public static final String tip_clickNumBer = "每步操作执行次数，点击为多次点击，长按为多次长按，只能填自然数，不填默认为 1";
 
-    public static final String tip_clickType = "每步操作需要按下的键";
+    public static final String tip_clickKey = "每步操作需要按下的键";
+
+    public static final String tip_clickType = "操作列表中点击加拖拽必须与松开操作数量一致，设置点击图像后只能选择点击后松开";
 
     public static final String tip_clickTime = "每步操作中，单次操作的点击时长，单位为毫秒，只能填自然数，不填默认为 0";
 
@@ -323,9 +321,9 @@ public class CommonFinals {
 
     public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
 
-    public static final String version = "2.1.5";
+    public static final String version = "2.2.0";
 
-    public static final String buildDate = "2025年4月25日";
+    public static final String buildDate = "2025年4月";
 
     public static final String tip_version = """
             version：%s
@@ -656,8 +654,6 @@ public class CommonFinals {
 
     public static final String mouseButton_back = "鼠标后侧键";
 
-    public static final String mouseButton_none = "鼠标仅移动";
-
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
      */
@@ -669,7 +665,6 @@ public class CommonFinals {
         runClickTypeMap.put(mouseButton_middle, MouseButton.MIDDLE);
         runClickTypeMap.put(mouseButton_forward, MouseButton.FORWARD);
         runClickTypeMap.put(mouseButton_back, MouseButton.BACK);
-        runClickTypeMap.put(mouseButton_none, MouseButton.NONE);
     }
 
     /**
@@ -684,5 +679,15 @@ public class CommonFinals {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back);
         recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
     }
+
+    public static final String clickType_press = "点击";
+
+    public static final String clickType_release = "松开";
+
+    public static final String clickType_move = "移动";
+
+    public static final String clickType_click = "点击后松开";
+
+    public static final String clickType_drag = "拖拽";
 
 }
