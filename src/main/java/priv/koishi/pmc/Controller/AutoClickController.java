@@ -49,7 +49,7 @@ import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.Properties.CommonProperties;
-import priv.koishi.pmc.ThreadPool.CommonThreadPoolExecutor;
+import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.awt.*;
 import java.io.File;
@@ -185,7 +185,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     /**
      * 线程池实例
      */
-    private static final ExecutorService executorService = new CommonThreadPoolExecutor().createNewThreadPool();
+    private static final ExecutorService executorService = ThreadPoolManager.getPool(AutoClickController.class);
 
     /**
      * 自动点击任务
@@ -392,10 +392,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Click");
             // 自动保存
             autoSave(autoSave, tableView, outPathValue);
-        }
-        // 关闭线程池
-        if (executorService != null) {
-            executorService.shutdownNow();
         }
     }
 
