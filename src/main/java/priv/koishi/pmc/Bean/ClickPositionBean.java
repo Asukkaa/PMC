@@ -133,12 +133,6 @@ public class ClickPositionBean {
     int sampleInterval;
 
     /**
-     * 是否为拖拽操作
-     */
-    @JsonIgnore
-    boolean dragOperation;
-
-    /**
      * 操作类型
      */
     String clickType;

@@ -1138,9 +1138,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 throw new IOException(text_LackKeyData);
             }
             clickPositionVO.setUuid(UUID.randomUUID().toString());
-            if (clickType_drag.equals(clickType)) {
-                clickPositionVO.setDragOperation(true);
-            }
         }
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, text_process);
@@ -1283,8 +1280,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     int x = (int) mousePoint.getX();
                     int y = (int) mousePoint.getY();
                     dragTrajectoryRecorder.recordMovePoint(x, y);
-                    pressClickBeans.forEach((key, value) -> value.setDragOperation(true)
-                            .setClickType(clickType_drag));
+                    pressClickBeans.forEach((key, value) -> value.setClickType(clickType_drag));
                 }
             }
         };
