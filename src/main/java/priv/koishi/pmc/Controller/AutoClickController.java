@@ -1242,16 +1242,20 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private class CustomMouseListener implements NativeMouseListener {
         // 鼠标拖拽轨迹记录器
-        public TrajectoryRecorder dragTrajectoryRecorder;
+        private TrajectoryRecorder dragTrajectoryRecorder;
         // 鼠标移动轨迹记录器
-        public TrajectoryRecorder moveTrajectoryRecorder;
+        private TrajectoryRecorder moveTrajectoryRecorder;
+        // 鼠标点击记录器
+        private final Map<Integer, ClickPositionVO> pressClickBeans = new ConcurrentHashMap<>();
 
         // 停止鼠标轨迹记录
         public void stopRecording() {
+            // 停止拖拽轨迹记录
             if (dragTrajectoryRecorder != null) {
                 dragTrajectoryRecorder.stopRecording();
             }
             removeNativeListener(dragMotionListener);
+            // 停止移动轨迹记录
             if (moveTrajectoryRecorder != null) {
                 moveTrajectoryRecorder.stopRecording();
                 if (isRecordClicking) {
@@ -1304,8 +1308,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
         private long releasedTime;
         // 首次点击标记
         private boolean isFirstClick = true;
-        // 鼠标点击记录器
-        private final Map<Integer, ClickPositionVO> pressClickBeans = new ConcurrentHashMap<>();
         // 添加类型
         private final int addType;
         // 鼠标移动记录器
@@ -1349,10 +1351,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 // 添加移动轨迹到表格
                 addMoveTrajectory(dataSize, startX, startY);
                 ClickPositionVO clickBean = createClickPositionVO();
-                // 记录拖拽轨迹
-                if (recordDrag) {
-                    dragTrajectoryRecorder = new TrajectoryRecorder(clickBean);
-                }
                 clickBean.setClickKey(recordClickTypeMap.get(pressButton))
                         .setName(text_step + dataSize + text_isRecord)
                         .setWaitTime(String.valueOf(waitTime))
@@ -1360,6 +1358,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
                         .setStartY(String.valueOf(startY))
                         .setClickType(clickType_press);
                 pressClickBeans.put(pressButton, clickBean);
+                // 记录拖拽轨迹
+                if (recordDrag) {
+                    dragTrajectoryRecorder = new TrajectoryRecorder(clickBean);
+                }
                 Platform.runLater(() -> {
                     log_Click.setTextFill(Color.BLUE);
                     // 添加至表格
@@ -1377,7 +1379,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
 
         // 添加移动轨迹到表格
         private void addMoveTrajectory(int dataSize, int startX, int startY) {
-            if (recordMove) {
+            // 所有按键都松开时才能记录
+            if (recordMove && pressClickBeans.isEmpty()) {
                 Platform.runLater(() -> {
                     log_Click.setTextFill(Color.BLUE);
                     // 添加至表格
@@ -1406,7 +1409,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     removeNativeListener(dragMotionListener);
                 }
                 // 开始移动轨迹记录
-                if (recordMove) {
+                if (recordMove && pressClickBeans.isEmpty()) {
                     addNativeListener(moveMotionListener);
                 }
                 isFirstClick = false;
