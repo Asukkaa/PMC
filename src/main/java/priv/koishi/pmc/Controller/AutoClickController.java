@@ -1241,12 +1241,35 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 鼠标监听器
      */
     private class CustomMouseListener implements NativeMouseListener {
+
         // 鼠标拖拽轨迹记录器
         private TrajectoryRecorder dragTrajectoryRecorder;
+
         // 鼠标移动轨迹记录器
         private TrajectoryRecorder moveTrajectoryRecorder;
+
         // 鼠标点击记录器
         private final Map<Integer, ClickPositionVO> pressClickBeans = new ConcurrentHashMap<>();
+
+        // 记录点击时刻
+        private long pressTime;
+
+        // 记录松开时刻
+        private long releasedTime;
+
+        // 首次点击标记
+        private boolean isFirstClick = true;
+
+        // 添加类型
+        private final int addType;
+
+        // 鼠标移动记录器
+        public ClickPositionVO movePoint = createClickPositionVO();
+
+        // 构造器
+        public CustomMouseListener(int addType) {
+            this.addType = addType;
+        }
 
         // 停止鼠标轨迹记录
         public void stopRecording() {
@@ -1302,20 +1325,26 @@ public class AutoClickController extends CommonProperties implements MousePositi
             }
         };
 
-        // 记录点击时刻
-        private long pressTime;
-        // 记录松开时刻
-        private long releasedTime;
-        // 首次点击标记
-        private boolean isFirstClick = true;
-        // 添加类型
-        private final int addType;
-        // 鼠标移动记录器
-        public ClickPositionVO movePoint = createClickPositionVO();
-
-        // 构造器
-        public CustomMouseListener(int addType) {
-            this.addType = addType;
+        // 添加移动轨迹到表格
+        private void addMoveTrajectory(int dataSize, int startX, int startY) {
+            // 所有按键都松开时才能记录
+            if (recordMove && pressClickBeans.isEmpty()) {
+                Platform.runLater(() -> {
+                    log_Click.setTextFill(Color.BLUE);
+                    // 添加至表格
+                    List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                    movePoint.setName(text_step + dataSize + text_isRecord)
+                            .setStartX(String.valueOf(startX))
+                            .setStartY(String.valueOf(startY))
+                            .setClickType(clickType_move);
+                    clickPositionVOS.add(movePoint);
+                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
+                    String log = text_cancelTask + text_recordClicking + "\n" +
+                            text_recorded + "鼠标移动轨迹";
+                    log_Click.setText(log);
+                    floatingLabel.setText(log);
+                });
+            }
         }
 
         // 监听鼠标按下
@@ -1371,28 +1400,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     String log = text_cancelTask + text_recordClicking + "\n" +
                             text_recorded + clickBean.getClickKey() +
                             " 点击 X：" + clickBean.getStartX() + " Y：" + clickBean.getStartY();
-                    log_Click.setText(log);
-                    floatingLabel.setText(log);
-                });
-            }
-        }
-
-        // 添加移动轨迹到表格
-        private void addMoveTrajectory(int dataSize, int startX, int startY) {
-            // 所有按键都松开时才能记录
-            if (recordMove && pressClickBeans.isEmpty()) {
-                Platform.runLater(() -> {
-                    log_Click.setTextFill(Color.BLUE);
-                    // 添加至表格
-                    List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                    movePoint.setName(text_step + dataSize + text_isRecord)
-                            .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .setClickType(clickType_move);
-                    clickPositionVOS.add(movePoint);
-                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
-                    String log = text_cancelTask + text_recordClicking + "\n" +
-                            text_recorded + "鼠标移动轨迹";
                     log_Click.setText(log);
                     floatingLabel.setText(log);
                 });
