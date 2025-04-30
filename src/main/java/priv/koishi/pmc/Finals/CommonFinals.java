@@ -330,7 +330,7 @@ public class CommonFinals {
 
     public static final String tip_recordDrag = "勾选后将会在录制自动操作时记录鼠标拖拽状态时的移动轨迹";
 
-    public static final String version = "2.2.0";
+    public static final String version = "2.2.1";
 
     public static final String buildDate = "2025年4月29日";
 
@@ -699,11 +699,21 @@ public class CommonFinals {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
     }
 
-    public static final String clickType_press = "点击";
+    /**
+     * 录制与点击按键类映射
+     */
+    public static final Map<Integer, MouseButton> NativeMouseToMouseButton = new HashMap<>();
 
-    public static final String clickType_release = "松开";
+    static {
+        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON1, MouseButton.PRIMARY);
+        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON2, MouseButton.SECONDARY);
+        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON3, MouseButton.MIDDLE);
+        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON4, MouseButton.BACK);
+        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON5, MouseButton.FORWARD);
+        NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
+    }
 
-    public static final String clickType_move = "移动";
+    public static final String clickType_move = "带轨迹的移动";
 
     public static final String clickType_click = "点击后松开";
 
@@ -714,7 +724,7 @@ public class CommonFinals {
     /**
      * 自动操作的操作类型选项
      */
-    public static final List<String> clickTypeList = Arrays.asList(clickType_press, clickType_release, clickType_move,
-            clickType_click, clickType_drag, clickType_moveTo);
+    public static final List<String> clickTypeList = Arrays.asList(clickType_move, clickType_click,
+            clickType_drag, clickType_moveTo);
 
 }

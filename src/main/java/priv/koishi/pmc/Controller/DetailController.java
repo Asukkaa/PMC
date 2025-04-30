@@ -241,16 +241,6 @@ public class DetailController {
         }
         tableView_Det.refresh();
         String clickImgPath = item.getClickImgPath();
-        if (StringUtils.isNotBlank(clickImgPath)) {
-            clickTypeItems.removeAll(clickType_press, clickType_release);
-        } else {
-            if (!clickTypeItems.contains(clickType_press)) {
-                clickTypeItems.add(clickType_press);
-            }
-            if (!clickTypeItems.contains(clickType_release)) {
-                clickTypeItems.add(clickType_release);
-            }
-        }
         showClickImg(clickImgPath);
     }
 
@@ -669,10 +659,10 @@ public class DetailController {
         File selectedFile = creatImgChooser(window, clickImgSelectPath);
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath, key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
+            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
+                    key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
             showClickImg(clickImgSelectPath);
             clickType_Det.setValue(clickType_click);
-            clickType_Det.getItems().removeAll(clickType_press, clickType_release);
             clickTypeHBox_Det.setVisible(true);
         }
     }
@@ -693,13 +683,6 @@ public class DetailController {
     @FXML
     public void removeClickImg() throws IOException {
         clickImgPath_Det.setText("");
-        ObservableList<String> clickTypeItems = clickType_Det.getItems();
-        if (!clickTypeItems.contains(clickType_press)) {
-            clickTypeItems.add(clickType_press);
-        }
-        if (!clickTypeItems.contains(clickType_release)) {
-            clickTypeItems.add(clickType_release);
-        }
         showClickImg(null);
         clickType_Det.setDisable(false);
     }

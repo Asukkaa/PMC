@@ -3,6 +3,8 @@ package priv.koishi.pmc.Bean;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * 鼠标移动轨迹点
  *
@@ -28,5 +30,10 @@ public class TrajectoryPoint {
      * 轨迹点纵坐标
      */
     int y;
+
+    /**
+     * 按下的键
+     */
+    List<Integer> pressButtons;
 
 }

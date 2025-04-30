@@ -6,9 +6,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 自动操作步骤类
@@ -124,7 +124,7 @@ public class ClickPositionBean {
      * 移动轨迹
      */
     @JsonSerialize(contentAs = TrajectoryPoint.class)
-    List<TrajectoryPoint> moveTrajectory = new ArrayList<>();
+    List<TrajectoryPoint> moveTrajectory = new CopyOnWriteArrayList<>();
 
     /**
      * 轨迹采样间隔配置（单位：ms）
@@ -139,20 +139,31 @@ public class ClickPositionBean {
 
     /**
      * 添加移动轨迹
+     *
+     * @param x            横坐标
+     * @param y            纵坐标
+     * @param pressButtons 当前按下的按键
+     * @param isDragging   是否是拖拽（true-拖拽，false-普通移动）
      */
-    public void addMovePoint(int x, int y) {
+    public void addMovePoint(int x, int y, List<Integer> pressButtons, boolean isDragging) {
         long timestamp = System.currentTimeMillis();
         if (!moveTrajectory.isEmpty()) {
             TrajectoryPoint last = moveTrajectory.getLast();
             double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
-            // 最小像素距离阈值
-            if (distance < 1) {
+            // 最小像素距离阈值，拖拽记录结束时不校验
+            if (distance < 1 && (!isDragging || pressButtons != null)) {
                 return;
             }
         }
-        if (moveTrajectory.isEmpty() || timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval) {
+        // 移动轨迹为空时认为是轨迹起点，直接添加起始轨迹点
+        if (moveTrajectory.isEmpty()
+                // 只有时间间隔超过采样间隔时才添加轨迹点
+                || (timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval)
+                // 拖拽时如果轨迹点为空则认为是结束拖拽，直接添加结束轨迹点
+                || (isDragging && pressButtons == null)) {
             TrajectoryPoint trajectoryPoint = new TrajectoryPoint();
-            trajectoryPoint.setTimestamp(timestamp)
+            trajectoryPoint.setPressButtons(pressButtons)
+                    .setTimestamp(timestamp)
                     .setX(x)
                     .setY(y);
             moveTrajectory.add(trajectoryPoint);

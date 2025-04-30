@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -303,18 +304,14 @@ public class AutoClickService {
             double finalStartY = startY;
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
-                if (clickType_release.equals(clickType)) {
+                robot.mouseMove(finalStartX, finalStartY);
+                // 执行自动流程前点击第一个起始坐标
+                if (firstClick.compareAndSet(true, false)) {
+                    robot.mousePress(mouseButton);
                     robot.mouseRelease(mouseButton);
-                } else {
-                    robot.mouseMove(finalStartX, finalStartY);
-                    // 执行自动流程前点击第一个起始坐标
-                    if (firstClick.compareAndSet(true, false)) {
-                        robot.mousePress(mouseButton);
-                        robot.mouseRelease(mouseButton);
-                    }
-                    if (clickType_press.equals(clickType) || clickType_click.equals(clickType) || clickType_drag.equals(clickType)) {
-                        robot.mousePress(mouseButton);
-                    }
+                }
+                if (clickType_click.equals(clickType)) {
+                    robot.mousePress(mouseButton);
                 }
                 actionFuture.complete(null);
             });
@@ -325,11 +322,7 @@ public class AutoClickService {
                 Thread.currentThread().interrupt();
                 break;
             }
-            // 如果是松开操作直接结束当前步骤
-            if (clickType_release.equals(clickType)) {
-                return gotoStep;
-            }
-            // 计算鼠标移动的轨迹
+            // 执行长按操作
             if (!clickType_drag.equals(clickType) && !clickType_move.equals(clickType)) {
                 // 单次操作时间
                 try {
@@ -353,58 +346,11 @@ public class AutoClickService {
                     break;
                 }
             } else {
-                // 执行拖拽轨迹
-                executeTrajectory(robot, clickPositionVO);
+                // 计算鼠标轨迹
+                executeTrajectoryPoints(robot, clickPositionVO.getMoveTrajectory());
             }
         }
         return gotoStep;
-    }
-
-    /**
-     * 根据轨迹类型执行不同的鼠标操作（拖拽/普通移动）
-     *
-     * @param robot           机器人操作实例
-     * @param clickPositionVO 包含轨迹数据和操作类型的值对象
-     * @throws Exception 当轨迹执行过程中出现异常时抛出
-     */
-    private static void executeTrajectory(Robot robot, ClickPositionVO clickPositionVO) throws Exception {
-        if (CollectionUtils.isNotEmpty(clickPositionVO.getMoveTrajectory())) {
-            String clickType = clickPositionVO.getClickType();
-            if (clickType_drag.equals(clickType)) {
-                // 执行拖拽轨迹
-                executeDragTrajectory(robot, clickPositionVO);
-            } else if (clickType_move.equals(clickType)) {
-                // 执行普通移动轨迹
-                executeMoveTrajectory(robot, clickPositionVO);
-            }
-        }
-    }
-
-    /**
-     * 执行拖拽轨迹操作（包含鼠标按下/释放的生命周期管理）
-     *
-     * @param robot 机器人操作实例
-     * @param vo    包含拖拽轨迹数据的值对象
-     * @throws Exception 当轨迹执行过程中出现异常时抛出
-     */
-    private static void executeDragTrajectory(Robot robot, ClickPositionVO vo) throws Exception {
-        List<TrajectoryPoint> points = vo.getMoveTrajectory();
-        // 按下鼠标开始拖拽
-        MouseButton button = runClickTypeMap.get(vo.getClickKey());
-        Platform.runLater(() -> robot.mousePress(button));
-        executeTrajectoryPoints(robot, points);
-    }
-
-    /**
-     * 执行普通移动轨迹操作
-     *
-     * @param robot 机器人操作实例
-     * @param vo    包含移动轨迹数据的值对象
-     * @throws Exception 当轨迹执行过程中出现异常时抛出
-     */
-    private static void executeMoveTrajectory(Robot robot, ClickPositionVO vo) throws Exception {
-        List<TrajectoryPoint> points = vo.getMoveTrajectory();
-        executeTrajectoryPoints(robot, points);
     }
 
     /**
@@ -418,14 +364,44 @@ public class AutoClickService {
         if (!points.isEmpty()) {
             TrajectoryPoint lastPoint = null;
             for (TrajectoryPoint point : points) {
+                // 当前轨迹点按下的按键
+                List<Integer> pressButtons = point.getPressButtons();
+                // 当前轨迹点要抬起的按键
+                List<Integer> releaseButtons = new CopyOnWriteArrayList<>();
+                // 当前轨迹点新增的要按下的按键
+                List<Integer> nowPressButtons;
                 long remaining = 0;
                 if (lastPoint != null) {
                     remaining = point.getTimestamp() - lastPoint.getTimestamp();
+                    // 上一个轨迹点按下的按键
+                    List<Integer> lastPressButtons = lastPoint.getPressButtons();
+                    if (CollectionUtils.isEmpty(pressButtons)) {
+                        nowPressButtons = null;
+                        releaseButtons = lastPressButtons;
+                    } else {
+                        if (CollectionUtils.isNotEmpty(lastPressButtons)) {
+                            releaseButtons = (List<Integer>) CollectionUtils.subtract(lastPressButtons, pressButtons);
+                            nowPressButtons = (List<Integer>) CollectionUtils.subtract(pressButtons, releaseButtons);
+                        } else {
+                            nowPressButtons = pressButtons;
+                        }
+                    }
+                } else {
+                    nowPressButtons = pressButtons;
                 }
                 lastPoint = point;
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
+                List<Integer> finalReleaseButtons = releaseButtons;
                 Platform.runLater(() -> {
+                    if (CollectionUtils.isNotEmpty(nowPressButtons)) {
+                        nowPressButtons.forEach(button ->
+                                robot.mousePress(NativeMouseToMouseButton.get(button)));
+                    }
                     robot.mouseMove(point.getX(), point.getY());
+                    if (CollectionUtils.isNotEmpty(finalReleaseButtons)) {
+                        finalReleaseButtons.forEach(button ->
+                                robot.mouseRelease(NativeMouseToMouseButton.get(button)));
+                    }
                     moveFuture.complete(null);
                 });
                 // 精确控制时间间隔
