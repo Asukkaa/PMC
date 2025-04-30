@@ -1264,15 +1264,15 @@ public class AutoClickController extends CommonProperties implements MousePositi
         private final int addType;
 
         // 鼠标移动记录器
-        public ClickPositionVO movePoint = createClickPositionVO();
+        private ClickPositionVO movePoint = createClickPositionVO();
 
         // 构造器
-        public CustomMouseListener(int addType) {
+        private CustomMouseListener(int addType) {
             this.addType = addType;
         }
 
         // 停止鼠标轨迹记录
-        public void stopRecording() {
+        private void stopRecording() {
             // 停止拖拽轨迹记录
             if (dragTrajectoryRecorder != null) {
                 dragTrajectoryRecorder.stopRecording();
@@ -1291,6 +1291,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 }
             }
             removeNativeListener(moveMotionListener);
+            pressClickBeans.clear();
             Platform.runLater(() -> {
                 log_Click.setTextFill(Color.BLUE);
                 log_Click.setText("录制已结束");
@@ -1299,7 +1300,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         }
 
         // 鼠标拖拽监听器
-        public final NativeMouseMotionListener dragMotionListener = new NativeMouseMotionListener() {
+        private final NativeMouseMotionListener dragMotionListener = new NativeMouseMotionListener() {
             @Override
             public void nativeMouseDragged(NativeMouseEvent e) {
                 if (recordClicking && recordDrag) {
@@ -1313,7 +1314,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         };
 
         // 鼠标移动监听器
-        public final NativeMouseMotionListener moveMotionListener = new NativeMouseMotionListener() {
+        private final NativeMouseMotionListener moveMotionListener = new NativeMouseMotionListener() {
             @Override
             public void nativeMouseMoved(NativeMouseEvent e) {
                 if (recordClicking && recordMove) {
