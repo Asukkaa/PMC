@@ -12,18 +12,18 @@
     -fx-font-size: 12px;
 }
 
-.checkBox-setting-style {
+.checkBox-short {
     -fx-cursor: hand;
     -fx-pref-height: 25;
-    -fx-pref-width: 250;
+    -fx-pref-width: 270;
 }
 
-.hBox-Detail-Short {
+.hBox-short {
     -fx-spacing: 5;
     -fx-pref-width: 270;
 }
 
-.hBox-Detail-Long {
+.hBox-long {
     -fx-spacing: 5;
     -fx-pref-width: 550;
 }

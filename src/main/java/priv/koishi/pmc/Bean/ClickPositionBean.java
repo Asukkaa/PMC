@@ -127,7 +127,7 @@ public class ClickPositionBean {
     List<TrajectoryPoint> moveTrajectory = new CopyOnWriteArrayList<>();
 
     /**
-     * 轨迹采样间隔配置（单位：ms）
+     * 轨迹采样间隔配置（单位：毫秒）
      */
     @JsonIgnore
     int sampleInterval;
@@ -136,6 +136,46 @@ public class ClickPositionBean {
      * 操作类型
      */
     String clickType;
+
+    /**
+     * 横轴随机偏移量
+     */
+    String randomX;
+
+    /**
+     * 纵轴随机偏移量
+     */
+    String randomY;
+
+    /**
+     * 是否启用随机点击坐标 0-不启用，1-启用
+     */
+    String randomClick;
+
+    /**
+     * 是否启用随机轨迹 0-不启用，1-启用
+     */
+    String randomTrajectory;
+
+    /**
+     * 随机偏移时长（单位：毫秒）
+     */
+    String randomTime;
+
+    /**
+     * 是否启用随机点击时长 0-不启用，1-启用
+     */
+    String randomClickTime;
+
+    /**
+     * 是否启用随机等待时长 0-不启用，1-启用
+     */
+    String randomWaitTime;
+
+    /**
+     * 是否启用随机点击间隔 0-不启用，1-启用
+     */
+    String randomClickInterval;
 
     /**
      * 添加移动轨迹

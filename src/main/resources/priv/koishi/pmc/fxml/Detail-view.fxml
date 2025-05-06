@@ -11,17 +11,17 @@
     <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="步骤序号:"/>
                     <Label prefHeight="25" fx:id="clickIndex_Det"/>
                 </HBox>
 
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="列表操作步骤数量:"/>
                     <Label prefHeight="25" fx:id="tableViewSize_Det"/>
                 </HBox>
 
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="步骤名称:"/>
                     <TextField fx:id="clickName_Det"/>
                 </HBox>
@@ -30,17 +30,19 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="鼠标点击起始横(X)坐标:"/>
                     <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
+                    <Label prefHeight="25" text="像素"/>
                 </HBox>
 
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="鼠标点击起始纵(Y)坐标:"/>
                     <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
+                    <Label prefHeight="25" text="像素"/>
                 </HBox>
 
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="点击按键:"/>
                     <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" onAction="#clickKeyChange">
                         <items>
@@ -58,7 +60,7 @@
                     </ChoiceBox>
                 </HBox>
 
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label fx:id="clickTypeText_Det" prefHeight="25" text="操作类型:"/>
                     <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" onAction="#clickTypeChange">
                         <items>
@@ -75,31 +77,67 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-Detail-Short">
+                <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="执行前等待时间:"/>
                     <TextField fx:id="wait_Det" prefWidth="80"/>
+                    <Label prefHeight="25" text="毫秒"/>
                 </HBox>
 
                 <HBox fx:id="clickTypeHBox_Det" spacing="10">
-                    <HBox styleClass="hBox-Detail-Short">
+                    <HBox styleClass="hBox-short">
                         <Label prefHeight="25" text="操作次数:"/>
                         <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
+                        <Label prefHeight="25" text="次"/>
                     </HBox>
 
-                    <HBox styleClass="hBox-Detail-Short">
+                    <HBox styleClass="hBox-short">
                         <Label prefHeight="25" text="单次操作点击时长:"/>
                         <TextField fx:id="timeClick_Det" prefWidth="80"/>
+                        <Label prefHeight="25" text="毫秒"/>
                     </HBox>
 
-                    <HBox styleClass="hBox-Detail-Short">
+                    <HBox styleClass="hBox-short">
                         <Label prefHeight="25" text="单次操作点击间隔时间:"/>
                         <TextField fx:id="interval_Det" prefWidth="80"/>
+                        <Label prefHeight="25" text="毫秒"/>
                     </HBox>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-Detail-Long">
+                <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="运行时启用随机点击坐标偏移"/>
+
+                <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short" text="运行时启用随机轨迹坐标偏移"/>
+
+                <HBox styleClass="hBox-short">
+                    <Label prefHeight="25" text="横坐标随机偏移量: ±"/>
+                    <TextField fx:id="randomClickX_Det" prefWidth="50"/>
+                    <Label prefHeight="25" text="像素"/>
+                </HBox>
+
+                <HBox styleClass="hBox-short">
+                    <Label prefHeight="25" text="纵坐标随机偏移量: ±"/>
+                    <TextField fx:id="randomClickY_Det" prefWidth="50"/>
+                    <Label prefHeight="25" text="像素"/>
+                </HBox>
+            </HBox>
+
+            <HBox spacing="10">
+                <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short" text="运行时启用随机点击时长偏移"/>
+
+                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short" text="运行时启用随机操作间隔时间偏移"/>
+
+                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short" text="运行时启用随机执行前等待时间偏移"/>
+
+                <HBox styleClass="hBox-short">
+                    <Label prefHeight="25" text="时长随机偏移量: ±"/>
+                    <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
+                    <Label prefHeight="25" text="毫秒"/>
+                </HBox>
+            </HBox>
+
+            <HBox spacing="10">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="要识别的图像识别匹配匹配度:"/>
                     <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -109,6 +147,7 @@
                 <HBox spacing="5">
                     <Label prefHeight="25" text="要识别的图像识别失败重试次数:"/>
                     <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
+                    <Label prefHeight="25" text="次"/>
                 </HBox>
             </HBox>
 
@@ -165,7 +204,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-Detail-Long">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="终止操作图像识别匹配匹配度:"/>
                     <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -175,6 +214,7 @@
                 <HBox spacing="5">
                     <Label prefHeight="25" text="终止操作图像识别失败重试次数:"/>
                     <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
+                    <Label prefHeight="25" text="次"/>
                 </HBox>
             </HBox>
 

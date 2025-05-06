@@ -16,6 +16,7 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -142,9 +143,16 @@ public class AutoClickService {
                         massageLabel.setText(text);
                         floatingLabel.setText(text);
                     });
+                    long wait = Long.parseLong(waitTime);
+                    // 处理随机等待时间偏移
+                    if (activation.equals(clickPositionVO.getRandomWaitTime())) {
+                        int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
+                        Random random = new Random();
+                        wait = (long) Math.max(0, wait + (random.nextDouble() * 2 - 1) * randomTime);
+                    }
                     // 执行前等待时间
                     try {
-                        Thread.sleep(Long.parseLong(waitTime));
+                        Thread.sleep(wait);
                     } catch (InterruptedException e) {
                         if (isCancelled()) {
                             break;
@@ -288,10 +296,16 @@ public class AutoClickService {
         long clickTime = Long.parseLong(clickPositionVO.getClickTime());
         long clickInterval = Long.parseLong(clickPositionVO.getClickInterval());
         String clickType = clickPositionVO.getClickType();
+        int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
         // 按照操作次数执行
         for (int i = 0; i < clickNum; i++) {
             // 每次操作的间隔时间
             if (i > 0) {
+                // 处理随机间隔时间偏移
+                if (activation.equals(clickPositionVO.getRandomClickInterval())) {
+                    Random random = new Random();
+                    clickInterval = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
+                }
                 try {
                     Thread.sleep(clickInterval);
                 } catch (InterruptedException e) {
@@ -300,6 +314,14 @@ public class AutoClickService {
                 }
             }
             MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickKey());
+            // 处理随机坐标偏移量
+            if (activation.equals(clickPositionVO.getRandomClick())) {
+                Random random = new Random();
+                int randomX = Integer.parseInt(clickPositionVO.getRandomX());
+                int randomY = Integer.parseInt(clickPositionVO.getRandomY());
+                startX = Math.max(0, startX + (random.nextDouble() * 2 - 1) * randomX);
+                startY = Math.max(0, startY + (random.nextDouble() * 2 - 1) * randomY);
+            }
             double finalStartX = startX;
             double finalStartY = startY;
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
@@ -324,6 +346,11 @@ public class AutoClickService {
             }
             // 执行长按操作
             if (!clickType_drag.equals(clickType) && !clickType_move.equals(clickType)) {
+                // 处理随机点击时长偏移
+                if (activation.equals(clickPositionVO.getRandomClickTime())) {
+                    Random random = new Random();
+                    clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
+                }
                 // 单次操作时间
                 try {
                     Thread.sleep(clickTime);
@@ -347,7 +374,7 @@ public class AutoClickService {
                 }
             } else {
                 // 计算鼠标轨迹
-                executeTrajectoryPoints(robot, clickPositionVO.getMoveTrajectory());
+                executeTrajectoryPoints(robot, clickPositionVO);
             }
         }
         return gotoStep;
@@ -356,11 +383,12 @@ public class AutoClickService {
     /**
      * 精确执行轨迹点移动序列
      *
-     * @param robot  机器人操作实例
-     * @param points 轨迹点集合
+     * @param robot           机器人操作实例
+     * @param clickPositionVO 点击位置信息
      * @throws Exception 当移动超时或线程中断时抛出
      */
-    private static void executeTrajectoryPoints(Robot robot, List<TrajectoryPoint> points) throws Exception {
+    private static void executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO) throws Exception {
+        List<TrajectoryPoint> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
             TrajectoryPoint lastPoint = null;
             for (TrajectoryPoint point : points) {
@@ -390,14 +418,25 @@ public class AutoClickService {
                     nowPressButtons = pressButtons;
                 }
                 lastPoint = point;
+                double x = point.getX();
+                double y = point.getY();
+                if (activation.equals(clickPositionVO.getRandomTrajectory())) {
+                    Random random = new Random();
+                    int randomX = Integer.parseInt(clickPositionVO.getRandomX());
+                    int randomY = Integer.parseInt(clickPositionVO.getRandomY());
+                    x = Math.max(0, x + (random.nextDouble() * 2 - 1) * randomX);
+                    y = Math.max(0, y + (random.nextDouble() * 2 - 1) * randomY);
+                }
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
                 List<Integer> finalReleaseButtons = releaseButtons;
+                double finalX = x;
+                double finalY = y;
                 Platform.runLater(() -> {
                     if (CollectionUtils.isNotEmpty(nowPressButtons)) {
                         nowPressButtons.forEach(button ->
                                 robot.mousePress(NativeMouseToMouseButton.get(button)));
                     }
-                    robot.mouseMove(point.getX(), point.getY());
+                    robot.mouseMove(finalX, finalY);
                     if (CollectionUtils.isNotEmpty(finalReleaseButtons)) {
                         finalReleaseButtons.forEach(button ->
                                 robot.mouseRelease(NativeMouseToMouseButton.get(button)));

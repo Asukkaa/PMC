@@ -10,13 +10,13 @@
 
         <HBox spacing="10">
             <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction"
-                      styleClass="checkBox-setting-style" selected="true" text="记住程序关闭前所在的页面"/>
+                      styleClass="checkBox-short" selected="true" text="记住程序关闭前所在的页面"/>
 
             <CheckBox fx:id="fullWindow_Set" onAction="#loadFullWindowAction"
-                      styleClass="checkBox-setting-style" selected="true" text="记住程序关闭时窗口是否全屏"/>
+                      styleClass="checkBox-short" selected="true" text="记住程序关闭时窗口是否全屏"/>
 
             <CheckBox fx:id="maxWindow_Set" onAction="#loadMaxWindowAction"
-                      styleClass="checkBox-setting-style" selected="true" text="记住程序关闭时窗口是否最大化"/>
+                      styleClass="checkBox-short" selected="true" text="记住程序关闭时窗口是否最大化"/>
         </HBox>
 
         <Separator/>
@@ -25,13 +25,13 @@
 
         <HBox spacing="10">
             <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction"
-                      styleClass="checkBox-setting-style" selected="true" text="自动操作工具 功能加载上次设置信息"/>
+                      styleClass="checkBox-short" selected="true" text="自动操作工具 功能加载上次设置信息"/>
 
             <CheckBox fx:id="remindSave_Set" onAction="#loadRemindSaveAction"
-                      styleClass="checkBox-setting-style" text="操作步骤详情页修改后未保存提示" selected="true"/>
+                      styleClass="checkBox-short" text="操作步骤详情页修改后未保存提示" selected="true"/>
 
             <CheckBox fx:id="autoSave_Set" onAction="#loadAutoSaveAction"
-                      selected="true" styleClass="checkBox-setting-style" text="关闭程序时自动保存列表操作步骤"/>
+                      selected="true" styleClass="checkBox-short" text="关闭程序时自动保存列表操作步骤"/>
         </HBox>
 
         <Separator/>
@@ -40,31 +40,76 @@
 
         <HBox spacing="10">
             <CheckBox fx:id="hideWindowRun_Set" onAction="#loadHideWindowRunAction"
-                      styleClass="checkBox-setting-style" text="运行自动流程前最小化本程序" selected="true"/>
+                      styleClass="checkBox-short" text="运行自动流程前最小化本程序" selected="true"/>
 
             <CheckBox fx:id="showWindowRun_Set" onAction="#loadShowWindowRunAction"
-                      styleClass="checkBox-setting-style" text="运行自动流程结束后弹出本程序" selected="true"/>
+                      styleClass="checkBox-short" text="运行自动流程结束后弹出本程序" selected="true"/>
 
             <CheckBox fx:id="hideWindowRecord_Set" onAction="#loadHideWindowRecordAction"
-                      styleClass="checkBox-setting-style" text="录制自动流程前最小化本程序" selected="true"/>
+                      styleClass="checkBox-short" text="录制自动流程前最小化本程序" selected="true"/>
 
             <CheckBox fx:id="showWindowRecord_Set" onAction="#loadShowWindowRecordAction"
-                      styleClass="checkBox-setting-style" text="录制自动流程结束后弹出本程序" selected="true"/>
+                      styleClass="checkBox-short" text="录制自动流程结束后弹出本程序" selected="true"/>
         </HBox>
 
         <HBox spacing="10">
-            <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-setting-style"
+            <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-short"
                       text="运行自动流程前点击第一个起始坐标"/>
 
-            <CheckBox fx:id="recordDrag_Set" onAction="#recordDrag" styleClass="checkBox-setting-style"
+            <CheckBox fx:id="recordDrag_Set" onAction="#recordDrag" styleClass="checkBox-short"
                       text="录制时记录拖鼠标拽轨迹"/>
 
-            <CheckBox fx:id="recordMove_Set" onAction="#recordMove" styleClass="checkBox-setting-style"
+            <CheckBox fx:id="recordMove_Set" onAction="#recordMove" styleClass="checkBox-short"
                       text="录制时记录鼠标移动轨迹"/>
 
-            <HBox spacing="10" prefWidth="250">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="鼠标轨迹采样间隔:"/>
                 <TextField fx:id="sampleInterval_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="毫秒"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="randomClick_Set" onAction="#randomClick" styleClass="checkBox-short"
+                      text="运行时启用随机点击坐标偏移"/>
+
+            <CheckBox fx:id="randomTrajectory_Set" onAction="#randomTrajectory" styleClass="checkBox-short"
+                      text="运行时启用随机轨迹坐标偏移"/>
+
+            <HBox styleClass="hBox-short">
+                <Label prefHeight="25" text="默认横坐标随机偏移量: ±"/>
+                <TextField fx:id="randomClickX_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="像素"/>
+            </HBox>
+
+            <HBox styleClass="hBox-short">
+                <Label prefHeight="25" text="默认纵坐标随机偏移量: ±"/>
+                <TextField fx:id="randomClickY_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="像素"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="randomClickTime_Set" onAction="#randomClickTime" styleClass="checkBox-short"
+                      text="运行时启用随机点击时长偏移"/>
+
+            <CheckBox fx:id="randomClickInterval_Set" onAction="#randomClickInterval" styleClass="checkBox-short"
+                      text="运行时启用随机操作间隔时间偏移"/>
+
+            <CheckBox fx:id="randomWaitTime_Set" onAction="#randomWaitTime" styleClass="checkBox-short"
+                      text="运行时启用随机执行前等待时间偏移"/>
+
+            <HBox styleClass="hBox-short">
+                <Label prefHeight="25" text="默认时长随机偏移量: ±"/>
+                <TextField fx:id="randomTimeOffset_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="毫秒"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox styleClass="hBox-short">
+                <Label prefHeight="25" text="默认单次点击时长:"/>
+                <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
                 <Label prefHeight="25" text="毫秒"/>
             </HBox>
         </HBox>
@@ -75,48 +120,51 @@
 
         <HBox spacing="10">
             <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction"
-                      styleClass="checkBox-setting-style" text="运行自动流程时显示信息浮窗" selected="true"/>
+                      styleClass="checkBox-short" text="运行自动流程时显示信息浮窗" selected="true"/>
 
             <CheckBox fx:id="mouseFloatingRun_Set" onAction="#loadMouseFloatingRunAction"
-                      styleClass="checkBox-setting-style" text="运行自动流程时信息浮窗跟随鼠标"/>
+                      styleClass="checkBox-short" text="运行自动流程时信息浮窗跟随鼠标"/>
 
             <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction"
-                      styleClass="checkBox-setting-style" text="录制自动流程时显示信息浮窗" selected="true"/>
+                      styleClass="checkBox-short" text="录制自动流程时显示信息浮窗" selected="true"/>
 
             <CheckBox fx:id="mouseFloatingRecord_Set" onAction="#loadMouseFloatingRecordAction"
-                      styleClass="checkBox-setting-style" text="录制自动流程时信息浮窗跟随鼠标"/>
+                      styleClass="checkBox-short" text="录制自动流程时信息浮窗跟随鼠标"/>
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="10" prefWidth="250">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="浮窗字体颜色:"/>
                 <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#colorAction"/>
             </HBox>
 
-            <HBox spacing="10" prefWidth="250">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="浮窗离屏幕边界距离:"/>
                 <TextField fx:id="floatingDistance_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="像素"/>
             </HBox>
 
-            <HBox spacing="10" prefWidth="250">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="浮窗跟随鼠标时横轴偏移量:"/>
                 <TextField fx:id="offsetX_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="像素"/>
             </HBox>
 
-            <HBox spacing="10" prefWidth="250">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="浮窗跟随鼠标时纵轴偏移量:"/>
                 <TextField fx:id="offsetY_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="像素"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="10" prefWidth="250">
+            <HBox styleClass="hBox-short">
                 <Button fx:id="setFloatingCoordinate_Set" onAction="#setFloatingCoordinate"
                         style="-fx-cursor: hand" text="显示浮窗位置"/>
             </HBox>
 
             <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction"
-                      styleClass="checkBox-setting-style" text="显示浮窗位置按钮显示的浮窗跟随鼠标"/>
+                      styleClass="checkBox-short" text="显示浮窗位置按钮显示的浮窗跟随鼠标"/>
 
             <HBox spacing="10">
                 <Label prefHeight="25" text="浮窗背景透明度:"/>
@@ -158,6 +206,7 @@
             <HBox spacing="5">
                 <Label prefHeight="25" text="要点击的图片默认识别失败重试次数:"/>
                 <TextField fx:id="clickRetryNum_Set" prefWidth="80"/>
+                <Label prefHeight="25" text="次"/>
             </HBox>
         </HBox>
 
@@ -172,6 +221,7 @@
             <HBox spacing="5">
                 <Label prefHeight="25" text="终止操作图片默认识别失败重试次数:"/>
                 <TextField fx:id="stopRetryNum_Set" prefWidth="80"/>
+                <Label prefHeight="25" text="次"/>
             </HBox>
         </HBox>
 

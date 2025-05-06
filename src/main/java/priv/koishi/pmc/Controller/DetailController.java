@@ -144,12 +144,17 @@ public class DetailController {
     private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
 
     @FXML
+    private CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
+            randomWaitTime_Det;
+
+    @FXML
     private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det, clickIndex_Det,
             tableViewSize_Det, clickTypeText_Det;
 
     @FXML
     private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
-            interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det;
+            interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
+            randomClickY_Det, randomTimeOffset_Det;
 
     @FXML
     private TableView<ImgFileVO> tableView_Det;
@@ -204,14 +209,22 @@ public class DetailController {
         timeClick_Det.setText(item.getClickTime());
         clickNumBer_Det.setText(item.getClickNum());
         retryType_Det.setValue(item.getRetryType());
+        randomClickX_Det.setText(item.getRandomX());
+        randomClickY_Det.setText(item.getRandomY());
         interval_Det.setText(item.getClickInterval());
         matchedType_Det.setValue(item.getMatchedType());
         stopImgSelectPath = item.getStopImgSelectPath();
         clickImgSelectPath = item.getClickImgSelectPath();
         stopRetryNum_Det.setText(item.getStopRetryTimes());
+        randomTimeOffset_Det.setText(item.getRandomTime());
         clickRetryNum_Det.setText(item.getClickRetryTimes());
+        randomClick_Det.setSelected(activation.equals(item.getRandomClick()));
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
+        randomWaitTime_Det.setSelected(activation.equals(item.getRandomWaitTime()));
         clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
+        randomClickTime_Det.setSelected(activation.equals(item.getRandomClickTime()));
+        randomTrajectory_Det.setSelected(activation.equals(item.getRandomTrajectory()));
+        randomClickInterval_Det.setSelected(activation.equals(item.getRandomClickInterval()));
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
         ObservableList<String> clickTypeItems = clickType_Det.getItems();
@@ -353,7 +366,10 @@ public class DetailController {
         registerWeakInvalidationListener(matchedStep_Det, matchedStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(randomClickX_Det, randomClickX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(randomClickY_Det, randomClickY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(randomClickTime_Det, randomClickTime_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
@@ -459,6 +475,15 @@ public class DetailController {
         // 限制点击次数文本输入框内容
         ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer);
         changeListeners.put(clickNumBer_Det, clickNumBerListener);
+        // 随机点击时间偏移量文本输入框内容
+        ChangeListener<String> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime + defaultRandomTime);
+        changeListeners.put(randomTimeOffset_Det, randomTimeListener);
+        // 随机横坐标偏移量文本输入框内容
+        ChangeListener<String> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX + defaultRandomClickX);
+        changeListeners.put(randomClickX_Det, randomClickXListener);
+        // 随机纵坐标偏移量文本输入框内容
+        ChangeListener<String> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY + defaultRandomClickY);
+        changeListeners.put(randomClickY_Det, randomClickYListener);
         // 限制终止操作识别失败重试次数文本输入框内容
         ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum + defaultStopRetryNum);
         changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
@@ -480,10 +505,15 @@ public class DetailController {
         addToolTip(tip_clickNumBer, clickNumBer_Det);
         addToolTip(tip_mouseStartX, mouseStartX_Det);
         addToolTip(tip_mouseStartY, mouseStartY_Det);
+        addToolTip(tip_randomClick, randomClick_Det);
         addToolTip(tip_removeStopImgBtn, removeAll_Det);
+        addToolTip(tip_randomWaitTime, randomWaitTime_Det);
+        addToolTip(tip_randomClickTime, randomClickTime_Det);
         addToolTip(tip_Step, matchedStep_Det, retryStep_Det);
         addToolTip(tip_removeClickImgBtn, removeClickImg_Det);
+        addToolTip(tip_randomTrajectory, randomTrajectory_Det);
         addToolTip(tip_updateClickNameBtn, updateClickName_Det);
+        addToolTip(tip_randomClickInterval, randomClickInterval_Det);
         addValueToolTip(clickKey_Det, tip_clickKey, clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType, clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
@@ -495,6 +525,9 @@ public class DetailController {
         addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
         addValueToolTip(stopOpacity_Det, tip_stopOpacity, String.valueOf((int) stopOpacity_Det.getValue()));
         addValueToolTip(clickOpacity_Det, tip_clickOpacity, String.valueOf((int) clickOpacity_Det.getValue()));
+        addValueToolTip(randomClickX_Det, tip_randomClickX + defaultRandomClickX);
+        addValueToolTip(randomClickY_Det, tip_randomClickY + defaultRandomClickY);
+        addValueToolTip(randomTimeOffset_Det, tip_randomTime + defaultRandomTime);
     }
 
     /**
@@ -578,13 +611,9 @@ public class DetailController {
      */
     @FXML
     private void saveDetail() {
-        int mouseStartX = setDefaultIntValue(mouseStartX_Det, 0, 0, null);
-        int mouseStartY = setDefaultIntValue(mouseStartY_Det, 0, 0, null);
         selectedItem.setName(clickName_Det.getText());
         selectedItem.setClickKey(clickKey_Det.getValue());
         selectedItem.setClickType(clickType_Det.getValue());
-        selectedItem.setStartX(String.valueOf(mouseStartX));
-        selectedItem.setStartY(String.valueOf(mouseStartY));
         selectedItem.setStopImgSelectPath(stopImgSelectPath);
         selectedItem.setClickImgSelectPath(clickImgSelectPath);
         selectedItem.setClickImgPath(clickImgPath_Det.getText());
@@ -592,11 +621,26 @@ public class DetailController {
         selectedItem.setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()));
         selectedItem.setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()));
         selectedItem.setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)));
-        selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, 0, 0, null)));
+        selectedItem.setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, null)));
+        selectedItem.setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, null)));
         selectedItem.setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)));
         selectedItem.setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)));
+        selectedItem.setRandomX(String.valueOf(setDefaultIntValue(randomClickX_Det, Integer.parseInt(defaultRandomClickX), 0, null)));
+        selectedItem.setRandomY(String.valueOf(setDefaultIntValue(randomClickY_Det, Integer.parseInt(defaultRandomClickY), 0, null)));
+        selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, Integer.parseInt(defaultClickTimeOffset), 0, null)));
+        selectedItem.setRandomTime(String.valueOf(setDefaultIntValue(randomTimeOffset_Det, Integer.parseInt(defaultRandomTime), 0, null)));
         selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(defaultStopRetryNum), 0, null)));
         selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
+        String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
+        selectedItem.setRandomClick(randomClick);
+        String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
+        selectedItem.setRandomWaitTime(randomWaitTime);
+        String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
+        selectedItem.setRandomClickTime(randomClickTime);
+        String randomTrajectory = randomTrajectory_Det.isSelected() ? activation : unActivation;
+        selectedItem.setRandomTrajectory(randomTrajectory);
+        String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
+        selectedItem.setRandomClickInterval(randomClickInterval);
         int selectIndex = selectedItem.getIndex();
         String matchedType = matchedType_Det.getValue();
         selectedItem.setMatchedType(matchedType);

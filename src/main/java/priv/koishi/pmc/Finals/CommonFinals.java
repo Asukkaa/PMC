@@ -119,6 +119,16 @@ public class CommonFinals {
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
+    /**
+     * 自动保存文件名
+     */
+    public static final String autoSaveFileName = "PMC自动导出流程";
+
+    /**
+     * 默认导出文件名称
+     */
+    public static final String defaultOutFileName = "PMC自动操作流程";
+
     public static final String desktop = "Desktop";
 
     public static final String mac = "mac";
@@ -168,6 +178,11 @@ public class CommonFinals {
     public static final String unActivation = "0";
 
     /**
+     * 启用禁用标志
+     */
+    public static final List<String> activationList = Arrays.asList(activation, unActivation);
+
+    /**
      * 默认浮窗横轴偏移量
      */
     public static final int defaultOffsetX = 30;
@@ -198,6 +213,26 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 默认随机偏移时长
+     */
+    public static final String defaultRandomTime = "50";
+
+    /**
+     * 默认点击时长
+     */
+    public static final String defaultClickTimeOffset = "120";
+
+    /**
+     * 默认横轴随机偏移量
+     */
+    public static final String defaultRandomClickX = "5";
+
+    /**
+     * 默认纵轴随机偏移量
+     */
+    public static final String defaultRandomClickY = "5";
+
+    /**
      * 默认鼠标轨迹采样间隔
      */
     public static final String defaultSampleInterval = "10";
@@ -211,6 +246,16 @@ public class CommonFinals {
      * 默认终止操作图片识别重试次数
      */
     public static final String defaultStopRetryNum = "0";
+
+    /**
+     * 默认录制准备时间
+     */
+    public static final String defaultPreparationRecordTime = "3";
+
+    /**
+     * 默认运行准备时间
+     */
+    public static final String defaultPreparationRunTime = "3";
 
     public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志";
 
@@ -330,13 +375,15 @@ public class CommonFinals {
 
     public static final String tip_recordDrag = "勾选后将会在录制自动操作时记录鼠标拖拽状态时的移动轨迹";
 
-    public static final String version = "2.2.1";
+    public static final String tip_randomClick = "勾选后运行自动操作点击时将按设置进行点击位置的坐标偏移";
 
-    public static final String buildDate = "2025年4月30日";
+    public static final String tip_randomTrajectory = "勾选后运行自动操作移动鼠标时将按设置进行轨迹坐标的偏移";
 
-    public static final String tip_version = """
-            version：%s
-            %s构建""".formatted(version, buildDate);
+    public static final String tip_randomClickTime = "勾选后运行自动操作点击时长将按设置的时间偏移量进行偏移";
+
+    public static final String tip_randomClickInterval = "勾选后运行自动操作时多次点击的操作步骤的点击间隔将按设置的时间偏移量进行偏移";
+
+    public static final String tip_randomWaitTime = "勾选后运行自动操作时每步操前的等待时间将按照设置的时间偏移量进行偏移";
 
     public static final String tip_sampleInterval = """
             在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
@@ -400,6 +447,30 @@ public class CommonFinals {
             5. 将\s""" + appName + app + """
              添加到允许列表中
             6. 重启\s""" + appName + app;
+
+    public static final String tip_randomClickX = """
+            运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标
+            单位为像素，只能填自然数，不填默认为\s""";
+
+    public static final String tip_randomClickY = """
+            运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标
+            单位为像素，只能填自然数，不填默认为\s""";
+
+    public static final String tip_randomTime = """
+            运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移
+            偏移后时间最小为0，单位为毫秒，只能填自然数，不填默认为\s""";
+
+    public static final String tip_clickTimeOffset = """
+            手动创建新的操作步骤时将会按照此设置先设置默认点击时长
+            单位为毫秒，只能填自然数，不填默认为\s""";
+
+    public static final String version = "2.3.0";
+
+    public static final String buildDate = "2025年5月";
+
+    public static final String tip_version = """
+            version：%s
+            %s构建""".formatted(version, buildDate);
 
     public static final String text_selectDirectory = "选择文件夹";
 
@@ -549,13 +620,29 @@ public class CommonFinals {
 
     public static final String key_floatingHeight = "floatingHeight";
 
-    public static final String key_autoSaveFileName = "autoSaveFileName";
-
     public static final String key_autoSave = "autoSave";
 
     public static final String key_recordDrag = "recordDrag";
 
     public static final String key_recordMove = "recordMove";
+
+    public static final String key_randomClick = "randomClick";
+
+    public static final String key_randomTrajectory = "randomTrajectory";
+
+    public static final String key_randomClickTime = "randomClickTime";
+
+    public static final String key_randomTimeOffset = "randomTimeOffset";
+
+    public static final String key_clickTimeOffset = "clickTimeOffset";
+
+    public static final String key_randomClickX = "randomClickX";
+
+    public static final String key_randomClickY = "randomClickY";
+
+    public static final String key_randomClickInterval = "randomClickInterval";
+
+    public static final String key_randomWaitTime = "randomWaitTime";
 
     public static final String key_sampleInterval = "sampleInterval";
 
@@ -591,15 +678,9 @@ public class CommonFinals {
 
     public static final String key_loadFloatingRecord = "lastFloatingRecord";
 
-    public static final String key_defaultOutFileName = "defaultOutFileName";
-
     public static final String key_lastPreparationRecordTime = "lastPreparationRecordTime";
 
-    public static final String key_defaultPreparationRecordTime = "defaultPreparationRecordTime";
-
     public static final String key_lastPreparationRunTime = "lastPreparationRunTime";
-
-    public static final String key_defaultPreparationRunTime = "defaultPreparationRunTime";
 
     public static final String key_defaultClickRetryNum = "defaultClickRetryNum";
 

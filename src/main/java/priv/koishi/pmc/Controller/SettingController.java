@@ -43,7 +43,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
+import static priv.koishi.pmc.Utils.UiUtils.integerRangeTextField;
 
 /**
  * 设置页面控制器
@@ -73,11 +73,6 @@ public class SettingController implements MousePositionUpdater {
      * 浮窗高度
      */
     private int floatingHeight;
-
-    /**
-     * 自动保存文件名
-     */
-    private static String autoSaveFileName;
 
     /**
      * 页面标识符
@@ -134,13 +129,15 @@ public class SettingController implements MousePositionUpdater {
 
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
-            retrySecond_Set, overtime_Set, sampleInterval_Set;
+            retrySecond_Set, overtime_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set,
+            randomTimeOffset_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindSave_Set,
-            autoSave_Set, recordDrag_Set, recordMove_Set;
+            autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
+            randomClickInterval_Set, randomWaitTime_Set;
 
     @FXML
     private TableView<ImgFileVO> tableView_Set;
@@ -216,6 +213,14 @@ public class SettingController implements MousePositionUpdater {
             prop.put(key_overtime, overtime.getText());
             TextField sampleInterval = (TextField) scene.lookup("#sampleInterval_Set");
             prop.put(key_sampleInterval, sampleInterval.getText());
+            TextField randomClickX = (TextField) scene.lookup("#randomClickX_Set");
+            prop.put(key_randomClickX, randomClickX.getText());
+            TextField randomClickY = (TextField) scene.lookup("#randomClickY_Set");
+            prop.put(key_randomClickY, randomClickY.getText());
+            TextField clickTimeOffset = (TextField) scene.lookup("#clickTimeOffset_Set");
+            prop.put(key_clickTimeOffset, clickTimeOffset.getText());
+            TextField randomTimeOffset_Set = (TextField) scene.lookup("#randomTimeOffset_Set");
+            prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
             List<ImgFileVO> list = tableView.getItems().stream().map(o -> (ImgFileVO) o).toList();
             int index = 0;
@@ -238,9 +243,6 @@ public class SettingController implements MousePositionUpdater {
      * 初始化浮窗
      */
     private void initFloatingWindow() {
-        // 获取主屏幕信息（初始位置用）
-        Screen primaryScreen = Screen.getPrimary();
-        Rectangle2D primaryBounds = primaryScreen.getBounds();
         // 创建一个矩形作为浮窗的内容
         rectangle = new Rectangle(floatingWidth, floatingHeight);
         // 描边设置
@@ -286,9 +288,6 @@ public class SettingController implements MousePositionUpdater {
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
-        // 初始位置设置在主屏幕顶部居中
-        floatingStage.setX(primaryBounds.getMinX() + (primaryBounds.getWidth() - floatingWidth) / 2);
-        floatingStage.setY(primaryBounds.getMinY() - margin);
     }
 
     /**
@@ -396,24 +395,33 @@ public class SettingController implements MousePositionUpdater {
         setControlLastConfig(remindSave_Set, prop, key_remindSave);
         setControlLastConfig(recordDrag_Set, prop, key_recordDrag);
         setControlLastConfig(recordMove_Set, prop, key_recordMove);
+        setControlLastConfig(randomClick_Set, prop, key_randomClick);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
         setControlLastConfig(floatingDistance_Set, prop, key_margin);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
         setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity);
+        setControlLastConfig(randomClickX_Set, prop, key_randomClickX);
+        setControlLastConfig(randomClickY_Set, prop, key_randomClickY);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig);
         setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval);
+        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime);
         setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun);
         setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun);
+        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime);
+        setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum);
         setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord);
         setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun);
+        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory);
+        setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset);
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum);
         setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
         setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord);
+        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         clickFileInput.close();
@@ -428,7 +436,6 @@ public class SettingController implements MousePositionUpdater {
         Properties prop = new Properties();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        autoSaveFileName = prop.getProperty(key_autoSaveFileName);
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
         floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
@@ -448,6 +455,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_recordDrag, recordDrag_Set);
         addToolTip(tip_recordMove, recordMove_Set);
+        addToolTip(tip_randomClick, randomClick_Set);
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
         addToolTip(tip_retrySecond, retrySecond_Set);
@@ -459,18 +467,26 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_defaultStopImgBtn, stopImgBtn_Set);
         addToolTip(tip_floatingRecord, floatingRecord_Set);
         addToolTip(maxWindow_Set.getText(), maxWindow_Set);
+        addToolTip(tip_randomWaitTime, randomWaitTime_Set);
+        addToolTip(tip_randomClickTime, randomClickTime_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
+        addToolTip(tip_randomTrajectory, randomTrajectory_Set);
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
         addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
         addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
+        addToolTip(tip_randomClickInterval, randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
         addToolTip(tip_sampleInterval + defaultSampleInterval, sampleInterval_Set);
+        addValueToolTip(randomClickX_Set, tip_randomClickX + defaultRandomClickX);
+        addValueToolTip(randomClickY_Set, tip_randomClickY + defaultRandomClickY);
+        addValueToolTip(randomTimeOffset_Set, tip_randomTime + defaultRandomTime);
         addValueToolTip(opacity_Set, tip_opacity, String.valueOf(opacity_Set.getValue()));
+        addValueToolTip(clickTimeOffset_Set, tip_clickTimeOffset + defaultClickTimeOffset);
         addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(colorPicker_Set.getValue()));
         addValueToolTip(stopOpacity_Set, tip_stopOpacity, String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity, String.valueOf((int) clickOpacity_Set.getValue()));
@@ -553,12 +569,20 @@ public class SettingController implements MousePositionUpdater {
         integerRangeTextField(retrySecond_Set, 0, null, tip_retrySecond);
         // 浮窗离屏幕边界距离输入框监听
         integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
+        // 随机横坐标偏移量文本输入框内容
+        integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX);
+        // 随机纵坐标偏移量文本输入框内容
+        integerRangeTextField(randomClickY_Set, 0, null, tip_randomClickY);
+        // 随机点击时间偏移量文本输入框内容
+        integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime);
         // 限制终止操作识别失败重试次数文本输入框内容
         integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum + defaultStopRetryNum);
         // 限制要点击的图片识别失败重试次数文本输入框内容
         integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum + defaultClickRetryNum);
         // 限制鼠标轨迹采样间隔文本输入框内容
         integerRangeTextField(sampleInterval_Set, 0, null, tip_sampleInterval + defaultSampleInterval);
+        // 限制默认单次点击时长文本输入框内容
+        integerRangeTextField(clickTimeOffset_Set, 0, null, tip_clickTimeOffset + defaultClickTimeOffset);
     }
 
     /**
@@ -814,6 +838,56 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private void recordMove() throws IOException {
         setLoadLastConfigCheckBox(recordMove_Set, configFile_Click, key_recordMove);
+    }
+
+    /**
+     * 运行时启用随机点击坐标偏移
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void randomClick() throws IOException {
+        setLoadLastConfigCheckBox(randomClick_Set, configFile_Click, key_randomClick);
+    }
+
+    /**
+     * 运行时启用随机轨迹坐标偏移
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void randomTrajectory() throws IOException {
+        setLoadLastConfigCheckBox(randomTrajectory_Set, configFile_Click, key_randomTrajectory);
+    }
+
+    /**
+     * 运行时启用随机点击时长偏移
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void randomClickTime() throws IOException {
+        setLoadLastConfigCheckBox(randomClickTime_Set, configFile_Click, key_randomClickTime);
+    }
+
+    /**
+     * 运行时启用随机操作间隔时间偏移
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void randomClickInterval() throws IOException {
+        setLoadLastConfigCheckBox(randomClickInterval_Set, configFile_Click, key_randomClickInterval);
+    }
+
+    /**
+     * 运行时启用随机操作执行前等待时间偏移
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void randomWaitTime() throws IOException {
+        setLoadLastConfigCheckBox(randomWaitTime_Set, configFile_Click, key_randomWaitTime);
     }
 
     /**

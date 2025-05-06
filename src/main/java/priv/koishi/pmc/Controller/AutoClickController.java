@@ -19,7 +19,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -90,11 +89,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private static String inFilePath;
 
     /**
-     * 自动保存文件名
-     */
-    private static String autoSaveFileName;
-
-    /**
      * 上次所选要点击的图片地址
      */
     private static String clickImgSelectPath;
@@ -103,21 +97,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 上次所选终止操作的图片地址
      */
     public static String stopImgSelectPath;
-
-    /**
-     * 默认导出文件名称
-     */
-    private static String defaultOutFileName;
-
-    /**
-     * 默认录制准备时间
-     */
-    private static String defaultPreparationRecordTime;
-
-    /**
-     * 默认运行准备时间
-     */
-    private static String defaultPreparationRunTime;
 
     /**
      * 默认要点击的图片识别重试次数
@@ -165,11 +144,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private int floatingY;
 
     /**
-     * 浮窗距离屏幕的边距
-     */
-    private int margin;
-
-    /**
      * 浮窗宽度
      */
     private int floatingWidth;
@@ -183,6 +157,51 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 鼠标轨迹采样间隔
      */
     private String sampleInterval;
+
+    /**
+     * 是否启用随机点击坐标 0-不启用，1-启用
+     */
+    private String randomClick;
+
+    /**
+     * 是否启用随机轨迹 0-不启用，1-启用
+     */
+    private String randomTrajectory;
+
+    /**
+     * 横轴随机偏移量
+     */
+    private String randomClickX;
+
+    /**
+     * 纵轴随机偏移量
+     */
+    private String randomClickY;
+
+    /**
+     * 是否启用随机点击时长 0-不启用，1-启用
+     */
+    private String randomClickTime;
+
+    /**
+     * 默认点击时长（单位：毫秒）
+     */
+    private String clickTimeOffset;
+
+    /**
+     * 随机点击时长（单位：毫秒）
+     */
+    private String randomTime;
+
+    /**
+     * 是否启用随机点击间隔 0-不启用，1-启用
+     */
+    private String randomClickInterval;
+
+    /**
+     * 是否启用随机等待时长 0-不启用，1-启用
+     */
+    private String randomWaitTime;
 
     /**
      * 记录鼠标移动轨迹
@@ -462,24 +481,48 @@ public class AutoClickController extends CommonProperties implements MousePositi
     }
 
     /**
-     * 读取配置文件
+     * 加载默认设置
      *
      * @throws IOException io异常
      */
     private void getConfig() throws IOException {
+        // 读取配置文件
+        getProperties();
+        // 读取设置页面设置的值
+        getSetting();
+    }
+
+    /**
+     * 读取配置文件
+     *
+     * @throws IOException io异常
+     */
+    private void getProperties() throws IOException {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
-        String marginStr = prop.getProperty(key_margin);
-        if (StringUtils.isNotBlank(marginStr)) {
-            margin = Integer.parseInt(marginStr);
-        }
+        inFilePath = prop.getProperty(key_inFilePath);
+        stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
+        clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
+        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
+        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
+        detailWidth = Integer.parseInt(prop.getProperty(key_detailWidth));
+        detailHeight = Integer.parseInt(prop.getProperty(key_detailHeight));
+        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
+        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
+        input.close();
+    }
+
+    /**
+     * 读取设置页面设置的值
+     */
+    private void getSetting() {
         Slider clickOpacity = (Slider) mainScene.lookup("#clickOpacity_Set");
         defaultClickOpacity = String.valueOf(clickOpacity.getValue());
         Slider stopOpacity = (Slider) mainScene.lookup("#stopOpacity_Set");
         defaultStopOpacity = String.valueOf(stopOpacity.getValue());
         TextField clickRetryNumTextField = (TextField) mainScene.lookup("#clickRetryNum_Set");
-        clickRetryNum = clickRetryNumTextField.getText() == null ? defaultStopRetryNum : clickRetryNumTextField.getText();
+        clickRetryNum = clickRetryNumTextField.getText() == null ? defaultClickRetryNum : clickRetryNumTextField.getText();
         TextField stopRetryNumTextField = (TextField) mainScene.lookup("#stopRetryNum_Set");
         stopRetryNum = stopRetryNumTextField.getText() == null ? defaultStopRetryNum : stopRetryNumTextField.getText();
         TextField sampleIntervalTextField = (TextField) mainScene.lookup("#sampleInterval_Set");
@@ -490,20 +533,24 @@ public class AutoClickController extends CommonProperties implements MousePositi
         recordMove = recordMoveCheckBox.isSelected();
         CheckBox recordDragCheckBox = (CheckBox) mainScene.lookup("#recordDrag_Set");
         recordDrag = recordDragCheckBox.isSelected();
-        inFilePath = prop.getProperty(key_inFilePath);
-        autoSaveFileName = prop.getProperty(key_autoSaveFileName);
-        stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
-        clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
-        defaultOutFileName = prop.getProperty(key_defaultOutFileName);
-        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
-        detailWidth = Integer.parseInt(prop.getProperty(key_detailWidth));
-        detailHeight = Integer.parseInt(prop.getProperty(key_detailHeight));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
-        defaultPreparationRunTime = prop.getProperty(key_defaultPreparationRunTime);
-        defaultPreparationRecordTime = prop.getProperty(key_defaultPreparationRecordTime);
-        input.close();
+        CheckBox randomClickCheckBox = (CheckBox) mainScene.lookup("#randomClick_Set");
+        randomClick = randomClickCheckBox.isSelected() ? activation : unActivation;
+        CheckBox randomTrajectoryCheckBox = (CheckBox) mainScene.lookup("#randomTrajectory_Set");
+        randomTrajectory = randomTrajectoryCheckBox.isSelected() ? activation : unActivation;
+        CheckBox randomClickTimeCheckBox = (CheckBox) mainScene.lookup("#randomClickTime_Set");
+        randomClickTime = randomClickTimeCheckBox.isSelected() ? activation : unActivation;
+        TextField randomTimeTextField = (TextField) mainScene.lookup("#randomTimeOffset_Set");
+        randomTime = randomTimeTextField.getText() == null ? defaultRandomTime : randomTimeTextField.getText();
+        TextField clickTimeOffsetTextField = (TextField) mainScene.lookup("#clickTimeOffset_Set");
+        clickTimeOffset = clickTimeOffsetTextField.getText() == null ? defaultClickTimeOffset : clickTimeOffsetTextField.getText();
+        TextField randomClickXTextField = (TextField) mainScene.lookup("#randomClickX_Set");
+        randomClickX = randomClickXTextField.getText() == null ? defaultRandomClickX : randomClickXTextField.getText();
+        TextField randomClickYTextField = (TextField) mainScene.lookup("#randomClickY_Set");
+        randomClickY = randomClickYTextField.getText() == null ? defaultRandomClickY : randomClickYTextField.getText();
+        CheckBox randomWaitTimeCheckBox = (CheckBox) mainScene.lookup("#randomWaitTime_Set");
+        randomWaitTime = randomWaitTimeCheckBox.isSelected() ? activation : unActivation;
+        CheckBox randomClickIntervalCheckBox = (CheckBox) mainScene.lookup("#randomClickInterval_Set");
+        randomClickInterval = randomClickIntervalCheckBox.isSelected() ? activation : unActivation;
     }
 
     /**
@@ -594,9 +641,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 初始化浮窗
      */
     private void initFloatingWindow() {
-        // 获取主屏幕信息（初始位置用）
-        Screen primaryScreen = Screen.getPrimary();
-        Rectangle2D primaryBounds = primaryScreen.getBounds();
         // 创建一个矩形作为浮窗的内容
         rectangle = new Rectangle(floatingWidth, floatingHeight);
         // 设置透明度
@@ -619,9 +663,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
-        // 初始位置设置在主屏幕顶部居中
-        floatingStage.setX(primaryBounds.getMinX() + (primaryBounds.getWidth() - floatingWidth) / 2);
-        floatingStage.setY(primaryBounds.getMinY() - margin);
     }
 
     /**
@@ -636,7 +677,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         Color color = colorPicker.getValue();
         floatingLabel.setTextFill(color);
         floatingMousePosition.setTextFill(color);
-        getConfig();
+        // 读取配置文件
+        getProperties();
         floatingStage.setX(floatingX);
         floatingStage.setY(floatingY);
         // 获取浮窗的显示设置
@@ -980,11 +1022,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @return clickPositionBean 自动操作步骤类
      */
     private ClickPositionVO getClickSetting(int tableViewItemSize) {
-        try {
-            getConfig();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // 读取设置页面设置的值
+        getSetting();
         ClickPositionVO clickPositionVO = createClickPositionVO();
         clickPositionVO.setName(text_step + (tableViewItemSize + 1) + text_isAdd);
         if (tableViewItemSize == -1) {
@@ -1002,17 +1041,25 @@ public class AutoClickController extends CommonProperties implements MousePositi
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setSampleInterval(Integer.parseInt(sampleInterval))
+                .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setStopMatchThreshold(defaultStopOpacity)
+                .setRandomTrajectory(randomTrajectory)
                 .setStopImgFiles(defaultStopImgFiles)
+                .setRandomClickTime(randomClickTime)
                 .setMatchedType(clickMatched_click)
+                .setRandomWaitTime(randomWaitTime)
                 .setClickRetryTimes(clickRetryNum)
                 .setClickKey(mouseButton_primary)
                 .setStopRetryTimes(stopRetryNum)
+                .setClickTime(clickTimeOffset)
                 .setClickType(clickType_click)
                 .setRetryType(retryType_stop)
+                .setRandomClick(randomClick)
+                .setRandomTime(randomTime)
+                .setRandomX(randomClickX)
+                .setRandomY(randomClickY)
                 .setClickInterval("0")
-                .setClickTime("0")
                 .setClickNum("1")
                 .setWaitTime("0")
                 .setStartX("0")
@@ -1065,7 +1112,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         File jsonFile = new File(filePath);
         List<ClickPositionBean> clickPositionBeans;
         try {
-            clickPositionBeans = objectMapper.readValue(jsonFile, objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
+            clickPositionBeans = objectMapper.readValue(jsonFile,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
         } catch (MismatchedInputException | JsonParseException e) {
             throw new IOException(text_loadAutoClick + filePath + text_formatError);
         }
@@ -1108,10 +1156,18 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     || !isInIntegerRange(clickPositionVO.getStopRetryTimes(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100)
                     || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
+                    || !isInIntegerRange(clickPositionVO.getRandomX(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getRandomY(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getRandomClickTime(), 0, null)
                     || !clickMatchedList.contains(clickPositionVO.getMatchedType())
                     || !runClickTypeMap.containsKey(clickPositionVO.getClickKey())
                     || !retryTypeList.contains(clickPositionVO.getRetryType())
-                    || !clickTypeList.contains(clickType)) {
+                    || !clickTypeList.contains(clickType)
+                    || !activationList.contains(clickPositionVO.getRandomClick())
+                    || !activationList.contains(clickPositionVO.getRandomTrajectory())
+                    || !activationList.contains(clickPositionVO.getRandomClickInterval())
+                    || !activationList.contains(clickPositionVO.getRandomWaitTime())
+                    || !activationList.contains(clickPositionVO.getRandomClickTime())) {
                 throw new IOException(text_LackKeyData);
             }
             clickPositionVO.setUuid(UUID.randomUUID().toString());
@@ -1452,11 +1508,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private void startNativeMouseListener(int addType) {
         removeNativeListener(nativeMouseListener);
-        try {
-            getConfig();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        // 读取设置页面设置的值
+        getSetting();
         CustomMouseListener listener = new CustomMouseListener(addType);
         nativeMouseListener = listener;
         // 注册监听器
@@ -1612,7 +1665,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             mainScene = anchorPane_Click.getScene();
             mainStage = (Stage) mainScene.getWindow();
             try {
-                // 读取配置文件
+                // 加载默认设置
                 getConfig();
                 // 设置鼠标悬停提示
                 setToolTip();
@@ -1712,7 +1765,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
     @FXML
     public void loadAutoClick(ActionEvent actionEvent) throws IOException {
         if (autoClickTask == null && !recordClicking) {
-            getConfig();
+            // 读取配置文件
+            getProperties();
             FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -1764,7 +1818,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     @FXML
     private void addOutPath(ActionEvent actionEvent) throws IOException {
-        getConfig();
+        // 读取配置文件
+        getProperties();
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         String outFilePath = outPath_Click.getText();
         File selectedFile = creatDirectoryChooser(window, outFilePath, text_selectDirectory);
