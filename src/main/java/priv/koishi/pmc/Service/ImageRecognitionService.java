@@ -41,17 +41,17 @@ public class ImageRecognitionService {
     /**
      * 获取屏幕宽度
      */
-    private static int screenWidth;
+    public static int screenWidth;
 
     /**
      * 获取屏幕高度
      */
-    private static int screenHeight;
+    public static int screenHeight;
 
     /**
      * 获取缩放比例
      */
-    private static double dpiScale;
+    public static double dpiScale;
 
     /**
      * 屏幕参数刷新方法

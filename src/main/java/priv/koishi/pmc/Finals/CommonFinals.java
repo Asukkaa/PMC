@@ -311,7 +311,7 @@ public class CommonFinals {
 
     public static final String tip_mouseFloating = "勾选后点击 显示浮窗位置 按钮所显示的浮窗会跟随鼠标移动";
 
-    public static final String tip_margin = "用来控制浮窗距离屏幕边界的最小距离，只能填自然数，不填默认为0，单位像素";
+    public static final String tip_margin = "用来控制浮窗距离屏幕边界的最小距离，只能填自然数，单位为像素，不填默认为 0";
 
     public static final String tip_preparationRecordTime = "在录制自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为 ";
 
@@ -327,9 +327,9 @@ public class CommonFinals {
 
     public static final String tip_saveFloating = "点击后将会关闭浮窗并保存浮窗位置";
 
-    public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为30";
+    public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为 30";
 
-    public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为30";
+    public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为 30";
 
     public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
 

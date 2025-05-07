@@ -570,11 +570,11 @@ public class SettingController implements MousePositionUpdater {
         // 浮窗离屏幕边界距离输入框监听
         integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
         // 随机横坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX);
+        integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX + defaultRandomClickX);
         // 随机纵坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickY_Set, 0, null, tip_randomClickY);
+        integerRangeTextField(randomClickY_Set, 0, null, tip_randomClickY + defaultRandomClickY);
         // 随机点击时间偏移量文本输入框内容
-        integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime);
+        integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime + defaultRandomTime);
         // 限制终止操作识别失败重试次数文本输入框内容
         integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum + defaultStopRetryNum);
         // 限制要点击的图片识别失败重试次数文本输入框内容

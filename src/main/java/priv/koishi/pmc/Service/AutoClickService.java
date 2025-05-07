@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Service.ImageRecognitionService.findPosition;
+import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
 
@@ -51,6 +51,11 @@ public class AutoClickService {
      * 程序界面信息栏
      */
     private static Label massageLabel;
+
+    /**
+     * 随机数
+     */
+    private static final Random random = new Random();
 
     /**
      * 自动点击任务线程
@@ -147,7 +152,6 @@ public class AutoClickService {
                     // 处理随机等待时间偏移
                     if (activation.equals(clickPositionVO.getRandomWaitTime())) {
                         int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
-                        Random random = new Random();
                         wait = (long) Math.max(0, wait + (random.nextDouble() * 2 - 1) * randomTime);
                     }
                     // 执行前等待时间
@@ -303,7 +307,6 @@ public class AutoClickService {
             if (i > 0) {
                 // 处理随机间隔时间偏移
                 if (activation.equals(clickPositionVO.getRandomClickInterval())) {
-                    Random random = new Random();
                     clickInterval = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
                 }
                 try {
@@ -316,11 +319,10 @@ public class AutoClickService {
             MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickKey());
             // 处理随机坐标偏移量
             if (activation.equals(clickPositionVO.getRandomClick())) {
-                Random random = new Random();
                 int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                 int randomY = Integer.parseInt(clickPositionVO.getRandomY());
-                startX = Math.max(0, startX + (random.nextDouble() * 2 - 1) * randomX);
-                startY = Math.max(0, startY + (random.nextDouble() * 2 - 1) * randomY);
+                startX = Math.min(Math.max(0, startX + (random.nextDouble() * 2 - 1) * randomX), screenWidth);
+                startY = Math.min(Math.max(0, startY + (random.nextDouble() * 2 - 1) * randomY), screenHeight);
             }
             double finalStartX = startX;
             double finalStartY = startY;
@@ -348,7 +350,6 @@ public class AutoClickService {
             if (!clickType_drag.equals(clickType) && !clickType_move.equals(clickType)) {
                 // 处理随机点击时长偏移
                 if (activation.equals(clickPositionVO.getRandomClickTime())) {
-                    Random random = new Random();
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
                 }
                 // 单次操作时间
@@ -421,11 +422,10 @@ public class AutoClickService {
                 double x = point.getX();
                 double y = point.getY();
                 if (activation.equals(clickPositionVO.getRandomTrajectory())) {
-                    Random random = new Random();
                     int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                     int randomY = Integer.parseInt(clickPositionVO.getRandomY());
-                    x = Math.max(0, x + (random.nextDouble() * 2 - 1) * randomX);
-                    y = Math.max(0, y + (random.nextDouble() * 2 - 1) * randomY);
+                    x = Math.min(Math.max(0, x + (random.nextDouble() * 2 - 1) * randomX), screenWidth);
+                    y = Math.min(Math.max(0, y + (random.nextDouble() * 2 - 1) * randomY), screenHeight);
                 }
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
                 List<Integer> finalReleaseButtons = releaseButtons;
