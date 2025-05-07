@@ -28,7 +28,7 @@
     -fx-pref-width: 550;
 }
 
-.delete-button-style {
+.img-button-style {
     -fx-cursor: hand;
     -fx-border-color: transparent;
     -fx-background-color: transparent;

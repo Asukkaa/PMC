@@ -42,6 +42,17 @@
             <Label fx:id="mail_Abt" prefHeight="25" textFill="blue" text="csolxqt@foxmail.com"/>
         </HBox>
 
+        <HBox spacing="5">
+            <Label prefHeight="45" text="如果喜欢本程序的话可以点击此按钮后扫描微信赞赏码给作者一个赞赏 —>"/>
+            <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style" prefHeight="20">
+                <graphic>
+                    <ImageView>
+                        <Image url="@../icon/Gift.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+
         <Separator/>
 
         <Label prefHeight="25" text="git地址："/>

@@ -248,10 +248,10 @@
                         <Label fx:id="clickImgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
 
                         <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
-                                styleClass="delete-button-style" visible="false">
+                                styleClass="img-button-style" visible="false">
                             <graphic>
                                 <ImageView>
-                                    <Image url="@../icon/trash.png"/>
+                                    <Image url="@../icon/Trash.png"/>
                                 </ImageView>
                             </graphic>
                         </Button>

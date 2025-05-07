@@ -1,12 +1,16 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -14,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -42,7 +47,7 @@ public class AboutController {
 
     @FXML
     private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt,
-            openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt;
+            openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt, appreciate_Abt;
 
     /**
      * 读取配置文件
@@ -128,6 +133,8 @@ public class AboutController {
         addToolTip(tip_thanks, logo_Abt, title_Abt);
         // 版本号鼠标悬停提示
         addToolTip(tip_version, version_Abt);
+        // 赞赏按钮添加鼠标悬停提示
+        addToolTip(tip_appreciate, appreciate_Abt);
     }
 
     /**
@@ -201,6 +208,32 @@ public class AboutController {
     @FXML
     private void openGiteeLink() throws Exception {
         Desktop.getDesktop().browse(new URI(giteeLink));
+    }
+
+    /**
+     * 赞赏界面人口
+     *
+     * @throws IOException 界面打开失败
+     */
+    @FXML
+    private void appreciate() throws IOException {
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Appreciate-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        Parent root = loader.load();
+        Stage detailStage = new Stage();
+        Properties prop = new Properties();
+        InputStream input = checkRunningInputStream(configFile);
+        prop.load(input);
+        double with = Double.parseDouble(prop.getProperty(key_appreciateWidth));
+        double height = Double.parseDouble(prop.getProperty(key_appreciateHeight));
+        input.close();
+        Scene scene = new Scene(root, with, height);
+        detailStage.setScene(scene);
+        detailStage.setTitle(tip_appreciate);
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        detailStage.setResizable(false);
+        setWindLogo(detailStage, logoPath);
+        detailStage.show();
     }
 
 }

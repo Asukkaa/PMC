@@ -47,3 +47,8 @@ jlink 打包后的操作都已写在 buildApp 脚本中，使用 jlink 打包后
 GitHub：https://github.com/Asukkaa/PMC
 
 Gitee：https://gitee.com/wowxqt/pmc
+
+# 赞赏
+如果喜欢本项目的话可以扫描微信赞赏码给作者一个赞赏
+
+![](.docs/Appreciate.jpg)

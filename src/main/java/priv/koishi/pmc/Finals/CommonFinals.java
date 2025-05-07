@@ -335,6 +335,8 @@ public class CommonFinals {
 
     public static final String tip_thanks = "感谢吧友 @拒绝神绮99次 设计的 logo";
 
+    public static final String tip_appreciate = "感谢你的赞赏！";
+
     public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
 
     public static final String tip_clickOpacity = "滑块将会改变当前步骤要点及的图像识别匹配度，建议设置 80% 以上";
@@ -581,6 +583,10 @@ public class CommonFinals {
     public static final String key_appWidth = "appWidth";
 
     public static final String key_appHeight = "appHeight";
+
+    public static final String key_appreciateWidth = "appreciateWidth";
+
+    public static final String key_appreciateHeight = "appreciateHeight";
 
     public static final String key_appPort = "appPort";
 

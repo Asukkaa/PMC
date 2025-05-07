@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<AnchorPane xmlns="http://javafx.com/javafx">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
+        <Label textFill="red" text="本程序为开源软件，赞赏行为纯属自愿，与软件使用权益无关！"/>
+
+        <ImageView fitWidth="400" fitHeight="400" preserveRatio="true">
+            <Image url="@../icon/Appreciate.jpg"/>
+        </ImageView>
+    </VBox>
+
+</AnchorPane>
