@@ -4,6 +4,12 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.VO.Indexable;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
+import static priv.koishi.pmc.Finals.CommonFinals.DTF;
+
 /**
  * 操作记录数据类
  *
@@ -23,7 +29,7 @@ public class ClickLogBean implements Indexable {
     /**
      * 操作时间
      */
-    String date;
+    String date = LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).format(DTF);
 
     /**
      * 操作类型

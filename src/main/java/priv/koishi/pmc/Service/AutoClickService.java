@@ -15,7 +15,6 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -167,7 +166,6 @@ public class AutoClickService {
                     }
                     ClickLogBean waitLog = new ClickLogBean();
                     waitLog.setClickTime(String.valueOf(wait))
-                            .setDate(sdf.format(new Date()))
                             .setType(log_wait);
                     clickLogBeans.add(waitLog);
                     // 执行自动流程
@@ -246,7 +244,6 @@ public class AutoClickService {
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(end - start))
                             .setResult(matchThreshold + " %")
-                            .setDate(sdf.format(new Date()))
                             .setX(String.valueOf(x))
                             .setY(String.valueOf(y))
                             .setType(log_stopImg);
@@ -297,7 +294,6 @@ public class AutoClickService {
                 ClickLogBean clickLogBean = new ClickLogBean();
                 clickLogBean.setClickTime(String.valueOf(end - start))
                         .setResult(matchThreshold + " %")
-                        .setDate(sdf.format(new Date()))
                         .setX(String.valueOf(startX))
                         .setY(String.valueOf(startY))
                         .setType(log_clickImg);
@@ -359,7 +355,6 @@ public class AutoClickService {
                 }
                 ClickLogBean clickLogBean = new ClickLogBean();
                 clickLogBean.setClickTime(String.valueOf(clickInterval))
-                        .setDate(sdf.format(new Date()))
                         .setType(log_wait);
                 clickLogBeans.add(clickLogBean);
                 clickResultBean.setClickLogs(clickLogBeans);
@@ -381,7 +376,6 @@ public class AutoClickService {
                 ClickLogBean moveLog = new ClickLogBean();
                 moveLog.setX(String.valueOf((int) finalStartX))
                         .setY(String.valueOf((int) finalStartY))
-                        .setDate(sdf.format(new Date()))
                         .setType(log_move);
                 clickLogBeans.add(moveLog);
                 clickResultBean.setClickLogs(clickLogBeans);
@@ -391,7 +385,6 @@ public class AutoClickService {
                     ClickLogBean pressLog = new ClickLogBean();
                     pressLog.setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
-                            .setDate(sdf.format(new Date()))
                             .setClickKey(clickKey)
                             .setType(log_press);
                     clickLogBeans.add(pressLog);
@@ -400,7 +393,6 @@ public class AutoClickService {
                     ClickLogBean releaseLog = new ClickLogBean();
                     releaseLog.setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
-                            .setDate(sdf.format(new Date()))
                             .setClickKey(clickKey)
                             .setType(log_release);
                     clickLogBeans.add(releaseLog);
@@ -411,7 +403,6 @@ public class AutoClickService {
                     ClickLogBean pressLog = new ClickLogBean();
                     pressLog.setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
-                            .setDate(sdf.format(new Date()))
                             .setClickKey(clickKey)
                             .setType(log_press);
                     clickLogBeans.add(pressLog);
@@ -443,7 +434,6 @@ public class AutoClickService {
                 clickLog.setClickTime(String.valueOf(clickTime))
                         .setX(String.valueOf((int) finalStartX))
                         .setY(String.valueOf((int) finalStartY))
-                        .setDate(sdf.format(new Date()))
                         .setClickKey(clickKey)
                         .setType(log_hold);
                 clickLogBeans.add(clickLog);
@@ -455,7 +445,6 @@ public class AutoClickService {
                         ClickLogBean releaseLog = new ClickLogBean();
                         releaseLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
-                                .setDate(sdf.format(new Date()))
                                 .setClickKey(clickKey)
                                 .setType(log_release);
                         clickLogBeans.add(releaseLog);
@@ -540,7 +529,6 @@ public class AutoClickService {
                             clickLog.setClickKey(recordClickTypeMap.get(button))
                                     .setX(String.valueOf((int) finalX))
                                     .setY(String.valueOf((int) finalY))
-                                    .setDate(sdf.format(new Date()))
                                     .setType(log_press);
                             clickLogBeans.add(clickLog);
                         });
@@ -552,7 +540,6 @@ public class AutoClickService {
                             releaseLog.setClickKey(recordClickTypeMap.get(button))
                                     .setX(String.valueOf((int) finalX))
                                     .setY(String.valueOf((int) finalY))
-                                    .setDate(sdf.format(new Date()))
                                     .setType(log_release);
                             clickLogBeans.add(releaseLog);
                         });
@@ -561,7 +548,6 @@ public class AutoClickService {
                     ClickLogBean moveLog = new ClickLogBean();
                     moveLog.setX(String.valueOf((int) finalX))
                             .setY(String.valueOf((int) finalY))
-                            .setDate(sdf.format(new Date()))
                             .setType(log_move);
                     if (CollectionUtils.isNotEmpty(pressButtons)) {
                         List<String> clickKeys = new ArrayList<>();
@@ -581,7 +567,6 @@ public class AutoClickService {
                     Thread.sleep(remaining);
                     ClickLogBean sleepLog = new ClickLogBean();
                     sleepLog.setClickTime(String.valueOf(remaining))
-                            .setDate(sdf.format(new Date()))
                             .setType(log_wait);
                     clickLogBeans.add(sleepLog);
                 }
