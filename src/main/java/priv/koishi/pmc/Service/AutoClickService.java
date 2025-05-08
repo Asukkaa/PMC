@@ -4,7 +4,6 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.robot.Robot;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,6 +14,8 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
-import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
 
 /**
  * 自动点击线程任务类
@@ -61,11 +61,13 @@ public class AutoClickService {
      * 自动点击任务线程
      *
      * @param taskBean 线程任务参数
+     * @return 执行记录
      */
-    public static Task<Void> autoClick(AutoClickTaskBean taskBean, Robot robot) {
+    public static Task<List<ClickLogBean>> autoClick(AutoClickTaskBean taskBean, Robot robot) {
         return new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected List<ClickLogBean> call() throws Exception {
+                List<ClickLogBean> clickLogBeans = new CopyOnWriteArrayList<>();
                 Timeline timeline = taskBean.getRunTimeline();
                 if (timeline != null) {
                     timeline.stop();
@@ -81,7 +83,7 @@ public class AutoClickService {
                             break;
                         }
                         // 执行操作流程
-                        clicks(tableViewItems, loopTimeText);
+                        clickLogBeans = clicks(tableViewItems, loopTimeText);
                     }
                 } else {
                     for (int i = 0; i < loopTime && !isCancelled(); i++) {
@@ -90,15 +92,16 @@ public class AutoClickService {
                             break;
                         }
                         // 执行操作流程
-                        clicks(tableViewItems, loopTimeText);
+                        clickLogBeans = clicks(tableViewItems, loopTimeText);
                     }
                 }
                 clearReferences();
-                return null;
+                return clickLogBeans;
             }
 
             // 执行操作流程
-            private void clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
+            private List<ClickLogBean> clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
+                List<ClickLogBean> clickLogBeans = new CopyOnWriteArrayList<>();
                 int dataSize = tableViewItems.size();
                 floatingLabel = taskBean.getFloatingLabel();
                 massageLabel = taskBean.getMassageLabel();
@@ -162,8 +165,15 @@ public class AutoClickService {
                             break;
                         }
                     }
+                    ClickLogBean waitLog = new ClickLogBean();
+                    waitLog.setClickTime(String.valueOf(wait))
+                            .setDate(sdf.format(new Date()))
+                            .setType(log_wait);
+                    clickLogBeans.add(waitLog);
                     // 执行自动流程
-                    int stepIndex = click(clickPositionVO, robot, loopTimeText);
+                    ClickResultBean clickResultBean = click(clickPositionVO, robot, loopTimeText, taskBean);
+                    clickLogBeans.addAll(clickResultBean.getClickLogs());
+                    int stepIndex = clickResultBean.getStepIndex();
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
                         continue;
@@ -174,6 +184,7 @@ public class AutoClickService {
                     }
                     currentStep++;
                 }
+                return clickLogBeans;
             }
         };
     }
@@ -183,17 +194,19 @@ public class AutoClickService {
      *
      * @param clickPositionVO 操作设置
      * @param robot           Robot实例
-     * @return 跳转的步骤索引，0为不跳转，-1为再次执行
+     * @param loopTimeText    信息浮窗日志
+     * @param taskBean        线程任务参数
+     * @return 执行结果
      */
-    private static int click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText) throws Exception {
-        int gotoStep = 0;
+    private static ClickResultBean click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText, AutoClickTaskBean taskBean) throws Exception {
+        List<ClickLogBean> clickLogBeans = new CopyOnWriteArrayList<>();
+        ClickResultBean clickResultBean = new ClickResultBean();
+        clickResultBean.setStepIndex(0);
+        int retrySecondValue = taskBean.getRetrySecondValue();
+        int overTimeValue = taskBean.getOverTimeValue();
         int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
         double startX = Double.parseDouble(clickPositionVO.getStartX());
         double startY = Double.parseDouble(clickPositionVO.getStartY());
-        TextField retrySecond = (TextField) clickPositionVO.getTableView().getScene().lookup("#retrySecond_Set");
-        int retrySecondValue = setDefaultIntValue(retrySecond, 1, 0, null);
-        TextField overTime = (TextField) clickPositionVO.getTableView().getScene().lookup("#overtime_Set");
-        int overTimeValue = setDefaultIntValue(overTime, 0, 1, null);
         // 匹配终止操作图像
         List<ImgFileBean> stopImgFileVOS = clickPositionVO.getStopImgFiles();
         if (CollectionUtils.isNotEmpty(stopImgFileVOS)) {
@@ -210,25 +223,40 @@ public class AutoClickService {
                         throw new RuntimeException(e);
                     }
                 });
+                long start = System.currentTimeMillis();
                 FindPositionConfig findPositionConfig = new FindPositionConfig();
-                findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionVO.getStopMatchThreshold()))
-                        .setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
+                double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
+                findPositionConfig.setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
+                        .setMatchThreshold(stopMatchThreshold)
                         .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
                         .setTemplatePath(stopPath)
                         .setContinuously(false);
-                MatchPoint matchPoint;
+                MatchPointBean matchPointBean;
                 try {
-                    matchPoint = findPosition(findPositionConfig);
+                    matchPointBean = findPosition(findPositionConfig);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                try (Point position = matchPoint.getPoint()) {
-                    if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
+                try (Point position = matchPointBean.getPoint()) {
+                    long end = System.currentTimeMillis();
+                    int x = position.x();
+                    int y = position.y();
+                    int matchThreshold = matchPointBean.getMatchThreshold();
+                    ClickLogBean clickLogBean = new ClickLogBean();
+                    clickLogBean.setClickTime(String.valueOf(end - start))
+                            .setResult(matchThreshold + " %")
+                            .setDate(sdf.format(new Date()))
+                            .setX(String.valueOf(x))
+                            .setY(String.valueOf(y))
+                            .setType(log_stopImg);
+                    clickLogBeans.add(clickLogBean);
+                    clickResultBean.setClickLogs(clickLogBeans);
+                    if (matchThreshold >= stopMatchThreshold) {
                         throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时终止操作" +
                                 "\n匹配到终止操作图像：" + fileName.get() +
-                                "\n匹配度为：" + matchPoint.getMatchThreshold() + " %" +
-                                "\n坐标 X：" + position.x() + " Y：" + position.y());
+                                "\n匹配度为：" + matchThreshold + " %" +
+                                "\n坐标 X：" + x + " Y：" + y);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -249,51 +277,65 @@ public class AutoClickService {
                     throw new RuntimeException(e);
                 }
             });
+            long start = System.currentTimeMillis();
             String retryType = clickPositionVO.getRetryType();
             FindPositionConfig findPositionConfig = new FindPositionConfig();
-            findPositionConfig.setMatchThreshold(Double.parseDouble(clickPositionVO.getClickMatchThreshold()))
-                    .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
+            double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
+            findPositionConfig.setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(retryType_continuously.equals(retryType))
+                    .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
                     .setTemplatePath(clickPath);
-            MatchPoint matchPoint = findPosition(findPositionConfig);
-            try (Point position = matchPoint.getPoint()) {
+            MatchPointBean matchPointBean = findPosition(findPositionConfig);
+            try (Point position = matchPointBean.getPoint()) {
                 String matchedType = clickPositionVO.getMatchedType();
-                if (matchPoint.getMatchThreshold() >= findPositionConfig.getMatchThreshold()) {
-                    // 匹配成功后跳过操作
+                long end = System.currentTimeMillis();
+                startX = position.x();
+                startY = position.y();
+                int matchThreshold = matchPointBean.getMatchThreshold();
+                ClickLogBean clickLogBean = new ClickLogBean();
+                clickLogBean.setClickTime(String.valueOf(end - start))
+                        .setResult(matchThreshold + " %")
+                        .setDate(sdf.format(new Date()))
+                        .setX(String.valueOf(startX))
+                        .setY(String.valueOf(startY))
+                        .setType(log_clickImg);
+                clickLogBeans.add(clickLogBean);
+                clickResultBean.setClickLogs(clickLogBeans);
+                if (matchThreshold >= clickMatchThreshold) {
+                    // 匹配成功后直接执行下一个操作步骤
                     if (clickMatched_break.equals(matchedType)) {
-                        return gotoStep;
+                        return clickResultBean;
                         // 匹配成功后执行指定步骤
                     } else if (clickMatched_step.equals(matchedType)) {
-                        return Integer.parseInt(clickPositionVO.getMatchedStep());
+                        clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()));
+                        return clickResultBean;
                         // 匹配成功后点击匹配图像并执行指定步骤
                     } else if (clickMatched_clickStep.equals(matchedType)) {
-                        gotoStep = Integer.parseInt(clickPositionVO.getMatchedStep());
+                        clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()));
                         // 匹配图像存在则重复点击
                     } else if (clickMatched_clickWhile.equals(matchedType)) {
-                        gotoStep = -1;
+                        clickResultBean.setStepIndex(-1);
                     }
-                    startX = position.x();
-                    startY = position.y();
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
                 } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
-                    return gotoStep;
-                }
-                // 匹配失败后终止操作
-                else if (retryType_stop.equals(retryType)) {
+                    return clickResultBean;
+                    // 匹配失败后终止操作
+                } else if (retryType_stop.equals(retryType)) {
                     try {
                         throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时发生异常" +
                                 "\n已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
                                 "\n未找到匹配图像：" + fileName.get() +
-                                "\n最接近的图像匹配度为：" + matchPoint.getMatchThreshold() + " %" +
+                                "\n最接近的图像匹配度为：" + matchPointBean.getMatchThreshold() + " %" +
                                 "\n坐标 X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                     // 匹配失败后执行指定步骤
                 } else if (retryType_Step.equals(retryType)) {
-                    return Integer.parseInt(clickPositionVO.getRetryStep());
+                    clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getRetryStep()));
+                    return clickResultBean;
                 }
             }
         }
@@ -315,8 +357,15 @@ public class AutoClickService {
                     Thread.currentThread().interrupt();
                     break;
                 }
+                ClickLogBean clickLogBean = new ClickLogBean();
+                clickLogBean.setClickTime(String.valueOf(clickInterval))
+                        .setDate(sdf.format(new Date()))
+                        .setType(log_wait);
+                clickLogBeans.add(clickLogBean);
+                clickResultBean.setClickLogs(clickLogBeans);
             }
             MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickKey());
+            String clickKey = clickPositionVO.getClickKey();
             // 处理随机坐标偏移量
             if (activation.equals(clickPositionVO.getRandomClick())) {
                 int randomX = Integer.parseInt(clickPositionVO.getRandomX());
@@ -329,13 +378,44 @@ public class AutoClickService {
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
                 robot.mouseMove(finalStartX, finalStartY);
+                ClickLogBean moveLog = new ClickLogBean();
+                moveLog.setX(String.valueOf((int) finalStartX))
+                        .setY(String.valueOf((int) finalStartY))
+                        .setDate(sdf.format(new Date()))
+                        .setType(log_move);
+                clickLogBeans.add(moveLog);
+                clickResultBean.setClickLogs(clickLogBeans);
                 // 执行自动流程前点击第一个起始坐标
                 if (firstClick.compareAndSet(true, false)) {
                     robot.mousePress(mouseButton);
+                    ClickLogBean pressLog = new ClickLogBean();
+                    pressLog.setX(String.valueOf((int) finalStartX))
+                            .setY(String.valueOf((int) finalStartY))
+                            .setDate(sdf.format(new Date()))
+                            .setClickKey(clickKey)
+                            .setType(log_press);
+                    clickLogBeans.add(pressLog);
+                    clickResultBean.setClickLogs(clickLogBeans);
                     robot.mouseRelease(mouseButton);
+                    ClickLogBean releaseLog = new ClickLogBean();
+                    releaseLog.setX(String.valueOf((int) finalStartX))
+                            .setY(String.valueOf((int) finalStartY))
+                            .setDate(sdf.format(new Date()))
+                            .setClickKey(clickKey)
+                            .setType(log_release);
+                    clickLogBeans.add(releaseLog);
+                    clickResultBean.setClickLogs(clickLogBeans);
                 }
                 if (clickType_click.equals(clickType)) {
                     robot.mousePress(mouseButton);
+                    ClickLogBean pressLog = new ClickLogBean();
+                    pressLog.setX(String.valueOf((int) finalStartX))
+                            .setY(String.valueOf((int) finalStartY))
+                            .setDate(sdf.format(new Date()))
+                            .setClickKey(clickKey)
+                            .setType(log_press);
+                    clickLogBeans.add(pressLog);
+                    clickResultBean.setClickLogs(clickLogBeans);
                 }
                 actionFuture.complete(null);
             });
@@ -359,10 +439,27 @@ public class AutoClickService {
                     Thread.currentThread().interrupt();
                     break;
                 }
+                ClickLogBean clickLog = new ClickLogBean();
+                clickLog.setClickTime(String.valueOf(clickTime))
+                        .setX(String.valueOf((int) finalStartX))
+                        .setY(String.valueOf((int) finalStartY))
+                        .setDate(sdf.format(new Date()))
+                        .setClickKey(clickKey)
+                        .setType(log_hold);
+                clickLogBeans.add(clickLog);
+                clickResultBean.setClickLogs(clickLogBeans);
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
                     if (clickType_click.equals(clickType)) {
                         robot.mouseRelease(mouseButton);
+                        ClickLogBean releaseLog = new ClickLogBean();
+                        releaseLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setDate(sdf.format(new Date()))
+                                .setClickKey(clickKey)
+                                .setType(log_release);
+                        clickLogBeans.add(releaseLog);
+                        clickResultBean.setClickLogs(clickLogBeans);
                     }
                     releaseFuture.complete(null);
                 });
@@ -375,10 +472,12 @@ public class AutoClickService {
                 }
             } else {
                 // 计算鼠标轨迹
-                executeTrajectoryPoints(robot, clickPositionVO);
+                List<ClickLogBean> logBeans = executeTrajectoryPoints(robot, clickPositionVO);
+                clickLogBeans.addAll(logBeans);
+                clickResultBean.setClickLogs(clickLogBeans);
             }
         }
-        return gotoStep;
+        return clickResultBean;
     }
 
     /**
@@ -386,13 +485,15 @@ public class AutoClickService {
      *
      * @param robot           机器人操作实例
      * @param clickPositionVO 点击位置信息
+     * @return 执行记录
      * @throws Exception 当移动超时或线程中断时抛出
      */
-    private static void executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO) throws Exception {
-        List<TrajectoryPoint> points = clickPositionVO.getMoveTrajectory();
+    private static List<ClickLogBean> executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO) throws Exception {
+        List<ClickLogBean> clickLogBeans = new CopyOnWriteArrayList<>();
+        List<TrajectoryPointBean> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
-            TrajectoryPoint lastPoint = null;
-            for (TrajectoryPoint point : points) {
+            TrajectoryPointBean lastPoint = null;
+            for (TrajectoryPointBean point : points) {
                 // 当前轨迹点按下的按键
                 List<Integer> pressButtons = point.getPressButtons();
                 // 当前轨迹点要抬起的按键
@@ -410,7 +511,7 @@ public class AutoClickService {
                     } else {
                         if (CollectionUtils.isNotEmpty(lastPressButtons)) {
                             releaseButtons = (List<Integer>) CollectionUtils.subtract(lastPressButtons, pressButtons);
-                            nowPressButtons = (List<Integer>) CollectionUtils.subtract(pressButtons, releaseButtons);
+                            nowPressButtons = (List<Integer>) CollectionUtils.subtract(pressButtons, lastPressButtons);
                         } else {
                             nowPressButtons = pressButtons;
                         }
@@ -433,23 +534,60 @@ public class AutoClickService {
                 double finalY = y;
                 Platform.runLater(() -> {
                     if (CollectionUtils.isNotEmpty(nowPressButtons)) {
-                        nowPressButtons.forEach(button ->
-                                robot.mousePress(NativeMouseToMouseButton.get(button)));
+                        nowPressButtons.forEach(button -> {
+                            robot.mousePress(NativeMouseToMouseButton.get(button));
+                            ClickLogBean clickLog = new ClickLogBean();
+                            clickLog.setClickKey(recordClickTypeMap.get(button))
+                                    .setX(String.valueOf((int) finalX))
+                                    .setY(String.valueOf((int) finalY))
+                                    .setDate(sdf.format(new Date()))
+                                    .setType(log_press);
+                            clickLogBeans.add(clickLog);
+                        });
+                    }
+                    if (CollectionUtils.isNotEmpty(finalReleaseButtons)) {
+                        finalReleaseButtons.forEach(button -> {
+                            robot.mouseRelease(NativeMouseToMouseButton.get(button));
+                            ClickLogBean releaseLog = new ClickLogBean();
+                            releaseLog.setClickKey(recordClickTypeMap.get(button))
+                                    .setX(String.valueOf((int) finalX))
+                                    .setY(String.valueOf((int) finalY))
+                                    .setDate(sdf.format(new Date()))
+                                    .setType(log_release);
+                            clickLogBeans.add(releaseLog);
+                        });
                     }
                     robot.mouseMove(finalX, finalY);
-                    if (CollectionUtils.isNotEmpty(finalReleaseButtons)) {
-                        finalReleaseButtons.forEach(button ->
-                                robot.mouseRelease(NativeMouseToMouseButton.get(button)));
+                    ClickLogBean moveLog = new ClickLogBean();
+                    moveLog.setX(String.valueOf((int) finalX))
+                            .setY(String.valueOf((int) finalY))
+                            .setDate(sdf.format(new Date()))
+                            .setType(log_move);
+                    if (CollectionUtils.isNotEmpty(pressButtons)) {
+                        List<String> clickKeys = new ArrayList<>();
+                        pressButtons.forEach(button -> {
+                            String clickKey = recordClickTypeMap.get(button);
+                            clickKeys.add(clickKey);
+                        });
+                        moveLog.setClickKey(String.join(",", clickKeys))
+                                .setType(log_drag);
                     }
+                    clickLogBeans.add(moveLog);
                     moveFuture.complete(null);
                 });
                 // 精确控制时间间隔
                 moveFuture.get(remaining + 500, TimeUnit.MILLISECONDS);
                 if (remaining > 0) {
                     Thread.sleep(remaining);
+                    ClickLogBean sleepLog = new ClickLogBean();
+                    sleepLog.setClickTime(String.valueOf(remaining))
+                            .setDate(sdf.format(new Date()))
+                            .setType(log_wait);
+                    clickLogBeans.add(sleepLog);
                 }
             }
         }
+        return clickLogBeans;
     }
 
     /**

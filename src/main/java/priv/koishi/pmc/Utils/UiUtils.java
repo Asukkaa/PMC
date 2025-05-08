@@ -418,7 +418,7 @@ public class UiUtils {
         String columnText = column.getText();
         if (StringUtils.isNotBlank(columnText)) {
             Label label = new Label(columnText);
-            label.setPrefWidth(column.getPrefWidth());
+            label.setMaxWidth(column.getMaxWidth());
             addToolTip(tooltip, label);
             column.setGraphic(label);
             column.setText(null);
@@ -454,7 +454,7 @@ public class UiUtils {
                 addTableColumnToolTip(m);
                 if (f.getType() == Image.class) {
                     try {
-                        Method getter = beanClass.getMethod("getThumb");
+                        Method getter = beanClass.getMethod("loadThumb");
                         // 显式标记方法调用（解决IDE误报）
                         if (getter.isAnnotationPresent(UsedByReflection.class)) {
                             Function<T, Image> supplier = bean -> {

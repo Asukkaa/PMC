@@ -70,7 +70,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
      * @return 当前图片表格的缩略图
      */
     @UsedByReflection
-    public Image getThumb() {
+    public Image loadThumb() {
         if (StringUtils.isBlank(this.getClickImgPath())) {
             return null;
         }

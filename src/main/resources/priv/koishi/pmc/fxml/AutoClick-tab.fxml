@@ -49,6 +49,8 @@
             <TextField fx:id="loopTime_Click" prefWidth="80"/>
             <Label prefHeight="25" text="次"/>
 
+            <Button  fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand" text="查看运行记录"/>
+
             <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
         </HBox>
 

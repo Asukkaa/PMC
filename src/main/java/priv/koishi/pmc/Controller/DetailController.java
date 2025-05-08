@@ -148,7 +148,7 @@ public class DetailController {
             randomWaitTime_Det;
 
     @FXML
-    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Debt, clickImgName_Det, clickImgType_Det, clickIndex_Det,
+    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
             tableViewSize_Det, clickTypeText_Det;
 
     @FXML
@@ -177,13 +177,14 @@ public class DetailController {
         tableView_Det.setPrefWidth(tableWidth);
         tableView_Det.setPrefHeight(stage.getHeight() * 0.4);
         nodeRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
-        nullLabel_Debt.setPrefWidth(stage.getWidth() * 0.4);
+        nullLabel_Det.setPrefWidth(stage.getWidth() * 0.4);
     }
 
     /**
      * 初始化数据
      *
      * @param item 列表选中的数据
+     * @param parentStage 上级页面的舞台
      */
     public void initData(ClickPositionVO item, Stage parentStage) throws IOException {
         this.parentStage = parentStage;

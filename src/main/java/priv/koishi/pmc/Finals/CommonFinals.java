@@ -2,11 +2,12 @@ package priv.koishi.pmc.Finals;
 
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
 
@@ -257,6 +258,11 @@ public class CommonFinals {
      */
     public static final String defaultPreparationRunTime = "3";
 
+    /**
+     * 操作记录列表时间格式
+     */
+    public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
     public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志";
 
     public static final String tip_learButton = "点击将会清空列表中的数据";
@@ -496,6 +502,8 @@ public class CommonFinals {
 
     public static final String text_img = " 张图片";
 
+    public static final String text_log = " 条记录";
+
     public static final String text_process = " 步操作";
 
     public static final String text_copySuccess = "复制成功";
@@ -593,6 +601,10 @@ public class CommonFinals {
     public static final String key_detailWidth = "detailWidth";
 
     public static final String key_detailHeight = "detailHeight";
+
+    public static final String key_logWidth = "logWidth";
+
+    public static final String key_logHeight = "logHeight";
 
     public static final String key_floatingX = "floatingX";
 
@@ -718,6 +730,22 @@ public class CommonFinals {
 
     public static final String menuItem_topCopy = "复制所选数据到列表顶部";
 
+    public static final String log_press = "按下";
+
+    public static final String log_release = "松开";
+
+    public static final String log_move = "移动鼠标";
+
+    public static final String log_hold = "长按";
+
+    public static final String log_drag = "拖拽";
+
+    public static final String log_wait = "等待";
+
+    public static final String log_clickImg = "识别目标图像";
+
+    public static final String log_stopImg = "识别终止操作图像";
+
     public static final String retryType_continuously = "重试直到图像出现";
 
     public static final String retryType_click = "按设置次数重试后点击设置位置";
@@ -763,7 +791,7 @@ public class CommonFinals {
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
      */
-    public static final Map<String, MouseButton> runClickTypeMap = new HashMap<>();
+    public static final BidiMap<String, MouseButton> runClickTypeMap = new DualHashBidiMap<>();
 
     static {
         runClickTypeMap.put(mouseButton_primary, MouseButton.PRIMARY);
@@ -776,7 +804,7 @@ public class CommonFinals {
     /**
      * 自动操作的操作类型选项对应的鼠标行为（录制用）
      */
-    public static final Map<Integer, String> recordClickTypeMap = new HashMap<>();
+    public static final BidiMap<Integer, String> recordClickTypeMap = new DualHashBidiMap<>();
 
     static {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON1, mouseButton_primary);
@@ -789,7 +817,7 @@ public class CommonFinals {
     /**
      * 录制与点击按键类映射
      */
-    public static final Map<Integer, MouseButton> NativeMouseToMouseButton = new HashMap<>();
+    public static final BidiMap<Integer, MouseButton> NativeMouseToMouseButton = new DualHashBidiMap<>();
 
     static {
         NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON1, MouseButton.PRIMARY);

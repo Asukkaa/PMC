@@ -123,8 +123,8 @@ public class ClickPositionBean {
     /**
      * 移动轨迹
      */
-    @JsonSerialize(contentAs = TrajectoryPoint.class)
-    List<TrajectoryPoint> moveTrajectory = new CopyOnWriteArrayList<>();
+    @JsonSerialize(contentAs = TrajectoryPointBean.class)
+    List<TrajectoryPointBean> moveTrajectory = new CopyOnWriteArrayList<>();
 
     /**
      * 轨迹采样间隔配置（单位：毫秒）
@@ -188,7 +188,7 @@ public class ClickPositionBean {
     public void addMovePoint(int x, int y, List<Integer> pressButtons, boolean isDragging) {
         long timestamp = System.currentTimeMillis();
         if (!moveTrajectory.isEmpty()) {
-            TrajectoryPoint last = moveTrajectory.getLast();
+            TrajectoryPointBean last = moveTrajectory.getLast();
             double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
             // 最小像素距离阈值，拖拽记录结束时不校验
             if (distance < 1 && (!isDragging || pressButtons != null)) {
@@ -201,12 +201,12 @@ public class ClickPositionBean {
                 || (timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval)
                 // 拖拽时如果轨迹点为空则认为是结束拖拽，直接添加结束轨迹点
                 || (isDragging && pressButtons == null)) {
-            TrajectoryPoint trajectoryPoint = new TrajectoryPoint();
-            trajectoryPoint.setPressButtons(pressButtons)
+            TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean();
+            trajectoryPointBean.setPressButtons(pressButtons)
                     .setTimestamp(timestamp)
                     .setX(x)
                     .setY(y);
-            moveTrajectory.add(trajectoryPoint);
+            moveTrajectory.add(trajectoryPointBean);
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class TrajectoryPoint {
+public class TrajectoryPointBean {
 
     /**
      * 轨迹点时间戳

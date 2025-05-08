@@ -9,7 +9,7 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
 import priv.koishi.pmc.Bean.FindPositionConfig;
-import priv.koishi.pmc.Bean.MatchPoint;
+import priv.koishi.pmc.Bean.MatchPointBean;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -71,7 +71,7 @@ public class ImageRecognitionService {
      * @return Javacv Point对象
      * @throws Exception 匹配失败时抛出异常
      */
-    public static MatchPoint findPosition(FindPositionConfig config) throws Exception {
+    public static MatchPointBean findPosition(FindPositionConfig config) throws Exception {
         double matchThreshold = config.getMatchThreshold();
         String templatePath = config.getTemplatePath();
         int overTime = config.getOverTime();
@@ -95,10 +95,10 @@ public class ImageRecognitionService {
                     String timeOutErr = "图片 " + fileName + " 匹配超时";
                     if (config.isContinuously()) {
                         while (true) {
-                            Future<MatchPoint> future = executor.submit(() ->
+                            Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
-                                MatchPoint result;
+                                MatchPointBean result;
                                 if (overTime > 0) {
                                     result = future.get(overTime, TimeUnit.SECONDS);
                                 } else {
@@ -117,9 +117,9 @@ public class ImageRecognitionService {
                             }, config.getRetryWait(), TimeUnit.SECONDS).get();
                         }
                     } else {
-                        MatchPoint result = new MatchPoint();
+                        MatchPointBean result = new MatchPointBean();
                         for (int i = 0; i <= config.getMaxRetry(); i++) {
-                            Future<MatchPoint> future = executor.submit(() ->
+                            Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
                                 if (overTime > 0) {
@@ -159,7 +159,7 @@ public class ImageRecognitionService {
      * @return Javacv Point对象
      * @throws Exception 匹配失败时抛出异常
      */
-    private static MatchPoint getPoint(String templatePath, double matchThreshold) throws Exception {
+    private static MatchPointBean getPoint(String templatePath, double matchThreshold) throws Exception {
         checkInterruption();
         // 获取屏幕当前画面
         BufferedImage screenImg;
@@ -170,7 +170,7 @@ public class ImageRecognitionService {
         }
         checkInterruption();
         // 初始化匹配结果存储变量
-        MatchPoint matchPoint = new MatchPoint();
+        MatchPointBean matchPointBean = new MatchPointBean();
         AtomicReference<Double> bestVal = new AtomicReference<>(-1.0);
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
         try (Mat screenMat = bufferedImageToMat(screenImg);
@@ -216,14 +216,14 @@ public class ImageRecognitionService {
                     });
                 }
             }
-            matchPoint.setPoint(bestLocRef.get())
+            matchPointBean.setPoint(bestLocRef.get())
                     .setMatchThreshold((int) (bestVal.get() * 100));
             // 匹配成功返回匹配坐标和匹配度，否则只返回匹配度
             if (bestVal.get() >= matchThreshold / 100) {
-                return matchPoint;
+                return matchPointBean;
             }
         }
-        return matchPoint;
+        return matchPointBean;
     }
 
     /**

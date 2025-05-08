@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="anchorPane_Log" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="priv.koishi.pmc.Controller.ClickLogController">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
+        <HBox fx:id="fileNumberHBox_Log" spacing="10">
+            <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
+
+            <Label fx:id="dataNumber_Log" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+        </HBox>
+
+        <TableView fx:id="tableView_Log">
+            <columns>
+                <TableColumn fx:id="index_Log" text="序号" sortable="false"/>
+                <TableColumn fx:id="date_Log" text="操作时间" sortable="false"/>
+                <TableColumn fx:id="type_Log" text="操作类型" sortable="false"/>
+                <TableColumn fx:id="X_Log" text="横(X)坐标" sortable="false"/>
+                <TableColumn fx:id="Y_Log" text="纵(Y)坐标" sortable="false"/>
+                <TableColumn fx:id="clickTime_Log" text="操作时长(毫秒)" sortable="false"/>
+                <TableColumn fx:id="clickKey_Log" text="操作按键" sortable="false"/>
+                <TableColumn fx:id="result_Log" text="操作结果" sortable="false"/>
+            </columns>
+        </TableView>
+    </VBox>
+</AnchorPane>

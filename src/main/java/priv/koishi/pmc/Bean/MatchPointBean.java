@@ -13,7 +13,7 @@ import org.bytedeco.opencv.opencv_core.Point;
  */
 @Data
 @Accessors(chain = true)
-public class MatchPoint {
+public class MatchPointBean {
 
     /**
      * 图像识别匹配的坐标

@@ -39,4 +39,14 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
      */
     Timeline runTimeline;
 
+    /**
+     * 匹配失败后重试时间间隔
+     */
+    int retrySecondValue;
+
+    /**
+     * 单次匹配最大时间
+     */
+    int overTimeValue;
+
 }

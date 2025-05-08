@@ -41,6 +41,7 @@ import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.AutoClickTaskBean;
+import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
@@ -124,6 +125,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private List<ImgFileBean> defaultStopImgFiles;
 
     /**
+     * 操作记录
+     */
+    private List<ClickLogBean> clickLogs;
+
+    /**
      * 详情页高度
      */
     private int detailHeight;
@@ -132,6 +138,16 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 详情页宽度
      */
     private int detailWidth;
+
+    /**
+     * 记录页高度
+     */
+    private int logHeight;
+
+    /**
+     * 记录页宽度
+     */
+    private int logWidth;
 
     /**
      * 浮窗X坐标
@@ -226,7 +242,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     /**
      * 自动点击任务
      */
-    private Task<Void> autoClickTask;
+    private Task<List<ClickLogBean>> autoClickTask;
 
     /**
      * 页面标识符
@@ -331,7 +347,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
 
     @FXML
     private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
-            exportAutoClick_Click, addOutPath_Click, recordClick_Click;
+            exportAutoClick_Click, addOutPath_Click, recordClick_Click, clickLog_Click;
 
     @FXML
     private TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
@@ -503,6 +519,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         prop.load(input);
         inFilePath = prop.getProperty(key_inFilePath);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
+        logWidth = Integer.parseInt(prop.getProperty(key_logWidth));
+        logHeight = Integer.parseInt(prop.getProperty(key_logHeight));
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
@@ -718,9 +736,16 @@ public class AutoClickController extends CommonProperties implements MousePositi
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
             runClicking = true;
+            if (CollectionUtils.isNotEmpty(clickLogs)) {
+                clickLogs.clear();
+            }
             CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
+            TextField retrySecond = (TextField) tableView_Click.getScene().lookup("#retrySecond_Set");
+            TextField overTime = (TextField) tableView_Click.getScene().lookup("#overtime_Set");
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
-            taskBean.setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
+            taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
+                    .setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
+                    .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
                     .setFirstClick(firstClick.isSelected())
                     .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
@@ -744,6 +769,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             // 绑定带进度条的线程
             bindingTaskNode(autoClickTask, taskBean);
             autoClickTask.setOnSucceeded(event -> {
+                clickLogs = autoClickTask.getValue();
                 taskUnbind(taskBean);
                 log_Click.setTextFill(Color.GREEN);
                 log_Click.setText(text_taskFinished);
@@ -759,6 +785,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 runClicking = false;
             });
             autoClickTask.setOnFailed(event -> {
+                clickLogs = autoClickTask.getValue();
                 taskNotSuccess(taskBean, text_taskFailed);
                 hideFloatingWindow();
                 CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
@@ -780,6 +807,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 throw new RuntimeException(ex);
             });
             autoClickTask.setOnCancelled(event -> {
+                clickLogs = autoClickTask.getValue();
                 taskNotSuccess(taskBean, text_taskCancelled);
                 hideFloatingWindow();
                 CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
@@ -1874,6 +1902,36 @@ public class AutoClickController extends CommonProperties implements MousePositi
     @FXML
     private void recordClick() {
         startRecord(append);
+    }
+
+    /**
+     * 查看运行记录
+     */
+    @FXML
+    private void clickLog() throws IOException {
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickLog-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        Parent root = loader.load();
+        ClickLogController controller = loader.getController();
+        controller.initData(clickLogs);
+        controller.setRefreshCallback(() -> {
+            List<ClickLogBean> logs = controller.getClickLogs();
+            if (CollectionUtils.isEmpty(logs)) {
+                clickLogs.clear();
+            }
+        });
+        Stage detailStage = new Stage();
+        Scene scene = new Scene(root, logWidth, logHeight);
+        detailStage.setScene(scene);
+        detailStage.setTitle("运行记录");
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        setWindLogo(detailStage, logoPath);
+        // 监听窗口面板宽度变化
+        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        // 监听窗口面板高度变化
+        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.show();
     }
 
 }

@@ -276,7 +276,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <Label fx:id="nullLabel_Debt"/>
+                <Label fx:id="nullLabel_Det"/>
                 <Button text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
                 <Button text="删除这个流程" style="-fx-cursor: hand" onAction="#removeDetail"/>
             </HBox>
