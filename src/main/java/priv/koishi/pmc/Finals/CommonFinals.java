@@ -393,6 +393,8 @@ public class CommonFinals {
 
     public static final String tip_randomWaitTime = "勾选后运行自动操作时每步操前的等待时间将按照设置的时间偏移量进行偏移";
 
+    public static final String tip_maxLogNum = "用来限制运行记录数量的设置，只能填正整数，不填则不限制最大记录数量";
+
     public static final String tip_sampleInterval = """
             在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
             只能填自然数，单位为毫秒，数字越小越接近录制轨迹，不填默认为\s""";
@@ -472,9 +474,9 @@ public class CommonFinals {
             手动创建新的操作步骤时将会按照此设置先设置默认点击时长
             单位为毫秒，只能填自然数，不填默认为\s""";
 
-    public static final String version = "2.3.0";
+    public static final String version = "2.4.0";
 
-    public static final String buildDate = "2025年5月7日";
+    public static final String buildDate = "2025年5月";
 
     public static final String tip_version = """
             version：%s
@@ -663,6 +665,20 @@ public class CommonFinals {
     public static final String key_randomWaitTime = "randomWaitTime";
 
     public static final String key_sampleInterval = "sampleInterval";
+
+    public static final String key_clickLog = "clickLog";
+
+    public static final String key_moveLog = "moveLog";
+
+    public static final String key_dragLog = "dragLog";
+
+    public static final String key_waitLog = "waitLog";
+
+    public static final String key_clickImgLog = "clickImgLog";
+
+    public static final String key_stopImgLog = "stopImgLog";
+
+    public static final String key_maxLogNum = "maxLogNum";
 
     public static final String key_loadLastConfig = "loadLastConfig";
 

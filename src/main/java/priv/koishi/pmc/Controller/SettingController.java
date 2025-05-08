@@ -43,7 +43,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.integerRangeTextField;
+import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -130,14 +130,15 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
             retrySecond_Set, overtime_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set,
-            randomTimeOffset_Set;
+            randomTimeOffset_Set, maxLogNum_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
-            randomClickInterval_Set, randomWaitTime_Set;
+            randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
+            stopImgLog_Set, waitLog_Set;
 
     @FXML
     private TableView<ImgFileVO> tableView_Set;
@@ -221,6 +222,8 @@ public class SettingController implements MousePositionUpdater {
             prop.put(key_clickTimeOffset, clickTimeOffset.getText());
             TextField randomTimeOffset_Set = (TextField) scene.lookup("#randomTimeOffset_Set");
             prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
+            TextField maxLogNum = (TextField) scene.lookup("#maxLogNum_Set");
+            prop.put(key_maxLogNum, maxLogNum.getText());
             TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
             List<ImgFileVO> list = tableView.getItems().stream().map(o -> (ImgFileVO) o).toList();
             int index = 0;
@@ -387,11 +390,18 @@ public class SettingController implements MousePositionUpdater {
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
+        setControlLastConfig(moveLog_Set, prop, key_moveLog);
+        setControlLastConfig(dragLog_Set, prop, key_dragLog);
         setControlLastConfig(offsetX_Set, prop, key_offsetX);
         setControlLastConfig(offsetY_Set, prop, key_offsetY);
         setControlLastConfig(opacity_Set, prop, key_opacity);
+        setControlLastConfig(waitLog_Set, prop, key_waitLog);
+        setControlLastConfig(clickLog_Set, prop, key_clickLog);
         setControlLastConfig(overtime_Set, prop, key_overtime);
         setControlLastConfig(autoSave_Set, prop, key_autoSave);
+        setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum);
+        setControlLastConfig(clickImgLog_Set, prop, key_clickLog);
+        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog);
         setControlLastConfig(remindSave_Set, prop, key_remindSave);
         setControlLastConfig(recordDrag_Set, prop, key_recordDrag);
         setControlLastConfig(recordMove_Set, prop, key_recordMove);
@@ -459,6 +469,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_floatingRun, floatingRun_Set);
         addToolTip(tip_margin, floatingDistance_Set);
         addToolTip(tip_retrySecond, retrySecond_Set);
+        addValueToolTip(maxLogNum_Set, tip_maxLogNum);
         addToolTip(lastTab_Set.getText(), lastTab_Set);
         addToolTip(tip_removeStopImgBtn, removeAll_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
@@ -565,6 +576,8 @@ public class SettingController implements MousePositionUpdater {
         integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
         integerRangeTextField(offsetY_Set, null, null, tip_offsetY);
+        // 最大记录数量文本输入框内容
+        integerRangeTextField(maxLogNum_Set, 1, null, tip_maxLogNum);
         // 匹配失败重试间隔时间输入框监听
         integerRangeTextField(retrySecond_Set, 0, null, tip_retrySecond);
         // 浮窗离屏幕边界距离输入框监听
@@ -888,6 +901,66 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private void randomWaitTime() throws IOException {
         setLoadLastConfigCheckBox(randomWaitTime_Set, configFile_Click, key_randomWaitTime);
+    }
+
+    /**
+     * 运行自动流程时记录点击信息
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void clickLog() throws IOException {
+        setLoadLastConfigCheckBox(clickLog_Set, configFile_Click, key_clickLog);
+    }
+
+    /**
+     * 运行自动流程时记录移动轨迹
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void moveLog() throws IOException {
+        setLoadLastConfigCheckBox(moveLog_Set, configFile_Click, key_moveLog);
+    }
+
+    /**
+     * 运行自动流程时记录拖拽轨迹
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void dragLog() throws IOException {
+        setLoadLastConfigCheckBox(dragLog_Set, configFile_Click, key_dragLog);
+    }
+
+    /**
+     * 运行自动流程时记目标图像识别信息
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void clickImgLog() throws IOException {
+        setLoadLastConfigCheckBox(clickImgLog_Set, configFile_Click, key_clickImgLog);
+    }
+
+    /**
+     * 运行自动流程时记终止图像识别信息
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void stopImgLog() throws IOException {
+        setLoadLastConfigCheckBox(stopImgLog_Set, configFile_Click, key_stopImgLog);
+    }
+
+    /**
+     * 运行自动流程时记录等待信息
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void waitLog() throws IOException {
+        setLoadLastConfigCheckBox(waitLog_Set, configFile_Click, key_waitLog);
     }
 
     /**

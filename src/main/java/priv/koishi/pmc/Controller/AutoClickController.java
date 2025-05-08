@@ -742,11 +742,25 @@ public class AutoClickController extends CommonProperties implements MousePositi
             CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
             TextField retrySecond = (TextField) tableView_Click.getScene().lookup("#retrySecond_Set");
             TextField overTime = (TextField) tableView_Click.getScene().lookup("#overtime_Set");
+            TextField maxLogNum = (TextField) tableView_Click.getScene().lookup("#maxLogNum_Set");
+            CheckBox clickLog = (CheckBox) mainScene.lookup("#clickLog_Set");
+            CheckBox moveLog = (CheckBox) mainScene.lookup("#moveLog_Set");
+            CheckBox dragLog = (CheckBox) mainScene.lookup("#dragLog_Set");
+            CheckBox clickImgLog = (CheckBox) mainScene.lookup("#clickImgLog_Set");
+            CheckBox stopImgLog = (CheckBox) mainScene.lookup("#stopImgLog_Set");
+            CheckBox waitLog = (CheckBox) mainScene.lookup("#waitLog_Set");
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                     .setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
+                    .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
+                    .setClickImgLog(clickImgLog.isSelected())
+                    .setStopImgLog(stopImgLog.isSelected())
                     .setFirstClick(firstClick.isSelected())
+                    .setClickLog(clickLog.isSelected())
+                    .setMoveLog(moveLog.isSelected())
+                    .setDragLog(dragLog.isSelected())
+                    .setWaitLog(waitLog.isSelected())
                     .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
                     .setProgressBar(progressBar_Click)

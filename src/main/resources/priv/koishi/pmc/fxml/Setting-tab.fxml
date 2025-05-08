@@ -116,6 +116,38 @@
 
         <Separator/>
 
+        <Label prefHeight="25" text="记录设置："/>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="clickLog_Set" onAction="#clickLog"
+                      styleClass="checkBox-short" text="运行自动流程时记录点击信息" selected="true"/>
+
+            <CheckBox fx:id="moveLog_Set" onAction="#moveLog"
+                      styleClass="checkBox-short" text="运行自动流程时记录移动轨迹" selected="true"/>
+
+            <CheckBox fx:id="dragLog_Set" onAction="#dragLog"
+                      styleClass="checkBox-short" text="运行自动流程时记录拖拽轨迹" selected="true"/>
+
+            <CheckBox fx:id="waitLog_Set" onAction="#waitLog"
+                      styleClass="checkBox-short" text="运行自动流程时记录等待信息" selected="true"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="clickImgLog_Set" onAction="#clickImgLog"
+                      styleClass="checkBox-short" text="运行自动流程时记目标图像识别信息" selected="true"/>
+
+            <CheckBox fx:id="stopImgLog_Set" onAction="#stopImgLog"
+                      styleClass="checkBox-short" text="运行自动流程时记终止图像识别信息" selected="true"/>
+
+            <HBox  styleClass="hBox-short">
+                <Label prefHeight="25" text="最大记录数量:"/>
+                <TextField fx:id="maxLogNum_Set" prefWidth="50"/>
+                <Label prefHeight="25" text="条"/>
+            </HBox>
+        </HBox>
+
+        <Separator/>
+
         <Label prefHeight="25" text="浮窗设置："/>
 
         <HBox spacing="10">

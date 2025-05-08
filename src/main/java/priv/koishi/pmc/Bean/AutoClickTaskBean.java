@@ -49,4 +49,39 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
      */
     int overTimeValue;
 
+    /**
+     * 运行自动流程时记录点击信息
+     */
+    boolean clickLog;
+
+    /**
+     * 运行自动流程时记录移动轨迹
+     */
+    boolean moveLog;
+
+    /**
+     * 运行自动流程时记录拖拽轨迹
+     */
+    boolean dragLog;
+
+    /**
+     * 运行自动流程时记目标图像识别
+     */
+    boolean clickImgLog;
+
+    /**
+     * 运行自动流程时记终止图像识别
+     */
+    boolean stopImgLog;
+
+    /**
+     * 运行自动流程时记录等待信息
+     */
+    boolean waitLog;
+
+    /**
+     * 最大记录数量
+     */
+    int maxLogNum;
+
 }
