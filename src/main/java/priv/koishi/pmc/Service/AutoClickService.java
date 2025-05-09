@@ -80,7 +80,7 @@ public class AutoClickService {
                         i++;
                         String loopTimeText = text_cancelTask + text_execution + i + " / ∞" + text_executionTime;
                         if (isCancelled()) {
-                            break;
+                            return clickLogBeans;
                         }
                         // 执行操作流程
                         clickLogBeans = clicks(tableViewItems, loopTimeText);
@@ -89,7 +89,7 @@ public class AutoClickService {
                     for (int i = 0; i < loopTime && !isCancelled(); i++) {
                         String loopTimeText = text_cancelTask + text_execution + (i + 1) + " / " + loopTime + text_executionTime;
                         if (isCancelled()) {
-                            break;
+                            return clickLogBeans;
                         }
                         // 执行操作流程
                         clickLogBeans = clicks(tableViewItems, loopTimeText);
