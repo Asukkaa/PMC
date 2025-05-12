@@ -229,6 +229,7 @@ public class AutoClickService {
                         floatingLabel.setText(text);
                         massageLabel.setText(text);
                     } catch (IOException e) {
+                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                         throw new RuntimeException(e);
                     }
                 });
@@ -245,6 +246,7 @@ public class AutoClickService {
                 try {
                     matchPointBean = findPosition(findPositionConfig);
                 } catch (Exception e) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     throw new RuntimeException(e);
                 }
                 try (Point position = matchPointBean.getPoint()) {
@@ -260,15 +262,16 @@ public class AutoClickService {
                                 .setY(String.valueOf(y))
                                 .setType(log_stopImg);
                         clickLogBeans.add(clickLogBean);
-                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     }
                     if (matchThreshold >= stopMatchThreshold) {
+                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                         throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时终止操作" +
                                 "\n匹配到终止操作图像：" + fileName.get() +
                                 "\n匹配度为：" + matchThreshold + " %" +
                                 "\n坐标 X：" + x + " Y：" + y);
                     }
                 } catch (Exception e) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     throw new RuntimeException(e);
                 }
             });
@@ -284,6 +287,7 @@ public class AutoClickService {
                     floatingLabel.setText(text);
                     massageLabel.setText(text);
                 } catch (IOException e) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     throw new RuntimeException(e);
                 }
             });
@@ -312,15 +316,16 @@ public class AutoClickService {
                             .setY(String.valueOf(startY))
                             .setType(log_clickImg);
                     clickLogBeans.add(clickLogBean);
-                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                 }
                 if (matchThreshold >= clickMatchThreshold) {
                     // 匹配成功后直接执行下一个操作步骤
                     if (clickMatched_break.equals(matchedType)) {
+                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                         return clickResultBean;
                         // 匹配成功后执行指定步骤
                     } else if (clickMatched_step.equals(matchedType)) {
-                        clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()));
+                        clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()))
+                                .setClickLogs(clickLogBeans.getSnapshot());
                         return clickResultBean;
                         // 匹配成功后点击匹配图像并执行指定步骤
                     } else if (clickMatched_clickStep.equals(matchedType)) {
@@ -331,9 +336,11 @@ public class AutoClickService {
                     }
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
                 } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     return clickResultBean;
                     // 匹配失败后终止操作
                 } else if (retryType_stop.equals(retryType)) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     try {
                         throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时发生异常" +
                                 "\n已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
@@ -341,11 +348,13 @@ public class AutoClickService {
                                 "\n最接近的图像匹配度为：" + matchPointBean.getMatchThreshold() + " %" +
                                 "\n坐标 X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
+                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                         throw new RuntimeException(e);
                     }
                     // 匹配失败后执行指定步骤
                 } else if (retryType_Step.equals(retryType)) {
-                    clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getRetryStep()));
+                    clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getRetryStep()))
+                            .setClickLogs(clickLogBeans.getSnapshot());
                     return clickResultBean;
                 }
             }
@@ -373,7 +382,6 @@ public class AutoClickService {
                     clickLogBean.setClickTime(String.valueOf(clickInterval))
                             .setType(log_wait);
                     clickLogBeans.add(clickLogBean);
-                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                 }
             }
             MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickKey());
@@ -396,7 +404,6 @@ public class AutoClickService {
                             .setY(String.valueOf((int) finalStartY))
                             .setType(log_move);
                     clickLogBeans.add(moveLog);
-                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                 }
                 // 执行自动流程前点击第一个起始坐标
                 if (firstClick.compareAndSet(true, false)) {
@@ -408,7 +415,6 @@ public class AutoClickService {
                                 .setClickKey(clickKey)
                                 .setType(log_press);
                         clickLogBeans.add(pressLog);
-                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     }
                     robot.mouseRelease(mouseButton);
                     if (taskBean.isClickLog()) {
@@ -418,7 +424,6 @@ public class AutoClickService {
                                 .setClickKey(clickKey)
                                 .setType(log_release);
                         clickLogBeans.add(releaseLog);
-                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     }
                 }
                 if (clickType_click.equals(clickType)) {
@@ -430,7 +435,6 @@ public class AutoClickService {
                                 .setClickKey(clickKey)
                                 .setType(log_press);
                         clickLogBeans.add(pressLog);
-                        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     }
                 }
                 actionFuture.complete(null);
@@ -439,6 +443,7 @@ public class AutoClickService {
             try {
                 actionFuture.get();
             } catch (Exception e) {
+                clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                 Thread.currentThread().interrupt();
                 break;
             }
@@ -452,6 +457,7 @@ public class AutoClickService {
                 try {
                     Thread.sleep(clickTime);
                 } catch (InterruptedException e) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     Thread.currentThread().interrupt();
                     break;
                 }
@@ -463,7 +469,6 @@ public class AutoClickService {
                             .setClickKey(clickKey)
                             .setType(log_hold);
                     clickLogBeans.add(clickLog);
-                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
@@ -476,7 +481,6 @@ public class AutoClickService {
                                     .setClickKey(clickKey)
                                     .setType(log_release);
                             clickLogBeans.add(releaseLog);
-                            clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                         }
                     }
                     releaseFuture.complete(null);
@@ -485,6 +489,7 @@ public class AutoClickService {
                 try {
                     releaseFuture.get();
                 } catch (Exception e) {
+                    clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
                     Thread.currentThread().interrupt();
                     break;
                 }
@@ -495,6 +500,7 @@ public class AutoClickService {
                 clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
             }
         }
+        clickResultBean.setClickLogs(clickLogBeans.getSnapshot());
         return clickResultBean;
     }
 
