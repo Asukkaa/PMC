@@ -481,7 +481,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
-        if (activation.equals(prop.getProperty(key_loadLastConfig))) {
+        if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName);
@@ -517,16 +517,16 @@ public class AutoClickController extends CommonProperties implements MousePositi
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         inFilePath = prop.getProperty(key_inFilePath);
-        stopImgSelectPath = prop.getProperty(key_stopImgSelectPath);
-        logWidth = Integer.parseInt(prop.getProperty(key_logWidth));
-        logHeight = Integer.parseInt(prop.getProperty(key_logHeight));
-        clickImgSelectPath = prop.getProperty(key_clickImgSelectPath);
-        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
-        detailWidth = Integer.parseInt(prop.getProperty(key_detailWidth));
-        detailHeight = Integer.parseInt(prop.getProperty(key_detailHeight));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
+        stopImgSelectPath = prop.getProperty(key_stopImgSelectPath, desktopPath);
+        clickImgSelectPath = prop.getProperty(key_clickImgSelectPath, desktopPath);
+        logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
+        logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
+        floatingX = Integer.parseInt(prop.getProperty(key_floatingX, defaultFloatingX));
+        floatingY = Integer.parseInt(prop.getProperty(key_floatingY, defaultFloatingY));
+        detailWidth = Integer.parseInt(prop.getProperty(key_detailWidth, defaultDetailWidth));
+        detailHeight = Integer.parseInt(prop.getProperty(key_detailHeight, defaultDetailHeight));
+        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth, defaultFloatingWidth));
+        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight, defaultFloatingHeight));
         input.close();
     }
 

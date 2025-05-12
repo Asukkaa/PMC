@@ -59,7 +59,7 @@ public class AboutController {
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
         // 获取日志储存数量配置
-        setControlLastConfig(logsNum_Abt, prop, key_logsNum);
+        setControlLastConfig(logsNum_Abt, prop, key_logsNum, "3");
         title_Abt.setTextFill(Color.HOTPINK);
         title_Abt.setText(appName);
         input.close();
@@ -224,8 +224,8 @@ public class AboutController {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
-        double with = Double.parseDouble(prop.getProperty(key_appreciateWidth));
-        double height = Double.parseDouble(prop.getProperty(key_appreciateHeight));
+        double with = Double.parseDouble(prop.getProperty(key_appreciateWidth, "450"));
+        double height = Double.parseDouble(prop.getProperty(key_appreciateHeight, "450"));
         input.close();
         Scene scene = new Scene(root, with, height);
         detailStage.setScene(scene);

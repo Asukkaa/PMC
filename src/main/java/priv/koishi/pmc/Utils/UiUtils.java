@@ -1421,9 +1421,21 @@ public class UiUtils {
      * @param prop    配置文件
      * @param key     要读取的key
      */
-    @SuppressWarnings("unchecked")
     public static void setControlLastConfig(Control control, Properties prop, String key) {
-        String lastValue = prop.getProperty(key);
+        setControlLastConfig(control, prop, key, "");
+    }
+
+    /**
+     * 为配置组件设置上次配置值
+     *
+     * @param control 需要处理的组件
+     * @param prop    配置文件
+     * @param key     要读取的key
+     * @param defaultValue 默认值
+     */
+    @SuppressWarnings("unchecked")
+    public static void setControlLastConfig(Control control, Properties prop, String key, String defaultValue) {
+        String lastValue = prop.getProperty(key, defaultValue);
         if (StringUtils.isNotBlank(lastValue)) {
             if (control instanceof ChoiceBox) {
                 ChoiceBox<String> choiceBox = (ChoiceBox<String>) control;
@@ -1490,7 +1502,7 @@ public class UiUtils {
      * @param colorCustomKey 保存的自定义颜色key
      */
     public static void setColorPickerConfig(ColorPicker colorPicker, Properties prop, String colorKey, String colorCustomKey) {
-        String selectColor = prop.getProperty(colorKey);
+        String selectColor = prop.getProperty(colorKey, defaultColor);
         if (StringUtils.isNotBlank(selectColor)) {
             colorPicker.setValue(Color.web(selectColor));
         }

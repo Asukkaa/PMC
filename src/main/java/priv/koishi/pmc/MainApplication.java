@@ -76,11 +76,13 @@ public class MainApplication extends Application {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
-        double appWidth = Double.parseDouble(prop.getProperty(key_appWidth));
-        double appHeight = Double.parseDouble(prop.getProperty(key_appHeight));
-        if (activation.equals(prop.getProperty(key_lastMaxWindow)) && activation.equals(prop.getProperty(key_loadLastMaxWindow))) {
+        double appWidth = Double.parseDouble(prop.getProperty(key_appWidth, defaultAppWidth));
+        double appHeight = Double.parseDouble(prop.getProperty(key_appHeight, defaultAppHeight));
+        if (activation.equals(prop.getProperty(key_lastMaxWindow, unActivation))
+                && activation.equals(prop.getProperty(key_loadLastMaxWindow, unActivation))) {
             stage.setMaximized(true);
-        } else if (activation.equals(prop.getProperty(key_lastFullWindow)) && activation.equals(prop.getProperty(key_loadLastFullWindow))) {
+        } else if (activation.equals(prop.getProperty(key_lastFullWindow, unActivation))
+                && activation.equals(prop.getProperty(key_loadLastFullWindow, unActivation))) {
             stage.setFullScreen(true);
         }
         Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
@@ -90,9 +92,9 @@ public class MainApplication extends Application {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
         TabPane tabPane = (TabPane) scene.lookup("#tabPane");
         // 设置默认选中的Tab
-        if (activation.equals(prop.getProperty(key_loadLastConfig))) {
+        if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             tabPane.getTabs().forEach(tab -> {
-                if (tab.getId().equals(prop.getProperty(key_lastTab))) {
+                if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
                     tabPane.getSelectionModel().select(tab);
                 }
             });
@@ -101,9 +103,11 @@ public class MainApplication extends Application {
         // 初始化macOS系统应用菜单
         initMenu(tabPane);
         // 监听窗口面板宽度变化
-        stage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
+        stage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(() -> mainAdaption(stage)));
         // 监听窗口面板高度变化
-        stage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(() -> mainAdaption(stage)));
+        stage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(() -> mainAdaption(stage)));
         stage.setOnCloseRequest(event -> {
             try {
                 stop();
@@ -124,7 +128,8 @@ public class MainApplication extends Application {
     public void init() throws Exception {
         super.init();
         // 在init()方法中设置全局异常处理器
-        Platform.runLater(() -> Thread.setDefaultUncaughtExceptionHandler((e, exception) -> showExceptionAlert(exception)));
+        Platform.runLater(() -> Thread.setDefaultUncaughtExceptionHandler((e, exception) ->
+                showExceptionAlert(exception)));
     }
 
     /**
@@ -177,7 +182,8 @@ public class MainApplication extends Application {
         MenuItem quit = MenuToolkit.toolkit(Locale.getDefault()).createQuitMenuItem(appName);
         quit.setText("退出 " + appName);
         Menu menu = new Menu();
-        menu.getItems().addAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(), hide, hideOthers, new SeparatorMenuItem(), quit);
+        menu.getItems().addAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(),
+                hide, hideOthers, new SeparatorMenuItem(), quit);
         MenuToolkit.toolkit(Locale.getDefault()).setApplicationMenu(menu);
     }
 
@@ -235,7 +241,7 @@ public class MainApplication extends Application {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
-        int port = Integer.parseInt(prop.getProperty(key_appPort));
+        int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
         input.close();
         // 启动时检查是否已经启动
         if (SingleInstanceGuard.checkRunning(port)) {

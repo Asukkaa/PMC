@@ -259,6 +259,106 @@ public class CommonFinals {
     public static final String defaultPreparationRunTime = "3";
 
     /**
+     * 默认悬信息浮窗位置横坐标
+     */
+    public static final String defaultFloatingX = "0";
+
+    /**
+     * 默认悬信息浮窗位置纵坐标
+     */
+    public static final String defaultFloatingY = "0";
+
+    /**
+     * 默认日志窗口宽度
+     */
+    public static final String defaultLogWidth = "1000";
+
+    /**
+     * 默认日志窗口高度
+     */
+    public static final String defaultLogHeight = "600";
+
+    /**
+     * 默认详情窗口宽度
+     */
+    public static final String defaultDetailWidth = "1200";
+
+    /**
+     * 默认详情窗口高度
+     */
+    public static final String defaultDetailHeight = "720";
+
+    /**
+     * 默认信息浮窗宽度
+     */
+    public static final String defaultFloatingWidth = "250";
+
+    /**
+     * 默认信息浮窗高度
+     */
+    public static final String defaultFloatingHeight = "160";
+
+    /**
+     * 默认应用窗口宽度
+     */
+    public static final String defaultAppWidth = "1300";
+
+    /**
+     * 默认应用窗口高度
+     */
+    public static final String defaultAppHeight = "720";
+
+    /**
+     * 默认打开的页面
+     */
+    public static final String defaultLastTab = "autoClickTab";
+
+    /**
+     * 默认应用端口
+     */
+    public static final String defaultAppPort = "52514";
+
+    /**
+     * 默认浮窗背景透明度
+     */
+    public static final String defaultOpacity = "0.5";
+
+    /**
+     * 默认操作记录最大条数
+     */
+    public static final String defaultMaxLog = "1000";
+
+    /**
+     * 默认图像识别重试间隔时长
+     */
+    public static final String defaultRetrySecond = "1";
+
+    /**
+     * 默认终止操作图片默认识别匹配匹配度
+     */
+    public static final String defaultStopOpacity = "80.0";
+
+    /**
+     * 默认信息浮窗边距
+     */
+    public static final String defaultMargin = "0";
+
+    /**
+     * 默认要点击的图片默认识别匹配匹配度
+     */
+    public static final String defaultClickOpacity = "80.0";
+
+    /**
+     * 默认时长随机偏移量
+     */
+    public static final String defaultRandomTimeOffset = "50";
+
+    /**
+     * 颜色选择器默认选中颜色
+     */
+    public static final String defaultColor = "0xffffffff";
+
+    /**
      * 操作记录列表时间格式
      */
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");

@@ -119,7 +119,7 @@ public class SettingController implements MousePositionUpdater {
     private ColorPicker colorPicker_Set;
 
     @FXML
-    private Label dataNumber_Set, tip_Set;
+    private Label dataNumber_Set, tip_Set, maxMemory_Set;
 
     @FXML
     private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
@@ -384,56 +384,56 @@ public class SettingController implements MousePositionUpdater {
         Properties prop = new Properties();
         InputStream configFileInput = checkRunningInputStream(configFile);
         prop.load(configFileInput);
-        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig);
-        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow);
-        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow);
+        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, activation);
+        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, unActivation);
+        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, unActivation);
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        setControlLastConfig(moveLog_Set, prop, key_moveLog);
-        setControlLastConfig(dragLog_Set, prop, key_dragLog);
-        setControlLastConfig(offsetX_Set, prop, key_offsetX);
-        setControlLastConfig(offsetY_Set, prop, key_offsetY);
-        setControlLastConfig(opacity_Set, prop, key_opacity);
-        setControlLastConfig(waitLog_Set, prop, key_waitLog);
-        setControlLastConfig(clickLog_Set, prop, key_clickLog);
         setControlLastConfig(overtime_Set, prop, key_overtime);
-        setControlLastConfig(autoSave_Set, prop, key_autoSave);
-        setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum);
-        setControlLastConfig(clickImgLog_Set, prop, key_clickLog);
-        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog);
-        setControlLastConfig(remindSave_Set, prop, key_remindSave);
-        setControlLastConfig(recordDrag_Set, prop, key_recordDrag);
-        setControlLastConfig(recordMove_Set, prop, key_recordMove);
-        setControlLastConfig(randomClick_Set, prop, key_randomClick);
-        setControlLastConfig(retrySecond_Set, prop, key_retrySecond);
-        setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity);
-        setControlLastConfig(floatingDistance_Set, prop, key_margin);
-        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick);
-        setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity);
-        setControlLastConfig(randomClickX_Set, prop, key_randomClickX);
-        setControlLastConfig(randomClickY_Set, prop, key_randomClickY);
-        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun);
-        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating);
-        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig);
-        setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval);
-        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime);
-        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun);
-        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun);
-        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime);
-        setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset);
-        setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum);
-        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord);
-        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun);
-        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory);
-        setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset);
-        setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum);
-        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord);
-        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord);
-        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord);
-        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval);
-        setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
+        setControlLastConfig(moveLog_Set, prop, key_moveLog, activation);
+        setControlLastConfig(dragLog_Set, prop, key_dragLog, activation);
+        setControlLastConfig(waitLog_Set, prop, key_waitLog, activation);
+        setControlLastConfig(autoSave_Set, prop, key_autoSave, activation);
+        setControlLastConfig(clickLog_Set, prop, key_clickLog, activation);
+        setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
+        setControlLastConfig(clickImgLog_Set, prop, key_clickLog, activation);
+        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, activation);
+        setControlLastConfig(remindSave_Set, prop, key_remindSave, activation);
+        setControlLastConfig(recordDrag_Set, prop, key_recordDrag, activation);
+        setControlLastConfig(recordMove_Set, prop, key_recordMove, activation);
+        setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
+        setControlLastConfig(randomClick_Set, prop, key_randomClick, unActivation);
+        setControlLastConfig(floatingDistance_Set, prop, key_margin, defaultMargin);
+        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, unActivation);
+        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, activation);
+        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
+        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
+        setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
+        setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, defaultStopOpacity);
+        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, unActivation);
+        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, activation);
+        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, activation);
+        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, unActivation);
+        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, activation);
+        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, activation);
+        setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity, defaultClickOpacity);
+        setControlLastConfig(randomClickX_Set, prop, key_randomClickX, defaultRandomClickX);
+        setControlLastConfig(randomClickY_Set, prop, key_randomClickY, defaultRandomClickY);
+        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory, unActivation);
+        setControlLastConfig(offsetX_Set, prop, key_offsetX, String.valueOf(defaultOffsetX));
+        setControlLastConfig(offsetY_Set, prop, key_offsetY, String.valueOf(defaultOffsetY));
+        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, activation);
+        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, activation);
+        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, activation);
+        setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval, defaultSampleInterval);
+        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, unActivation);
+        setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, defaultStopRetryNum);
+        setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, defaultClickTimeOffset);
+        setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, defaultClickRetryNum);
+        setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, defaultRandomTimeOffset);
         setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
+        setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         clickFileInput.close();
     }
 
@@ -446,10 +446,10 @@ public class SettingController implements MousePositionUpdater {
         Properties prop = new Properties();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        floatingX = Integer.parseInt(prop.getProperty(key_floatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_floatingY));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight));
+        floatingX = Integer.parseInt(prop.getProperty(key_floatingX, defaultFloatingX));
+        floatingY = Integer.parseInt(prop.getProperty(key_floatingY, defaultFloatingY));
+        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth, defaultFloatingWidth));
+        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight, defaultFloatingHeight));
         clickFileInput.close();
     }
 
@@ -644,6 +644,8 @@ public class SettingController implements MousePositionUpdater {
      */
     @FXML
     private void initialize() throws IOException {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        maxMemory_Set.setText(String.valueOf(maxMemory / 1024 / 1024));
         // 读取配置文件
         getConfig();
         // 设置javafx单元格宽度

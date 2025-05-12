@@ -64,12 +64,12 @@ public class DetailController {
     /**
      * 默认要点击的图片识别重试次数
      */
-    private String defaultClickRetryNum;
+    private String clickRetryNumDefault;
 
     /**
      * 默认终止操作图片识别重试次数
      */
-    private String defaultStopRetryNum;
+    private String stopRetryNumDefault;
 
     /**
      * 操作列表步骤数量（操作步骤最大跳转序号）
@@ -486,10 +486,10 @@ public class DetailController {
         ChangeListener<String> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY + defaultRandomClickY);
         changeListeners.put(randomClickY_Det, randomClickYListener);
         // 限制终止操作识别失败重试次数文本输入框内容
-        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum + defaultStopRetryNum);
+        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum + stopRetryNumDefault);
         changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum + defaultClickRetryNum);
+        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum + clickRetryNumDefault);
         changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
     }
 
@@ -518,10 +518,10 @@ public class DetailController {
         addValueToolTip(clickKey_Det, tip_clickKey, clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType, clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
-        addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Det);
+        addToolTip(tip_stopRetryNum + stopRetryNumDefault, stopRetryNum_Det);
         addToolTip(tip_clickIndex + clickIndex_Det.getText(), clickIndex_Det);
         addValueToolTip(clickTypeText_Det, tip_clickType, clickType_Det.getValue());
-        addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Det);
+        addToolTip(tip_clickRetryNum + clickRetryNumDefault, clickRetryNum_Det);
         addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
         addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
         addValueToolTip(stopOpacity_Det, tip_stopOpacity, String.valueOf((int) stopOpacity_Det.getValue()));
@@ -540,8 +540,8 @@ public class DetailController {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
-        defaultStopRetryNum = prop.getProperty(key_defaultStopRetryNum);
-        defaultClickRetryNum = prop.getProperty(key_defaultClickRetryNum);
+        stopRetryNumDefault = prop.getProperty(key_defaultStopRetryNum, defaultStopRetryNum);
+        clickRetryNumDefault = prop.getProperty(key_defaultClickRetryNum, defaultClickRetryNum);
         input.close();
     }
 
@@ -630,8 +630,8 @@ public class DetailController {
         selectedItem.setRandomY(String.valueOf(setDefaultIntValue(randomClickY_Det, Integer.parseInt(defaultRandomClickY), 0, null)));
         selectedItem.setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, Integer.parseInt(defaultClickTimeOffset), 0, null)));
         selectedItem.setRandomTime(String.valueOf(setDefaultIntValue(randomTimeOffset_Det, Integer.parseInt(defaultRandomTime), 0, null)));
-        selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(defaultStopRetryNum), 0, null)));
-        selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(defaultClickRetryNum), 0, null)));
+        selectedItem.setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(stopRetryNumDefault), 0, null)));
+        selectedItem.setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(clickRetryNumDefault), 0, null)));
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
         selectedItem.setRandomClick(randomClick);
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
