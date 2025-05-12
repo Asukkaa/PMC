@@ -1,9 +1,7 @@
 package priv.koishi.pmc.Bean;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
 import java.util.List;
 
@@ -26,13 +24,11 @@ public class TrajectoryPointBean {
     /**
      * 轨迹点横坐标
      */
-    @JsonSerialize(using = DoubleStringToIntSerializer.class)
     double x;
 
     /**
      * 轨迹点纵坐标
      */
-    @JsonSerialize(using = DoubleStringToIntSerializer.class)
     double y;
 
     /**
