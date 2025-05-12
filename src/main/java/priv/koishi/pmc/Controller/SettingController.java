@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.*;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
+import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
@@ -245,15 +246,26 @@ public class SettingController implements MousePositionUpdater {
             prop.store(output, null);
             input.close();
             output.close();
-            TextField nextRunMemory = (TextField) scene.lookup("#nextRunMemory_Set");
-            String XmxValue = nextRunMemory.getText() + G;
-            ChoiceBox<?> nextGcType = (ChoiceBox<?>) scene.lookup("#nextGcType_Set");
-            String nextGcTypeValue = (String) nextGcType.getValue();
-            Map<String, String> options = new HashMap<>();
-            options.put(Xmx, XmxValue);
-            options.put(XX, nextGcTypeValue);
-            setJavaOptionValue(options);
+            // 保存JVM参数设置
+            saveJVMConfig(scene);
         }
+    }
+
+    /**
+     * 保存JVM参数设置
+     *
+     * @param scene 程序主场景
+     */
+    private static void saveJVMConfig(Scene scene) throws IOException {
+        TextField nextRunMemory = (TextField) scene.lookup("#nextRunMemory_Set");
+        String XmxValue = nextRunMemory.getText() + G;
+        ChoiceBox<?> nextGcType = (ChoiceBox<?>) scene.lookup("#nextGcType_Set");
+        String nextGcTypeValue = (String) nextGcType.getValue();
+        Map<String, String> options = new HashMap<>();
+        options.put(Xmx, XmxValue);
+        options.put(XX, nextGcTypeValue);
+        // 更新cfg文件中jvm参数设置
+        setJavaOptionValue(options);
     }
 
     /**
@@ -1034,6 +1046,8 @@ public class SettingController implements MousePositionUpdater {
      */
     @FXML
     private void reLaunch() throws IOException {
+        // 保存设置
+        saveAllLastConfig((Stage) mainScene.getWindow());
         Platform.exit();
         if (!isRunningFromJar()) {
             ProcessBuilder processBuilder = new ProcessBuilder();
