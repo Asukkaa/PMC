@@ -5,7 +5,6 @@ import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -151,9 +150,9 @@ public class CommonFinals {
      */
     public static final String cfgFilePath = getCFGPath();
 
-    public static final String appDirectory = File.separator + "app";
+    public static final String appDirectory = "/app";
 
-    public static final String contentsDirectory = File.separator + "Contents";
+    public static final String contentsDirectory = "/Contents";
 
     public static final String desktop = "Desktop";
 

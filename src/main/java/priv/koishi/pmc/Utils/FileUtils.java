@@ -510,11 +510,11 @@ public class FileUtils {
             cfgPath = appName + cfg;
         } else {
             String appPath = getAppPath();
-            String cfgFileName = appName + cfg;
+            String cfgFileName = "/" + appName + cfg;
             if (systemName.contains(win)) {
-                cfgPath = new File(appPath).getParent() + appDirectory + File.separator + cfgFileName;
+                cfgPath = new File(appPath).getParent() + appDirectory + cfgFileName;
             } else {
-                cfgPath = appPath + contentsDirectory + appDirectory + File.separator + cfgFileName;
+                cfgPath = appPath + contentsDirectory + appDirectory + cfgFileName;
             }
         }
         return cfgPath;
