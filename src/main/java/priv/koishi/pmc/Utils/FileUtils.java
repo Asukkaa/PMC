@@ -432,10 +432,9 @@ public class FileUtils {
      * @throws IOException 配置文件读取异常
      */
     public static Map<String, String> getJavaOptionValue(List<String> optionKeys) throws IOException {
-        String cfgPath = getCFGPath();
         Map<String, String> jvmOptions = new HashMap<>();
         List<String> jvmOptionsList = new ArrayList<>(optionKeys);
-        try (BufferedReader reader = Files.newBufferedReader(Path.of(cfgPath))) {
+        try (BufferedReader reader = Files.newBufferedReader(Path.of(cfgFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 // 检测配置段
@@ -464,8 +463,7 @@ public class FileUtils {
      * @throws IOException 配置文件读取或写入异常
      */
     public static void setJavaOptionValue(Map<String, String> options) throws IOException {
-        String cfgPath = getCFGPath();
-        Path configPath = Path.of(cfgPath);
+        Path configPath = Path.of(cfgFilePath);
         List<String> lines = Files.readAllLines(configPath);
         boolean modified = false;
         for (int i = 0; i < lines.size(); i++) {
@@ -506,13 +504,18 @@ public class FileUtils {
      *
      * @return cfg文件路径
      */
-    private static String getCFGPath() {
+    public static String getCFGPath() {
         String cfgPath;
         if (isRunningFromJar()) {
             cfgPath = appName + cfg;
         } else {
             String appPath = getAppPath();
-            cfgPath = new File(appPath).getParent() + File.separator + "/app/" + appName + cfg;
+            String cfgFileName = appName + cfg;
+            if (systemName.contains(win)) {
+                cfgPath = new File(appPath).getParent() + appDirectory + File.separator + cfgFileName;
+            } else {
+                cfgPath = appPath + contentsDirectory + appDirectory + File.separator + cfgFileName;
+            }
         }
         return cfgPath;
     }
