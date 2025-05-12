@@ -26,6 +26,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
@@ -34,16 +35,18 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
+import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 设置页面控制器
@@ -119,10 +122,13 @@ public class SettingController implements MousePositionUpdater {
     private ColorPicker colorPicker_Set;
 
     @FXML
-    private Label dataNumber_Set, tip_Set, maxMemory_Set;
+    private ChoiceBox<String> nextGcType_Set;
 
     @FXML
     private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
+
+    @FXML
+    private Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set;
 
     @FXML
     private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
@@ -130,7 +136,7 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
             retrySecond_Set, overtime_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set,
-            randomTimeOffset_Set, maxLogNum_Set;
+            randomTimeOffset_Set, maxLogNum_Set, nextRunMemory_Set;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
@@ -239,6 +245,14 @@ public class SettingController implements MousePositionUpdater {
             prop.store(output, null);
             input.close();
             output.close();
+            TextField nextRunMemory = (TextField) scene.lookup("#nextRunMemory_Set");
+            String XmxValue = nextRunMemory.getText() + G;
+            ChoiceBox<?> nextGcType = (ChoiceBox<?>) scene.lookup("#nextGcType_Set");
+            String nextGcTypeValue = (String) nextGcType.getValue();
+            Map<String, String> options = new HashMap<>();
+            options.put(Xmx, XmxValue);
+            options.put(XX, nextGcTypeValue);
+            setJavaOptionValue(options);
         }
     }
 
@@ -481,6 +495,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_randomWaitTime, randomWaitTime_Set);
         addToolTip(tip_randomClickTime, randomClickTime_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
+        addValueToolTip(nextRunMemory_Set, tip_nextRunMemory);
         addToolTip(tip_randomTrajectory, randomTrajectory_Set);
         addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
@@ -491,6 +506,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
         addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
         addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
+        addValueToolTip(nextGcType_Set, tip_nextGcType, nextGcType_Set.getValue());
         addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
         addToolTip(tip_sampleInterval + defaultSampleInterval, sampleInterval_Set);
         addValueToolTip(randomClickX_Set, tip_randomClickX + defaultRandomClickX);
@@ -582,6 +598,8 @@ public class SettingController implements MousePositionUpdater {
         integerRangeTextField(retrySecond_Set, 0, null, tip_retrySecond);
         // 浮窗离屏幕边界距离输入框监听
         integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
+        // 限制下次运行内存文本输入框内容
+        integerRangeTextField(nextRunMemory_Set, 1, null, tip_nextRunMemory);
         // 随机横坐标偏移量文本输入框内容
         integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX + defaultRandomClickX);
         // 随机纵坐标偏移量文本输入框内容
@@ -638,14 +656,38 @@ public class SettingController implements MousePositionUpdater {
     }
 
     /**
+     * 获取JVM设置并展示
+     *
+     * @throws IOException io异常
+     */
+    private void getJVMConfig() throws IOException {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        runningMemory_Set.setText(getUnitSize(maxMemory, false));
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        long totalMemory = ((com.sun.management.OperatingSystemMXBean) osBean).getTotalMemorySize();
+        String systemUnitSizeMemory = getUnitSize(totalMemory, false);
+        systemMemory_Set.setText(systemUnitSizeMemory);
+        Map<String, String> jvm = getJavaOptionValue(jvmArgs);
+        String xmxValue = jvm.get(Xmx);
+        if (StringUtils.isNotBlank(xmxValue)) {
+            nextRunMemory_Set.setText(xmxValue.substring(0, xmxValue.indexOf(G)));
+        }
+        gcType_Set.setText(getCurrentGCType());
+        String gcType = jvm.get(XX);
+        if (StringUtils.isNotBlank(gcType)) {
+            nextGcType_Set.setValue(gcType);
+        }
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
      */
     @FXML
     private void initialize() throws IOException {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        maxMemory_Set.setText(String.valueOf(maxMemory / 1024 / 1024));
+        // 获取最大运行内存并展示
+        getJVMConfig();
         // 读取配置文件
         getConfig();
         // 设置javafx单元格宽度

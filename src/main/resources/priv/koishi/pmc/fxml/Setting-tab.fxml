@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import java.lang.*?>
 <AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
@@ -282,9 +284,52 @@
 
         <Separator/>
 
-        <Label prefHeight="25" text="重启程序："/>
+        <Label prefHeight="25" text="内存设置："/>
 
-        <Button fx:id="reLaunch_Set" text="重启程序" onAction="#reLaunch" />
+        <HBox spacing="20">
+            <HBox spacing="5">
+                <Label prefHeight="25" text="当前内存上限:"/>
+                <Label prefHeight="25" fx:id="runningMemory_Set"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="操作系统内存:"/>
+                <Label prefHeight="25" fx:id="systemMemory_Set"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="5">
+            <Label prefHeight="25" text="下次启动时程序内存上限:"/>
+            <TextField fx:id="nextRunMemory_Set" prefHeight="20" prefWidth="50"/>
+            <Label prefHeight="25" prefWidth="50" text="GB"/>
+
+            <Button fx:id="reLaunch_Set" onAction="#reLaunch" style="-fx-cursor: hand" text="立刻重启程序"/>
+        </HBox>
+
+        <HBox spacing="20">
+            <HBox spacing="5">
+                <Label prefHeight="25" text="当前GC类型:"/>
+                <Label prefHeight="25" fx:id="gcType_Set"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="下次启动时垃圾回收(GC)类型:"/>
+                <ChoiceBox fx:id="nextGcType_Set" prefHeight="25" prefWidth="150">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="G1GC"/>
+                            <String fx:value="ZGC"/>
+                            <String fx:value="ParallelGC"/>
+                            <String fx:value="ShenandoahGC"/>
+                            <String fx:value="SerialGC"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <String fx:value="G1GC"/>
+                    </value>
+                </ChoiceBox>
+            </HBox>
+        </HBox>
 
         <Separator/>
     </VBox>

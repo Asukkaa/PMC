@@ -7,7 +7,11 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.util.Properties;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.*;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 
@@ -371,6 +375,146 @@ public class FileUtils {
             }
         }
         return path;
+    }
+
+    /**
+     * 根据操作系统将数值转换为文件大小
+     *
+     * @param size          没带单位的文件大小
+     * @param distinguishOS 区分操作系统文件大小单位进制，true区分，false不区分，macos文件大小为1000进制，内存大小为1024进制
+     * @return 带单位的文件大小
+     */
+    public static String getUnitSize(long size, boolean distinguishOS) {
+        long winUnit = 1024;
+        long macUnit = 1000;
+        long kb;
+        // macOS与Windows文件大小进制不同
+        if (systemName.contains(mac) && distinguishOS) {
+            kb = macUnit;
+        } else {
+            kb = winUnit;
+        }
+        return getRet(kb, size);
+    }
+
+    /**
+     * 格式化文件大小数据
+     *
+     * @param kb   文件大小单位进制
+     * @param size 不带单位的文件大小
+     * @return 带单位的文件大小
+     */
+    private static String getRet(long kb, long size) {
+        long mb = kb * kb;
+        long gb = mb * kb;
+        long tb = gb * kb;
+        String ret = "";
+        DecimalFormat df = new DecimalFormat("0.00");
+        if (size >= tb) {
+            ret = df.format(size / (tb * 1.0)) + " " + TB;
+        } else if (size >= gb) {
+            ret = df.format(size / (gb * 1.0)) + " " + GB;
+        } else if (size >= mb) {
+            ret = df.format(size / (mb * 1.0)) + " " + MB;
+        } else if (size >= kb) {
+            ret = df.format(size / (kb * 1.0)) + " " + KB;
+        } else if (size >= 0) {
+            ret = df.format(size) + " " + Byte;
+        }
+        return ret;
+    }
+
+    /**
+     * 根据jvm参数key读取cfg文件对应设置值
+     *
+     * @param optionKeys 要查询的jvm参数key
+     * @return jvm参数key与对应的参数右侧的值
+     * @throws IOException 配置文件读取异常
+     */
+    public static Map<String, String> getJavaOptionValue(List<String> optionKeys) throws IOException {
+        String cfgPath = getCFGPath();
+        Map<String, String> jvmOptions = new HashMap<>();
+        List<String> jvmOptionsList = new ArrayList<>(optionKeys);
+        try (BufferedReader reader = Files.newBufferedReader(Path.of(cfgPath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // 检测配置段
+                if (line.startsWith(javaOptions)) {
+                    String arg = line.substring(javaOptions.length());
+                    Iterator<String> iterator = jvmOptionsList.iterator();
+                    while (iterator.hasNext()) {
+                        String optionKey = iterator.next();
+                        if (arg.contains(optionKey)) {
+                            String value = arg.substring(arg.indexOf(optionKey) + optionKey.length());
+                            jvmOptions.put(optionKey, value);
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+        }
+        jvmOptionsList.forEach(optionKey -> jvmOptions.put(optionKey, ""));
+        return jvmOptions;
+    }
+
+    /**
+     * 更新cfg文件中jvm参数设置
+     *
+     * @param options 要修改的jvm参数键值对
+     * @throws IOException 配置文件读取或写入异常
+     */
+    public static void setJavaOptionValue(Map<String, String> options) throws IOException {
+        String cfgPath = getCFGPath();
+        Path configPath = Path.of(cfgPath);
+        List<String> lines = Files.readAllLines(configPath);
+        boolean modified = false;
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.startsWith(javaOptions)) {
+                Iterator<Map.Entry<String, String>> iterator = options.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> entry = iterator.next();
+                    String optionKey = entry.getKey();
+                    String optionValue = entry.getValue();
+                    if (line.contains(optionKey)) {
+                        if (!G.equals(optionValue)) {
+                            // 处理修改参数
+                            String newLineContent = javaOptions + optionKey + optionValue;
+                            lines.set(i, line.replace(line, newLineContent));
+                        } else {
+                            // 处理删除参数
+                            lines.remove(i);
+                        }
+                        iterator.remove();
+                        modified = true;
+                    }
+                }
+            }
+        }
+        // 处理新增参数
+        for (Map.Entry<String, String> entry : options.entrySet()) {
+            lines.add(javaOptions + entry.getKey() + entry.getValue());
+            modified = true;
+        }
+        if (modified) {
+            Files.write(configPath, lines);
+        }
+    }
+
+    /**
+     * 获取cfg文件路径
+     *
+     * @return cfg文件路径
+     */
+    private static String getCFGPath() {
+        String cfgPath;
+        if (isRunningFromJar()) {
+            cfgPath = appName + cfg;
+        } else {
+            String appPath = getAppPath();
+            cfgPath = new File(appPath).getParent() + File.separator + "/app/" + appName + cfg;
+        }
+        return cfgPath;
     }
 
 }

@@ -130,6 +130,20 @@ public class CommonFinals {
      */
     public static final String defaultOutFileName = "PMC自动操作流程";
 
+    /**
+     * jvm最大内存设置参数
+     */
+    public static final String Xmx = "-Xmx";
+
+    public static final String XX = "-XX:+Use";
+
+    public static final List<String> jvmArgs = Arrays.asList(Xmx, XX);
+
+    /**
+     * cfg文件jvm参数头
+     */
+    public static final String javaOptions = "java-options=";
+
     public static final String desktop = "Desktop";
 
     public static final String mac = "mac";
@@ -138,6 +152,8 @@ public class CommonFinals {
 
     public static final String log = ".log";
 
+    public static final String cfg = ".cfg";
+
     public static final String allPMC = "*.pmc";
 
     public static final String PMC = ".pmc";
@@ -145,6 +161,18 @@ public class CommonFinals {
     public static final String exe = ".exe";
 
     public static final String app = ".app";
+
+    public static final String Byte = "Byte";
+
+    public static final String KB = "KB";
+
+    public static final String MB = "MB";
+
+    public static final String GB = "GB";
+
+    public static final String TB = "TB";
+
+    public static final String G = "G";
 
     public static final String extension_file = "文件";
 
@@ -494,6 +522,16 @@ public class CommonFinals {
     public static final String tip_randomWaitTime = "勾选后运行自动操作时每步操前的等待时间将按照设置的时间偏移量进行偏移";
 
     public static final String tip_maxLogNum = "用来限制运行记录数量的设置，只能填正整数，不填则不限制最大记录数量";
+
+    public static final String tip_nextRunMemory = "下次启动程序将会按照此设置项分配程序最大运行内存，单位为GB，只能填自然数，为空将设置为默认值操作系统最大内存的1/4";
+
+    public static final String tip_nextGcType = """
+            下次启动程序将会按照此设置项设置垃圾回收（GC）方式
+            G1GC：分区回收，低延迟与吞吐量平衡
+            ZGC：亚毫秒级停顿
+            ParallelGC：多线程并行回收，吞吐量优先
+            ShenandoahGC：全并发回收，停顿时间与堆大小无关
+            SerialGC：单线程回收，简单高效""";
 
     public static final String tip_sampleInterval = """
             在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
