@@ -67,8 +67,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
-import static priv.koishi.pmc.Service.AutoClickService.autoClick;
-import static priv.koishi.pmc.Service.AutoClickService.clearReferences;
+import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -784,6 +783,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
             bindingTaskNode(autoClickTask, taskBean);
             autoClickTask.setOnSucceeded(event -> {
                 clickLogs = autoClickTask.getValue();
+                clearReferences();
                 taskUnbind(taskBean);
                 log_Click.setTextFill(Color.GREEN);
                 log_Click.setText(text_taskFinished);
@@ -799,7 +799,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 runClicking = false;
             });
             autoClickTask.setOnFailed(event -> {
-                clickLogs = autoClickTask.getValue();
+                clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskFailed);
                 hideFloatingWindow();
                 CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
@@ -821,7 +821,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 throw new RuntimeException(ex);
             });
             autoClickTask.setOnCancelled(event -> {
-                clickLogs = autoClickTask.getValue();
+                clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskCancelled);
                 hideFloatingWindow();
                 CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");

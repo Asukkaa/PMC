@@ -58,6 +58,11 @@ public class AutoClickService {
     private static final Random random = new Random();
 
     /**
+     * 日志动态容量队列
+     */
+    private static DynamicQueue<ClickLogBean> dynamicQueue;
+
+    /**
      * 自动点击任务线程
      *
      * @param taskBean 线程任务参数
@@ -71,6 +76,11 @@ public class AutoClickService {
                 Timeline timeline = taskBean.getRunTimeline();
                 if (timeline != null) {
                     timeline.stop();
+                }
+                dynamicQueue = new DynamicQueue<>();
+                int maxLogNum = taskBean.getMaxLogNum();
+                if (maxLogNum > 0) {
+                    dynamicQueue.setMaxSize(maxLogNum);
                 }
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
                 int loopTime = taskBean.getLoopTime();
@@ -95,17 +105,11 @@ public class AutoClickService {
                         clickLogBeans = clicks(tableViewItems, loopTimeText);
                     }
                 }
-                clearReferences();
                 return clickLogBeans;
             }
 
             // 执行操作流程
             private List<ClickLogBean> clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
-                DynamicQueue<ClickLogBean> dynamicQueue = new DynamicQueue<>();
-                int maxLogNum = taskBean.getMaxLogNum();
-                if (maxLogNum > 0) {
-                    dynamicQueue.setMaxSize(maxLogNum);
-                }
                 int dataSize = tableViewItems.size();
                 floatingLabel = taskBean.getFloatingLabel();
                 massageLabel = taskBean.getMassageLabel();
@@ -177,7 +181,6 @@ public class AutoClickService {
                     }
                     // 执行自动流程
                     ClickResultBean clickResultBean = click(clickPositionVO, robot, loopTimeText, taskBean);
-                    dynamicQueue.addAll(clickResultBean.getClickLogs());
                     int stepIndex = clickResultBean.getStepIndex();
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
@@ -204,11 +207,6 @@ public class AutoClickService {
      * @return 执行结果
      */
     private static ClickResultBean click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText, AutoClickTaskBean taskBean) throws Exception {
-        DynamicQueue<ClickLogBean> dynamicQueue = new DynamicQueue<>();
-        int maxLogNum = taskBean.getMaxLogNum();
-        if (maxLogNum > 0) {
-            dynamicQueue.setMaxSize(maxLogNum);
-        }
         ClickResultBean clickResultBean = new ClickResultBean();
         clickResultBean.setStepIndex(0);
         int retrySecondValue = taskBean.getRetrySecondValue();
@@ -495,8 +493,7 @@ public class AutoClickService {
                 }
             } else {
                 // 计算鼠标轨迹
-                DynamicQueue<ClickLogBean> logBeans = executeTrajectoryPoints(robot, clickPositionVO, taskBean);
-                dynamicQueue.addAll(logBeans);
+                executeTrajectoryPoints(robot, clickPositionVO, taskBean);
                 clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
             }
         }
@@ -510,15 +507,10 @@ public class AutoClickService {
      * @param robot           机器人操作实例
      * @param clickPositionVO 点击位置信息
      * @param taskBean        线程任务参数
-     * @return 执行记录
      * @throws Exception 当移动超时或线程中断时抛出
      */
-    private static DynamicQueue<ClickLogBean> executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) throws Exception {
-        DynamicQueue<ClickLogBean> dynamicQueue = new DynamicQueue<>();
-        int maxLogNum = taskBean.getMaxLogNum();
-        if (maxLogNum > 0) {
-            dynamicQueue.setMaxSize(maxLogNum);
-        }
+    private static void executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) throws Exception {
+
         List<TrajectoryPointBean> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
             TrajectoryPointBean lastPoint = null;
@@ -623,7 +615,6 @@ public class AutoClickService {
                 }
             }
         }
-        return dynamicQueue;
     }
 
     /**
@@ -632,6 +623,16 @@ public class AutoClickService {
     public static void clearReferences() {
         floatingLabel = null;
         massageLabel = null;
+        dynamicQueue = null;
+    }
+
+    /**
+     * 获取当前产生的日志（任务终止时使用）
+     *
+     * @return 当前产生的日志
+     **/
+    public static List<ClickLogBean> getNowLogs() {
+        return dynamicQueue.getSnapshot();
     }
 
 }

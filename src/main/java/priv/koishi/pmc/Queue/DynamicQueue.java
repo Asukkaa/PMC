@@ -1,9 +1,6 @@
 package priv.koishi.pmc.Queue;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -48,52 +45,11 @@ public class DynamicQueue<E> {
     }
 
     /**
-     * 批量添加元素，保持原集合顺序（将会忽略空元素）
-     *
-     * @param elements 添加的元素集合
-     */
-    public void addAll(Collection<? extends E> elements) {
-        if (CollectionUtils.isNotEmpty(elements)) {
-            int validCount = 0;
-            for (E element : elements) {
-                if (element != null) {
-                    // 每个元素添加到队头
-                    delegate.addFirst(element);
-                    validCount++;
-                }
-            }
-            approximateSize.addAndGet(validCount);
-            adjustSize();
-        }
-    }
-
-    /**
-     * 从另一个 DynamicQueue 中添加所有元素，保持原顺序
-     *
-     * @param otherQueue 要添加的 DynamicQueue
-     */
-    public void addAll(DynamicQueue<? extends E> otherQueue) {
-        if (otherQueue != null && !otherQueue.delegate.isEmpty()) {
-            Iterator<? extends E> it = otherQueue.delegate.descendingIterator();
-            int validCount = 0;
-            while (it.hasNext()) {
-                E element = it.next();
-                if (element != null) {
-                    delegate.addFirst(element);
-                    validCount++;
-                }
-            }
-            approximateSize.addAndGet(validCount);
-            adjustSize();
-        }
-    }
-
-    /**
      * 调整delegate的大小以确保不超过预设的最大容量maxSize。
      */
     private void adjustSize() {
         if (approximateSize.get() > maxSize) {
-            synchronized (this) {
+            synchronized (delegate) {
                 int actualSize = approximateSize.get();
                 if (actualSize > maxSize) {
                     int elementsToRemove = actualSize - maxSize;
