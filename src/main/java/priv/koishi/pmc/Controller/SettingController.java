@@ -32,6 +32,7 @@ import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -129,10 +130,10 @@ public class SettingController implements MousePositionUpdater {
     private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
 
     @FXML
-    private Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set;
+    private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
 
     @FXML
-    private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
+    private Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set;
 
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
@@ -255,6 +256,7 @@ public class SettingController implements MousePositionUpdater {
      * 保存JVM参数设置
      *
      * @param scene 程序主场景
+     * @throws IOException io异常
      */
     private static void saveJVMConfig(Scene scene) throws IOException {
         TextField nextRunMemory = (TextField) scene.lookup("#nextRunMemory_Set");
@@ -673,6 +675,8 @@ public class SettingController implements MousePositionUpdater {
      * @throws IOException io异常
      */
     private void getJVMConfig() throws IOException {
+        // 获取当前运行路径
+        setPathLabel(thisPath_Set, getAppPath(), false);
         long maxMemory = Runtime.getRuntime().maxMemory();
         runningMemory_Set.setText(getUnitSize(maxMemory, false));
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
@@ -1050,13 +1054,19 @@ public class SettingController implements MousePositionUpdater {
         saveAllLastConfig((Stage) mainScene.getWindow());
         Platform.exit();
         if (!isRunningFromJar()) {
-            ProcessBuilder processBuilder = new ProcessBuilder();
+            ProcessBuilder processBuilder = null;
             if (systemName.contains(win)) {
-                processBuilder.command(getAppPath());
+                String path = userDir.substring(0, userDir.lastIndexOf(appNameSeparator) + appNameSeparator.length());
+                String appPath = path + File.separator + appName + exe;
+                processBuilder = new ProcessBuilder(appPath);
             } else if (systemName.contains(mac)) {
-                processBuilder.command("open", "-n", getAppPath());
+                String macApp = File.separator + appName + app;
+                String appPath = userDir.substring(0, userDir.lastIndexOf(macApp)) + macApp;
+                processBuilder = new ProcessBuilder("open", "-n", appPath);
             }
-            processBuilder.start();
+            if (processBuilder != null) {
+                processBuilder.start();
+            }
         }
     }
 
