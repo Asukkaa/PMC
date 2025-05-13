@@ -43,6 +43,14 @@ macOS 依赖文件中的 libopenblas_nolapack.0.dylib 因文件太大所以进�
 
 jlink 打包后的操作都已写在 buildApp 脚本中，使用 jlink 打包后直接运行对应操作系统的 buildApp 脚本文件即可生成可执行文件。
 程序的版本号相关信息将会由对应脚本从 ../src/main/java/priv/koishi/pmc/CommonFinals.java 文件中的 version 属性读取，所以每次修改版本号信息时都需要修改该文件中的版本号。
+
+jpackage 打包后如果需要修改 jvm 参数需要修改对应操作系统下的 .cfg 文件，项目中也有对应修改的代码，修改后下次启动程序即可生效。
+
+win 的 .cfg 文件在 ../Perfect Mouse Control/app/bin/ 目录下，macOS 的 .cfg 文件在 ../Perfect Mouse Control.app/Contents/app/ 目录下。
+项目中的 .cfg 文件仅供测试读取和修改功能，无法修改 idea 启动时的 jvm 参数。
+
+修改参数只需要更改 java-options= 右侧的内容即可，如果需要添加参数则需在行末添加新的 java-options= 并在右侧写上需要的 jvm 参数，删除参数必须删除整行，只删除 java-options= 右侧的内容会导致程序无法启动，目前没有发现如何单行添加多个参数的写法。
+
 # 项目地址
 GitHub：https://github.com/Asukkaa/PMC
 

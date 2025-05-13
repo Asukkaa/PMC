@@ -1046,7 +1046,7 @@ public class SettingController implements MousePositionUpdater {
      */
     @FXML
     private void reLaunch() throws IOException {
-        // 保存设置
+        // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新jvm配置参数
         saveAllLastConfig((Stage) mainScene.getWindow());
         Platform.exit();
         if (!isRunningFromJar()) {

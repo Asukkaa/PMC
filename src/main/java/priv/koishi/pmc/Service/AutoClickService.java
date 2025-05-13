@@ -510,7 +510,6 @@ public class AutoClickService {
      * @throws Exception 当移动超时或线程中断时抛出
      */
     private static void executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) throws Exception {
-
         List<TrajectoryPointBean> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
             TrajectoryPointBean lastPoint = null;
