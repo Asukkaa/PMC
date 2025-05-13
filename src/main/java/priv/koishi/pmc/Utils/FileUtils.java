@@ -491,8 +491,9 @@ public class FileUtils {
         }
         // 处理新增参数
         for (Map.Entry<String, String> entry : options.entrySet()) {
-            if (StringUtils.isNotBlank(entry.getValue())) {
-                lines.add(javaOptions + entry.getKey() + entry.getValue());
+            String optionValue = entry.getValue();
+            if (StringUtils.isNotBlank(optionValue)) {
+                lines.add(javaOptions + entry.getKey() + optionValue);
                 modified = true;
             }
         }
