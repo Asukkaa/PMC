@@ -266,7 +266,7 @@ public class DetailController {
      */
     private void showClickImg(String clickImgPath) throws IOException {
         if (StringUtils.isNotBlank(clickImgPath)) {
-            File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath, false);
+            File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath);
             removeClickImg_Det.setVisible(true);
             if (clickImgFile.exists()) {
                 clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));

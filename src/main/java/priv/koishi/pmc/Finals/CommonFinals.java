@@ -633,7 +633,7 @@ public class CommonFinals {
             手动创建新的操作步骤时将会按照此设置先设置默认点击时长
             单位为毫秒，只能填自然数，不填默认为\s""";
 
-    public static final String version = "2.4.1";
+    public static final String version = "2.4.2";
 
     public static final String buildDate = "2025年5月13日";
 

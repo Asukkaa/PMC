@@ -70,7 +70,7 @@ public class AboutController {
      */
     private void setLogsPath() {
         String logsPath = getLogsPath();
-        setPathLabel(logsPath_Abt, logsPath, false);
+        setPathLabel(logsPath_Abt, logsPath);
     }
 
     /**

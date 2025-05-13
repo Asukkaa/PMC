@@ -129,14 +129,30 @@ public class FileUtils {
                 Desktop.getDesktop().open(file);
             }
             if (file.isFile()) {
-                ProcessBuilder processBuilder;
-                if (systemName.contains(win)) {
-                    processBuilder = new ProcessBuilder("cmd.exe", "/C", "explorer /select, " + openPath);
-                } else {
-                    processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
-                }
-                processBuilder.start();
+                openParentDirectory(openPath);
             }
+        }
+    }
+
+    /**
+     * 打开上级目录并选中目标文件
+     *
+     * @param openPath 目标文件的路径
+     * @throws IOException 文件不存在
+     */
+    public static void openParentDirectory(String openPath) throws IOException {
+        if (StringUtils.isNotEmpty(openPath)) {
+            File file = new File(openPath);
+            if (!file.exists()) {
+                throw new IOException(text_fileNotExists);
+            }
+            ProcessBuilder processBuilder;
+            if (systemName.contains(win)) {
+                processBuilder = new ProcessBuilder("cmd.exe", "/C", "explorer /select, " + openPath);
+            } else {
+                processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
+            }
+            processBuilder.start();
         }
     }
 

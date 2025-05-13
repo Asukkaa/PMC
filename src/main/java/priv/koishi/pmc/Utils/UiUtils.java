@@ -781,7 +781,7 @@ public class UiUtils {
             filePath = selectedFilePath;
         }
         if (pathLabel != null) {
-            setPathLabel(pathLabel, selectedFilePath, false);
+            setPathLabel(pathLabel, selectedFilePath);
         }
         return filePath;
     }
@@ -1198,7 +1198,7 @@ public class UiUtils {
      * 修改点击按键二级菜单选项
      *
      * @param tableView 要添加右键菜单的列表
-     * @param clickKey 点击按键
+     * @param clickKey  点击按键
      */
     private static void updateClickKeyMenuItem(TableView<ClickPositionVO> tableView, String clickKey) {
         List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
@@ -1428,9 +1428,9 @@ public class UiUtils {
     /**
      * 为配置组件设置上次配置值
      *
-     * @param control 需要处理的组件
-     * @param prop    配置文件
-     * @param key     要读取的key
+     * @param control      需要处理的组件
+     * @param prop         配置文件
+     * @param key          要读取的key
      * @param defaultValue 默认值
      */
     @SuppressWarnings("unchecked")
@@ -1489,7 +1489,7 @@ public class UiUtils {
     public static void setControlLastConfig(Label label, Properties prop, String key) {
         String lastValue = prop.getProperty(key);
         if (FilenameUtils.getPrefixLength(lastValue) != -1) {
-            setPathLabel(label, lastValue, false);
+            setPathLabel(label, lastValue);
         }
     }
 
@@ -1516,15 +1516,14 @@ public class UiUtils {
     }
 
     /**
-     * 显示可打开的文件类路径
+     * 设置可打开的文件路径文本框
      *
      * @param pathLabel 文件路径文本栏
      * @param path      文件路径
-     * @param openFile  点击是否打开文件，true打开文件，false打开文件所在文件夹
      * @return 要展示路径的文件
      * @throws RuntimeException io异常
      */
-    public static File setPathLabel(Label pathLabel, String path, boolean openFile) {
+    public static File setPathLabel(Label pathLabel, String path) {
         pathLabel.setText(path);
         File file = new File(path);
         String openText = "\n鼠标左键点击打开 ";
@@ -1537,21 +1536,29 @@ public class UiUtils {
             pathLabel.getStyleClass().add("label-button-style");
         }
         String openPath;
-        // 判断是否打开文件
-        if (!openFile && file.isFile()) {
-            openPath = file.getParent();
+        // 判断打开方式
+        boolean openParentDirectory;
+        if (file.isDirectory()) {
+            if (systemName.contains(mac) && file.getName().contains(app)) {
+                openPath = file.getParent();
+                openParentDirectory = true;
+            } else {
+                openParentDirectory = false;
+                openPath = path;
+            }
         } else {
-            openPath = path;
+            openParentDirectory = true;
+            openPath = file.getParent();
         }
         pathLabel.setOnMouseClicked(event -> {
             // 只接受左键点击
             if (event.getButton() == MouseButton.PRIMARY) {
                 try {
                     // 判断是否打开文件
-                    if (!openFile) {
-                        openDirectory(path);
+                    if (openParentDirectory) {
+                        openParentDirectory(path);
                     } else {
-                        openFile(path);
+                        openDirectory(path);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -1581,7 +1588,15 @@ public class UiUtils {
                 throw new RuntimeException(e);
             }
         });
-        contextMenu.getItems().add(openDirectoryMenuItem);
+        MenuItem openParentDirectoryMenuItem = new MenuItem("打开上级文件夹");
+        openParentDirectoryMenuItem.setOnAction(event -> {
+            try {
+                openParentDirectory(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        contextMenu.getItems().addAll(openDirectoryMenuItem, openParentDirectoryMenuItem);
         if (new File(path).isFile()) {
             MenuItem openFileMenuItem = new MenuItem("打开文件");
             openFileMenuItem.setOnAction(event -> {
