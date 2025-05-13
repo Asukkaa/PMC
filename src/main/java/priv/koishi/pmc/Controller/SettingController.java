@@ -32,7 +32,6 @@ import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -48,7 +47,6 @@ import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 设置页面控制器
@@ -260,7 +258,8 @@ public class SettingController implements MousePositionUpdater {
      */
     private static void saveJVMConfig(Scene scene) throws IOException {
         TextField nextRunMemory = (TextField) scene.lookup("#nextRunMemory_Set");
-        String XmxValue = nextRunMemory.getText() + G;
+        String nextRunMemoryValue = nextRunMemory.getText();
+        String XmxValue = StringUtils.isBlank(nextRunMemoryValue) ? "" : nextRunMemoryValue + G;
         ChoiceBox<?> nextGcType = (ChoiceBox<?>) scene.lookup("#nextGcType_Set");
         String nextGcTypeValue = (String) nextGcType.getValue();
         Map<String, String> options = new HashMap<>();
@@ -1056,13 +1055,9 @@ public class SettingController implements MousePositionUpdater {
         if (!isRunningFromJar()) {
             ProcessBuilder processBuilder = null;
             if (systemName.contains(win)) {
-                String path = userDir.substring(0, userDir.lastIndexOf(appNameSeparator) + appNameSeparator.length());
-                String appPath = path + File.separator + appName + exe;
-                processBuilder = new ProcessBuilder(appPath);
+                processBuilder = new ProcessBuilder(getAppPath());
             } else if (systemName.contains(mac)) {
-                String macApp = File.separator + appName + app;
-                String appPath = userDir.substring(0, userDir.lastIndexOf(macApp)) + macApp;
-                processBuilder = new ProcessBuilder("open", "-n", appPath);
+                processBuilder = new ProcessBuilder("open", "-n", getAppPath());
             }
             if (processBuilder != null) {
                 processBuilder.start();

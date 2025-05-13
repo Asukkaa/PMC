@@ -5,7 +5,6 @@ import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -156,11 +155,6 @@ public class CommonFinals {
      * cfg文件路径
      */
     public static final String cfgFilePath = getCFGPath();
-
-    /**
-     * 程序根目录
-     */
-    public static final String appNameSeparator = appName + File.separator;
 
     public static final String appDirectory = "/app";
 
@@ -634,9 +628,9 @@ public class CommonFinals {
             手动创建新的操作步骤时将会按照此设置先设置默认点击时长
             单位为毫秒，只能填自然数，不填默认为\s""";
 
-    public static final String version = "2.4.0";
+    public static final String version = "2.4.1";
 
-    public static final String buildDate = "2025年5月12日";
+    public static final String buildDate = "2025年5月13日";
 
     public static final String tip_version = """
             version：%s

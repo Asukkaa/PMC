@@ -475,7 +475,7 @@ public class FileUtils {
                     String optionKey = entry.getKey();
                     String optionValue = entry.getValue();
                     if (line.contains(optionKey)) {
-                        if (!G.equals(optionValue)) {
+                        if (StringUtils.isNotBlank(optionValue)) {
                             // 处理修改参数
                             String newLineContent = javaOptions + optionKey + optionValue;
                             lines.set(i, line.replace(line, newLineContent));
@@ -491,8 +491,10 @@ public class FileUtils {
         }
         // 处理新增参数
         for (Map.Entry<String, String> entry : options.entrySet()) {
-            lines.add(javaOptions + entry.getKey() + entry.getValue());
-            modified = true;
+            if (StringUtils.isNotBlank(entry.getValue())) {
+                lines.add(javaOptions + entry.getKey() + entry.getValue());
+                modified = true;
+            }
         }
         if (modified) {
             Files.write(configPath, lines);
