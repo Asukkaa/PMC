@@ -436,6 +436,7 @@ public class SettingController implements MousePositionUpdater {
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, activation);
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
+        setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, defaultStopOpacity);
         setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, unActivation);
@@ -456,11 +457,10 @@ public class SettingController implements MousePositionUpdater {
         setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval, defaultSampleInterval);
         setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, unActivation);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, defaultStopRetryNum);
+        setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, defaultClickTimeOffset);
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, defaultClickRetryNum);
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, defaultRandomTimeOffset);
-        setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
-        setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         clickFileInput.close();
     }
 

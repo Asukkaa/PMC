@@ -258,6 +258,11 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 默认循环次数
+     */
+    public static final String defaultLoopTime = "1";
+
+    /**
      * 默认随机偏移时长
      */
     public static final String defaultRandomTime = "50";

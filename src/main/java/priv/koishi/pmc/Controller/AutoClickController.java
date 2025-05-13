@@ -482,12 +482,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
-            setControlLastConfig(outPath_Click, prop, key_outFilePath);
-            setControlLastConfig(loopTime_Click, prop, key_lastLoopTime);
-            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName);
-            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory);
-            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime);
-            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime);
+            setControlLastConfig(outPath_Click, prop, key_outFilePath, desktopPath);
+            setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
+            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
+            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultOutFileName);
+            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRunTime);
+            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, defaultPreparationRecordTime);
         }
         if (StringUtils.isBlank(outPath_Click.getText())) {
             setPathLabel(outPath_Click, defaultFileChooserPath, false);
