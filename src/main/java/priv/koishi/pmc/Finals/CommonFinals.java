@@ -136,8 +136,14 @@ public class CommonFinals {
      */
     public static final String Xmx = "-Xmx";
 
+    /**
+     * gc类型设置参数
+     */
     public static final String XX = "-XX:+Use";
 
+    /**
+     * jvm参数
+     */
     public static final List<String> jvmArgs = Arrays.asList(Xmx, XX);
 
     /**
