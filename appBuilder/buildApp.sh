@@ -226,11 +226,14 @@ hdiutil convert "$dmgTemp.sparseimage" -format UDZO -o "$dmgFinal" >/dev/null ||
 rm -f "$dmgTemp.sparseimage"
 echo "DMG 已生成：$dmgFinal"
 
-# 自动打开Finder并选中生成的dmg文件
-if [ -f "$dmgFinal" ]; then
-    echo "正在打开构建目录：$dmgFinal"
-    open -R "$dmgFinal"
-else
-    echo "错误：生成的 dmg 文件不存在" >&2
-    exit 1
-fi
+# 自动打开Finder并选中生成的文件
+echo "正在打开构建目录：${target}"
+osascript <<EOL
+tell application "Finder"
+    activate
+    set targetFolder to (POSIX file "$target") as alias
+    open targetFolder -- 打开目录
+    delay 1 -- 等待目录加载
+    select {POSIX file "$appFullPath" as alias, POSIX file "$dmgFinal" as alias} -- 多选文件
+end tell
+EOL
