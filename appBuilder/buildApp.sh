@@ -125,9 +125,6 @@ mountPoint=$(echo "$mountOutput" | awk -F'\t' '/\/Volumes/{print $3}')
 # 载点验证
 if [[ "$mountPoint" != "/Volumes/$volumeName"* ]] || [ ! -w "$mountPoint" ]; then
     echo "错误：挂载失败，输出信息：$mountOutput" >&2
-    echo "建议检查："
-    echo "1. 使用 diskutil list 查看是否残留挂载点"
-    echo "2. 手动执行: hdiutil unmount '/Volumes/$volumeName' -force"
     exit 1
 fi
 
