@@ -283,8 +283,8 @@ public class SettingController implements MousePositionUpdater {
         root.setBackground(Background.fill(Color.TRANSPARENT));
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
         // 添加拖拽事件处理器
-        final double[] xOffset = new double[1];
-        final double[] yOffset = new double[1];
+        double[] xOffset = new double[1];
+        double[] yOffset = new double[1];
         root.setOnMousePressed(event -> {
             // 记录鼠标按下时的初始偏移量
             xOffset[0] = event.getSceneX();

@@ -251,12 +251,12 @@ public class AutoClickController extends CommonProperties implements MousePositi
     /**
      * 无辅助功能权限
      */
-    private boolean isNativeHookException = false;
+    private boolean isNativeHookException;
 
     /**
      * 无录屏与录音权限
      */
-    private boolean noScreenCapturePermission = false;
+    private boolean noScreenCapturePermission;
 
     /**
      * 正在录制标识
@@ -854,7 +854,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     /**
      * 检查跳转逻辑参数与操作类型设置是否合理
      */
-    private static void checkSetting(List<ClickPositionVO> clickPositionVOS) {
+    private static void checkSetting(List<? extends ClickPositionVO> clickPositionVOS) {
         int maxIndex = clickPositionVOS.size();
         clickPositionVOS.forEach(clickPositionVO -> {
             int index = clickPositionVO.getIndex();
@@ -959,7 +959,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void buildDetailMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+    private void buildDetailMenuItem(TableView<? extends ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem("查看所选项第一行详情");
         detailItem.setOnAction(e -> {
             ClickPositionVO selected = tableView.getSelectionModel().getSelectedItems().getFirst();
@@ -1185,7 +1185,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      *
      * @param clickPositionVOS 自动流程集合
      */
-    private void addAutoClickPositions(List<ClickPositionVO> clickPositionVOS) throws IOException {
+    private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS) throws IOException {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
             String clickType = clickPositionVO.getClickType();
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)

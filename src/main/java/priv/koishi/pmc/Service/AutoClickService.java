@@ -109,7 +109,7 @@ public class AutoClickService {
             }
 
             // 执行操作流程
-            private List<ClickLogBean> clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
+            private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
                 int dataSize = tableViewItems.size();
                 floatingLabel = taskBean.getFloatingLabel();
                 massageLabel = taskBean.getMassageLabel();

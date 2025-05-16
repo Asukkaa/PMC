@@ -56,7 +56,7 @@ public class ImgFileVO extends ImgFileBean implements Indexable {
      */
     @UsedByReflection
     public Image loadThumb() {
-        if (StringUtils.isBlank(this.getPath())) {
+        if (StringUtils.isBlank(getPath())) {
             return null;
         }
         if (thumb == null) {
@@ -72,19 +72,19 @@ public class ImgFileVO extends ImgFileBean implements Indexable {
     private void loadThumbnailAsync() {
         // 文件不是图片时会实时刷新列表缩略图
         try {
-            if (isImgFile(new File(this.getPath()))) {
+            if (isImgFile(new File(getPath()))) {
                 // 终止进行中的服务
                 if (currentThumbService != null && currentThumbService.isRunning()) {
                     currentThumbService.cancel();
                 }
-                currentThumbService = tableViewImageService(this.getPath());
+                currentThumbService = tableViewImageService(getPath());
                 currentThumbService.setOnSucceeded(e -> {
-                    this.thumb = currentThumbService.getValue();
+                    thumb = currentThumbService.getValue();
                     Platform.runLater(() -> tableView.refresh());
                 });
                 currentThumbService.start();
             } else {
-                this.thumb = null;
+                thumb = null;
                 Platform.runLater(() -> tableView.refresh());
             }
         } catch (IOException e) {
@@ -96,7 +96,7 @@ public class ImgFileVO extends ImgFileBean implements Indexable {
      * 更新缩略图
      */
     public void updateThumb() {
-        if (StringUtils.isNotBlank(this.getPath())) {
+        if (StringUtils.isNotBlank(getPath())) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();
         }

@@ -32,7 +32,7 @@ public class ImgFileBean {
     StringProperty path = new SimpleStringProperty();
 
     public StringProperty pathProperty() {
-        return this.path;
+        return path;
     }
 
     public String getPath() {

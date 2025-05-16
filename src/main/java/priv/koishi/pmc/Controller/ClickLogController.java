@@ -88,7 +88,7 @@ public class ClickLogController {
      * @param logs 操作记录
      */
     public void initData(List<ClickLogBean> logs) {
-        this.clickLogs = logs;
+        clickLogs = logs;
         if (CollectionUtils.isNotEmpty(logs)) {
             tableView_Log.getItems().addAll(logs);
             updateTableViewSizeText(tableView_Log, dataNumber_Log, text_log);

@@ -79,7 +79,7 @@ public class DetailController {
     /**
      * 页面是否修改标志
      */
-    private boolean isModified = false;
+    private boolean isModified;
 
     /**
      * 修改内容变化标志监听器
@@ -188,7 +188,7 @@ public class DetailController {
      */
     public void initData(ClickPositionVO item, Stage parentStage) throws IOException {
         this.parentStage = parentStage;
-        this.selectedItem = item;
+        selectedItem = item;
         isModified = false;
         maxIndex = selectedItem.getTableView().getItems().size();
         clickIndex_Det.setText(String.valueOf(item.getIndex()));

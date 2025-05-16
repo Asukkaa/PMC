@@ -474,7 +474,7 @@ public class UiUtils {
                     if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
                         // 设置列为序号列
                         buildIndexCellValue(indexColumn);
-                    } else if (beanClass == ImgFileVO.class && fieldName.equals("path")) {
+                    } else if (beanClass == ImgFileVO.class && "path".equals(fieldName)) {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());
@@ -542,7 +542,7 @@ public class UiUtils {
      * @param column 要创建图片表格的列
      * @param <T>    列对应的数据类型
      */
-    public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<T, Image> thumbSupplier) {
+    public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<? super T, ? extends Image> thumbSupplier) {
         column.setCellValueFactory(cellData ->
                 new SimpleObjectProperty<>(thumbSupplier.apply(cellData.getValue())));
         column.setCellFactory(col -> new TableCell<>() {
@@ -580,7 +580,7 @@ public class UiUtils {
             }
 
             // 判断字体是否变红，true 变红，false 不变红
-            private boolean isRedText(TableRow<T> tableRow) {
+            private boolean isRedText(TableRow<? extends T> tableRow) {
                 T bean = tableRow.getItem();
                 String imgPath = null;
                 if (bean instanceof ImgFileVO imgFileVO) {
@@ -648,7 +648,7 @@ public class UiUtils {
      * @param dataNumberUnit 数据数量单位
      * @param <T>            数据类型
      */
-    public static <T> void addData(List<T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
+    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
         ObservableList<T> tableViewItems = tableView.getItems();
         List<T> selectedItem = tableView.getSelectionModel().getSelectedItems();
         switch (addType) {
@@ -796,7 +796,7 @@ public class UiUtils {
     public static <T> void tableViewDragRow(TableView<T> tableView) {
         tableView.setRowFactory(tv -> {
             TableRow<T> row = new TableRow<>();
-            final ObservableList<Integer> draggedIndices = FXCollections.observableArrayList();
+            ObservableList<Integer> draggedIndices = FXCollections.observableArrayList();
             // 拖拽检测
             row.setOnDragDetected(e -> {
                 if (!row.isEmpty()) {
@@ -1090,7 +1090,7 @@ public class UiUtils {
      *
      * @param tableView 要添加右键菜单的列表
      */
-    private static void copyFilePathItem(TableView<ImgFileVO> tableView) {
+    private static void copyFilePathItem(TableView<? extends ImgFileVO> tableView) {
         ImgFileVO fileBean = tableView.getSelectionModel().getSelectedItem();
         copyText(fileBean.getPath());
     }
@@ -1408,7 +1408,7 @@ public class UiUtils {
      * @param disableNodes 防重复点击组件列表
      * @param disable      可点击状态，true设置为不可点击，false设置为可点击
      */
-    public static void changeDisableNodes(List<Node> disableNodes, boolean disable) {
+    public static void changeDisableNodes(List<? extends Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
             disableNodes.forEach(dc -> dc.setDisable(disable));
         }
@@ -1877,7 +1877,7 @@ public class UiUtils {
      * @param <T>                 属性值的泛型类型
      */
     public static <T> void registerWeakListener(Object key, Property<T> property, ChangeListener<? super T> listener,
-                                                Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners) {
+                                                Map<Object, ? super WeakReference<ChangeListener<?>>> weakChangeListeners) {
         // 将原始监听器包装为弱引用版本，确保不影响垃圾回收
         ChangeListener<? super T> weakListener = new WeakChangeListener<>(listener);
         property.addListener(weakListener);
@@ -1894,7 +1894,7 @@ public class UiUtils {
      * @param weakInvalidationListeners 维护弱引用监听器的存储映射表
      */
     public static void registerWeakInvalidationListener(Object key, ObservableValue<?> observable, InvalidationListener listener,
-                                                        Map<Object, WeakReference<InvalidationListener>> weakInvalidationListeners) {
+                                                        Map<Object, ? super WeakReference<InvalidationListener>> weakInvalidationListeners) {
         // 创建弱引用包装器，解除对原始监听器的强引用
         InvalidationListener weakListener = new WeakInvalidationListener(listener);
         observable.addListener(weakListener);

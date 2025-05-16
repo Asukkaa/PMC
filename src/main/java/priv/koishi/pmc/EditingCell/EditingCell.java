@@ -30,7 +30,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     /**
      * 用于引入lambda表达式的对象
      */
-    private final ItemConsumer<T> itemConsumer;
+    private final ItemConsumer<? super T> itemConsumer;
 
     /**
      * 单元格鼠标悬停提示
@@ -50,7 +50,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     /**
      * 输入框限制只能输入整数
      */
-    private boolean integerRange = false;
+    private boolean integerRange;
 
     /**
      * 输入框文本改变监听器
@@ -72,7 +72,7 @@ public class EditingCell<T> extends TableCell<T, String> {
      *
      * @param itemConsumer 用于引入lambda表达式的对象
      */
-    public EditingCell(ItemConsumer<T> itemConsumer) {
+    public EditingCell(ItemConsumer<? super T> itemConsumer) {
         this.itemConsumer = itemConsumer;
     }
 
@@ -84,7 +84,7 @@ public class EditingCell<T> extends TableCell<T, String> {
      * @param min          输入框可输入的最小值
      * @param max          输入框可输入的最大值
      */
-    public EditingCell(ItemConsumer<T> itemConsumer, boolean integerRange, Integer min, Integer max) {
+    public EditingCell(ItemConsumer<? super T> itemConsumer, boolean integerRange, Integer min, Integer max) {
         this.itemConsumer = itemConsumer;
         this.integerRange = integerRange;
         this.min = min;
@@ -165,8 +165,8 @@ public class EditingCell<T> extends TableCell<T, String> {
      * 则只是改变了表格显示的值,一旦表格刷新,则仍会表示旧值.
      */
     private void setTProperties(String newValue) {
-        TableView<T> tableView = this.getTableView();
-        T t = tableView.getItems().get(this.getIndex());
+        TableView<T> tableView = getTableView();
+        T t = tableView.getItems().get(getIndex());
         itemConsumer.setTProperties(t, newValue);
     }
 
@@ -175,7 +175,7 @@ public class EditingCell<T> extends TableCell<T, String> {
      */
     private void createTextField() {
         textField = new TextField(getString());
-        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+        textField.setMinWidth(getWidth() - getGraphicTextGap() * 2);
         // 限制只能输入整数
         if (integerRange) {
             textChangeListener = (observable, oldValue, newValue) -> {

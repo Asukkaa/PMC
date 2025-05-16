@@ -71,7 +71,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
      */
     @UsedByReflection
     public Image loadThumb() {
-        if (StringUtils.isBlank(this.getClickImgPath())) {
+        if (StringUtils.isBlank(getClickImgPath())) {
             return null;
         }
         if (thumb == null) {
@@ -87,19 +87,19 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
     private void loadThumbnailAsync() {
         // 文件不是图片时会实时刷新列表缩略图
         try {
-            if (isImgFile(new File(this.getClickImgPath()))) {
+            if (isImgFile(new File(getClickImgPath()))) {
                 // 终止进行中的服务
                 if (currentThumbService != null && currentThumbService.isRunning()) {
                     currentThumbService.cancel();
                 }
-                currentThumbService = tableViewImageService(this.getClickImgPath());
+                currentThumbService = tableViewImageService(getClickImgPath());
                 currentThumbService.setOnSucceeded(e -> {
-                    this.thumb = currentThumbService.getValue();
+                    thumb = currentThumbService.getValue();
                     Platform.runLater(() -> tableView.refresh());
                 });
                 currentThumbService.start();
             } else {
-                this.thumb = null;
+                thumb = null;
                 Platform.runLater(() -> tableView.refresh());
             }
         } catch (IOException e) {
@@ -111,7 +111,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
      * 更新缩略图
      */
     public void updateThumb() {
-        if (StringUtils.isNotBlank(this.getClickImgPath())) {
+        if (StringUtils.isNotBlank(getClickImgPath())) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();
         }

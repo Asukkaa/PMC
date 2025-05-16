@@ -93,7 +93,7 @@ public class DynamicQueue<E> {
         if (newSize < 0) {
             throw new IllegalArgumentException("容量不能小于0");
         }
-        this.maxSize = newSize;
+        maxSize = newSize;
         synchronized (this) {
             adjustSize();
         }

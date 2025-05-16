@@ -51,7 +51,7 @@ public class MessageBubble extends Label implements MousePositionUpdater {
         setTextFill(Color.WHITE);
         setPadding(new Insets(10));
         setStyle("-fx-background-radius: 5; -fx-background-color: black;-fx-opacity: 0.8;");
-        this.bubbleStage = new Stage();
+        bubbleStage = new Stage();
         bubbleStage.initStyle(StageStyle.TRANSPARENT);
         bubbleStage.initModality(Modality.NONE);
         bubbleStage.setAlwaysOnTop(true);

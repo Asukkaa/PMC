@@ -58,7 +58,7 @@ public class MainController {
         // 保存设置功能最后设置
         SettingController.saveLastConfig(scene);
         // 保存关程序闭前页面状态设置
-        MainController.saveLastConfig(stage);
+        saveLastConfig(stage);
         // 保存日志文件数量设置
         AboutController.saveLastConfig(scene);
     }
