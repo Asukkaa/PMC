@@ -853,21 +853,15 @@ public class AutoClickController extends CommonProperties implements MousePositi
 
     /**
      * 检查跳转逻辑参数与操作类型设置是否合理
+     *
+     * @param clickPositionVOS 操作步骤
+     * @throws RuntimeException 参数设置相关错误
      */
     private static void checkSetting(List<? extends ClickPositionVO> clickPositionVOS) {
         int maxIndex = clickPositionVOS.size();
         clickPositionVOS.forEach(clickPositionVO -> {
             int index = clickPositionVO.getIndex();
-            String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
-            if (clickMatched_clickStep.equals(clickPositionVO.getMatchedType())) {
-                int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
-                if (matchStep > maxIndex) {
-                    throw new RuntimeException(err + text_matchedStepGreaterMax);
-                }
-                if (matchStep == index) {
-                    throw new RuntimeException(err + text_matchedStepEqualIndex);
-                }
-            }
+            String err = getString(clickPositionVO, index, maxIndex);
             if (retryType_Step.equals(clickPositionVO.getRetryStep())) {
                 int retryStep = Integer.parseInt(clickPositionVO.getMatchedStep());
                 if (retryStep > maxIndex) {
@@ -878,6 +872,29 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 }
             }
         });
+    }
+
+    /**
+     * 获取错误信息
+     *
+     * @param clickPositionVO 操作步骤
+     * @param index           操作步骤序号
+     * @param maxIndex        最大序号
+     * @return 错误信息
+     * @throws RuntimeException 参数设置相关错误
+     */
+    private static String getString(ClickPositionVO clickPositionVO, int index, int maxIndex) {
+        String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
+        if (clickMatched_clickStep.equals(clickPositionVO.getMatchedType())) {
+            int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
+            if (matchStep > maxIndex) {
+                throw new RuntimeException(err + text_matchedStepGreaterMax);
+            }
+            if (matchStep == index) {
+                throw new RuntimeException(err + text_matchedStepEqualIndex);
+            }
+        }
+        return err;
     }
 
     /**
