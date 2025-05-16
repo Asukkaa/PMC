@@ -328,6 +328,7 @@ public class UiUtils {
     /**
      * 创建一个确认弹窗
      *
+     * @param title   确认弹窗标题
      * @param confirm 确认框文案
      * @param ok      确认按钮文案
      * @param cancel  取消按钮文案
@@ -539,8 +540,9 @@ public class UiUtils {
     /**
      * 创建图片表格
      *
-     * @param column 要创建图片表格的列
-     * @param <T>    列对应的数据类型
+     * @param column        要创建图片表格的列
+     * @param thumbSupplier 获取图片的函数
+     * @param <T>           列对应的数据类型
      */
     public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<? super T, ? extends Image> thumbSupplier) {
         column.setCellValueFactory(cellData ->
@@ -1459,6 +1461,7 @@ public class UiUtils {
      * @param prop       配置文件
      * @param key        要读取的key
      * @param dataNumber 列表数据数量
+     * @throws IOException 路径不能为空、路径格式不正确、文件不存在
      */
     public static void setControlLastConfig(TableView<ImgFileVO> tableView, Properties prop, String key, Label dataNumber) throws IOException {
         int index = 0;
@@ -1699,6 +1702,7 @@ public class UiUtils {
     /**
      * 获取当前所在屏幕
      *
+     * @param floatingStage 要获取屏幕位置的窗口
      * @return 当前所在屏幕
      */
     public static Screen getCurrentScreen(Stage floatingStage) {
@@ -1776,6 +1780,7 @@ public class UiUtils {
      * @param dataNumber        图片数量信息栏
      * @param stopImgSelectPath 文件选择器初始路径
      * @return 选择的文件路径
+     * @throws IOException io异常
      */
     public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileVO> tableView, Label dataNumber, String stopImgSelectPath) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -1849,6 +1854,9 @@ public class UiUtils {
 
     /**
      * 构建右键菜单
+     *
+     * @param tableView  要添加右键菜单的列表
+     * @param dataNumber 数据数量信息栏
      */
     public static void buildContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
         // 添加右键菜单
