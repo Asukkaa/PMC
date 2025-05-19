@@ -71,6 +71,8 @@ public class CommonFinals {
      */
     public static final String logs = "logs";
 
+    public static final String userHome = System.getProperty("user.home");
+
     /**
      * 当前程序运行位置
      */
@@ -633,7 +635,7 @@ public class CommonFinals {
             手动创建新的操作步骤时将会按照此设置先设置默认点击时长
             单位为毫秒，只能填自然数，不填默认为\s""";
 
-    public static final String version = "2.5.0";
+    public static final String version = "3.0.0";
 
     public static final String buildDate = "2025年5月";
 
@@ -1016,5 +1018,14 @@ public class CommonFinals {
      */
     public static final List<String> clickTypeList = Arrays.asList(clickType_move, clickType_click,
             clickType_drag, clickType_moveTo);
+
+    public static final BidiMap<String, String> repeatTypeMap = new DualHashBidiMap<>();
+
+    static {
+        repeatTypeMap.put("每天", "DAILY");
+        repeatTypeMap.put("每周", "WEEKLY");
+        repeatTypeMap.put("每月", "MONTHLY");
+        repeatTypeMap.put("仅一次", "ONCE");
+    }
 
 }

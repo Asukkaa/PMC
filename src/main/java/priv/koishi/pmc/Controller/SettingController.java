@@ -29,6 +29,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
@@ -63,6 +65,9 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Time:下午4:51
  */
 public class SettingController implements MousePositionUpdater {
+
+    private static final Logger logger = LogManager.getLogger(SettingController.class);
+
 
     private static String inFilePath;
 
@@ -1152,6 +1157,7 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     public void getScheduleTask(ActionEvent actionEvent) throws IOException {
         System.out.println("查询定时任务：" + getTaskDetails());
+        logger.info("查询定时任务：{}", getTaskDetails());
     }
 
     @FXML

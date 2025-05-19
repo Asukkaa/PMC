@@ -6,7 +6,7 @@
 
     <groupId>priv.Koishi</groupId>
     <artifactId>PMC</artifactId>
-    <version>2.5.0</version>
+    <version>3.0.0</version>
     <name>PMC</name>
 
     <properties>
