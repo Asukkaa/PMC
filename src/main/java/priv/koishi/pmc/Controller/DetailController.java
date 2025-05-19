@@ -183,7 +183,7 @@ public class DetailController {
     /**
      * 初始化数据
      *
-     * @param item 列表选中的数据
+     * @param item        列表选中的数据
      * @param parentStage 上级页面的舞台
      */
     public void initData(ClickPositionVO item, Stage parentStage) throws IOException {
@@ -265,8 +265,8 @@ public class DetailController {
      * @throws IOException 文件不存在
      */
     private void showClickImg(String clickImgPath) throws IOException {
-        if (StringUtils.isNotBlank(clickImgPath)) {
-            File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath);
+        File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath);
+        if (clickImgFile != null) {
             removeClickImg_Det.setVisible(true);
             if (clickImgFile.exists()) {
                 clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));
@@ -286,7 +286,6 @@ public class DetailController {
             addToolTip(imgType, clickImgType_Det);
             clickImgVBox_Det.setVisible(true);
         } else {
-            clickImgPath_Det.setText("");
             removeClickImg_Det.setVisible(false);
             clickImg_Det.setImage(null);
             clickImgName_Det.setText("");
@@ -727,7 +726,6 @@ public class DetailController {
      */
     @FXML
     public void removeClickImg() throws IOException {
-        clickImgPath_Det.setText("");
         showClickImg(null);
         clickType_Det.setDisable(false);
     }

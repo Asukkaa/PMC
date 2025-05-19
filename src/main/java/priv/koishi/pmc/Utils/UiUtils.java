@@ -1528,6 +1528,14 @@ public class UiUtils {
      */
     public static File setPathLabel(Label pathLabel, String path) {
         pathLabel.setText(path);
+        if (StringUtils.isBlank(path)) {
+            pathLabel.getStyleClass().removeAll("label-button-style", "label-err-style");
+            pathLabel.setOnMouseClicked(null);
+            pathLabel.setContextMenu(null);
+            pathLabel.setOnMousePressed(null);
+            Tooltip.uninstall(pathLabel, pathLabel.getTooltip());
+            return null;
+        }
         File file = new File(path);
         String openText = "\n鼠标左键点击打开 ";
         if (!file.exists()) {
