@@ -62,6 +62,10 @@ public class MainApplication extends Application {
      */
     private static ServerSocket serverSocket;
 
+    public static String loadPMCPath;
+
+    public static boolean runPMCFile;
+
     /**
      * 加载fxml页面
      *
@@ -238,6 +242,20 @@ public class MainApplication extends Application {
         }
         logger = LogManager.getLogger(MainApplication.class);
         logger.info("==============程序启动中====================");
+        logger.info("启动参数数量: {}", args.length);
+        for (int i = 0; i < args.length; i++) {
+            // 示例：处理 --scheduled 参数
+            if ("-l".equals(args[i])) {
+                logger.info("检测到定时任务模式");
+                // 在此处添加定时任务相关初始化逻辑
+            } else if ("-r".equals(args[i])) {
+                runPMCFile = true;
+            } else if (args[i].contains(PMC)) {
+                logger.info("检测到加载PMC文件模式");
+                loadPMCPath = args[i];
+            }
+            logger.info("参数 {}: {}", i, args[i]);
+        }
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);

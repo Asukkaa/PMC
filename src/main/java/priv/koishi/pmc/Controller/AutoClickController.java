@@ -67,6 +67,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
+import static priv.koishi.pmc.MainApplication.loadPMCPath;
+import static priv.koishi.pmc.MainApplication.runPMCFile;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
@@ -1176,9 +1178,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
         } catch (MismatchedInputException | JsonParseException e) {
             throw new IOException(text_loadAutoClick + filePath + text_formatError);
         }
+        // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
+        int index = 0;
         if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
             List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-            clickPositionBeans.forEach(bean -> {
+            for (ClickPositionBean bean : clickPositionBeans) {
                 ClickPositionVO vo = new ClickPositionVO();
                 try {
                     // 自动拷贝父类中的属性
@@ -1190,10 +1194,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 vo.setTableView(tableView_Click)
                         .setRemove(false)
                         .setUuid(UUID.randomUUID().toString());
+                vo.setIndex(index++);
                 clickPositionVOS.add(vo);
-            });
+            }
             // 将自动流程添加到列表中
-            addAutoClickPositions(clickPositionVOS);
+            addAutoClickPositions(clickPositionVOS, filePath);
         }
     }
 
@@ -1201,8 +1206,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 将自动流程添加到列表中
      *
      * @param clickPositionVOS 自动流程集合
+     * @param filePath         要导入的文件路径
      */
-    private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS) throws IOException {
+    private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) throws IOException {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
             String clickType = clickPositionVO.getClickType();
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
@@ -1233,7 +1239,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         }
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, text_process);
-        updateLabel(log_Click, text_loadSuccess + inFilePath);
+        updateLabel(log_Click, text_loadSuccess + filePath);
         log_Click.setTextFill(Color.GREEN);
     }
 
@@ -1763,6 +1769,17 @@ public class AutoClickController extends CommonProperties implements MousePositi
             tableViewDragRow(tableView_Click);
             // 构建右键菜单
             buildContextMenu();
+            if (StringUtils.isNotBlank(loadPMCPath)) {
+                try {
+                    loadPMCFile(loadPMCPath);
+                    if (runPMCFile) {
+                        tableView_Click.refresh();
+                        runClick();
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         });
     }
 

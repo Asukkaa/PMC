@@ -11,10 +11,10 @@ import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.AnchorPane;
@@ -23,26 +23,33 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Service.ScheduledService.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -56,6 +63,8 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Time:下午4:51
  */
 public class SettingController implements MousePositionUpdater {
+
+    private static String inFilePath;
 
     /**
      * 浮窗X坐标
@@ -119,10 +128,13 @@ public class SettingController implements MousePositionUpdater {
     private HBox fileNumberHBox_Set, findImgSetting_Set;
 
     @FXML
+    private DatePicker datePicker;
+
+    @FXML
     private ColorPicker colorPicker_Set;
 
     @FXML
-    private ChoiceBox<String> nextGcType_Set;
+    private ChoiceBox<String> nextGcType_Set, repeatType;
 
     @FXML
     private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
@@ -131,12 +143,12 @@ public class SettingController implements MousePositionUpdater {
     private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
 
     @FXML
-    private Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set;
+    private Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set, pmcFilePath;
 
     @FXML
     private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
             retrySecond_Set, overtime_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set,
-            randomTimeOffset_Set, maxLogNum_Set, nextRunMemory_Set;
+            randomTimeOffset_Set, maxLogNum_Set, nextRunMemory_Set, hourField, minuteField, secondField;
 
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
@@ -1116,6 +1128,48 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     public void acceptDrop(DragEvent dragEvent) {
         acceptDropImg(dragEvent);
+    }
+
+    @FXML
+    public void setSchedule(ActionEvent schedule) throws IOException {
+            // 获取日期部分
+            LocalDate selectedDate = datePicker.getValue();
+            if (selectedDate == null) {
+                return;
+            }
+            // 获取时间部分
+            int hour = Integer.parseInt(hourField.getText());
+            int minute = Integer.parseInt(minuteField.getText());
+            if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                throw new IllegalArgumentException("时间格式错误");
+            }
+            // 组合完整时间
+            LocalDateTime triggerTime = LocalDateTime.of(selectedDate, LocalTime.of(hour, minute));
+            // 创建定时任务
+            createTask(triggerTime, repeatType.getValue(), pmcFilePath.getText());
+    }
+
+    @FXML
+    public void getScheduleTask(ActionEvent actionEvent) throws IOException {
+        System.out.println("查询定时任务：" + getTaskDetails());
+    }
+
+    @FXML
+    public void cancelScheduleTask(ActionEvent actionEvent) throws IOException {
+        deleteTask();
+    }
+
+    @FXML
+    public void loadAutoClick(ActionEvent actionEvent) throws IOException {
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile);
+        if (selectedFile != null) {
+            inFilePath = selectedFile.getPath();
+            updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
+            pmcFilePath.setText(inFilePath);
+        }
     }
 
 }
