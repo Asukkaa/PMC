@@ -380,6 +380,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         // 设置组件宽度
         double tableWidth = stage.getWidth() * 0.95;
         table.setMaxWidth(tableWidth);
+        table.setPrefWidth(tableWidth);
         Node index = scene.lookup("#index_Click");
         index.setStyle("-fx-pref-width: " + tableWidth * 0.05 + "px;");
         Node thumb = scene.lookup("#thumb_Click");

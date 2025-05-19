@@ -71,6 +71,9 @@ public class CommonFinals {
      */
     public static final String logs = "logs";
 
+    /**
+     * 用户主目录
+     */
     public static final String userHome = System.getProperty("user.home");
 
     /**
@@ -210,9 +213,16 @@ public class CommonFinals {
 
     public static final String jpeg = ".jpeg";
 
+    public static final String plist = ".plist";
+
     public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
 
     public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    /**
+     * 定时任务自动执行参数前缀
+     */
+    public static final String r = "--r ";
 
     /**
      * 启用
@@ -548,6 +558,10 @@ public class CommonFinals {
 
     public static final String tip_nextRunMemory = "下次启动程序将会按照此设置项分配程序最大运行内存，单位为GB，只能填自然数，为空将设置为默认值操作系统最大内存的1/4";
 
+    public static final String tip_hour = "只能填0到23的自然数，不填默认为0";
+
+    public static final String tip_minute = "只能填0到59的自然数，不填默认为0";
+
     public static final String tip_nextGcType = """
             下次启动程序将会按照此设置项设置垃圾回收（GC）方式
             G1GC：分区回收，低延迟与吞吐量平衡
@@ -740,6 +754,8 @@ public class CommonFinals {
     public static final String text_matchedStepEqualIndex = "匹配后要跳转的步骤序号不能等于当前步骤序号";
 
     public static final String text_matchedStepIsNull = "匹配后要跳转的步骤序号不能为空";
+
+    public static final String text_onlyLaunch = "仅启动程序";
 
     public static final String key_logsNum = "logsNum";
 
@@ -1019,13 +1035,37 @@ public class CommonFinals {
     public static final List<String> clickTypeList = Arrays.asList(clickType_move, clickType_click,
             clickType_drag, clickType_moveTo);
 
+    public static final String DAILY = "DAILY";
+
+    public static final String WEEKLY = "WEEKLY";
+
+    public static final String ONCE = "ONCE";
+
+    public static final String DAILY_CN = "每天";
+
+    public static final String WEEKLY_CN = "每周";
+
+    public static final String ONCE_CN = "仅一次";
+
+
     public static final BidiMap<String, String> repeatTypeMap = new DualHashBidiMap<>();
 
     static {
-        repeatTypeMap.put("每天", "DAILY");
-        repeatTypeMap.put("每周", "WEEKLY");
-        repeatTypeMap.put("每月", "MONTHLY");
-        repeatTypeMap.put("仅一次", "ONCE");
+        repeatTypeMap.put(DAILY_CN, DAILY);
+        repeatTypeMap.put(WEEKLY_CN, WEEKLY);
+        repeatTypeMap.put(ONCE_CN, ONCE);
+    }
+
+    public static final BidiMap<String, String> dayOfWeekName = new DualHashBidiMap<>();
+
+    static {
+        dayOfWeekName.put("MON", "星期一");
+        dayOfWeekName.put("TUE", "星期二");
+        dayOfWeekName.put("WED", "星期三");
+        dayOfWeekName.put("THU", "星期四");
+        dayOfWeekName.put("FRI", "星期五");
+        dayOfWeekName.put("SAT", "星期六");
+        dayOfWeekName.put("SUN", "星期日");
     }
 
 }

@@ -251,8 +251,8 @@ public class MainApplication extends Application {
                 runPMCFile = true;
             } else if (args[i].contains(PMC)) {
                 loadPMCPath = args[i];
-                if (loadPMCPath.contains("--r ")) {
-                    loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf("--r ") + 4);
+                if (loadPMCPath.contains(r)) {
+                    loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf(r) + r.length());
                     runPMCFile = true;
                 }
                 loadPMC = true;

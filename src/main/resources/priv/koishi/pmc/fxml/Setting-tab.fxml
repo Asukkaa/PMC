@@ -339,39 +339,5 @@
         </VBox>
 
         <Separator/>
-
-        <DatePicker fx:id="datePicker"/>
-
-        <HBox spacing="10">
-            <Label text="选择时间：" />
-            <TextField fx:id="hourField" prefWidth="50" promptText="HH" />
-            <Label text=":" />
-            <TextField fx:id="minuteField" prefWidth="50" promptText="MM" />
-            <Label text=":" />
-            <TextField fx:id="secondField" prefWidth="50" promptText="SS" />
-        </HBox>
-
-        <ChoiceBox fx:id="repeatType" prefHeight="25" prefWidth="150">
-            <items>
-                <FXCollections fx:factory="observableArrayList">
-                    <String fx:value="仅一次"/>
-                    <String fx:value="每天"/>
-                    <String fx:value="每周"/>
-                    <String fx:value="每月"/>
-                </FXCollections>
-            </items>
-            <value>
-                <String fx:value="仅一次"/>
-            </value>
-        </ChoiceBox>
-
-        <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
-        <Label fx:id="pmcFilePath" />
-
-        <Button text="设置定时启动" onAction="#setSchedule"/>
-        <Button text="查询定时任务" onAction="#getScheduleTask"/>
-        <Button text="取消定时任务" onAction="#cancelScheduleTask"/>
-
-        <Separator/>
     </VBox>
 </AnchorPane>

@@ -27,7 +27,7 @@ public class MainController {
     private TabPane tabPane;
 
     @FXML
-    private Tab settingTab, aboutTab, autoClickTab;
+    private Tab settingTab, aboutTab, autoClickTab, timedStartTab;
 
     /**
      * 组件自适应宽高
@@ -44,6 +44,8 @@ public class MainController {
         AutoClickController.adaption(stage);
         // 设置页组件宽度自适应
         SettingController.adaption(stage);
+        // 定时任务页组件宽度自适应
+        TimedTaskController.adaption(stage);
     }
 
     /**

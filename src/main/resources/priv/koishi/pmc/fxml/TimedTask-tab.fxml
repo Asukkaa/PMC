@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<AnchorPane fx:id="anchorPane_Task" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.TimedTaskController">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
+
+        <HBox>
+            <HBox styleClass="hBox-short">
+                <Label text="起始日期："/>
+                <DatePicker fx:id="datePicker_Task"/>
+            </HBox>
+
+            <HBox styleClass="hBox-short">
+                <Label text="设置小时："/>
+                <TextField fx:id="hourField_Task" prefWidth="50" promptText="HH"/>
+
+                <Label text="设置分钟:"/>
+                <TextField fx:id="minuteField_Task" prefWidth="50" promptText="MM"/>
+            </HBox>
+
+            <HBox styleClass="hBox-short">
+                <Label text="重复类型："/>
+                <ChoiceBox fx:id="repeatType_Task" prefHeight="25" prefWidth="150">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="仅一次"/>
+                            <String fx:value="每天"/>
+                            <String fx:value="每周"/>
+                        </FXCollections>
+                    </items>
+                    <value>
+                        <String fx:value="仅一次"/>
+                    </value>
+                </ChoiceBox>
+            </HBox>
+
+            <HBox spacing="10">
+                <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
+                <Label fx:id="pmcFilePath_Task" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+                <Button fx:id="removePath_Task" onAction="#removePath" prefHeight="20"
+                        styleClass="img-button-style" visible="false">
+                    <graphic>
+                        <ImageView>
+                            <Image url="@../icon/Trash.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
+        </HBox>
+
+        <HBox fx:id="fileNumberHBox_Task" spacing="10">
+            <Button fx:id="addTimedTask_Task" text="添加定时任务" onAction="#addTimedTask"/>
+            <Button fx:id="getScheduleTask_Task" text="查询定时任务" onAction="#getScheduleTask"/>
+            <Button fx:id="clearButton_Task" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
+
+            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+        </HBox>
+
+        <TableView fx:id="tableView_Task">
+            <placeholder>
+                <Label text="拖拽操作流程文件或点击导入操作流程即可追加操作流程，设置操作流程后点击添加操作流程即可新增自定义流程"/>
+            </placeholder>
+
+            <columns>
+                <TableColumn fx:id="index_Task" text="序号" sortable="false"/>
+                <TableColumn fx:id="taskName_Task" text="任务名称" sortable="false"/>
+                <TableColumn fx:id="date_Task" text="起始日期" sortable="false"/>
+                <TableColumn fx:id="time_Task" text="触发时间" sortable="false"/>
+                <TableColumn fx:id="repeat_Task" text="重复类型" sortable="false"/>
+                <TableColumn fx:id="days_Task" text="重复日" sortable="false"/>
+                <TableColumn fx:id="name_Task" text="执行流程" sortable="false"/>
+                <TableColumn fx:id="path_Task" text="文件地址" sortable="false"/>
+            </columns>
+        </TableView>
+
+        <HBox fx:id="tipHBox_Task" spacing="10">
+            <Label fx:id="tip_Task" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
+                   text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整操作，双击单元格可进行编辑"/>
+        </HBox>
+    </VBox>
+</AnchorPane>
