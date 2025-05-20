@@ -1,31 +1,34 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import priv.koishi.pmc.Bean.TimedTaskBean;
+import priv.koishi.pmc.MainApplication;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Service.ScheduledService.createTask;
+import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
+import static priv.koishi.pmc.Finals.CommonFinals.text_process;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetails;
-import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -38,14 +41,24 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class TimedTaskController {
 
     /**
-     * 导入文件路径
-     */
-    private static String inFilePath;
-
-    /**
      * 页面标识符
      */
     private static final String tabId = "_Task";
+
+    /**
+     * 详情页高度
+     */
+    private int detailHeight;
+
+    /**
+     * 详情页宽度
+     */
+    private int detailWidth;
+
+    /**
+     * 程序主舞台
+     */
+    private Stage mainStage;
 
     @FXML
     private AnchorPane anchorPane_Task;
@@ -54,19 +67,10 @@ public class TimedTaskController {
     private HBox fileNumberHBox_Task, tipHBox_Task;
 
     @FXML
-    private DatePicker datePicker_Task;
+    private Label dataNumber_Task, tip_Task;
 
     @FXML
-    private ChoiceBox<String> repeatType_Task;
-
-    @FXML
-    private TextField hourField_Task, minuteField_Task;
-
-    @FXML
-    private Label pmcFilePath_Task, dataNumber_Task, tip_Task;
-
-    @FXML
-    private Button removePath_Task, addTimedTask_Task, getScheduleTask_Task, clearButton_Task;
+    private Button addTimedTask_Task, getScheduleTask_Task;
 
     @FXML
     private TableView<TimedTaskBean> tableView_Task;
@@ -130,15 +134,66 @@ public class TimedTaskController {
         path_Task.prefWidthProperty().bind(tableView_Task.widthProperty().multiply(0.3));
     }
 
+    /**
+     * 加载默认设置
+     *
+     * @throws IOException io异常
+     */
+    private void getConfig() throws IOException {
+        Properties prop = new Properties();
+        InputStream input = checkRunningInputStream(configFile_Click);
+        prop.load(input);
+        detailWidth = Integer.parseInt(prop.getProperty(key_taskDetailWidth, defaultTaskDetailWidth));
+        detailHeight = Integer.parseInt(prop.getProperty(key_taskDetailHeight, defaultTaskDetailHeight));
+        input.close();
+    }
 
     /**
-     * 给输入框添加内容变化监听
+     * 清空javafx列表按钮
      */
-    private void textFieldChangeListener() {
-        // 限制小时文本输入框内容
-        integerRangeTextField(hourField_Task, 0, 23, tip_hour);
-        // 限制分钟文本输入框内容
-        minuteSecondRangeTextField(minuteField_Task, tip_minute);
+    public void removeAll() {
+        removeTableViewData(tableView_Task, dataNumber_Task, null);
+    }
+
+    /**
+     * 显示详情页
+     *
+     * @param item 要显示详情的操作流程设置
+     */
+    private void showDetail(TimedTaskBean item) {
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/TaskDetail-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        TaskDetailController controller = loader.getController();
+        controller.initData(item, mainStage);
+        // 设置保存后的回调
+        controller.setRefreshCallback(() -> {
+            if (item.isRemove()) {
+                tableView_Task.getItems().remove(item);
+            }
+            // 刷新列表
+            tableView_Task.refresh();
+            // 更新列表数量
+            updateTableViewSizeText(tableView_Task, dataNumber_Task, text_process);
+        });
+        Stage detailStage = new Stage();
+        Scene scene = new Scene(root, detailWidth, detailHeight);
+        detailStage.setScene(scene);
+        String title = item.getTaskName();
+        detailStage.setTitle(title + " 任务详情");
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        setWindLogo(detailStage, logoPath);
+        // 监听窗口面板宽度变化
+        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        // 监听窗口面板高度变化
+        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.show();
     }
 
     /**
@@ -146,56 +201,20 @@ public class TimedTaskController {
      */
     @FXML
     private void initialize() {
-        // 给输入框添加内容变化监听
-        textFieldChangeListener();
-        // 给日期选择框添加鼠标点击事件
-        datePicker_Task.getEditor().setOnMouseClicked(e -> {
-            if (!datePicker_Task.isShowing()) {
-                datePicker_Task.show();
-            }
-        });
         Platform.runLater(() -> {
+            mainStage = (Stage) anchorPane_Task.getScene().getWindow();
             bindPrefWidthProperty();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId, index_Task);
             try {
+                // 查询定时任务
                 getScheduleTask();
+                // 加载默认设置
+                getConfig();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    /**
-     * 添加定时任务
-     *
-     * @throws IOException              任务创建失败
-     * @throws IllegalArgumentException 时间格式错误
-     */
-    @FXML
-    private void addTimedTask() throws IOException {
-        // 获取日期部分
-        LocalDate selectedDate = datePicker_Task.getValue();
-        if (selectedDate == null) {
-            throw new IllegalArgumentException("日期格式为空");
-        }
-        // 获取时间部分
-        int hour = Integer.parseInt(hourField_Task.getText());
-        int minute = Integer.parseInt(minuteField_Task.getText());
-        if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-            throw new IllegalArgumentException("时间格式错误");
-        }
-        List<Integer> days = new ArrayList<>();
-        String repeatType = repeatType_Task.getValue();
-        if (WEEKLY_CN.equals(repeatType)) {
-            int dayOfWeek = selectedDate.getDayOfWeek().getValue();
-            days.add(dayOfWeek);
-        }
-        // 组合完整时间
-        LocalDateTime triggerTime = LocalDateTime.of(selectedDate, LocalTime.of(hour, minute));
-        // 创建定时任务
-        createTask(triggerTime, repeatType, pmcFilePath_Task.getText(), days);
-        getScheduleTask();
     }
 
     /**
@@ -211,40 +230,9 @@ public class TimedTaskController {
         System.out.println("查询定时任务：" + taskDetails);
     }
 
-    /**
-     * 设置定时任务要执行的流程
-     *
-     * @throws IOException io异
-     */
     @FXML
-    private void loadAutoClick(ActionEvent actionEvent) throws IOException {
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
-        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
-        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-        File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile);
-        if (selectedFile != null) {
-            inFilePath = selectedFile.getPath();
-            updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
-            setPathLabel(pmcFilePath_Task, inFilePath);
-            removePath_Task.setVisible(true);
-        }
-    }
-
-    /**
-     * 删除要执行的PMC文件路径
-     */
-    @FXML
-    private void removePath() {
-        setPathLabel(pmcFilePath_Task, "");
-        removePath_Task.setVisible(false);
-    }
-
-    /**
-     * 清空javafx列表按钮
-     */
-    @FXML
-    public void removeAll() {
-        removeTableViewData(tableView_Task, dataNumber_Task, null);
+    public void addTimedTask() {
+        showDetail(new TimedTaskBean());
     }
 
 }

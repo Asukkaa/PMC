@@ -526,10 +526,10 @@ public class AutoClickController extends CommonProperties implements MousePositi
         logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
         floatingX = Integer.parseInt(prop.getProperty(key_floatingX, defaultFloatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_floatingY, defaultFloatingY));
-        detailWidth = Integer.parseInt(prop.getProperty(key_detailWidth, defaultDetailWidth));
-        detailHeight = Integer.parseInt(prop.getProperty(key_detailHeight, defaultDetailHeight));
         floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth, defaultFloatingWidth));
         floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight, defaultFloatingHeight));
+        detailWidth = Integer.parseInt(prop.getProperty(key_clickDetailWidth, defaultClickDetailWidth));
+        detailHeight = Integer.parseInt(prop.getProperty(key_clickDetailHeight, defaultClickDetailHeight));
         input.close();
     }
 
@@ -606,7 +606,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param item 要显示详情的操作流程设置
      */
     private void showDetail(ClickPositionVO item) {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Detail-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickDetail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root;
         try {
@@ -614,7 +614,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        DetailController controller = loader.getController();
+        ClickDetailController controller = loader.getController();
         item.setClickImgSelectPath(clickImgSelectPath);
         item.setStopImgSelectPath(stopImgSelectPath);
         try {

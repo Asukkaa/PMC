@@ -44,7 +44,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date 2022/3/11
  * Time 15:09
  */
-public class DetailController {
+public class ClickDetailController {
 
     /**
      * 页面数据对象

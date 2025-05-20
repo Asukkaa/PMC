@@ -340,14 +340,24 @@ public class CommonFinals {
     public static final String defaultLogHeight = "600";
 
     /**
-     * 默认详情窗口宽度
+     * 默认操作步骤详情窗口宽度
      */
-    public static final String defaultDetailWidth = "1200";
+    public static final String defaultClickDetailWidth = "1200";
 
     /**
-     * 默认详情窗口高度
+     * 默认操作步骤详情窗口高度
      */
-    public static final String defaultDetailHeight = "720";
+    public static final String defaultClickDetailHeight = "720";
+
+    /**
+     * 默认定时任务详情窗口宽度
+     */
+    public static final String defaultTaskDetailWidth = "850";
+
+    /**
+     * 默认定时任务详情窗口高度
+     */
+    public static final String defaultTaskDetailHeight = "400";
 
     /**
      * 默认信息浮窗宽度
@@ -777,9 +787,13 @@ public class CommonFinals {
 
     public static final String key_appPort = "appPort";
 
-    public static final String key_detailWidth = "detailWidth";
+    public static final String key_clickDetailWidth = "clickDetailHeight";
 
-    public static final String key_detailHeight = "detailHeight";
+    public static final String key_clickDetailHeight = "clickDetailWidth";
+
+    public static final String key_taskDetailWidth = "taskDetailWidth";
+
+    public static final String key_taskDetailHeight = "taskDetailHeight";
 
     public static final String key_logWidth = "logWidth";
 

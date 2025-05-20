@@ -1,63 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.*?>
 <AnchorPane fx:id="anchorPane_Task" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.TimedTaskController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-
-        <HBox>
-            <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="起始日期："/>
-                <DatePicker fx:id="datePicker_Task" editable="false" promptText="点击选择日期"/>
-            </HBox>
-
-            <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="设置小时："/>
-                <TextField fx:id="hourField_Task" prefWidth="50" promptText="HH"/>
-
-                <Label prefHeight="25" text="设置分钟:"/>
-                <TextField fx:id="minuteField_Task" prefWidth="50" promptText="MM"/>
-            </HBox>
-
-            <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="重复类型："/>
-                <ChoiceBox fx:id="repeatType_Task" prefHeight="25" prefWidth="150">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="仅一次"/>
-                            <String fx:value="每天"/>
-                            <String fx:value="每周"/>
-                        </FXCollections>
-                    </items>
-                    <value>
-                        <String fx:value="仅一次"/>
-                    </value>
-                </ChoiceBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
-                <Label fx:id="pmcFilePath_Task" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
-                <Button fx:id="removePath_Task" onAction="#removePath" prefHeight="20"
-                        styleClass="img-button-style" visible="false">
-                    <graphic>
-                        <ImageView>
-                            <Image url="@../icon/Trash.png"/>
-                        </ImageView>
-                    </graphic>
-                </Button>
-            </HBox>
-        </HBox>
-
         <HBox fx:id="fileNumberHBox_Task" spacing="10">
             <Button fx:id="addTimedTask_Task" text="添加定时任务" onAction="#addTimedTask"/>
             <Button fx:id="getScheduleTask_Task" text="查询定时任务" onAction="#getScheduleTask"/>
-            <Button fx:id="clearButton_Task" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
 
             <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
         </HBox>

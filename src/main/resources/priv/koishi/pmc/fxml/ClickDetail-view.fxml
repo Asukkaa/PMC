@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
-            fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.DetailController">
+            fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
     <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
