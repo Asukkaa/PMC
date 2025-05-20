@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ScheduledService.createTask;
@@ -136,7 +138,7 @@ public class TimedTaskController {
         // 限制小时文本输入框内容
         integerRangeTextField(hourField_Task, 0, 23, tip_hour);
         // 限制分钟文本输入框内容
-        integerRangeTextField(minuteField_Task, 0, 59, tip_minute);
+        minuteSecondRangeTextField(minuteField_Task, tip_minute);
     }
 
     /**
@@ -146,6 +148,12 @@ public class TimedTaskController {
     private void initialize() {
         // 给输入框添加内容变化监听
         textFieldChangeListener();
+        // 给日期选择框添加鼠标点击事件
+        datePicker_Task.getEditor().setOnMouseClicked(e -> {
+            if (!datePicker_Task.isShowing()) {
+                datePicker_Task.show();
+            }
+        });
         Platform.runLater(() -> {
             bindPrefWidthProperty();
             // 自动填充javafx表格
@@ -187,6 +195,7 @@ public class TimedTaskController {
         LocalDateTime triggerTime = LocalDateTime.of(selectedDate, LocalTime.of(hour, minute));
         // 创建定时任务
         createTask(triggerTime, repeatType, pmcFilePath_Task.getText(), days);
+        getScheduleTask();
     }
 
     /**

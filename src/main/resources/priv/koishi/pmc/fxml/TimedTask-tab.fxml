@@ -12,20 +12,20 @@
 
         <HBox>
             <HBox styleClass="hBox-short">
-                <Label text="起始日期："/>
-                <DatePicker fx:id="datePicker_Task"/>
+                <Label prefHeight="25" text="起始日期："/>
+                <DatePicker fx:id="datePicker_Task" editable="false" promptText="点击选择日期"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <Label text="设置小时："/>
+                <Label prefHeight="25" text="设置小时："/>
                 <TextField fx:id="hourField_Task" prefWidth="50" promptText="HH"/>
 
-                <Label text="设置分钟:"/>
+                <Label prefHeight="25" text="设置分钟:"/>
                 <TextField fx:id="minuteField_Task" prefWidth="50" promptText="MM"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <Label text="重复类型："/>
+                <Label prefHeight="25" text="重复类型："/>
                 <ChoiceBox fx:id="repeatType_Task" prefHeight="25" prefWidth="150">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
@@ -59,7 +59,7 @@
             <Button fx:id="getScheduleTask_Task" text="查询定时任务" onAction="#getScheduleTask"/>
             <Button fx:id="clearButton_Task" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
 
-            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
         </HBox>
 
         <TableView fx:id="tableView_Task">

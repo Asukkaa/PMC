@@ -742,6 +742,23 @@ public class UiUtils {
     }
 
     /**
+     * 限制输入框只能输入分和秒范围内的整数
+     *
+     * @param textField 要处理的文本输入框
+     * @param tip       鼠标悬停提示文案
+     */
+    public static void minuteSecondRangeTextField(TextField textField, String tip) {
+        ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+            // 这里处理文本变化的逻辑
+            if (!isInMinuteSecondRange(newValue) && StringUtils.isNotBlank(newValue)) {
+                textField.setText(oldValue);
+            }
+            addValueToolTip(textField, tip);
+        };
+        textField.textProperty().addListener(listener);
+    }
+
+    /**
      * 监听输入框内容变化
      *
      * @param textField 要监听的文本输入框

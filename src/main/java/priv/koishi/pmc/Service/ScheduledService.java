@@ -134,42 +134,101 @@ public class ScheduledService {
             Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + ".plist");
             if (Files.exists(plistPath)) {
                 String content = new String(Files.readAllBytes(plistPath));
+                System.out.println(content);
+                // 解析任务名称
+                Pattern labelPattern = Pattern.compile("<key>Label</key>\\s*<string>(.*?)</string>");
+                Matcher labelMatcher = labelPattern.matcher(content);
+                if (labelMatcher.find()) {
+                    timedTaskBean.setTaskName(labelMatcher.group(1));
+                }
                 // 解析macOS任务信息
                 Pattern pathPattern = Pattern.compile("<string>--r\\s*(.+)</string>");
                 Matcher pathMatcher = pathPattern.matcher(content);
                 if (pathMatcher.find()) {
-                    timedTaskBean.setPath(pathMatcher.group(1));
-                    timedTaskBean.setName(getFileName(timedTaskBean.getPath()));
-                }
-                if (content.contains("StartInterval")) {
-                    if (content.contains("86400")) {
-                        timedTaskBean.setRepeat("daily");
-                    } else if (content.contains("604800")) {
-                        timedTaskBean.setRepeat("weekly");
-                    } else if (content.contains("2592000")) {
-                        timedTaskBean.setRepeat("monthly");
+                    String path = pathMatcher.group(1);
+                    timedTaskBean.setName(text_onlyLaunch)
+                            .setPath(text_onlyLaunch);
+                    if (path.contains(PMC)) {
+                        timedTaskBean.setName(getFileName(path))
+                                .setPath(path);
                     }
+                }
+                if (content.contains(DAILY)) {
+                    Pattern dailyPattern = Pattern.compile(
+                            "<key>StartCalendarInterval</key>\\s*<dict>"
+                                    + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
+                                    + "\\s*</dict>");
+                    Matcher dailyMatcher = dailyPattern.matcher(content);
+                    if (dailyMatcher.find()) {
+                        int hour = Integer.parseInt(dailyMatcher.group(1));
+                        int minute = Integer.parseInt(dailyMatcher.group(2));
+                        timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
+                                .setRepeat(DAILY_CN)
+                                .setDays(DAILY_CN);
+                    }
+                    // 获取起始日期
+                    findStartDate(content, timedTaskBean);
+                } else if (content.contains("Weekday")) {
+                    Pattern dailyPattern = Pattern.compile(
+                            "<key>StartCalendarInterval</key>\\s*<dict>"
+                                    + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Weekday</key><integer>(\\d+)</integer>"
+                                    + "\\s*</dict>");
+                    Matcher dailyMatcher = dailyPattern.matcher(content);
+                    if (dailyMatcher.find()) {
+                        System.out.println("Weekday");
+                        int hour = Integer.parseInt(dailyMatcher.group(1));
+                        int minute = Integer.parseInt(dailyMatcher.group(2));
+                        int weekday = Integer.parseInt(dailyMatcher.group(3));
+                        timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
+                                .setDays(dayOfWeek.get(weekday))
+                                .setRepeat(WEEKLY_CN);
+                    }
+                    // 获取起始日期
+                    findStartDate(content, timedTaskBean);
                 } else {
                     Pattern datePattern = Pattern.compile(
-                            "<key>StartCalendarInterval</key>\\s*<dict>\\s*<key>Hour</key><integer>(\\d+)" +
-                                    "</integer>\\s*<key>Minute</key><integer>(\\d+)</integer>\\s*<key>Day</key>" +
-                                    "<integer>(\\d+)</integer>\\s*<key>Month</key><integer>(\\d+)</integer>");
+                            "<key>StartCalendarInterval</key>\\s*<dict>"
+                                    + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Day</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Month</key><integer>(\\d+)</integer>"
+                                    + "\\s*<key>Year</key><integer>(\\d+)</integer>"
+                                    + "\\s*</dict>");
                     Matcher dateMatcher = datePattern.matcher(content);
                     if (dateMatcher.find()) {
                         int hour = Integer.parseInt(dateMatcher.group(1));
                         int minute = Integer.parseInt(dateMatcher.group(2));
                         int day = Integer.parseInt(dateMatcher.group(3));
                         int month = Integer.parseInt(dateMatcher.group(4));
-                        LocalDateTime triggerTime = LocalDateTime.of(2025, month, day, hour, minute);
-                        timedTaskBean.setDate(TIME_FORMATTER.format(triggerTime));
-                        timedTaskBean.setTime(TIME_FORMATTER.format(triggerTime));
-                        timedTaskBean.setRepeat("once");
+                        int year = Integer.parseInt(dateMatcher.group(5));
+                        LocalDateTime triggerTime = LocalDateTime.of(year, month, day, hour, minute);
+                        timedTaskBean.setDate(triggerTime.toLocalDate().toString())
+                                .setTime(triggerTime.format(TIME_FORMATTER))
+                                .setRepeat(ONCE_CN)
+                                .setDays(ONCE_CN);
                     }
                 }
             }
         }
         taskDetails.add(timedTaskBean);
         return taskDetails;
+    }
+
+    /**
+     * 获取起始日期
+     *
+     * @param content       定时任务内容
+     * @param timedTaskBean 定时任务对象
+     */
+    private static void findStartDate(String content, TimedTaskBean timedTaskBean) {
+        Pattern startDatePattern = Pattern.compile("<key>StartDate</key>\\s*<string>(\\d{4}-\\d{2}-\\d{2})</string>");
+        Matcher startDateMatcher = startDatePattern.matcher(content);
+        if (startDateMatcher.find()) {
+            timedTaskBean.setDate(startDateMatcher.group(1));
+        }
     }
 
     /**
@@ -260,22 +319,37 @@ public class ScheduledService {
         String interval;
         switch (repeatType) {
             case DAILY: {
-                interval = "<key>StartInterval</key><integer>86400</integer>";
+                interval = String.format("""
+                                <key>StartCalendarInterval</key>
+                                <dict>
+                                    <key>Hour</key><integer>%d</integer>
+                                    <key>Minute</key><integer>%d</integer>
+                                </dict>
+                                <key>StartDate</key>
+                                <string>%s</string>
+                                <key>RepeatType</key>
+                                <string>%s</string>""",
+                        triggerTime.getHour(),
+                        triggerTime.getMinute(),
+                        triggerTime.toLocalDate(),
+                        repeatType);
                 break;
             }
             case WEEKLY: {
                 // 支持多天执行（如每周一、三）
                 interval = days.stream().map(day -> String.format("""
-                                        <key>StartCalendarInterval</key>
-                                        <dict>
-                                            <key>Hour</key><integer>%d</integer>
-                                            <key>Minute</key><integer>%d</integer>
-                                            <key>Weekday</key><integer>%d</integer>
-                                        </dict>""",
-                                triggerTime.getHour(),
-                                triggerTime.getMinute(),
-                                day))
-                        .collect(Collectors.joining());
+                                <key>StartCalendarInterval</key>
+                                <dict>
+                                    <key>Hour</key><integer>%d</integer>
+                                    <key>Minute</key><integer>%d</integer>
+                                    <key>Weekday</key><integer>%d</integer>
+                                </dict>
+                                <key>StartDate</key>
+                                <string>%s</string>""",
+                        triggerTime.getHour(),
+                        triggerTime.getMinute(),
+                        day,
+                        triggerTime.toLocalDate())).collect(Collectors.joining());
                 break;
             }
             default: {
@@ -287,16 +361,17 @@ public class ScheduledService {
                 String.format("""
                                 <key>StartCalendarInterval</key>
                                 <dict>
-                                    <key>Minute</key><integer>%d</integer>
                                     <key>Hour</key><integer>%d</integer>
+                                    <key>Minute</key><integer>%d</integer>
                                     <key>Day</key><integer>%d</integer>
                                     <key>Month</key><integer>%d</integer>
+                                    <key>Year</key><integer>%d</integer>
                                 </dict>""",
-                        triggerTime.getMinute(),
                         triggerTime.getHour(),
+                        triggerTime.getMinute(),
                         triggerTime.getDayOfMonth(),
-                        triggerTime.getMonthValue()
-                ) : "";
+                        triggerTime.getMonthValue(),
+                        triggerTime.getYear()) : "";
         String plistContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n" +
                 "<plist version=\"1.0\">\n" +

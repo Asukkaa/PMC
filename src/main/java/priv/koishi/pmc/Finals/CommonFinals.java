@@ -1068,4 +1068,16 @@ public class CommonFinals {
         dayOfWeekName.put("SUN", "星期日");
     }
 
+    public static final BidiMap<Integer, String> dayOfWeek = new DualHashBidiMap<>();
+
+    static {
+        dayOfWeek.put(1, "星期一");
+        dayOfWeek.put(2, "星期二");
+        dayOfWeek.put(3, "星期三");
+        dayOfWeek.put(4, "星期四");
+        dayOfWeek.put(5, "星期五");
+        dayOfWeek.put(6, "星期六");
+        dayOfWeek.put(7, "星期日");
+    }
+
 }

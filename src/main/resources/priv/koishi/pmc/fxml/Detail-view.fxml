@@ -224,7 +224,7 @@
                         <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的图片"/>
                         <Button fx:id="removeAll_Det" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
 
-                        <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+                        <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
                     </HBox>
 
                     <TableView fx:id="tableView_Det" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

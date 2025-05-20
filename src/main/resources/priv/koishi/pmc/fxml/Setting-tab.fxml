@@ -320,7 +320,7 @@
                 <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的默认图片"/>
                 <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
 
-                <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+                <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
             </HBox>
 
             <TableView fx:id="tableView_Set" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

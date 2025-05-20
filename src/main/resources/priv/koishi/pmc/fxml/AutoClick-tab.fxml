@@ -51,7 +51,7 @@
 
             <Button  fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand" text="查看运行记录"/>
 
-            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="20" text="列表为空"/>
+            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
         </HBox>
 
         <TableView fx:id="tableView_Click" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

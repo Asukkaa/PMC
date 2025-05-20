@@ -67,6 +67,34 @@ public class CommonUtils {
     }
 
     /**
+     * 正则表达式用于匹配分和秒范围的整数
+     *
+     * @param str 要校验的字符串
+     * @return 在设置范围内为true，不在范围内为false
+     */
+    public static boolean isInMinuteSecondRange(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        // 禁止出现0开头的非0数字
+        if (str.indexOf("0") == 0 && str.length() > 2) {
+            return false;
+        }
+        // 禁止出现负数开头的0
+        if (str.indexOf("-0") == 0) {
+            return false;
+        }
+        Pattern integerPattern = Pattern.compile("^-?\\d{1,10}$");
+        // 使用正则表达式判断字符串是否为整数
+        if (!integerPattern.matcher(str).matches()) {
+            return false;
+        }
+        // 将字符串转换为整数并判断是否在指定范围内
+        int value = Integer.parseInt(str);
+        return value >= 0 && value <= 59;
+    }
+
+    /**
      * 获取详细的异常信息
      *
      * @param e 要获取的异常
