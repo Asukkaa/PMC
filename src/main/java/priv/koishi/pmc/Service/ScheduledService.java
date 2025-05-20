@@ -1,6 +1,6 @@
 package priv.koishi.pmc.Service;
 
-import org.apache.commons.lang3.StringUtils;
+import javafx.concurrent.Task;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
 import java.io.BufferedReader;
@@ -34,7 +34,7 @@ public class ScheduledService {
     /**
      * 定时任务名称
      */
-    private static final String TASK_NAME = "PMC-*";
+    private static final String TASK_NAME = "PMC-";
 
     /**
      * 定时任务时间格式
@@ -44,185 +44,225 @@ public class ScheduledService {
     /**
      * 创建定时任务
      *
-     * @param triggerTime 触发时间
-     * @param repeatType  重复类型
-     * @param PMCFilePath PMC文件路径
-     * @param days        指定的星期
+     * @param timedTaskBean 定时任务信息
      * @throws IOException 任务创建失败
      */
-    public static void createTask(LocalDateTime triggerTime, String repeatType, String PMCFilePath, List<Integer> days) throws IOException {
+    public static void createTask(TimedTaskBean timedTaskBean) throws IOException {
         if (systemName.contains(win)) {
-            createWinLaunchdTask(triggerTime, repeatType, PMCFilePath, days);
+            createWinLaunchdTask(timedTaskBean);
         } else if (systemName.contains(mac)) {
-            createMacLaunchdTask(triggerTime, repeatType, PMCFilePath, days);
+            createMacLaunchdTask(timedTaskBean);
         }
     }
 
     /**
      * 删除定时任务
      *
+     * @param taskName 定时任务名称自定义部分
      * @throws IOException 删除任务失败
      */
-    public static void deleteTask() throws IOException {
+    public static void deleteTask(String taskName) throws IOException {
+        taskName = TASK_NAME + taskName;
         if (systemName.contains(win)) {
-            new ProcessBuilder("schtasks", "/delete", "/tn", TASK_NAME, "/f").start();
+            new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start();
         } else if (systemName.contains(mac)) {
-            Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + plist);
+            Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
             Files.deleteIfExists(plistFile);
         }
     }
 
-    private static String extractValue(Pattern pattern, String input) {
-        Matcher matcher = pattern.matcher(input);
-        return matcher.find() ? matcher.group(1) : "";
-    }
-
     /**
-     * 获取定时任务详情
+     * 查询定时任务详情
      *
      * @return 定时任务详情
-     * @throws IOException 获取任务详情失败
      */
-    public static List<TimedTaskBean> getTaskDetails() throws IOException {
-        List<TimedTaskBean> taskDetails = new ArrayList<>();
-        if (systemName.contains(win)) {
-            Process process = new ProcessBuilder("schtasks", "/query", "/tn", TASK_NAME, "/fo", "LIST", "/v").start();
-            String output = readProcessOutput(process);
-            String[] taskBlocks = output.split("\n\n");
-            System.out.println(output);
-            for (String block : taskBlocks) {
-                if (StringUtils.isNotBlank(block)) {
+    public static Task<List<TimedTaskBean>> getTaskDetailsTask() {
+        return new Task<>() {
+            @Override
+            protected List<TimedTaskBean> call() throws Exception {
+                updateMessage("查询中");
+                List<TimedTaskBean> taskDetails = new ArrayList<>();
+                if (systemName.contains(win)) {
+                    getWinTaskDetails(taskDetails);
+                } else if (systemName.contains(mac)) {
+                    getMacTaskDetails(taskDetails);
+                }
+                updateMessage("");
+                return taskDetails;
+            }
+
+            /**
+             * 查询mac定时任务详情
+             *
+             * @param taskDetails 任务详情
+             * @throws IOException 获取任务详情失败
+             */
+            private void getMacTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
+                Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + ".plist");
+                if (Files.exists(plistPath)) {
                     TimedTaskBean timedTaskBean = new TimedTaskBean();
-                    // 解析Windows任务信息
-                    Pattern startDatePattern = Pattern.compile("Start Date:\\s+(.*?)\\n");
-                    Pattern startTimePattern = Pattern.compile("Start Time:\\s+(.*?)\\n");
-                    Pattern scheduleTypePattern = Pattern.compile("Schedule Type:\\s+(.*?)\\n");
-                    Pattern taskToRunPattern = Pattern.compile("Task To Run:\\s+(.*?)\\n");
-                    Pattern DaysPattern = Pattern.compile("Days:\\s+(.*?)\\n");
-                    Pattern taskNamePattern = Pattern.compile("TaskName:\\s+(.*?)\\n");
-                    // 提取各字段值
-                    String startDate = extractValue(startDatePattern, block);
-                    String startTime = extractValue(startTimePattern, block);
-                    String scheduleType = extractValue(scheduleTypePattern, block).toUpperCase().trim();
-                    String taskToRun = extractValue(taskToRunPattern, block);
-                    String days = extractValue(DaysPattern, block);
-                    String taskName = extractValue(taskNamePattern, block);
-                    if ("ONE TIME ONLY".equals(scheduleType)) {
-                        scheduleType = ONCE;
+                    String content = new String(Files.readAllBytes(plistPath));
+                    System.out.println(content);
+                    // 解析任务名称
+                    Pattern labelPattern = Pattern.compile("<key>Label</key>\\s*<string>(.*?)</string>");
+                    Matcher labelMatcher = labelPattern.matcher(content);
+                    if (labelMatcher.find()) {
+                        String label = labelMatcher.group(1);
+                        timedTaskBean.setTaskName(label.substring(label.indexOf(TASK_NAME) + TASK_NAME.length()));
                     }
-                    String repeatType = repeatTypeMap.getKey(scheduleType);
-                    String daysCN = Arrays.stream(days.split(",\\s*"))
-                            .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
-                            .collect(Collectors.joining(", "));
-                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-                    LocalTime time = LocalTime.parse(startTime, inputFormatter);
-                    timedTaskBean.setTaskName(taskName.substring(taskName.indexOf("\\") + 1))
-                            .setTime(time.format(TIME_FORMATTER))
-                            .setPath(text_onlyLaunch)
-                            .setName(text_onlyLaunch)
-                            .setRepeat(repeatType)
-                            .setDate(startDate)
-                            .setDays(daysCN);
-                    if (taskToRun.contains(PMC)) {
-                        String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length());
-                        String name = getFileName(path);
-                        timedTaskBean.setPath(path)
-                                .setName(name);
+                    // 解析macOS任务信息
+                    Pattern pathPattern = Pattern.compile("<string>--r\\s*(.+)</string>");
+                    Matcher pathMatcher = pathPattern.matcher(content);
+                    if (pathMatcher.find()) {
+                        String path = pathMatcher.group(1);
+                        timedTaskBean.setName(text_onlyLaunch)
+                                .setPath(text_onlyLaunch);
+                        if (path.contains(PMC)) {
+                            timedTaskBean.setName(getFileName(path))
+                                    .setPath(path);
+                        }
                     }
-                    if ("Every day of the week".equals(days) || DAILY_CN.equals(repeatType)) {
-                        timedTaskBean.setDays(DAILY_CN);
-                    } else if (ONCE_CN.equals(repeatType)) {
-                        timedTaskBean.setDays(ONCE_CN);
+                    if (content.contains(DAILY)) {
+                        Pattern dailyPattern = Pattern.compile(
+                                "<key>StartCalendarInterval</key>\\s*<dict>"
+                                        + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
+                                        + "\\s*</dict>");
+                        Matcher dailyMatcher = dailyPattern.matcher(content);
+                        if (dailyMatcher.find()) {
+                            int hour = Integer.parseInt(dailyMatcher.group(1));
+                            int minute = Integer.parseInt(dailyMatcher.group(2));
+                            timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
+                                    .setRepeat(DAILY_CN)
+                                    .setDays(DAILY_CN);
+                        }
+                        // 获取起始日期
+                        findStartDate(content, timedTaskBean);
+                    } else if (content.contains("Weekday")) {
+                        Pattern dailyPattern = Pattern.compile(
+                                "<key>StartCalendarInterval</key>\\s*<dict>"
+                                        + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Weekday</key><integer>(\\d+)</integer>"
+                                        + "\\s*</dict>");
+                        Matcher dailyMatcher = dailyPattern.matcher(content);
+                        if (dailyMatcher.find()) {
+                            int hour = Integer.parseInt(dailyMatcher.group(1));
+                            int minute = Integer.parseInt(dailyMatcher.group(2));
+                            int weekday = Integer.parseInt(dailyMatcher.group(3));
+                            timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
+                                    .setDays(dayOfWeek.get(weekday))
+                                    .setRepeat(WEEKLY_CN);
+                        }
+                        // 获取起始日期
+                        findStartDate(content, timedTaskBean);
+                    } else {
+                        Pattern datePattern = Pattern.compile(
+                                "<key>StartCalendarInterval</key>\\s*<dict>"
+                                        + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Day</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Month</key><integer>(\\d+)</integer>"
+                                        + "\\s*<key>Year</key><integer>(\\d+)</integer>"
+                                        + "\\s*</dict>");
+                        Matcher dateMatcher = datePattern.matcher(content);
+                        if (dateMatcher.find()) {
+                            int hour = Integer.parseInt(dateMatcher.group(1));
+                            int minute = Integer.parseInt(dateMatcher.group(2));
+                            int day = Integer.parseInt(dateMatcher.group(3));
+                            int month = Integer.parseInt(dateMatcher.group(4));
+                            int year = Integer.parseInt(dateMatcher.group(5));
+                            LocalDateTime triggerTime = LocalDateTime.of(year, month, day, hour, minute);
+                            timedTaskBean.setDate(triggerTime.toLocalDate().toString())
+                                    .setTime(triggerTime.format(TIME_FORMATTER))
+                                    .setRepeat(ONCE_CN)
+                                    .setDays(ONCE_CN);
+                        }
                     }
                     taskDetails.add(timedTaskBean);
                 }
             }
-        } else if (systemName.contains(mac)) {
-            Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + ".plist");
-            if (Files.exists(plistPath)) {
-                TimedTaskBean timedTaskBean = new TimedTaskBean();
-                String content = new String(Files.readAllBytes(plistPath));
-                System.out.println(content);
-                // 解析任务名称
-                Pattern labelPattern = Pattern.compile("<key>Label</key>\\s*<string>(.*?)</string>");
-                Matcher labelMatcher = labelPattern.matcher(content);
-                if (labelMatcher.find()) {
-                    timedTaskBean.setTaskName(labelMatcher.group(1));
-                }
-                // 解析macOS任务信息
-                Pattern pathPattern = Pattern.compile("<string>--r\\s*(.+)</string>");
-                Matcher pathMatcher = pathPattern.matcher(content);
-                if (pathMatcher.find()) {
-                    String path = pathMatcher.group(1);
-                    timedTaskBean.setName(text_onlyLaunch)
-                            .setPath(text_onlyLaunch);
-                    if (path.contains(PMC)) {
-                        timedTaskBean.setName(getFileName(path))
-                                .setPath(path);
+
+            /**
+             * 查询win定时任务详情
+             *
+             * @param taskDetails 任务详情
+             * @throws IOException 获取任务详情失败
+             */
+            private void getWinTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
+                // 改为查询全部任务
+                Process process = new ProcessBuilder("schtasks", "/query", "/fo", "LIST", "/v").start();
+                String output = readProcessOutput(process);
+                // 新增程序路径过滤（使用正则表达式忽略大小写）
+                Pattern exePattern = Pattern.compile(Pattern.quote(appName + exe), Pattern.CASE_INSENSITIVE);
+                String[] taskBlocks = output.split("\n\n");
+                int dataSize = taskBlocks.length;
+                updateProgress(0, dataSize);
+                for (int i = 0; i < dataSize; i++) {
+                    updateProgress(i + 1, dataSize);
+                    String block = taskBlocks[i];
+                    // 只处理包含程序路径的任务块
+                    if (exePattern.matcher(block).find()) {
+                        TimedTaskBean timedTaskBean = new TimedTaskBean();
+                        // 解析Windows任务信息
+                        Pattern startDatePattern = Pattern.compile("Start Date:\\s+(.*?)\\n");
+                        Pattern startTimePattern = Pattern.compile("Start Time:\\s+(.*?)\\n");
+                        Pattern scheduleTypePattern = Pattern.compile("Schedule Type:\\s+(.*?)\\n");
+                        Pattern taskToRunPattern = Pattern.compile("Task To Run:\\s+(.*?)\\n");
+                        Pattern DaysPattern = Pattern.compile("Days:\\s+(.*?)\\n");
+                        Pattern taskNamePattern = Pattern.compile("TaskName:\\s+(.*?)\\n");
+                        // 提取各字段值
+                        String startDate = extractValue(startDatePattern, block);
+                        String startTime = extractValue(startTimePattern, block);
+                        String scheduleType = extractValue(scheduleTypePattern, block).toUpperCase().trim();
+                        String taskToRun = extractValue(taskToRunPattern, block);
+                        String days = extractValue(DaysPattern, block);
+                        String taskName = extractValue(taskNamePattern, block);
+                        if ("ONE TIME ONLY".equals(scheduleType)) {
+                            scheduleType = ONCE;
+                        }
+                        String repeatType = repeatTypeMap.getKey(scheduleType);
+                        String daysCN = Arrays.stream(days.split(",\\s*"))
+                                .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
+                                .collect(Collectors.joining(", "));
+                        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                        LocalTime time = LocalTime.parse(startTime, inputFormatter);
+                        timedTaskBean.setTaskName(taskName.substring(taskName.indexOf(TASK_NAME) + TASK_NAME.length()))
+                                .setTime(time.format(TIME_FORMATTER))
+                                .setPath(text_onlyLaunch)
+                                .setName(text_onlyLaunch)
+                                .setRepeat(repeatType)
+                                .setDate(startDate)
+                                .setDays(daysCN);
+                        if (taskToRun.contains(PMC)) {
+                            String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length());
+                            String name = getFileName(path);
+                            timedTaskBean.setPath(path)
+                                    .setName(name);
+                        }
+                        if ("Every day of the week".equals(days) || DAILY_CN.equals(repeatType)) {
+                            timedTaskBean.setDays(DAILY_CN);
+                        } else if (ONCE_CN.equals(repeatType)) {
+                            timedTaskBean.setDays(ONCE_CN);
+                        }
+                        taskDetails.add(timedTaskBean);
                     }
                 }
-                if (content.contains(DAILY)) {
-                    Pattern dailyPattern = Pattern.compile(
-                            "<key>StartCalendarInterval</key>\\s*<dict>"
-                                    + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
-                                    + "\\s*</dict>");
-                    Matcher dailyMatcher = dailyPattern.matcher(content);
-                    if (dailyMatcher.find()) {
-                        int hour = Integer.parseInt(dailyMatcher.group(1));
-                        int minute = Integer.parseInt(dailyMatcher.group(2));
-                        timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                                .setRepeat(DAILY_CN)
-                                .setDays(DAILY_CN);
-                    }
-                    // 获取起始日期
-                    findStartDate(content, timedTaskBean);
-                } else if (content.contains("Weekday")) {
-                    Pattern dailyPattern = Pattern.compile(
-                            "<key>StartCalendarInterval</key>\\s*<dict>"
-                                    + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Weekday</key><integer>(\\d+)</integer>"
-                                    + "\\s*</dict>");
-                    Matcher dailyMatcher = dailyPattern.matcher(content);
-                    if (dailyMatcher.find()) {
-                        System.out.println("Weekday");
-                        int hour = Integer.parseInt(dailyMatcher.group(1));
-                        int minute = Integer.parseInt(dailyMatcher.group(2));
-                        int weekday = Integer.parseInt(dailyMatcher.group(3));
-                        timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                                .setDays(dayOfWeek.get(weekday))
-                                .setRepeat(WEEKLY_CN);
-                    }
-                    // 获取起始日期
-                    findStartDate(content, timedTaskBean);
-                } else {
-                    Pattern datePattern = Pattern.compile(
-                            "<key>StartCalendarInterval</key>\\s*<dict>"
-                                    + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Day</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Month</key><integer>(\\d+)</integer>"
-                                    + "\\s*<key>Year</key><integer>(\\d+)</integer>"
-                                    + "\\s*</dict>");
-                    Matcher dateMatcher = datePattern.matcher(content);
-                    if (dateMatcher.find()) {
-                        int hour = Integer.parseInt(dateMatcher.group(1));
-                        int minute = Integer.parseInt(dateMatcher.group(2));
-                        int day = Integer.parseInt(dateMatcher.group(3));
-                        int month = Integer.parseInt(dateMatcher.group(4));
-                        int year = Integer.parseInt(dateMatcher.group(5));
-                        LocalDateTime triggerTime = LocalDateTime.of(year, month, day, hour, minute);
-                        timedTaskBean.setDate(triggerTime.toLocalDate().toString())
-                                .setTime(triggerTime.format(TIME_FORMATTER))
-                                .setRepeat(ONCE_CN)
-                                .setDays(ONCE_CN);
-                    }
-                }
-                taskDetails.add(timedTaskBean);
             }
-        }
-        return taskDetails;
+        };
+    }
+
+
+    /**
+     * 从字符串中提取指定值
+     *
+     * @param pattern 正则表达式模式
+     * @param input   输入字符串
+     * @return 提取的值，如果未找到则返回空字符串
+     */
+    private static String extractValue(Pattern pattern, String input) {
+        Matcher matcher = pattern.matcher(input);
+        return matcher.find() ? matcher.group(1) : "";
     }
 
     /**
@@ -261,15 +301,18 @@ public class ScheduledService {
     /**
      * 创建win定时任务
      *
-     * @param triggerTime 触发时间
-     * @param repeatType  重复类型
-     * @param PMCFilePath PMC文件路径
-     * @param days        指定的星期
+     * @param timedTaskBean 定时任务信息
      * @throws IOException 创建失败
      */
-    private static void createWinLaunchdTask(LocalDateTime triggerTime, String repeatType, String PMCFilePath, List<Integer> days) throws IOException {
+    private static void createWinLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
         String exePath = getAppPath();
         String workingDir = Paths.get(exePath).getParent().toString();
+        System.out.println(timedTaskBean);
+        String PMCFilePath = timedTaskBean.getPath();
+        LocalDateTime triggerTime = timedTaskBean.getDateTime();
+        String repeatType = timedTaskBean.getRepeat();
+        List<Integer> days = timedTaskBean.getDayList();
+        String taskName = TASK_NAME + timedTaskBean.getTaskName();
         // 构建基础命令
         StringBuilder psCommand = new StringBuilder();
         psCommand.append("$action = New-ScheduledTaskAction -Execute '\"").append(exePath).append("'\" ")
@@ -277,13 +320,13 @@ public class ScheduledService {
                 .append("-Argument '--r ").append(PMCFilePath).append("'; ");
         // 构建触发器
         psCommand.append("$triggers = @(); ");
-        switch (repeatTypeMap.get(repeatType)) {
-            case DAILY: {
+        switch (repeatType) {
+            case DAILY_CN: {
                 psCommand.append("$trigger = New-ScheduledTaskTrigger -Daily -At '").append(triggerTime.format(TIME_FORMATTER)).append("'; ");
                 psCommand.append("$triggers += $trigger; ");
                 break;
             }
-            case WEEKLY: {
+            case WEEKLY_CN: {
                 for (int day : days) {
                     // 使用 -Weekly + -DaysOfMonth 实现每月指定日期
                     psCommand.append(String.format(
@@ -292,7 +335,7 @@ public class ScheduledService {
                 }
                 break;
             }
-            case ONCE: {
+            case ONCE_CN: {
                 // 添加单次触发器
                 psCommand.append(String.format("$trigger = New-ScheduledTaskTrigger -Once -At '%s'; $triggers += $trigger; ",
                         triggerTime.format(TIME_FORMATTER)));
@@ -301,7 +344,7 @@ public class ScheduledService {
         }
         // 注册任务（支持多个触发器）
         psCommand.append(String.format("Register-ScheduledTask -TaskName '%s' -Action $action -Trigger $triggers -Settings (New-ScheduledTaskSettingsSet -Compatibility Win8) -Force",
-                TASK_NAME));
+                taskName));
         // 执行 PowerShell 命令
         ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-Command", psCommand.toString());
         pb.redirectErrorStream(true);
@@ -315,18 +358,19 @@ public class ScheduledService {
     /**
      * 创建mac定时任务
      *
-     * @param triggerTime 触发时间
-     * @param repeatType  重复类型
-     * @param PMCFilePath PMC文件路径
-     * @param days        指定的星期
+     * @param timedTaskBean 定时任务信息
      * @throws IOException 创建失败
      */
-    private static void createMacLaunchdTask(LocalDateTime triggerTime, String repeatType, String PMCFilePath, List<Integer> days) throws IOException {
-        Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + plist);
-        repeatType = repeatTypeMap.get(repeatType);
+    private static void createMacLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
+        String taskName = TASK_NAME + timedTaskBean.getTaskName();
+        Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
+        LocalDateTime triggerTime = timedTaskBean.getDateTime();
+        List<Integer> days = timedTaskBean.getDayList();
+        String repeatType = timedTaskBean.getRepeat();
+        String PMCFilePath = timedTaskBean.getPath();
         String interval;
         switch (repeatType) {
-            case DAILY: {
+            case DAILY_CN: {
                 interval = String.format("""
                                 <key>StartCalendarInterval</key>
                                 <dict>
@@ -343,7 +387,7 @@ public class ScheduledService {
                         repeatType);
                 break;
             }
-            case WEEKLY: {
+            case WEEKLY_CN: {
                 // 支持多天执行（如每周一、三）
                 interval = days.stream().map(day -> String.format("""
                                 <key>StartCalendarInterval</key>
@@ -365,7 +409,7 @@ public class ScheduledService {
                 break;
             }
         }
-        String calendarInterval = ONCE.equals(repeatType) ?
+        String calendarInterval = ONCE_CN.equals(repeatType) ?
                 String.format("""
                                 <key>StartCalendarInterval</key>
                                 <dict>
@@ -385,7 +429,7 @@ public class ScheduledService {
                 "<plist version=\"1.0\">\n" +
                 "<dict>\n" +
                 "    <key>Label</key>\n" +
-                "    <string>" + TASK_NAME + "</string>\n" +
+                "    <string>" + taskName + "</string>\n" +
                 "    <key>ProgramArguments</key>\n" +
                 "    <array>\n" +
                 "        <string>/usr/bin/open</string>\n" +

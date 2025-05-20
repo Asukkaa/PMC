@@ -93,8 +93,9 @@ public class TaskDetailController {
      *
      * @param item        列表选中的数据
      * @param parentStage 上级页面的舞台
+     * @param isEdit      是否为编辑模式
      */
-    public void initData(TimedTaskBean item, Stage parentStage) {
+    public void initData(TimedTaskBean item, Stage parentStage, boolean isEdit) {
         this.parentStage = parentStage;
         selectedItem = item;
         if (item.getPath() != null) {
@@ -103,12 +104,16 @@ public class TaskDetailController {
                 setPathLabel(pmcFilePath_TD, item.getPath());
                 removePath_TD.setVisible(true);
             }
-            datePicker_TD.setValue(LocalDate.parse(item.getDate()));
-            hourField_TD.setText(item.getTime().substring(0, 2));
-            minuteField_TD.setText(item.getTime().substring(3, 5));
-            repeatType_TD.setValue(item.getRepeat());
-            taskNameField_TD.setText(item.getTaskName());
         }
+        LocalDateTime dateTime = item.getDateTime();
+        if (dateTime != null) {
+            datePicker_TD.setValue(dateTime.toLocalDate());
+            hourField_TD.setText(String.valueOf(dateTime.getHour()));
+            minuteField_TD.setText(String.valueOf(dateTime.getMinute()));
+        }
+        repeatType_TD.setValue(item.getRepeat());
+        taskNameField_TD.setText(item.getTaskName());
+        taskNameField_TD.setDisable(isEdit);
     }
 
     /**
@@ -194,8 +199,14 @@ public class TaskDetailController {
         }
         // 组合完整时间
         LocalDateTime triggerTime = LocalDateTime.of(selectedDate, LocalTime.of(hour, minute));
+        TimedTaskBean timedTaskBean = new TimedTaskBean();
+        timedTaskBean.setTaskName(taskNameField_TD.getText())
+                .setPath(pmcFilePath_TD.getText())
+                .setDateTime(triggerTime)
+                .setRepeat(repeatType)
+                .setDayList(days);
         // 创建定时任务
-        createTask(triggerTime, repeatType, pmcFilePath_TD.getText(), days);
+        createTask(timedTaskBean);
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
@@ -208,7 +219,10 @@ public class TaskDetailController {
      */
     @FXML
     private void removeDetail() throws IOException {
-        deleteTask();
+        String taskName = selectedItem.getTaskName();
+        if (StringUtils.isNotBlank(taskName)) {
+            deleteTask(taskName);
+        }
         stage.close();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {

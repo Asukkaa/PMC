@@ -1,34 +1,36 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 import priv.koishi.pmc.MainApplication;
+import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
-import static priv.koishi.pmc.Finals.CommonFinals.text_process;
-import static priv.koishi.pmc.Service.ScheduledService.getTaskDetails;
+import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -56,6 +58,16 @@ public class TimedTaskController {
     private int detailWidth;
 
     /**
+     * 线程池实例
+     */
+    private static final ExecutorService executorService = ThreadPoolManager.getPool(TimedTaskController.class);
+
+    /**
+     * 要防重复点击的组件
+     */
+    private static final List<Node> disableNodes = new ArrayList<>();
+
+    /**
      * 程序主舞台
      */
     private Stage mainStage;
@@ -64,10 +76,13 @@ public class TimedTaskController {
     private AnchorPane anchorPane_Task;
 
     @FXML
-    private HBox fileNumberHBox_Task, tipHBox_Task;
+    private HBox fileNumberHBox_Task, tipHBox_Task, logHBox_Task;
 
     @FXML
-    private Label dataNumber_Task, tip_Task;
+    private ProgressBar progressBar_Task;
+
+    @FXML
+    private Label dataNumber_Task, tip_Task, log_Task;
 
     @FXML
     private Button addTimedTask_Task, getScheduleTask_Task;
@@ -159,8 +174,9 @@ public class TimedTaskController {
      * 显示详情页
      *
      * @param item 要显示详情的操作流程设置
+     * @param isEdit 是否为编辑模式
      */
-    private void showDetail(TimedTaskBean item) {
+    private void showDetail(TimedTaskBean item, boolean isEdit) {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/TaskDetail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root;
@@ -170,16 +186,15 @@ public class TimedTaskController {
             throw new RuntimeException(e);
         }
         TaskDetailController controller = loader.getController();
-        controller.initData(item, mainStage);
+        controller.initData(item, mainStage, isEdit);
         // 设置保存后的回调
         controller.setRefreshCallback(() -> {
-            if (item.isRemove()) {
-                tableView_Task.getItems().remove(item);
+            try {
+                // 查询定时任务
+                getScheduleTask();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            // 刷新列表
-            tableView_Task.refresh();
-            // 更新列表数量
-            updateTableViewSizeText(tableView_Task, dataNumber_Task, text_process);
         });
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, detailWidth, detailHeight);
@@ -197,10 +212,52 @@ public class TimedTaskController {
     }
 
     /**
+     * 设置要防重复点击的组件
+     */
+    private void setDisableNodes() {
+        disableNodes.add(addTimedTask_Task);
+        disableNodes.add(getScheduleTask_Task);
+    }
+
+    /**
+     * 执行查询定时任务
+     *
+     * @param successHandler 成功回调
+     */
+    private void executeGetScheduleTask(Consumer<? super List<TimedTaskBean>> successHandler) {
+        removeAll();
+        TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(progressBar_Task)
+                .setDisableNodes(disableNodes)
+                .setBindingMassageLabel(true)
+                .setMassageLabel(log_Task);
+        Task<List<TimedTaskBean>> task = getTaskDetailsTask();
+        bindingTaskNode(task, taskBean);
+        task.setOnSucceeded(event -> {
+            List<TimedTaskBean> result = task.getValue();
+            Platform.runLater(() -> {
+                addData(result, append, tableView_Task, dataNumber_Task, text_data);
+                taskUnbind(taskBean);
+            });
+            if (successHandler != null) {
+                successHandler.accept(result);
+            }
+        });
+        task.setOnFailed(event -> {
+            taskNotSuccess(taskBean, text_taskFailed);
+            Throwable ex = task.getException();
+            taskUnbind(taskBean);
+            throw new RuntimeException(ex);
+        });
+        executorService.execute(task);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
+        setDisableNodes();
         Platform.runLater(() -> {
             mainStage = (Stage) anchorPane_Task.getScene().getWindow();
             bindPrefWidthProperty();
@@ -224,15 +281,21 @@ public class TimedTaskController {
      */
     @FXML
     private void getScheduleTask() throws IOException {
-        removeAll();
-        List<TimedTaskBean> taskDetails = getTaskDetails();
-        addData(taskDetails, append, tableView_Task, dataNumber_Task, text_data);
-        System.out.println("查询定时任务：" + taskDetails);
+        executeGetScheduleTask(null);
     }
 
+    /**
+     * 添加定时任务
+     */
     @FXML
     public void addTimedTask() {
-        showDetail(new TimedTaskBean());
+        executeGetScheduleTask(result -> Platform.runLater(() -> {
+            int dataSize = tableView_Task.getItems().size() + 1;
+            TimedTaskBean newTask = new TimedTaskBean()
+                    .setTaskName("自动启动任务" + dataSize)
+                    .setRepeat(DAILY_CN);
+            showDetail(newTask, false);
+        }));
     }
 
 }

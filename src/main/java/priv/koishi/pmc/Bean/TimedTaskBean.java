@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.VO.Indexable;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * 定时任务数据类
  *
@@ -54,6 +57,16 @@ public class TimedTaskBean implements Indexable {
      * 文件地址
      */
     String path;
+
+    /**
+     * 完整的时间信息
+     */
+    LocalDateTime dateTime;
+
+    /**
+     * 设置的星期信息
+     */
+    List<Integer> dayList;
 
     /**
      * 为列表数据设置序号接口

@@ -770,7 +770,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     .setDisableNodes(disableNodes)
                     .setBeanList(clickPositionVOS)
                     .setMassageLabel(log_Click);
-            updateLabel(log_Click, "");
             CheckBox hideWindowRun = (CheckBox) mainScene.lookup("#hideWindowRun_Set");
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
@@ -821,6 +820,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 autoClickTask = null;
                 runClicking = false;
                 clearReferences();
+                taskUnbind(taskBean);
                 throw new RuntimeException(ex);
             });
             autoClickTask.setOnCancelled(event -> {
@@ -837,10 +837,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 runTimeline = null;
                 runClicking = false;
                 clearReferences();
+                taskUnbind(taskBean);
             });
             if (runTimeline == null) {
-                // 改变要防重复点击的组件状态
-                changeDisableNodes(taskBean, true);
                 // 获取准备时间值
                 int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
@@ -1677,6 +1676,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
+        disableNodes.add(clickLog_Click);
         disableNodes.add(runClick_Click);
         disableNodes.add(clickTest_Click);
         disableNodes.add(tableView_Click);

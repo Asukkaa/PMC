@@ -9,6 +9,7 @@ import priv.koishi.pmc.Bean.TaskBean;
 
 import static priv.koishi.pmc.Finals.CommonFinals.text_taskFailed;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
 
 /**
  * 多线程任务工具的方法
@@ -26,6 +27,8 @@ public class TaskUtils {
      * @param taskBean 绑定线程任务所需参数
      */
     public static void bindingTaskNode(Task<?> task, TaskBean<?> taskBean) {
+        // 设置防重复点击按钮不可点击限制
+        changeDisableNodes(taskBean, true);
         ProgressBar progressBar = taskBean.getProgressBar();
         if (progressBar != null) {
             // 绑定进度条的值属性
@@ -39,6 +42,7 @@ public class TaskUtils {
         if (massageLabel != null && taskBean.isBindingMassageLabel()) {
             // 绑定TextField的值属性
             massageLabel.textProperty().unbind();
+            updateLabel(massageLabel, "");
             massageLabel.textProperty().bind(task.messageProperty());
         }
         throwTaskException(task, taskBean);

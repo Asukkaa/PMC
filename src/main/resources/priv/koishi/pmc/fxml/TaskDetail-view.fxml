@@ -10,18 +10,18 @@
             fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.TaskDetailController">
     <AnchorPane fx:id="anchorPane_TD" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
-            <HBox>
+            <HBox spacing="10">
             <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="任务名称："/>
-                <TextField fx:id="taskNameField_TD" prefWidth="300"/>
+                <TextField fx:id="taskNameField_TD" prefWidth="200"/>
             </HBox>
 
                 <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="设置小时："/>
-                    <TextField fx:id="hourField_TD" prefWidth="50" promptText="HH"/>
+                    <TextField fx:id="hourField_TD" prefWidth="70" promptText="HH"/>
 
                     <Label prefHeight="25" text="设置分钟:"/>
-                    <TextField fx:id="minuteField_TD" prefWidth="50" promptText="MM"/>
+                    <TextField fx:id="minuteField_TD" prefWidth="70" promptText="MM"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
@@ -29,13 +29,13 @@
                     <ChoiceBox fx:id="repeatType_TD" prefHeight="25" prefWidth="150">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="仅一次"/>
                                 <String fx:value="每天"/>
                                 <String fx:value="每周"/>
+                                <String fx:value="仅一次"/>
                             </FXCollections>
                         </items>
                         <value>
-                            <String fx:value="仅一次"/>
+                            <String fx:value="每天"/>
                         </value>
                     </ChoiceBox>
                 </HBox>
@@ -47,7 +47,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
+                <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="选择操作流程"/>
                 <Label fx:id="pmcFilePath_TD" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
                 <Button fx:id="removePath_TD" onAction="#removePath" prefHeight="20"
                         styleClass="img-button-style" visible="false">
@@ -62,7 +62,7 @@
             <HBox spacing="10">
                 <Label fx:id="nullLabel_DT"/>
                 <Button text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
-                <Button text="删除这个流程" style="-fx-cursor: hand" onAction="#removeDetail"/>
+                <Button text="删除这个任务" style="-fx-cursor: hand" onAction="#removeDetail"/>
             </HBox>
         </VBox>
     </AnchorPane>
