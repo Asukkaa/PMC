@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Service;
 
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
 import java.io.BufferedReader;
@@ -84,55 +85,59 @@ public class ScheduledService {
      */
     public static List<TimedTaskBean> getTaskDetails() throws IOException {
         List<TimedTaskBean> taskDetails = new ArrayList<>();
-        TimedTaskBean timedTaskBean = new TimedTaskBean();
         if (systemName.contains(win)) {
             Process process = new ProcessBuilder("schtasks", "/query", "/tn", TASK_NAME, "/fo", "LIST", "/v").start();
             String output = readProcessOutput(process);
             System.out.println(output);
-            // 解析Windows任务信息
-            Pattern startDatePattern = Pattern.compile("Start Date:\\s+(.*?)\\n");
-            Pattern startTimePattern = Pattern.compile("Start Time:\\s+(.*?)\\n");
-            Pattern scheduleTypePattern = Pattern.compile("Schedule Type:\\s+(.*?)\\n");
-            Pattern taskToRunPattern = Pattern.compile("Task To Run:\\s+(.*?)\\n");
-            Pattern DaysPattern = Pattern.compile("Days:\\s+(.*?)\\n");
-            Pattern taskNamePattern = Pattern.compile("TaskName:\\s+(.*?)\\n");
-            // 提取各字段值
-            String startDate = extractValue(startDatePattern, output);
-            String startTime = extractValue(startTimePattern, output);
-            String scheduleType = extractValue(scheduleTypePattern, output).toUpperCase().trim();
-            String taskToRun = extractValue(taskToRunPattern, output);
-            String days = extractValue(DaysPattern, output);
-            String taskName = extractValue(taskNamePattern, output);
-            if ("ONE TIME ONLY".equals(scheduleType)) {
-                scheduleType = ONCE;
-            }
-            String repeatType = repeatTypeMap.getKey(scheduleType);
-            String daysCN = Arrays.stream(days.split(",\\s*"))
-                    .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
-                    .collect(Collectors.joining(", "));
-            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-            LocalTime time = LocalTime.parse(startTime, inputFormatter);
-            timedTaskBean.setTaskName(taskName.substring(taskName.indexOf("\\") + 1))
-                    .setTime(time.format(TIME_FORMATTER))
-                    .setPath(text_onlyLaunch)
-                    .setName(text_onlyLaunch)
-                    .setRepeat(repeatType)
-                    .setDate(startDate)
-                    .setDays(daysCN);
-            if (taskToRun.contains(PMC)) {
-                String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length());
-                String name = getFileName(path);
-                timedTaskBean.setPath(path)
-                        .setName(name);
-            }
-            if ("Every day of the week".equals(days) || DAILY_CN.equals(repeatType)) {
-                timedTaskBean.setDays(DAILY_CN);
-            } else if (ONCE_CN.equals(repeatType)) {
-                timedTaskBean.setDays(ONCE_CN);
+            if (StringUtils.isNotBlank(output)) {
+                TimedTaskBean timedTaskBean = new TimedTaskBean();
+                // 解析Windows任务信息
+                Pattern startDatePattern = Pattern.compile("Start Date:\\s+(.*?)\\n");
+                Pattern startTimePattern = Pattern.compile("Start Time:\\s+(.*?)\\n");
+                Pattern scheduleTypePattern = Pattern.compile("Schedule Type:\\s+(.*?)\\n");
+                Pattern taskToRunPattern = Pattern.compile("Task To Run:\\s+(.*?)\\n");
+                Pattern DaysPattern = Pattern.compile("Days:\\s+(.*?)\\n");
+                Pattern taskNamePattern = Pattern.compile("TaskName:\\s+(.*?)\\n");
+                // 提取各字段值
+                String startDate = extractValue(startDatePattern, output);
+                String startTime = extractValue(startTimePattern, output);
+                String scheduleType = extractValue(scheduleTypePattern, output).toUpperCase().trim();
+                String taskToRun = extractValue(taskToRunPattern, output);
+                String days = extractValue(DaysPattern, output);
+                String taskName = extractValue(taskNamePattern, output);
+                if ("ONE TIME ONLY".equals(scheduleType)) {
+                    scheduleType = ONCE;
+                }
+                String repeatType = repeatTypeMap.getKey(scheduleType);
+                String daysCN = Arrays.stream(days.split(",\\s*"))
+                        .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
+                        .collect(Collectors.joining(", "));
+                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                LocalTime time = LocalTime.parse(startTime, inputFormatter);
+                timedTaskBean.setTaskName(taskName.substring(taskName.indexOf("\\") + 1))
+                        .setTime(time.format(TIME_FORMATTER))
+                        .setPath(text_onlyLaunch)
+                        .setName(text_onlyLaunch)
+                        .setRepeat(repeatType)
+                        .setDate(startDate)
+                        .setDays(daysCN);
+                if (taskToRun.contains(PMC)) {
+                    String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length());
+                    String name = getFileName(path);
+                    timedTaskBean.setPath(path)
+                            .setName(name);
+                }
+                if ("Every day of the week".equals(days) || DAILY_CN.equals(repeatType)) {
+                    timedTaskBean.setDays(DAILY_CN);
+                } else if (ONCE_CN.equals(repeatType)) {
+                    timedTaskBean.setDays(ONCE_CN);
+                }
+                taskDetails.add(timedTaskBean);
             }
         } else if (systemName.contains(mac)) {
             Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + ".plist");
             if (Files.exists(plistPath)) {
+                TimedTaskBean timedTaskBean = new TimedTaskBean();
                 String content = new String(Files.readAllBytes(plistPath));
                 System.out.println(content);
                 // 解析任务名称
@@ -211,9 +216,9 @@ public class ScheduledService {
                                 .setDays(ONCE_CN);
                     }
                 }
+                taskDetails.add(timedTaskBean);
             }
         }
-        taskDetails.add(timedTaskBean);
         return taskDetails;
     }
 

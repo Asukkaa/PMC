@@ -64,7 +64,7 @@
 
         <TableView fx:id="tableView_Task">
             <placeholder>
-                <Label text="拖拽操作流程文件或点击导入操作流程即可追加操作流程，设置操作流程后点击添加操作流程即可新增自定义流程"/>
+                <Label text="当前未设置定时任务"/>
             </placeholder>
 
             <columns>
