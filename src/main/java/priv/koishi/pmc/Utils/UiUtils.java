@@ -1,5 +1,9 @@
 package priv.koishi.pmc.Utils;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -651,6 +655,21 @@ public class UiUtils {
      * @param <T>            数据类型
      */
     public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
+        addData(data, addType, tableView, dataNumber, dataNumberUnit, true);
+    }
+
+    /**
+     * 向列表指定位置添加数据
+     *
+     * @param data           要添加的数据
+     * @param addType        添加位置类型
+     * @param tableView      要添加数据的列表
+     * @param dataNumber     用于展示列表数据数量的文本框
+     * @param dataNumberUnit 数据数量单位
+     * @param selected       true 表示选中添加的数据，false 表示不选中添加的数据
+     * @param <T>            数据类型
+     */
+    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit, boolean selected) {
         ObservableList<T> tableViewItems = tableView.getItems();
         List<T> selectedItem = tableView.getSelectionModel().getSelectedItems();
         switch (addType) {
@@ -663,7 +682,9 @@ public class UiUtils {
                 // 滚动到插入位置
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
-                tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                if (selected) {
+                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                }
                 break;
             }
             // 在列表所选行最后一行下方插入
@@ -675,7 +696,9 @@ public class UiUtils {
                 // 滚动到插入位置
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
-                tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                if (selected) {
+                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                }
                 break;
             }
             // 向列表第一行上方插入
@@ -684,7 +707,10 @@ public class UiUtils {
                 tableView.getItems().addAll(0, data);
                 // 滚动到插入位置
                 tableView.scrollTo(0);
-                tableView.getSelectionModel().selectRange(0, data.size());
+                // 选中新插入的数据
+                if (selected) {
+                    tableView.getSelectionModel().selectRange(0, data.size());
+                }
                 break;
             }
             // 向列表最后一行追加
@@ -694,7 +720,10 @@ public class UiUtils {
                 tableViewItems.addAll(data);
                 // 滚动到插入位置
                 tableView.scrollTo(tableViewItems.size());
-                tableView.getSelectionModel().selectRange(lastIndex, lastIndex + data.size());
+                // 选中新插入的数据
+                if (selected) {
+                    tableView.getSelectionModel().selectRange(lastIndex, lastIndex + data.size());
+                }
                 break;
             }
         }
@@ -739,23 +768,6 @@ public class UiUtils {
         };
         textField.textProperty().addListener(listener);
         return listener;
-    }
-
-    /**
-     * 限制输入框只能输入分和秒范围内的整数
-     *
-     * @param textField 要处理的文本输入框
-     * @param tip       鼠标悬停提示文案
-     */
-    public static void minuteSecondRangeTextField(TextField textField, String tip) {
-        ChangeListener<String> listener = (observable, oldValue, newValue) -> {
-            // 这里处理文本变化的逻辑
-            if (!isInMinuteSecondRange(newValue) && StringUtils.isNotBlank(newValue)) {
-                textField.setText(oldValue);
-            }
-            addValueToolTip(textField, tip);
-        };
-        textField.textProperty().addListener(listener);
     }
 
     /**
@@ -1950,6 +1962,109 @@ public class UiUtils {
             dataNumber.setText(text_allHave + tableSize + dataNumberUnit);
         } else {
             dataNumber.setText(text_dataListNull);
+        }
+    }
+
+    /**
+     * 移除修改内容变化标志监听器（滑块组件专用）
+     *
+     * @param weakInvalidationListeners 监听器集合
+     */
+    public static void removeInvalidationListeners(Map<Object, ? extends WeakReference<InvalidationListener>> weakInvalidationListeners) {
+        // 处理失效监听器集合，遍历所有entry，根据不同类型移除对应的属性监听器
+        weakInvalidationListeners.entrySet().removeIf(entry -> {
+            Object key = entry.getKey();
+            WeakReference<InvalidationListener> ref = entry.getValue();
+            InvalidationListener listener = ref.get();
+            if (key instanceof ImgFileVO imgFileVO) {
+                if (listener != null) {
+                    imgFileVO.pathProperty().removeListener(listener);
+                }
+                return true;
+            } else if (key instanceof TextInputControl textInput) {
+                if (listener != null) {
+                    textInput.textProperty().removeListener(listener);
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 移除修改内容变化标志监听器
+     *
+     * @param weakChangeListeners 监听器集合
+     */
+    @SuppressWarnings("unchecked")
+    public static void removeWeakReferenceChangeListener(Map<Object, ? extends WeakReference<ChangeListener<?>>> weakChangeListeners) {
+        // 处理变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
+        weakChangeListeners.forEach((key, ref) -> {
+            ChangeListener<?> listener = ref.get();
+            if (listener == null) {
+                return;
+            }
+            if (key instanceof ChoiceBox<?> choiceBox) {
+                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
+            } else if (key instanceof Slider slider) {
+                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
+            }
+        });
+    }
+
+    /**
+     * 移除带鼠标悬停提示的内容变化监听器
+     *
+     * @param changeListeners 监听器集合
+     */
+    @SuppressWarnings("unchecked")
+    public static void removeChangeListener(Map<Object, ChangeListener<?>> changeListeners) {
+        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
+        changeListeners.forEach((key, listener) -> {
+            if (key instanceof ChoiceBox<?> choiceBox) {
+                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
+            } else if (key instanceof Slider slider) {
+                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
+            } else if (key instanceof TextInputControl textInput) {
+                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
+            } else if (key instanceof CheckBox checkBox) {
+                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
+            }
+        });
+    }
+
+    /**
+     * 移除全局输入监听
+     *
+     * @param listener 要移除的监听器
+     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
+     */
+    public static void removeNativeListener(EventListener listener) {
+        if (listener != null) {
+            switch (listener) {
+                case NativeMouseListener nativeMouseListener ->
+                        GlobalScreen.removeNativeMouseListener(nativeMouseListener);
+                case NativeMouseMotionListener nativeMouseMotionListener ->
+                        GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
+                case NativeKeyListener nativeKeyListener -> GlobalScreen.removeNativeKeyListener(nativeKeyListener);
+                default -> throw new IllegalArgumentException("未知监听类型");
+            }
+        }
+    }
+
+    /**
+     * 添加全局输入监听
+     *
+     * @param listener 要添加的监听器
+     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
+     */
+    public static void addNativeListener(EventListener listener) {
+        switch (listener) {
+            case NativeMouseListener nativeMouseListener -> GlobalScreen.addNativeMouseListener(nativeMouseListener);
+            case NativeMouseMotionListener nativeMouseMotionListener ->
+                    GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
+            case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
+            default -> throw new IllegalArgumentException("未知监听类型");
         }
     }
 

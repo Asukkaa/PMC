@@ -28,8 +28,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -173,7 +174,7 @@ public class TimedTaskController {
     /**
      * 显示详情页
      *
-     * @param item 要显示详情的操作流程设置
+     * @param item   要显示详情的操作流程设置
      * @param isEdit 是否为编辑模式
      */
     private void showDetail(TimedTaskBean item, boolean isEdit) {
@@ -220,7 +221,7 @@ public class TimedTaskController {
     }
 
     /**
-     * 执行查询定时任务
+     * 执行查询设置的定时任务
      *
      * @param successHandler 成功回调
      */
@@ -236,7 +237,7 @@ public class TimedTaskController {
         task.setOnSucceeded(event -> {
             List<TimedTaskBean> result = task.getValue();
             Platform.runLater(() -> {
-                addData(result, append, tableView_Task, dataNumber_Task, text_data);
+                addData(result, append, tableView_Task, dataNumber_Task, text_data, false);
                 taskUnbind(taskBean);
             });
             if (successHandler != null) {
@@ -253,6 +254,71 @@ public class TimedTaskController {
     }
 
     /**
+     * 构建右键菜单
+     */
+    public void buildContextMenu() {
+        // 添加右键菜单
+        ContextMenu contextMenu = new ContextMenu();
+        // 查看详情选项
+        buildDetailMenuItem(tableView_Task, contextMenu);
+        // 移动所选行选项
+        buildMoveDataMenu(tableView_Task, contextMenu);
+        // 取消选中选项
+        buildClearSelectedData(tableView_Task, contextMenu);
+        // 删除所选数据选项
+        buildDeleteDataMenuItem(tableView_Task, contextMenu);
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(contextMenu, tableView_Task);
+    }
+
+    /**
+     * 查看所选项第一行详情选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildDetailMenuItem(TableView<? extends TimedTaskBean> tableView, ContextMenu contextMenu) {
+        MenuItem detailItem = new MenuItem("查看所选项第一行详情");
+        detailItem.setOnAction(e -> {
+            TimedTaskBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
+            if (selected != null) {
+                showDetail(selected, true);
+            }
+        });
+        contextMenu.getItems().add(detailItem);
+    }
+
+    /**
+     * 删除所选数据选项
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildDeleteDataMenuItem(TableView<TimedTaskBean> tableView, ContextMenu contextMenu) {
+        MenuItem deleteDataMenuItem = new MenuItem("删除所选数据");
+        deleteDataMenuItem.setOnAction(event -> {
+            List<TimedTaskBean> ts = tableView.getSelectionModel().getSelectedItems();
+            ts.forEach(item -> {
+                try {
+                    deleteTask(item.getTaskName());
+                    getScheduleTask();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
+        contextMenu.getItems().add(deleteDataMenuItem);
+    }
+
+    /**
+     * 设置鼠标悬停提示
+     */
+    private void setToolTip() {
+        addToolTip(tip_addTimedTask, addTimedTask_Task);
+        addToolTip(tip_getScheduleTask, getScheduleTask_Task);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
@@ -263,6 +329,12 @@ public class TimedTaskController {
             bindPrefWidthProperty();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId, index_Task);
+            // 设置列表通过拖拽排序行
+            tableViewDragRow(tableView_Task);
+            // 构建右键菜单
+            buildContextMenu();
+            // 设置鼠标悬停提示
+            setToolTip();
             try {
                 // 查询定时任务
                 getScheduleTask();
@@ -292,7 +364,7 @@ public class TimedTaskController {
         executeGetScheduleTask(result -> Platform.runLater(() -> {
             int dataSize = tableView_Task.getItems().size() + 1;
             TimedTaskBean newTask = new TimedTaskBean()
-                    .setTaskName("自动启动任务" + dataSize)
+                    .setTaskName(defaultTaskName + dataSize)
                     .setRepeat(DAILY_CN);
             showDetail(newTask, false);
         }));

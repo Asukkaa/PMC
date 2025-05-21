@@ -2,10 +2,14 @@ package priv.koishi.pmc.Bean;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import priv.koishi.pmc.Bean.VO.Indexable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static priv.koishi.pmc.Finals.CommonFinals.WEEKLY_CN;
+import static priv.koishi.pmc.Finals.CommonFinals.text_onlyLaunch;
 
 /**
  * 定时任务数据类
@@ -76,6 +80,44 @@ public class TimedTaskBean implements Indexable {
     @Override
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    /**
+     * 判断两个定时任务数据是否相同
+     *
+     * @param bean 要判断的定时任务数据
+     * @return true表示相同，false表示不同
+     */
+    public boolean equals(TimedTaskBean bean) {
+        if (bean == this) {
+            return true;
+        }
+        if (bean == null) {
+            return false;
+        }
+        String equalsPath = path;
+        if (text_onlyLaunch.equals(equalsPath)) {
+            equalsPath = "";
+        }
+        String beanPath = bean.getPath();
+        if (text_onlyLaunch.equals(beanPath)) {
+            beanPath = "";
+        }
+        String equalsDays  = days;
+        if (!WEEKLY_CN.equals(repeat)) {
+            equalsDays = "";
+        }
+        String beanDays  = bean.getDays();
+        if (!WEEKLY_CN.equals(bean.getRepeat())) {
+            beanDays = "";
+        }
+        return new EqualsBuilder()
+                .append(taskName, bean.getTaskName())
+                .append(equalsPath, beanPath)
+                .append(dateTime, bean.getDateTime())
+                .append(repeat, bean.getRepeat())
+                .append(equalsDays, beanDays)
+                .isEquals();
     }
 
 }

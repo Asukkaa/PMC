@@ -8,6 +8,7 @@
         <HBox fx:id="fileNumberHBox_Task" spacing="10">
             <Button fx:id="addTimedTask_Task" text="添加定时任务" onAction="#addTimedTask"/>
             <Button fx:id="getScheduleTask_Task" text="查询定时任务" onAction="#getScheduleTask"/>
+            <Label text="定时任务只有在电脑没有锁屏或关机且本程序没有启动时才会正常执行" textFill="red" prefHeight="25"/>
 
             <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
         </HBox>
@@ -18,21 +19,21 @@
             </placeholder>
 
             <columns>
-                <TableColumn fx:id="index_Task" text="序号" sortable="false"/>
-                <TableColumn fx:id="taskName_Task" text="任务名称" sortable="false"/>
-                <TableColumn fx:id="date_Task" text="起始日期" sortable="false"/>
-                <TableColumn fx:id="time_Task" text="触发时间" sortable="false"/>
-                <TableColumn fx:id="repeat_Task" text="重复类型" sortable="false"/>
-                <TableColumn fx:id="days_Task" text="重复日" sortable="false"/>
-                <TableColumn fx:id="name_Task" text="执行流程" sortable="false"/>
-                <TableColumn fx:id="path_Task" text="文件地址" sortable="false"/>
+                <TableColumn fx:id="index_Task" text="序号"/>
+                <TableColumn fx:id="taskName_Task" text="任务名称"/>
+                <TableColumn fx:id="date_Task" text="起始日期"/>
+                <TableColumn fx:id="time_Task" text="触发时间"/>
+                <TableColumn fx:id="repeat_Task" text="重复类型"/>
+                <TableColumn fx:id="days_Task" text="重复日"/>
+                <TableColumn fx:id="name_Task" text="执行流程"/>
+                <TableColumn fx:id="path_Task" text="文件地址"/>
             </columns>
         </TableView>
 
         <HBox fx:id="tipHBox_Task" spacing="10">
             <ProgressBar fx:id="progressBar_Task" visible="false" prefWidth="200.0" progress="0.0"/>
             <Label fx:id="tip_Task" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
-                   text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整操作，双击单元格可进行编辑"/>
+                   text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整或编辑操作"/>
         </HBox>
 
         <HBox fx:id="logHBox_Task" spacing="10">

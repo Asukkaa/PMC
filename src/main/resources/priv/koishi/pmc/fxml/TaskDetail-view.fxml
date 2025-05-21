@@ -18,10 +18,10 @@
 
                 <HBox spacing="5">
                     <Label prefHeight="25" text="设置小时："/>
-                    <TextField fx:id="hourField_TD" prefWidth="70" promptText="HH"/>
+                    <TextField fx:id="hourField_TD" prefWidth="70" promptText="0"/>
 
                     <Label prefHeight="25" text="设置分钟:"/>
-                    <TextField fx:id="minuteField_TD" prefWidth="70" promptText="MM"/>
+                    <TextField fx:id="minuteField_TD" prefWidth="70" promptText="0"/>
                 </HBox>
 
                 <HBox spacing="5">
