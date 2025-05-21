@@ -301,11 +301,15 @@ public class TimedTaskController {
             ts.forEach(item -> {
                 try {
                     deleteTask(item.getTaskName());
-                    getScheduleTask();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             });
+            try {
+                getScheduleTask();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
         contextMenu.getItems().add(deleteDataMenuItem);
     }
