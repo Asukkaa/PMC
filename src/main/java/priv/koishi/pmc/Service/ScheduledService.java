@@ -331,9 +331,9 @@ public class ScheduledService {
             timedTaskBean.setDate(startDate);
             String startTime = timedTaskBean.getTime();
             if (StringUtils.isNotBlank(startTime)) {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate parsedDate = LocalDate.parse(startDate, dateFormatter);
-                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm");
                 LocalTime time = LocalTime.parse(startTime, inputFormatter);
                 timedTaskBean.setDateTime(LocalDateTime.of(parsedDate, time));
             }
