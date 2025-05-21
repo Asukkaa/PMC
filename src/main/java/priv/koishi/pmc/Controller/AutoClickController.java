@@ -1162,6 +1162,16 @@ public class AutoClickController extends CommonProperties implements MousePositi
     }
 
     /**
+     * 设置文本输入框提示
+     */
+    private void setPromptText() {
+        loopTime_Click.setPromptText(defaultLoopTime);
+        outFileName_Click.setPromptText(defaultOutFileName);
+        preparationRunTime_Click.setPromptText(defaultPreparationRunTime);
+        preparationRecordTime_Click.setPromptText(defaultPreparationRecordTime);
+    }
+
+    /**
      * 导入自动操作流程文件
      *
      * @param filePath 文件路径
@@ -1691,6 +1701,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
         disableNodes.add(settingTab);
         Node aboutTab = mainScene.lookup("#aboutTab");
         disableNodes.add(aboutTab);
+        Node timedStartTab = mainScene.lookup("#timedStartTab");
+        disableNodes.add(timedStartTab);
     }
 
     /**
@@ -1735,6 +1747,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 getConfig();
                 // 设置鼠标悬停提示
                 setToolTip();
+                // 设置文本输入框提示
+                setPromptText();
                 // 给输入框添加内容变化监听
                 textFieldChangeListener();
                 // 设置初始配置值为上次配置值

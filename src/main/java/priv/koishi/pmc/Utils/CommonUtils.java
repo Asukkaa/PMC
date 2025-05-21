@@ -1,9 +1,5 @@
 package priv.koishi.pmc.Utils;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
-import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
@@ -12,7 +8,6 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,34 +62,6 @@ public class CommonUtils {
     }
 
     /**
-     * 正则表达式用于匹配分和秒范围的整数
-     *
-     * @param str 要校验的字符串
-     * @return 在设置范围内为true，不在范围内为false
-     */
-    public static boolean isInMinuteSecondRange(String str) {
-        if (StringUtils.isEmpty(str)) {
-            return false;
-        }
-        // 禁止出现0开头的非0数字
-        if (str.indexOf("0") == 0 && str.length() > 2) {
-            return false;
-        }
-        // 禁止出现负数开头的0
-        if (str.indexOf("-0") == 0) {
-            return false;
-        }
-        Pattern integerPattern = Pattern.compile("^-?\\d{1,10}$");
-        // 使用正则表达式判断字符串是否为整数
-        if (!integerPattern.matcher(str).matches()) {
-            return false;
-        }
-        // 将字符串转换为整数并判断是否在指定范围内
-        int value = Integer.parseInt(str);
-        return value >= 0 && value <= 59;
-    }
-
-    /**
      * 获取详细的异常信息
      *
      * @param e 要获取的异常
@@ -107,41 +74,6 @@ public class CommonUtils {
         pw.flush();
         sw.flush();
         return sw.toString();
-    }
-
-    /**
-     * 移除全局输入监听
-     *
-     * @param listener 要移除的监听器
-     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
-     */
-    public static void removeNativeListener(EventListener listener) {
-        if (listener != null) {
-            switch (listener) {
-                case NativeMouseListener nativeMouseListener ->
-                        GlobalScreen.removeNativeMouseListener(nativeMouseListener);
-                case NativeMouseMotionListener nativeMouseMotionListener ->
-                        GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
-                case NativeKeyListener nativeKeyListener -> GlobalScreen.removeNativeKeyListener(nativeKeyListener);
-                default -> throw new IllegalArgumentException("未知监听类型");
-            }
-        }
-    }
-
-    /**
-     * 添加全局输入监听
-     *
-     * @param listener 要添加的监听器
-     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
-     */
-    public static void addNativeListener(EventListener listener) {
-        switch (listener) {
-            case NativeMouseListener nativeMouseListener -> GlobalScreen.addNativeMouseListener(nativeMouseListener);
-            case NativeMouseMotionListener nativeMouseMotionListener ->
-                    GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
-            case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
-            default -> throw new IllegalArgumentException("未知监听类型");
-        }
     }
 
     /**

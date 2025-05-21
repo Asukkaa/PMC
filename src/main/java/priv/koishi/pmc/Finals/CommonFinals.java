@@ -430,11 +430,16 @@ public class CommonFinals {
     public static final String defaultColor = "0xffffffff";
 
     /**
+     * 定时任务默认任务名称
+     */
+    public static final String defaultTaskName = "自动启动任务 ";
+
+    /**
      * 操作记录列表时间格式
      */
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志";
+    public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志，不填将会保留全部日志";
 
     public static final String tip_learButton = "点击将会清空列表中的数据";
 
@@ -504,9 +509,9 @@ public class CommonFinals {
 
     public static final String tip_saveFloating = "点击后将会关闭浮窗并保存浮窗位置";
 
-    public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为 30";
+    public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为 ";
 
-    public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为 30";
+    public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为 ";
 
     public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
 
@@ -568,9 +573,19 @@ public class CommonFinals {
 
     public static final String tip_nextRunMemory = "下次启动程序将会按照此设置项分配程序最大运行内存，单位为GB，只能填自然数，为空将设置为默认值操作系统最大内存的1/4";
 
-    public static final String tip_hour = "只能填0到23的自然数，不填默认为0";
+    public static final String tip_hour = "只能填 0 到 23 的自然数，不填默认为 0";
 
-    public static final String tip_minute = "只能填0到59的自然数，不填默认为0";
+    public static final String tip_minute = "只能填 0 到 59 的自然数，不填默认为 0";
+
+    public static final String tip_taskName = "定时任务的名称，保存后无法修改，同名任务将会被覆盖，不填默认为 ";
+
+    public static final String tip_datePicker = "重复类型选择仅一次时才可修改，其他重复类型只能设置当天生效";
+
+    public static final String tip_repeatType = "定时任务将按照此选项设置类型间隔进行运作";
+
+    public static final String tip_addTimedTask = "点击后将会打开定时任务设置页，设置定时任务并保存成功后将会在下面列表中显示";
+
+    public static final String tip_getScheduleTask = "点击后将会刷新定时任务列表，查询最新设置";
 
     public static final String tip_nextGcType = """
             下次启动程序将会按照此设置项设置垃圾回收（GC）方式
@@ -787,9 +802,9 @@ public class CommonFinals {
 
     public static final String key_appPort = "appPort";
 
-    public static final String key_clickDetailWidth = "clickDetailHeight";
+    public static final String key_clickDetailWidth = "clickDetailWidth";
 
-    public static final String key_clickDetailHeight = "clickDetailWidth";
+    public static final String key_clickDetailHeight = "clickDetailHeight";
 
     public static final String key_taskDetailWidth = "taskDetailWidth";
 
@@ -815,7 +830,9 @@ public class CommonFinals {
 
     public static final String key_overtime = "overtime";
 
-    public static final String key_remindSave = "remindSave";
+    public static final String key_remindClickSave = "remindClickSave";
+
+    public static final String key_remindTaskSave = "remindTaskSave";
 
     public static final String key_mouseFloatingRun = "mouseFloatingRun";
 
@@ -1082,16 +1099,16 @@ public class CommonFinals {
         dayOfWeekName.put("SUN", "星期日");
     }
 
-    public static final BidiMap<Integer, String> dayOfWeek = new DualHashBidiMap<>();
+    public static final BidiMap<Integer, String> dayOfWeekMap = new DualHashBidiMap<>();
 
     static {
-        dayOfWeek.put(1, "星期一");
-        dayOfWeek.put(2, "星期二");
-        dayOfWeek.put(3, "星期三");
-        dayOfWeek.put(4, "星期四");
-        dayOfWeek.put(5, "星期五");
-        dayOfWeek.put(6, "星期六");
-        dayOfWeek.put(7, "星期日");
+        dayOfWeekMap.put(1, "星期一");
+        dayOfWeekMap.put(2, "星期二");
+        dayOfWeekMap.put(3, "星期三");
+        dayOfWeekMap.put(4, "星期四");
+        dayOfWeekMap.put(5, "星期五");
+        dayOfWeekMap.put(6, "星期六");
+        dayOfWeekMap.put(7, "星期日");
     }
 
 }

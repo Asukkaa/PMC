@@ -200,6 +200,8 @@ public class ClickDetailController {
         tableViewSize_Det.setText(tableViewSize);
         // 设置鼠标悬停提示
         setToolTip();
+        // 设置文本输入框提示
+        setPromptText();
         // 给输入框添加内容变化监听
         nodeValueChangeListener();
         wait_Det.setText(item.getWaitTime());
@@ -297,52 +299,15 @@ public class ClickDetailController {
     /**
      * 移除所有监听器
      */
-    @SuppressWarnings("unchecked")
     private void removeAllListeners() {
-        // 处理失效监听器集合，遍历所有entry，根据不同类型移除对应的属性监听器
-        weakInvalidationListeners.entrySet().removeIf(entry -> {
-            Object key = entry.getKey();
-            WeakReference<InvalidationListener> ref = entry.getValue();
-            InvalidationListener listener = ref.get();
-            if (key instanceof ImgFileVO imgFileVO) {
-                if (listener != null) {
-                    imgFileVO.pathProperty().removeListener(listener);
-                }
-                return true;
-            } else if (key instanceof TextInputControl textInput) {
-                if (listener != null) {
-                    textInput.textProperty().removeListener(listener);
-                }
-                return true;
-            }
-            return false;
-        });
+        // 移除修改内容变化标志监听器（滑块组件专用）
+        removeInvalidationListeners(weakInvalidationListeners);
         weakInvalidationListeners.clear();
-        // 处理变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
-        weakChangeListeners.forEach((key, ref) -> {
-            ChangeListener<?> listener = ref.get();
-            if (listener == null) {
-                return;
-            }
-            if (key instanceof ChoiceBox<?> choiceBox) {
-                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
-            } else if (key instanceof Slider slider) {
-                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
-            }
-        });
+        // 移除修改内容变化标志监听器
+        removeWeakReferenceChangeListener(weakChangeListeners);
         weakChangeListeners.clear();
-        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
-        changeListeners.forEach((key, listener) -> {
-            if (key instanceof ChoiceBox<?> choiceBox) {
-                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
-            } else if (key instanceof Slider slider) {
-                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
-            } else if (key instanceof TextInputControl textInput) {
-                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
-            } else if (key instanceof CheckBox checkBox) {
-                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
-            }
-        });
+        // 移除带鼠标悬停提示的内容变化监听器
+        removeChangeListener(changeListeners);
         changeListeners.clear();
         // 处理表格监听器引用
         tableListener = null;
@@ -493,6 +458,24 @@ public class ClickDetailController {
     }
 
     /**
+     * 设置文本输入框提示
+     */
+    private void setPromptText() {
+        clickName_Det.setPromptText(selectedItem.getName());
+        mouseStartX_Det.setPromptText(selectedItem.getStartX());
+        mouseStartY_Det.setPromptText(selectedItem.getStartY());
+        wait_Det.setPromptText(selectedItem.getWaitTime());
+        timeClick_Det.setPromptText(selectedItem.getClickTime());
+        clickNumBer_Det.setPromptText(selectedItem.getClickNum());
+        interval_Det.setPromptText(selectedItem.getClickInterval());
+        randomClickX_Det.setPromptText(defaultRandomClickX);
+        randomClickY_Det.setPromptText(defaultRandomClickY);
+        randomTimeOffset_Det.setPromptText(defaultRandomTime);
+        clickRetryNum_Det.setPromptText(clickRetryNumDefault);
+        stopRetryNum_Det.setPromptText(stopRetryNumDefault);
+    }
+
+    /**
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
@@ -522,12 +505,12 @@ public class ClickDetailController {
         addValueToolTip(clickTypeText_Det, tip_clickType, clickType_Det.getValue());
         addToolTip(tip_clickRetryNum + clickRetryNumDefault, clickRetryNum_Det);
         addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
-        addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
-        addValueToolTip(stopOpacity_Det, tip_stopOpacity, String.valueOf((int) stopOpacity_Det.getValue()));
-        addValueToolTip(clickOpacity_Det, tip_clickOpacity, String.valueOf((int) clickOpacity_Det.getValue()));
         addValueToolTip(randomClickX_Det, tip_randomClickX + defaultRandomClickX);
         addValueToolTip(randomClickY_Det, tip_randomClickY + defaultRandomClickY);
         addValueToolTip(randomTimeOffset_Det, tip_randomTime + defaultRandomTime);
+        addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
+        addValueToolTip(stopOpacity_Det, tip_stopOpacity, String.valueOf((int) stopOpacity_Det.getValue()));
+        addValueToolTip(clickOpacity_Det, tip_clickOpacity, String.valueOf((int) clickOpacity_Det.getValue()));
     }
 
     /**
@@ -559,7 +542,7 @@ public class ClickDetailController {
      * 添加确认关闭确认框
      */
     private void addCloseConfirm() {
-        CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindSave_Set");
+        CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindClickSave_Set");
         // 添加关闭请求监听
         if (remindSave != null && remindSave.isSelected()) {
             stage.setOnCloseRequest(e -> {

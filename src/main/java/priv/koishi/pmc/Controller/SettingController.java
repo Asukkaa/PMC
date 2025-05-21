@@ -44,7 +44,6 @@ import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
-import static priv.koishi.pmc.Utils.CommonUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -141,10 +140,10 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
-            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindSave_Set,
+            mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
-            stopImgLog_Set, waitLog_Set;
+            stopImgLog_Set, waitLog_Set, remindTaskSave_Set;
 
     @FXML
     private TableView<ImgFileVO> tableView_Set;
@@ -427,7 +426,7 @@ public class SettingController implements MousePositionUpdater {
         setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
         setControlLastConfig(clickImgLog_Set, prop, key_clickLog, activation);
         setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, activation);
-        setControlLastConfig(remindSave_Set, prop, key_remindSave, activation);
+        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
         setControlLastConfig(recordDrag_Set, prop, key_recordDrag, activation);
         setControlLastConfig(recordMove_Set, prop, key_recordMove, activation);
         setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
@@ -485,11 +484,8 @@ public class SettingController implements MousePositionUpdater {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(tip_offsetX, offsetX_Set);
-        addToolTip(tip_offsetY, offsetY_Set);
         addToolTip(tip_reLaunch, reLaunch_Set);
         addToolTip(tip_overtime, overtime_Set);
-        addToolTip(tip_remindSave, remindSave_Set);
         addToolTip(tip_firstClick, firstClick_Set);
         addToolTip(tip_recordDrag, recordDrag_Set);
         addToolTip(tip_recordMove, recordMove_Set);
@@ -499,6 +495,7 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_retrySecond, retrySecond_Set);
         addValueToolTip(maxLogNum_Set, tip_maxLogNum);
         addToolTip(lastTab_Set.getText(), lastTab_Set);
+        addToolTip(tip_remindSave, remindClickSave_Set);
         addToolTip(tip_removeStopImgBtn, removeAll_Set);
         addToolTip(tip_mouseFloating, mouseFloating_Set);
         addToolTip(tip_hideWindowRun, hideWindowRun_Set);
@@ -515,6 +512,8 @@ public class SettingController implements MousePositionUpdater {
         addToolTip(tip_showWindowRecord, showWindowRecord_Set);
         addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
         addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
+        addToolTip(tip_offsetX + defaultOffsetX, offsetX_Set);
+        addToolTip(tip_offsetY + defaultOffsetY, offsetY_Set);
         addToolTip(tip_randomClickInterval, randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
         addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
@@ -531,6 +530,23 @@ public class SettingController implements MousePositionUpdater {
         addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(colorPicker_Set.getValue()));
         addValueToolTip(stopOpacity_Set, tip_stopOpacity, String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity, String.valueOf((int) clickOpacity_Set.getValue()));
+    }
+
+    /**
+     * 设置文本输入框提示
+     */
+    private void setPromptText() {
+        retrySecond_Set.setPromptText("1");
+        floatingDistance_Set.setPromptText("0");
+        stopRetryNum_Set.setPromptText(defaultStopRetryNum);
+        randomClickX_Set.setPromptText(defaultRandomClickX);
+        randomClickY_Set.setPromptText(defaultRandomClickY);
+        randomTimeOffset_Set.setPromptText(defaultRandomTime);
+        clickRetryNum_Set.setPromptText(defaultClickRetryNum);
+        sampleInterval_Set.setPromptText(defaultSampleInterval);
+        offsetX_Set.setPromptText(String.valueOf(defaultOffsetX));
+        offsetY_Set.setPromptText(String.valueOf(defaultOffsetY));
+        clickTimeOffset_Set.setPromptText(defaultClickTimeOffset);
     }
 
     /**
@@ -710,6 +726,8 @@ public class SettingController implements MousePositionUpdater {
         bindPrefWidthProperty();
         // 设置鼠标悬停提示
         setToolTip();
+        // 设置文本输入框提示
+        setPromptText();
         // 给组件添加内容变化监听
         nodeValueChangeListener();
         // 加载上次设置信息
@@ -749,8 +767,18 @@ public class SettingController implements MousePositionUpdater {
      * @throws IOException io异常
      */
     @FXML
-    private void loadRemindSaveAction() throws IOException {
-        setLoadLastConfigCheckBox(remindSave_Set, configFile_Click, key_remindSave);
+    private void loadClickRemindSaveAction() throws IOException {
+        setLoadLastConfigCheckBox(remindClickSave_Set, configFile_Click, key_remindClickSave);
+    }
+
+    /**
+     * 定时任务详情页修改后未保存提示
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void loadTaskRemindSaveAction() throws IOException {
+        setLoadLastConfigCheckBox(remindTaskSave_Set, configFile_Click, key_remindTaskSave);
     }
 
     /**

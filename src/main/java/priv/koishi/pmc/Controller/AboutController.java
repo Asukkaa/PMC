@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -59,7 +60,7 @@ public class AboutController {
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
         // 获取日志储存数量配置
-        setControlLastConfig(logsNum_Abt, prop, key_logsNum, "3");
+        setControlLastConfig(logsNum_Abt, prop, key_logsNum);
         title_Abt.setTextFill(Color.HOTPINK);
         title_Abt.setText(appName);
         input.close();
@@ -98,25 +99,28 @@ public class AboutController {
      * @throws RuntimeException 删除日志文件失败
      */
     private void deleteLogs() throws IOException {
-        File[] files = new File(logsPath_Abt.getText()).listFiles();
-        if (files != null) {
-            List<File> logList = new ArrayList<>();
-            for (File file : files) {
-                if (log.equals(getExistsFileType(file))) {
-                    logList.add(file);
-                }
-            }
-            int logsNum = Integer.parseInt(logsNum_Abt.getText());
-            if (logList.size() > logsNum) {
-                logList.sort((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
-                List<File> removeList = logList.stream().skip(logsNum).toList();
-                removeList.forEach(r -> {
-                    String path = r.getAbsolutePath();
-                    File file = new File(path);
-                    if (!file.delete()) {
-                        throw new RuntimeException("日志文件 " + path + " 删除失败");
+        String logsNumValue = logsNum_Abt.getText();
+        if (StringUtils.isNotBlank(logsNumValue)) {
+            File[] files = new File(logsPath_Abt.getText()).listFiles();
+            if (files != null) {
+                List<File> logList = new ArrayList<>();
+                for (File file : files) {
+                    if (log.equals(getExistsFileType(file))) {
+                        logList.add(file);
                     }
-                });
+                }
+                int logsNum = Integer.parseInt(logsNumValue);
+                if (logList.size() > logsNum) {
+                    logList.sort((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+                    List<File> removeList = logList.stream().skip(logsNum).toList();
+                    removeList.forEach(r -> {
+                        String path = r.getAbsolutePath();
+                        File file = new File(path);
+                        if (!file.delete()) {
+                            throw new RuntimeException("日志文件 " + path + " 删除失败");
+                        }
+                    });
+                }
             }
         }
     }
@@ -125,16 +129,18 @@ public class AboutController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        // 给网盘跳转按钮添加鼠标悬停提示
-        addToolTip(tip_openLink, openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
-        // 给github、gitee跳转按钮添加鼠标悬停提示
-        addToolTip(tip_openGitLink, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
-        // 给logo和应用名称添加鼠标悬停提示
-        addToolTip(tip_thanks, logo_Abt, title_Abt);
         // 版本号鼠标悬停提示
         addToolTip(tip_version, version_Abt);
+        // 日志文件数量输入框添加鼠标悬停提示
+        addValueToolTip(logsNum_Abt, tip_logsNum);
         // 赞赏按钮添加鼠标悬停提示
         addToolTip(tip_appreciate, appreciate_Abt);
+        // 给logo和应用名称添加鼠标悬停提示
+        addToolTip(tip_thanks, logo_Abt, title_Abt);
+        // 给github、gitee跳转按钮添加鼠标悬停提示
+        addToolTip(tip_openGitLink, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
+        // 给网盘跳转按钮添加鼠标悬停提示
+        addToolTip(tip_openLink, openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
     }
 
     /**
@@ -148,12 +154,12 @@ public class AboutController {
         version_Abt.setText(version);
         // 添加右键菜单
         setCopyValueContextMenu(mail_Abt, "复制反馈邮件");
+        // 设置鼠标悬停提示
+        setToolTip();
         // log 文件保留数量输入监听
         integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum);
         // 读取配置文件
         getConfig();
-        // 设置鼠标悬停提示
-        setToolTip();
         // 获取logs文件夹路径并展示
         setLogsPath();
         // 清理多余log文件
