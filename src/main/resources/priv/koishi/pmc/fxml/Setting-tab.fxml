@@ -29,8 +29,11 @@
             <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction"
                       styleClass="checkBox-short" selected="true" text="自动操作工具 功能加载上次设置信息"/>
 
-            <CheckBox fx:id="remindSave_Set" onAction="#loadRemindSaveAction"
+            <CheckBox fx:id="remindClickSave_Set" onAction="#loadClickRemindSaveAction"
                       styleClass="checkBox-short" text="操作步骤详情页修改后未保存提示" selected="true"/>
+
+            <CheckBox fx:id="remindTaskSave_Set" onAction="#loadTaskRemindSaveAction"
+                      styleClass="checkBox-short" text="定时任务详情页修改后未保存提示" selected="true"/>
 
             <CheckBox fx:id="autoSave_Set" onAction="#loadAutoSaveAction"
                       selected="true" styleClass="checkBox-short" text="关闭程序时自动保存列表操作步骤"/>
