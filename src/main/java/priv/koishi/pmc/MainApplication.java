@@ -62,10 +62,19 @@ public class MainApplication extends Application {
      */
     private static ServerSocket serverSocket;
 
+    /**
+     * 程序启动后要自动加载的pmc文件路径
+     */
     public static String loadPMCPath;
 
+    /**
+     * 程序启动后运行pmc流程标志（true-运行 false-不运行）
+     */
     public static boolean runPMCFile;
 
+    /**
+     * 重新启动后自动加载过pmc文件标志（true-加载过 false-没有加载过）
+     */
     private static boolean loadPMC;
 
     /**
