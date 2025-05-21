@@ -7,26 +7,31 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
+import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 定时任务详情控制器
@@ -73,6 +78,11 @@ public class TaskDetailController {
     private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
 
     /**
+     * 星期复选框集合
+     */
+    private final BidiMap<DayOfWeek, CheckBox> weekCheckBoxMap = new DualHashBidiMap<>();
+
+    /**
      * 更新数据用的回调函数
      */
     @Setter
@@ -82,7 +92,10 @@ public class TaskDetailController {
     private AnchorPane anchorPane_TD;
 
     @FXML
-    private Button removePath_TD;
+    private HBox filePathHBox_DT, fileNameHBox_TD;
+
+    @FXML
+    private Button delete_TD;
 
     @FXML
     private DatePicker datePicker_TD;
@@ -91,15 +104,19 @@ public class TaskDetailController {
     private ChoiceBox<String> repeatType_TD;
 
     @FXML
-    private Label pmcFilePath_TD, nullLabel_DT;
+    private Label pmcFilePath_TD, nullLabel_DT, fileName_DT;
 
     @FXML
     private TextField hourField_TD, minuteField_TD, taskNameField_TD;
+
+    @FXML
+    private CheckBox monday_TD, tuesday_TD, wednesday_TD, thursday_TD, friday_TD, saturday_TD, sunday_TD;
 
     /**
      * 组件宽高自适应
      */
     public void adaption() {
+        fileName_DT.setMaxWidth(stage.getWidth() * 0.7);
         nullLabel_DT.setPrefWidth(stage.getWidth() * 0.4);
         pmcFilePath_TD.setMaxWidth(stage.getWidth() * 0.7);
     }
@@ -110,15 +127,24 @@ public class TaskDetailController {
      * @param item        列表选中的数据
      * @param parentStage 上级页面的舞台
      * @param isEdit      是否为编辑模式
+     * @throws IOException 路径不能为空、路径格式不正确
      */
-    public void initData(TimedTaskBean item, Stage parentStage, boolean isEdit) {
+    public void initData(TimedTaskBean item, Stage parentStage, boolean isEdit) throws IOException {
         this.isEdit = isEdit;
         this.parentStage = parentStage;
         selectedItem = item;
         String path = item.getPath();
         if (StringUtils.isNotBlank(path) && !text_onlyLaunch.equals(path)) {
             setPathLabel(pmcFilePath_TD, item.getPath());
-            removePath_TD.setVisible(true);
+            filePathHBox_DT.setVisible(true);
+            fileNameHBox_TD.setVisible(true);
+            fileName_DT.setText(getFileName(item.getPath()));
+            addToolTip(fileName_DT.getText(), fileName_DT);
+            if (new File(item.getPath()).exists()) {
+                fileName_DT.setTextFill(existsFileColor);
+            } else {
+                fileName_DT.setTextFill(notExistsFileColor);
+            }
         }
         LocalDateTime dateTime = item.getDateTime();
         if (dateTime != null) {
@@ -128,7 +154,15 @@ public class TaskDetailController {
         } else {
             datePicker_TD.setValue(LocalDate.now());
         }
-        repeatType_TD.setValue(item.getRepeat());
+        String repeat = item.getRepeat();
+        repeatType_TD.setValue(repeat);
+        if (WEEKLY_CN.equals(repeat)) {
+            String days = item.getDays();
+            for (String day : days.split(dayOfWeekRegex)) {
+                Integer dayInt = dayOfWeekMap.getKey(day);
+                weekCheckBoxMap.get(DayOfWeek.of(dayInt)).setSelected(true);
+            }
+        }
         taskNameField_TD.setText(item.getTaskName());
         taskNameField_TD.setDisable(isEdit);
         taskNameField_TD.setPromptText(item.getTaskName());
@@ -173,15 +207,18 @@ public class TaskDetailController {
         String repeatType = repeatType_TD.getValue();
         List<String> dayNames = new ArrayList<>();
         if (WEEKLY_CN.equals(repeatType)) {
-            int dayOfWeek = selectedDate.getDayOfWeek().getValue();
-            days.add(dayOfWeek);
-            dayNames.add(dayOfWeekMap.get(dayOfWeek));
+            Arrays.stream(DayOfWeek.values())
+                    .filter(day -> weekCheckBoxMap.get(day).isSelected())
+                    .forEach(day -> {
+                        days.add(day.getValue());
+                        dayNames.add(dayOfWeekMap.get(day.getValue()));
+                    });
         }
         // 组合完整时间
         LocalDateTime triggerTime = LocalDateTime.of(selectedDate, LocalTime.of(hour, minute));
         TimedTaskBean timedTaskBean = new TimedTaskBean();
         timedTaskBean.setTaskName(taskNameField_TD.getText())
-                .setDays(String.join(",", dayNames))
+                .setDays(String.join(dayOfWeekRegex, dayNames))
                 .setPath(pmcFilePath_TD.getText())
                 .setDateTime(triggerTime)
                 .setRepeat(repeatType)
@@ -224,11 +261,26 @@ public class TaskDetailController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_deletePath, delete_TD);
         addValueToolTip(hourField_TD, tip_hour);
         addValueToolTip(minuteField_TD, tip_minute);
         addValueToolTip(datePicker_TD.getEditor(), tip_datePicker);
         addValueToolTip(repeatType_TD, tip_repeatType, repeatType_TD.getValue());
         addValueToolTip(taskNameField_TD, tip_taskName + selectedItem.getTaskName());
+        weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> addToolTip(checkBox.getText(), checkBox));
+    }
+
+    /**
+     * 设置星期复选框集合
+     */
+    private void setWSeekCheckBoxList() {
+        weekCheckBoxMap.put(DayOfWeek.MONDAY, monday_TD);
+        weekCheckBoxMap.put(DayOfWeek.TUESDAY, tuesday_TD);
+        weekCheckBoxMap.put(DayOfWeek.WEDNESDAY, wednesday_TD);
+        weekCheckBoxMap.put(DayOfWeek.THURSDAY, thursday_TD);
+        weekCheckBoxMap.put(DayOfWeek.FRIDAY, friday_TD);
+        weekCheckBoxMap.put(DayOfWeek.SATURDAY, saturday_TD);
+        weekCheckBoxMap.put(DayOfWeek.SUNDAY, sunday_TD);
     }
 
     /**
@@ -236,12 +288,10 @@ public class TaskDetailController {
      */
     @FXML
     private void initialize() {
-        // 给日期选择框添加鼠标点击事件
-        datePicker_TD.getEditor().setOnMouseClicked(e -> {
-            if (!datePicker_TD.isShowing()) {
-                datePicker_TD.show();
-            }
-        });
+        // 设置星期复选框集合
+        setWSeekCheckBoxList();
+        // 设置日期选择器显示格式
+        setDatePickerFormatter(datePicker_TD, DateTimeFormatter.ofPattern("yyyy-MM-dd EEEE"));
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_TD.getScene().getWindow();
             // 设置鼠标悬停提示
@@ -270,7 +320,10 @@ public class TaskDetailController {
             inFilePath = selectedFile.getPath();
             updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
             setPathLabel(pmcFilePath_TD, inFilePath);
-            removePath_TD.setVisible(true);
+            fileNameHBox_TD.setVisible(true);
+            filePathHBox_DT.setVisible(true);
+            fileName_DT.setText(getFileName(inFilePath));
+            fileName_DT.setTextFill(existsFileColor);
         }
     }
 
@@ -280,7 +333,8 @@ public class TaskDetailController {
     @FXML
     private void removePath() {
         setPathLabel(pmcFilePath_TD, "");
-        removePath_TD.setVisible(false);
+        fileNameHBox_TD.setVisible(false);
+        filePathHBox_DT.setVisible(false);
     }
 
     /**
@@ -317,6 +371,45 @@ public class TaskDetailController {
         if (isEdit && refreshCallback != null) {
             refreshCallback.run();
         }
+    }
+
+    /**
+     * 监听重复类型选项变化
+     */
+    @FXML
+    private void repeatTypeChange() {
+        String repeatType = repeatType_TD.getValue();
+        switch (repeatType) {
+            case ONCE_CN -> {
+                datePicker_TD.setDisable(false);
+                datePickerAction();
+                weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(true));
+            }
+            case WEEKLY_CN -> {
+                datePicker_TD.setValue(LocalDate.now());
+                datePicker_TD.setDisable(true);
+                datePickerAction();
+                weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(false));
+            }
+            case DAILY_CN -> {
+                datePicker_TD.setValue(LocalDate.now());
+                datePicker_TD.setDisable(true);
+                weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {
+                    checkBox.setSelected(true);
+                    checkBox.setDisable(true);
+                });
+            }
+        }
+    }
+
+    /**
+     * 监听日期选择器值变化
+     */
+    @FXML
+    private void datePickerAction() {
+        DayOfWeek dayOfWeek = datePicker_TD.getValue().getDayOfWeek();
+        weekCheckBoxMap.forEach((dayOfWeek1, checkBox) -> checkBox.setSelected(false));
+        weekCheckBoxMap.get(dayOfWeek).setSelected(true);
     }
 
 }

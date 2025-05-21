@@ -37,6 +37,7 @@ import javafx.stage.*;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +57,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -2066,6 +2069,33 @@ public class UiUtils {
             case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
             default -> throw new IllegalArgumentException("未知监听类型");
         }
+    }
+
+    /**
+     * 设置日期选择器显示格式
+     *
+     * @param datePicker    日期选择框
+     * @param dateFormatter 日期格式
+     */
+    public static void setDatePickerFormatter(DatePicker datePicker, DateTimeFormatter dateFormatter) {
+        // 设置日期转换器
+        datePicker.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(LocalDate date) {
+                return date != null ? dateFormatter.format(date) : "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                return LocalDate.parse(string, dateFormatter);
+            }
+        });
+        // 给日期选择框添加鼠标点击事件
+        datePicker.getEditor().setOnMouseClicked(e -> {
+            if (!datePicker.isShowing()) {
+                datePicker.show();
+            }
+        });
     }
 
 }

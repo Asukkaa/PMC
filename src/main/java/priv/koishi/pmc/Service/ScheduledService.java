@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -387,12 +388,11 @@ public class ScheduledService {
                 break;
             }
             case WEEKLY_CN: {
-                for (int day : days) {
-                    // 使用 -Weekly + -DaysOfMonth 实现每月指定日期
-                    psCommand.append(String.format(
-                            "$trigger = New-ScheduledTaskTrigger -Weekly -At '%s' -DaysOfWeek %d; $triggers += $trigger; ",
-                            triggerTime.format(FULL_TIME_FORMATTER), day));
-                }
+                String daysOfWeek = days.stream().map(day -> DayOfWeek.of(day).toString())
+                        .collect(Collectors.joining(","));
+                psCommand.append(String.format(
+                        "$trigger = New-ScheduledTaskTrigger -Weekly -At '%s' -DaysOfWeek %s; $triggers += $trigger; ",
+                        triggerTime.format(FULL_TIME_FORMATTER), daysOfWeek));
                 break;
             }
             case ONCE_CN: {

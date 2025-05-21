@@ -26,7 +26,7 @@
 
                 <HBox spacing="5">
                     <Label prefHeight="25" text="重复类型："/>
-                    <ChoiceBox fx:id="repeatType_TD" prefHeight="25" prefWidth="150">
+                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefHeight="25" prefWidth="100">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
                                 <String fx:value="每天"/>
@@ -43,21 +43,46 @@
 
             <HBox spacing="5">
                 <Label prefHeight="25" text="起始日期："/>
-                <DatePicker fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
+                <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
+                <Label prefHeight="25" text="重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效" textFill="red"/>
             </HBox>
 
-            <HBox spacing="10">
-                <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="选择操作流程"/>
-                <Label fx:id="pmcFilePath_TD" prefHeight="25" style="-fx-font-size: 15px;"/>
-                <Button fx:id="removePath_TD" onAction="#removePath" prefHeight="20"
-                        styleClass="img-button-style" visible="false">
-                    <graphic>
-                        <ImageView>
-                            <Image url="@../icon/Trash.png"/>
-                        </ImageView>
-                    </graphic>
-                </Button>
-            </HBox>
+            <VBox spacing="10">
+                <Label prefHeight="25" text="选择星期："/>
+                <HBox spacing="20">
+                    <CheckBox fx:id="monday_TD" text="星期一"/>
+                    <CheckBox fx:id="tuesday_TD" text="星期二"/>
+                    <CheckBox fx:id="wednesday_TD" text="星期三"/>
+                    <CheckBox fx:id="thursday_TD" text="星期四"/>
+                    <CheckBox fx:id="friday_TD" text="星期五"/>
+                    <CheckBox fx:id="saturday_TD" text="星期六"/>
+                    <CheckBox fx:id="sunday_TD" text="星期日"/>
+                </HBox>
+            </VBox>
+
+            <VBox spacing="10">
+                <HBox spacing="10">
+                    <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="选择操作流程"/>
+
+                    <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
+                        <Label prefHeight="25" text="文件名称："/>
+                        <Label prefHeight="25" fx:id="fileName_DT"/>
+                        <Button onAction="#removePath" prefHeight="20" fx:id="delete_TD"
+                                styleClass="img-button-style">
+                            <graphic>
+                                <ImageView>
+                                    <Image url="@../icon/Trash.png"/>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </HBox>
+
+                <HBox fx:id="filePathHBox_DT" visible="false">
+                    <Label prefHeight="25" text="文件路径："/>
+                    <Label fx:id="pmcFilePath_TD" prefHeight="25" style="-fx-font-size: 15px;"/>
+                </HBox>
+            </VBox>
 
             <HBox spacing="10">
                 <Label fx:id="nullLabel_DT"/>

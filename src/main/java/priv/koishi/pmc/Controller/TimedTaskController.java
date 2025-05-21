@@ -187,7 +187,11 @@ public class TimedTaskController {
             throw new RuntimeException(e);
         }
         TaskDetailController controller = loader.getController();
-        controller.initData(item, mainStage, isEdit);
+        try {
+            controller.initData(item, mainStage, isEdit);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // 设置保存后的回调
         controller.setRefreshCallback(() -> {
             try {

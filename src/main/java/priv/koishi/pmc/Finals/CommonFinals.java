@@ -2,6 +2,7 @@ package priv.koishi.pmc.Finals;
 
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
@@ -218,6 +219,21 @@ public class CommonFinals {
     public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
 
     public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    /**
+     * 存在的文件路径颜色
+     */
+    public static final Color existsFileColor = Color.rgb(0, 88, 128);
+
+    /**
+     * 不存在的文件路径颜色
+     */
+    public static final Color notExistsFileColor = Color.RED;
+
+    /**
+     * 星期分隔符
+     */
+    public static final String dayOfWeekRegex = ", ";
 
     /**
      * 定时任务自动执行参数前缀
@@ -579,13 +595,15 @@ public class CommonFinals {
 
     public static final String tip_taskName = "定时任务的名称，保存后无法修改，同名任务将会被覆盖，不填默认为 ";
 
-    public static final String tip_datePicker = "重复类型选择仅一次时才可修改，其他重复类型只能设置当天生效";
+    public static final String tip_datePicker = "重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效";
 
     public static final String tip_repeatType = "定时任务将按照此选项设置类型间隔进行运作";
 
     public static final String tip_addTimedTask = "点击后将会打开定时任务设置页，设置定时任务并保存成功后将会在下面列表中显示";
 
     public static final String tip_getScheduleTask = "点击后将会刷新定时任务列表，查询最新设置";
+
+    public static final String tip_deletePath = "删除所选文件";
 
     public static final String tip_nextGcType = """
             下次启动程序将会按照此设置项设置垃圾回收（GC）方式

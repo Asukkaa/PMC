@@ -16,7 +16,6 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
@@ -272,13 +271,12 @@ public class ClickDetailController {
             removeClickImg_Det.setVisible(true);
             if (clickImgFile.exists()) {
                 clickImg_Det.setImage(new Image((clickImgFile).toURI().toString()));
-                Color rgb = Color.rgb(0, 88, 128);
-                clickImgName_Det.setTextFill(rgb);
-                clickImgType_Det.setTextFill(rgb);
+                clickImgName_Det.setTextFill(existsFileColor);
+                clickImgType_Det.setTextFill(existsFileColor);
             } else {
                 clickImg_Det.setImage(null);
-                clickImgName_Det.setTextFill(Color.RED);
-                clickImgType_Det.setTextFill(Color.RED);
+                clickImgName_Det.setTextFill(notExistsFileColor);
+                clickImgType_Det.setTextFill(notExistsFileColor);
             }
             String imgName = getFileName(clickImgFile.getPath());
             clickImgName_Det.setText(imgName);
