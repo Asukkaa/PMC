@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.getAppPath;
@@ -98,11 +99,36 @@ public class ScheduledService {
              * @throws IOException 获取任务详情失败
              */
             private void getMacTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
-                Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", TASK_NAME + ".plist");
+                Path launchAgentsPath = Paths.get(userHome, "Library", "LaunchAgents");
+                if (Files.exists(launchAgentsPath)) {
+                    // 遍历所有以 TASK_NAME 开头的 .plist 文件
+                    try (Stream<Path> stream = Files.list(launchAgentsPath)) {
+                        stream.filter(path -> path.toString().endsWith(plist) && path.getFileName().toString().startsWith(TASK_NAME))
+                                .forEach(path -> {
+                                    try {
+                                        parseMacTaskContent(taskDetails, path);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                });
+                    } catch (IOException e) {
+                        throw new IOException("读取 LaunchAgents 目录失败: " + launchAgentsPath, e);
+                    }
+                }
+            }
+
+            /**
+             * 解析mac定时任务详情
+             *
+             * @param taskDetails 任务详情
+             * @param plistPath plist文件路径
+             * @throws IOException 获取任务详情失败
+             */
+            private void parseMacTaskContent(List<? super TimedTaskBean> taskDetails, Path plistPath) throws
+                    IOException {
                 if (Files.exists(plistPath)) {
                     TimedTaskBean timedTaskBean = new TimedTaskBean();
                     String content = new String(Files.readAllBytes(plistPath));
-                    System.out.println(content);
                     // 解析任务名称
                     Pattern labelPattern = Pattern.compile("<key>Label</key>\\s*<string>(.*?)</string>");
                     Matcher labelMatcher = labelPattern.matcher(content);
@@ -122,7 +148,7 @@ public class ScheduledService {
                                     .setPath(path);
                         }
                     }
-                    if (content.contains(DAILY)) {
+                    if (content.contains(DAILY_CN)) {
                         Pattern dailyPattern = Pattern.compile(
                                 "<key>StartCalendarInterval</key>\\s*<dict>"
                                         + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
@@ -249,7 +275,9 @@ public class ScheduledService {
                     }
                 }
             }
-        };
+        }
+
+                ;
     }
 
 

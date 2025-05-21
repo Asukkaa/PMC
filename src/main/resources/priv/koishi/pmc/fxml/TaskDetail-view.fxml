@@ -11,12 +11,12 @@
     <AnchorPane fx:id="anchorPane_TD" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
-            <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="任务名称："/>
-                <TextField fx:id="taskNameField_TD" prefWidth="200"/>
-            </HBox>
+                <HBox spacing="5">
+                    <Label prefHeight="25" text="任务名称："/>
+                    <TextField fx:id="taskNameField_TD" prefWidth="200"/>
+                </HBox>
 
-                <HBox styleClass="hBox-short">
+                <HBox spacing="5">
                     <Label prefHeight="25" text="设置小时："/>
                     <TextField fx:id="hourField_TD" prefWidth="70" promptText="HH"/>
 
@@ -24,7 +24,7 @@
                     <TextField fx:id="minuteField_TD" prefWidth="70" promptText="MM"/>
                 </HBox>
 
-                <HBox styleClass="hBox-short">
+                <HBox spacing="5">
                     <Label prefHeight="25" text="重复类型："/>
                     <ChoiceBox fx:id="repeatType_TD" prefHeight="25" prefWidth="150">
                         <items>
@@ -41,14 +41,14 @@
                 </HBox>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox spacing="5">
                 <Label prefHeight="25" text="起始日期："/>
                 <DatePicker fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
             </HBox>
 
             <HBox spacing="10">
                 <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="选择操作流程"/>
-                <Label fx:id="pmcFilePath_TD" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+                <Label fx:id="pmcFilePath_TD" prefHeight="25" style="-fx-font-size: 15px;"/>
                 <Button fx:id="removePath_TD" onAction="#removePath" prefHeight="20"
                         styleClass="img-button-style" visible="false">
                     <graphic>

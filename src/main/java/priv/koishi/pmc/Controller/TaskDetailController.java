@@ -86,6 +86,7 @@ public class TaskDetailController {
      */
     public void adaption() {
         nullLabel_DT.setPrefWidth(stage.getWidth() * 0.4);
+        pmcFilePath_TD.setMaxWidth(stage.getWidth() * 0.7);
     }
 
     /**
