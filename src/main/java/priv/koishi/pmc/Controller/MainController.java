@@ -14,6 +14,7 @@ import java.util.Properties;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
+import static priv.koishi.pmc.Utils.UiUtils.creatTooltip;
 
 /**
  * 全局页面控制器
@@ -28,6 +29,15 @@ public class MainController {
 
     @FXML
     private Tab settingTab, aboutTab, autoClickTab, timedStartTab;
+
+    /**
+     * 页面初始化
+     */
+    @FXML
+    private void initialize() {
+        // 设置tab页的鼠标悬停提示
+        tabPane.getTabs().forEach(tab -> tab.setTooltip(creatTooltip(tab.getText())));
+    }
 
     /**
      * 组件自适应宽高

@@ -14,7 +14,7 @@
             </ScrollPane>
         </Tab>
 
-        <Tab style="-fx-cursor: hand" fx:id="timedStartTab" text="定时任务">
+        <Tab style="-fx-cursor: hand" fx:id="timedStartTab" text="定时启动任务">
             <ScrollPane fitToWidth="true" fitToHeight="true">
                 <AnchorPane>
                     <fx:include source="TimedTask-tab.fxml"/>
