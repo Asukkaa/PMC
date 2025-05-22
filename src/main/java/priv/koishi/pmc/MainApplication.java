@@ -279,6 +279,7 @@ public class MainApplication extends Application {
         }
         // 启动激活监听服务
         startActivationServer(port);
+        Locale.setDefault(Locale.CHINA);
         launch();
     }
 
