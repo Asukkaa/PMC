@@ -44,11 +44,14 @@
             <HBox spacing="5">
                 <Label prefHeight="25" text="起始日期："/>
                 <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
-                <Label prefHeight="25" text="重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效" textFill="red"/>
+                <Label prefHeight="25" text=" 重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效" textFill="red"/>
             </HBox>
 
             <VBox spacing="10">
-                <Label prefHeight="25" text="选择星期："/>
+                <HBox spacing="10">
+                    <Label prefHeight="25" text="选择星期："/>
+                    <Label prefHeight="25" text="重复类型选择 每周 时才可修改，其他重复类型只能选择当天" textFill="red"/>
+                </HBox>
                 <HBox spacing="20">
                     <CheckBox fx:id="monday_TD" text="星期一"/>
                     <CheckBox fx:id="tuesday_TD" text="星期二"/>

@@ -158,6 +158,7 @@ public class TaskDetailController {
         repeatType_TD.setValue(repeat);
         if (WEEKLY_CN.equals(repeat)) {
             String days = item.getDays();
+            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setSelected(false));
             for (String day : days.split(dayOfWeekRegex)) {
                 Integer dayInt = dayOfWeekMap.getKey(day);
                 weekCheckBoxMap.get(DayOfWeek.of(dayInt)).setSelected(true);
@@ -206,14 +207,12 @@ public class TaskDetailController {
         List<Integer> days = new ArrayList<>();
         String repeatType = repeatType_TD.getValue();
         List<String> dayNames = new ArrayList<>();
-        if (WEEKLY_CN.equals(repeatType)) {
-            Arrays.stream(DayOfWeek.values())
-                    .filter(day -> weekCheckBoxMap.get(day).isSelected())
-                    .forEach(day -> {
-                        days.add(day.getValue());
-                        dayNames.add(dayOfWeekMap.get(day.getValue()));
-                    });
-        }
+        Arrays.stream(DayOfWeek.values())
+                .filter(day -> weekCheckBoxMap.get(day).isSelected())
+                .forEach(day -> {
+                    days.add(day.getValue());
+                    dayNames.add(dayOfWeekMap.get(day.getValue()));
+                });
         // 组合完整时间
         LocalDateTime triggerTime = LocalDateTime.of(selectedDate, LocalTime.of(hour, minute));
         TimedTaskBean timedTaskBean = new TimedTaskBean();
@@ -346,6 +345,9 @@ public class TaskDetailController {
     @FXML
     private void saveDetail() throws IOException {
         TimedTaskBean timedTaskBean = getTimedTaskBean();
+        if (StringUtils.isBlank(timedTaskBean.getDays())) {
+            throw new IllegalArgumentException("未选择任何星期");
+        }
         // 创建定时任务
         createTask(timedTaskBean);
         stage.close();

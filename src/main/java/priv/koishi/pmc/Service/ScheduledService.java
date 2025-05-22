@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Service;
 
 import javafx.concurrent.Task;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
@@ -181,24 +182,32 @@ public class ScheduledService {
                         // 获取起始日期
                         findStartDate(content, timedTaskBean);
                     } else if (content.contains("Weekday")) {
-                        Pattern weeklyPattern = Pattern.compile(
-                                "<key>StartCalendarInterval</key>\\s*<dict>"
-                                        + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
-                                        + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
-                                        + "\\s*<key>Weekday</key><integer>(\\d+)</integer>"
-                                        + "\\s*</dict>", Pattern.DOTALL);
-                        List<String> weekdays = new ArrayList<>();
-                        Matcher weeklyMatcher = weeklyPattern.matcher(content);
-                        while (weeklyMatcher.find()) {
-                            int hour = Integer.parseInt(weeklyMatcher.group(1));
-                            int minute = Integer.parseInt(weeklyMatcher.group(2));
-                            int weekday = Integer.parseInt(weeklyMatcher.group(3));
-                            timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                                    .setRepeat(WEEKLY_CN);
-                            weekdays.add(dayOfWeekMap.get(weekday));
-                        }
-                        if (!weekdays.isEmpty()) {
-                            timedTaskBean.setDays(StringUtils.join(weekdays, dayOfWeekRegex));
+                        Pattern arrayPattern = Pattern.compile(
+                                "<key>StartCalendarInterval</key>\\s*<array>(.*?)</array>",
+                                Pattern.DOTALL);
+                        Matcher arrayMatcher = arrayPattern.matcher(content);
+                        if (arrayMatcher.find()) {
+                            String arrayContent = arrayMatcher.group(1);
+                            Pattern dictPattern = Pattern.compile(
+                                    "<dict>\\s*" +
+                                            "<key>Hour</key><integer>(\\d+)</integer>\\s*" +
+                                            "<key>Minute</key><integer>(\\d+)</integer>\\s*" +
+                                            "<key>Weekday</key><integer>(\\d+)</integer>\\s*" +
+                                            "</dict>",
+                                    Pattern.DOTALL);
+                            Matcher dictMatcher = dictPattern.matcher(arrayContent);
+                            List<String> weekdays = new ArrayList<>();
+                            while (dictMatcher.find()) {
+                                int hour = Integer.parseInt(dictMatcher.group(1));
+                                int minute = Integer.parseInt(dictMatcher.group(2));
+                                int weekday = Integer.parseInt(dictMatcher.group(3));
+                                timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
+                                        .setRepeat(WEEKLY_CN);
+                                weekdays.add(dayOfWeekMap.get(weekday));
+                            }
+                            if (CollectionUtils.isNotEmpty(weekdays)) {
+                                timedTaskBean.setDays(StringUtils.join(weekdays, dayOfWeekRegex));
+                            }
                         }
                         // 获取起始日期
                         findStartDate(content, timedTaskBean);
@@ -405,7 +414,7 @@ public class ScheduledService {
         }
         // 注册任务（支持多个触发器）
         psCommand.append(String.format("Register-ScheduledTask -TaskName '%s' -Action $action -Trigger $triggers" +
-                        " -Settings (New-ScheduledTaskSettingsSet -Compatibility Win8) -Force", taskName));
+                " -Settings (New-ScheduledTaskSettingsSet -Compatibility Win8) -Force", taskName));
         // 执行 PowerShell 命令
         ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-Command", psCommand.toString());
         pb.redirectErrorStream(true);
@@ -449,20 +458,25 @@ public class ScheduledService {
                 break;
             }
             case WEEKLY_CN: {
-                // 支持多天执行（如每周一、三）
-                interval = days.stream().map(day -> String.format("""
-                                <key>StartCalendarInterval</key>
+                // 支持多天执行
+                String intervals = days.stream().map(day -> String.format("""
                                 <dict>
                                     <key>Hour</key><integer>%d</integer>
                                     <key>Minute</key><integer>%d</integer>
                                     <key>Weekday</key><integer>%d</integer>
-                                </dict>
-                                <key>StartDate</key>
-                                <string>%s</string>""",
+                                </dict>""",
                         triggerTime.getHour(),
                         triggerTime.getMinute(),
-                        day,
-                        triggerTime.toLocalDate())).collect(Collectors.joining());
+                        day)).collect(Collectors.joining("\n"));
+                interval = String.format("""
+                                <key>StartCalendarInterval</key>
+                                <array>
+                                    %s
+                                </array>
+                                <key>StartDate</key>
+                                <string>%s</string>""",
+                        intervals,
+                        triggerTime.toLocalDate());
                 break;
             }
             default: {
