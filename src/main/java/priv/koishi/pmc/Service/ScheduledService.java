@@ -181,20 +181,24 @@ public class ScheduledService {
                         // 获取起始日期
                         findStartDate(content, timedTaskBean);
                     } else if (content.contains("Weekday")) {
-                        Pattern dailyPattern = Pattern.compile(
+                        Pattern weeklyPattern = Pattern.compile(
                                 "<key>StartCalendarInterval</key>\\s*<dict>"
                                         + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
                                         + "\\s*<key>Minute</key><integer>(\\d+)</integer>"
                                         + "\\s*<key>Weekday</key><integer>(\\d+)</integer>"
-                                        + "\\s*</dict>");
-                        Matcher dailyMatcher = dailyPattern.matcher(content);
-                        if (dailyMatcher.find()) {
-                            int hour = Integer.parseInt(dailyMatcher.group(1));
-                            int minute = Integer.parseInt(dailyMatcher.group(2));
-                            int weekday = Integer.parseInt(dailyMatcher.group(3));
+                                        + "\\s*</dict>", Pattern.DOTALL);
+                        List<String> weekdays = new ArrayList<>();
+                        Matcher weeklyMatcher = weeklyPattern.matcher(content);
+                        while (weeklyMatcher.find()) {
+                            int hour = Integer.parseInt(weeklyMatcher.group(1));
+                            int minute = Integer.parseInt(weeklyMatcher.group(2));
+                            int weekday = Integer.parseInt(weeklyMatcher.group(3));
                             timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                                    .setDays(dayOfWeekMap.get(weekday))
                                     .setRepeat(WEEKLY_CN);
+                            weekdays.add(dayOfWeekMap.get(weekday));
+                        }
+                        if (!weekdays.isEmpty()) {
+                            timedTaskBean.setDays(StringUtils.join(weekdays, dayOfWeekRegex));
                         }
                         // 获取起始日期
                         findStartDate(content, timedTaskBean);
@@ -268,7 +272,7 @@ public class ScheduledService {
                         String repeatType = repeatTypeMap.getKey(scheduleType);
                         String daysCN = Arrays.stream(days.split(",\\s*"))
                                 .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
-                                .collect(Collectors.joining(", "));
+                                .collect(Collectors.joining(dayOfWeekRegex));
                         DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
                                 .appendValue(ChronoField.HOUR_OF_DAY, 1, 2, SignStyle.NEVER)
                                 .appendPattern(":mm:ss")
@@ -299,11 +303,8 @@ public class ScheduledService {
                     }
                 }
             }
-        }
-
-                ;
+        };
     }
-
 
     /**
      * 从字符串中提取指定值
