@@ -103,11 +103,11 @@ public class TimedTaskBean implements Indexable {
         if (text_onlyLaunch.equals(beanPath)) {
             beanPath = "";
         }
-        String equalsDays  = days;
+        String equalsDays = days;
         if (!WEEKLY_CN.equals(repeat)) {
             equalsDays = "";
         }
-        String beanDays  = bean.getDays();
+        String beanDays = bean.getDays();
         if (!WEEKLY_CN.equals(bean.getRepeat())) {
             beanDays = "";
         }
@@ -118,6 +118,15 @@ public class TimedTaskBean implements Indexable {
                 .append(repeat, bean.getRepeat())
                 .append(equalsDays, beanDays)
                 .isEquals();
+    }
+
+    /**
+     * 获取哈希码
+     *
+     * @return 哈希码
+     */
+    public int hashCode() {
+        return taskName.hashCode();
     }
 
 }
