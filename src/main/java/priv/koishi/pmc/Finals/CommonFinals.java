@@ -1102,7 +1102,9 @@ public class CommonFinals {
 
     public static final String ONCE_CN = "仅一次";
 
-
+    /**
+     * 定时任务重复类型映射
+     */
     public static final BidiMap<String, String> repeatTypeMap = new DualHashBidiMap<>();
 
     static {
@@ -1111,6 +1113,9 @@ public class CommonFinals {
         repeatTypeMap.put(ONCE_CN, ONCE);
     }
 
+    /**
+     * 定时任务星期名称中英文映射
+     */
     public static final BidiMap<String, String> dayOfWeekName = new DualHashBidiMap<>();
 
     static {
@@ -1123,6 +1128,9 @@ public class CommonFinals {
         dayOfWeekName.put("SUN", "星期日");
     }
 
+    /**
+     * 定时任务星期名称与数字映射
+     */
     public static final BidiMap<Integer, String> dayOfWeekMap = new DualHashBidiMap<>();
 
     static {
@@ -1135,6 +1143,9 @@ public class CommonFinals {
         dayOfWeekMap.put(7, "星期日");
     }
 
+    /**
+     * 定时任务星期名称与数字映射的逆向映射
+     */
     public static final Map<String, Integer> dayOfWeekReverseMap = dayOfWeekMap.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
