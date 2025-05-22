@@ -9,6 +9,8 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Utils.FileUtils.getCFGPath;
 import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
@@ -728,6 +730,8 @@ public class CommonFinals {
 
     public static final String text_copySuccess = "复制成功";
 
+    public static final String text_successSave = "保存成功";
+
     public static final String text_nowValue = "当前设置值为： ";
 
     public static final String text_saveSuccess = "所有数据已导出到： ";
@@ -1128,5 +1132,8 @@ public class CommonFinals {
         dayOfWeekMap.put(6, "星期六");
         dayOfWeekMap.put(7, "星期日");
     }
+
+    public static final Map<String, Integer> dayOfWeekReverseMap = dayOfWeekMap.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
 }

@@ -2,12 +2,14 @@ package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -15,7 +17,10 @@ import lombok.Setter;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
+import priv.koishi.pmc.MessageBubble.MessageBubble;
+import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,12 +30,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -83,6 +90,16 @@ public class TaskDetailController {
     private final BidiMap<DayOfWeek, CheckBox> weekCheckBoxMap = new DualHashBidiMap<>();
 
     /**
+     * 线程池实例
+     */
+    private static final ExecutorService executorService = ThreadPoolManager.getPool(TaskDetailController.class);
+
+    /**
+     * 要防重复点击的组件
+     */
+    private static final List<Node> disableNodes = new ArrayList<>();
+
+    /**
      * 更新数据用的回调函数
      */
     @Setter
@@ -92,19 +109,25 @@ public class TaskDetailController {
     private AnchorPane anchorPane_TD;
 
     @FXML
-    private HBox filePathHBox_DT, fileNameHBox_TD;
+    private VBox progressBarVBox_TD;
 
     @FXML
-    private Button delete_TD;
+    private HBox filePathHBox_DT, fileNameHBox_TD;
 
     @FXML
     private DatePicker datePicker_TD;
 
     @FXML
+    private ProgressBar progressBar_TD;
+
+    @FXML
     private ChoiceBox<String> repeatType_TD;
 
     @FXML
-    private Label pmcFilePath_TD, nullLabel_DT, fileName_DT;
+    private Label pmcFilePath_TD, fileName_DT, log_TD;
+
+    @FXML
+    private Button delete_TD, saveDetail_TD, removeDetail_TD;
 
     @FXML
     private TextField hourField_TD, minuteField_TD, taskNameField_TD;
@@ -117,8 +140,8 @@ public class TaskDetailController {
      */
     public void adaption() {
         fileName_DT.setMaxWidth(stage.getWidth() * 0.7);
-        nullLabel_DT.setPrefWidth(stage.getWidth() * 0.4);
         pmcFilePath_TD.setMaxWidth(stage.getWidth() * 0.7);
+        progressBarVBox_TD.setPrefWidth(stage.getWidth() * 0.4);
     }
 
     /**
@@ -283,10 +306,20 @@ public class TaskDetailController {
     }
 
     /**
+     * 设置要防重复点击的组件
+     */
+    private void setDisableNodes() {
+        disableNodes.add(saveDetail_TD);
+        disableNodes.add(removeDetail_TD);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
+        // 设置要防重复点击的组件
+        setDisableNodes();
         // 设置星期复选框集合
         setWSeekCheckBoxList();
         // 设置日期选择器显示格式
@@ -348,13 +381,31 @@ public class TaskDetailController {
         if (StringUtils.isBlank(timedTaskBean.getDays())) {
             throw new IllegalArgumentException("未选择任何星期");
         }
+        TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(progressBar_TD)
+                .setDisableNodes(disableNodes)
+                .setBindingMassageLabel(true)
+                .setMassageLabel(log_TD);
         // 创建定时任务
-        createTask(timedTaskBean);
-        stage.close();
-        // 触发列表刷新（通过回调）
-        if (refreshCallback != null) {
-            refreshCallback.run();
-        }
+        Task<Void> task = createTask(timedTaskBean);
+        bindingTaskNode(task, taskBean);
+        task.setOnSucceeded(event -> Platform.runLater(() -> {
+            taskUnbind(taskBean);
+            // 复制成功消息气泡
+            new MessageBubble(text_successSave, 2);
+            stage.close();
+            // 触发列表刷新（通过回调）
+            if (refreshCallback != null) {
+                refreshCallback.run();
+            }
+        }));
+        task.setOnFailed(event -> {
+            taskNotSuccess(taskBean, text_taskFailed);
+            Throwable ex = task.getException();
+            taskUnbind(taskBean);
+            throw new RuntimeException(ex);
+        });
+        executorService.execute(task);
     }
 
     /**

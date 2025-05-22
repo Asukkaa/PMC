@@ -43,14 +43,16 @@
 
             <HBox spacing="5">
                 <Label prefHeight="25" text="起始日期："/>
-                <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
-                <Label prefHeight="25" text=" 重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效" textFill="red"/>
+                <HBox spacing="10">
+                    <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
+                    <Label prefHeight="25" text=" 重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效" textFill="red"/>
+                </HBox>
             </HBox>
 
             <VBox spacing="10">
                 <HBox spacing="10">
                     <Label prefHeight="25" text="选择星期："/>
-                    <Label prefHeight="25" text="重复类型选择 每周 时才可修改，其他重复类型只能选择当天" textFill="red"/>
+                    <Label prefHeight="25" text="重复类型选择 每周 时才可修改，其他重复类型只能选择当天，无论哪种重复类型都至少要选择一天" textFill="red"/>
                 </HBox>
                 <HBox spacing="20">
                     <CheckBox fx:id="monday_TD" text="星期一"/>
@@ -66,19 +68,20 @@
             <VBox spacing="10">
                 <HBox spacing="10">
                     <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="选择操作流程"/>
+                    <Label prefHeight="25" text="如果不设置可以执行的操作流程文件，时间到了后程序只会定时启动" textFill="red"/>
+                </HBox>
 
-                    <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
-                        <Label prefHeight="25" text="文件名称："/>
-                        <Label prefHeight="25" fx:id="fileName_DT"/>
-                        <Button onAction="#removePath" prefHeight="20" fx:id="delete_TD"
-                                styleClass="img-button-style">
-                            <graphic>
-                                <ImageView>
-                                    <Image url="@../icon/Trash.png"/>
-                                </ImageView>
-                            </graphic>
-                        </Button>
-                    </HBox>
+                <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
+                    <Label prefHeight="25" text="文件名称："/>
+                    <Label prefHeight="25" fx:id="fileName_DT"/>
+                    <Button onAction="#removePath" prefHeight="20" fx:id="delete_TD"
+                            styleClass="img-button-style">
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../icon/Trash.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
                 </HBox>
 
                 <HBox fx:id="filePathHBox_DT" visible="false">
@@ -88,9 +91,13 @@
             </VBox>
 
             <HBox spacing="10">
-                <Label fx:id="nullLabel_DT"/>
-                <Button text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
-                <Button text="删除这个任务" style="-fx-cursor: hand" onAction="#removeDetail"/>
+                <VBox fx:id="progressBarVBox_TD">
+                    <ProgressBar fx:id="progressBar_TD" visible="false" prefWidth="200.0" progress="0.0"/>
+                    <Label fx:id="log_TD"/>
+                </VBox>
+
+                <Button fx:id="saveDetail_TD" text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
+                <Button fx:id="removeDetail_TD" text="删除这个任务" style="-fx-cursor: hand" onAction="#removeDetail"/>
             </HBox>
         </VBox>
     </AnchorPane>

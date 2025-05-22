@@ -331,6 +331,7 @@ public class TimedTaskController {
      */
     @FXML
     private void initialize() {
+        // 设置要防重复点击的组件
         setDisableNodes();
         Platform.runLater(() -> {
             mainStage = (Stage) anchorPane_Task.getScene().getWindow();
