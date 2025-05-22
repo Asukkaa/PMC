@@ -15,6 +15,7 @@ module priv.koishi.pmc {
     requires org.bytedeco.javacv;
     requires org.bytedeco.opencv;
     requires com.sun.jna;
+    requires jdk.localedata;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;

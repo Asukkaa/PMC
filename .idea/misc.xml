@@ -5,6 +5,9 @@
       <item index="0" class="java.lang.String" itemvalue="javafx.fxml.FXML" />
       <item index="1" class="java.lang.String" itemvalue="priv.koishi.pmc.Annotate.UsedByReflection" />
     </list>
+    <writeAnnotations>
+      <writeAnnotation name="javafx.fxml.FXML" />
+    </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MavenProjectsManager">
