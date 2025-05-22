@@ -722,6 +722,8 @@ public class CommonFinals {
 
     public static final String text_data = " 组数据";
 
+    public static final String text_task = " 个任务";
+
     public static final String text_img = " 张图片";
 
     public static final String text_log = " 条记录";

@@ -8,7 +8,7 @@
         <HBox fx:id="fileNumberHBox_Task" spacing="10">
             <Button fx:id="addTimedTask_Task" text="添加定时任务" onAction="#addTimedTask"/>
             <Button fx:id="getScheduleTask_Task" text="查询定时任务" onAction="#getScheduleTask"/>
-            <Label text="定时任务只有在电脑没有锁屏或关机且本程序没有启动时才会正常执行" textFill="red" prefHeight="25"/>
+            <Label text="定时任务只有在电脑没有锁屏或关机且本程序没有启动时才会正常执行，移动程序目录也会导致任务无法正常执行" textFill="red" prefHeight="25"/>
 
             <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
         </HBox>

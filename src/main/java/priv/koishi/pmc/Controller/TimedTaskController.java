@@ -241,7 +241,7 @@ public class TimedTaskController {
         task.setOnSucceeded(event -> {
             List<TimedTaskBean> result = task.getValue();
             Platform.runLater(() -> {
-                addData(result, append, tableView_Task, dataNumber_Task, text_data, false);
+                addData(result, append, tableView_Task, dataNumber_Task, text_task, false);
                 taskUnbind(taskBean);
             });
             if (successHandler != null) {
@@ -335,6 +335,7 @@ public class TimedTaskController {
         setDisableNodes();
         Platform.runLater(() -> {
             mainStage = (Stage) anchorPane_Task.getScene().getWindow();
+            // 设置javafx单元格宽度
             bindPrefWidthProperty();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId, index_Task);
