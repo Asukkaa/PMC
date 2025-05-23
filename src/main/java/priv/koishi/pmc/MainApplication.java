@@ -223,6 +223,7 @@ public class MainApplication extends Application {
                 }
             } catch (BindException e) {
                 logger.error("端口{}已被占用，无法启动激活服务", port);
+                System.exit(0);
             } catch (IOException e) {
                 if (serverSocket != null && !serverSocket.isClosed()) {
                     logger.error("激活窗口服务异常", e);
