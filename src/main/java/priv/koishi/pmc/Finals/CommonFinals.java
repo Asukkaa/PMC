@@ -253,6 +253,11 @@ public class CommonFinals {
     public static final String unActivation = "0";
 
     /**
+     * 端口被占用时激活窗口信号
+     */
+    public static final String activatePMC = "activatePMC";
+
+    /**
      * 启用禁用标志
      */
     public static final List<String> activationList = Arrays.asList(activation, unActivation);

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -17,6 +18,8 @@ import java.nio.file.attribute.FileTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static priv.koishi.pmc.Finals.CommonFinals.activatePMC;
 
 /**
  * 单实例守护
@@ -255,7 +258,9 @@ public class SingleInstanceGuard {
      * @param port 端口号
      */
     private static void sendActivationSignal(int port) {
-        try (Socket ignored = new Socket("localhost", port)) {
+        try (Socket socket = new Socket("localhost", port)) {
+            OutputStream out = socket.getOutputStream();
+            out.write(activatePMC.getBytes());
             logger.info("程序正在运行，将发送弹出程序窗口的信号");
         } catch (IOException e) {
             logger.error("激活信号发送失败，可能主程序未启动完成", e);

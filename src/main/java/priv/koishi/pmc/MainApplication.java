@@ -18,14 +18,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
-import priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.BindException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Locale;
@@ -35,6 +32,7 @@ import java.util.Properties;
 import static priv.koishi.pmc.Controller.MainController.mainAdaption;
 import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -213,17 +211,32 @@ public class MainApplication extends Application {
                 serverSocket = new ServerSocket(port);
                 while (!serverSocket.isClosed()) {
                     Socket socket = serverSocket.accept();
-                    Platform.runLater(() -> {
-                        // 弹出程序窗口
-                        if (primaryStage != null) {
-                            showStage(primaryStage);
-                        }
-                    });
+                    InputStream in = socket.getInputStream();
+                    byte[] buffer = new byte[activatePMC.length()];
+                    int bytesRead = in.read(buffer);
+                    if (bytesRead > 0 && activatePMC.equals(new String(buffer, 0, bytesRead))) {
+                        Platform.runLater(() -> {
+                            // 弹出程序窗口
+                            if (primaryStage != null) {
+                                showStage(primaryStage);
+                            }
+                        });
+                    }
                     socket.close();
                 }
             } catch (BindException e) {
-                logger.error("端口{}已被占用，无法启动激活服务", port);
-                System.exit(0);
+                // 发送激活正在运行的程序窗口信号
+                try (Socket socket = new Socket("localhost", port)) {
+                    OutputStream out = socket.getOutputStream();
+                    out.write(activatePMC.getBytes());
+                    logger.info("检测到重复启动，激活现有实例");
+                    System.exit(0);
+                } catch (ConnectException ce) {
+                    logger.error("端口{}被其他进程占用", port);
+                } catch (IOException ex) {
+                    logger.error("端口检测异常: {}", ex.getMessage());
+                    System.exit(1);
+                }
             } catch (IOException e) {
                 if (serverSocket != null && !serverSocket.isClosed()) {
                     logger.error("激活窗口服务异常", e);
@@ -275,7 +288,7 @@ public class MainApplication extends Application {
         int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
         input.close();
         // 启动时检查是否已经启动
-        if (SingleInstanceGuard.checkRunning(port)) {
+        if (checkRunning(port)) {
             System.exit(0);
         }
         // 启动激活监听服务
