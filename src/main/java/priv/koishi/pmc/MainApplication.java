@@ -270,7 +270,7 @@ public class MainApplication extends Application {
         logger.info("启动参数数量: {}", args.length);
         for (int i = 0; i < args.length; i++) {
             // windows --r pmcFilePath 算两个参数，macOS算一个
-            if ("--r".equals(args[i])) {
+            if (r.trim().equals(args[i])) {
                 runPMCFile = true;
             } else if (args[i].contains(PMC)) {
                 loadPMCPath = args[i];
