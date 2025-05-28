@@ -318,7 +318,7 @@ public class UiUtils {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("异常信息");
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        setWindLogo(stage, logoPath);
+        setWindowLogo(stage, logoPath);
         // 创建展示异常信息的TextArea
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
@@ -326,7 +326,8 @@ public class UiUtils {
         textArea.setText(errString);
         // 创建VBox并添加TextArea
         VBox details = new VBox();
-        details.heightProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> textArea.setPrefHeight(details.getHeight())));
+        details.heightProperty().addListener((observable, oldValue, newValue)
+                -> Platform.runLater(() -> textArea.setPrefHeight(details.getHeight())));
         details.getChildren().add(textArea);
         alert.getDialogPane().setExpandableContent(details);
         return alert;
@@ -346,7 +347,7 @@ public class UiUtils {
         dialog.setTitle(title);
         dialog.setHeaderText(confirm);
         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-        setWindLogo(stage, logoPath);
+        setWindowLogo(stage, logoPath);
         ButtonType okButton = new ButtonType(ok, ButtonBar.ButtonData.APPLY);
         ButtonType cancelButton = new ButtonType(cancel, ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
@@ -359,7 +360,7 @@ public class UiUtils {
      * @param stage 要设置logo的窗口
      * @param path  logo路径
      */
-    public static void setWindLogo(Stage stage, String path) {
+    public static void setWindowLogo(Stage stage, String path) {
         stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource(path)).toString()));
     }
 
@@ -1445,7 +1446,11 @@ public class UiUtils {
      */
     public static void changeDisableNodes(List<? extends Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
-            disableNodes.forEach(dc -> dc.setDisable(disable));
+            disableNodes.forEach(dc -> {
+                if (dc != null) {
+                    dc.setDisable(disable);
+                }
+            });
         }
     }
 

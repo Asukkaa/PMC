@@ -482,8 +482,6 @@ public class CommonFinals {
 
     public static final String tip_addPosition = "点击后将会根据设置在列表中添加一条操作步骤";
 
-    public static final String tip_clickTest = "点击后将会按照设置位置点击";
-
     public static final String tip_loopTime = "自动操作循环次数，只能填自然数，不填默认为 1，填 0 为无限循环";
 
     public static final String tip_clickNumBer = "每步操作执行次数，点击为多次点击，长按为多次长按，只能填自然数，不填默认为 1";

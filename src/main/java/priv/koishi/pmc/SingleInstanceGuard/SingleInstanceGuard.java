@@ -87,7 +87,7 @@ public class SingleInstanceGuard {
      * @param port 激活信号端口
      * @return true表示已有实例运行，false表示当前是首个实例
      */
-    public static boolean checkRunning(int port) {
+    public static boolean checkRunning(int port,String[] args ) {
         try {
             // 获取锁文件路径
             Path lockPath = getLockFilePath();
@@ -102,7 +102,7 @@ public class SingleInstanceGuard {
             // 若文件已锁定或心跳守护线程启动失败则返回true
             if (fileLock == null || !startHeartbeat()) {
                 // 发送激活窗口信号
-                sendActivationSignal(port);
+                sendActivationSignal(port, args);
                 // 释放文件锁资源
                 releaseResources();
                 return true;
@@ -257,11 +257,12 @@ public class SingleInstanceGuard {
      *
      * @param port 端口号
      */
-    private static void sendActivationSignal(int port) {
+    private static void sendActivationSignal(int port, String[] args) {
         try (Socket socket = new Socket("localhost", port)) {
             OutputStream out = socket.getOutputStream();
-            out.write(activatePMC.getBytes());
-            logger.info("程序正在运行，将发送弹出程序窗口的信号");
+            String payload = activatePMC + "\n" + String.join("\n", args);
+            out.write(payload.getBytes());
+            logger.info("程序正在运行，发送激活信号及参数: {}", payload);
         } catch (IOException e) {
             logger.error("激活信号发送失败，可能主程序未启动完成", e);
         }

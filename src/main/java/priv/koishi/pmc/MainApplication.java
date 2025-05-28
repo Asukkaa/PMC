@@ -6,10 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -18,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
+import priv.koishi.pmc.Controller.MainController;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.*;
@@ -25,12 +23,9 @@ import java.net.BindException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
-import static priv.koishi.pmc.Controller.MainController.mainAdaption;
-import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -53,7 +48,12 @@ public class MainApplication extends Application {
     /**
      * 程序主舞台
      */
-    private static Stage primaryStage;
+    public static Stage mainStage;
+
+    /**
+     * 程序主场景
+     */
+    public static Scene mainScene;
 
     /**
      * 用来激活已运行的窗口的Socket服务
@@ -76,6 +76,16 @@ public class MainApplication extends Application {
     private static boolean loadPMC;
 
     /**
+     * 程序启动时的参数
+     */
+    private static String[] args;
+
+    /**
+     * 主控制器
+     */
+    public static MainController mainController;
+
+    /**
      * 加载fxml页面
      *
      * @param stage 程序主舞台
@@ -83,7 +93,7 @@ public class MainApplication extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
-        primaryStage = stage;
+        mainStage = stage;
         // 读取fxml页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"));
         Properties prop = new Properties();
@@ -98,12 +108,13 @@ public class MainApplication extends Application {
                 && activation.equals(prop.getProperty(key_loadLastFullWindow, unActivation))) {
             stage.setFullScreen(true);
         }
-        Scene scene = new Scene(fxmlLoader.load(), appWidth, appHeight);
+        mainScene = new Scene(fxmlLoader.load(), appWidth, appHeight);
         stage.setTitle(appName);
-        stage.setScene(scene);
-        setWindLogo(stage, logoPath);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
-        TabPane tabPane = (TabPane) scene.lookup("#tabPane");
+        stage.setScene(mainScene);
+        setWindowLogo(stage, logoPath);
+        mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
+        mainController = fxmlLoader.getController();
+        TabPane tabPane = mainController.tabPane;
         // 设置默认选中的Tab
         if (!loadPMC && activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             tabPane.getTabs().forEach(tab -> {
@@ -117,10 +128,10 @@ public class MainApplication extends Application {
         initMenu(tabPane);
         // 监听窗口面板宽度变化
         stage.widthProperty().addListener((v1, v2, v3) ->
-                Platform.runLater(() -> mainAdaption(stage)));
+                Platform.runLater(mainController::mainAdaption));
         // 监听窗口面板高度变化
         stage.heightProperty().addListener((v1, v2, v3) ->
-                Platform.runLater(() -> mainAdaption(stage)));
+                Platform.runLater(mainController::mainAdaption));
         stage.setOnCloseRequest(event -> {
             try {
                 stop();
@@ -157,7 +168,7 @@ public class MainApplication extends Application {
         // 卸载全局输入监听钩子
         GlobalScreen.unregisterNativeHook();
         // 保存设置
-        saveAllLastConfig(primaryStage);
+        mainController.saveAllLastConfig();
         // 关闭Socket服务
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
@@ -177,7 +188,7 @@ public class MainApplication extends Application {
             if ("aboutTab".equals(tab.getId())) {
                 tabPane.getSelectionModel().select(tab);
             }
-            showStage(primaryStage);
+            showStage(mainStage);
         }));
         MenuItem setting = new MenuItem("设置...");
         setting.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
@@ -185,7 +196,7 @@ public class MainApplication extends Application {
             if ("settingTab".equals(tab.getId())) {
                 tabPane.getSelectionModel().select(tab);
             }
-            showStage(primaryStage);
+            showStage(mainStage);
         }));
         MenuToolkit.toolkit(Locale.getDefault()).createAboutMenuItem(appName);
         MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
@@ -212,15 +223,12 @@ public class MainApplication extends Application {
                 while (!serverSocket.isClosed()) {
                     Socket socket = serverSocket.accept();
                     InputStream in = socket.getInputStream();
-                    byte[] buffer = new byte[activatePMC.length()];
-                    int bytesRead = in.read(buffer);
-                    if (bytesRead > 0 && activatePMC.equals(new String(buffer, 0, bytesRead))) {
-                        Platform.runLater(() -> {
-                            // 弹出程序窗口
-                            if (primaryStage != null) {
-                                showStage(primaryStage);
-                            }
-                        });
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    // 读取第一行为激活标记
+                    String signal = reader.readLine();
+                    if (activatePMC.equals(signal)) {
+                        // 弹出程序窗口
+                        showWindow(reader);
                     }
                     socket.close();
                 }
@@ -228,8 +236,9 @@ public class MainApplication extends Application {
                 // 发送激活正在运行的程序窗口信号
                 try (Socket socket = new Socket("localhost", port)) {
                     OutputStream out = socket.getOutputStream();
-                    out.write(activatePMC.getBytes());
-                    logger.info("检测到重复启动，激活现有实例");
+                    String payload = activatePMC + "\n" + String.join("\n", args);
+                    out.write(payload.getBytes());
+                    logger.info("程序正在运行，发送激活信号及参数: {}", payload);
                     System.exit(0);
                 } catch (ConnectException ce) {
                     logger.error("端口{}被其他进程占用", port);
@@ -246,12 +255,80 @@ public class MainApplication extends Application {
     }
 
     /**
+     * 弹出程序窗口
+     *
+     * @param reader 输入流
+     */
+    private static void showWindow(BufferedReader reader) {
+        // 弹出程序窗口
+        if (mainStage != null) {
+            // 读取后续行作为参数
+            List<String> receivedArgs = new ArrayList<>();
+            String line;
+            while (true) {
+                try {
+                    if ((line = reader.readLine()) == null) {
+                        break;
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                receivedArgs.add(line);
+            }
+            for (String arg : receivedArgs) {
+                if (arg.contains(PMC)) {
+                    loadPMCPath = arg;
+                    if (loadPMCPath.contains(r)) {
+                        loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf(r) + r.length());
+                    }
+                    loadPMC = true;
+                    break;
+                }
+            }
+            Platform.runLater(() -> {
+                showStage(mainStage);
+                if (loadPMC) {
+                    File file = new File(loadPMCPath);
+                    logger.info(loadPMCPath);
+                    if (file.exists()) {
+                        Dialog<ButtonType> dialog = new Dialog<>();
+                        dialog.setTitle("导入pmc文件");
+                        dialog.setHeaderText("是否清空操作列表？");
+                        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+                        setWindowLogo(stage, logoPath);
+                        ButtonType appendButton = new ButtonType("在操作列表下方追加流程", ButtonBar.ButtonData.APPLY);
+                        ButtonType clearButton = new ButtonType("清空操作列表后导入流程", ButtonBar.ButtonData.OTHER);
+                        ButtonType cancelButton = new ButtonType("取消导入", ButtonBar.ButtonData.CANCEL_CLOSE);
+                        dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
+                        ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
+                        if (buttonType == appendButton) {
+                            try {
+                                autoClickController.loadPMCFile(loadPMCPath);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (buttonType == clearButton) {
+                            autoClickController.removeAll();
+                            try {
+                                autoClickController.loadPMCFile(loadPMCPath);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
      * 启动程序
      *
      * @param args 启动参数
      * @throws IOException io异常
      */
     public static void main(String[] args) throws IOException {
+        MainApplication.args = args;
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
             String logsPath = getLogsPath();
@@ -269,18 +346,19 @@ public class MainApplication extends Application {
         logger.info("==============程序启动中====================");
         logger.info("启动参数数量: {}", args.length);
         for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
             // windows --r pmcFilePath 算两个参数，macOS算一个
-            if (r.trim().equals(args[i])) {
+            if (r.trim().equals(arg)) {
                 runPMCFile = true;
-            } else if (args[i].contains(PMC)) {
-                loadPMCPath = args[i];
+            } else if (arg.contains(PMC)) {
+                loadPMCPath = arg;
                 if (loadPMCPath.contains(r)) {
                     loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf(r) + r.length());
                     runPMCFile = true;
                 }
                 loadPMC = true;
             }
-            logger.info("参数 {}: {}", i, args[i]);
+            logger.info("参数 {}: {}", i, arg);
         }
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
@@ -288,7 +366,7 @@ public class MainApplication extends Application {
         int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
         input.close();
         // 启动时检查是否已经启动
-        if (checkRunning(port)) {
+        if (checkRunning(port, args)) {
             System.exit(0);
         }
         // 启动激活监听服务

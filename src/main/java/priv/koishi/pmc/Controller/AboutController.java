@@ -35,19 +35,19 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-01-07
  * Time:16:45
  */
-public class AboutController {
+public class AboutController extends RootController {
 
     @FXML
-    private ImageView logo_Abt;
+    public ImageView logo_Abt;
 
     @FXML
-    private TextField logsNum_Abt;
+    public TextField logsNum_Abt;
 
     @FXML
-    private Label logsPath_Abt, mail_Abt, version_Abt, title_Abt;
+    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt;
 
     @FXML
-    private Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt,
+    public Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt,
             openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt, appreciate_Abt;
 
     /**
@@ -77,15 +77,13 @@ public class AboutController {
     /**
      * 保存日志问文件数量设置
      *
-     * @param scene 程序主场景
      * @throws IOException io异常
      */
-    public static void saveLastConfig(Scene scene) throws IOException {
+    public void saveLastConfig() throws IOException {
         InputStream input = checkRunningInputStream(configFile);
         Properties prop = new Properties();
         prop.load(input);
-        TextField logsNumTextField = (TextField) scene.lookup("#logsNum_Abt");
-        String logsNumValue = logsNumTextField.getText();
+        String logsNumValue = logsNum_Abt.getText();
         prop.setProperty(key_logsNum, logsNumValue);
         OutputStream output = checkRunningOutputStream(configFile);
         prop.store(output, null);
@@ -238,7 +236,7 @@ public class AboutController {
         detailStage.setTitle(tip_appreciate);
         detailStage.initModality(Modality.APPLICATION_MODAL);
         detailStage.setResizable(false);
-        setWindLogo(detailStage, logoPath);
+        setWindowLogo(detailStage, logoPath);
         detailStage.show();
     }
 

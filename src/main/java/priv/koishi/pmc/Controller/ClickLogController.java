@@ -26,7 +26,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-05-08
  * Time:12:26
  */
-public class ClickLogController {
+public class ClickLogController extends RootController {
 
     /**
      * 操作记录
@@ -51,7 +51,7 @@ public class ClickLogController {
     private Runnable refreshCallback;
 
     @FXML
-    private AnchorPane anchorPane_Log;
+    public AnchorPane anchorPane_Log;
 
     @FXML
     public HBox fileNumberHBox_Log;

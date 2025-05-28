@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
@@ -47,7 +48,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-05-20
  * Time:14:53
  */
-public class TaskDetailController {
+public class TaskDetailController extends RootController {
 
     /**
      * 页面数据对象
@@ -68,11 +69,6 @@ public class TaskDetailController {
      * 编辑模式标志
      */
     private boolean isEdit;
-
-    /**
-     * 上级页面舞台
-     */
-    private Stage parentStage;
 
     /**
      * 详情页页面舞台
@@ -106,34 +102,34 @@ public class TaskDetailController {
     private Runnable refreshCallback;
 
     @FXML
-    private AnchorPane anchorPane_TD;
+    public AnchorPane anchorPane_TD;
 
     @FXML
-    private VBox progressBarVBox_TD;
+    public VBox progressBarVBox_TD;
 
     @FXML
-    private HBox filePathHBox_DT, fileNameHBox_TD;
+    public HBox filePathHBox_DT, fileNameHBox_TD;
 
     @FXML
-    private DatePicker datePicker_TD;
+    public DatePicker datePicker_TD;
 
     @FXML
-    private ProgressBar progressBar_TD;
+    public ProgressBar progressBar_TD;
 
     @FXML
-    private ChoiceBox<String> repeatType_TD;
+    public ChoiceBox<String> repeatType_TD;
 
     @FXML
-    private Label pmcFilePath_TD, fileName_DT, log_TD;
+    public Label pmcFilePath_TD, fileName_DT, log_TD;
 
     @FXML
-    private Button delete_TD, saveDetail_TD, removeDetail_TD;
+    public Button delete_TD, saveDetail_TD, removeDetail_TD;
 
     @FXML
-    private TextField hourField_TD, minuteField_TD, taskNameField_TD;
+    public TextField hourField_TD, minuteField_TD, taskNameField_TD;
 
     @FXML
-    private CheckBox monday_TD, tuesday_TD, wednesday_TD, thursday_TD, friday_TD, saturday_TD, sunday_TD;
+    public CheckBox monday_TD, tuesday_TD, wednesday_TD, thursday_TD, friday_TD, saturday_TD, sunday_TD;
 
     /**
      * 组件宽高自适应
@@ -148,13 +144,11 @@ public class TaskDetailController {
      * 初始化数据
      *
      * @param item        列表选中的数据
-     * @param parentStage 上级页面的舞台
      * @param isEdit      是否为编辑模式
      * @throws IOException 路径不能为空、路径格式不正确
      */
-    public void initData(TimedTaskBean item, Stage parentStage, boolean isEdit) throws IOException {
+    public void initData(TimedTaskBean item, boolean isEdit) throws IOException {
         this.isEdit = isEdit;
-        this.parentStage = parentStage;
         selectedItem = item;
         String path = item.getPath();
         if (StringUtils.isNotBlank(path) && !text_onlyLaunch.equals(path)) {
@@ -253,7 +247,7 @@ public class TaskDetailController {
      * 添加确认关闭确认框
      */
     private void addCloseConfirm() {
-        CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindTaskSave_Set");
+        CheckBox remindSave = settingController.remindTaskSave_Set;
         // 添加关闭请求监听
         if (remindSave != null && remindSave.isSelected()) {
             stage.setOnCloseRequest(e -> {
@@ -461,7 +455,7 @@ public class TaskDetailController {
     @FXML
     private void datePickerAction() {
         DayOfWeek dayOfWeek = datePicker_TD.getValue().getDayOfWeek();
-        weekCheckBoxMap.forEach((dayOfWeek1, checkBox) -> checkBox.setSelected(false));
+        weekCheckBoxMap.forEach((day, checkBox) -> checkBox.setSelected(false));
         weekCheckBoxMap.get(dayOfWeek).setSelected(true);
     }
 

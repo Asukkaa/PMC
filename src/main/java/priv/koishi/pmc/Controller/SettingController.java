@@ -41,8 +41,8 @@ import java.util.*;
 import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
-import static priv.koishi.pmc.Controller.MainController.saveAllLastConfig;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -54,7 +54,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2024-11-12
  * Time:下午4:51
  */
-public class SettingController implements MousePositionUpdater {
+public class SettingController extends RootController implements MousePositionUpdater {
 
     /**
      * 浮窗X坐标
@@ -106,39 +106,34 @@ public class SettingController implements MousePositionUpdater {
      */
     private Label floatingLabel;
 
-    /**
-     * 程序主场景
-     */
-    private Scene mainScene;
+    @FXML
+    public AnchorPane anchorPane_Set;
 
     @FXML
-    private AnchorPane anchorPane_Set;
+    public HBox fileNumberHBox_Set, findImgSetting_Set;
 
     @FXML
-    private HBox fileNumberHBox_Set, findImgSetting_Set;
+    public ColorPicker colorPicker_Set;
 
     @FXML
-    private ColorPicker colorPicker_Set;
+    public ChoiceBox<String> nextGcType_Set;
 
     @FXML
-    private ChoiceBox<String> nextGcType_Set;
+    public Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
 
     @FXML
-    private Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
+    public Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
 
     @FXML
-    private Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
+    public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set;
 
     @FXML
-    private Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set;
-
-    @FXML
-    private TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
+    public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
             retrySecond_Set, overtime_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set,
             randomTimeOffset_Set, maxLogNum_Set, nextRunMemory_Set;
 
     @FXML
-    private CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
+    public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
             hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
@@ -146,92 +141,57 @@ public class SettingController implements MousePositionUpdater {
             stopImgLog_Set, waitLog_Set, remindTaskSave_Set;
 
     @FXML
-    private TableView<ImgFileVO> tableView_Set;
+    public TableView<ImgFileVO> tableView_Set;
 
     @FXML
-    private TableColumn<ImgFileVO, Integer> index_Set;
+    public TableColumn<ImgFileVO, Integer> index_Set;
 
     @FXML
-    private TableColumn<ImgFileVO, ImageView> thumb_Set;
+    public TableColumn<ImgFileVO, ImageView> thumb_Set;
 
     @FXML
-    private TableColumn<ImgFileVO, String> name_Set, type_Set, path_Set;
+    public TableColumn<ImgFileVO, String> name_Set, type_Set, path_Set;
 
     /**
      * 组件自适应宽高
-     *
-     * @param stage 程序主舞台
      */
-    public static void adaption(Stage stage) {
-        Scene scene = stage.getScene();
+    public void adaption() {
         // 设置组件高度
-        double stageHeight = stage.getHeight();
-        TableView<?> table = (TableView<?>) scene.lookup("#tableView_Set");
-        table.setPrefHeight(stageHeight * 0.3);
+        double stageHeight = mainStage.getHeight();
+        tableView_Set.setPrefHeight(stageHeight * 0.3);
         // 设置组件宽度
-        double tableWidth = stage.getWidth() * 0.9;
-        table.setMaxWidth(tableWidth);
-        table.setPrefWidth(tableWidth);
-        Node index = scene.lookup("#index_Set");
-        index.setStyle("-fx-pref-width: " + tableWidth * 0.05 + "px;");
-        Node thumb = scene.lookup("#thumb_Set");
-        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.2 + "px;");
-        Node name = scene.lookup("#name_Set");
-        name.setStyle("-fx-pref-width: " + tableWidth * 0.25 + "px;");
-        Node path = scene.lookup("#path_Set");
-        path.setStyle("-fx-pref-width: " + tableWidth * 0.4 + "px;");
-        Node type = scene.lookup("#type_Set");
-        type.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Label dataNum = (Label) scene.lookup("#dataNumber_Set");
-        HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Set");
-        nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
-        Label tip = (Label) scene.lookup("#tip_Set");
-        HBox findImgSetting = (HBox) scene.lookup("#findImgSetting_Set");
-        nodeRightAlignment(findImgSetting, tableWidth, tip);
+        double tableWidth = mainStage.getWidth() * 0.9;
+        tableView_Set.setMaxWidth(tableWidth);
+        tableView_Set.setPrefWidth(tableWidth);
+        nodeRightAlignment(fileNumberHBox_Set, tableWidth, dataNumber_Set);
+        nodeRightAlignment(findImgSetting_Set, tableWidth, tip_Set);
     }
 
     /**
      * 保存设置功能最后设置
      *
-     * @param scene 程序主场景
      * @throws IOException io异常
      */
-    public static void saveLastConfig(Scene scene) throws IOException {
-        AnchorPane anchorPane = (AnchorPane) scene.lookup("#anchorPane_Set");
-        if (anchorPane != null) {
+    public void saveLastConfig() throws IOException {
+        if (anchorPane_Set != null) {
             InputStream input = checkRunningInputStream(configFile_Click);
             Properties prop = new Properties();
             prop.load(input);
-            TextField floatingDistance = (TextField) scene.lookup("#floatingDistance_Set");
-            prop.put(key_margin, floatingDistance.getText());
-            Slider opacity = (Slider) scene.lookup("#opacity_Set");
-            prop.put(key_opacity, String.valueOf(opacity.getValue()));
-            Slider clickOpacity = (Slider) scene.lookup("#clickOpacity_Set");
-            prop.put(key_clickOpacity, String.valueOf(clickOpacity.getValue()));
-            Slider stopOpacity = (Slider) scene.lookup("#stopOpacity_Set");
-            prop.put(key_stopOpacity, String.valueOf(stopOpacity.getValue()));
-            TextField clickRetryNum = (TextField) scene.lookup("#clickRetryNum_Set");
-            prop.put(key_defaultClickRetryNum, clickRetryNum.getText());
-            TextField stopRetryNum = (TextField) scene.lookup("#stopRetryNum_Set");
-            prop.put(key_defaultStopRetryNum, stopRetryNum.getText());
-            TextField retrySecond = (TextField) scene.lookup("#retrySecond_Set");
-            prop.put(key_retrySecond, retrySecond.getText());
-            TextField overtime = (TextField) scene.lookup("#overtime_Set");
-            prop.put(key_overtime, overtime.getText());
-            TextField sampleInterval = (TextField) scene.lookup("#sampleInterval_Set");
-            prop.put(key_sampleInterval, sampleInterval.getText());
-            TextField randomClickX = (TextField) scene.lookup("#randomClickX_Set");
-            prop.put(key_randomClickX, randomClickX.getText());
-            TextField randomClickY = (TextField) scene.lookup("#randomClickY_Set");
-            prop.put(key_randomClickY, randomClickY.getText());
-            TextField clickTimeOffset = (TextField) scene.lookup("#clickTimeOffset_Set");
-            prop.put(key_clickTimeOffset, clickTimeOffset.getText());
-            TextField randomTimeOffset_Set = (TextField) scene.lookup("#randomTimeOffset_Set");
+            prop.put(key_margin, floatingDistance_Set.getText());
+            prop.put(key_opacity, String.valueOf(opacity_Set.getValue()));
+            prop.put(key_clickOpacity, String.valueOf(clickOpacity_Set.getValue()));
+            prop.put(key_stopOpacity, String.valueOf(stopOpacity_Set.getValue()));
+            prop.put(key_defaultClickRetryNum, clickRetryNum_Set.getText());
+            prop.put(key_defaultStopRetryNum, stopRetryNum_Set.getText());
+            prop.put(key_retrySecond, retrySecond_Set.getText());
+            prop.put(key_overtime, overtime_Set.getText());
+            prop.put(key_sampleInterval, sampleInterval_Set.getText());
+            prop.put(key_randomClickX, randomClickX_Set.getText());
+            prop.put(key_randomClickY, randomClickY_Set.getText());
+            prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
             prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
-            TextField maxLogNum = (TextField) scene.lookup("#maxLogNum_Set");
-            prop.put(key_maxLogNum, maxLogNum.getText());
-            TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Set");
-            List<ImgFileVO> list = tableView.getItems().stream().map(o -> (ImgFileVO) o).toList();
+            prop.put(key_maxLogNum, maxLogNum_Set.getText());
+            List<ImgFileVO> list = tableView_Set.getItems();
             int index = 0;
             while (index < 10) {
                 prop.remove(key_defaultStopImg + index);
@@ -246,22 +206,19 @@ public class SettingController implements MousePositionUpdater {
             input.close();
             output.close();
             // 保存JVM参数设置
-            saveJVMConfig(scene);
+            saveJVMConfig();
         }
     }
 
     /**
      * 保存JVM参数设置
      *
-     * @param scene 程序主场景
      * @throws IOException io异常
      */
-    private static void saveJVMConfig(Scene scene) throws IOException {
-        TextField nextRunMemory = (TextField) scene.lookup("#nextRunMemory_Set");
-        String nextRunMemoryValue = nextRunMemory.getText();
+    private void saveJVMConfig() throws IOException {
+        String nextRunMemoryValue = nextRunMemory_Set.getText();
         String XmxValue = StringUtils.isBlank(nextRunMemoryValue) ? "" : nextRunMemoryValue + G;
-        ChoiceBox<?> nextGcType = (ChoiceBox<?>) scene.lookup("#nextGcType_Set");
-        String nextGcTypeValue = (String) nextGcType.getValue();
+        String nextGcTypeValue = nextGcType_Set.getValue();
         Map<String, String> options = new HashMap<>();
         options.put(Xmx, XmxValue);
         options.put(XX, nextGcTypeValue);
@@ -280,7 +237,7 @@ public class SettingController implements MousePositionUpdater {
         // 设置透明度
         rectangle.setFill(new Color(0, 0, 0, 0.5));
         StackPane root = new StackPane();
-        root.setBackground(Background.fill(Color.TRANSPARENT));
+        root.setBackground(Background.EMPTY);
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
         // 添加拖拽事件处理器
         double[] xOffset = new double[1];
@@ -650,6 +607,8 @@ public class SettingController implements MousePositionUpdater {
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
+        Node timedStartTab = mainScene.lookup("#timedStartTab");
+        disableNodes.add(timedStartTab);
         Node autoClickTab = mainScene.lookup("#autoClickTab");
         disableNodes.add(autoClickTab);
         Node settingTab = mainScene.lookup("#settingTab");
@@ -737,9 +696,10 @@ public class SettingController implements MousePositionUpdater {
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
-            mainScene = anchorPane_Set.getScene();
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
+            // 补偿性首次更新
+            onMousePositionUpdate(MouseInfo.getPointerInfo().getLocation());
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格
@@ -1079,7 +1039,7 @@ public class SettingController implements MousePositionUpdater {
     @FXML
     private void reLaunch() throws IOException {
         // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新jvm配置参数
-        saveAllLastConfig((Stage) mainScene.getWindow());
+        mainController.saveAllLastConfig();
         Platform.exit();
         if (!isRunningFromJar()) {
             ProcessBuilder processBuilder = null;

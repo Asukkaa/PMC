@@ -27,7 +27,6 @@
 
         <HBox spacing="10">
             <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand" text="添加操作流程"/>
-            <Button fx:id="clickTest_Click" onAction="#clickTest" style="-fx-cursor: hand" text="测试操作流程"/>
             <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
             <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand"
                     text="导出操作流程"/>
