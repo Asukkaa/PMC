@@ -698,8 +698,6 @@ public class SettingController extends RootController implements MousePositionUp
         Platform.runLater(() -> {
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
-            // 补偿性首次更新
-            onMousePositionUpdate(MouseInfo.getPointerInfo().getLocation());
             // 设置要防重复点击的组件
             setDisableNodes();
             // 自动填充javafx表格
