@@ -154,7 +154,7 @@ public class ScheduledService {
              */
             private void getWinTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
                 // 改为查询全部任务
-                Process process = new ProcessBuilder("schtasks", "/query", "/fo", "LIST", "/v").start();
+                Process process = new ProcessBuilder("cmd", "/c", "chcp 65001 >nul && schtasks /query /fo LIST /v").start();
                 String output = readProcessOutput(process);
                 // 新增程序路径过滤（使用正则表达式忽略大小写）
                 Pattern exePattern = Pattern.compile(Pattern.quote(appName + exe), Pattern.CASE_INSENSITIVE);
