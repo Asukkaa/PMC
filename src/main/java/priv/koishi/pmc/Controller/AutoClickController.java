@@ -1676,6 +1676,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param event 设置页加载完成事件
      */
     private void settingsLoaded(SettingsLoadedEvent event) {
+        // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
             Platform.runLater(() -> {
                 try {
@@ -1689,6 +1690,7 @@ public class AutoClickController extends RootController implements MousePosition
                 }
             });
         }
+        // 禁用需要辅助控制权限的组件
         if (isNativeHookException) {
             Button saveButton = settingController.setFloatingCoordinate_Set;
             saveButton.setDisable(true);
