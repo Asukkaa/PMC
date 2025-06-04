@@ -1652,8 +1652,6 @@ public class AutoClickController extends RootController implements MousePosition
         isNativeHookException = true;
         runClick_Click.setDisable(true);
         recordClick_Click.setDisable(true);
-        Button saveButton = settingController.setFloatingCoordinate_Set;
-        saveButton.setDisable(true);
         String errorMessage = appName + " 缺少必要系统权限";
         if (systemName.contains(mac)) {
             errorMessage = tip_NativeHookException;
@@ -1673,11 +1671,11 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 页面加载完毕后运行定时任务
+     * 页面加载完毕后的执行逻辑
      *
      * @param event 设置页加载完成事件
      */
-    private void runTimedTask(SettingsLoadedEvent event) {
+    private void settingsLoaded(SettingsLoadedEvent event) {
         if (StringUtils.isNotBlank(loadPMCPath)) {
             Platform.runLater(() -> {
                 try {
@@ -1690,6 +1688,10 @@ public class AutoClickController extends RootController implements MousePosition
                     throw new RuntimeException(e);
                 }
             });
+        }
+        if (isNativeHookException) {
+            Button saveButton = settingController.setFloatingCoordinate_Set;
+            saveButton.setDisable(true);
         }
     }
 
@@ -1742,7 +1744,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 构建右键菜单
             buildContextMenu();
             // 运行定时任务
-            EventBus.subscribe(SettingsLoadedEvent.class, this::runTimedTask);
+            EventBus.subscribe(SettingsLoadedEvent.class, this::settingsLoaded);
         });
     }
 
