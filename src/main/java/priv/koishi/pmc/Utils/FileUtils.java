@@ -147,7 +147,7 @@ public class FileUtils {
                 throw new IOException(text_fileNotExists);
             }
             ProcessBuilder processBuilder;
-            if (systemName.contains(win)) {
+            if (isWin) {
                 processBuilder = new ProcessBuilder("cmd.exe", "/C", "explorer /select, " + openPath);
             } else {
                 processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
@@ -264,7 +264,7 @@ public class FileUtils {
      * @return 不同操作系统下程序启动路径
      */
     public static String getAppPath() {
-        if (systemName.contains(win)) {
+        if (isWin) {
             return pmcDir + File.separator + appName + exe;
         } else if (isMac) {
             return javaHome.substring(0, javaHome.indexOf(app) + app.length());
@@ -522,7 +522,7 @@ public class FileUtils {
         } else {
             String appPath = getAppPath();
             String cfgFileName = "/" + appName + cfg;
-            if (systemName.contains(win)) {
+            if (isWin) {
                 cfgPath = new File(appPath).getParent() + appDirectory + cfgFileName;
             } else {
                 cfgPath = appPath + contentsDirectory + appDirectory + cfgFileName;

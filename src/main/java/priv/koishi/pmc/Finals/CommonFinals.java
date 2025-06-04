@@ -96,11 +96,6 @@ public class CommonFinals {
     public static final String pmcDir = new File(javaHome).getParent();
 
     /**
-     * 当前程序运行操作系统
-     */
-    public static final String systemName = System.getProperty("os.name").toLowerCase();
-
-    /**
      * 桌面目录
      */
     public static final String desktopPath = getDesktopPath();
@@ -109,6 +104,21 @@ public class CommonFinals {
      * 文件选择器默认路径
      */
     public static final String defaultFileChooserPath = desktopPath;
+
+    /**
+     * 当前程序运行操作系统名称
+     */
+    public static final String systemName = System.getProperty("os.name").toLowerCase();
+
+    /**
+     * win操作系统
+     */
+    public static final boolean isWin = systemName.contains("win");
+
+    /**
+     * mac操作系统
+     */
+    public static final boolean isMac = systemName.contains("mac");
 
     /**
      * 百度网盘地址
@@ -175,10 +185,6 @@ public class CommonFinals {
     public static final String contentsDirectory = "/Contents";
 
     public static final String desktop = "Desktop";
-
-    public static final String mac = "mac";
-
-    public static final String win = "win";
 
     public static final String log = ".log";
 
@@ -247,16 +253,6 @@ public class CommonFinals {
      * 定时任务自动执行参数前缀
      */
     public static final String r = "--r ";
-
-    /**
-     * win操作系统
-     */
-    public static final boolean isWin = systemName.contains(win);
-
-    /**
-     * mac操作系统
-     */
-    public static final boolean isMac = systemName.contains(mac);
 
     /**
      * 启用
