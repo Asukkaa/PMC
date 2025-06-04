@@ -47,6 +47,8 @@ import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EditingCell.EditingCell;
+import priv.koishi.pmc.EventBus.EventBus;
+import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.MainApplication;
@@ -1665,6 +1667,27 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 运行定时任务
+     *
+     * @param event 设置页加载完成事件
+     */
+    private void runTimedTask(SettingsLoadedEvent event) {
+        if (StringUtils.isNotBlank(loadPMCPath)) {
+            Platform.runLater(() -> {
+                try {
+                    loadPMCFile(loadPMCPath);
+                    if (runPMCFile) {
+                        tableView_Click.refresh();
+                        runClick();
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    /**
      * 页面初始化
      */
     @FXML
@@ -1712,17 +1735,8 @@ public class AutoClickController extends RootController implements MousePosition
             tableViewDragRow(tableView_Click);
             // 构建右键菜单
             buildContextMenu();
-            if (StringUtils.isNotBlank(loadPMCPath)) {
-                try {
-                    loadPMCFile(loadPMCPath);
-                    if (runPMCFile) {
-                        tableView_Click.refresh();
-                        runClick();
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            // 运行定时任务
+            EventBus.subscribe(SettingsLoadedEvent.class, this::runTimedTask);
         });
     }
 

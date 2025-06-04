@@ -28,6 +28,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.EventBus.EventBus;
+import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 
@@ -706,6 +708,8 @@ public class SettingController extends RootController implements MousePositionUp
             tableViewDragRow(tableView_Set);
             // 构建右键菜单
             buildContextMenu(tableView_Set, dataNumber_Set);
+            // 加载完成后发布事件
+            EventBus.publish(new SettingsLoadedEvent());
         });
     }
 
