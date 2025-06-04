@@ -1653,7 +1653,7 @@ public class AutoClickController extends RootController implements MousePosition
         runClick_Click.setDisable(true);
         recordClick_Click.setDisable(true);
         String errorMessage = appName + " 缺少必要系统权限";
-        if (systemName.contains(mac)) {
+        if (isMac) {
             errorMessage = tip_NativeHookException;
         }
         err_Click.setText(errorMessage);

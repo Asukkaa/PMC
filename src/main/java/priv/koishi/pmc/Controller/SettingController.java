@@ -1045,9 +1045,9 @@ public class SettingController extends RootController implements MousePositionUp
         Platform.exit();
         if (!isRunningFromJar()) {
             ProcessBuilder processBuilder = null;
-            if (systemName.contains(win)) {
+            if (isWin) {
                 processBuilder = new ProcessBuilder(getAppPath());
-            } else if (systemName.contains(mac)) {
+            } else if (isMac) {
                 processBuilder = new ProcessBuilder("open", "-n", getAppPath());
             }
             if (processBuilder != null) {

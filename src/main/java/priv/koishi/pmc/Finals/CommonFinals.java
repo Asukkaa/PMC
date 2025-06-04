@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +53,7 @@ public class CommonFinals {
     /**
      * jpackage打包后的资源文件路径
      */
-    public static String packagePath = "runtime/bin/";
+    public static String packagePath = "/bin/";
 
     /**
      * log4j配置文件名称
@@ -72,7 +73,7 @@ public class CommonFinals {
     /**
      * log文件夹目录
      */
-    public static final String logsDir = "/bin/logs";
+    public static final String logsDir = packagePath + "logs";
 
     /**
      * log文件夹名称
@@ -85,14 +86,14 @@ public class CommonFinals {
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * 当前程序运行位置
-     */
-    public static final String userDir = System.getProperty("user.dir");
-
-    /**
      * java home目录
      */
     public static final String javaHome = System.getProperty("java.home");
+
+    /**
+     * 程序根目录
+     */
+    public static final String pmcDir = new File(javaHome).getParent();
 
     /**
      * 当前程序运行操作系统
@@ -246,6 +247,16 @@ public class CommonFinals {
      * 定时任务自动执行参数前缀
      */
     public static final String r = "--r ";
+
+    /**
+     * win操作系统
+     */
+    public static final boolean isWin = systemName.contains(win);
+
+    /**
+     * mac操作系统
+     */
+    public static final boolean isMac = systemName.contains(mac);
 
     /**
      * 启用

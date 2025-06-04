@@ -1599,7 +1599,7 @@ public class UiUtils {
         // 判断打开方式
         boolean openParentDirectory;
         if (file.isDirectory()) {
-            if (systemName.contains(mac) && file.getName().contains(app)) {
+            if (isMac && file.getName().contains(app)) {
                 openPath = file.getParent();
                 openParentDirectory = true;
             } else {

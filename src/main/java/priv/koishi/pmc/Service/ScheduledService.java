@@ -65,10 +65,10 @@ public class ScheduledService {
             @Override
             protected Void call() throws IOException {
                 updateMessage("保存中...");
-                if (systemName.contains(win)) {
+                if (isWin) {
                     // 创建win定时任务
                     createWinLaunchdTask(timedTaskBean);
-                } else if (systemName.contains(mac)) {
+                } else if (isMac) {
                     // 创建mac定时任务
                     createMacLaunchdTask(timedTaskBean);
                 }
@@ -86,9 +86,9 @@ public class ScheduledService {
      */
     public static void deleteTask(String taskName) throws IOException {
         taskName = TASK_NAME + taskName;
-        if (systemName.contains(win)) {
+        if (isWin) {
             new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start();
-        } else if (systemName.contains(mac)) {
+        } else if (isMac) {
             Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
             Files.deleteIfExists(plistFile);
         }
@@ -105,9 +105,9 @@ public class ScheduledService {
             protected List<TimedTaskBean> call() throws Exception {
                 updateMessage("查询中...");
                 List<TimedTaskBean> taskDetails = new ArrayList<>();
-                if (systemName.contains(win)) {
+                if (isWin) {
                     getWinTaskDetails(taskDetails);
-                } else if (systemName.contains(mac)) {
+                } else if (isMac) {
                     getMacTaskDetails(taskDetails);
                 }
                 updateMessage("");
