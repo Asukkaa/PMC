@@ -35,6 +35,11 @@ public class CommonFinals {
     public static String logoPath = "icon/PMC.png";
 
     /**
+     * css样式文件路径
+     */
+    public static String stylesCss = "css/Styles.css";
+
+    /**
      * 资源文件夹地址前缀
      */
     public static String resourcePath = "/priv/koishi/pmc/";

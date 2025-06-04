@@ -385,7 +385,6 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
         setControlLastConfig(clickImgLog_Set, prop, key_clickLog, activation);
         setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, activation);
-        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
         setControlLastConfig(recordDrag_Set, prop, key_recordDrag, activation);
         setControlLastConfig(recordMove_Set, prop, key_recordMove, activation);
         setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
@@ -396,6 +395,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
+        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, defaultStopOpacity);
         setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, unActivation);

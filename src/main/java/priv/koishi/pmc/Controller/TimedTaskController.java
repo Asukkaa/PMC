@@ -14,7 +14,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
-import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -31,7 +29,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
-import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -91,7 +89,8 @@ public class TimedTaskController extends RootController {
     public TableColumn<TimedTaskBean, Integer> index_Task;
 
     @FXML
-    public TableColumn<TimedTaskBean, String> taskName_Task, date_Task, time_Task, repeat_Task, days_Task, name_Task, path_Task;
+    public TableColumn<TimedTaskBean, String> taskName_Task, date_Task, time_Task, repeat_Task, days_Task, name_Task,
+            path_Task;
 
     /**
      * 组件自适应宽高
@@ -181,10 +180,13 @@ public class TimedTaskController extends RootController {
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
-        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
         detailStage.show();
     }
 

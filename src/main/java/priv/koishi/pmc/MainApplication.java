@@ -112,7 +112,8 @@ public class MainApplication extends Application {
         stage.setTitle(appName);
         stage.setScene(mainScene);
         setWindowLogo(stage, logoPath);
-        mainScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("css/Styles.css")).toExternalForm());
+        // 设置css样式
+        setWindowCss(mainScene, stylesCss);
         mainController = fxmlLoader.getController();
         TabPane tabPane = mainController.tabPane;
         // 设置默认选中的Tab

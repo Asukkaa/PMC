@@ -19,6 +19,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -362,6 +363,16 @@ public class UiUtils {
      */
     public static void setWindowLogo(Stage stage, String path) {
         stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource(path)).toString()));
+    }
+
+    /**
+     * 设置窗口css样式
+     *
+     * @param scene     要设置样式的场景
+     * @param stylesCss css文件路径
+     */
+    public static void setWindowCss(Scene scene, String stylesCss) {
+        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource(stylesCss)).toExternalForm());
     }
 
     /**
@@ -1802,6 +1813,8 @@ public class UiUtils {
         }
         floatingStage.setX(x);
         floatingStage.setY(y);
+        // 保证浮窗一直置顶
+        showStage(floatingStage);
     }
 
     /**

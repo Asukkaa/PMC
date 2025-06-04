@@ -51,7 +51,6 @@ import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
-import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.awt.*;
@@ -533,10 +532,14 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
-        name_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setName));
-        waitTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
-        clickTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
-        clickNum_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
+        name_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setName));
+        waitTime_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
+        clickTime_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
+        clickNum_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
     }
 
     /**
@@ -589,10 +592,13 @@ public class AutoClickController extends RootController implements MousePosition
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
-        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
         detailStage.show();
     }
 
@@ -1667,7 +1673,7 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 运行定时任务
+     * 页面加载完毕后运行定时任务
      *
      * @param event 设置页加载完成事件
      */
@@ -1920,7 +1926,8 @@ public class AutoClickController extends RootController implements MousePosition
         detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
-        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
         detailStage.show();
     }
 
