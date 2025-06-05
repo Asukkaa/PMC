@@ -245,7 +245,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 自动点击任务
      */
-    private Task<List<ClickLogBean>> autoClickTask;
+    public Task<List<ClickLogBean>> autoClickTask;
 
     /**
      * 页面标识符
@@ -265,7 +265,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 正在录制标识
      */
-    private boolean recordClicking;
+    public boolean recordClicking;
 
     /**
      * 正在录制标识（准备时间结束）
@@ -671,16 +671,26 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 判断程序是否为空闲状态
+     *
+     * @return true表示为空闲状态，false表示非空闲状态
+     */
+    public boolean isFree() {
+        return !runClicking && !recordClicking;
+    }
+
+    /**
      * 启动自动操作流程
      *
      * @param clickPositionVOS 自动操作流程
      * @throws IOException io异常
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
-        if (!runClicking && !recordClicking) {
+        if (isFree()) {
+            // 标记为正在运行自动操作
+            runClicking = true;
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
-            runClicking = true;
             if (CollectionUtils.isNotEmpty(clickLogs)) {
                 clickLogs.clear();
             }
@@ -1539,7 +1549,8 @@ public class AutoClickController extends RootController implements MousePosition
      * @param addType 添加类型
      */
     private void startRecord(int addType) {
-        if (!runClicking && !recordClicking) {
+        if (isFree()) {
+            // 标记为正在录制
             recordClicking = true;
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, true);
@@ -1683,8 +1694,11 @@ public class AutoClickController extends RootController implements MousePosition
                     loadPMCFile(loadPMCPath);
                     if (runPMCFile) {
                         tableView_Click.refresh();
+                        // 运行自动操作
                         runClick();
                     }
+                    // 清空启动参数
+                    clearArgs();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -1927,9 +1941,11 @@ public class AutoClickController extends RootController implements MousePosition
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 设置css样式
         setWindowCss(scene, stylesCss);
         detailStage.show();

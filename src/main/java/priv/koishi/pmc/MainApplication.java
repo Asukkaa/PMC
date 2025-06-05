@@ -73,12 +73,12 @@ public class MainApplication extends Application {
     /**
      * 重新启动后自动加载过pmc文件标志（true-加载过 false-没有加载过）
      */
-    private static boolean loadPMC;
+    public static boolean loadPMC;
 
     /**
      * 程序启动时的参数
      */
-    private static String[] args;
+    public static String[] args;
 
     /**
      * 主控制器
@@ -117,7 +117,9 @@ public class MainApplication extends Application {
         mainController = fxmlLoader.getController();
         TabPane tabPane = mainController.tabPane;
         // 设置默认选中的Tab
-        if (!loadPMC && activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
+        if (loadPMC) {
+            tabPane.getSelectionModel().select(mainController.autoClickTab);
+        } else if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             tabPane.getTabs().forEach(tab -> {
                 if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
                     tabPane.getSelectionModel().select(tab);
@@ -187,20 +189,22 @@ public class MainApplication extends Application {
      */
     private void initMenu(TabPane tabPane) {
         MenuItem about = new MenuItem("关于 " + appName);
-        about.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
-            if ("aboutTab".equals(tab.getId())) {
-                tabPane.getSelectionModel().select(tab);
+        about.setOnAction(e -> {
+            // 只有在程序空闲时才弹出程序窗口
+            if (autoClickController.isFree()) {
+                tabPane.getSelectionModel().select(mainController.aboutTab);
+                showStage(mainStage);
             }
-            showStage(mainStage);
-        }));
+        });
         MenuItem setting = new MenuItem("设置...");
         setting.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
-        setting.setOnAction(e -> tabPane.getTabs().forEach(tab -> {
-            if ("settingTab".equals(tab.getId())) {
-                tabPane.getSelectionModel().select(tab);
+        setting.setOnAction(e -> {
+            // 只有在程序空闲时才弹出程序窗口
+            if (autoClickController.isFree()) {
+                tabPane.getSelectionModel().select(mainController.settingTab);
+                showStage(mainStage);
             }
-            showStage(mainStage);
-        }));
+        });
         MenuToolkit.toolkit(Locale.getDefault()).createAboutMenuItem(appName);
         MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
         hide.setText("隐藏 " + appName);
@@ -230,8 +234,10 @@ public class MainApplication extends Application {
                     // 读取第一行为激活标记
                     String signal = reader.readLine();
                     if (activatePMC.equals(signal)) {
-                        // 弹出程序窗口
-                        showWindow(reader);
+                        // 只有在程序空闲时才弹出程序窗口
+                        if (autoClickController.isFree()) {
+                            showWindow(reader);
+                        }
                     }
                     socket.close();
                 }
@@ -279,11 +285,12 @@ public class MainApplication extends Application {
                 receivedArgs.add(line);
             }
             for (String arg : receivedArgs) {
-                if (arg.contains(PMC)) {
+                logger.info("程序运行时接收到参数: {}", arg);
+                // 只处理手动打开文件的行为，忽略自动任务导入
+                if (arg.contains(r.trim())) {
+                    break;
+                } else if (arg.contains(PMC)) {
                     loadPMCPath = arg;
-                    if (loadPMCPath.contains(r)) {
-                        loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf(r) + r.length());
-                    }
                     loadPMC = true;
                     break;
                 }
@@ -292,7 +299,6 @@ public class MainApplication extends Application {
                 showStage(mainStage);
                 if (loadPMC) {
                     File file = new File(loadPMCPath);
-                    logger.info(loadPMCPath);
                     if (file.exists()) {
                         Dialog<ButtonType> dialog = new Dialog<>();
                         dialog.setTitle("导入pmc文件");
@@ -304,9 +310,12 @@ public class MainApplication extends Application {
                         ButtonType cancelButton = new ButtonType("取消导入", ButtonBar.ButtonData.CANCEL_CLOSE);
                         dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
                         ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
+                        TabPane tabPane = mainController.tabPane;
+                        Tab autoClickTab = mainController.autoClickTab;
                         if (buttonType == appendButton) {
                             try {
                                 autoClickController.loadPMCFile(loadPMCPath);
+                                tabPane.getSelectionModel().select(autoClickTab);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -314,14 +323,27 @@ public class MainApplication extends Application {
                             autoClickController.removeAll();
                             try {
                                 autoClickController.loadPMCFile(loadPMCPath);
+                                tabPane.getSelectionModel().select(autoClickTab);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                         }
                     }
                 }
+                // 清空启动参数
+                clearArgs();
             });
         }
+    }
+
+    /**
+     * 清空启动参数
+     */
+    public static void clearArgs() {
+        loadPMCPath = null;
+        loadPMC = false;
+        runPMCFile = false;
+        args = null;
     }
 
     /**
