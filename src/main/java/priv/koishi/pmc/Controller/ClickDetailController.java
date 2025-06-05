@@ -32,6 +32,7 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -43,7 +44,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date 2022/3/11
  * Time 15:09
  */
-public class ClickDetailController {
+public class ClickDetailController extends RootController {
 
     /**
      * 页面数据对象
@@ -106,11 +107,6 @@ public class ClickDetailController {
     private static final String tabId = "_Det";
 
     /**
-     * 上级页面舞台
-     */
-    private Stage parentStage;
-
-    /**
      * 详情页页面舞台
      */
     private Stage stage;
@@ -122,50 +118,50 @@ public class ClickDetailController {
     private Runnable refreshCallback;
 
     @FXML
-    private AnchorPane anchorPane_Det;
+    public AnchorPane anchorPane_Det;
 
     @FXML
-    private VBox clickImgVBox_Det;
+    public VBox clickImgVBox_Det;
 
     @FXML
-    private HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det;
+    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det;
 
     @FXML
-    private ImageView clickImg_Det;
+    public ImageView clickImg_Det;
 
     @FXML
-    private Slider clickOpacity_Det, stopOpacity_Det;
+    public Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    private ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det;
+    public ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det;
 
     @FXML
-    private Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
+    public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det;
 
     @FXML
-    private CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
+    public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
             randomWaitTime_Det;
 
     @FXML
-    private Label clickImgPath_Det, dataNumber_Det, nullLabel_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
+    public Label clickImgPath_Det, dataNumber_Det, nullLabel_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
             tableViewSize_Det, clickTypeText_Det;
 
     @FXML
-    private TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
+    public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
             randomClickY_Det, randomTimeOffset_Det;
 
     @FXML
-    private TableView<ImgFileVO> tableView_Det;
+    public TableView<ImgFileVO> tableView_Det;
 
     @FXML
-    private TableColumn<ImgFileVO, Integer> index_Det;
+    public TableColumn<ImgFileVO, Integer> index_Det;
 
     @FXML
-    private TableColumn<ImgFileVO, ImageView> thumb_Det;
+    public TableColumn<ImgFileVO, ImageView> thumb_Det;
 
     @FXML
-    private TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
+    public TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
 
     /**
      * 组件宽高自适应
@@ -182,11 +178,9 @@ public class ClickDetailController {
     /**
      * 初始化数据
      *
-     * @param item        列表选中的数据
-     * @param parentStage 上级页面的舞台
+     * @param item 列表选中的数据
      */
-    public void initData(ClickPositionVO item, Stage parentStage) throws IOException {
-        this.parentStage = parentStage;
+    public void initData(ClickPositionVO item) throws IOException {
         selectedItem = item;
         isModified = false;
         maxIndex = selectedItem.getTableView().getItems().size();
@@ -540,7 +534,7 @@ public class ClickDetailController {
      * 添加确认关闭确认框
      */
     private void addCloseConfirm() {
-        CheckBox remindSave = (CheckBox) parentStage.getScene().lookup("#remindClickSave_Set");
+        CheckBox remindSave = settingController.remindClickSave_Set;
         // 添加关闭请求监听
         if (remindSave != null && remindSave.isSelected()) {
             stage.setOnCloseRequest(e -> {

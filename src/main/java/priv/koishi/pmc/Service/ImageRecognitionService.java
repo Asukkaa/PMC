@@ -5,6 +5,7 @@ import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
@@ -14,13 +15,12 @@ import priv.koishi.pmc.Bean.MatchPointBean;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
-import static org.bytedeco.opencv.global.opencv_imgcodecs.IMREAD_COLOR;
-import static org.bytedeco.opencv.global.opencv_imgcodecs.imread;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
@@ -173,8 +173,10 @@ public class ImageRecognitionService {
         MatchPointBean matchPointBean = new MatchPointBean();
         AtomicReference<Double> bestVal = new AtomicReference<>(-1.0);
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
+        // 读取图片为byte数组，防止中文路径乱码
+        byte[] bytes = Files.readAllBytes(new File(templatePath).toPath());
         try (Mat screenMat = bufferedImageToMat(screenImg);
-             Mat templateMat = imread(templatePath, IMREAD_COLOR)) {
+             Mat templateMat = opencv_imgcodecs.imdecode(new Mat(bytes), opencv_imgcodecs.IMREAD_UNCHANGED)) {
             // 转换为灰度图提升处理效率
             try (Mat screenGray = new Mat(); Mat templateGray = new Mat()) {
                 cvtColor(screenMat, screenGray, COLOR_BGR2GRAY);

@@ -10,8 +10,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 
@@ -147,7 +147,7 @@ public class FileUtils {
                 throw new IOException(text_fileNotExists);
             }
             ProcessBuilder processBuilder;
-            if (systemName.contains(win)) {
+            if (isWin) {
                 processBuilder = new ProcessBuilder("cmd.exe", "/C", "explorer /select, " + openPath);
             } else {
                 processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
@@ -241,15 +241,7 @@ public class FileUtils {
      * @return 资源文件绝对路径
      */
     public static String getAppResourcePath(String path) {
-        String resourcePath = packagePath + path;
-        // 处理macos打包成.app文件后的路径
-        if (systemName.contains(mac)) {
-            resourcePath = javaHome + "/bin/" + path;
-        }
-        if (!new File(resourcePath).exists()) {
-            resourcePath = path;
-        }
-        return resourcePath;
+        return javaHome + packagePath + path;
     }
 
     /**
@@ -258,9 +250,9 @@ public class FileUtils {
      * @return 不同操作系统下logs文件夹地址
      */
     public static String getLogsPath() {
-        String logsPath = userDir + File.separator + logs;
+        String logsPath = pmcDir + File.separator + logs;
         // 处理macos打包成.app文件后的路径
-        if (systemName.contains(mac) && !isRunningFromJar()) {
+        if (isMac && !isRunningFromJar()) {
             logsPath = javaHome + logsDir;
         }
         return logsPath;
@@ -272,9 +264,9 @@ public class FileUtils {
      * @return 不同操作系统下程序启动路径
      */
     public static String getAppPath() {
-        if (systemName.contains(win)) {
-            return new File(javaHome).getParent() + File.separator + appName + exe;
-        } else if (systemName.contains(mac)) {
+        if (isWin) {
+            return pmcDir + File.separator + appName + exe;
+        } else if (isMac) {
             return javaHome.substring(0, javaHome.indexOf(app) + app.length());
         }
         return javaHome;
@@ -405,7 +397,7 @@ public class FileUtils {
         long macUnit = 1000;
         long kb;
         // macOS与Windows文件大小进制不同
-        if (systemName.contains(mac) && distinguishOS) {
+        if (isMac && distinguishOS) {
             kb = macUnit;
         } else {
             kb = winUnit;
@@ -530,7 +522,7 @@ public class FileUtils {
         } else {
             String appPath = getAppPath();
             String cfgFileName = "/" + appName + cfg;
-            if (systemName.contains(win)) {
+            if (isWin) {
                 cfgPath = new File(appPath).getParent() + appDirectory + cfgFileName;
             } else {
                 cfgPath = appPath + contentsDirectory + appDirectory + cfgFileName;

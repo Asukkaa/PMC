@@ -65,10 +65,10 @@ public class ScheduledService {
             @Override
             protected Void call() throws IOException {
                 updateMessage("保存中...");
-                if (systemName.contains(win)) {
+                if (isWin) {
                     // 创建win定时任务
                     createWinLaunchdTask(timedTaskBean);
-                } else if (systemName.contains(mac)) {
+                } else if (isMac) {
                     // 创建mac定时任务
                     createMacLaunchdTask(timedTaskBean);
                 }
@@ -86,9 +86,9 @@ public class ScheduledService {
      */
     public static void deleteTask(String taskName) throws IOException {
         taskName = TASK_NAME + taskName;
-        if (systemName.contains(win)) {
+        if (isWin) {
             new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start();
-        } else if (systemName.contains(mac)) {
+        } else if (isMac) {
             Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
             Files.deleteIfExists(plistFile);
         }
@@ -105,9 +105,9 @@ public class ScheduledService {
             protected List<TimedTaskBean> call() throws Exception {
                 updateMessage("查询中...");
                 List<TimedTaskBean> taskDetails = new ArrayList<>();
-                if (systemName.contains(win)) {
+                if (isWin) {
                     getWinTaskDetails(taskDetails);
-                } else if (systemName.contains(mac)) {
+                } else if (isMac) {
                     getMacTaskDetails(taskDetails);
                 }
                 updateMessage("");
@@ -154,7 +154,7 @@ public class ScheduledService {
              */
             private void getWinTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
                 // 改为查询全部任务
-                Process process = new ProcessBuilder("schtasks", "/query", "/fo", "LIST", "/v").start();
+                Process process = new ProcessBuilder("cmd", "/c", "chcp 65001 >nul && schtasks /query /fo LIST /v").start();
                 String output = readProcessOutput(process);
                 // 新增程序路径过滤（使用正则表达式忽略大小写）
                 Pattern exePattern = Pattern.compile(Pattern.quote(appName + exe), Pattern.CASE_INSENSITIVE);

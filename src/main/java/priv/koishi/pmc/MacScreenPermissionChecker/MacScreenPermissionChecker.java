@@ -2,8 +2,7 @@ package priv.koishi.pmc.MacScreenPermissionChecker;
 
 import java.awt.*;
 
-import static priv.koishi.pmc.Finals.CommonFinals.mac;
-import static priv.koishi.pmc.Finals.CommonFinals.systemName;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapturePermission;
 
 /**
@@ -20,7 +19,7 @@ public class MacScreenPermissionChecker {
      */
     public static boolean hasScreenCapturePermission() {
         // 非macOS系统直接返回true
-        if (!systemName.contains(mac)) {
+        if (!isMac) {
             return true;
         }
         try {

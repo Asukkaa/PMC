@@ -14,7 +14,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
-import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.IOException;
@@ -22,15 +21,15 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
-import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -41,7 +40,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-05-19
  * Time:16:17
  */
-public class TimedTaskController {
+public class TimedTaskController extends RootController {
 
     /**
      * 页面标识符
@@ -68,72 +67,44 @@ public class TimedTaskController {
      */
     private static final List<Node> disableNodes = new ArrayList<>();
 
-    /**
-     * 程序主舞台
-     */
-    private Stage mainStage;
+    @FXML
+    public AnchorPane anchorPane_Task;
 
     @FXML
-    private AnchorPane anchorPane_Task;
+    public HBox fileNumberHBox_Task, tipHBox_Task, logHBox_Task;
 
     @FXML
-    private HBox fileNumberHBox_Task, tipHBox_Task, logHBox_Task;
+    public ProgressBar progressBar_Task;
 
     @FXML
-    private ProgressBar progressBar_Task;
+    public Label dataNumber_Task, tip_Task, log_Task;
 
     @FXML
-    private Label dataNumber_Task, tip_Task, log_Task;
+    public Button addTimedTask_Task, getScheduleTask_Task;
 
     @FXML
-    private Button addTimedTask_Task, getScheduleTask_Task;
+    public TableView<TimedTaskBean> tableView_Task;
 
     @FXML
-    private TableView<TimedTaskBean> tableView_Task;
+    public TableColumn<TimedTaskBean, Integer> index_Task;
 
     @FXML
-    private TableColumn<TimedTaskBean, Integer> index_Task;
-
-    @FXML
-    private TableColumn<TimedTaskBean, String> taskName_Task, date_Task, time_Task, repeat_Task, days_Task, name_Task, path_Task;
+    public TableColumn<TimedTaskBean, String> taskName_Task, date_Task, time_Task, repeat_Task, days_Task, name_Task,
+            path_Task;
 
     /**
      * 组件自适应宽高
-     *
-     * @param stage 程序主舞台
      */
-    public static void adaption(Stage stage) {
-        Scene scene = stage.getScene();
+    public void adaption() {
         // 设置组件高度
-        double stageHeight = stage.getHeight();
-        TableView<?> table = (TableView<?>) scene.lookup("#tableView_Task");
-        table.setPrefHeight(stageHeight * 0.7);
+        double stageHeight = mainStage.getHeight();
+        tableView_Task.setPrefHeight(stageHeight * 0.7);
         // 设置组件宽度
-        double tableWidth = stage.getWidth() * 0.95;
-        table.setMaxWidth(tableWidth);
-        table.setPrefWidth(tableWidth);
-        Node index = scene.lookup("#index_Task");
-        index.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node taskName = scene.lookup("#taskName_Task");
-        taskName.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node date = scene.lookup("#date_Task");
-        date.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node time = scene.lookup("#time_Task");
-        time.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node repeat = scene.lookup("#repeat_Task");
-        repeat.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node days = scene.lookup("#days_Task");
-        days.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node name = scene.lookup("#name_Task");
-        name.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node path = scene.lookup("#path_Task");
-        path.setStyle("-fx-pref-width: " + tableWidth * 0.3 + "px;");
-        Label dataNum = (Label) scene.lookup("#dataNumber_Task");
-        HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Task");
-        nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
-        Label tip = (Label) scene.lookup("#tip_Task");
-        HBox tipHBox = (HBox) scene.lookup("#tipHBox_Task");
-        nodeRightAlignment(tipHBox, tableWidth, tip);
+        double tableWidth = mainStage.getWidth() * 0.95;
+        tableView_Task.setMaxWidth(tableWidth);
+        tableView_Task.setPrefWidth(tableWidth);
+        nodeRightAlignment(fileNumberHBox_Task, tableWidth, dataNumber_Task);
+        nodeRightAlignment(tipHBox_Task, tableWidth, tip_Task);
     }
 
     /**
@@ -188,7 +159,7 @@ public class TimedTaskController {
         }
         TaskDetailController controller = loader.getController();
         try {
-            controller.initData(item, mainStage, isEdit);
+            controller.initData(item, isEdit);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -207,12 +178,15 @@ public class TimedTaskController {
         String title = item.getTaskName();
         detailStage.setTitle(title + " 任务详情");
         detailStage.initModality(Modality.APPLICATION_MODAL);
-        setWindLogo(detailStage, logoPath);
+        setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
-        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
         detailStage.show();
     }
 
@@ -334,7 +308,6 @@ public class TimedTaskController {
         // 设置要防重复点击的组件
         setDisableNodes();
         Platform.runLater(() -> {
-            mainStage = (Stage) anchorPane_Task.getScene().getWindow();
             // 设置javafx单元格宽度
             bindPrefWidthProperty();
             // 自动填充javafx表格

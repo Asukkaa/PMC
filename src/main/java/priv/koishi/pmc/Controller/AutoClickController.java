@@ -22,12 +22,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
@@ -35,8 +35,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Window;
 import javafx.stage.*;
+import javafx.stage.Window;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,11 +45,12 @@ import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EditingCell.EditingCell;
+import priv.koishi.pmc.EventBus.EventBus;
+import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
-import priv.koishi.pmc.MainApplication;
-import priv.koishi.pmc.Properties.CommonProperties;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.awt.*;
@@ -58,32 +59,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
-import static priv.koishi.pmc.MainApplication.loadPMCPath;
-import static priv.koishi.pmc.MainApplication.runPMCFile;
+import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
-import static priv.koishi.pmc.Utils.CommonUtils.*;
+import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
+import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
- * 自动点击工具页面控制器
+ * 自动操作工具页面控制器
  *
  * @author KOISHI
  * Date:2025-02-17
  * Time:17:21
  */
-public class AutoClickController extends CommonProperties implements MousePositionUpdater {
+public class AutoClickController extends RootController implements MousePositionUpdater {
 
     /**
      * 导入文件路径
@@ -243,7 +245,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     /**
      * 自动点击任务
      */
-    private Task<List<ClickLogBean>> autoClickTask;
+    public Task<List<ClickLogBean>> autoClickTask;
 
     /**
      * 页面标识符
@@ -263,7 +265,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
     /**
      * 正在录制标识
      */
-    private boolean recordClicking;
+    public boolean recordClicking;
 
     /**
      * 正在录制标识（准备时间结束）
@@ -320,150 +322,98 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private Rectangle rectangle;
 
-    /**
-     * 程序主场景
-     */
-    private Scene mainScene;
-
-    /**
-     * 程序主舞台
-     */
-    private Stage mainStage;
+    @FXML
+    public AnchorPane anchorPane_Click;
 
     @FXML
-    private AnchorPane anchorPane_Click;
+    public HBox fileNumberHBox_Click, tipHBox_Click, cancelTipHBox_Click, logHBox_Click;
 
     @FXML
-    private HBox fileNumberHBox_Click, tipHBox_Click, cancelTipHBox_Click, logHBox_Click;
+    public ProgressBar progressBar_Click;
 
     @FXML
-    private ProgressBar progressBar_Click;
-
-    @FXML
-    private Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click,
+    public Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click,
             err_Click;
 
     @FXML
-    private CheckBox openDirectory_Click;
+    public CheckBox openDirectory_Click;
 
     @FXML
-    private Button clearButton_Click, runClick_Click, clickTest_Click, addPosition_Click, loadAutoClick_Click,
+    public Button clearButton_Click, runClick_Click, addPosition_Click, loadAutoClick_Click,
             exportAutoClick_Click, addOutPath_Click, recordClick_Click, clickLog_Click;
 
     @FXML
-    private TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
+    public TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
 
     @FXML
-    private TableView<ClickPositionVO> tableView_Click;
+    public TableView<ClickPositionVO> tableView_Click;
 
     @FXML
-    private TableColumn<ClickPositionVO, Integer> index_Click;
+    public TableColumn<ClickPositionVO, Integer> index_Click;
 
     @FXML
-    private TableColumn<ClickPositionVO, ImageView> thumb_Click;
+    public TableColumn<ClickPositionVO, ImageView> thumb_Click;
 
     @FXML
-    private TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickKey_Click,
+    public TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickKey_Click,
             waitTime_Click, clickType_Click, matchedType_Click, retryType_Click;
 
     /**
      * 组件自适应宽高
-     *
-     * @param stage 程序主舞台
      */
-    public static void adaption(Stage stage) {
-        Scene scene = stage.getScene();
+    public void adaption() {
         // 设置组件高度
-        double stageHeight = stage.getHeight();
-        TableView<?> table = (TableView<?>) scene.lookup("#tableView_Click");
-        table.setPrefHeight(stageHeight * 0.5);
+        double stageHeight = mainStage.getHeight();
+        tableView_Click.setPrefHeight(stageHeight * 0.5);
         // 设置组件宽度
-        double tableWidth = stage.getWidth() * 0.95;
-        table.setMaxWidth(tableWidth);
-        table.setPrefWidth(tableWidth);
-        Node index = scene.lookup("#index_Click");
-        index.setStyle("-fx-pref-width: " + tableWidth * 0.05 + "px;");
-        Node thumb = scene.lookup("#thumb_Click");
-        thumb.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node name = scene.lookup("#name_Click");
-        name.setStyle("-fx-pref-width: " + tableWidth * 0.13 + "px;");
-        Node clickTime = scene.lookup("#clickTime_Click");
-        clickTime.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
-        Node clickNum = scene.lookup("#clickNum_Click");
-        clickNum.setStyle("-fx-pref-width: " + tableWidth * 0.07 + "px;");
-        Node clickKey = scene.lookup("#clickKey_Click");
-        clickKey.setStyle("-fx-pref-width: " + tableWidth * 0.08 + "px;");
-        Node waitTime = scene.lookup("#waitTime_Click");
-        waitTime.setStyle("-fx-pref-width: " + tableWidth * 0.1 + "px;");
-        Node clickType = scene.lookup("#clickType_Click");
-        clickType.setStyle("-fx-pref-width: " + tableWidth * 0.08 + "px;");
-        Node matchedType = scene.lookup("#matchedType_Click");
-        matchedType.setStyle("-fx-pref-width: " + tableWidth * 0.16 + "px;");
-        Node retryType = scene.lookup("#retryType_Click");
-        retryType.setStyle("-fx-pref-width: " + tableWidth * 0.16 + "px;");
-        Label dataNum = (Label) scene.lookup("#dataNumber_Click");
-        HBox fileNumberHBox = (HBox) scene.lookup("#fileNumberHBox_Click");
-        nodeRightAlignment(fileNumberHBox, tableWidth, dataNum);
-        Label tip = (Label) scene.lookup("#tip_Click");
-        HBox tipHBox = (HBox) scene.lookup("#tipHBox_Click");
-        nodeRightAlignment(tipHBox, tableWidth, tip);
-        Label cancelTip = (Label) scene.lookup("#cancelTip_Click");
-        HBox cancelTipHBox = (HBox) scene.lookup("#cancelTipHBox_Click");
-        nodeRightAlignment(cancelTipHBox, tableWidth, cancelTip);
-        Label err = (Label) scene.lookup("#err_Click");
-        if (err != null) {
-            HBox logHBox = (HBox) scene.lookup("#logHBox_Click");
-            nodeRightAlignment(logHBox, tableWidth, err);
+        double tableWidth = mainStage.getWidth() * 0.95;
+        tableView_Click.setMaxWidth(tableWidth);
+        tableView_Click.setPrefWidth(tableWidth);
+        nodeRightAlignment(fileNumberHBox_Click, tableWidth, dataNumber_Click);
+        nodeRightAlignment(tipHBox_Click, tableWidth, tip_Click);
+        nodeRightAlignment(cancelTipHBox_Click, tableWidth, cancelTip_Click);
+        if (err_Click != null) {
+            nodeRightAlignment(logHBox_Click, tableWidth, err_Click);
         }
     }
 
     /**
      * 保存最后一次配置的值
      *
-     * @param scene 程序主场景
      * @throws IOException io异常
      */
-    public static void saveLastConfig(Scene scene) throws IOException {
-        AnchorPane anchorPane = (AnchorPane) scene.lookup("#anchorPane_Click");
-        if (anchorPane != null) {
+    public void saveLastConfig() throws IOException {
+        if (anchorPane_Click != null) {
             InputStream input = checkRunningInputStream(configFile_Click);
             Properties prop = new Properties();
             prop.load(input);
-            TextField loopTime = (TextField) scene.lookup("#loopTime_Click");
-            prop.put(key_lastLoopTime, loopTime.getText());
-            TextField outFileName = (TextField) scene.lookup("#outFileName_Click");
-            prop.put(key_lastOutFileName, outFileName.getText());
-            CheckBox openDirectory = (CheckBox) scene.lookup("#openDirectory_Click");
-            String lastOpenDirectoryValue = openDirectory.isSelected() ? activation : unActivation;
+            prop.put(key_lastLoopTime, loopTime_Click.getText());
+            prop.put(key_lastOutFileName, outFileName_Click.getText());
+            String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? activation : unActivation;
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
-            TextField preparationRecordTime = (TextField) scene.lookup("#preparationRecordTime_Click");
-            prop.put(key_lastPreparationRecordTime, preparationRecordTime.getText());
-            TextField preparationRunTime = (TextField) scene.lookup("#preparationRunTime_Click");
-            prop.put(key_lastPreparationRunTime, preparationRunTime.getText());
-            Label outPath = (Label) scene.lookup("#outPath_Click");
-            String outPathValue = outPath.getText();
+            prop.put(key_lastPreparationRecordTime, preparationRecordTime_Click.getText());
+            prop.put(key_lastPreparationRunTime, preparationRunTime_Click.getText());
+            String outPathValue = outPath_Click.getText();
             prop.put(key_outFilePath, outPathValue);
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
             output.close();
-            CheckBox autoSave = (CheckBox) scene.lookup("#autoSave_Set");
-            TableView<?> tableView = (TableView<?>) scene.lookup("#tableView_Click");
+            CheckBox autoSave = settingController.autoSave_Set;
             // 自动保存
-            autoSave(autoSave, tableView, outPathValue);
+            autoSave(autoSave, outPathValue);
         }
     }
 
     /**
      * 自动保存操作流程
      *
-     * @param autoSave  自动保存开关
-     * @param tableView 操作流程列表
+     * @param autoSave 自动保存开关
      * @throws IOException io异常
      */
-    private static void autoSave(CheckBox autoSave, TableView<?> tableView, String outPath) throws IOException {
+    private void autoSave(CheckBox autoSave, String outPath) throws IOException {
         if (autoSave.isSelected()) {
-            List<?> tableViewItems = new ArrayList<>(tableView.getItems());
+            List<?> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String path = notOverwritePath(outPath + File.separator + autoSaveFileName + PMC);
@@ -499,18 +449,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
     }
 
     /**
-     * 加载默认设置
-     *
-     * @throws IOException io异常
-     */
-    private void getConfig() throws IOException {
-        // 读取配置文件
-        getProperties();
-        // 读取设置页面设置的值
-        getSetting();
-    }
-
-    /**
      * 读取配置文件
      *
      * @throws IOException io异常
@@ -537,39 +475,39 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * 读取设置页面设置的值
      */
     private void getSetting() {
-        Slider clickOpacity = (Slider) mainScene.lookup("#clickOpacity_Set");
+        Slider clickOpacity = settingController.clickOpacity_Set;
         defaultClickOpacity = String.valueOf(clickOpacity.getValue());
-        Slider stopOpacity = (Slider) mainScene.lookup("#stopOpacity_Set");
+        Slider stopOpacity = settingController.stopOpacity_Set;
         defaultStopOpacity = String.valueOf(stopOpacity.getValue());
-        TextField clickRetryNumTextField = (TextField) mainScene.lookup("#clickRetryNum_Set");
+        TextField clickRetryNumTextField = settingController.clickRetryNum_Set;
         clickRetryNum = StringUtils.isBlank(clickRetryNumTextField.getText()) ? defaultClickRetryNum : clickRetryNumTextField.getText();
-        TextField stopRetryNumTextField = (TextField) mainScene.lookup("#stopRetryNum_Set");
+        TextField stopRetryNumTextField = settingController.stopRetryNum_Set;
         stopRetryNum = StringUtils.isBlank(stopRetryNumTextField.getText()) ? defaultStopRetryNum : stopRetryNumTextField.getText();
-        TextField sampleIntervalTextField = (TextField) mainScene.lookup("#sampleInterval_Set");
+        TextField sampleIntervalTextField = settingController.sampleInterval_Set;
         sampleInterval = StringUtils.isBlank(sampleIntervalTextField.getText()) ? defaultSampleInterval : sampleIntervalTextField.getText();
-        TableView<?> tableView = (TableView<?>) mainScene.lookup("#tableView_Set");
+        TableView<ImgFileVO> tableView = settingController.tableView_Set;
         defaultStopImgFiles = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
-        CheckBox recordMoveCheckBox = (CheckBox) mainScene.lookup("#recordMove_Set");
+        CheckBox recordMoveCheckBox = settingController.recordMove_Set;
         recordMove = recordMoveCheckBox.isSelected();
-        CheckBox recordDragCheckBox = (CheckBox) mainScene.lookup("#recordDrag_Set");
+        CheckBox recordDragCheckBox = settingController.recordDrag_Set;
         recordDrag = recordDragCheckBox.isSelected();
-        CheckBox randomClickCheckBox = (CheckBox) mainScene.lookup("#randomClick_Set");
+        CheckBox randomClickCheckBox = settingController.randomClick_Set;
         randomClick = randomClickCheckBox.isSelected() ? activation : unActivation;
-        CheckBox randomTrajectoryCheckBox = (CheckBox) mainScene.lookup("#randomTrajectory_Set");
+        CheckBox randomTrajectoryCheckBox = settingController.randomTrajectory_Set;
         randomTrajectory = randomTrajectoryCheckBox.isSelected() ? activation : unActivation;
-        CheckBox randomClickTimeCheckBox = (CheckBox) mainScene.lookup("#randomClickTime_Set");
+        CheckBox randomClickTimeCheckBox = settingController.randomClickTime_Set;
         randomClickTime = randomClickTimeCheckBox.isSelected() ? activation : unActivation;
-        TextField randomTimeTextField = (TextField) mainScene.lookup("#randomTimeOffset_Set");
+        TextField randomTimeTextField = settingController.randomTimeOffset_Set;
         randomTime = StringUtils.isBlank(randomTimeTextField.getText()) ? defaultRandomTime : randomTimeTextField.getText();
-        TextField clickTimeOffsetTextField = (TextField) mainScene.lookup("#clickTimeOffset_Set");
+        TextField clickTimeOffsetTextField = settingController.clickTimeOffset_Set;
         clickTimeOffset = StringUtils.isBlank(clickTimeOffsetTextField.getText()) ? defaultClickTimeOffset : clickTimeOffsetTextField.getText();
-        TextField randomClickXTextField = (TextField) mainScene.lookup("#randomClickX_Set");
+        TextField randomClickXTextField = settingController.randomClickX_Set;
         randomClickX = StringUtils.isBlank(randomClickXTextField.getText()) ? defaultRandomClickX : randomClickXTextField.getText();
-        TextField randomClickYTextField = (TextField) mainScene.lookup("#randomClickY_Set");
+        TextField randomClickYTextField = settingController.randomClickY_Set;
         randomClickY = StringUtils.isBlank(randomClickYTextField.getText()) ? defaultRandomClickY : randomClickYTextField.getText();
-        CheckBox randomWaitTimeCheckBox = (CheckBox) mainScene.lookup("#randomWaitTime_Set");
+        CheckBox randomWaitTimeCheckBox = settingController.randomWaitTime_Set;
         randomWaitTime = randomWaitTimeCheckBox.isSelected() ? activation : unActivation;
-        CheckBox randomClickIntervalCheckBox = (CheckBox) mainScene.lookup("#randomClickInterval_Set");
+        CheckBox randomClickIntervalCheckBox = settingController.randomClickInterval_Set;
         randomClickInterval = randomClickIntervalCheckBox.isSelected() ? activation : unActivation;
     }
 
@@ -594,10 +532,14 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
-        name_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setName));
-        waitTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
-        clickTime_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
-        clickNum_Click.setCellFactory((tableColumn) -> new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
+        name_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setName));
+        waitTime_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
+        clickTime_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
+        clickNum_Click.setCellFactory((tableColumn) ->
+                new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
     }
 
     /**
@@ -618,7 +560,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
         item.setClickImgSelectPath(clickImgSelectPath);
         item.setStopImgSelectPath(stopImgSelectPath);
         try {
-            controller.initData(item, mainStage);
+            controller.initData(item);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -648,12 +590,15 @@ public class AutoClickController extends CommonProperties implements MousePositi
         String title = item.getName() == null ? "" : item.getName();
         detailStage.setTitle(title + " 步骤详情");
         detailStage.initModality(Modality.APPLICATION_MODAL);
-        setWindLogo(detailStage, logoPath);
+        setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
-        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
         detailStage.show();
     }
 
@@ -663,10 +608,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void initFloatingWindow() {
         // 创建一个矩形作为浮窗的内容
         rectangle = new Rectangle(floatingWidth, floatingHeight);
-        // 设置透明度
-        rectangle.setOpacity(0);
         StackPane root = new StackPane();
-        root.setBackground(Background.fill(Color.TRANSPARENT));
+        root.setBackground(Background.EMPTY);
         Color labelTextFill = Color.WHITE;
         floatingLabel = new Label(text_cancelTask);
         floatingLabel.setTextFill(labelTextFill);
@@ -693,23 +636,23 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     private void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
-        ColorPicker colorPicker = (ColorPicker) mainScene.lookup("#colorPicker_Set");
+        ColorPicker colorPicker = settingController.colorPicker_Set;
         Color color = colorPicker.getValue();
-        floatingLabel.setTextFill(color);
-        floatingMousePosition.setTextFill(color);
         // 读取配置文件
         getProperties();
-        floatingStage.setX(floatingX);
-        floatingStage.setY(floatingY);
         // 获取浮窗的显示设置
-        CheckBox floatingRun = (CheckBox) mainScene.lookup("#floatingRun_Set");
-        CheckBox floatingRecord = (CheckBox) mainScene.lookup("#floatingRecord_Set");
+        CheckBox floatingRun = settingController.floatingRun_Set;
+        CheckBox floatingRecord = settingController.floatingRecord_Set;
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
-        Slider slider = (Slider) mainScene.lookup("#opacity_Set");
-        rectangle.setOpacity(slider.getValue());
+        Slider slider = settingController.opacity_Set;
         if (isShow) {
             Platform.runLater(() -> {
                 if (floatingStage != null && !floatingStage.isShowing()) {
+                    floatingLabel.setTextFill(color);
+                    floatingMousePosition.setTextFill(color);
+                    rectangle.setOpacity(slider.getValue());
+                    floatingStage.setX(floatingX);
+                    floatingStage.setY(floatingY);
                     floatingStage.show();
                 }
             });
@@ -728,29 +671,39 @@ public class AutoClickController extends CommonProperties implements MousePositi
     }
 
     /**
+     * 判断程序是否为空闲状态
+     *
+     * @return true表示为空闲状态，false表示非空闲状态
+     */
+    public boolean isFree() {
+        return !runClicking && !recordClicking;
+    }
+
+    /**
      * 启动自动操作流程
      *
      * @param clickPositionVOS 自动操作流程
      * @throws IOException io异常
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
-        if (!runClicking && !recordClicking) {
+        if (isFree()) {
+            // 标记为正在运行自动操作
+            runClicking = true;
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
-            runClicking = true;
             if (CollectionUtils.isNotEmpty(clickLogs)) {
                 clickLogs.clear();
             }
-            CheckBox firstClick = (CheckBox) mainScene.lookup("#firstClick_Set");
-            TextField retrySecond = (TextField) tableView_Click.getScene().lookup("#retrySecond_Set");
-            TextField overTime = (TextField) tableView_Click.getScene().lookup("#overtime_Set");
-            TextField maxLogNum = (TextField) tableView_Click.getScene().lookup("#maxLogNum_Set");
-            CheckBox clickLog = (CheckBox) mainScene.lookup("#clickLog_Set");
-            CheckBox moveLog = (CheckBox) mainScene.lookup("#moveLog_Set");
-            CheckBox dragLog = (CheckBox) mainScene.lookup("#dragLog_Set");
-            CheckBox clickImgLog = (CheckBox) mainScene.lookup("#clickImgLog_Set");
-            CheckBox stopImgLog = (CheckBox) mainScene.lookup("#stopImgLog_Set");
-            CheckBox waitLog = (CheckBox) mainScene.lookup("#waitLog_Set");
+            CheckBox firstClick = settingController.firstClick_Set;
+            TextField retrySecond = settingController.retrySecond_Set;
+            TextField overTime = settingController.overtime_Set;
+            TextField maxLogNum = settingController.maxLogNum_Set;
+            CheckBox clickLog = settingController.clickLog_Set;
+            CheckBox moveLog = settingController.moveLog_Set;
+            CheckBox dragLog = settingController.dragLog_Set;
+            CheckBox clickImgLog = settingController.clickImgLog_Set;
+            CheckBox stopImgLog = settingController.stopImgLog_Set;
+            CheckBox waitLog = settingController.waitLog_Set;
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                     .setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
@@ -770,7 +723,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                     .setDisableNodes(disableNodes)
                     .setBeanList(clickPositionVOS)
                     .setMassageLabel(log_Click);
-            CheckBox hideWindowRun = (CheckBox) mainScene.lookup("#hideWindowRun_Set");
+            CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
             }
@@ -790,7 +743,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 log_Click.setTextFill(Color.GREEN);
                 log_Click.setText(text_taskFinished);
                 hideFloatingWindow();
-                CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
+                CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     showStage(mainStage);
                 }
@@ -804,7 +757,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskFailed);
                 hideFloatingWindow();
-                CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
+                CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     showStage(mainStage);
                 }
@@ -827,7 +780,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskCancelled);
                 hideFloatingWindow();
-                CheckBox showWindowRun = (CheckBox) mainScene.lookup("#showWindowRun_Set");
+                CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     showStage(mainStage);
                 }
@@ -1087,9 +1040,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
         getSetting();
         ClickPositionVO clickPositionVO = createClickPositionVO();
         clickPositionVO.setName(text_step + (tableViewItemSize + 1) + text_isAdd);
-        if (tableViewItemSize == -1) {
-            clickPositionVO.setName("测试步骤");
-        }
         return clickPositionVO;
     }
 
@@ -1148,7 +1098,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void setToolTip() {
         addToolTip(tip_runClick, runClick_Click);
         addToolTip(tip_loopTime, loopTime_Click);
-        addToolTip(tip_clickTest, clickTest_Click);
         addToolTip(tip_learButton, clearButton_Click);
         addToolTip(tip_addPosition, addPosition_Click);
         addToolTip(tip_recordClick, recordClick_Click);
@@ -1177,38 +1126,40 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param filePath 文件路径
      * @throws IOException 导入自动化流程文件内容格式不正确
      */
-    private void loadPMCFile(String filePath) throws IOException {
-        // 读取 JSON 文件并转换为 List<ClickPositionBean>
-        ObjectMapper objectMapper = new ObjectMapper();
-        File jsonFile = new File(filePath);
-        List<ClickPositionBean> clickPositionBeans;
-        try {
-            clickPositionBeans = objectMapper.readValue(jsonFile,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
-        } catch (MismatchedInputException | JsonParseException e) {
-            throw new IOException(text_loadAutoClick + filePath + text_formatError);
-        }
-        // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
-        int index = 0;
-        if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
-            List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-            for (ClickPositionBean bean : clickPositionBeans) {
-                ClickPositionVO vo = new ClickPositionVO();
-                try {
-                    // 自动拷贝父类中的属性
-                    copyProperties(bean, vo);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-                // 初始化子类特有属性
-                vo.setTableView(tableView_Click)
-                        .setRemove(false)
-                        .setUuid(UUID.randomUUID().toString());
-                vo.setIndex(index++);
-                clickPositionVOS.add(vo);
+    public void loadPMCFile(String filePath) throws IOException {
+        if (autoClickTask == null && !recordClicking) {
+            // 读取 JSON 文件并转换为 List<ClickPositionBean>
+            ObjectMapper objectMapper = new ObjectMapper();
+            File jsonFile = new File(filePath);
+            List<ClickPositionBean> clickPositionBeans;
+            try {
+                clickPositionBeans = objectMapper.readValue(jsonFile,
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
+            } catch (MismatchedInputException | JsonParseException e) {
+                throw new IOException(text_loadAutoClick + filePath + text_formatError);
             }
-            // 将自动流程添加到列表中
-            addAutoClickPositions(clickPositionVOS, filePath);
+            // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
+            int index = 0;
+            if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
+                List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                for (ClickPositionBean bean : clickPositionBeans) {
+                    ClickPositionVO vo = new ClickPositionVO();
+                    try {
+                        // 自动拷贝父类中的属性
+                        copyProperties(bean, vo);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // 初始化子类特有属性
+                    vo.setTableView(tableView_Click)
+                            .setRemove(false)
+                            .setUuid(UUID.randomUUID().toString());
+                    vo.setIndex(index++);
+                    clickPositionVOS.add(vo);
+                }
+                // 将自动流程添加到列表中
+                addAutoClickPositions(clickPositionVOS, filePath);
+            }
         }
     }
 
@@ -1260,16 +1211,16 @@ public class AutoClickController extends CommonProperties implements MousePositi
      */
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
-        int x = (int) mousePoint.getX();
-        int y = (int) mousePoint.getY();
-        String text = "当前鼠标位置为： X: " + x + " Y: " + y;
-        CheckBox mouseFloatingRun = (CheckBox) mainScene.lookup("#mouseFloatingRun_Set");
-        CheckBox mouseFloatingRecord = (CheckBox) mainScene.lookup("#mouseFloatingRecord_Set");
-        TextField offsetXTextField = (TextField) mainScene.lookup("#offsetX_Set");
-        int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
-        TextField offsetYTextField = (TextField) mainScene.lookup("#offsetY_Set");
-        int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
         Platform.runLater(() -> {
+            int x = (int) mousePoint.getX();
+            int y = (int) mousePoint.getY();
+            String text = "当前鼠标位置为： X: " + x + " Y: " + y;
+            CheckBox mouseFloatingRun = settingController.mouseFloatingRun_Set;
+            CheckBox mouseFloatingRecord = settingController.mouseFloatingRecord_Set;
+            TextField offsetXTextField = settingController.offsetX_Set;
+            int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
+            TextField offsetYTextField = settingController.offsetY_Set;
+            int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
             floatingMousePosition.setText(text);
             mousePosition_Click.setText(text);
             if (floatingStage != null && floatingStage.isShowing()) {
@@ -1328,7 +1279,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                             changeDisableNodes(disableNodes, false);
                             hideFloatingWindow();
                             // 弹出程序主窗口
-                            CheckBox showWindowRecord = (CheckBox) mainScene.lookup("#showWindowRecord_Set");
+                            CheckBox showWindowRecord = settingController.showWindowRecord_Set;
                             if (showWindowRecord.isSelected()) {
                                 showStage(mainStage);
                             }
@@ -1369,6 +1320,11 @@ public class AutoClickController extends CommonProperties implements MousePositi
          * 添加类型
          */
         private final int addType;
+
+        /**
+         * 开始移动时刻
+         */
+        private long startMoveTime;
 
         /**
          * 鼠标移动记录器
@@ -1460,9 +1416,15 @@ public class AutoClickController extends CommonProperties implements MousePositi
             if (recordMove && pressButtonList.isEmpty()) {
                 Platform.runLater(() -> {
                     log_Click.setTextFill(Color.BLUE);
+                    // 计算移动时长
+                    long endMoveTime = System.currentTimeMillis();
+                    long moveTime = isFirstClick ?
+                            endMoveTime - recordingStartTime :
+                            endMoveTime - startMoveTime;
                     // 添加至表格
                     List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                     movePoint.setName(text_step + index + text_isRecord)
+                            .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
                             .setClickType(clickType_move);
@@ -1551,6 +1513,7 @@ public class AutoClickController extends CommonProperties implements MousePositi
                 }
                 // 所有按键都抬起后开始移动轨迹记录
                 if (recordMove && pressButtonList.isEmpty()) {
+                    startMoveTime = System.currentTimeMillis();
                     addNativeListener(moveMotionListener);
                 }
                 // 只有在所有按键都抬起时才算一个完整的操作步骤
@@ -1598,14 +1561,15 @@ public class AutoClickController extends CommonProperties implements MousePositi
      * @param addType 添加类型
      */
     private void startRecord(int addType) {
-        if (!runClicking && !recordClicking) {
+        if (isFree()) {
+            // 标记为正在录制
             recordClicking = true;
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, true);
             // 获取准备时间值
             int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click, Integer.parseInt(defaultPreparationRecordTime), 0, null);
             // 开始录制
-            CheckBox hideWindowRecord = (CheckBox) mainScene.lookup("#hideWindowRecord_Set");
+            CheckBox hideWindowRecord = settingController.hideWindowRecord_Set;
             if (hideWindowRecord.isSelected()) {
                 mainStage.setIconified(true);
             }
@@ -1688,7 +1652,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void setDisableNodes() {
         disableNodes.add(clickLog_Click);
         disableNodes.add(runClick_Click);
-        disableNodes.add(clickTest_Click);
         disableNodes.add(tableView_Click);
         disableNodes.add(recordClick_Click);
         disableNodes.add(addPosition_Click);
@@ -1711,12 +1674,9 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void setNativeHookExceptionLog() {
         isNativeHookException = true;
         runClick_Click.setDisable(true);
-        clickTest_Click.setDisable(true);
         recordClick_Click.setDisable(true);
-        Button saveButton = (Button) mainScene.lookup("#setFloatingCoordinate_Set");
-        saveButton.setDisable(true);
         String errorMessage = appName + " 缺少必要系统权限";
-        if (systemName.contains(mac)) {
+        if (isMac) {
             errorMessage = tip_NativeHookException;
         }
         err_Click.setText(errorMessage);
@@ -1729,22 +1689,53 @@ public class AutoClickController extends CommonProperties implements MousePositi
     private void setNoScreenCapturePermissionLog() {
         noScreenCapturePermission = true;
         runClick_Click.setDisable(true);
-        clickTest_Click.setDisable(true);
         err_Click.setText(tip_noScreenCapturePermission);
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission));
+    }
+
+    /**
+     * 页面加载完毕后的执行逻辑
+     *
+     * @param event 设置页加载完成事件
+     */
+    private void settingsLoaded(SettingsLoadedEvent event) {
+        // 运行定时任务
+        if (StringUtils.isNotBlank(loadPMCPath)) {
+            Platform.runLater(() -> {
+                try {
+                    loadPMCFile(loadPMCPath);
+                    if (runPMCFile) {
+                        tableView_Click.refresh();
+                        // 运行自动操作
+                        runClick();
+                    }
+                    // 清空启动参数
+                    clearArgs();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        // 禁用需要辅助控制权限的组件
+        if (isNativeHookException) {
+            Button saveButton = settingController.setFloatingCoordinate_Set;
+            saveButton.setDisable(true);
+        }
     }
 
     /**
      * 页面初始化
      */
     @FXML
-    private void initialize() {
+    private void initialize() throws IOException {
+        // 设置javafx单元格宽度
+        bindPrefWidthProperty();
+        // 读取配置文件
+        getProperties();
         Platform.runLater(() -> {
-            mainScene = anchorPane_Click.getScene();
-            mainStage = (Stage) mainScene.getWindow();
             try {
-                // 加载默认设置
-                getConfig();
+                // 初始化浮窗
+                initFloatingWindow();
                 // 设置鼠标悬停提示
                 setToolTip();
                 // 设置文本输入框提示
@@ -1768,10 +1759,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
             if (StringUtils.isBlank(err_Click.getText())) {
                 logHBox_Click.getChildren().remove(err_Click);
             }
-            // 设置javafx单元格宽度
-            bindPrefWidthProperty();
-            // 初始化浮窗
-            initFloatingWindow();
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件
@@ -1784,17 +1771,8 @@ public class AutoClickController extends CommonProperties implements MousePositi
             tableViewDragRow(tableView_Click);
             // 构建右键菜单
             buildContextMenu();
-            if (StringUtils.isNotBlank(loadPMCPath)) {
-                try {
-                    loadPMCFile(loadPMCPath);
-                    if (runPMCFile) {
-                        tableView_Click.refresh();
-                        runClick();
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            // 运行定时任务
+            EventBus.subscribe(SettingsLoadedEvent.class, this::settingsLoaded);
         });
     }
 
@@ -1821,21 +1799,6 @@ public class AutoClickController extends CommonProperties implements MousePositi
         if (autoClickTask == null && !recordClicking) {
             removeTableViewData(tableView_Click, dataNumber_Click, log_Click);
         }
-    }
-
-    /**
-     * 点击测试按钮
-     *
-     * @throws IOException io异常
-     */
-    @FXML
-    private void clickTest() throws IOException {
-        // 获取步骤设置
-        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-        ClickPositionVO clickPositionVO = getClickSetting(-1);
-        clickPositionVOS.add(clickPositionVO);
-        // 启动自动操作流程
-        launchClickTask(clickPositionVOS);
     }
 
     /**
@@ -1988,12 +1951,15 @@ public class AutoClickController extends CommonProperties implements MousePositi
         detailStage.setScene(scene);
         detailStage.setTitle("运行记录");
         detailStage.initModality(Modality.APPLICATION_MODAL);
-        setWindLogo(detailStage, logoPath);
+        setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) -> Platform.runLater(controller::adaption));
-        scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource("css/Styles.css")).toExternalForm());
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
         detailStage.show();
     }
 

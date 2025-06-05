@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +36,11 @@ public class CommonFinals {
     public static String logoPath = "icon/PMC.png";
 
     /**
+     * css样式文件路径
+     */
+    public static String stylesCss = "css/Styles.css";
+
+    /**
      * 资源文件夹地址前缀
      */
     public static String resourcePath = "/priv/koishi/pmc/";
@@ -47,7 +53,7 @@ public class CommonFinals {
     /**
      * jpackage打包后的资源文件路径
      */
-    public static String packagePath = "runtime/bin/";
+    public static String packagePath = "/bin/";
 
     /**
      * log4j配置文件名称
@@ -67,7 +73,7 @@ public class CommonFinals {
     /**
      * log文件夹目录
      */
-    public static final String logsDir = "/bin/logs";
+    public static final String logsDir = packagePath + "logs";
 
     /**
      * log文件夹名称
@@ -80,19 +86,14 @@ public class CommonFinals {
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * 当前程序运行位置
-     */
-    public static final String userDir = System.getProperty("user.dir");
-
-    /**
      * java home目录
      */
     public static final String javaHome = System.getProperty("java.home");
 
     /**
-     * 当前程序运行操作系统
+     * 程序根目录
      */
-    public static final String systemName = System.getProperty("os.name").toLowerCase();
+    public static final String pmcDir = new File(javaHome).getParent();
 
     /**
      * 桌面目录
@@ -103,6 +104,21 @@ public class CommonFinals {
      * 文件选择器默认路径
      */
     public static final String defaultFileChooserPath = desktopPath;
+
+    /**
+     * 当前程序运行操作系统名称
+     */
+    public static final String systemName = System.getProperty("os.name").toLowerCase();
+
+    /**
+     * win操作系统
+     */
+    public static final boolean isWin = systemName.contains("win");
+
+    /**
+     * mac操作系统
+     */
+    public static final boolean isMac = systemName.contains("mac");
 
     /**
      * 百度网盘地址
@@ -169,10 +185,6 @@ public class CommonFinals {
     public static final String contentsDirectory = "/Contents";
 
     public static final String desktop = "Desktop";
-
-    public static final String mac = "mac";
-
-    public static final String win = "win";
 
     public static final String log = ".log";
 
@@ -481,8 +493,6 @@ public class CommonFinals {
     public static final String tip_runClick = "点击后将会按照列表中的步骤执行自动操作，执行自动化任务时按下 esc 即可取消任务";
 
     public static final String tip_addPosition = "点击后将会根据设置在列表中添加一条操作步骤";
-
-    public static final String tip_clickTest = "点击后将会按照设置位置点击";
 
     public static final String tip_loopTime = "自动操作循环次数，只能填自然数，不填默认为 1，填 0 为无限循环";
 
