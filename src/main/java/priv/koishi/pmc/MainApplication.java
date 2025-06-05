@@ -86,6 +86,11 @@ public class MainApplication extends Application {
     public static MainController mainController;
 
     /**
+     * 语言包
+     */
+    public static ResourceBundle bundle;
+
+    /**
      * 加载fxml页面
      *
      * @param stage 程序主舞台
@@ -95,7 +100,7 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws Exception {
         mainStage = stage;
         // 读取fxml页面
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
@@ -188,7 +193,7 @@ public class MainApplication extends Application {
      * @param tabPane 程序页面基础布局
      */
     private void initMenu(TabPane tabPane) {
-        MenuItem about = new MenuItem("关于 " + appName);
+        MenuItem about = new MenuItem(bundle.getString("menu.about") + appName);
         about.setOnAction(e -> {
             // 只有在程序空闲时才弹出程序窗口
             if (autoClickController.isFree()) {
@@ -196,7 +201,7 @@ public class MainApplication extends Application {
                 showStage(mainStage);
             }
         });
-        MenuItem setting = new MenuItem("设置...");
+        MenuItem setting = new MenuItem(bundle.getString("menu.settings"));
         setting.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
         setting.setOnAction(e -> {
             // 只有在程序空闲时才弹出程序窗口
@@ -207,11 +212,11 @@ public class MainApplication extends Application {
         });
         MenuToolkit.toolkit(Locale.getDefault()).createAboutMenuItem(appName);
         MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
-        hide.setText("隐藏 " + appName);
+        hide.setText(bundle.getString("menu.hide") + appName);
         MenuItem hideOthers = MenuToolkit.toolkit(Locale.getDefault()).createHideOthersMenuItem();
-        hideOthers.setText("隐藏其他");
+        hideOthers.setText(bundle.getString("menu.hideOther"));
         MenuItem quit = MenuToolkit.toolkit(Locale.getDefault()).createQuitMenuItem(appName);
-        quit.setText("退出 " + appName);
+        quit.setText(bundle.getString("menu.quit") + appName);
         Menu menu = new Menu();
         menu.getItems().addAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(),
                 hide, hideOthers, new SeparatorMenuItem(), quit);
@@ -301,13 +306,13 @@ public class MainApplication extends Application {
                     File file = new File(loadPMCPath);
                     if (file.exists()) {
                         Dialog<ButtonType> dialog = new Dialog<>();
-                        dialog.setTitle("导入pmc文件");
-                        dialog.setHeaderText("是否清空操作列表？");
+                        dialog.setTitle(bundle.getString("dialog.import.title"));
+                        dialog.setHeaderText(bundle.getString("dialog.import.header"));
                         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
                         setWindowLogo(stage, logoPath);
-                        ButtonType appendButton = new ButtonType("在操作列表下方追加流程", ButtonBar.ButtonData.APPLY);
-                        ButtonType clearButton = new ButtonType("清空操作列表后导入流程", ButtonBar.ButtonData.OTHER);
-                        ButtonType cancelButton = new ButtonType("取消导入", ButtonBar.ButtonData.CANCEL_CLOSE);
+                        ButtonType appendButton = new ButtonType(bundle.getString("button.append"), ButtonBar.ButtonData.APPLY);
+                        ButtonType clearButton = new ButtonType(bundle.getString("button.clear"), ButtonBar.ButtonData.OTHER);
+                        ButtonType cancelButton = new ButtonType(bundle.getString("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
                         dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
                         ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
                         TabPane tabPane = mainController.tabPane;
@@ -354,6 +359,7 @@ public class MainApplication extends Application {
      */
     public static void main(String[] args) throws IOException {
         MainApplication.args = args;
+        bundle = ResourceBundle.getBundle("priv.koishi.pmc.language", Locale.getDefault());
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
             String logsPath = getLogsPath();
