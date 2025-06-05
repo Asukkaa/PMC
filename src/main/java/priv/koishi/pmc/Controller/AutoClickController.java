@@ -1322,6 +1322,11 @@ public class AutoClickController extends RootController implements MousePosition
         private final int addType;
 
         /**
+         * 开始移动时刻
+         */
+        private long startMoveTime;
+
+        /**
          * 鼠标移动记录器
          */
         private ClickPositionVO movePoint = createClickPositionVO();
@@ -1411,9 +1416,15 @@ public class AutoClickController extends RootController implements MousePosition
             if (recordMove && pressButtonList.isEmpty()) {
                 Platform.runLater(() -> {
                     log_Click.setTextFill(Color.BLUE);
+                    // 计算移动时长
+                    long endMoveTime = System.currentTimeMillis();
+                    long moveTime = isFirstClick ?
+                            endMoveTime - recordingStartTime :
+                            endMoveTime - startMoveTime;
                     // 添加至表格
                     List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                     movePoint.setName(text_step + index + text_isRecord)
+                            .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
                             .setClickType(clickType_move);
@@ -1502,6 +1513,7 @@ public class AutoClickController extends RootController implements MousePosition
                 }
                 // 所有按键都抬起后开始移动轨迹记录
                 if (recordMove && pressButtonList.isEmpty()) {
+                    startMoveTime = System.currentTimeMillis();
                     addNativeListener(moveMotionListener);
                 }
                 // 只有在所有按键都抬起时才算一个完整的操作步骤
