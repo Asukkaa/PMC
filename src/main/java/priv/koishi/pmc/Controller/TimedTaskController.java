@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
@@ -150,7 +151,7 @@ public class TimedTaskController extends RootController {
      */
     private void showDetail(TimedTaskBean item, boolean isEdit) {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/TaskDetail-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root;
         try {
             root = loader.load();
@@ -348,7 +349,7 @@ public class TimedTaskController extends RootController {
             int dataSize = tableView_Task.getItems().size() + 1;
             TimedTaskBean newTask = new TimedTaskBean()
                     .setTaskName(defaultTaskName + dataSize)
-                    .setRepeat(DAILY_CN);
+                    .setRepeat(repeatType_daily);
             showDetail(newTask, false);
         }));
     }

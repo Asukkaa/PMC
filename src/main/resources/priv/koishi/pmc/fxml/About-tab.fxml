@@ -7,7 +7,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AboutController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-        <Label prefHeight="25" text="关于："/>
+        <Label prefHeight="25" text="%about.aboutLabel0"/>
 
         <HBox spacing="10">
             <ImageView fx:id="logo_Abt" fitWidth="140" fitHeight="140" preserveRatio="true">
@@ -17,35 +17,35 @@
             <VBox spacing="10">
                 <HBox>
                     <Label prefHeight="20" fx:id="title_Abt"/>
-                    <Label prefHeight="20" text=" 是一个由 javafx 实现的按照设置流程进行自动操作的开源工具。"/>
+                    <Label prefHeight="20" text="%about.aboutLabel1"/>
                 </HBox>
 
-                <Label prefHeight="20" text="自动操作功能目前支持鼠标左右键、鼠标中键、鼠标前后侧键点击长按、曲线拖拽、记录鼠标移动轨迹等功能。"/>
+                <Label prefHeight="20" text="%about.aboutLabel2"/>
 
-                <Label prefHeight="20" text="可以编辑操作流程或直接录制操作流程，可在操作步骤中设置图形识别逻辑，设置完毕后自动流程可进行循环操作。"/>
+                <Label prefHeight="20" text="%about.aboutLabel3"/>
 
-                <Label prefHeight="20" text="目前软件正在继续开发中，仍有很多功能还未实现，问题肯定也不少，有问题或建议可以给下面邮箱发邮件反馈。"/>
+                <Label prefHeight="20" text="%about.aboutLabel4"/>
 
-                <Label prefHeight="20" text="如果遇到报错可到将 logs 文件夹压缩后发送给反馈邮件。"/>
+                <Label prefHeight="20" text="%about.aboutLabel5"/>
             </VBox>
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="25" text="logs 文件夹目录："/>
+            <Label prefHeight="25" text="%about.logsPath"/>
             <Label prefHeight="25" prefWidth="400" fx:id="logsPath_Abt"/>
 
-            <Label prefHeight="25" text="log 文件保留数量："/>
+            <Label prefHeight="25" text="%about.logsNum"/>
             <TextField fx:id="logsNum_Abt" prefHeight="20" prefWidth="50"/>
             <Label prefHeight="25" text="个"/>
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="25" text="反馈邮箱："/>
+            <Label prefHeight="25" text="%about.email"/>
             <Label fx:id="mail_Abt" prefHeight="25" textFill="blue" text="csolxqt@foxmail.com"/>
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="45" text="如果喜欢本程序的话可以点击此按钮后扫描微信赞赏码给作者一个赞赏 —>"/>
+            <Label prefHeight="45" text="%about.appreciate"/>
             <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style" prefHeight="20">
                 <graphic>
                     <ImageView>
@@ -57,41 +57,46 @@
 
         <Separator/>
 
-        <Label prefHeight="25" text="git地址："/>
+        <Label prefHeight="25" text="%about.git"/>
 
         <HBox spacing="10">
-            <Label prefHeight="25" text="gitHub地址:"/>
-            <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" style="-fx-cursor: hand" text="点击查看本项目gitHub主页"/>
+            <Label prefHeight="25" text="%about.gitHub"/>
+            <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" style="-fx-cursor: hand"
+                    text="%about.openGitHubLinkBtn_Abt"/>
 
             <Label prefWidth="100"/>
 
-            <Label prefHeight="25" text="gitee地址:"/>
-            <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" style="-fx-cursor: hand" text="点击查看本项目gitee主页"/>
+            <Label prefHeight="25" text="%about.gitee"/>
+            <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" style="-fx-cursor: hand"
+                    text="%about.openGiteeLinkBtn_Abt"/>
         </HBox>
 
         <Separator/>
 
         <VBox spacing="15">
-            <Label prefHeight="25" text="版本更新："/>
-            <Label prefHeight="25" text="目前主要下载渠道为网盘下载，最新版本将会在下列网盘发布，点击查看最新版本即可跳转对应网盘分享页面。"/>
+            <Label prefHeight="25" text="%about.versionUpdate"/>
+            <Label prefHeight="25" text="%about.download"/>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="百度网盘："/>
-                <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" style="-fx-cursor: hand" text="点击查看最新版本"/>
+                <Label prefHeight="25" text="%about.openBaiduLinkBtn"/>
+                <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" style="-fx-cursor: hand"
+                        text="%about.latestVersion"/>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="夸克网盘："/>
-                <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" style="-fx-cursor: hand" text="点击查看最新版本"/>
+                <Label prefHeight="25" text="%about.openQuarkLinkBtn"/>
+                <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" style="-fx-cursor: hand"
+                        text="%about.latestVersion"/>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="迅雷网盘："/>
-                <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" style="-fx-cursor: hand" text="点击查看最新版本"/>
+                <Label prefHeight="25" text="%about.openXunleiLinkBtn"/>
+                <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" style="-fx-cursor: hand"
+                        text="%about.latestVersion"/>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="当前版本："/>
+                <Label prefHeight="25" text="%about.version"/>
                 <Label fx:id="version_Abt" prefHeight="25" textFill="limegreen"/>
             </HBox>
         </VBox>

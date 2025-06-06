@@ -2116,4 +2116,18 @@ public class UiUtils {
         });
     }
 
+    /**
+     * 初始化下拉框
+     *
+     * @param choiceBox    下拉框
+     * @param defaultValue 默认值
+     * @param values       可选值
+     * @param <T>          可选值类型
+     */
+    public static <T> void initializeChoiceBoxItems(ChoiceBox<? super T> choiceBox, T defaultValue, List<? extends T> values) {
+        choiceBox.getItems().clear();
+        choiceBox.getItems().addAll(values);
+        choiceBox.setValue(defaultValue);
+    }
+
 }

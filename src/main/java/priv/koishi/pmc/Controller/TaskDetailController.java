@@ -123,10 +123,10 @@ public class TaskDetailController extends RootController {
     public Label pmcFilePath_TD, fileName_DT, log_TD;
 
     @FXML
-    public Button delete_TD, saveDetail_TD, removeDetail_TD;
+    public TextField hourField_TD, minuteField_TD, taskNameField_TD;
 
     @FXML
-    public TextField hourField_TD, minuteField_TD, taskNameField_TD;
+    public Button delete_TD, saveDetail_TD, removeDetail_TD, loadAutoClick_TD;
 
     @FXML
     public CheckBox monday_TD, tuesday_TD, wednesday_TD, thursday_TD, friday_TD, saturday_TD, sunday_TD;
@@ -143,8 +143,8 @@ public class TaskDetailController extends RootController {
     /**
      * 初始化数据
      *
-     * @param item        列表选中的数据
-     * @param isEdit      是否为编辑模式
+     * @param item   列表选中的数据
+     * @param isEdit 是否为编辑模式
      * @throws IOException 路径不能为空、路径格式不正确
      */
     public void initData(TimedTaskBean item, boolean isEdit) throws IOException {
@@ -173,7 +173,7 @@ public class TaskDetailController extends RootController {
         }
         String repeat = item.getRepeat();
         repeatType_TD.setValue(repeat);
-        if (WEEKLY_CN.equals(repeat)) {
+        if (repeatType_weekly.equals(repeat)) {
             String days = item.getDays();
             weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setSelected(false));
             for (String day : days.split(dayOfWeekRegex)) {
@@ -253,8 +253,8 @@ public class TaskDetailController extends RootController {
             stage.setOnCloseRequest(e -> {
                 getTimedTaskBean();
                 if (isModified) {
-                    ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
-                            "保存并关闭", "直接关闭");
+                    ButtonType result = creatConfirmDialog(confirm_unSaved, confirm_unSavedConfirm,
+                            confirm_ok, confirm_cancel);
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
@@ -308,10 +308,20 @@ public class TaskDetailController extends RootController {
     }
 
     /**
+     * 初始化下拉框
+     */
+    private void setChoiceBoxItems() {
+        // 重复类型
+        initializeChoiceBoxItems(repeatType_TD, repeatType_daily, repeatTypeList);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
+        // 初始化下拉框
+        setChoiceBoxItems();
         // 设置要防重复点击的组件
         setDisableNodes();
         // 设置星期复选框集合
@@ -426,26 +436,22 @@ public class TaskDetailController extends RootController {
     @FXML
     private void repeatTypeChange() {
         String repeatType = repeatType_TD.getValue();
-        switch (repeatType) {
-            case ONCE_CN -> {
-                datePicker_TD.setDisable(false);
-                datePickerAction();
-                weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(true));
-            }
-            case WEEKLY_CN -> {
-                datePicker_TD.setValue(LocalDate.now());
-                datePicker_TD.setDisable(true);
-                datePickerAction();
-                weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(false));
-            }
-            case DAILY_CN -> {
-                datePicker_TD.setValue(LocalDate.now());
-                datePicker_TD.setDisable(true);
-                weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {
-                    checkBox.setSelected(true);
-                    checkBox.setDisable(true);
-                });
-            }
+        if (repeatType_once.equals(repeatType)) {
+            datePicker_TD.setDisable(false);
+            datePickerAction();
+            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(true));
+        } else if (repeatType_weekly.equals(repeatType)) {
+            datePicker_TD.setValue(LocalDate.now());
+            datePicker_TD.setDisable(true);
+            datePickerAction();
+            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(false));
+        } else if (repeatType_daily.equals(repeatType)) {
+            datePicker_TD.setValue(LocalDate.now());
+            datePicker_TD.setDisable(true);
+            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {
+                checkBox.setSelected(true);
+                checkBox.setDisable(true);
+            });
         }
     }
 

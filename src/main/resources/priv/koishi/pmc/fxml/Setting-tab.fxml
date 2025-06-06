@@ -8,71 +8,71 @@
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
 
-        <Label prefHeight="25" text="窗口设置："/>
+        <Label prefHeight="25" text="%setting.windowSet"/>
 
         <HBox spacing="10">
             <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction"
-                      styleClass="checkBox-short" selected="true" text="记住程序关闭前所在的页面"/>
+                      styleClass="checkBox-short" selected="true" text="%setting.lastTab_Set"/>
 
             <CheckBox fx:id="fullWindow_Set" onAction="#loadFullWindowAction"
-                      styleClass="checkBox-short" selected="true" text="记住程序关闭时窗口是否全屏"/>
+                      styleClass="checkBox-short" selected="true" text="%setting.fullWindow_Set"/>
 
             <CheckBox fx:id="maxWindow_Set" onAction="#loadMaxWindowAction"
-                      styleClass="checkBox-short" selected="true" text="记住程序关闭时窗口是否最大化"/>
+                      styleClass="checkBox-short" selected="true" text="%setting.maxWindow_Set"/>
         </HBox>
 
         <Separator/>
 
-        <Label prefHeight="25" text="基础设置："/>
+        <Label prefHeight="25" text="%setting.generalSet"/>
 
         <HBox spacing="10">
             <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction"
-                      styleClass="checkBox-short" selected="true" text="自动操作工具 功能加载上次设置信息"/>
+                      styleClass="checkBox-short" selected="true" text="%setting.loadAutoClick_Set"/>
 
             <CheckBox fx:id="remindClickSave_Set" onAction="#loadClickRemindSaveAction"
-                      styleClass="checkBox-short" text="操作步骤详情页修改后未保存提示" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.remindClickSave_Set" selected="true"/>
 
             <CheckBox fx:id="remindTaskSave_Set" onAction="#loadTaskRemindSaveAction"
-                      styleClass="checkBox-short" text="定时任务详情页修改后未保存提示" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.remindTaskSave_Set" selected="true"/>
 
             <CheckBox fx:id="autoSave_Set" onAction="#loadAutoSaveAction"
-                      selected="true" styleClass="checkBox-short" text="关闭程序时自动保存列表操作步骤"/>
+                      selected="true" styleClass="checkBox-short" text="%setting.autoSave_Set"/>
         </HBox>
 
         <Separator/>
 
-        <Label prefHeight="25" text="内存设置："/>
+        <Label prefHeight="25" text="%setting.memorySet"/>
 
         <HBox spacing="20">
             <HBox spacing="5" prefWidth="350">
-                <Label prefHeight="25" text="当前内存上限:"/>
+                <Label prefHeight="25" text="%setting.runningMemory"/>
                 <Label prefHeight="25" fx:id="runningMemory_Set"/>
             </HBox>
 
             <HBox spacing="5" prefWidth="350">
-                <Label prefHeight="25" text="操作系统内存:"/>
+                <Label prefHeight="25" text="%setting.systemMemory"/>
                 <Label prefHeight="25" fx:id="systemMemory_Set"/>
             </HBox>
         </HBox>
 
         <HBox spacing="20">
             <HBox spacing="5" prefWidth="350">
-                <Label prefHeight="25" text="下次启动时程序内存上限:"/>
+                <Label prefHeight="25" text="%setting.nextRunMemory"/>
                 <TextField fx:id="nextRunMemory_Set" prefHeight="20" prefWidth="50"/>
                 <Label prefHeight="25" prefWidth="50" text="GB"/>
             </HBox>
 
-            <Button fx:id="reLaunch_Set" onAction="#reLaunch" style="-fx-cursor: hand" text="立刻重启程序"/>
+            <Button fx:id="reLaunch_Set" onAction="#reLaunch" style="-fx-cursor: hand" text="%setting.reLaunch_Set"/>
         </HBox>
 
         <HBox spacing="20">
             <HBox spacing="5" prefWidth="350">
-                <Label prefHeight="25" text="当前垃圾回收(GC)类型:"/>
+                <Label prefHeight="25" text="%setting.gcType"/>
                 <Label prefHeight="25" fx:id="gcType_Set"/>
             </HBox>
 
             <HBox spacing="5" prefWidth="350">
-                <Label prefHeight="25" text="下次启动时垃圾回收(GC)类型:"/>
+                <Label prefHeight="25" text="%setting.nextGcType"/>
                 <ChoiceBox fx:id="nextGcType_Set" prefHeight="25" prefWidth="150">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
@@ -91,176 +91,176 @@
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="25" text="当前程序所在目录："/>
+            <Label prefHeight="25" text="%setting.thisPath"/>
             <Label prefHeight="25" fx:id="thisPath_Set" styleClass="label-button-style"/>
         </HBox>
 
         <Separator/>
 
-        <Label prefHeight="25" text="功能设置："/>
+        <Label prefHeight="25" text="%setting.featureSet"/>
 
         <HBox spacing="10">
             <CheckBox fx:id="hideWindowRun_Set" onAction="#loadHideWindowRunAction"
-                      styleClass="checkBox-short" text="运行自动流程前最小化本程序" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.hideWindowRun_Set" selected="true"/>
 
             <CheckBox fx:id="showWindowRun_Set" onAction="#loadShowWindowRunAction"
-                      styleClass="checkBox-short" text="运行自动流程结束后弹出本程序" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.showWindowRun_Set" selected="true"/>
 
             <CheckBox fx:id="hideWindowRecord_Set" onAction="#loadHideWindowRecordAction"
-                      styleClass="checkBox-short" text="录制自动流程前最小化本程序" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.hideWindowRecord_Set" selected="true"/>
 
             <CheckBox fx:id="showWindowRecord_Set" onAction="#loadShowWindowRecordAction"
-                      styleClass="checkBox-short" text="录制自动流程结束后弹出本程序" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.showWindowRecord_Set" selected="true"/>
         </HBox>
 
         <HBox spacing="10">
             <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-short"
-                      text="运行自动流程前点击第一个起始坐标"/>
+                      text="%setting.firstClick_Set"/>
 
             <CheckBox fx:id="recordDrag_Set" onAction="#recordDrag" styleClass="checkBox-short"
-                      text="录制时记录拖鼠标拽轨迹"/>
+                      text="%setting.recordDrag_Set"/>
 
             <CheckBox fx:id="recordMove_Set" onAction="#recordMove" styleClass="checkBox-short"
-                      text="录制时记录鼠标移动轨迹"/>
+                      text="%setting.recordMove_Set"/>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="鼠标轨迹采样间隔:"/>
+                <Label prefHeight="25" text="%setting.sampleInterval"/>
                 <TextField fx:id="sampleInterval_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="毫秒"/>
+                <Label prefHeight="25" text="%unit.ms"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
             <CheckBox fx:id="randomClick_Set" onAction="#randomClick" styleClass="checkBox-short"
-                      text="运行时启用随机点击坐标偏移"/>
+                      text="%randomClick"/>
 
             <CheckBox fx:id="randomTrajectory_Set" onAction="#randomTrajectory" styleClass="checkBox-short"
-                      text="运行时启用随机轨迹坐标偏移"/>
+                      text="%randomTrajectory"/>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="默认横坐标随机偏移量: ±"/>
+                <Label prefHeight="25" text="%setting.randomClickX"/>
                 <TextField fx:id="randomClickX_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="像素"/>
+                <Label prefHeight="25" text="%unit.px"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="默认纵坐标随机偏移量: ±"/>
+                <Label prefHeight="25" text="%setting.randomClickY"/>
                 <TextField fx:id="randomClickY_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="像素"/>
+                <Label prefHeight="25" text="%unit.px"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
             <CheckBox fx:id="randomClickTime_Set" onAction="#randomClickTime" styleClass="checkBox-short"
-                      text="运行时启用随机点击时长偏移"/>
+                      text="%randomClickTime"/>
 
             <CheckBox fx:id="randomClickInterval_Set" onAction="#randomClickInterval" styleClass="checkBox-short"
-                      text="运行时启用随机操作间隔时间偏移"/>
+                      text="%randomClickInterval"/>
 
             <CheckBox fx:id="randomWaitTime_Set" onAction="#randomWaitTime" styleClass="checkBox-short"
-                      text="运行时启用随机执行前等待时间偏移"/>
+                      text="%randomWaitTime"/>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="默认时长随机偏移量: ±"/>
+                <Label prefHeight="25" text="%setting.randomTimeOffset"/>
                 <TextField fx:id="randomTimeOffset_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="毫秒"/>
+                <Label prefHeight="25" text="%unit.ms"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="默认单次点击时长:"/>
+                <Label prefHeight="25" text="%setting.clickTimeOffset"/>
                 <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="毫秒"/>
+                <Label prefHeight="25" text="%unit.ms"/>
             </HBox>
         </HBox>
 
         <Separator/>
 
-        <Label prefHeight="25" text="记录设置："/>
+        <Label prefHeight="25" text="%setting.logSet"/>
 
         <HBox spacing="10">
             <CheckBox fx:id="clickLog_Set" onAction="#clickLog"
-                      styleClass="checkBox-short" text="运行自动流程时记录点击信息" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.clickLog_Set" selected="true"/>
 
             <CheckBox fx:id="moveLog_Set" onAction="#moveLog"
-                      styleClass="checkBox-short" text="运行自动流程时记录移动轨迹" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.moveLog_Set" selected="true"/>
 
             <CheckBox fx:id="dragLog_Set" onAction="#dragLog"
-                      styleClass="checkBox-short" text="运行自动流程时记录拖拽轨迹" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.dragLog_Set" selected="true"/>
 
             <CheckBox fx:id="waitLog_Set" onAction="#waitLog"
-                      styleClass="checkBox-short" text="运行自动流程时记录等待信息" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.waitLog_Set" selected="true"/>
         </HBox>
 
         <HBox spacing="10">
             <CheckBox fx:id="clickImgLog_Set" onAction="#clickImgLog"
-                      styleClass="checkBox-short" text="运行自动流程时记目标图像识别信息" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.clickImgLog_Set" selected="true"/>
 
             <CheckBox fx:id="stopImgLog_Set" onAction="#stopImgLog"
-                      styleClass="checkBox-short" text="运行自动流程时记终止图像识别信息" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.stopImgLog_Set" selected="true"/>
 
             <HBox  styleClass="hBox-short">
-                <Label prefHeight="25" text="最大记录数量:"/>
+                <Label prefHeight="25" text="%setting.maxLogNum"/>
                 <TextField fx:id="maxLogNum_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="条"/>
+                <Label prefHeight="25" text="%unit.number"/>
             </HBox>
         </HBox>
 
         <Separator/>
 
-        <Label prefHeight="25" text="浮窗设置："/>
+        <Label prefHeight="25" text="%setting.floatingSet"/>
 
         <HBox spacing="10">
             <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction"
-                      styleClass="checkBox-short" text="运行自动流程时显示信息浮窗" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.floatingRun_Set" selected="true"/>
 
             <CheckBox fx:id="mouseFloatingRun_Set" onAction="#loadMouseFloatingRunAction"
-                      styleClass="checkBox-short" text="运行自动流程时信息浮窗跟随鼠标"/>
+                      styleClass="checkBox-short" text="%setting.mouseFloatingRun_Set"/>
 
             <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction"
-                      styleClass="checkBox-short" text="录制自动流程时显示信息浮窗" selected="true"/>
+                      styleClass="checkBox-short" text="%setting.floatingRecord_Set" selected="true"/>
 
             <CheckBox fx:id="mouseFloatingRecord_Set" onAction="#loadMouseFloatingRecordAction"
-                      styleClass="checkBox-short" text="录制自动流程时信息浮窗跟随鼠标"/>
+                      styleClass="checkBox-short" text="%setting.mouseFloatingRecord_Set"/>
         </HBox>
 
         <HBox spacing="10">
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="浮窗字体颜色:"/>
+                <Label prefHeight="25" text="%setting.colorPicker"/>
                 <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#colorAction"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="浮窗离屏幕边界距离:"/>
+                <Label prefHeight="25" text="%setting.floatingDistance"/>
                 <TextField fx:id="floatingDistance_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="像素"/>
+                <Label prefHeight="25" text="%unit.px"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="浮窗跟随鼠标时横轴偏移量:"/>
+                <Label prefHeight="25" text="%setting.offsetX"/>
                 <TextField fx:id="offsetX_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="像素"/>
+                <Label prefHeight="25" text="%unit.px"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <Label prefHeight="25" text="浮窗跟随鼠标时纵轴偏移量:"/>
+                <Label prefHeight="25" text="%setting.offsetY"/>
                 <TextField fx:id="offsetY_Set" prefWidth="50"/>
-                <Label prefHeight="25" text="像素"/>
+                <Label prefHeight="25" text="%unit.px"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
             <HBox styleClass="hBox-short">
                 <Button fx:id="setFloatingCoordinate_Set" onAction="#setFloatingCoordinate"
-                        style="-fx-cursor: hand" text="显示浮窗位置"/>
+                        style="-fx-cursor: hand" text="%setting.setFloatingCoordinate_Set"/>
             </HBox>
 
             <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction"
-                      styleClass="checkBox-short" text="显示浮窗位置按钮显示的浮窗跟随鼠标"/>
+                      styleClass="checkBox-short" text="%setting.mouseFloating_Set"/>
 
             <HBox spacing="10">
-                <Label prefHeight="25" text="浮窗背景透明度:"/>
+                <Label prefHeight="25" text="%setting.opacity"/>
                 <Slider fx:id="opacity_Set" prefWidth="200" value="0.5" showTickLabels="true" showTickMarks="true"
                         snapToTicks="true" majorTickUnit="0.1" blockIncrement="0.1" max="1"/>
             </HBox>
@@ -269,74 +269,74 @@
         <Separator/>
 
         <HBox fx:id="findImgSetting_Set">
-            <Label prefHeight="25" text="图像识别设置："/>
+            <Label prefHeight="25" text="%setting.findImgSet"/>
             <Label fx:id="tip_Set" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
-                   text="更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
+                   text="%setting.tip_Set"/>
         </HBox>
 
         <HBox spacing="10">
             <HBox spacing="5" prefWidth="490">
-                <Label prefHeight="25" text="匹配失败重试间隔时间:"/>
+                <Label prefHeight="25" text="%setting.retrySecond"/>
                 <TextField fx:id="retrySecond_Set" prefWidth="80"/>
-                <Label prefHeight="25" text="秒"/>
+                <Label prefHeight="25" text="%unit.s"/>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="每张图片最大匹配时间:"/>
+                <Label prefHeight="25" text="%setting.overtime"/>
                 <TextField fx:id="overtime_Set" prefWidth="80"/>
-                <Label prefHeight="25" text="秒"/>
+                <Label prefHeight="25" text="%unit.s"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
             <HBox spacing="5" prefWidth="490">
-                <Label prefHeight="25" text="要点击的图片默认识别匹配匹配度:"/>
+                <Label prefHeight="25" text="%setting.clickOpacity"/>
                 <Slider fx:id="clickOpacity_Set" prefWidth="220" value="80" showTickLabels="true"
                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                 <Label prefHeight="25" text="\%"/>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="要点击的图片默认识别失败重试次数:"/>
+                <Label prefHeight="25" text="%setting.clickRetryNum"/>
                 <TextField fx:id="clickRetryNum_Set" prefWidth="80"/>
-                <Label prefHeight="25" text="次"/>
+                <Label prefHeight="25" text="%unit.times"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
             <HBox spacing="5" prefWidth="490">
-                <Label prefHeight="25" text="终止操作图片默认识别匹配匹配度:"/>
+                <Label prefHeight="25" text="%setting.stopOpacity"/>
                 <Slider fx:id="stopOpacity_Set" prefWidth="220" value="80" showTickLabels="true"
                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                 <Label prefHeight="25" text="\%"/>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="终止操作图片默认识别失败重试次数:"/>
+                <Label prefHeight="25" text="%setting.stopRetryNum"/>
                 <TextField fx:id="stopRetryNum_Set" prefWidth="80"/>
-                <Label prefHeight="25" text="次"/>
+                <Label prefHeight="25" text="%unit.times"/>
             </HBox>
         </HBox>
 
         <VBox spacing="10">
             <HBox fx:id="fileNumberHBox_Set" spacing="10">
-                <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的默认图片"/>
-                <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
+                <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" style="-fx-cursor: hand" text="%setting.stopImgBtn_Set"/>
+                <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand" text="%listText.removeAll"/>
 
-                <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
+                <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_Set" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
                 <placeholder>
-                    <Label text="拖拽图片文件或点击选择终止操作的图片即可追加止操作的图片"/>
+                    <Label text="%setting.tableView_Set"/>
                 </placeholder>
 
                 <columns>
-                    <TableColumn fx:id="index_Set" text="序号" sortable="false"/>
-                    <TableColumn fx:id="thumb_Set" text="缩略图" sortable="false"/>
-                    <TableColumn fx:id="name_Set" text="图片名称" sortable="false"/>
-                    <TableColumn fx:id="path_Set" text="图片地址" sortable="false"/>
-                    <TableColumn fx:id="type_Set" text="图片类型" sortable="false"/>
+                    <TableColumn fx:id="index_Set" text="%listText.index" sortable="false"/>
+                    <TableColumn fx:id="thumb_Set" text="%stopImg.thumb" sortable="false"/>
+                    <TableColumn fx:id="name_Set" text="%stopImg.name" sortable="false"/>
+                    <TableColumn fx:id="path_Set" text="%stopImg.path" sortable="false"/>
+                    <TableColumn fx:id="type_Set" text="%stopImg.type" sortable="false"/>
                 </columns>
             </TableView>
         </VBox>

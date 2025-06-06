@@ -15,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.ClickLogBean;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Finals.CommonFinals.text_log;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -29,12 +30,6 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class ClickLogController extends RootController {
 
     /**
-     * 操作记录
-     */
-    @Getter
-    public List<ClickLogBean> clickLogs;
-
-    /**
      * 页面标识符
      */
     private static final String tabId = "_Log";
@@ -43,6 +38,12 @@ public class ClickLogController extends RootController {
      * 详情页页面舞台
      */
     private Stage stage;
+
+    /**
+     * 操作记录
+     */
+    @Getter
+    public List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
 
     /**
      * 更新数据用的回调函数
@@ -130,9 +131,7 @@ public class ClickLogController extends RootController {
     @FXML
     private void removeAll() {
         removeTableViewData(tableView_Log, dataNumber_Log, null);
-        if (CollectionUtils.isNotEmpty(clickLogs)) {
-            clickLogs.clear();
-        }
+        clickLogs.clear();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <AnchorPane xmlns="http://javafx.com/javafx">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-        <Label textFill="red" text="本程序为开源软件，赞赏行为纯属自愿，与软件使用权益无关！"/>
+        <Label textFill="red" text="%appreciate.tip"/>
 
         <ImageView fitWidth="400" fitHeight="400" preserveRatio="true">
             <Image url="@../icon/Appreciate.jpg"/>

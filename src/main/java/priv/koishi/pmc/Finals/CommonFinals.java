@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getCFGPath;
 import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
 
@@ -973,6 +974,14 @@ public class CommonFinals {
 
     public static final String key_lastColorCustom = "lastColorCustom";
 
+    public static final String confirm_unSaved = bundle.getString("confirm.unSaved");
+
+    public static final String confirm_unSavedConfirm = bundle.getString("confirm.unSavedConfirm");
+
+    public static final String confirm_ok = bundle.getString("confirm.ok");
+
+    public static final String confirm_cancel = bundle.getString("confirm.cancel");
+
     public static final String menuItem_insertUp = "插入设置步骤到所选行第一行上一行";
 
     public static final String menuItem_insertDown = "插入设置步骤到所选行最后一行下一行";
@@ -1009,15 +1018,15 @@ public class CommonFinals {
 
     public static final String log_stopImg = "识别终止操作图像";
 
-    public static final String retryType_continuously = "重试直到图像出现";
+    public static final String retryType_continuously = bundle.getString("retryType.continuously");
 
-    public static final String retryType_click = "按设置次数重试后点击设置位置";
+    public static final String retryType_click = bundle.getString("retryType.click");
 
-    public static final String retryType_stop = "按设置次数重试后终止操作";
+    public static final String retryType_stop = bundle.getString("retryType.stop");
 
-    public static final String retryType_break = "按设置次数重试后跳过本次操作";
+    public static final String retryType_break = bundle.getString("retryType.break");
 
-    public static final String retryType_Step = "按设置次数重试后跳转指定步骤";
+    public static final String retryType_Step = bundle.getString("retryType.Step");
 
     /**
      * 重试逻辑下拉框选项
@@ -1025,15 +1034,15 @@ public class CommonFinals {
     public static final List<String> retryTypeList = Arrays.asList(retryType_continuously, retryType_click,
             retryType_stop, retryType_break, retryType_Step);
 
-    public static final String clickMatched_click = "点击匹配的图像";
+    public static final String clickMatched_click = bundle.getString("clickMatched.click");
 
-    public static final String clickMatched_break = "直接执行下一个操作步骤";
+    public static final String clickMatched_break = bundle.getString("clickMatched.break");
 
-    public static final String clickMatched_step = "跳转到指定操作步骤";
+    public static final String clickMatched_step = bundle.getString("clickMatched.step");
 
-    public static final String clickMatched_clickStep = "点击匹配图像后跳转指定步骤";
+    public static final String clickMatched_clickStep = bundle.getString("clickMatched.clickStep");
 
-    public static final String clickMatched_clickWhile = "匹配图像存在则重复点击";
+    public static final String clickMatched_clickWhile = bundle.getString("clickMatched.clickWhile");
 
     /**
      * 要识别的图像识别匹配后逻辑下拉框选项
@@ -1041,15 +1050,21 @@ public class CommonFinals {
     public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click, clickMatched_break,
             clickMatched_step, clickMatched_clickStep);
 
-    public static final String mouseButton_primary = "鼠标左键";
+    public static final String mouseButton_primary = bundle.getString("primary");
 
-    public static final String mouseButton_secondary = "鼠标右键";
+    public static final String mouseButton_secondary = bundle.getString("secondary");
 
-    public static final String mouseButton_middle = "鼠标中键";
+    public static final String mouseButton_middle = bundle.getString("middle");
 
-    public static final String mouseButton_forward = "鼠标前侧键";
+    public static final String mouseButton_forward = bundle.getString("forward");
 
-    public static final String mouseButton_back = "鼠标后侧键";
+    public static final String mouseButton_back = bundle.getString("back");
+
+    /**
+     * 点击按键下拉框选项
+     */
+    public static final List<String> mouseButtonList = Arrays.asList(mouseButton_primary, mouseButton_secondary,
+            mouseButton_middle, mouseButton_forward, mouseButton_back);
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
@@ -1091,13 +1106,13 @@ public class CommonFinals {
         NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
     }
 
-    public static final String clickType_move = "带轨迹的移动";
+    public static final String clickType_move = bundle.getString("clickType.move");
 
-    public static final String clickType_click = "点击后松开";
+    public static final String clickType_click = bundle.getString("clickType.click");
 
-    public static final String clickType_drag = "拖拽";
+    public static final String clickType_drag = bundle.getString("clickType.drag");
 
-    public static final String clickType_moveTo = "移动到设置坐标";
+    public static final String clickType_moveTo = bundle.getString("clickType.moveTo");
 
     /**
      * 自动操作的操作类型选项
@@ -1111,11 +1126,17 @@ public class CommonFinals {
 
     public static final String ONCE = "ONCE";
 
-    public static final String DAILY_CN = "每天";
+    public static final String repeatType_daily = bundle.getString("repeatType.daily");
 
-    public static final String WEEKLY_CN = "每周";
+    public static final String repeatType_weekly = bundle.getString("repeatType.weekly");
 
-    public static final String ONCE_CN = "仅一次";
+    public static final String repeatType_once = bundle.getString("repeatType.once");
+
+    /**
+     * 重复类型下拉框选项
+     */
+    public static final List<String> repeatTypeList = Arrays.asList(repeatType_daily, repeatType_weekly,
+            repeatType_once);
 
     /**
      * 定时任务重复类型映射
@@ -1123,9 +1144,9 @@ public class CommonFinals {
     public static final BidiMap<String, String> repeatTypeMap = new DualHashBidiMap<>();
 
     static {
-        repeatTypeMap.put(DAILY_CN, DAILY);
-        repeatTypeMap.put(WEEKLY_CN, WEEKLY);
-        repeatTypeMap.put(ONCE_CN, ONCE);
+        repeatTypeMap.put(repeatType_daily, DAILY);
+        repeatTypeMap.put(repeatType_weekly, WEEKLY);
+        repeatTypeMap.put(repeatType_once, ONCE);
     }
 
     /**
@@ -1134,13 +1155,13 @@ public class CommonFinals {
     public static final BidiMap<String, String> dayOfWeekName = new DualHashBidiMap<>();
 
     static {
-        dayOfWeekName.put("MON", "星期一");
-        dayOfWeekName.put("TUE", "星期二");
-        dayOfWeekName.put("WED", "星期三");
-        dayOfWeekName.put("THU", "星期四");
-        dayOfWeekName.put("FRI", "星期五");
-        dayOfWeekName.put("SAT", "星期六");
-        dayOfWeekName.put("SUN", "星期日");
+        dayOfWeekName.put("MON", bundle.getString("monday"));
+        dayOfWeekName.put("TUE", bundle.getString("tuesday"));
+        dayOfWeekName.put("WED", bundle.getString("wednesday"));
+        dayOfWeekName.put("THU", bundle.getString("thursday"));
+        dayOfWeekName.put("FRI", bundle.getString("friday"));
+        dayOfWeekName.put("SAT", bundle.getString("saturday"));
+        dayOfWeekName.put("SUN", bundle.getString("sunday"));
     }
 
     /**
@@ -1149,13 +1170,13 @@ public class CommonFinals {
     public static final BidiMap<Integer, String> dayOfWeekMap = new DualHashBidiMap<>();
 
     static {
-        dayOfWeekMap.put(1, "星期一");
-        dayOfWeekMap.put(2, "星期二");
-        dayOfWeekMap.put(3, "星期三");
-        dayOfWeekMap.put(4, "星期四");
-        dayOfWeekMap.put(5, "星期五");
-        dayOfWeekMap.put(6, "星期六");
-        dayOfWeekMap.put(7, "星期日");
+        dayOfWeekMap.put(1, bundle.getString("monday"));
+        dayOfWeekMap.put(2, bundle.getString("tuesday"));
+        dayOfWeekMap.put(3, bundle.getString("wednesday"));
+        dayOfWeekMap.put(4, bundle.getString("thursday"));
+        dayOfWeekMap.put(5, bundle.getString("friday"));
+        dayOfWeekMap.put(6, bundle.getString("saturday"));
+        dayOfWeekMap.put(7, bundle.getString("sunday"));
     }
 
     /**

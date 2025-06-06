@@ -229,10 +229,10 @@ public class ScheduledService {
                 timedTaskBean.setPath(path)
                         .setName(name);
             }
-            if ("Every day of the week".equals(days) || DAILY_CN.equals(repeatType)) {
-                timedTaskBean.setDays(DAILY_CN);
-            } else if (ONCE_CN.equals(repeatType)) {
-                timedTaskBean.setDays(ONCE_CN);
+            if ("Every day of the week".equals(days) || repeatType_daily.equals(repeatType)) {
+                timedTaskBean.setDays(repeatType_daily);
+            } else if (repeatType_once.equals(repeatType)) {
+                timedTaskBean.setDays(repeatType_once);
             }
             taskDetails.add(timedTaskBean);
         }
@@ -269,7 +269,7 @@ public class ScheduledService {
                             .setPath(path);
                 }
             }
-            if (content.contains(DAILY_CN)) {
+            if (content.contains(repeatType_daily)) {
                 Pattern dailyPattern = Pattern.compile(
                         "<key>StartCalendarInterval</key>\\s*<dict>"
                                 + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
@@ -280,8 +280,8 @@ public class ScheduledService {
                     int hour = Integer.parseInt(dailyMatcher.group(1));
                     int minute = Integer.parseInt(dailyMatcher.group(2));
                     timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                            .setRepeat(DAILY_CN)
-                            .setDays(DAILY_CN);
+                            .setRepeat(repeatType_daily)
+                            .setDays(repeatType_daily);
                 }
                 // 获取起始日期
                 findStartDate(content, timedTaskBean);
@@ -306,7 +306,7 @@ public class ScheduledService {
                         int minute = Integer.parseInt(dictMatcher.group(2));
                         int weekday = Integer.parseInt(dictMatcher.group(3));
                         timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                                .setRepeat(WEEKLY_CN);
+                                .setRepeat(repeatType_weekly);
                         weekdays.add(dayOfWeekMap.get(weekday));
                     }
                     if (CollectionUtils.isNotEmpty(weekdays)) {
@@ -338,8 +338,8 @@ public class ScheduledService {
                     timedTaskBean.setDate(triggerTime.toLocalDate().toString())
                             .setTime(triggerTime.format(TIME_FORMATTER))
                             .setDateTime(triggerTime)
-                            .setRepeat(ONCE_CN)
-                            .setDays(ONCE_CN);
+                            .setRepeat(repeatType_once)
+                            .setDays(repeatType_once);
                 }
             }
             taskDetails.add(timedTaskBean);
@@ -421,27 +421,20 @@ public class ScheduledService {
                 .append("-Argument '--r ").append(PMCFilePath).append("'; ");
         // 构建触发器
         psCommand.append("$triggers = @(); ");
-        switch (repeatType) {
-            case DAILY_CN: {
-                psCommand.append("$trigger = New-ScheduledTaskTrigger -Daily -At '")
-                        .append(triggerTime.format(FULL_TIME_FORMATTER)).append("'; ");
-                psCommand.append("$triggers += $trigger; ");
-                break;
-            }
-            case WEEKLY_CN: {
-                String daysOfWeek = days.stream().map(day -> DayOfWeek.of(day).toString())
-                        .collect(Collectors.joining(","));
-                psCommand.append(String.format(
-                        "$trigger = New-ScheduledTaskTrigger -Weekly -At '%s' -DaysOfWeek %s; $triggers += $trigger; ",
-                        triggerTime.format(FULL_TIME_FORMATTER), daysOfWeek));
-                break;
-            }
-            case ONCE_CN: {
-                // 添加单次触发器
-                psCommand.append(String.format("$trigger = New-ScheduledTaskTrigger -Once -At '%s'; $triggers += $trigger; ",
-                        triggerTime.format(FULL_TIME_FORMATTER)));
-                break;
-            }
+        if (repeatType_daily.equals(repeatType)) {
+            psCommand.append("$trigger = New-ScheduledTaskTrigger -Daily -At '")
+                    .append(triggerTime.format(FULL_TIME_FORMATTER)).append("'; ");
+            psCommand.append("$triggers += $trigger; ");
+        } else if (repeatType_weekly.equals(repeatType)) {
+            String daysOfWeek = days.stream().map(day -> DayOfWeek.of(day).toString())
+                    .collect(Collectors.joining(","));
+            psCommand.append(String.format(
+                    "$trigger = New-ScheduledTaskTrigger -Weekly -At '%s' -DaysOfWeek %s; $triggers += $trigger; ",
+                    triggerTime.format(FULL_TIME_FORMATTER), daysOfWeek));
+        } else if (repeatType_once.equals(repeatType)) {
+            // 添加单次触发器
+            psCommand.append(String.format("$trigger = New-ScheduledTaskTrigger -Once -At '%s'; $triggers += $trigger; ",
+                    triggerTime.format(FULL_TIME_FORMATTER)));
         }
         // 注册任务（支持多个触发器）
         psCommand.append(String.format("Register-ScheduledTask -TaskName '%s' -Action $action -Trigger $triggers" +
@@ -470,52 +463,45 @@ public class ScheduledService {
         String repeatType = timedTaskBean.getRepeat();
         String PMCFilePath = timedTaskBean.getPath();
         String interval;
-        switch (repeatType) {
-            case DAILY_CN: {
-                interval = String.format("""
-                                <key>StartCalendarInterval</key>
-                                <dict>
-                                    <key>Hour</key><integer>%d</integer>
-                                    <key>Minute</key><integer>%d</integer>
-                                </dict>
-                                <key>StartDate</key>
-                                <string>%s</string>
-                                <key>RepeatType</key>
-                                <string>%s</string>""",
-                        triggerTime.getHour(),
-                        triggerTime.getMinute(),
-                        triggerTime.toLocalDate(),
-                        repeatType);
-                break;
-            }
-            case WEEKLY_CN: {
-                // 支持多天执行
-                String intervals = days.stream().map(day -> String.format("""
-                                <dict>
-                                    <key>Hour</key><integer>%d</integer>
-                                    <key>Minute</key><integer>%d</integer>
-                                    <key>Weekday</key><integer>%d</integer>
-                                </dict>""",
-                        triggerTime.getHour(),
-                        triggerTime.getMinute(),
-                        day)).collect(Collectors.joining("\n"));
-                interval = String.format("""
-                                <key>StartCalendarInterval</key>
-                                <array>
-                                    %s
-                                </array>
-                                <key>StartDate</key>
-                                <string>%s</string>""",
-                        intervals,
-                        triggerTime.toLocalDate());
-                break;
-            }
-            default: {
-                interval = "<key>RunAtLoad</key><false/>";
-                break;
-            }
+        if (repeatType_daily.equals(repeatType)) {
+            interval = String.format("""
+                            <key>StartCalendarInterval</key>
+                            <dict>
+                                <key>Hour</key><integer>%d</integer>
+                                <key>Minute</key><integer>%d</integer>
+                            </dict>
+                            <key>StartDate</key>
+                            <string>%s</string>
+                            <key>RepeatType</key>
+                            <string>%s</string>""",
+                    triggerTime.getHour(),
+                    triggerTime.getMinute(),
+                    triggerTime.toLocalDate(),
+                    repeatType);
+        } else if (repeatType_weekly.equals(repeatType)) {
+            // 支持多天执行
+            String intervals = days.stream().map(day -> String.format("""
+                            <dict>
+                                <key>Hour</key><integer>%d</integer>
+                                <key>Minute</key><integer>%d</integer>
+                                <key>Weekday</key><integer>%d</integer>
+                            </dict>""",
+                    triggerTime.getHour(),
+                    triggerTime.getMinute(),
+                    day)).collect(Collectors.joining("\n"));
+            interval = String.format("""
+                            <key>StartCalendarInterval</key>
+                            <array>
+                                %s
+                            </array>
+                            <key>StartDate</key>
+                            <string>%s</string>""",
+                    intervals,
+                    triggerTime.toLocalDate());
+        } else {
+            interval = "<key>RunAtLoad</key><false/>";
         }
-        String calendarInterval = ONCE_CN.equals(repeatType) ?
+        String calendarInterval = repeatType_once.equals(repeatType) ?
                 String.format("""
                                 <key>StartCalendarInterval</key>
                                 <dict>

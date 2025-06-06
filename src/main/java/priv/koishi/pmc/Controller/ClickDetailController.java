@@ -36,6 +36,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.initializeChoiceBoxItems;
 
 /**
  * 操作步骤详情页控制器
@@ -539,8 +540,8 @@ public class ClickDetailController extends RootController {
         if (remindSave != null && remindSave.isSelected()) {
             stage.setOnCloseRequest(e -> {
                 if (isModified) {
-                    ButtonType result = creatConfirmDialog("修改未保存", "当前有未保存的修改，是否保存？",
-                            "保存并关闭", "直接关闭");
+                    ButtonType result = creatConfirmDialog(confirm_unSaved, confirm_unSavedConfirm,
+                            confirm_ok, confirm_cancel);
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
@@ -556,12 +557,28 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 初始化下拉框
+     */
+    private void setChoiceBoxItems() {
+        // 要匹配的图像重试逻辑
+        initializeChoiceBoxItems(retryType_Det, retryType_stop, retryTypeList);
+        // 操作类型
+        initializeChoiceBoxItems(clickType_Det, clickType_click, clickTypeList);
+        // 点击按键
+        initializeChoiceBoxItems(clickKey_Det, mouseButton_primary, mouseButtonList);
+        // 图像识别匹配逻辑
+        initializeChoiceBoxItems(matchedType_Det, clickMatched_click, clickMatchedList);
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException io异常
      */
     @FXML
     private void initialize() throws IOException {
+        // 初始化下拉框
+        setChoiceBoxItems();
         // 设置javafx单元格宽度
         bindPrefWidthProperty();
         // 读取配置文件

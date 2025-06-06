@@ -6,21 +6,25 @@
             fx:controller="priv.koishi.pmc.Controller.ClickLogController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
         <HBox fx:id="fileNumberHBox_Log" spacing="10">
-            <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
+            <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand" text="%listText.removeAll"/>
 
-            <Label fx:id="dataNumber_Log" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
+            <Label fx:id="dataNumber_Log" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Log">
+            <placeholder>
+                <Label text="%clickLog.tableView_Log"/>
+            </placeholder>
+
             <columns>
-                <TableColumn fx:id="index_Log" text="序号" sortable="false"/>
-                <TableColumn fx:id="date_Log" text="操作时间" sortable="false"/>
-                <TableColumn fx:id="type_Log" text="操作类型" sortable="false"/>
-                <TableColumn fx:id="X_Log" text="横(X)坐标" sortable="false"/>
-                <TableColumn fx:id="Y_Log" text="纵(Y)坐标" sortable="false"/>
-                <TableColumn fx:id="clickTime_Log" text="操作时长(毫秒)" sortable="false"/>
-                <TableColumn fx:id="clickKey_Log" text="操作按键" sortable="false"/>
-                <TableColumn fx:id="result_Log" text="操作结果" sortable="false"/>
+                <TableColumn fx:id="index_Log" text="%listText.index" sortable="false"/>
+                <TableColumn fx:id="date_Log" text="%clickLog.date_Log" sortable="false"/>
+                <TableColumn fx:id="type_Log" text="%clickLog.type_Log" sortable="false"/>
+                <TableColumn fx:id="X_Log" text="%clickLog.X_Log" sortable="false"/>
+                <TableColumn fx:id="Y_Log" text="%clickLog.Y_Log" sortable="false"/>
+                <TableColumn fx:id="clickTime_Log" text="%clickLog.clickTime_Log" sortable="false"/>
+                <TableColumn fx:id="clickKey_Log" text="%clickLog.clickKey_Log" sortable="false"/>
+                <TableColumn fx:id="result_Log" text="%clickLog.result_Log" sortable="false"/>
             </columns>
         </TableView>
     </VBox>

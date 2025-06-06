@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -222,7 +223,7 @@ public class AboutController extends RootController {
     @FXML
     private void appreciate() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Appreciate-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root = loader.load();
         Stage detailStage = new Stage();
         Properties prop = new Properties();

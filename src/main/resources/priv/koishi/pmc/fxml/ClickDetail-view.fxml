@@ -1,203 +1,152 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.*?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
             fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
     <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="步骤序号:"/>
+                    <Label prefHeight="25" text="%clickDetail.clickIndex"/>
                     <Label prefHeight="25" fx:id="clickIndex_Det"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="列表操作步骤数量:"/>
+                    <Label prefHeight="25" text="%clickDetail.tableViewSize"/>
                     <Label prefHeight="25" fx:id="tableViewSize_Det"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="步骤名称:"/>
+                    <Label prefHeight="25" text="%clickDetail.clickName"/>
                     <TextField fx:id="clickName_Det"/>
                 </HBox>
 
-                <Label prefHeight="25" textFill="red" text="更改屏幕分辨率后可能需要重新截图才能准确进行图像识别"/>
+                <Label prefHeight="25" textFill="red" text="%clickDetail.tip"/>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="鼠标点击起始横(X)坐标:"/>
+                    <Label prefHeight="25" text="%clickDetail.mouseStartX"/>
                     <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="像素"/>
+                    <Label prefHeight="25" text="%unit.px"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="鼠标点击起始纵(Y)坐标:"/>
+                    <Label prefHeight="25" text="%clickDetail.mouseStartY"/>
                     <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="像素"/>
+                    <Label prefHeight="25" text="%unit.px"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="点击按键:"/>
-                    <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" onAction="#clickKeyChange">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="鼠标左键"/>
-                                <String fx:value="鼠标右键"/>
-                                <String fx:value="鼠标中键"/>
-                                <String fx:value="鼠标前侧键"/>
-                                <String fx:value="鼠标后侧键"/>
-                            </FXCollections>
-                        </items>
-                        <value>
-                            <String fx:value="鼠标左键"/>
-                        </value>
-                    </ChoiceBox>
+                    <Label prefHeight="25" text="%clickDetail.clickKey_Det"/>
+                    <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" onAction="#clickKeyChange"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
-                    <Label fx:id="clickTypeText_Det" prefHeight="25" text="操作类型:"/>
-                    <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" onAction="#clickTypeChange">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="点击后松开"/>
-                                <String fx:value="移动到设置坐标"/>
-                            </FXCollections>
-                        </items>
-                        <value>
-                            <String fx:value="点击后松开"/>
-                        </value>
-                    </ChoiceBox>
+                    <Label fx:id="clickTypeText_Det" prefHeight="25" text="%clickDetail.clickTypeText_Det"/>
+                    <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" onAction="#clickTypeChange"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="执行前等待时间:"/>
+                    <Label prefHeight="25" text="%clickDetail.wait"/>
                     <TextField fx:id="wait_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="毫秒"/>
+                    <Label prefHeight="25" text="%unit.ms"/>
                 </HBox>
 
                 <HBox fx:id="clickTypeHBox_Det" spacing="10">
                     <HBox styleClass="hBox-short">
-                        <Label prefHeight="25" text="操作次数:"/>
+                        <Label prefHeight="25" text="%clickDetail.clickNumBer"/>
                         <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
-                        <Label prefHeight="25" text="次"/>
+                        <Label prefHeight="25" text="%unit.times"/>
                     </HBox>
 
                     <HBox styleClass="hBox-short">
-                        <Label prefHeight="25" text="单次操作点击时长:"/>
+                        <Label prefHeight="25" text="%clickDetail.timeClick"/>
                         <TextField fx:id="timeClick_Det" prefWidth="80"/>
-                        <Label prefHeight="25" text="毫秒"/>
+                        <Label prefHeight="25" text="%unit.ms"/>
                     </HBox>
 
                     <HBox styleClass="hBox-short">
-                        <Label prefHeight="25" text="单次操作点击间隔时间:"/>
+                        <Label prefHeight="25" text="%clickDetail.interval"/>
                         <TextField fx:id="interval_Det" prefWidth="80"/>
-                        <Label prefHeight="25" text="毫秒"/>
+                        <Label prefHeight="25" text="%unit.ms"/>
                     </HBox>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
-                <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="运行时启用随机点击坐标偏移"/>
+                <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
 
-                <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short" text="运行时启用随机轨迹坐标偏移"/>
+                <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short" text="%randomTrajectory"/>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="横坐标随机偏移量: ±"/>
+                    <Label prefHeight="25" text="%clickDetail.randomClickX"/>
                     <TextField fx:id="randomClickX_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="像素"/>
+                    <Label prefHeight="25" text="%unit.px"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="纵坐标随机偏移量: ±"/>
+                    <Label prefHeight="25" text="%clickDetail.randomClickY"/>
                     <TextField fx:id="randomClickY_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="像素"/>
+                    <Label prefHeight="25" text="%unit.px"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
-                <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short" text="运行时启用随机点击时长偏移"/>
+                <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short" text="%randomClickTime"/>
 
-                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short" text="运行时启用随机操作间隔时间偏移"/>
+                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short" text="%randomClickInterval"/>
 
-                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short" text="运行时启用随机执行前等待时间偏移"/>
+                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short" text="%randomWaitTime"/>
 
                 <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="时长随机偏移量: ±"/>
+                    <Label prefHeight="25" text="%clickDetail.randomTimeOffset"/>
                     <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="毫秒"/>
+                    <Label prefHeight="25" text="%unit.ms"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="要识别的图像识别匹配匹配度:"/>
+                    <Label prefHeight="25" text="%clickDetail.clickOpacity"/>
                     <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                     <Label prefHeight="25" text="\%"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="要识别的图像识别失败重试次数:"/>
+                    <Label prefHeight="25" text="%clickDetail.clickRetryNum"/>
                     <TextField fx:id="clickRetryNum_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="次"/>
+                    <Label prefHeight="25" text="%unit.times"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
                 <HBox prefWidth="550" spacing="10">
                     <HBox spacing="10">
-                        <Label prefHeight="25" text="图像识别匹配逻辑:"/>
-                        <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="210" onAction="#matchedTypeChange">
-                            <items>
-                                <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="点击匹配的图像"/>
-                                    <String fx:value="直接执行下一个操作步骤"/>
-                                    <String fx:value="匹配图像存在则重复点击"/>
-                                    <String fx:value="跳转到指定操作步骤"/>
-                                    <String fx:value="点击匹配图像后跳转指定步骤"/>
-                                </FXCollections>
-                            </items>
-                            <value>
-                                <String fx:value="点击匹配的图像"/>
-                            </value>
-                        </ChoiceBox>
+                        <Label prefHeight="25" text="%clickDetail.matchedType_Det"/>
+                        <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="210" onAction="#matchedTypeChange"/>
                     </HBox>
 
                     <HBox fx:id="matchedStepHBox_Det" spacing="10">
-                        <Label prefHeight="25" text="要跳转的步骤序号:"/>
+                        <Label prefHeight="25" text="%clickDetail.matchedStep"/>
                         <TextField fx:id="matchedStep_Det" prefWidth="60"/>
                     </HBox>
                 </HBox>
 
                 <HBox spacing="10">
                     <HBox spacing="10">
-                        <Label prefHeight="25" text="要匹配的图像重试逻辑:"/>
-                        <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210" onAction="#retryTypeChange">
-                            <items>
-                                <FXCollections fx:factory="observableArrayList">
-                                    <String fx:value="重试直到图像出现"/>
-                                    <String fx:value="按设置次数重试后点击设置位置"/>
-                                    <String fx:value="按设置次数重试后终止操作"/>
-                                    <String fx:value="按设置次数重试后跳过本次操作"/>
-                                    <String fx:value="按设置次数重试后跳转指定步骤"/>
-                                </FXCollections>
-                            </items>
-                            <value>
-                                <String fx:value="按设置次数重试后终止操作"/>
-                            </value>
-                        </ChoiceBox>
+                        <Label prefHeight="25" text="%clickDetail.retryType_Det"/>
+                        <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210" onAction="#retryTypeChange"/>
                     </HBox>
 
                     <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">
-                        <Label prefHeight="25" text="要跳转的步骤序号:"/>
+                        <Label prefHeight="25" text="%clickDetail.retryStep"/>
                         <TextField fx:id="retryStep_Det" prefWidth="60"/>
                     </HBox>
                 </HBox>
@@ -205,46 +154,49 @@
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="终止操作图像识别匹配匹配度:"/>
+                    <Label prefHeight="25" text="%clickDetail.stopOpacity"/>
                     <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                     <Label prefHeight="25" text="\%"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="终止操作图像识别失败重试次数:"/>
+                    <Label prefHeight="25" text="%clickDetail.stopRetryNum"/>
                     <TextField fx:id="stopRetryNum_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="次"/>
+                    <Label prefHeight="25" text="%unit.times"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="20">
                 <VBox spacing="10">
                     <HBox fx:id="fileNumberHBox_Det" spacing="10">
-                        <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath" style="-fx-cursor: hand" text="选择终止操作的图片"/>
-                        <Button fx:id="removeAll_Det" onAction="#removeAll" style="-fx-cursor: hand" text="清空列表"/>
+                        <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath" style="-fx-cursor: hand"
+                                text="%clickDetail.stopImgBtn_Det"/>
+                        <Button fx:id="removeAll_Det" onAction="#removeAll" style="-fx-cursor: hand"
+                                text="%listText.removeAll"/>
 
-                        <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
+                        <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
                     </HBox>
 
                     <TableView fx:id="tableView_Det" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
                         <placeholder>
-                            <Label text="拖拽图片文件或点击选择终止操作的图片即可追加止操作的图片"/>
+                            <Label text="%clickDetail.tableView_Det"/>
                         </placeholder>
 
                         <columns>
-                            <TableColumn fx:id="index_Det" text="序号" sortable="false"/>
-                            <TableColumn fx:id="thumb_Det" text="缩略图" sortable="false"/>
-                            <TableColumn fx:id="name_Det" text="图片名称" sortable="false"/>
-                            <TableColumn fx:id="path_Det" text="图片地址" sortable="false"/>
-                            <TableColumn fx:id="type_Det" text="图片类型" sortable="false"/>
+                            <TableColumn fx:id="index_Det" text="%listText.index" sortable="false"/>
+                            <TableColumn fx:id="thumb_Det" text="%stopImg.thumb" sortable="false"/>
+                            <TableColumn fx:id="name_Det" text="%stopImg.name" sortable="false"/>
+                            <TableColumn fx:id="path_Det" text="%stopImg.path" sortable="false"/>
+                            <TableColumn fx:id="type_Det" text="%stopImg.type" sortable="false"/>
                         </columns>
                     </TableView>
                 </VBox>
 
                 <VBox spacing="10">
                     <HBox spacing="5">
-                        <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath" style="-fx-cursor: hand" text="选择要点击的图片"/>
+                        <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath" style="-fx-cursor: hand"
+                                text="%clickDetail.clickImgBtn_Det"/>
                         <Label fx:id="clickImgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
 
                         <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
@@ -261,14 +213,14 @@
                         <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200" preserveRatio="true"/>
 
                         <HBox spacing="10">
-                            <Label maxHeight="25" text="图片名称:"/>
+                            <Label maxHeight="25" text="%clickDetail.clickImgName"/>
                             <Label maxHeight="25" fx:id="clickImgName_Det"/>
-                            <Button fx:id="updateClickName_Det" onAction="#updateClickName" text="更新步骤名称"
-                                    style="-fx-cursor: hand"/>
+                            <Button fx:id="updateClickName_Det" onAction="#updateClickName"
+                                    text="%clickDetail.updateClickName_Det" style="-fx-cursor: hand"/>
                         </HBox>
 
                         <HBox spacing="10">
-                            <Label maxHeight="25" text="图片类型:"/>
+                            <Label maxHeight="25" text="%clickDetail.clickImgType"/>
                             <Label maxHeight="25" fx:id="clickImgType_Det"/>
                         </HBox>
                     </VBox>
@@ -277,8 +229,8 @@
 
             <HBox spacing="10">
                 <Label fx:id="nullLabel_Det"/>
-                <Button text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
-                <Button text="删除这个流程" style="-fx-cursor: hand" onAction="#removeDetail"/>
+                <Button text="%detail.save" style="-fx-cursor: hand" onAction="#saveDetail"/>
+                <Button text="%clickDetail.removeDetail" style="-fx-cursor: hand" onAction="#removeDetail"/>
             </HBox>
         </VBox>
     </AnchorPane>

@@ -193,7 +193,7 @@ public class MainApplication extends Application {
      * @param tabPane 程序页面基础布局
      */
     private void initMenu(TabPane tabPane) {
-        MenuItem about = new MenuItem(bundle.getString("menu.about") + appName);
+        MenuItem about = new MenuItem(bundle.getString("macMenu.about") + appName);
         about.setOnAction(e -> {
             // 只有在程序空闲时才弹出程序窗口
             if (autoClickController.isFree()) {
@@ -201,7 +201,7 @@ public class MainApplication extends Application {
                 showStage(mainStage);
             }
         });
-        MenuItem setting = new MenuItem(bundle.getString("menu.settings"));
+        MenuItem setting = new MenuItem(bundle.getString("macMenu.settings"));
         setting.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
         setting.setOnAction(e -> {
             // 只有在程序空闲时才弹出程序窗口
@@ -212,11 +212,11 @@ public class MainApplication extends Application {
         });
         MenuToolkit.toolkit(Locale.getDefault()).createAboutMenuItem(appName);
         MenuItem hide = MenuToolkit.toolkit(Locale.getDefault()).createHideMenuItem(appName);
-        hide.setText(bundle.getString("menu.hide") + appName);
+        hide.setText(bundle.getString("macMenu.hide") + appName);
         MenuItem hideOthers = MenuToolkit.toolkit(Locale.getDefault()).createHideOthersMenuItem();
-        hideOthers.setText(bundle.getString("menu.hideOther"));
+        hideOthers.setText(bundle.getString("macMenu.hideOther"));
         MenuItem quit = MenuToolkit.toolkit(Locale.getDefault()).createQuitMenuItem(appName);
-        quit.setText(bundle.getString("menu.quit") + appName);
+        quit.setText(bundle.getString("macMenu.quit") + appName);
         Menu menu = new Menu();
         menu.getItems().addAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(),
                 hide, hideOthers, new SeparatorMenuItem(), quit);
@@ -306,13 +306,16 @@ public class MainApplication extends Application {
                     File file = new File(loadPMCPath);
                     if (file.exists()) {
                         Dialog<ButtonType> dialog = new Dialog<>();
-                        dialog.setTitle(bundle.getString("dialog.import.title"));
-                        dialog.setHeaderText(bundle.getString("dialog.import.header"));
+                        dialog.setTitle(bundle.getString("showWindow.import.title"));
+                        dialog.setHeaderText(bundle.getString("showWindow.import.header"));
                         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
                         setWindowLogo(stage, logoPath);
-                        ButtonType appendButton = new ButtonType(bundle.getString("button.append"), ButtonBar.ButtonData.APPLY);
-                        ButtonType clearButton = new ButtonType(bundle.getString("button.clear"), ButtonBar.ButtonData.OTHER);
-                        ButtonType cancelButton = new ButtonType(bundle.getString("button.cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
+                        ButtonType appendButton = new ButtonType(bundle.getString("showWindow.import.append"),
+                                ButtonBar.ButtonData.APPLY);
+                        ButtonType clearButton = new ButtonType(bundle.getString("showWindow.import.clear"),
+                                ButtonBar.ButtonData.OTHER);
+                        ButtonType cancelButton = new ButtonType(bundle.getString("showWindow.import.cancel"),
+                                ButtonBar.ButtonData.CANCEL_CLOSE);
                         dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
                         ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
                         TabPane tabPane = mainController.tabPane;

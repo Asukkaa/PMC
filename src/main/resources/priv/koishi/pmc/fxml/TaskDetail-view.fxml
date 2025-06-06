@@ -1,78 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.String?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
             fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.TaskDetailController">
     <AnchorPane fx:id="anchorPane_TD" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="任务名称："/>
+                    <Label prefHeight="25" text="%taskDetail.taskNameField"/>
                     <TextField fx:id="taskNameField_TD" prefWidth="200"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="设置小时："/>
+                    <Label prefHeight="25" text="%taskDetail.hourField"/>
                     <TextField fx:id="hourField_TD" prefWidth="70" promptText="0"/>
 
-                    <Label prefHeight="25" text="设置分钟:"/>
+                    <Label prefHeight="25" text="%taskDetail.minuteField"/>
                     <TextField fx:id="minuteField_TD" prefWidth="70" promptText="0"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="重复类型："/>
-                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefHeight="25" prefWidth="100">
-                        <items>
-                            <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="每天"/>
-                                <String fx:value="每周"/>
-                                <String fx:value="仅一次"/>
-                            </FXCollections>
-                        </items>
-                        <value>
-                            <String fx:value="每天"/>
-                        </value>
-                    </ChoiceBox>
+                    <Label prefHeight="25" text="%taskDetail.repeatType"/>
+                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefHeight="25" prefWidth="100"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="起始日期："/>
+                <Label prefHeight="25" text="%taskDetail.startDate"/>
                 <HBox spacing="10">
-                    <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="点击选择日期"/>
-                    <Label prefHeight="25" text=" 重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效" textFill="red"/>
+                    <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="%taskDetail.datePicker_TD"/>
+                    <Label prefHeight="25" text="%taskDetail.dateTip" textFill="red"/>
                 </HBox>
             </HBox>
 
             <VBox spacing="10">
                 <HBox spacing="10">
-                    <Label prefHeight="25" text="选择星期："/>
-                    <Label prefHeight="25" text="重复类型选择 每周 时才可修改，其他重复类型只能选择当天，无论哪种重复类型都至少要选择一天" textFill="red"/>
+                    <Label prefHeight="25" text="%taskDetail.weekField"/>
+                    <Label prefHeight="25" text="%taskDetail.weekTip" textFill="red"/>
                 </HBox>
                 <HBox spacing="20">
-                    <CheckBox fx:id="monday_TD" text="星期一"/>
-                    <CheckBox fx:id="tuesday_TD" text="星期二"/>
-                    <CheckBox fx:id="wednesday_TD" text="星期三"/>
-                    <CheckBox fx:id="thursday_TD" text="星期四"/>
-                    <CheckBox fx:id="friday_TD" text="星期五"/>
-                    <CheckBox fx:id="saturday_TD" text="星期六"/>
-                    <CheckBox fx:id="sunday_TD" text="星期日"/>
+                    <CheckBox fx:id="monday_TD" text="%monday"/>
+                    <CheckBox fx:id="tuesday_TD" text="%tuesday"/>
+                    <CheckBox fx:id="wednesday_TD" text="%wednesday"/>
+                    <CheckBox fx:id="thursday_TD" text="%thursday"/>
+                    <CheckBox fx:id="friday_TD" text="%friday"/>
+                    <CheckBox fx:id="saturday_TD" text="%saturday"/>
+                    <CheckBox fx:id="sunday_TD" text="%sunday"/>
                 </HBox>
             </VBox>
 
             <VBox spacing="10">
                 <HBox spacing="10">
-                    <Button onAction="#loadAutoClick" style="-fx-cursor: hand" text="选择操作流程"/>
-                    <Label prefHeight="25" text="如果不设置可以执行的操作流程文件，时间到了后程序只会定时启动" textFill="red"/>
+                    <Button fx:id="loadAutoClick_TD" onAction="#loadAutoClick" style="-fx-cursor: hand"
+                            text="%taskDetail.loadAutoClick_TD"/>
+                    <Label prefHeight="25" text="%taskDetail.loadAutoClickTip" textFill="red"/>
                 </HBox>
 
                 <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
-                    <Label prefHeight="25" text="文件名称："/>
+                    <Label prefHeight="25" text="%taskDetail.fileName"/>
                     <Label prefHeight="25" fx:id="fileName_DT"/>
                     <Button onAction="#removePath" prefHeight="20" fx:id="delete_TD"
                             styleClass="img-button-style">
@@ -85,7 +73,7 @@
                 </HBox>
 
                 <HBox fx:id="filePathHBox_DT" visible="false">
-                    <Label prefHeight="25" text="文件路径："/>
+                    <Label prefHeight="25" text="%taskDetail.filePath"/>
                     <Label fx:id="pmcFilePath_TD" prefHeight="25" style="-fx-font-size: 15px;"/>
                 </HBox>
             </VBox>
@@ -96,8 +84,9 @@
                     <Label fx:id="log_TD"/>
                 </VBox>
 
-                <Button fx:id="saveDetail_TD" text="保存并关闭" style="-fx-cursor: hand" onAction="#saveDetail"/>
-                <Button fx:id="removeDetail_TD" text="删除这个任务" style="-fx-cursor: hand" onAction="#removeDetail"/>
+                <Button fx:id="saveDetail_TD" text="%detail.save" style="-fx-cursor: hand" onAction="#saveDetail"/>
+                <Button fx:id="removeDetail_TD" text="%taskDetail.removeDetail_TD" style="-fx-cursor: hand"
+                        onAction="#removeDetail"/>
             </HBox>
         </VBox>
     </AnchorPane>

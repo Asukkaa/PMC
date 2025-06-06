@@ -8,7 +8,7 @@ import priv.koishi.pmc.Bean.VO.Indexable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.WEEKLY_CN;
+import static priv.koishi.pmc.Finals.CommonFinals.repeatType_weekly;
 import static priv.koishi.pmc.Finals.CommonFinals.text_onlyLaunch;
 
 /**
@@ -104,11 +104,11 @@ public class TimedTaskBean implements Indexable {
             beanPath = "";
         }
         String equalsDays = days;
-        if (!WEEKLY_CN.equals(repeat)) {
+        if (!repeatType_weekly.equals(repeat)) {
             equalsDays = "";
         }
         String beanDays = bean.getDays();
-        if (!WEEKLY_CN.equals(bean.getRepeat())) {
+        if (!repeatType_weekly.equals(bean.getRepeat())) {
             beanDays = "";
         }
         return new EqualsBuilder()

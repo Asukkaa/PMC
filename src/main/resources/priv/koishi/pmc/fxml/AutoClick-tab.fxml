@@ -8,74 +8,81 @@
         <HBox fx:id="cancelTipHBox_Click" spacing="10">
             <Label prefHeight="25" prefWidth="250" fx:id="mousePosition_Click"/>
 
-            <Label prefHeight="25" textFill="coral" text="提示：1 秒 = 1000 毫秒  列表中每条数据为一步，每步可操作多次"/>
+            <Label prefHeight="25" textFill="coral" text="%autoClick.tip"/>
 
             <Label fx:id="cancelTip_Click" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
-                   text="运行或录制自动化任务时按下 esc 即可取消任务"/>
+                   text="%autoClick.cancelTip_Click"/>
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand" text="选择导出文件夹"/>
+            <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand"
+                    text="%autoClick.addOutPath_Click"/>
             <Label fx:id="outPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
 
-            <Label prefHeight="25" text="导出自动流程文件名称："/>
+            <Label prefHeight="25" text="%autoClick.outFileName"/>
             <TextField fx:id="outFileName_Click" prefWidth="140"/>
 
             <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand"
-                      text="导出后打开文件夹"/>
+                      text="%autoClick.openDirectory_Click"/>
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand" text="添加操作流程"/>
-            <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand" text="导入操作流程"/>
+            <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand"
+                    text="%autoClick.addPosition_Click"/>
+            <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand"
+                    text="%autoClick.loadAutoClick_Click"/>
             <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand"
-                    text="导出操作流程"/>
-            <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand" text="清空操作列表"/>
+                    text="%autoClick.exportAutoClick_Click"/>
+            <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand"
+                    text="%listText.removeAll"/>
         </HBox>
 
         <HBox fx:id="fileNumberHBox_Click" spacing="10">
-            <Label prefHeight="25" text="录制自动操作前准备时间："/>
+            <Label prefHeight="25" text="%autoClick.preparationRecordTime"/>
             <TextField fx:id="preparationRecordTime_Click" prefWidth="50"/>
-            <Label prefHeight="25" text="秒"/>
-            <Button fx:id="recordClick_Click" onAction="#recordClick" style="-fx-cursor: hand" text="录制自动操作"/>
+            <Label prefHeight="25" text="%unit.s"/>
+            <Button fx:id="recordClick_Click" onAction="#recordClick" style="-fx-cursor: hand"
+                    text="%autoClick.recordClick_Click"/>
 
-            <Label prefHeight="25" text="运行自动操作前准备时间："/>
+            <Label prefHeight="25" text="%autoClick.preparationRunTime"/>
             <TextField fx:id="preparationRunTime_Click" prefWidth="50"/>
-            <Label prefHeight="25" text="秒"/>
-            <Button fx:id="runClick_Click" onAction="#runClick" style="-fx-cursor: hand" text="运行自动操作"/>
+            <Label prefHeight="25" text="%unit.s"/>
+            <Button fx:id="runClick_Click" onAction="#runClick" style="-fx-cursor: hand"
+                    text="%autoClick.runClick_Click"/>
 
-            <Label prefHeight="25" text="循环次数："/>
+            <Label prefHeight="25" text="%autoClick.loopTime"/>
             <TextField fx:id="loopTime_Click" prefWidth="80"/>
-            <Label prefHeight="25" text="次"/>
+            <Label prefHeight="25" text="%unit.times"/>
 
-            <Button  fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand" text="查看运行记录"/>
+            <Button  fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand"
+                     text="%autoClick.clickLog_Click"/>
 
-            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
+            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Click" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
             <placeholder>
-                <Label text="拖拽操作流程文件或点击导入操作流程即可追加操作流程，设置操作流程后点击添加操作流程即可新增自定义流程"/>
+                <Label text="%autoClick.tableView_Click"/>
             </placeholder>
 
             <columns>
-                <TableColumn fx:id="index_Click" text="序号" sortable="false"/>
-                <TableColumn fx:id="thumb_Click" text="要识别的图像" sortable="false"/>
-                <TableColumn fx:id="name_Click" text="步骤名称" sortable="false"/>
-                <TableColumn fx:id="clickTime_Click" text="操作时长" sortable="false"/>
-                <TableColumn fx:id="clickNum_Click" text="操作次数" sortable="false"/>
-                <TableColumn fx:id="waitTime_Click" text="执行前等待时间" sortable="false"/>
-                <TableColumn fx:id="clickKey_Click" text="点击按键" sortable="false"/>
-                <TableColumn fx:id="clickType_Click" text="操作类型" sortable="false"/>
-                <TableColumn fx:id="matchedType_Click" text="图像识别匹配逻辑" sortable="false"/>
-                <TableColumn fx:id="retryType_Click" text="图像识别重试逻辑" sortable="false"/>
+                <TableColumn fx:id="index_Click" text="%listText.index" sortable="false"/>
+                <TableColumn fx:id="thumb_Click" text="%autoClick.thumb_Click" sortable="false"/>
+                <TableColumn fx:id="name_Click" text="%autoClick.name_Click" sortable="false"/>
+                <TableColumn fx:id="clickTime_Click" text="%autoClick.clickTime_Click" sortable="false"/>
+                <TableColumn fx:id="clickNum_Click" text="%autoClick.clickNum_Click" sortable="false"/>
+                <TableColumn fx:id="waitTime_Click" text="%autoClick.waitTime_Click" sortable="false"/>
+                <TableColumn fx:id="clickKey_Click" text="%autoClick.clickKey_Click" sortable="false"/>
+                <TableColumn fx:id="clickType_Click" text="%autoClick.clickType_Click" sortable="false"/>
+                <TableColumn fx:id="matchedType_Click" text="%autoClick.matchedType_Click" sortable="false"/>
+                <TableColumn fx:id="retryType_Click" text="%autoClick.retryType_Click" sortable="false"/>
             </columns>
         </TableView>
 
         <HBox fx:id="tipHBox_Click" spacing="10">
             <ProgressBar fx:id="progressBar_Click" visible="false" prefWidth="200.0" progress="0.0"/>
             <Label fx:id="tip_Click" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
-                   text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整操作，双击单元格可进行编辑"/>
+                   text="%autoClick.tip_Click"/>
         </HBox>
 
         <HBox fx:id="logHBox_Click" spacing="10">

@@ -6,34 +6,34 @@
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.TimedTaskController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <HBox fx:id="fileNumberHBox_Task" spacing="10">
-            <Button fx:id="addTimedTask_Task" text="添加定时任务" onAction="#addTimedTask"/>
-            <Button fx:id="getScheduleTask_Task" text="查询定时任务" onAction="#getScheduleTask"/>
-            <Label text="定时任务只有在电脑没有锁屏或关机且本程序没有启动时才会正常执行，移动程序目录也会导致任务无法正常执行" textFill="red" prefHeight="25"/>
+            <Button fx:id="addTimedTask_Task" text="%timedTask.addTimedTask_Task" onAction="#addTimedTask"/>
+            <Button fx:id="getScheduleTask_Task" text="%timedTask.getScheduleTask_Task" onAction="#getScheduleTask"/>
+            <Label text="%timedTask.tip" textFill="red" prefHeight="25"/>
 
-            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
+            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Task">
             <placeholder>
-                <Label text="当前未设置定时任务"/>
+                <Label text="%timedTask.tableView_Task"/>
             </placeholder>
 
             <columns>
-                <TableColumn fx:id="index_Task" text="序号"/>
-                <TableColumn fx:id="taskName_Task" text="任务名称"/>
-                <TableColumn fx:id="date_Task" text="起始日期"/>
-                <TableColumn fx:id="time_Task" text="触发时间"/>
-                <TableColumn fx:id="repeat_Task" text="重复类型"/>
-                <TableColumn fx:id="days_Task" text="重复日"/>
-                <TableColumn fx:id="name_Task" text="执行流程"/>
-                <TableColumn fx:id="path_Task" text="文件地址"/>
+                <TableColumn fx:id="index_Task" text="%listText.index"/>
+                <TableColumn fx:id="taskName_Task" text="%timedTask.taskName_Task"/>
+                <TableColumn fx:id="date_Task" text="%timedTask.date_Task"/>
+                <TableColumn fx:id="time_Task" text="%timedTask.time_Task"/>
+                <TableColumn fx:id="repeat_Task" text="%timedTask.repeat_Task"/>
+                <TableColumn fx:id="days_Task" text="%timedTask.days_Task"/>
+                <TableColumn fx:id="name_Task" text="%timedTask.name_Task"/>
+                <TableColumn fx:id="path_Task" text="%timedTask.path_Task"/>
             </columns>
         </TableView>
 
         <HBox fx:id="tipHBox_Task" spacing="10">
             <ProgressBar fx:id="progressBar_Task" visible="false" prefWidth="200.0" progress="0.0"/>
             <Label fx:id="tip_Task" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
-                   text="设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整或编辑操作"/>
+                   text="%timedTask.tip_Task"/>
         </HBox>
 
         <HBox fx:id="logHBox_Task" spacing="10">

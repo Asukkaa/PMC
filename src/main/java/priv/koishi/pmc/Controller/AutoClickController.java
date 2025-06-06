@@ -130,7 +130,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 操作记录
      */
-    private List<ClickLogBean> clickLogs;
+    private List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
 
     /**
      * 详情页高度
@@ -588,7 +588,7 @@ public class AutoClickController extends RootController implements MousePosition
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         String title = item.getName() == null ? "" : item.getName();
-        detailStage.setTitle(title + " 步骤详情");
+        detailStage.setTitle(title + bundle.getString("clickDetail.title"));
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
@@ -691,9 +691,7 @@ public class AutoClickController extends RootController implements MousePosition
             runClicking = true;
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
-            if (CollectionUtils.isNotEmpty(clickLogs)) {
-                clickLogs.clear();
-            }
+            clickLogs.clear();
             CheckBox firstClick = settingController.firstClick_Set;
             TextField retrySecond = settingController.retrySecond_Set;
             TextField overTime = settingController.overtime_Set;
@@ -1942,14 +1940,14 @@ public class AutoClickController extends RootController implements MousePosition
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> {
             List<ClickLogBean> logs = controller.getClickLogs();
-            if (CollectionUtils.isEmpty(logs) && CollectionUtils.isNotEmpty(clickLogs)) {
+            if (CollectionUtils.isEmpty(logs)) {
                 clickLogs.clear();
             }
         });
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, logWidth, logHeight);
         detailStage.setScene(scene);
-        detailStage.setTitle("运行记录");
+        detailStage.setTitle(bundle.getString("clickLog.title"));
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
