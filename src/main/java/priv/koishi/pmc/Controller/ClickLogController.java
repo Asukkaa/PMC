@@ -130,7 +130,9 @@ public class ClickLogController extends RootController {
     @FXML
     private void removeAll() {
         removeTableViewData(tableView_Log, dataNumber_Log, null);
-        clickLogs.clear();
+        if (CollectionUtils.isNotEmpty(clickLogs)) {
+            clickLogs.clear();
+        }
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();

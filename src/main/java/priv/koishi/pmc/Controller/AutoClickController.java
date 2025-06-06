@@ -549,7 +549,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void showDetail(ClickPositionVO item) {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickDetail-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root;
         try {
             root = loader.load();
@@ -1936,13 +1936,13 @@ public class AutoClickController extends RootController implements MousePosition
     @FXML
     private void clickLog() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickLog-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root = loader.load();
         ClickLogController controller = loader.getController();
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> {
             List<ClickLogBean> logs = controller.getClickLogs();
-            if (CollectionUtils.isEmpty(logs)) {
+            if (CollectionUtils.isEmpty(logs) && CollectionUtils.isNotEmpty(clickLogs)) {
                 clickLogs.clear();
             }
         });
