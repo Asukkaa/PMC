@@ -177,7 +177,7 @@ public class TimedTaskController extends RootController {
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         String title = item.getTaskName();
-        detailStage.setTitle(title + " 任务详情");
+        detailStage.setTitle(title + bundle.getString("taskDetail.title"));
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
@@ -257,7 +257,7 @@ public class TimedTaskController extends RootController {
      * @param contextMenu 右键菜单集合
      */
     private void buildDetailMenuItem(TableView<? extends TimedTaskBean> tableView, ContextMenu contextMenu) {
-        MenuItem detailItem = new MenuItem("查看所选项第一行详情");
+        MenuItem detailItem = new MenuItem(menu_detailMenu);
         detailItem.setOnAction(e -> {
             TimedTaskBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
@@ -274,7 +274,7 @@ public class TimedTaskController extends RootController {
      * @param contextMenu 右键菜单集合
      */
     private void buildDeleteDataMenuItem(TableView<TimedTaskBean> tableView, ContextMenu contextMenu) {
-        MenuItem deleteDataMenuItem = new MenuItem("删除所选数据");
+        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu);
         deleteDataMenuItem.setOnAction(event -> {
             List<TimedTaskBean> ts = tableView.getSelectionModel().getSelectedItems();
             ts.forEach(item -> {

@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
@@ -383,7 +384,7 @@ public class TaskDetailController extends RootController {
     private void saveDetail() throws IOException {
         TimedTaskBean timedTaskBean = getTimedTaskBean();
         if (StringUtils.isBlank(timedTaskBean.getDays())) {
-            throw new IllegalArgumentException("未选择任何星期");
+            throw new IllegalArgumentException(bundle.getString("taskDetail.noWeekDay"));
         }
         TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_TD)

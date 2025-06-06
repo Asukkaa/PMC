@@ -792,6 +792,8 @@ public class CommonFinals {
 
     public static final String text_recorded = "已记录 ";
 
+    public static final String text_mouseTrajectory = bundle.getString("autoClick.mouseTrajectory");
+
     public static final String text_taskFailed = "出现错误，任务终止";
 
     public static final String text_taskCancelled = "任务已取消";
@@ -821,6 +823,8 @@ public class CommonFinals {
     public static final String text_matchedStepIsNull = "匹配后要跳转的步骤序号不能为空";
 
     public static final String text_onlyLaunch = "仅启动程序";
+
+    public static final String text_recordEnd = bundle.getString("autoClick.recordEnd");
 
     public static final String key_logsNum = "logsNum";
 
@@ -1002,21 +1006,29 @@ public class CommonFinals {
 
     public static final String menuItem_topCopy = "复制所选数据到列表顶部";
 
-    public static final String log_press = "按下";
+    public static final String menu_detailMenu = bundle.getString("detailMenu");
 
-    public static final String log_release = "松开";
+    public static final String menu_deleteMenu = bundle.getString("deleteMenu");
 
-    public static final String log_move = "移动鼠标";
+    public static final String menu_runSelectMenu = bundle.getString("runSelectMenu");
 
-    public static final String log_hold = "长按";
+    public static final String menu_addDateMenu = bundle.getString("addDateMenu");
 
-    public static final String log_drag = "拖拽";
+    public static final String log_press = bundle.getString("log.press");
 
-    public static final String log_wait = "等待";
+    public static final String log_release = bundle.getString("log.release");
 
-    public static final String log_clickImg = "识别目标图像";
+    public static final String log_move = bundle.getString("log.move");
 
-    public static final String log_stopImg = "识别终止操作图像";
+    public static final String log_hold = bundle.getString("log.hold");
+
+    public static final String log_drag = bundle.getString("log.drag");
+
+    public static final String log_wait = bundle.getString("log.wait");
+
+    public static final String log_clickImg = bundle.getString("log.clickImg");
+
+    public static final String log_stopImg = bundle.getString("log.stopImg");
 
     public static final String retryType_continuously = bundle.getString("retryType.continuously");
 
@@ -1149,19 +1161,33 @@ public class CommonFinals {
         repeatTypeMap.put(repeatType_once, ONCE);
     }
 
+    public static final String monday = bundle.getString("monday");
+
+    public static final String tuesday = bundle.getString("tuesday");
+
+    public static final String wednesday = bundle.getString("wednesday");
+
+    public static final String thursday = bundle.getString("thursday");
+
+    public static final String friday = bundle.getString("friday");
+
+    public static final String saturday = bundle.getString("saturday");
+
+    public static final String sunday = bundle.getString("sunday");
+
     /**
      * 定时任务星期名称中英文映射
      */
     public static final BidiMap<String, String> dayOfWeekName = new DualHashBidiMap<>();
 
     static {
-        dayOfWeekName.put("MON", bundle.getString("monday"));
-        dayOfWeekName.put("TUE", bundle.getString("tuesday"));
-        dayOfWeekName.put("WED", bundle.getString("wednesday"));
-        dayOfWeekName.put("THU", bundle.getString("thursday"));
-        dayOfWeekName.put("FRI", bundle.getString("friday"));
-        dayOfWeekName.put("SAT", bundle.getString("saturday"));
-        dayOfWeekName.put("SUN", bundle.getString("sunday"));
+        dayOfWeekName.put("MON", monday);
+        dayOfWeekName.put("TUE", tuesday);
+        dayOfWeekName.put("WED", wednesday);
+        dayOfWeekName.put("THU", thursday);
+        dayOfWeekName.put("FRI", friday);
+        dayOfWeekName.put("SAT", saturday);
+        dayOfWeekName.put("SUN", sunday);
     }
 
     /**
@@ -1170,13 +1196,13 @@ public class CommonFinals {
     public static final BidiMap<Integer, String> dayOfWeekMap = new DualHashBidiMap<>();
 
     static {
-        dayOfWeekMap.put(1, bundle.getString("monday"));
-        dayOfWeekMap.put(2, bundle.getString("tuesday"));
-        dayOfWeekMap.put(3, bundle.getString("wednesday"));
-        dayOfWeekMap.put(4, bundle.getString("thursday"));
-        dayOfWeekMap.put(5, bundle.getString("friday"));
-        dayOfWeekMap.put(6, bundle.getString("saturday"));
-        dayOfWeekMap.put(7, bundle.getString("sunday"));
+        dayOfWeekMap.put(1, monday);
+        dayOfWeekMap.put(2, tuesday);
+        dayOfWeekMap.put(3, wednesday);
+        dayOfWeekMap.put(4, thursday);
+        dayOfWeekMap.put(5, friday);
+        dayOfWeekMap.put(6, saturday);
+        dayOfWeekMap.put(7, sunday);
     }
 
     /**

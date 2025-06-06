@@ -480,11 +480,14 @@ public class AutoClickController extends RootController implements MousePosition
         Slider stopOpacity = settingController.stopOpacity_Set;
         defaultStopOpacity = String.valueOf(stopOpacity.getValue());
         TextField clickRetryNumTextField = settingController.clickRetryNum_Set;
-        clickRetryNum = StringUtils.isBlank(clickRetryNumTextField.getText()) ? defaultClickRetryNum : clickRetryNumTextField.getText();
+        clickRetryNum = StringUtils.isBlank(clickRetryNumTextField.getText()) ?
+                defaultClickRetryNum : clickRetryNumTextField.getText();
         TextField stopRetryNumTextField = settingController.stopRetryNum_Set;
-        stopRetryNum = StringUtils.isBlank(stopRetryNumTextField.getText()) ? defaultStopRetryNum : stopRetryNumTextField.getText();
+        stopRetryNum = StringUtils.isBlank(stopRetryNumTextField.getText()) ?
+                defaultStopRetryNum : stopRetryNumTextField.getText();
         TextField sampleIntervalTextField = settingController.sampleInterval_Set;
-        sampleInterval = StringUtils.isBlank(sampleIntervalTextField.getText()) ? defaultSampleInterval : sampleIntervalTextField.getText();
+        sampleInterval = StringUtils.isBlank(sampleIntervalTextField.getText()) ?
+                defaultSampleInterval : sampleIntervalTextField.getText();
         TableView<ImgFileVO> tableView = settingController.tableView_Set;
         defaultStopImgFiles = tableView.getItems().stream().map(o -> (ImgFileBean) o).toList();
         CheckBox recordMoveCheckBox = settingController.recordMove_Set;
@@ -498,13 +501,17 @@ public class AutoClickController extends RootController implements MousePosition
         CheckBox randomClickTimeCheckBox = settingController.randomClickTime_Set;
         randomClickTime = randomClickTimeCheckBox.isSelected() ? activation : unActivation;
         TextField randomTimeTextField = settingController.randomTimeOffset_Set;
-        randomTime = StringUtils.isBlank(randomTimeTextField.getText()) ? defaultRandomTime : randomTimeTextField.getText();
+        randomTime = StringUtils.isBlank(randomTimeTextField.getText()) ?
+                defaultRandomTime : randomTimeTextField.getText();
         TextField clickTimeOffsetTextField = settingController.clickTimeOffset_Set;
-        clickTimeOffset = StringUtils.isBlank(clickTimeOffsetTextField.getText()) ? defaultClickTimeOffset : clickTimeOffsetTextField.getText();
+        clickTimeOffset = StringUtils.isBlank(clickTimeOffsetTextField.getText()) ?
+                defaultClickTimeOffset : clickTimeOffsetTextField.getText();
         TextField randomClickXTextField = settingController.randomClickX_Set;
-        randomClickX = StringUtils.isBlank(randomClickXTextField.getText()) ? defaultRandomClickX : randomClickXTextField.getText();
+        randomClickX = StringUtils.isBlank(randomClickXTextField.getText()) ?
+                defaultRandomClickX : randomClickXTextField.getText();
         TextField randomClickYTextField = settingController.randomClickY_Set;
-        randomClickY = StringUtils.isBlank(randomClickYTextField.getText()) ? defaultRandomClickY : randomClickYTextField.getText();
+        randomClickY = StringUtils.isBlank(randomClickYTextField.getText()) ?
+                defaultRandomClickY : randomClickYTextField.getText();
         CheckBox randomWaitTimeCheckBox = settingController.randomWaitTime_Set;
         randomWaitTime = randomWaitTimeCheckBox.isSelected() ? activation : unActivation;
         CheckBox randomClickIntervalCheckBox = settingController.randomClickInterval_Set;
@@ -792,7 +799,8 @@ public class AutoClickController extends RootController implements MousePosition
             });
             if (runTimeline == null) {
                 // 获取准备时间值
-                int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click, Integer.parseInt(defaultPreparationRunTime), 0, null);
+                int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click,
+                        Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
                 String text = text_cancelTask + preparationTimeValue + text_run;
                 floatingLabel.setText(text);
@@ -837,7 +845,9 @@ public class AutoClickController extends RootController implements MousePosition
      * @throws RuntimeException 参数设置相关错误
      */
     private static String getString(ClickPositionVO clickPositionVO, int index, int maxIndex) {
-        String err = "序号为：" + index + " 名称为：" + clickPositionVO.getName() + " 的操作步骤设置有误\n";
+        String err = bundle.getString("autoClick.index") + index +
+                bundle.getString("autoClick.name") + clickPositionVO.getName() +
+                bundle.getString("autoClick.settingErr");
         if (clickMatched_clickStep.equals(clickPositionVO.getMatchedType())) {
             int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
             if (matchStep > maxIndex) {
@@ -930,7 +940,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param contextMenu 右键菜单集合
      */
     private void buildDetailMenuItem(TableView<? extends ClickPositionVO> tableView, ContextMenu contextMenu) {
-        MenuItem detailItem = new MenuItem("查看所选项第一行详情");
+        MenuItem detailItem = new MenuItem(menu_detailMenu);
         detailItem.setOnAction(e -> {
             ClickPositionVO selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
@@ -947,7 +957,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param contextMenu 右键菜单集合
      */
     private MenuItem buildClickTestMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        MenuItem menuItem = new MenuItem("执行选中的步骤");
+        MenuItem menuItem = new MenuItem(menu_runSelectMenu);
         menuItem.setOnAction(event -> {
             List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
@@ -969,7 +979,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param contextMenu 右键菜单集合
      */
     private void insertDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("插入数据");
+        Menu menu = new Menu(menu_addDateMenu);
         // 创建二级菜单项
         MenuItem insertUp = new MenuItem(menuItem_insertUp);
         MenuItem insertDown = new MenuItem(menuItem_insertDown);
@@ -1212,7 +1222,7 @@ public class AutoClickController extends RootController implements MousePosition
         Platform.runLater(() -> {
             int x = (int) mousePoint.getX();
             int y = (int) mousePoint.getY();
-            String text = "当前鼠标位置为： X: " + x + " Y: " + y;
+            String text = bundle.getString("autoClick.nowMousePos") + " X: " + x + " Y: " + y;
             CheckBox mouseFloatingRun = settingController.mouseFloatingRun_Set;
             CheckBox mouseFloatingRecord = settingController.mouseFloatingRecord_Set;
             TextField offsetXTextField = settingController.offsetX_Set;
@@ -1260,7 +1270,7 @@ public class AutoClickController extends RootController implements MousePosition
                                 recordTimeline = null;
                                 Platform.runLater(() -> {
                                     log_Click.setTextFill(Color.BLUE);
-                                    log_Click.setText("录制已结束");
+                                    log_Click.setText(text_recordEnd);
                                 });
                             }
                             // 停止运行计时
@@ -1365,7 +1375,7 @@ public class AutoClickController extends RootController implements MousePosition
             pressButtonList.clear();
             Platform.runLater(() -> {
                 log_Click.setTextFill(Color.BLUE);
-                log_Click.setText("录制已结束");
+                log_Click.setText(text_recordEnd);
                 tableView_Click.refresh();
             });
         }
@@ -1429,7 +1439,7 @@ public class AutoClickController extends RootController implements MousePosition
                     clickPositionVOS.add(movePoint);
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
                     String log = text_cancelTask + text_recordClicking + "\n" +
-                            text_recorded + "鼠标移动轨迹";
+                            text_recorded + text_mouseTrajectory;
                     log_Click.setText(log);
                     floatingLabel.setText(log);
                 });
@@ -1527,8 +1537,8 @@ public class AutoClickController extends RootController implements MousePosition
                         clickPositionVOS.add(clickBean);
                         addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process);
                         String log = text_cancelTask + text_recordClicking + "\n" +
-                                text_recorded + clickBean.getClickKey() +
-                                "松开 X：" + endX + " Y：" + endY;
+                                text_recorded + clickBean.getClickKey() + bundle.getString("click") +
+                                " X：" + endX + " Y：" + endY;
                         log_Click.setText(log);
                         floatingLabel.setText(log);
                     });
@@ -1673,7 +1683,7 @@ public class AutoClickController extends RootController implements MousePosition
         isNativeHookException = true;
         runClick_Click.setDisable(true);
         recordClick_Click.setDisable(true);
-        String errorMessage = appName + " 缺少必要系统权限";
+        String errorMessage = appName + bundle.getString("autoClick.noPermissions");
         if (isMac) {
             errorMessage = tip_NativeHookException;
         }

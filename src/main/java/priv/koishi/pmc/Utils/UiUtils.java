@@ -1387,7 +1387,7 @@ public class UiUtils {
      * @param <T>         列表数据类型
      */
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
-        MenuItem deleteDataMenuItem = new MenuItem("删除所选数据");
+        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu);
         deleteDataMenuItem.setOnAction(event -> {
             List<T> ts = tableView.getSelectionModel().getSelectedItems();
             ObservableList<T> items = tableView.getItems();

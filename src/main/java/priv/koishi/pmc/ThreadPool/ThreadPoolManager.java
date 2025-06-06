@@ -50,7 +50,7 @@ public class ThreadPoolManager {
                 try {
                     if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
                         List<Runnable> dropped = pool.shutdownNow();
-                        logger.warn("{} 线程池强制关闭，丢弃 {} 个任务", clazz.getSimpleName(), dropped.size());
+                        logger.info("{} 线程池强制关闭，丢弃 {} 个任务", clazz.getSimpleName(), dropped.size());
                     }
                 } catch (InterruptedException e) {
                     pool.shutdownNow();

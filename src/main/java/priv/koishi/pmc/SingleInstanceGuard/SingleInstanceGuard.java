@@ -170,7 +170,7 @@ public class SingleInstanceGuard {
                     try {
                         Path path = getLockFilePath();
                         if (!Files.exists(path)) {
-                            logger.warn("锁文件不存在，重建文件");
+                            logger.info("锁文件不存在，重建文件");
                             lockChannel = FileChannel.open(path,
                                     StandardOpenOption.CREATE,
                                     StandardOpenOption.READ,
@@ -189,7 +189,7 @@ public class SingleInstanceGuard {
                             Files.setLastModifiedTime(path, FileTime.fromMillis(System.currentTimeMillis()));
                         }
                     } catch (ClosedChannelException e) {
-                        logger.warn("通道已关闭，终止心跳");
+                        logger.error("通道已关闭，终止心跳");
                         scheduler.shutdownNow();
                     } catch (IOException e) {
                         logger.error("心跳写入失败", e);
@@ -214,7 +214,7 @@ public class SingleInstanceGuard {
                     Files.deleteIfExists(lockPath);
                 }
             } catch (IOException e) {
-                logger.warn("锁文件删除失败", e);
+                logger.error("锁文件删除失败", e);
             }
             // 释放文件锁资源
             releaseResources();
@@ -222,7 +222,7 @@ public class SingleInstanceGuard {
                 scheduler.shutdownNow();
                 try {
                     if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                        logger.warn("心跳线程强制终止");
+                        logger.info("心跳线程强制终止");
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();

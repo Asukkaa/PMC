@@ -116,7 +116,7 @@ public class AboutController extends RootController {
                         String path = r.getAbsolutePath();
                         File file = new File(path);
                         if (!file.delete()) {
-                            throw new RuntimeException("日志文件 " + path + " 删除失败");
+                            throw new RuntimeException(bundle.getString("about.deleteFailed") + path);
                         }
                     });
                 }
@@ -152,7 +152,7 @@ public class AboutController extends RootController {
         // 设置版本号
         version_Abt.setText(version);
         // 添加右键菜单
-        setCopyValueContextMenu(mail_Abt, "复制反馈邮件");
+        setCopyValueContextMenu(mail_Abt, bundle.getString("about.copyEmail"));
         // 设置鼠标悬停提示
         setToolTip();
         // log 文件保留数量输入监听
