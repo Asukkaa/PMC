@@ -135,7 +135,7 @@ public class UiUtils {
      * @param text      要展示的提示文案
      */
     public static void addValueToolTip(TextField textField, String text) {
-        addValueToolTip(textField, text, text_nowValue);
+        addValueToolTip(textField, text, text_nowValue());
     }
 
     /**
@@ -158,7 +158,7 @@ public class UiUtils {
      * @param value 当前所填值
      */
     public static void addValueToolTip(Node node, String text, String value) {
-        addValueToolTip(node, text, text_nowValue, value);
+        addValueToolTip(node, text, text_nowValue(), value);
     }
 
     /**
@@ -246,7 +246,7 @@ public class UiUtils {
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
-        return creatFileChooser(window, stopImgSelectPath, extensionFilters, text_selectTemplateImg);
+        return creatFileChooser(window, stopImgSelectPath, extensionFilters, text_selectTemplateImg());
     }
 
     /**
@@ -584,12 +584,12 @@ public class UiUtils {
                 } else if (image == null) {
                     TableRow<T> tableRow = getTableRow();
                     if (isRedText(tableRow)) {
-                        setText(text_badImg);
+                        setText(text_badImg());
                         setTextFill(Color.RED);
-                        setTooltip(creatTooltip(text_badImg));
+                        setTooltip(creatTooltip(text_badImg()));
                     } else {
-                        setText(text_noImg);
-                        setTooltip(creatTooltip(text_noImg));
+                        setText(text_noImg());
+                        setTooltip(creatTooltip(text_noImg()));
                     }
                     setGraphic(null);
                 } else {
@@ -652,7 +652,7 @@ public class UiUtils {
      */
     public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber, Label log) {
         tableView.getItems().clear();
-        updateLabel(fileNumber, text_dataListNull);
+        updateLabel(fileNumber, text_dataListNull());
         if (log != null) {
             updateLabel(log, "");
         }
@@ -1152,15 +1152,15 @@ public class UiUtils {
     public static void buildCopyDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu, Label dataNumber) {
         Menu menu = new Menu("复制所选数据");
         // 创建二级菜单项
-        MenuItem upCopy = new MenuItem(menuItem_upCopy);
-        MenuItem downCopy = new MenuItem(menuItem_downCopy);
-        MenuItem appendCopy = new MenuItem(menuItem_appendCopy);
-        MenuItem topCopy = new MenuItem(menuItem_topCopy);
+        MenuItem upCopy = new MenuItem(menuItem_upCopy());
+        MenuItem downCopy = new MenuItem(menuItem_downCopy());
+        MenuItem appendCopy = new MenuItem(menuItem_appendCopy());
+        MenuItem topCopy = new MenuItem(menuItem_topCopy());
         // 为每个菜单项添加事件处理
-        upCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_upCopy, dataNumber));
-        downCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_downCopy, dataNumber));
-        appendCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_appendCopy, dataNumber));
-        topCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_topCopy, dataNumber));
+        upCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_upCopy(), dataNumber));
+        downCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_downCopy(), dataNumber));
+        appendCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber));
+        topCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(upCopy, downCopy, appendCopy, topCopy);
         contextMenu.getItems().add(menu);
@@ -1175,14 +1175,14 @@ public class UiUtils {
      */
     private static void copyDataMenuItem(TableView<ClickPositionVO> tableView, String copyType, Label dataNumber) {
         List<ClickPositionVO> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
-        if (menuItem_upCopy.equals(copyType)) {
-            addData(copiedList, upAdd, tableView, dataNumber, text_process);
-        } else if (menuItem_downCopy.equals(copyType)) {
-            addData(copiedList, downAdd, tableView, dataNumber, text_process);
-        } else if (menuItem_appendCopy.equals(copyType)) {
-            addData(copiedList, append, tableView, dataNumber, text_process);
-        } else if (menuItem_topCopy.equals(copyType)) {
-            addData(copiedList, topAdd, tableView, dataNumber, text_process);
+        if (menuItem_upCopy().equals(copyType)) {
+            addData(copiedList, upAdd, tableView, dataNumber, text_process());
+        } else if (menuItem_downCopy().equals(copyType)) {
+            addData(copiedList, downAdd, tableView, dataNumber, text_process());
+        } else if (menuItem_appendCopy().equals(copyType)) {
+            addData(copiedList, append, tableView, dataNumber, text_process());
+        } else if (menuItem_topCopy().equals(copyType)) {
+            addData(copiedList, topAdd, tableView, dataNumber, text_process());
         }
     }
 
@@ -1216,17 +1216,17 @@ public class UiUtils {
     public static void buildEditClickKeyMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu("更改点击按键");
         // 创建二级菜单项
-        MenuItem primary = new MenuItem(mouseButton_primary);
-        MenuItem secondary = new MenuItem(mouseButton_secondary);
-        MenuItem middle = new MenuItem(mouseButton_middle);
-        MenuItem forward = new MenuItem(mouseButton_forward);
-        MenuItem back = new MenuItem(mouseButton_back);
+        MenuItem primary = new MenuItem(mouseButton_primary());
+        MenuItem secondary = new MenuItem(mouseButton_secondary());
+        MenuItem middle = new MenuItem(mouseButton_middle());
+        MenuItem forward = new MenuItem(mouseButton_forward());
+        MenuItem back = new MenuItem(mouseButton_back());
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_primary));
-        secondary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_secondary));
-        middle.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_middle));
-        forward.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_forward));
-        back.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_back));
+        primary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_primary()));
+        secondary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_secondary()));
+        middle.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_middle()));
+        forward.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_forward()));
+        back.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_back()));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(primary, secondary, middle, forward, back);
         contextMenu.getItems().add(menu);
@@ -1257,15 +1257,15 @@ public class UiUtils {
     public static void buildEditRetryTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu("更改重试类型");
         // 创建二级菜单项
-        MenuItem primary = new MenuItem(retryType_continuously);
-        MenuItem secondary = new MenuItem(retryType_click);
-        MenuItem middle = new MenuItem(retryType_stop);
-        MenuItem forward = new MenuItem(retryType_break);
+        MenuItem primary = new MenuItem(retryType_continuously());
+        MenuItem secondary = new MenuItem(retryType_click());
+        MenuItem middle = new MenuItem(retryType_stop());
+        MenuItem forward = new MenuItem(retryType_break());
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_continuously));
-        secondary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_click));
-        middle.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_stop));
-        forward.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_break));
+        primary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_continuously()));
+        secondary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_click()));
+        middle.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_stop()));
+        forward.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_break()));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(primary, secondary, middle, forward);
         contextMenu.getItems().add(menu);
@@ -1378,7 +1378,7 @@ public class UiUtils {
      * @param <T>         列表数据类型
      */
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
-        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu);
+        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
         deleteDataMenuItem.setOnAction(event -> {
             List<T> ts = tableView.getSelectionModel().getSelectedItems();
             ObservableList<T> items = tableView.getItems();
@@ -1519,7 +1519,7 @@ public class UiUtils {
             tableView.getItems().add(bean);
             index++;
         }
-        updateTableViewSizeText(tableView, dataNumber, text_img);
+        updateTableViewSizeText(tableView, dataNumber, text_img());
     }
 
     /**
@@ -1709,7 +1709,7 @@ public class UiUtils {
         // 设置剪贴板内容
         clipboard.setContent(content);
         // 复制成功消息气泡
-        new MessageBubble(text_copySuccess, 2);
+        new MessageBubble(text_copySuccess(), 2);
     }
 
     /**
@@ -1848,10 +1848,10 @@ public class UiUtils {
                         .setPath(selectedFile.getPath());
                 items.add(imgFileVO);
             } else {
-                new MessageBubble(text_imgExist, 2);
+                new MessageBubble(text_imgExist(), 2);
             }
             tableView.refresh();
-            updateTableViewSizeText(tableView, dataNumber, text_img);
+            updateTableViewSizeText(tableView, dataNumber, text_img());
         }
         return stopImgSelectPath;
     }
@@ -1912,7 +1912,7 @@ public class UiUtils {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
-        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, text_img);
+        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, text_img());
         // 移动所选行选项
         buildMoveDataMenu(tableView, contextMenu);
         // 查看文件选项
@@ -1920,7 +1920,7 @@ public class UiUtils {
         // 取消选中选项
         buildClearSelectedData(tableView, contextMenu);
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, text_img);
+        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, text_img());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView);
     }
@@ -1971,9 +1971,9 @@ public class UiUtils {
     public static <T> void updateTableViewSizeText(TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
         int tableSize = tableView.getItems().size();
         if (tableSize > 0) {
-            dataNumber.setText(text_allHave + tableSize + dataNumberUnit);
+            dataNumber.setText(text_allHave() + tableSize + dataNumberUnit);
         } else {
-            dataNumber.setText(text_dataListNull);
+            dataNumber.setText(text_dataListNull());
         }
     }
 

@@ -362,7 +362,8 @@ public class MainApplication extends Application {
      */
     public static void main(String[] args) throws IOException {
         MainApplication.args = args;
-        bundle = ResourceBundle.getBundle("priv.koishi.pmc.language", Locale.getDefault());
+        String languagePath = "priv.koishi.pmc.language";
+        bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
             String logsPath = getLogsPath();
@@ -398,6 +399,20 @@ public class MainApplication extends Application {
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
         int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
+        String firstRunValue = prop.getProperty(key_firstRun);
+        boolean firstRun = activation.equals(firstRunValue);
+        // 首次运行时如果有对应语言包则使用操作系统设置的语言
+        if (firstRun) {
+            if (languageMap.get(Locale.getDefault()) == null) {
+                Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
+                bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
+            }
+            updateProperties(configFile, key_firstRun, unActivation);
+        } else {
+            Locale locale = languageMap.getKey(prop.getProperty(key_language));
+            Locale.setDefault(locale);
+            bundle = ResourceBundle.getBundle(languagePath, locale);
+        }
         input.close();
         // 启动时检查是否已经启动
         if (checkRunning(port, args)) {

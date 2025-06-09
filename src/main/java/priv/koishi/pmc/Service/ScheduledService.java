@@ -219,8 +219,8 @@ public class ScheduledService {
             timedTaskBean.setTaskName(taskName.substring(taskName.indexOf(TASK_NAME) + TASK_NAME.length()))
                     .setDateTime(LocalDateTime.of(parsedDate, time))
                     .setTime(time.format(TIME_FORMATTER))
-                    .setPath(text_onlyLaunch)
-                    .setName(text_onlyLaunch)
+                    .setPath(text_onlyLaunch())
+                    .setName(text_onlyLaunch())
                     .setRepeat(repeatType)
                     .setDate(startDate)
                     .setDays(daysCN);
@@ -230,10 +230,10 @@ public class ScheduledService {
                 timedTaskBean.setPath(path)
                         .setName(name);
             }
-            if ("Every day of the week".equals(days) || repeatType_daily.equals(repeatType)) {
-                timedTaskBean.setDays(repeatType_daily);
-            } else if (repeatType_once.equals(repeatType)) {
-                timedTaskBean.setDays(repeatType_once);
+            if ("Every day of the week".equals(days) || repeatType_daily().equals(repeatType)) {
+                timedTaskBean.setDays(repeatType_daily());
+            } else if (repeatType_once().equals(repeatType)) {
+                timedTaskBean.setDays(repeatType_once());
             }
             taskDetails.add(timedTaskBean);
         }
@@ -263,14 +263,14 @@ public class ScheduledService {
             Matcher pathMatcher = pathPattern.matcher(content);
             if (pathMatcher.find()) {
                 String path = pathMatcher.group(1);
-                timedTaskBean.setName(text_onlyLaunch)
-                        .setPath(text_onlyLaunch);
+                timedTaskBean.setName(text_onlyLaunch())
+                        .setPath(text_onlyLaunch());
                 if (path.contains(PMC)) {
                     timedTaskBean.setName(getFileName(path))
                             .setPath(path);
                 }
             }
-            if (content.contains(repeatType_daily)) {
+            if (content.contains(repeatType_daily())) {
                 Pattern dailyPattern = Pattern.compile(
                         "<key>StartCalendarInterval</key>\\s*<dict>"
                                 + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
@@ -281,8 +281,8 @@ public class ScheduledService {
                     int hour = Integer.parseInt(dailyMatcher.group(1));
                     int minute = Integer.parseInt(dailyMatcher.group(2));
                     timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                            .setRepeat(repeatType_daily)
-                            .setDays(repeatType_daily);
+                            .setRepeat(repeatType_daily())
+                            .setDays(repeatType_daily());
                 }
                 // 获取起始日期
                 findStartDate(content, timedTaskBean);
@@ -307,7 +307,7 @@ public class ScheduledService {
                         int minute = Integer.parseInt(dictMatcher.group(2));
                         int weekday = Integer.parseInt(dictMatcher.group(3));
                         timedTaskBean.setTime(String.format("%02d:%02d", hour, minute))
-                                .setRepeat(repeatType_weekly);
+                                .setRepeat(repeatType_weekly());
                         weekdays.add(dayOfWeekMap.get(weekday));
                     }
                     if (CollectionUtils.isNotEmpty(weekdays)) {
@@ -339,8 +339,8 @@ public class ScheduledService {
                     timedTaskBean.setDate(triggerTime.toLocalDate().toString())
                             .setTime(triggerTime.format(TIME_FORMATTER))
                             .setDateTime(triggerTime)
-                            .setRepeat(repeatType_once)
-                            .setDays(repeatType_once);
+                            .setRepeat(repeatType_once())
+                            .setDays(repeatType_once());
                 }
             }
             taskDetails.add(timedTaskBean);
@@ -422,17 +422,17 @@ public class ScheduledService {
                 .append("-Argument '--r ").append(PMCFilePath).append("'; ");
         // 构建触发器
         psCommand.append("$triggers = @(); ");
-        if (repeatType_daily.equals(repeatType)) {
+        if (repeatType_daily().equals(repeatType)) {
             psCommand.append("$trigger = New-ScheduledTaskTrigger -Daily -At '")
                     .append(triggerTime.format(FULL_TIME_FORMATTER)).append("'; ");
             psCommand.append("$triggers += $trigger; ");
-        } else if (repeatType_weekly.equals(repeatType)) {
+        } else if (repeatType_weekly().equals(repeatType)) {
             String daysOfWeek = days.stream().map(day -> DayOfWeek.of(day).toString())
                     .collect(Collectors.joining(","));
             psCommand.append(String.format(
                     "$trigger = New-ScheduledTaskTrigger -Weekly -At '%s' -DaysOfWeek %s; $triggers += $trigger; ",
                     triggerTime.format(FULL_TIME_FORMATTER), daysOfWeek));
-        } else if (repeatType_once.equals(repeatType)) {
+        } else if (repeatType_once().equals(repeatType)) {
             // 添加单次触发器
             psCommand.append(String.format("$trigger = New-ScheduledTaskTrigger -Once -At '%s'; $triggers += $trigger; ",
                     triggerTime.format(FULL_TIME_FORMATTER)));
@@ -464,7 +464,7 @@ public class ScheduledService {
         String repeatType = timedTaskBean.getRepeat();
         String PMCFilePath = timedTaskBean.getPath();
         String interval;
-        if (repeatType_daily.equals(repeatType)) {
+        if (repeatType_daily().equals(repeatType)) {
             interval = String.format("""
                             <key>StartCalendarInterval</key>
                             <dict>
@@ -479,7 +479,7 @@ public class ScheduledService {
                     triggerTime.getMinute(),
                     triggerTime.toLocalDate(),
                     repeatType);
-        } else if (repeatType_weekly.equals(repeatType)) {
+        } else if (repeatType_weekly().equals(repeatType)) {
             // 支持多天执行
             String intervals = days.stream().map(day -> String.format("""
                             <dict>
@@ -502,7 +502,7 @@ public class ScheduledService {
         } else {
             interval = "<key>RunAtLoad</key><false/>";
         }
-        String calendarInterval = repeatType_once.equals(repeatType) ?
+        String calendarInterval = repeatType_once().equals(repeatType) ?
                 String.format("""
                                 <key>StartCalendarInterval</key>
                                 <dict>

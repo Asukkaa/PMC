@@ -48,6 +48,7 @@ import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -118,7 +119,7 @@ public class SettingController extends RootController implements MousePositionUp
     public ColorPicker colorPicker_Set;
 
     @FXML
-    public ChoiceBox<String> nextGcType_Set;
+    public ChoiceBox<String> nextGcType_Set, language_Set;
 
     @FXML
     public Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
@@ -266,7 +267,7 @@ public class SettingController extends RootController implements MousePositionUp
             floatingStage.setY(y);
         });
         Color labelTextFill = Color.WHITE;
-        floatingLabel = new Label(text_saveFloatingCoordinate);
+        floatingLabel = new Label(text_saveFloatingCoordinate());
         floatingLabel.setTextFill(labelTextFill);
         floatingLabel.setStyle("-fx-font-size: 18px;");
         root.getChildren().addAll(rectangle, floatingLabel);
@@ -296,13 +297,13 @@ public class SettingController extends RootController implements MousePositionUp
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, true);
             if (mouseFloating_Set.isSelected()) {
-                floatingLabel.setText(text_escCloseFloating);
-                setFloatingCoordinate_Set.setText(text_closeFloating);
-                addToolTip(tip_closeFloating, setFloatingCoordinate_Set);
+                floatingLabel.setText(text_escCloseFloating());
+                setFloatingCoordinate_Set.setText(text_closeFloating());
+                addToolTip(tip_closeFloating(), setFloatingCoordinate_Set);
             } else {
-                floatingLabel.setText(text_saveFloatingCoordinate);
-                setFloatingCoordinate_Set.setText(text_saveCloseFloating);
-                addToolTip(tip_saveFloating, setFloatingCoordinate_Set);
+                floatingLabel.setText(text_saveFloatingCoordinate());
+                setFloatingCoordinate_Set.setText(text_saveCloseFloating());
+                addToolTip(tip_saveFloating(), setFloatingCoordinate_Set);
             }
             floatingStage.show();
             // 监听键盘事件
@@ -323,8 +324,8 @@ public class SettingController extends RootController implements MousePositionUp
                 }
             }
             floatingStage.hide();
-            setFloatingCoordinate_Set.setText(text_showFloating);
-            addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
+            setFloatingCoordinate_Set.setText(text_showFloating());
+            addToolTip(tip_setFloatingCoordinate(), setFloatingCoordinate_Set);
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, false);
             removeNativeListener(nativeKeyListener);
@@ -421,6 +422,10 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, defaultClickRetryNum);
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, defaultRandomTimeOffset);
         clickFileInput.close();
+        String language = languageMap.get(bundle.getLocale());
+        if (language != null) {
+            language_Set.setValue(language);
+        }
     }
 
     /**
@@ -443,52 +448,52 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(tip_reLaunch, reLaunch_Set);
-        addToolTip(tip_overtime, overtime_Set);
-        addToolTip(tip_firstClick, firstClick_Set);
-        addToolTip(tip_recordDrag, recordDrag_Set);
-        addToolTip(tip_recordMove, recordMove_Set);
-        addToolTip(tip_randomClick, randomClick_Set);
-        addToolTip(tip_floatingRun, floatingRun_Set);
-        addToolTip(tip_margin, floatingDistance_Set);
-        addToolTip(tip_retrySecond, retrySecond_Set);
-        addValueToolTip(maxLogNum_Set, tip_maxLogNum);
+        addToolTip(tip_reLaunch(), reLaunch_Set);
+        addToolTip(tip_overtime(), overtime_Set);
+        addToolTip(tip_firstClick(), firstClick_Set);
+        addToolTip(tip_recordDrag(), recordDrag_Set);
+        addToolTip(tip_recordMove(), recordMove_Set);
+        addToolTip(tip_randomClick(), randomClick_Set);
+        addToolTip(tip_floatingRun(), floatingRun_Set);
+        addToolTip(tip_margin(), floatingDistance_Set);
+        addToolTip(tip_retrySecond(), retrySecond_Set);
+        addValueToolTip(maxLogNum_Set, tip_maxLogNum());
         addToolTip(lastTab_Set.getText(), lastTab_Set);
-        addToolTip(tip_remindSave, remindClickSave_Set);
-        addToolTip(tip_removeStopImgBtn, removeAll_Set);
-        addToolTip(tip_mouseFloating, mouseFloating_Set);
-        addToolTip(tip_hideWindowRun, hideWindowRun_Set);
-        addToolTip(tip_showWindowRun, showWindowRun_Set);
-        addToolTip(tip_defaultStopImgBtn, stopImgBtn_Set);
-        addToolTip(tip_floatingRecord, floatingRecord_Set);
+        addToolTip(tip_remindSave(), remindClickSave_Set);
+        addToolTip(tip_removeStopImgBtn(), removeAll_Set);
+        addToolTip(tip_mouseFloating(), mouseFloating_Set);
+        addToolTip(tip_hideWindowRun(), hideWindowRun_Set);
+        addToolTip(tip_showWindowRun(), showWindowRun_Set);
+        addToolTip(tip_defaultStopImgBtn(), stopImgBtn_Set);
+        addToolTip(tip_floatingRecord(), floatingRecord_Set);
         addToolTip(maxWindow_Set.getText(), maxWindow_Set);
-        addToolTip(tip_randomWaitTime, randomWaitTime_Set);
-        addToolTip(tip_randomClickTime, randomClickTime_Set);
+        addToolTip(tip_randomWaitTime(), randomWaitTime_Set);
+        addToolTip(tip_randomClickTime(), randomClickTime_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
-        addValueToolTip(nextRunMemory_Set, tip_nextRunMemory);
-        addToolTip(tip_randomTrajectory, randomTrajectory_Set);
-        addToolTip(tip_hideWindowRecord, hideWindowRecord_Set);
-        addToolTip(tip_showWindowRecord, showWindowRecord_Set);
-        addToolTip(tip_mouseFloatingRun, mouseFloatingRun_Set);
-        addToolTip(tip_lastAutoClickSetting, loadAutoClick_Set);
-        addToolTip(tip_offsetX + defaultOffsetX, offsetX_Set);
-        addToolTip(tip_offsetY + defaultOffsetY, offsetY_Set);
-        addToolTip(tip_randomClickInterval, randomClickInterval_Set);
-        addToolTip(tip_mouseFloatingRecord, mouseFloatingRecord_Set);
-        addToolTip(tip_autoSave + autoSaveFileName, autoSave_Set);
-        addToolTip(tip_setFloatingCoordinate, setFloatingCoordinate_Set);
-        addToolTip(tip_stopRetryNum + defaultStopRetryNum, stopRetryNum_Set);
-        addValueToolTip(nextGcType_Set, tip_nextGcType, nextGcType_Set.getValue());
-        addToolTip(tip_clickRetryNum + defaultClickRetryNum, clickRetryNum_Set);
-        addToolTip(tip_sampleInterval + defaultSampleInterval, sampleInterval_Set);
-        addValueToolTip(randomClickX_Set, tip_randomClickX + defaultRandomClickX);
-        addValueToolTip(randomClickY_Set, tip_randomClickY + defaultRandomClickY);
-        addValueToolTip(randomTimeOffset_Set, tip_randomTime + defaultRandomTime);
-        addValueToolTip(opacity_Set, tip_opacity, String.valueOf(opacity_Set.getValue()));
-        addValueToolTip(clickTimeOffset_Set, tip_clickTimeOffset + defaultClickTimeOffset);
-        addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(colorPicker_Set.getValue()));
-        addValueToolTip(stopOpacity_Set, tip_stopOpacity, String.valueOf((int) stopOpacity_Set.getValue()));
-        addValueToolTip(clickOpacity_Set, tip_clickOpacity, String.valueOf((int) clickOpacity_Set.getValue()));
+        addValueToolTip(nextRunMemory_Set, tip_nextRunMemory());
+        addToolTip(tip_randomTrajectory(), randomTrajectory_Set);
+        addToolTip(tip_hideWindowRecord(), hideWindowRecord_Set);
+        addToolTip(tip_showWindowRecord(), showWindowRecord_Set);
+        addToolTip(tip_mouseFloatingRun(), mouseFloatingRun_Set);
+        addToolTip(tip_lastAutoClickSetting(), loadAutoClick_Set);
+        addToolTip(tip_offsetX() + defaultOffsetX, offsetX_Set);
+        addToolTip(tip_offsetY() + defaultOffsetY, offsetY_Set);
+        addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
+        addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
+        addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
+        addToolTip(tip_setFloatingCoordinate(), setFloatingCoordinate_Set);
+        addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
+        addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
+        addToolTip(tip_clickRetryNum() + defaultClickRetryNum, clickRetryNum_Set);
+        addToolTip(tip_sampleInterval() + defaultSampleInterval, sampleInterval_Set);
+        addValueToolTip(randomClickX_Set, tip_randomClickX() + defaultRandomClickX);
+        addValueToolTip(randomClickY_Set, tip_randomClickY() + defaultRandomClickY);
+        addValueToolTip(randomTimeOffset_Set, tip_randomTime() + defaultRandomTime);
+        addValueToolTip(opacity_Set, tip_opacity(), String.valueOf(opacity_Set.getValue()));
+        addValueToolTip(clickTimeOffset_Set, tip_clickTimeOffset() + defaultClickTimeOffset);
+        addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(colorPicker_Set.getValue()));
+        addValueToolTip(stopOpacity_Set, tip_stopOpacity(), String.valueOf((int) stopOpacity_Set.getValue()));
+        addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
     }
 
     /**
@@ -539,7 +544,7 @@ public class SettingController extends RootController implements MousePositionUp
             if (floatingLabel != null) {
                 floatingLabel.setTextFill(newValue);
             }
-            addValueToolTip(colorPicker_Set, tip_colorPicker, String.valueOf(newValue));
+            addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(newValue));
         });
     }
 
@@ -559,7 +564,7 @@ public class SettingController extends RootController implements MousePositionUp
                     rectangle.setFill(new Color(0, 0, 0, rounded));
                 }
             }
-            addValueToolTip(opacity_Set, tip_opacity, String.valueOf(rounded));
+            addValueToolTip(opacity_Set, tip_opacity(), String.valueOf(rounded));
         });
     }
 
@@ -572,37 +577,37 @@ public class SettingController extends RootController implements MousePositionUp
         // 透明度滑块监听
         sliderValueListener();
         // 停止操作图像识别准确度设置监听
-        integerSliderValueListener(stopOpacity_Set, tip_stopOpacity);
+        integerSliderValueListener(stopOpacity_Set, tip_stopOpacity());
         // 要点击的图像识别准确度设置监听
-        integerSliderValueListener(clickOpacity_Set, tip_clickOpacity);
+        integerSliderValueListener(clickOpacity_Set, tip_clickOpacity());
         // 每张图片最大匹配时间输入框监听
-        integerRangeTextField(overtime_Set, 1, null, tip_overtime);
+        integerRangeTextField(overtime_Set, 1, null, tip_overtime());
         // 浮窗跟随鼠标时横轴偏移量输入框监听
-        integerRangeTextField(offsetX_Set, null, null, tip_offsetX);
+        integerRangeTextField(offsetX_Set, null, null, tip_offsetX());
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
-        integerRangeTextField(offsetY_Set, null, null, tip_offsetY);
+        integerRangeTextField(offsetY_Set, null, null, tip_offsetY());
         // 最大记录数量文本输入框内容
-        integerRangeTextField(maxLogNum_Set, 1, null, tip_maxLogNum);
+        integerRangeTextField(maxLogNum_Set, 1, null, tip_maxLogNum());
         // 匹配失败重试间隔时间输入框监听
-        integerRangeTextField(retrySecond_Set, 0, null, tip_retrySecond);
+        integerRangeTextField(retrySecond_Set, 0, null, tip_retrySecond());
         // 浮窗离屏幕边界距离输入框监听
-        integerRangeTextField(floatingDistance_Set, 0, null, tip_margin);
+        integerRangeTextField(floatingDistance_Set, 0, null, tip_margin());
         // 限制下次运行内存文本输入框内容
-        integerRangeTextField(nextRunMemory_Set, 1, null, tip_nextRunMemory);
+        integerRangeTextField(nextRunMemory_Set, 1, null, tip_nextRunMemory());
         // 随机横坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX + defaultRandomClickX);
+        integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX() + defaultRandomClickX);
         // 随机纵坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickY_Set, 0, null, tip_randomClickY + defaultRandomClickY);
+        integerRangeTextField(randomClickY_Set, 0, null, tip_randomClickY() + defaultRandomClickY);
         // 随机点击时间偏移量文本输入框内容
-        integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime + defaultRandomTime);
+        integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime() + defaultRandomTime);
         // 限制终止操作识别失败重试次数文本输入框内容
-        integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum + defaultStopRetryNum);
+        integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum() + defaultStopRetryNum);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum + defaultClickRetryNum);
+        integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum() + defaultClickRetryNum);
         // 限制鼠标轨迹采样间隔文本输入框内容
-        integerRangeTextField(sampleInterval_Set, 0, null, tip_sampleInterval + defaultSampleInterval);
+        integerRangeTextField(sampleInterval_Set, 0, null, tip_sampleInterval() + defaultSampleInterval);
         // 限制默认单次点击时长文本输入框内容
-        integerRangeTextField(clickTimeOffset_Set, 0, null, tip_clickTimeOffset + defaultClickTimeOffset);
+        integerRangeTextField(clickTimeOffset_Set, 0, null, tip_clickTimeOffset() + defaultClickTimeOffset);
     }
 
     /**
@@ -1022,14 +1027,14 @@ public class SettingController extends RootController implements MousePositionUp
     private void mouseFloatingAction() throws IOException {
         setLoadLastConfigCheckBox(mouseFloating_Set, configFile_Click, key_mouseFloating);
         if (floatingStage != null && floatingStage.isShowing() && mouseFloating_Set.isSelected()) {
-            floatingLabel.setText(text_escCloseFloating);
-            setFloatingCoordinate_Set.setText(text_closeFloating);
-            addToolTip(tip_closeFloating, setFloatingCoordinate_Set);
+            floatingLabel.setText(text_escCloseFloating());
+            setFloatingCoordinate_Set.setText(text_closeFloating());
+            addToolTip(tip_closeFloating(), setFloatingCoordinate_Set);
         }
         if (floatingStage != null && floatingStage.isShowing() && !mouseFloating_Set.isSelected()) {
-            floatingLabel.setText(text_saveFloatingCoordinate);
-            setFloatingCoordinate_Set.setText(text_saveCloseFloating);
-            addToolTip(tip_saveFloating, setFloatingCoordinate_Set);
+            floatingLabel.setText(text_saveFloatingCoordinate());
+            setFloatingCoordinate_Set.setText(text_saveCloseFloating());
+            addToolTip(tip_saveFloating(), setFloatingCoordinate_Set);
         }
     }
 
@@ -1095,7 +1100,7 @@ public class SettingController extends RootController implements MousePositionUp
      * @param dragEvent 拖拽事件
      */
     @FXML
-    public void handleDrop(DragEvent dragEvent) {
+    private void handleDrop(DragEvent dragEvent) {
         handleDropImg(dragEvent, tableView_Set);
     }
 
@@ -1105,8 +1110,16 @@ public class SettingController extends RootController implements MousePositionUp
      * @param dragEvent 拖拽事件
      */
     @FXML
-    public void acceptDrop(DragEvent dragEvent) {
+    private void acceptDrop(DragEvent dragEvent) {
         acceptDropImg(dragEvent);
+    }
+
+    /**
+     * 更改语言下拉框
+     */
+    @FXML
+    private void languageAction() throws IOException {
+        updateProperties(configFile, key_language, language_Set.getValue());
     }
 
 }

@@ -10,6 +10,7 @@ import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -147,16 +148,6 @@ public class CommonFinals {
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
     /**
-     * 自动保存文件名
-     */
-    public static final String autoSaveFileName = bundle.getString("autoSaveFileName");
-
-    /**
-     * 默认导出文件名称
-     */
-    public static final String defaultOutFileName = bundle.getString("defaultOutFileName");
-
-    /**
      * jvm最大内存设置参数
      */
     public static final String Xmx = "-Xmx";
@@ -210,12 +201,6 @@ public class CommonFinals {
     public static final String TB = "TB";
 
     public static final String G = "G";
-
-    public static final String extension_file = bundle.getString("extension.file");
-
-    public static final String extension_folder = bundle.getString("extension.folder");
-
-    public static final String extension_fileOrFolder = bundle.getString("extension.fileOrFolder");
 
     public static final String allPng = "*.png";
 
@@ -466,330 +451,9 @@ public class CommonFinals {
     public static final String defaultColor = "0xffffffff";
 
     /**
-     * 定时任务默认任务名称
-     */
-    public static final String defaultTaskName = bundle.getString("defaultTaskName");
-
-    /**
      * 操作记录列表时间格式
      */
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-    public static final String tip_logsNum = bundle.getString("tip.logsNum");
-
-    public static final String tip_learButton = bundle.getString("tip.learButton");
-
-    public static final String tip_openDirectory = bundle.getString("tip.openDirectory");
-
-    public static final String tip_openLink = bundle.getString("tip.openLink");
-
-    public static final String tip_openGitLink = bundle.getString("tip.openGitLink");
-
-    public static final String tip_wait = bundle.getString("tip.wait");
-
-    public static final String tip_mouseStartX = bundle.getString("tip.mouseStartX");
-
-    public static final String tip_mouseStartY = bundle.getString("tip.mouseStartY");
-
-    public static final String tip_runClick = bundle.getString("tip.runClick");
-
-    public static final String tip_addPosition = bundle.getString("tip.addPosition");
-
-    public static final String tip_loopTime = bundle.getString("tip.loopTime");
-
-    public static final String tip_clickNumBer = bundle.getString("tip.clickNumBer");
-
-    public static final String tip_clickKey = bundle.getString("tip.clickKey");
-
-    public static final String tip_clickType = bundle.getString("tip.clickType");
-
-    public static final String tip_clickTime = bundle.getString("tip.clickTime");
-
-    public static final String tip_clickInterval = bundle.getString("tip.clickInterval");
-
-    public static final String tip_clickName = bundle.getString("tip.clickName");
-
-    public static final String tip_outAutoClickPath = bundle.getString("tip.outAutoClickPath");
-
-    public static final String tip_loadAutoClick = bundle.getString("tip.loadAutoClick");
-
-    public static final String tip_exportAutoClick = bundle.getString("tip.exportAutoClick");
-
-    public static final String tip_showWindowRun = bundle.getString("tip.showWindowRun");
-
-    public static final String tip_hideWindowRecord = bundle.getString("tip.hideWindowRecord");
-
-    public static final String tip_showWindowRecord = bundle.getString("tip.showWindowRecord");
-
-    public static final String tip_mouseFloatingRun = bundle.getString("tip.mouseFloatingRun");
-
-    public static final String tip_mouseFloatingRecord = bundle.getString("tip.mouseFloatingRecord");
-
-    public static final String tip_mouseFloating = bundle.getString("tip.mouseFloating");
-
-    public static final String tip_margin = bundle.getString("tip.margin");
-
-    public static final String tip_preparationRecordTime = bundle.getString("tip.preparationRecordTime");
-
-    public static final String tip_preparationRunTime = bundle.getString("tip.preparationRunTime");
-
-    public static final String tip_floatingRun = bundle.getString("tip.floatingRun");
-
-    public static final String tip_floatingRecord = bundle.getString("tip.floatingRecord");
-
-    public static final String tip_setFloatingCoordinate = bundle.getString("tip.setFloatingCoordinate");
-
-    public static final String tip_closeFloating = bundle.getString("tip.closeFloating");
-
-    public static final String tip_saveFloating = bundle.getString("tip.saveFloating");
-
-    public static final String tip_offsetX = bundle.getString("tip.offsetX");
-
-    public static final String tip_offsetY = bundle.getString("tip.offsetY");
-
-    public static final String tip_colorPicker = bundle.getString("tip.colorPicker");
-
-    public static final String tip_thanks = bundle.getString("tip.thanks");
-
-    public static final String tip_appreciate = bundle.getString("tip.appreciate");
-
-    public static final String tip_lastAutoClickSetting = bundle.getString("tip.lastAutoClickSetting");
-
-    public static final String tip_clickOpacity = bundle.getString("tip.clickOpacity");
-
-    public static final String tip_stopOpacity = bundle.getString("tip.stopOpacity");
-
-    public static final String tip_stopImgBtn = bundle.getString("tip.stopImgBtn");
-
-    public static final String tip_defaultStopImgBtn = bundle.getString("tip.defaultStopImgBtn");
-
-    public static final String tip_clickImgBtn = bundle.getString("tip.clickImgBtn");
-
-    public static final String tip_removeClickImgBtn = bundle.getString("tip.removeClickImgBtn");
-
-    public static final String tip_removeStopImgBtn = bundle.getString("tip.removeStopImgBtn");
-
-    public static final String tip_updateClickNameBtn = bundle.getString("tip.updateClickNameBtn");
-
-    public static final String tip_overtime = bundle.getString("tip.overtime");
-
-    public static final String tip_retrySecond = bundle.getString("tip.retrySecond");
-
-    public static final String tip_reLaunch = bundle.getString("tip.reLaunch");
-
-    public static final String tip_remindSave = bundle.getString("tip.remindSave");
-
-    public static final String tip_clickIndex = bundle.getString("tip.clickIndex");
-
-    public static final String tip_tableViewSize = bundle.getString("tip.tableViewSize");
-
-    public static final String tip_step = bundle.getString("tip.step");
-
-    public static final String tip_matchedType = bundle.getString("tip.matchedType");
-
-    public static final String tip_retryType = bundle.getString("tip.retryType");
-
-    public static final String tip_recordMove = bundle.getString("tip.recordMove");
-
-    public static final String tip_recordDrag = bundle.getString("tip.recordDrag");
-
-    public static final String tip_randomClick = bundle.getString("tip.randomClick");
-
-    public static final String tip_randomTrajectory = bundle.getString("tip.randomTrajectory");
-
-    public static final String tip_randomClickTime = bundle.getString("tip.randomClickTime");
-
-    public static final String tip_randomClickInterval = bundle.getString("tip.randomClickInterval");
-
-    public static final String tip_randomWaitTime = bundle.getString("tip.randomWaitTime");
-
-    public static final String tip_maxLogNum = bundle.getString("tip.maxLogNum");
-
-    public static final String tip_nextRunMemory = bundle.getString("tip.nextRunMemory");
-
-    public static final String tip_hour = bundle.getString("tip.hour");
-
-    public static final String tip_minute = bundle.getString("tip.minute");
-
-    public static final String tip_taskName = bundle.getString("tip.taskName");
-
-    public static final String tip_datePicker = bundle.getString("tip.datePicker");
-
-    public static final String tip_repeatType = bundle.getString("tip.repeatType");
-
-    public static final String tip_addTimedTask = bundle.getString("tip.addTimedTask");
-
-    public static final String tip_getScheduleTask = bundle.getString("tip.getScheduleTask");
-
-    public static final String tip_deletePath = bundle.getString("tip.deletePath");
-
-    public static final String tip_nextGcType = bundle.getString("tip.nextGcType");
-
-    public static final String tip_sampleInterval = bundle.getString("tip.sampleInterval");
-
-    public static final String tip_clickRetryNum = bundle.getString("tip.clickRetryNum");
-
-    public static final String tip_stopRetryNum = bundle.getString("tip.stopRetryNum");
-
-    public static final String tip_opacity = bundle.getString("tip.opacity");
-
-    public static final String tip_recordClick = bundle.getString("tip.recordClick");
-
-    public static final String tip_autoClickFileName = bundle.getString("tip.autoClickFileName");
-
-    public static final String tip_firstClick = bundle.getString("tip.firstClick");
-
-    public static final String tip_autoSave = bundle.getString("tip.autoSave");
-
-    public static final String tip_hideWindowRun = bundle.getString("tip.hideWindowRun");
-
-    public static final String tip_NativeHookException = bundle.getString("tip.NativeHookException") +
-            "\n" + appName + app +
-            "\n" + bundle.getString("tip.ifHave") +
-            "\n" + bundle.getString("tip.addList") + appName + app;
-
-    public static final String tip_noScreenCapturePermission = bundle.getString("tip.noScreenCapturePermission") +
-            "\n" + appName + app +
-            "\n" + bundle.getString("tip.ifHave") +
-            "\n" + bundle.getString("tip.addList") + appName + app;
-
-    public static final String tip_randomClickX = bundle.getString("tip.randomClickX");
-
-    public static final String tip_randomClickY = bundle.getString("tip.randomClickY");
-
-    public static final String tip_randomTime = bundle.getString("tip.randomTime");
-
-    public static final String tip_clickTimeOffset = bundle.getString("tip.clickTimeOffset");
-
-    public static final String version = "3.0.0";
-
-    public static final String buildDate = "2025.06";
-
-    public static final String tip_version = """
-            version：%s
-            build：%s""".formatted(version, buildDate);
-
-    public static final String text_selectDirectory = bundle.getString("selectDirectory");
-
-    public static final String text_selectTemplateImg = bundle.getString("selectTemplateImg");
-
-    public static final String text_dataListNull = bundle.getString("listText.null");
-
-    public static final String text_outPathNull = bundle.getString("outPathNull");
-
-    public static final String text_selectAutoFile = bundle.getString("selectAutoFile");
-
-    public static final String text_fileNotExists = bundle.getString("fileNotExists");
-
-    public static final String text_nullPath = bundle.getString("pathNull");
-
-    public static final String text_errPathFormat = bundle.getString("errPathFormat");
-
-    public static final String text_allHave = bundle.getString("allHave");
-
-    public static final String text_data = bundle.getString("unit.data");
-
-    public static final String text_task = bundle.getString("unit.task");
-
-    public static final String text_img = bundle.getString("unit.img");
-
-    public static final String text_log = bundle.getString("unit.log");
-
-    public static final String text_process = bundle.getString("unit.process");
-
-    public static final String text_copySuccess = bundle.getString("copySuccess");
-
-    public static final String text_successSave = bundle.getString("successSave");
-
-    public static final String text_nowValue = bundle.getString("nowValue");
-
-    public static final String text_saveSuccess = bundle.getString("saveSuccess");
-
-    public static final String text_loadSuccess = bundle.getString("loadSuccess");
-
-    public static final String text_executionTime = bundle.getString("executionTime");
-
-    public static final String text_execution = bundle.getString("execution");
-
-    public static final String text_cancelTask = bundle.getString("cancelTask");
-
-    public static final String text_saveFloatingCoordinate = bundle.getString("saveFloatingCoordinate");
-
-    public static final String text_escCloseFloating = bundle.getString("escCloseFloating");
-
-    public static final String text_closeFloating = bundle.getString("closeFloating");
-
-    public static final String text_saveCloseFloating = bundle.getString("saveCloseFloating");
-
-    public static final String text_showFloating = bundle.getString("showFloating");
-
-    public static final String text_loadAutoClick = bundle.getString("loadAutoClick");
-
-    public static final String text_formatError = bundle.getString("formatError");
-
-    public static final String text_noAutoClickList = bundle.getString("noAutoClickList");
-
-    public static final String text_noAutoClickToRun = bundle.getString("noAutoClickToRun");
-
-    public static final String text_missingKeyData = bundle.getString("missingKeyData");
-
-    public static final String text_step = bundle.getString("step");
-
-    public static final String text_recordClicking = bundle.getString("recordClicking");
-
-    public static final String text_preparation = bundle.getString("preparation");
-
-    public static final String text_run = bundle.getString("run");
-
-    public static final String text_recorded = bundle.getString("recorded");
-
-    public static final String text_mouseTrajectory = bundle.getString("autoClick.mouseTrajectory");
-
-    public static final String text_taskFailed = bundle.getString("taskFailed");
-
-    public static final String text_taskCancelled = bundle.getString("taskCancelled");
-
-    public static final String text_taskFinished = bundle.getString("taskFinished");
-
-    public static final String text_isAdd = bundle.getString("isAdd");
-
-    public static final String text_isRecord = bundle.getString("isRecord");
-
-    public static final String text_imgExist = bundle.getString("imgExist");
-
-    public static final String text_noImg = bundle.getString("noImg");
-
-    public static final String text_badImg = bundle.getString("badImg");
-
-    public static final String text_retryStepGreaterMax = bundle.getString("retryStepGreaterMax");
-
-    public static final String text_retryStepEqualIndex = bundle.getString("retryStepEqualIndex");
-
-    public static final String text_retryStepIsNull = bundle.getString("retryStepIsNull");
-
-    public static final String text_matchedStepGreaterMax = bundle.getString("matchedStepGreaterMax");
-
-    public static final String text_matchedStepEqualIndex = bundle.getString("matchedStepEqualIndex");
-
-    public static final String text_matchedStepIsNull = bundle.getString("matchedStepIsNull");
-
-    public static final String text_onlyLaunch = bundle.getString("onlyLaunch");
-
-    public static final String text_recordEnd = bundle.getString("autoClick.recordEnd");
-
-    public static final String text_image = bundle.getString("img");
-
-    public static final String text_progress = bundle.getString("progress");
-
-    public static final String text_willBe = bundle.getString("willBe");
-
-    public static final String text_ms = bundle.getString("unit.ms");
-
-    public static final String text_msWillBe = bundle.getString("msWillBe");
-
-    public static final String text_index = bundle.getString("taskIndex");
-
-    public static final String text_point = bundle.getString("point");
 
     public static final String key_logsNum = "logsNum";
 
@@ -943,105 +607,842 @@ public class CommonFinals {
 
     public static final String key_lastColorCustom = "lastColorCustom";
 
-    public static final String confirm_unSaved = bundle.getString("confirm.unSaved");
+    public static final String key_language = "language";
 
-    public static final String confirm_unSavedConfirm = bundle.getString("confirm.unSavedConfirm");
+    public static final String key_firstRun = "firstRun";
 
-    public static final String confirm_ok = bundle.getString("confirm.ok");
+    public static String extension_file() {
+        return bundle.getString("extension.file");
+    }
 
-    public static final String confirm_cancel = bundle.getString("confirm.cancel");
+    public static String extension_folder() {
+        return bundle.getString("extension.folder");
+    }
 
-    public static final String menuItem_insertUp = bundle.getString("menuItem.insertUp");
+    public static String extension_fileOrFolder() {
+        return bundle.getString("extension.fileOrFolder");
+    }
 
-    public static final String menuItem_insertDown = bundle.getString("menuItem.insertDown");
+    /**
+     * 自动保存文件名
+     */
+    public static String autoSaveFileName() {
+        return bundle.getString("autoSaveFileName");
+    }
 
-    public static final String menuItem_recordUp = bundle.getString("menuItem.recordUp");
+    /**
+     * 默认导出文件名称
+     */
+    public static String defaultOutFileName() {
+        return bundle.getString("defaultOutFileName");
+    }
 
-    public static final String menuItem_recordDown = bundle.getString("menuItem.recordDown");
+    /**
+     * 定时任务默认任务名称
+     */
+    public static String defaultTaskName() {
+        return bundle.getString("defaultTaskName");
+    }
 
-    public static final String menuItem_insertTop = bundle.getString("menuItem.insertTop");
+    public static String tip_logsNum() {
+        return bundle.getString("tip.logsNum");
+    }
 
-    public static final String menuItem_recordTop = bundle.getString("menuItem.recordTop");
+    public static String tip_learButton() {
+        return bundle.getString("tip.learButton");
+    }
 
-    public static final String menuItem_upCopy = bundle.getString("menuItem.upCopy");
+    public static String tip_openDirectory() {
+        return bundle.getString("tip.openDirectory");
+    }
 
-    public static final String menuItem_downCopy = bundle.getString("menuItem.downCopy");
+    public static String tip_openLink() {
+        return bundle.getString("tip.openLink");
+    }
 
-    public static final String menuItem_appendCopy = bundle.getString("menuItem.appendCopy");
+    public static String tip_openGitLink() {
+        return bundle.getString("tip.openGitLink");
+    }
 
-    public static final String menuItem_topCopy = bundle.getString("menuItem.topCopy");
+    public static String tip_wait() {
+        return bundle.getString("tip.wait");
+    }
 
-    public static final String menu_detailMenu = bundle.getString("detailMenu");
+    public static String tip_mouseStartX() {
+        return bundle.getString("tip.mouseStartX");
+    }
 
-    public static final String menu_deleteMenu = bundle.getString("deleteMenu");
+    public static String tip_mouseStartY() {
+        return bundle.getString("tip.mouseStartY");
+    }
 
-    public static final String menu_runSelectMenu = bundle.getString("runSelectMenu");
+    public static String tip_runClick() {
+        return bundle.getString("tip.runClick");
+    }
 
-    public static final String menu_addDateMenu = bundle.getString("addDateMenu");
+    public static String tip_addPosition() {
+        return bundle.getString("tip.addPosition");
+    }
 
-    public static final String log_press = bundle.getString("log.press");
+    public static String tip_loopTime() {
+        return bundle.getString("tip.loopTime");
+    }
 
-    public static final String log_release = bundle.getString("log.release");
+    public static String tip_clickNumBer() {
+        return bundle.getString("tip.clickNumBer");
+    }
 
-    public static final String log_move = bundle.getString("log.move");
+    public static String tip_clickKey() {
+        return bundle.getString("tip.clickKey");
+    }
 
-    public static final String log_hold = bundle.getString("log.hold");
+    public static String tip_clickType() {
+        return bundle.getString("tip.clickType");
+    }
 
-    public static final String log_drag = bundle.getString("log.drag");
+    public static String tip_clickTime() {
+        return bundle.getString("tip.clickTime");
+    }
 
-    public static final String log_wait = bundle.getString("log.wait");
+    public static String tip_clickInterval() {
+        return bundle.getString("tip.clickInterval");
+    }
 
-    public static final String log_clickImg = bundle.getString("log.clickImg");
+    public static String tip_clickName() {
+        return bundle.getString("tip.clickName");
+    }
 
-    public static final String log_stopImg = bundle.getString("log.stopImg");
+    public static String tip_outAutoClickPath() {
+        return bundle.getString("tip.outAutoClickPath");
+    }
 
-    public static final String retryType_continuously = bundle.getString("retryType.continuously");
+    public static String tip_loadAutoClick() {
+        return bundle.getString("tip.loadAutoClick");
+    }
 
-    public static final String retryType_click = bundle.getString("retryType.click");
+    public static String tip_exportAutoClick() {
+        return bundle.getString("tip.exportAutoClick");
+    }
 
-    public static final String retryType_stop = bundle.getString("retryType.stop");
+    public static String tip_showWindowRun() {
+        return bundle.getString("tip.showWindowRun");
+    }
 
-    public static final String retryType_break = bundle.getString("retryType.break");
+    public static String tip_hideWindowRecord() {
+        return bundle.getString("tip.hideWindowRecord");
+    }
 
-    public static final String retryType_Step = bundle.getString("retryType.Step");
+    public static String tip_showWindowRecord() {
+        return bundle.getString("tip.showWindowRecord");
+    }
+
+    public static String tip_mouseFloatingRun() {
+        return bundle.getString("tip.mouseFloatingRun");
+    }
+
+    public static String tip_mouseFloatingRecord() {
+        return bundle.getString("tip.mouseFloatingRecord");
+    }
+
+    public static String tip_mouseFloating() {
+        return bundle.getString("tip.mouseFloating");
+    }
+
+    public static String tip_margin() {
+        return bundle.getString("tip.margin");
+    }
+
+    public static String tip_preparationRecordTime() {
+        return bundle.getString("tip.preparationRecordTime");
+    }
+
+    public static String tip_preparationRunTime() {
+        return bundle.getString("tip.preparationRunTime");
+    }
+
+    public static String tip_floatingRun() {
+        return bundle.getString("tip.floatingRun");
+    }
+
+    public static String tip_floatingRecord() {
+        return bundle.getString("tip.floatingRecord");
+    }
+
+    public static String tip_setFloatingCoordinate() {
+        return bundle.getString("tip.setFloatingCoordinate");
+    }
+
+    public static String tip_closeFloating() {
+        return bundle.getString("tip.closeFloating");
+    }
+
+    public static String tip_saveFloating() {
+        return bundle.getString("tip.saveFloating");
+    }
+
+    public static String tip_offsetX() {
+        return bundle.getString("tip.offsetX");
+    }
+
+    public static String tip_offsetY() {
+        return bundle.getString("tip.offsetY");
+    }
+
+    public static String tip_colorPicker() {
+        return bundle.getString("tip.colorPicker");
+    }
+
+    public static String tip_thanks() {
+        return bundle.getString("tip.thanks");
+    }
+
+    public static String tip_appreciate() {
+        return bundle.getString("tip.appreciate");
+    }
+
+    public static String tip_lastAutoClickSetting() {
+        return bundle.getString("tip.lastAutoClickSetting");
+    }
+
+    public static String tip_clickOpacity() {
+        return bundle.getString("tip.clickOpacity");
+    }
+
+    public static String tip_stopOpacity() {
+        return bundle.getString("tip.stopOpacity");
+    }
+
+    public static String tip_stopImgBtn() {
+        return bundle.getString("tip.stopImgBtn");
+    }
+
+    public static String tip_defaultStopImgBtn() {
+        return bundle.getString("tip.defaultStopImgBtn");
+    }
+
+    public static String tip_clickImgBtn() {
+        return bundle.getString("tip.clickImgBtn");
+    }
+
+    public static String tip_removeClickImgBtn() {
+        return bundle.getString("tip.removeClickImgBtn");
+    }
+
+    public static String tip_removeStopImgBtn() {
+        return bundle.getString("tip.removeStopImgBtn");
+    }
+
+    public static String tip_updateClickNameBtn() {
+        return bundle.getString("tip.updateClickNameBtn");
+    }
+
+    public static String tip_overtime() {
+        return bundle.getString("tip.overtime");
+    }
+
+    public static String tip_retrySecond() {
+        return bundle.getString("tip.retrySecond");
+    }
+
+    public static String tip_reLaunch() {
+        return bundle.getString("tip.reLaunch");
+    }
+
+    public static String tip_remindSave() {
+        return bundle.getString("tip.remindSave");
+    }
+
+    public static String tip_clickIndex() {
+        return bundle.getString("tip.clickIndex");
+    }
+
+    public static String tip_tableViewSize() {
+        return bundle.getString("tip.tableViewSize");
+    }
+
+    public static String tip_step() {
+        return bundle.getString("tip.step");
+    }
+
+    public static String tip_matchedType() {
+        return bundle.getString("tip.matchedType");
+    }
+
+    public static String tip_retryType() {
+        return bundle.getString("tip.retryType");
+    }
+
+    public static String tip_recordMove() {
+        return bundle.getString("tip.recordMove");
+    }
+
+    public static String tip_recordDrag() {
+        return bundle.getString("tip.recordDrag");
+    }
+
+    public static String tip_randomClick() {
+        return bundle.getString("tip.randomClick");
+    }
+
+    public static String tip_randomTrajectory() {
+        return bundle.getString("tip.randomTrajectory");
+    }
+
+    public static String tip_randomClickTime() {
+        return bundle.getString("tip.randomClickTime");
+    }
+
+    public static String tip_randomClickInterval() {
+        return bundle.getString("tip.randomClickInterval");
+    }
+
+    public static String tip_randomWaitTime() {
+        return bundle.getString("tip.randomWaitTime");
+    }
+
+    public static String tip_maxLogNum() {
+        return bundle.getString("tip.maxLogNum");
+    }
+
+    public static String tip_nextRunMemory() {
+        return bundle.getString("tip.nextRunMemory");
+    }
+
+    public static String tip_hour() {
+        return bundle.getString("tip.hour");
+    }
+
+    public static String tip_minute() {
+        return bundle.getString("tip.minute");
+    }
+
+    public static String tip_taskName() {
+        return bundle.getString("tip.taskName");
+    }
+
+    public static String tip_datePicker() {
+        return bundle.getString("tip.datePicker");
+    }
+
+    public static String tip_repeatType() {
+        return bundle.getString("tip.repeatType");
+    }
+
+    public static String tip_addTimedTask() {
+        return bundle.getString("tip.addTimedTask");
+    }
+
+    public static String tip_getScheduleTask() {
+        return bundle.getString("tip.getScheduleTask");
+    }
+
+    public static String tip_deletePath() {
+        return bundle.getString("tip.deletePath");
+    }
+
+    public static String tip_nextGcType() {
+        return bundle.getString("tip.nextGcType");
+    }
+
+    public static String tip_sampleInterval() {
+        return bundle.getString("tip.sampleInterval");
+    }
+
+    public static String tip_clickRetryNum() {
+        return bundle.getString("tip.clickRetryNum");
+    }
+
+    public static String tip_stopRetryNum() {
+        return bundle.getString("tip.stopRetryNum");
+    }
+
+    public static String tip_opacity() {
+        return bundle.getString("tip.opacity");
+    }
+
+    public static String tip_recordClick() {
+        return bundle.getString("tip.recordClick");
+    }
+
+    public static String tip_autoClickFileName() {
+        return bundle.getString("tip.autoClickFileName");
+    }
+
+    public static String tip_firstClick() {
+        return bundle.getString("tip.firstClick");
+    }
+
+    public static String tip_autoSave() {
+        return bundle.getString("tip.autoSave");
+    }
+
+    public static String tip_hideWindowRun() {
+        return bundle.getString("tip.hideWindowRun");
+    }
+
+    public static String tip_NativeHookException() {
+        return bundle.getString("tip.NativeHookException") +
+                "\n" + appName + app +
+                "\n" + bundle.getString("tip.ifHave") +
+                "\n" + bundle.getString("tip.addList") + appName + app;
+    }
+
+    public static String tip_noScreenCapturePermission() {
+        return bundle.getString("tip.noScreenCapturePermission") +
+                "\n" + appName + app +
+                "\n" + bundle.getString("tip.ifHave") +
+                "\n" + bundle.getString("tip.addList") + appName + app;
+    }
+
+    public static String tip_randomClickX() {
+        return bundle.getString("tip.randomClickX");
+    }
+
+    public static String tip_randomClickY() {
+        return bundle.getString("tip.randomClickY");
+    }
+
+    public static String tip_randomTime() {
+        return bundle.getString("tip.randomTime");
+    }
+
+    public static String tip_clickTimeOffset() {
+        return bundle.getString("tip.clickTimeOffset");
+    }
+
+    public static final String version = "3.0.0";
+
+    public static final String buildDate = "2025.06";
+
+    public static final String tip_version = """
+            version：%s
+            build：%s""".formatted(version, buildDate);
+
+    public static String text_selectDirectory() {
+        return bundle.getString("selectDirectory");
+    }
+
+    public static String text_selectTemplateImg() {
+        return bundle.getString("selectTemplateImg");
+    }
+
+    public static String text_dataListNull() {
+        return bundle.getString("listText.null");
+    }
+
+    public static String text_outPathNull() {
+        return bundle.getString("outPathNull");
+    }
+
+    public static String text_selectAutoFile() {
+        return bundle.getString("selectAutoFile");
+    }
+
+    public static String text_fileNotExists() {
+        return bundle.getString("fileNotExists");
+    }
+
+    public static String text_nullPath() {
+        return bundle.getString("pathNull");
+    }
+
+    public static String text_errPathFormat() {
+        return bundle.getString("errPathFormat");
+    }
+
+    public static String text_allHave() {
+        return bundle.getString("allHave");
+    }
+
+    public static String text_data() {
+        return bundle.getString("unit.data");
+    }
+
+    public static String text_task() {
+        return bundle.getString("unit.task");
+    }
+
+    public static String text_img() {
+        return bundle.getString("unit.img");
+    }
+
+    public static String text_log() {
+        return bundle.getString("unit.log");
+    }
+
+    public static String text_process() {
+        return bundle.getString("unit.process");
+    }
+
+    public static String text_copySuccess() {
+        return bundle.getString("copySuccess");
+    }
+
+    public static String text_successSave() {
+        return bundle.getString("successSave");
+    }
+
+    public static String text_nowValue() {
+        return bundle.getString("nowValue");
+    }
+
+    public static String text_saveSuccess() {
+        return bundle.getString("saveSuccess");
+    }
+
+    public static String text_loadSuccess() {
+        return bundle.getString("loadSuccess");
+    }
+
+    public static String text_executionTime() {
+        return bundle.getString("executionTime");
+    }
+
+    public static String text_execution() {
+        return bundle.getString("execution");
+    }
+
+    public static String text_cancelTask() {
+        return bundle.getString("cancelTask");
+    }
+
+    public static String text_saveFloatingCoordinate() {
+        return bundle.getString("saveFloatingCoordinate");
+    }
+
+    public static String text_escCloseFloating() {
+        return bundle.getString("escCloseFloating");
+    }
+
+    public static String text_closeFloating() {
+        return bundle.getString("closeFloating");
+    }
+
+    public static String text_saveCloseFloating() {
+        return bundle.getString("saveCloseFloating");
+    }
+
+    public static String text_showFloating() {
+        return bundle.getString("showFloating");
+    }
+
+    public static String text_loadAutoClick() {
+        return bundle.getString("loadAutoClick");
+    }
+
+    public static String text_formatError() {
+        return bundle.getString("formatError");
+    }
+
+    public static String text_noAutoClickList() {
+        return bundle.getString("noAutoClickList");
+    }
+
+    public static String text_noAutoClickToRun() {
+        return bundle.getString("noAutoClickToRun");
+    }
+
+    public static String text_missingKeyData() {
+        return bundle.getString("missingKeyData");
+    }
+
+    public static String text_step() {
+        return bundle.getString("step");
+    }
+
+    public static String text_recordClicking() {
+        return bundle.getString("recordClicking");
+    }
+
+    public static String text_preparation() {
+        return bundle.getString("preparation");
+    }
+
+    public static String text_run() {
+        return bundle.getString("run");
+    }
+
+    public static String text_recorded() {
+        return bundle.getString("recorded");
+    }
+
+    public static String text_mouseTrajectory() {
+        return bundle.getString("autoClick.mouseTrajectory");
+    }
+
+    public static String text_taskFailed() {
+        return bundle.getString("taskFailed");
+    }
+
+    public static String text_taskCancelled() {
+        return bundle.getString("taskCancelled");
+    }
+
+    public static String text_taskFinished() {
+        return bundle.getString("taskFinished");
+    }
+
+    public static String text_isAdd() {
+        return bundle.getString("isAdd");
+    }
+
+    public static String text_isRecord() {
+        return bundle.getString("isRecord");
+    }
+
+    public static String text_imgExist() {
+        return bundle.getString("imgExist");
+    }
+
+    public static String text_noImg() {
+        return bundle.getString("noImg");
+    }
+
+    public static String text_badImg() {
+        return bundle.getString("badImg");
+    }
+
+    public static String text_retryStepGreaterMax() {
+        return bundle.getString("retryStepGreaterMax");
+    }
+
+    public static String text_retryStepEqualIndex() {
+        return bundle.getString("retryStepEqualIndex");
+    }
+
+    public static String text_retryStepIsNull() {
+        return bundle.getString("retryStepIsNull");
+    }
+
+    public static String text_matchedStepGreaterMax() {
+        return bundle.getString("matchedStepGreaterMax");
+    }
+
+    public static String text_matchedStepEqualIndex() {
+        return bundle.getString("matchedStepEqualIndex");
+    }
+
+    public static String text_matchedStepIsNull() {
+        return bundle.getString("matchedStepIsNull");
+    }
+
+    public static String text_onlyLaunch() {
+        return bundle.getString("onlyLaunch");
+    }
+
+    public static String text_recordEnd() {
+        return bundle.getString("autoClick.recordEnd");
+    }
+
+    public static String text_image() {
+        return bundle.getString("img");
+    }
+
+    public static String text_progress() {
+        return bundle.getString("progress");
+    }
+
+    public static String text_willBe() {
+        return bundle.getString("willBe");
+    }
+
+    public static String text_ms() {
+        return bundle.getString("unit.ms");
+    }
+
+    public static String text_msWillBe() {
+        return bundle.getString("msWillBe");
+    }
+
+    public static String text_index() {
+        return bundle.getString("taskIndex");
+    }
+
+    public static String text_point() {
+        return bundle.getString("point");
+    }
+
+    public static String confirm_unSaved() {
+        return bundle.getString("confirm.unSaved");
+    }
+
+    public static String confirm_unSavedConfirm() {
+        return bundle.getString("confirm.unSavedConfirm");
+    }
+
+    public static String confirm_ok() {
+        return bundle.getString("confirm.ok");
+    }
+
+    public static String confirm_cancel() {
+        return bundle.getString("confirm.cancel");
+    }
+
+    public static String menuItem_insertUp() {
+        return bundle.getString("menuItem.insertUp");
+    }
+
+    public static String menuItem_insertDown() {
+        return bundle.getString("menuItem.insertDown");
+    }
+
+    public static String menuItem_recordUp() {
+        return bundle.getString("menuItem.recordUp");
+    }
+
+    public static String menuItem_recordDown() {
+        return bundle.getString("menuItem.recordDown");
+    }
+
+    public static String menuItem_insertTop() {
+        return bundle.getString("menuItem.insertTop");
+    }
+
+    public static String menuItem_recordTop() {
+        return bundle.getString("menuItem.recordTop");
+    }
+
+    public static String menuItem_upCopy() {
+        return bundle.getString("menuItem.upCopy");
+    }
+
+    public static String menuItem_downCopy() {
+        return bundle.getString("menuItem.downCopy");
+    }
+
+    public static String menuItem_appendCopy() {
+        return bundle.getString("menuItem.appendCopy");
+    }
+
+    public static String menuItem_topCopy() {
+        return bundle.getString("menuItem.topCopy");
+    }
+
+    public static String menu_detailMenu() {
+        return bundle.getString("detailMenu");
+    }
+
+    public static String menu_deleteMenu() {
+        return bundle.getString("deleteMenu");
+    }
+
+    public static String menu_runSelectMenu() {
+        return bundle.getString("runSelectMenu");
+    }
+
+    public static String menu_addDateMenu() {
+        return bundle.getString("addDateMenu");
+    }
+
+    public static String log_press() {
+        return bundle.getString("log.press");
+    }
+
+    public static String log_release() {
+        return bundle.getString("log.release");
+    }
+
+    public static String log_move() {
+        return bundle.getString("log.move");
+    }
+
+    public static String log_hold() {
+        return bundle.getString("log.hold");
+    }
+
+    public static String log_drag() {
+        return bundle.getString("log.drag");
+    }
+
+    public static String log_wait() {
+        return bundle.getString("log.wait");
+    }
+
+    public static String log_clickImg() {
+        return bundle.getString("log.clickImg");
+    }
+
+    public static String log_stopImg() {
+        return bundle.getString("log.stopImg");
+    }
+
+    public static String retryType_continuously() {
+        return bundle.getString("retryType.continuously");
+    }
+
+    public static String retryType_click() {
+        return bundle.getString("retryType.click");
+    }
+
+    public static String retryType_stop() {
+        return bundle.getString("retryType.stop");
+    }
+
+    public static String retryType_break() {
+        return bundle.getString("retryType.break");
+    }
+
+    public static String retryType_Step() {
+        return bundle.getString("retryType.Step");
+    }
 
     /**
      * 重试逻辑下拉框选项
      */
-    public static final List<String> retryTypeList = Arrays.asList(retryType_continuously, retryType_click,
-            retryType_stop, retryType_break, retryType_Step);
+    public static final List<String> retryTypeList = Arrays.asList(retryType_continuously(), retryType_click(),
+            retryType_stop(), retryType_break(), retryType_Step());
 
-    public static final String clickMatched_click = bundle.getString("clickMatched.click");
+    public static String clickMatched_click() {
+        return bundle.getString("clickMatched.click");
+    }
 
-    public static final String clickMatched_break = bundle.getString("clickMatched.break");
+    public static String clickMatched_break() {
+        return bundle.getString("clickMatched.break");
+    }
 
-    public static final String clickMatched_step = bundle.getString("clickMatched.step");
+    public static String clickMatched_step() {
+        return bundle.getString("clickMatched.step");
+    }
 
-    public static final String clickMatched_clickStep = bundle.getString("clickMatched.clickStep");
+    public static String clickMatched_clickStep() {
+        return bundle.getString("clickMatched.clickStep");
+    }
 
-    public static final String clickMatched_clickWhile = bundle.getString("clickMatched.clickWhile");
+    public static String clickMatched_clickWhile() {
+        return bundle.getString("clickMatched.clickWhile");
+    }
 
     /**
      * 要识别的图像识别匹配后逻辑下拉框选项
      */
-    public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click, clickMatched_break,
-            clickMatched_step, clickMatched_clickStep);
+    public static final List<String> clickMatchedList = Arrays.asList(clickMatched_click(), clickMatched_break(),
+            clickMatched_step(), clickMatched_clickStep());
 
-    public static final String mouseButton_primary = bundle.getString("primary");
+    public static String mouseButton_primary() {
+        return bundle.getString("primary");
+    }
 
-    public static final String mouseButton_secondary = bundle.getString("secondary");
+    public static String mouseButton_secondary() {
+        return bundle.getString("secondary");
+    }
 
-    public static final String mouseButton_middle = bundle.getString("middle");
+    public static String mouseButton_middle() {
+        return bundle.getString("middle");
+    }
 
-    public static final String mouseButton_forward = bundle.getString("forward");
+    public static String mouseButton_forward() {
+        return bundle.getString("forward");
+    }
 
-    public static final String mouseButton_back = bundle.getString("back");
+    public static String mouseButton_back() {
+        return bundle.getString("back");
+    }
 
     /**
      * 点击按键下拉框选项
      */
-    public static final List<String> mouseButtonList = Arrays.asList(mouseButton_primary, mouseButton_secondary,
-            mouseButton_middle, mouseButton_forward, mouseButton_back);
+    public static final List<String> mouseButtonList = Arrays.asList(mouseButton_primary(), mouseButton_secondary(),
+            mouseButton_middle(), mouseButton_forward(), mouseButton_back());
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
@@ -1049,11 +1450,11 @@ public class CommonFinals {
     public static final BidiMap<String, MouseButton> runClickTypeMap = new DualHashBidiMap<>();
 
     static {
-        runClickTypeMap.put(mouseButton_primary, MouseButton.PRIMARY);
-        runClickTypeMap.put(mouseButton_secondary, MouseButton.SECONDARY);
-        runClickTypeMap.put(mouseButton_middle, MouseButton.MIDDLE);
-        runClickTypeMap.put(mouseButton_forward, MouseButton.FORWARD);
-        runClickTypeMap.put(mouseButton_back, MouseButton.BACK);
+        runClickTypeMap.put(mouseButton_primary(), MouseButton.PRIMARY);
+        runClickTypeMap.put(mouseButton_secondary(), MouseButton.SECONDARY);
+        runClickTypeMap.put(mouseButton_middle(), MouseButton.MIDDLE);
+        runClickTypeMap.put(mouseButton_forward(), MouseButton.FORWARD);
+        runClickTypeMap.put(mouseButton_back(), MouseButton.BACK);
     }
 
     /**
@@ -1062,11 +1463,11 @@ public class CommonFinals {
     public static final BidiMap<Integer, String> recordClickTypeMap = new DualHashBidiMap<>();
 
     static {
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON1, mouseButton_primary);
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON2, mouseButton_secondary);
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON3, mouseButton_middle);
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back);
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward);
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON1, mouseButton_primary());
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON2, mouseButton_secondary());
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON3, mouseButton_middle());
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back());
+        recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward());
     }
 
     /**
@@ -1083,19 +1484,27 @@ public class CommonFinals {
         NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
     }
 
-    public static final String clickType_move = bundle.getString("clickType.move");
+    public static String clickType_move() {
+        return bundle.getString("clickType.move");
+    }
 
-    public static final String clickType_click = bundle.getString("clickType.click");
+    public static String clickType_click() {
+        return bundle.getString("clickType.click");
+    }
 
-    public static final String clickType_drag = bundle.getString("clickType.drag");
+    public static String clickType_drag() {
+        return bundle.getString("clickType.drag");
+    }
 
-    public static final String clickType_moveTo = bundle.getString("clickType.moveTo");
+    public static String clickType_moveTo() {
+        return bundle.getString("clickType.moveTo");
+    }
 
     /**
      * 自动操作的操作类型选项
      */
-    public static final List<String> clickTypeList = Arrays.asList(clickType_move, clickType_click,
-            clickType_drag, clickType_moveTo);
+    public static final List<String> clickTypeList = Arrays.asList(clickType_move(), clickType_click(),
+            clickType_drag(), clickType_moveTo());
 
     public static final String DAILY = "DAILY";
 
@@ -1103,17 +1512,23 @@ public class CommonFinals {
 
     public static final String ONCE = "ONCE";
 
-    public static final String repeatType_daily = bundle.getString("repeatType.daily");
+    public static String repeatType_daily() {
+        return bundle.getString("repeatType.daily");
+    }
 
-    public static final String repeatType_weekly = bundle.getString("repeatType.weekly");
+    public static String repeatType_weekly() {
+        return bundle.getString("repeatType.weekly");
+    }
 
-    public static final String repeatType_once = bundle.getString("repeatType.once");
+    public static String repeatType_once() {
+        return bundle.getString("repeatType.once");
+    }
 
     /**
      * 重复类型下拉框选项
      */
-    public static final List<String> repeatTypeList = Arrays.asList(repeatType_daily, repeatType_weekly,
-            repeatType_once);
+    public static final List<String> repeatTypeList = Arrays.asList(repeatType_daily(), repeatType_weekly(),
+            repeatType_once());
 
     /**
      * 定时任务重复类型映射
@@ -1121,24 +1536,38 @@ public class CommonFinals {
     public static final BidiMap<String, String> repeatTypeMap = new DualHashBidiMap<>();
 
     static {
-        repeatTypeMap.put(repeatType_daily, DAILY);
-        repeatTypeMap.put(repeatType_weekly, WEEKLY);
-        repeatTypeMap.put(repeatType_once, ONCE);
+        repeatTypeMap.put(repeatType_daily(), DAILY);
+        repeatTypeMap.put(repeatType_weekly(), WEEKLY);
+        repeatTypeMap.put(repeatType_once(), ONCE);
     }
 
-    public static final String monday = bundle.getString("monday");
+    public static String monday() {
+        return bundle.getString("monday");
+    }
 
-    public static final String tuesday = bundle.getString("tuesday");
+    public static String tuesday() {
+        return bundle.getString("tuesday");
+    }
 
-    public static final String wednesday = bundle.getString("wednesday");
+    public static String wednesday() {
+        return bundle.getString("wednesday");
+    }
 
-    public static final String thursday = bundle.getString("thursday");
+    public static String thursday() {
+        return bundle.getString("thursday");
+    }
 
-    public static final String friday = bundle.getString("friday");
+    public static String friday() {
+        return bundle.getString("friday");
+    }
 
-    public static final String saturday = bundle.getString("saturday");
+    public static String saturday() {
+        return bundle.getString("saturday");
+    }
 
-    public static final String sunday = bundle.getString("sunday");
+    public static String sunday() {
+        return bundle.getString("sunday");
+    }
 
     /**
      * 定时任务星期名称中英文映射
@@ -1146,13 +1575,13 @@ public class CommonFinals {
     public static final BidiMap<String, String> dayOfWeekName = new DualHashBidiMap<>();
 
     static {
-        dayOfWeekName.put("MON", monday);
-        dayOfWeekName.put("TUE", tuesday);
-        dayOfWeekName.put("WED", wednesday);
-        dayOfWeekName.put("THU", thursday);
-        dayOfWeekName.put("FRI", friday);
-        dayOfWeekName.put("SAT", saturday);
-        dayOfWeekName.put("SUN", sunday);
+        dayOfWeekName.put("MON", monday());
+        dayOfWeekName.put("TUE", tuesday());
+        dayOfWeekName.put("WED", wednesday());
+        dayOfWeekName.put("THU", thursday());
+        dayOfWeekName.put("FRI", friday());
+        dayOfWeekName.put("SAT", saturday());
+        dayOfWeekName.put("SUN", sunday());
     }
 
     /**
@@ -1161,13 +1590,13 @@ public class CommonFinals {
     public static final BidiMap<Integer, String> dayOfWeekMap = new DualHashBidiMap<>();
 
     static {
-        dayOfWeekMap.put(1, monday);
-        dayOfWeekMap.put(2, tuesday);
-        dayOfWeekMap.put(3, wednesday);
-        dayOfWeekMap.put(4, thursday);
-        dayOfWeekMap.put(5, friday);
-        dayOfWeekMap.put(6, saturday);
-        dayOfWeekMap.put(7, sunday);
+        dayOfWeekMap.put(1, monday());
+        dayOfWeekMap.put(2, tuesday());
+        dayOfWeekMap.put(3, wednesday());
+        dayOfWeekMap.put(4, thursday());
+        dayOfWeekMap.put(5, friday());
+        dayOfWeekMap.put(6, saturday());
+        dayOfWeekMap.put(7, sunday());
     }
 
     /**
@@ -1175,5 +1604,16 @@ public class CommonFinals {
      */
     public static final Map<String, Integer> dayOfWeekReverseMap = dayOfWeekMap.entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+    /**
+     * 切换语言下拉框选项
+     */
+    public static final BidiMap<Locale, String> languageMap = new DualHashBidiMap<>();
+
+    static {
+        languageMap.put(Locale.SIMPLIFIED_CHINESE, "简体中文");
+        languageMap.put(Locale.TRADITIONAL_CHINESE, "繁體中文");
+        languageMap.put(Locale.ENGLISH, "English");
+    }
 
 }

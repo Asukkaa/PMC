@@ -33,14 +33,14 @@ public class FileUtils {
      */
     public static String getExistsFileType(File file) throws IOException {
         if (!file.exists()) {
-            throw new IOException(text_fileNotExists);
+            throw new IOException(text_fileNotExists());
         }
         if (file.isDirectory()) {
-            return extension_folder;
+            return extension_folder();
         }
         String filePath = file.getPath();
         if (filePath.lastIndexOf(".") == -1) {
-            return extension_file;
+            return extension_file();
         }
         return filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
     }
@@ -54,13 +54,13 @@ public class FileUtils {
      */
     public static String getFileType(String path) throws IOException {
         if (StringUtils.isBlank(path)) {
-            throw new IOException(text_nullPath);
+            throw new IOException(text_nullPath());
         }
         if (FilenameUtils.getPrefixLength(path) == -1) {
-            throw new IOException(text_errPathFormat);
+            throw new IOException(text_errPathFormat());
         }
         if (path.lastIndexOf(".") == -1) {
-            return extension_fileOrFolder;
+            return extension_fileOrFolder();
         }
         return path.substring(path.lastIndexOf(".")).toLowerCase();
     }
@@ -107,7 +107,7 @@ public class FileUtils {
         if (StringUtils.isNotEmpty(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
-                throw new IOException(text_fileNotExists);
+                throw new IOException(text_fileNotExists());
             }
             Desktop.getDesktop().open(file);
         }
@@ -123,7 +123,7 @@ public class FileUtils {
         if (StringUtils.isNotEmpty(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
-                throw new IOException(text_fileNotExists);
+                throw new IOException(text_fileNotExists());
             }
             if (file.isDirectory()) {
                 Desktop.getDesktop().open(file);
@@ -144,7 +144,7 @@ public class FileUtils {
         if (StringUtils.isNotEmpty(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
-                throw new IOException(text_fileNotExists);
+                throw new IOException(text_fileNotExists());
             }
             ProcessBuilder processBuilder;
             if (isWin) {
@@ -281,7 +281,7 @@ public class FileUtils {
      */
     public static String getExistsFileName(File file) throws IOException {
         if (!file.exists()) {
-            throw new IOException(text_fileNotExists);
+            throw new IOException(text_fileNotExists());
         }
         String fileName = file.getName();
         if (!file.isDirectory() && fileName.contains(".")) {
@@ -299,7 +299,7 @@ public class FileUtils {
      */
     public static String getFileName(String path) throws IOException {
         if (StringUtils.isBlank(path)) {
-            throw new IOException(text_nullPath);
+            throw new IOException(text_nullPath());
         }
         if (FilenameUtils.getPrefixLength(path) != -1) {
             if (path.lastIndexOf(".") != -1) {
@@ -308,7 +308,7 @@ public class FileUtils {
                 return path.substring(path.lastIndexOf(File.separator) + 1);
             }
         }
-        throw new IOException(text_errPathFormat);
+        throw new IOException(text_errPathFormat());
     }
 
     /**
@@ -345,7 +345,7 @@ public class FileUtils {
      */
     public static String notOverwritePath(String path) throws IOException {
         if (StringUtils.isBlank(path)) {
-            throw new IOException(text_nullPath);
+            throw new IOException(text_nullPath());
         }
         File file = new File(path);
         if (!file.exists()) {
@@ -354,7 +354,7 @@ public class FileUtils {
         String parentDir = file.getParent();
         String fileName = getExistsFileName(file);
         String extension = getExistsFileType(file);
-        if (extension_file.equals(extension) || extension_folder.equals(extension)) {
+        if (extension_file().equals(extension) || extension_folder().equals(extension)) {
             extension = "";
         }
         // 递归添加尾缀

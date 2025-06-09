@@ -80,10 +80,10 @@ public class ImageRecognitionService {
         File file = new File(templatePath);
         String fileName = getFileName(templatePath);
         if (StringUtils.isBlank(templatePath)) {
-            throw new Exception(text_image + fileName + bundle.getString("nullPath"));
+            throw new Exception(text_image() + fileName + bundle.getString("nullPath"));
         }
         if (!file.exists()) {
-            throw new Exception(text_image + fileName + bundle.getString("noExists"));
+            throw new Exception(text_image() + fileName + bundle.getString("noExists"));
         }
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
             // 创建带名称的线程池（便于问题排查）
@@ -94,7 +94,7 @@ public class ImageRecognitionService {
                 return t;
             })) {
                 try {
-                    String timeOutErr = text_image + fileName + bundle.getString("timeOut");
+                    String timeOutErr = text_image() + fileName + bundle.getString("timeOut");
                     if (config.isContinuously()) {
                         while (true) {
                             Future<MatchPointBean> future = executor.submit(() ->

@@ -187,8 +187,8 @@ public class ClickDetailController extends RootController {
         maxIndex = selectedItem.getTableView().getItems().size();
         clickIndex_Det.setText(String.valueOf(item.getIndex()));
         if (maxIndex == 1) {
-            retryType_Det.getItems().remove(retryType_Step);
-            matchedType_Det.getItems().removeAll(clickMatched_step, clickMatched_clickStep);
+            retryType_Det.getItems().remove(retryType_Step());
+            matchedType_Det.getItems().removeAll(clickMatched_step(), clickMatched_clickStep());
         }
         String tableViewSize = String.valueOf(maxIndex);
         tableViewSize_Det.setText(tableViewSize);
@@ -225,7 +225,7 @@ public class ClickDetailController extends RootController {
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
         ObservableList<String> clickTypeItems = clickType_Det.getItems();
-        if (clickType_drag.equals(clickType) || clickType_move.equals(clickType)) {
+        if (clickType_drag().equals(clickType) || clickType_move().equals(clickType)) {
             clickTypeItems.add(clickType);
             clickType_Det.setDisable(true);
             mouseStartX_Det.setDisable(true);
@@ -247,7 +247,7 @@ public class ClickDetailController extends RootController {
                         .setPath(b.getPath());
                 items.add(imgFileVO);
             });
-            updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img);
+            updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img());
         }
         tableView_Det.refresh();
         String clickImgPath = item.getClickImgPath();
@@ -401,52 +401,52 @@ public class ClickDetailController extends RootController {
      */
     private void nodeValueChangeListener() {
         // 操作名称文本输入框鼠标悬停提示
-        ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName);
+        ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName());
         changeListeners.put(clickName_Det, clickNameListener);
         // 限制每步操作执行前等待时间文本输入框内容
-        ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait);
+        ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait());
         changeListeners.put(wait_Det, waitListener);
         // 停止操作图像识别准确度设置监听
-        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
+        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
         changeListeners.put(stopOpacity_Det, stopOpacityListener);
         // 限制重试后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> retryStepListener = integerRangeTextField(retryStep_Det, 1, maxIndex, tip_step);
+        ChangeListener<String> retryStepListener = integerRangeTextField(retryStep_Det, 1, maxIndex, tip_step());
         changeListeners.put(retryStep_Det, retryStepListener);
         // 要点击的图像识别准确度设置监听
-        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
+        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
         changeListeners.put(clickOpacity_Det, clickOpacityListener);
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> matchedStepListener = integerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step);
+        ChangeListener<String> matchedStepListener = integerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step());
         changeListeners.put(matchedStep_Det, matchedStepListener);
         // 限制操作时长文本输入内容
-        ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
+        ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
         changeListeners.put(timeClick_Det, timeClickListener);
         // 限制操作间隔文本输入框内容
-        ChangeListener<String> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval);
+        ChangeListener<String> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
         changeListeners.put(interval_Det, intervalListener);
         // 限制鼠标起始位置横(X)坐标文本输入框内容
-        ChangeListener<String> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX);
+        ChangeListener<String> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
         changeListeners.put(mouseStartX_Det, mouseStartXListener);
         // 限制鼠标起始位置纵(Y)坐标文本输入框内容
-        ChangeListener<String> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY);
+        ChangeListener<String> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
         changeListeners.put(mouseStartY_Det, mouseStartYListener);
         // 限制点击次数文本输入框内容
-        ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer);
+        ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
         changeListeners.put(clickNumBer_Det, clickNumBerListener);
         // 随机点击时间偏移量文本输入框内容
-        ChangeListener<String> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime + defaultRandomTime);
+        ChangeListener<String> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
         changeListeners.put(randomTimeOffset_Det, randomTimeListener);
         // 随机横坐标偏移量文本输入框内容
-        ChangeListener<String> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX + defaultRandomClickX);
+        ChangeListener<String> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
         changeListeners.put(randomClickX_Det, randomClickXListener);
         // 随机纵坐标偏移量文本输入框内容
-        ChangeListener<String> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY + defaultRandomClickY);
+        ChangeListener<String> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
         changeListeners.put(randomClickY_Det, randomClickYListener);
         // 限制终止操作识别失败重试次数文本输入框内容
-        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum + stopRetryNumDefault);
+        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
         changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum + clickRetryNumDefault);
+        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
         changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
     }
 
@@ -472,38 +472,38 @@ public class ClickDetailController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(tip_wait, wait_Det);
-        addToolTip(tip_clickTime, timeClick_Det);
-        addToolTip(tip_clickName, clickName_Det);
-        addToolTip(tip_stopImgBtn, stopImgBtn_Det);
-        addToolTip(tip_clickInterval, interval_Det);
-        addToolTip(tip_clickImgBtn, clickImgBtn_Det);
-        addToolTip(tip_clickNumBer, clickNumBer_Det);
-        addToolTip(tip_mouseStartX, mouseStartX_Det);
-        addToolTip(tip_mouseStartY, mouseStartY_Det);
-        addToolTip(tip_randomClick, randomClick_Det);
-        addToolTip(tip_removeStopImgBtn, removeAll_Det);
-        addToolTip(tip_randomWaitTime, randomWaitTime_Det);
-        addToolTip(tip_randomClickTime, randomClickTime_Det);
-        addToolTip(tip_step, matchedStep_Det, retryStep_Det);
-        addToolTip(tip_removeClickImgBtn, removeClickImg_Det);
-        addToolTip(tip_randomTrajectory, randomTrajectory_Det);
-        addToolTip(tip_updateClickNameBtn, updateClickName_Det);
-        addToolTip(tip_randomClickInterval, randomClickInterval_Det);
-        addValueToolTip(clickKey_Det, tip_clickKey, clickKey_Det.getValue());
-        addValueToolTip(clickType_Det, tip_clickType, clickType_Det.getValue());
-        addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
-        addToolTip(tip_stopRetryNum + stopRetryNumDefault, stopRetryNum_Det);
-        addToolTip(tip_clickIndex + clickIndex_Det.getText(), clickIndex_Det);
-        addValueToolTip(clickTypeText_Det, tip_clickType, clickType_Det.getValue());
-        addToolTip(tip_clickRetryNum + clickRetryNumDefault, clickRetryNum_Det);
-        addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
-        addValueToolTip(randomClickX_Det, tip_randomClickX + defaultRandomClickX);
-        addValueToolTip(randomClickY_Det, tip_randomClickY + defaultRandomClickY);
-        addValueToolTip(randomTimeOffset_Det, tip_randomTime + defaultRandomTime);
-        addToolTip(tip_tableViewSize + tableViewSize_Det.getText(), tableViewSize_Det);
-        addValueToolTip(stopOpacity_Det, tip_stopOpacity, String.valueOf((int) stopOpacity_Det.getValue()));
-        addValueToolTip(clickOpacity_Det, tip_clickOpacity, String.valueOf((int) clickOpacity_Det.getValue()));
+        addToolTip(tip_wait(), wait_Det);
+        addToolTip(tip_clickTime(), timeClick_Det);
+        addToolTip(tip_clickName(), clickName_Det);
+        addToolTip(tip_stopImgBtn(), stopImgBtn_Det);
+        addToolTip(tip_clickInterval(), interval_Det);
+        addToolTip(tip_clickImgBtn(), clickImgBtn_Det);
+        addToolTip(tip_clickNumBer(), clickNumBer_Det);
+        addToolTip(tip_mouseStartX(), mouseStartX_Det);
+        addToolTip(tip_mouseStartY(), mouseStartY_Det);
+        addToolTip(tip_randomClick(), randomClick_Det);
+        addToolTip(tip_removeStopImgBtn(), removeAll_Det);
+        addToolTip(tip_randomWaitTime(), randomWaitTime_Det);
+        addToolTip(tip_randomClickTime(), randomClickTime_Det);
+        addToolTip(tip_step(), matchedStep_Det, retryStep_Det);
+        addToolTip(tip_removeClickImgBtn(), removeClickImg_Det);
+        addToolTip(tip_randomTrajectory(), randomTrajectory_Det);
+        addToolTip(tip_updateClickNameBtn(), updateClickName_Det);
+        addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
+        addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
+        addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
+        addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
+        addToolTip(tip_stopRetryNum() + stopRetryNumDefault, stopRetryNum_Det);
+        addToolTip(tip_clickIndex() + clickIndex_Det.getText(), clickIndex_Det);
+        addValueToolTip(clickTypeText_Det, tip_clickType(), clickType_Det.getValue());
+        addToolTip(tip_clickRetryNum() + clickRetryNumDefault, clickRetryNum_Det);
+        addValueToolTip(matchedType_Det, tip_matchedType(), matchedType_Det.getValue());
+        addValueToolTip(randomClickX_Det, tip_randomClickX() + defaultRandomClickX);
+        addValueToolTip(randomClickY_Det, tip_randomClickY() + defaultRandomClickY);
+        addValueToolTip(randomTimeOffset_Det, tip_randomTime() + defaultRandomTime);
+        addToolTip(tip_tableViewSize() + tableViewSize_Det.getText(), tableViewSize_Det);
+        addValueToolTip(stopOpacity_Det, tip_stopOpacity(), String.valueOf((int) stopOpacity_Det.getValue()));
+        addValueToolTip(clickOpacity_Det, tip_clickOpacity(), String.valueOf((int) clickOpacity_Det.getValue()));
     }
 
     /**
@@ -540,8 +540,8 @@ public class ClickDetailController extends RootController {
         if (remindSave != null && remindSave.isSelected()) {
             stage.setOnCloseRequest(e -> {
                 if (isModified) {
-                    ButtonType result = creatConfirmDialog(confirm_unSaved, confirm_unSavedConfirm,
-                            confirm_ok, confirm_cancel);
+                    ButtonType result = creatConfirmDialog(confirm_unSaved(), confirm_unSavedConfirm(),
+                            confirm_ok(), confirm_cancel());
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
@@ -561,13 +561,13 @@ public class ClickDetailController extends RootController {
      */
     private void setChoiceBoxItems() {
         // 要匹配的图像重试逻辑
-        initializeChoiceBoxItems(retryType_Det, retryType_stop, retryTypeList);
+        initializeChoiceBoxItems(retryType_Det, retryType_stop(), retryTypeList);
         // 操作类型
-        initializeChoiceBoxItems(clickType_Det, clickType_click, clickTypeList);
+        initializeChoiceBoxItems(clickType_Det, clickType_click(), clickTypeList);
         // 点击按键
-        initializeChoiceBoxItems(clickKey_Det, mouseButton_primary, mouseButtonList);
+        initializeChoiceBoxItems(clickKey_Det, mouseButton_primary(), mouseButtonList);
         // 图像识别匹配逻辑
-        initializeChoiceBoxItems(matchedType_Det, clickMatched_click, clickMatchedList);
+        initializeChoiceBoxItems(matchedType_Det, clickMatched_click(), clickMatchedList);
     }
 
     /**
@@ -636,31 +636,31 @@ public class ClickDetailController extends RootController {
         int selectIndex = selectedItem.getIndex();
         String matchedType = matchedType_Det.getValue();
         selectedItem.setMatchedType(matchedType);
-        if (clickMatched_step.equals(matchedType) || clickMatched_clickStep.equals(matchedType)) {
+        if (clickMatched_step().equals(matchedType) || clickMatched_clickStep().equals(matchedType)) {
             String matchedStep = matchedStep_Det.getText();
             if (StringUtils.isBlank(matchedStep)) {
-                throw new RuntimeException(text_matchedStepIsNull);
+                throw new RuntimeException(text_matchedStepIsNull());
             }
             if (Integer.parseInt(matchedStep) > maxIndex) {
-                throw new RuntimeException(text_matchedStepGreaterMax);
+                throw new RuntimeException(text_matchedStepGreaterMax());
             }
             if (Integer.parseInt(matchedStep) == selectIndex) {
-                throw new RuntimeException(text_matchedStepEqualIndex);
+                throw new RuntimeException(text_matchedStepEqualIndex());
             }
             selectedItem.setMatchedStep(matchedStep);
         }
         String retryType = retryType_Det.getValue();
         selectedItem.setRetryType(retryType);
-        if (retryType_Step.equals(retryType)) {
+        if (retryType_Step().equals(retryType)) {
             String retryStep = retryStep_Det.getText();
             if (StringUtils.isBlank(retryStep)) {
-                throw new RuntimeException(text_retryStepIsNull);
+                throw new RuntimeException(text_retryStepIsNull());
             }
             if (Integer.parseInt(retryStep) > maxIndex) {
-                throw new RuntimeException(text_retryStepGreaterMax);
+                throw new RuntimeException(text_retryStepGreaterMax());
             }
             if (Integer.parseInt(retryStep) == selectIndex) {
-                throw new RuntimeException(text_retryStepEqualIndex);
+                throw new RuntimeException(text_retryStepEqualIndex());
             }
             selectedItem.setRetryStep(retryStep);
         }
@@ -698,7 +698,7 @@ public class ClickDetailController extends RootController {
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
                     key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
             showClickImg(clickImgSelectPath);
-            clickType_Det.setValue(clickType_click);
+            clickType_Det.setValue(clickType_click());
             clickTypeHBox_Det.setVisible(true);
         }
     }
@@ -764,8 +764,8 @@ public class ClickDetailController extends RootController {
     @FXML
     private void retryTypeChange() {
         retryStep_Det.setText("");
-        retryStepHBox_Det.setVisible(retryType_Step.equals(retryType_Det.getValue()));
-        addValueToolTip(retryType_Det, tip_retryType, retryType_Det.getValue());
+        retryStepHBox_Det.setVisible(retryType_Step().equals(retryType_Det.getValue()));
+        addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
     }
 
     /**
@@ -774,8 +774,9 @@ public class ClickDetailController extends RootController {
     @FXML
     private void matchedTypeChange() {
         matchedStep_Det.setText("");
-        matchedStepHBox_Det.setVisible(clickMatched_step.equals(matchedType_Det.getValue()) || clickMatched_clickStep.equals(matchedType_Det.getValue()));
-        addValueToolTip(matchedType_Det, tip_matchedType, matchedType_Det.getValue());
+        matchedStepHBox_Det.setVisible(clickMatched_step().equals(matchedType_Det.getValue()) ||
+                clickMatched_clickStep().equals(matchedType_Det.getValue()));
+        addValueToolTip(matchedType_Det, tip_matchedType(), matchedType_Det.getValue());
     }
 
     /**
@@ -783,9 +784,9 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickTypeChange() {
-        clickTypeHBox_Det.setVisible(clickType_click.equals(clickType_Det.getValue()));
-        addValueToolTip(clickType_Det, tip_clickType, clickType_Det.getValue());
-        addValueToolTip(clickTypeText_Det, tip_clickType, clickType_Det.getValue());
+        clickTypeHBox_Det.setVisible(clickType_click().equals(clickType_Det.getValue()));
+        addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
+        addValueToolTip(clickTypeText_Det, tip_clickType(), clickType_Det.getValue());
     }
 
     /**
@@ -793,7 +794,7 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickKeyChange() {
-        addValueToolTip(clickKey_Det, tip_clickKey, clickKey_Det.getValue());
+        addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
     }
 
 }

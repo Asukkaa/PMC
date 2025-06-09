@@ -131,15 +131,15 @@ public class AboutController extends RootController {
         // 版本号鼠标悬停提示
         addToolTip(tip_version, version_Abt);
         // 日志文件数量输入框添加鼠标悬停提示
-        addValueToolTip(logsNum_Abt, tip_logsNum);
+        addValueToolTip(logsNum_Abt, tip_logsNum());
         // 赞赏按钮添加鼠标悬停提示
-        addToolTip(tip_appreciate, appreciate_Abt);
+        addToolTip(tip_appreciate(), appreciate_Abt);
         // 给logo和应用名称添加鼠标悬停提示
-        addToolTip(tip_thanks, logo_Abt, title_Abt);
+        addToolTip(tip_thanks(), logo_Abt, title_Abt);
         // 给github、gitee跳转按钮添加鼠标悬停提示
-        addToolTip(tip_openGitLink, openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
+        addToolTip(tip_openGitLink(), openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
         // 给网盘跳转按钮添加鼠标悬停提示
-        addToolTip(tip_openLink, openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
+        addToolTip(tip_openLink(), openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
     }
 
     /**
@@ -156,7 +156,7 @@ public class AboutController extends RootController {
         // 设置鼠标悬停提示
         setToolTip();
         // log 文件保留数量输入监听
-        integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum);
+        integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum());
         // 读取配置文件
         getConfig();
         // 获取logs文件夹路径并展示
@@ -234,7 +234,7 @@ public class AboutController extends RootController {
         input.close();
         Scene scene = new Scene(root, with, height);
         detailStage.setScene(scene);
-        detailStage.setTitle(tip_appreciate);
+        detailStage.setTitle(tip_appreciate());
         detailStage.initModality(Modality.APPLICATION_MODAL);
         detailStage.setResizable(false);
         setWindowLogo(detailStage, logoPath);

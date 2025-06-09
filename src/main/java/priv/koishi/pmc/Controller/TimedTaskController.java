@@ -216,7 +216,7 @@ public class TimedTaskController extends RootController {
         task.setOnSucceeded(event -> {
             List<TimedTaskBean> result = task.getValue();
             Platform.runLater(() -> {
-                addData(result, append, tableView_Task, dataNumber_Task, text_task, false);
+                addData(result, append, tableView_Task, dataNumber_Task, text_task(), false);
                 taskUnbind(taskBean);
             });
             if (successHandler != null) {
@@ -224,7 +224,7 @@ public class TimedTaskController extends RootController {
             }
         });
         task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, text_taskFailed);
+            taskNotSuccess(taskBean, text_taskFailed());
             Throwable ex = task.getException();
             taskUnbind(taskBean);
             throw new RuntimeException(ex);
@@ -257,7 +257,7 @@ public class TimedTaskController extends RootController {
      * @param contextMenu 右键菜单集合
      */
     private void buildDetailMenuItem(TableView<? extends TimedTaskBean> tableView, ContextMenu contextMenu) {
-        MenuItem detailItem = new MenuItem(menu_detailMenu);
+        MenuItem detailItem = new MenuItem(menu_detailMenu());
         detailItem.setOnAction(e -> {
             TimedTaskBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
@@ -274,7 +274,7 @@ public class TimedTaskController extends RootController {
      * @param contextMenu 右键菜单集合
      */
     private void buildDeleteDataMenuItem(TableView<TimedTaskBean> tableView, ContextMenu contextMenu) {
-        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu);
+        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
         deleteDataMenuItem.setOnAction(event -> {
             List<TimedTaskBean> ts = tableView.getSelectionModel().getSelectedItems();
             ts.forEach(item -> {
@@ -297,8 +297,8 @@ public class TimedTaskController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(tip_addTimedTask, addTimedTask_Task);
-        addToolTip(tip_getScheduleTask, getScheduleTask_Task);
+        addToolTip(tip_addTimedTask(), addTimedTask_Task);
+        addToolTip(tip_getScheduleTask(), getScheduleTask_Task);
     }
 
     /**
@@ -348,8 +348,8 @@ public class TimedTaskController extends RootController {
         executeGetScheduleTask(result -> Platform.runLater(() -> {
             int dataSize = tableView_Task.getItems().size() + 1;
             TimedTaskBean newTask = new TimedTaskBean()
-                    .setTaskName(defaultTaskName + dataSize)
-                    .setRepeat(repeatType_daily);
+                    .setTaskName(defaultTaskName() + dataSize)
+                    .setRepeat(repeatType_daily());
             showDetail(newTask, false);
         }));
     }

@@ -152,7 +152,7 @@ public class TaskDetailController extends RootController {
         this.isEdit = isEdit;
         selectedItem = item;
         String path = item.getPath();
-        if (StringUtils.isNotBlank(path) && !text_onlyLaunch.equals(path)) {
+        if (StringUtils.isNotBlank(path) && !text_onlyLaunch().equals(path)) {
             setPathLabel(pmcFilePath_TD, item.getPath());
             filePathHBox_DT.setVisible(true);
             fileNameHBox_TD.setVisible(true);
@@ -174,7 +174,7 @@ public class TaskDetailController extends RootController {
         }
         String repeat = item.getRepeat();
         repeatType_TD.setValue(repeat);
-        if (repeatType_weekly.equals(repeat)) {
+        if (repeatType_weekly().equals(repeat)) {
             String days = item.getDays();
             weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setSelected(false));
             for (String day : days.split(dayOfWeekRegex)) {
@@ -201,13 +201,13 @@ public class TaskDetailController extends RootController {
      */
     private void textFieldChangeListener() {
         // 限制小时文本输入框内容
-        ChangeListener<String> hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour);
+        ChangeListener<String> hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
         changeListeners.put(hourField_TD, hourFieldListener);
         // 限制分钟文本输入框内容
-        ChangeListener<String> minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute);
+        ChangeListener<String> minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
         changeListeners.put(minuteField_TD, minuteFieldListener);
         // 限制任务名称文本输入框内容
-        ChangeListener<String> taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName + selectedItem.getTaskName());
+        ChangeListener<String> taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
         changeListeners.put(taskNameField_TD, taskNameFieldListener);
     }
 
@@ -254,8 +254,8 @@ public class TaskDetailController extends RootController {
             stage.setOnCloseRequest(e -> {
                 getTimedTaskBean();
                 if (isModified) {
-                    ButtonType result = creatConfirmDialog(confirm_unSaved, confirm_unSavedConfirm,
-                            confirm_ok, confirm_cancel);
+                    ButtonType result = creatConfirmDialog(confirm_unSaved(), confirm_unSavedConfirm(),
+                            confirm_ok(), confirm_cancel());
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
@@ -278,12 +278,12 @@ public class TaskDetailController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        addToolTip(tip_deletePath, delete_TD);
-        addValueToolTip(hourField_TD, tip_hour);
-        addValueToolTip(minuteField_TD, tip_minute);
-        addValueToolTip(datePicker_TD.getEditor(), tip_datePicker);
-        addValueToolTip(repeatType_TD, tip_repeatType, repeatType_TD.getValue());
-        addValueToolTip(taskNameField_TD, tip_taskName + selectedItem.getTaskName());
+        addToolTip(tip_deletePath(), delete_TD);
+        addValueToolTip(hourField_TD, tip_hour());
+        addValueToolTip(minuteField_TD, tip_minute());
+        addValueToolTip(datePicker_TD.getEditor(), tip_datePicker());
+        addValueToolTip(repeatType_TD, tip_repeatType(), repeatType_TD.getValue());
+        addValueToolTip(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
         weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> addToolTip(checkBox.getText(), checkBox));
     }
 
@@ -313,7 +313,7 @@ public class TaskDetailController extends RootController {
      */
     private void setChoiceBoxItems() {
         // 重复类型
-        initializeChoiceBoxItems(repeatType_TD, repeatType_daily, repeatTypeList);
+        initializeChoiceBoxItems(repeatType_TD, repeatType_daily(), repeatTypeList);
     }
 
     /**
@@ -352,7 +352,7 @@ public class TaskDetailController extends RootController {
         FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-        File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile);
+        File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
         if (selectedFile != null) {
             inFilePath = selectedFile.getPath();
             updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
@@ -397,7 +397,7 @@ public class TaskDetailController extends RootController {
         task.setOnSucceeded(event -> Platform.runLater(() -> {
             taskUnbind(taskBean);
             // 复制成功消息气泡
-            new MessageBubble(text_successSave, 2);
+            new MessageBubble(text_successSave(), 2);
             stage.close();
             // 触发列表刷新（通过回调）
             if (refreshCallback != null) {
@@ -405,7 +405,7 @@ public class TaskDetailController extends RootController {
             }
         }));
         task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, text_taskFailed);
+            taskNotSuccess(taskBean, text_taskFailed());
             Throwable ex = task.getException();
             taskUnbind(taskBean);
             throw new RuntimeException(ex);
@@ -437,16 +437,16 @@ public class TaskDetailController extends RootController {
     @FXML
     private void repeatTypeChange() {
         String repeatType = repeatType_TD.getValue();
-        if (repeatType_once.equals(repeatType)) {
+        if (repeatType_once().equals(repeatType)) {
             datePicker_TD.setDisable(false);
             datePickerAction();
             weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(true));
-        } else if (repeatType_weekly.equals(repeatType)) {
+        } else if (repeatType_weekly().equals(repeatType)) {
             datePicker_TD.setValue(LocalDate.now());
             datePicker_TD.setDisable(true);
             datePickerAction();
             weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(false));
-        } else if (repeatType_daily.equals(repeatType)) {
+        } else if (repeatType_daily().equals(repeatType)) {
             datePicker_TD.setValue(LocalDate.now());
             datePicker_TD.setDisable(true);
             weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {

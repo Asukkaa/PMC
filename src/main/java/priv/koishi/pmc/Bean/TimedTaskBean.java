@@ -96,19 +96,19 @@ public class TimedTaskBean implements Indexable {
             return false;
         }
         String equalsPath = path;
-        if (text_onlyLaunch.equals(equalsPath)) {
+        if (text_onlyLaunch().equals(equalsPath)) {
             equalsPath = "";
         }
         String beanPath = bean.getPath();
-        if (text_onlyLaunch.equals(beanPath)) {
+        if (text_onlyLaunch().equals(beanPath)) {
             beanPath = "";
         }
         String equalsDays = days;
-        if (!repeatType_weekly.equals(repeat)) {
+        if (!repeatType_weekly().equals(repeat)) {
             equalsDays = "";
         }
         String beanDays = bean.getDays();
-        if (!repeatType_weekly.equals(bean.getRepeat())) {
+        if (!repeatType_weekly().equals(bean.getRepeat())) {
             beanDays = "";
         }
         return new EqualsBuilder()

@@ -92,7 +92,7 @@ public class ClickLogController extends RootController {
         clickLogs = logs;
         if (CollectionUtils.isNotEmpty(logs)) {
             tableView_Log.getItems().addAll(logs);
-            updateTableViewSizeText(tableView_Log, dataNumber_Log, text_log);
+            updateTableViewSizeText(tableView_Log, dataNumber_Log, text_log());
             tableView_Log.refresh();
         }
     }

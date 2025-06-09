@@ -58,7 +58,7 @@ public class TaskUtils {
     public static void throwTaskException(Task<?> task, TaskBean<?> taskBean) {
         System.gc();
         task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, text_taskFailed);
+            taskNotSuccess(taskBean, text_taskFailed());
             // 获取抛出的异常
             Throwable ex = task.getException();
             System.gc();

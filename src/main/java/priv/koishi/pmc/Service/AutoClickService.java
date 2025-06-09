@@ -89,7 +89,7 @@ public class AutoClickService {
                     int i = 0;
                     while (!isCancelled()) {
                         i++;
-                        String loopTimeText = text_cancelTask + text_execution + i + " / ∞" + text_executionTime;
+                        String loopTimeText = text_cancelTask() + text_execution() + i + " / ∞" + text_executionTime();
                         if (isCancelled()) {
                             return clickLogBeans;
                         }
@@ -98,7 +98,7 @@ public class AutoClickService {
                     }
                 } else {
                     for (int i = 0; i < loopTime && !isCancelled(); i++) {
-                        String loopTimeText = text_cancelTask + text_execution + (i + 1) + " / " + loopTime + text_executionTime;
+                        String loopTimeText = text_cancelTask() + text_execution() + (i + 1) + " / " + loopTime + text_executionTime();
                         if (isCancelled()) {
                             return clickLogBeans;
                         }
@@ -133,23 +133,23 @@ public class AutoClickService {
                     String matchType = clickPositionVO.getMatchedType();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     String clickText;
-                    if (clickType_move.equalsIgnoreCase(clickType)) {
+                    if (clickType_move().equalsIgnoreCase(clickType)) {
                         clickText = "";
                     } else {
                         clickText = bundle.getString("taskInfo") + clickKey + clickType;
                     }
                     Platform.runLater(() -> {
                         String text = loopTimeText +
-                                text_progress + progress + "/" + dataSize +
-                                text_willBe + waitTime + text_msWillBe + name +
-                                text_point + " X：" + startX + " Y：" + startY + clickText +
-                                bundle.getString("clickTime") + clickTime + " " + text_ms +
-                                bundle.getString("repeat") + clickNum + bundle.getString("interval") + interval + " " + text_ms;
+                                text_progress() + progress + "/" + dataSize +
+                                text_willBe() + waitTime + text_msWillBe() + name +
+                                text_point() + " X：" + startX + " Y：" + startY + clickText +
+                                bundle.getString("clickTime") + clickTime + " " + text_ms() +
+                                bundle.getString("repeat") + clickNum + bundle.getString("interval") + interval + " " + text_ms();
                         if (StringUtils.isNotBlank(clickImgPath)) {
                             try {
                                 text = loopTimeText +
-                                        text_progress + progress + "/" + dataSize +
-                                        text_willBe + waitTime + text_msWillBe + name +
+                                        text_progress() + progress + "/" + dataSize +
+                                        text_willBe() + waitTime + text_msWillBe() + name +
                                         bundle.getString("picTarget") +
                                         "\n" + getExistsFileName(new File(clickImgPath)) +
                                         bundle.getString("afterMatch") + matchType;
@@ -177,7 +177,7 @@ public class AutoClickService {
                     if (taskBean.isWaitLog()) {
                         ClickLogBean waitLog = new ClickLogBean();
                         waitLog.setClickTime(String.valueOf(wait))
-                                .setType(log_wait);
+                                .setType(log_wait());
                         dynamicQueue.add(waitLog);
                     }
                     // 执行自动流程
@@ -259,15 +259,15 @@ public class AutoClickService {
                                 .setResult(matchThreshold + " %")
                                 .setX(String.valueOf(x))
                                 .setY(String.valueOf(y))
-                                .setType(log_stopImg);
+                                .setType(log_stopImg());
                         dynamicQueue.add(clickLogBean);
                     }
                     if (matchThreshold >= stopMatchThreshold) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
-                        throw new Exception(text_index + clickPositionVO.getIndex() + bundle.getString("taskStop") +
+                        throw new Exception(text_index() + clickPositionVO.getIndex() + bundle.getString("taskStop") +
                                 bundle.getString("findStopImg") + fileName.get() +
                                 bundle.getString("matchThreshold") + matchThreshold + " %" +
-                                "\n" + text_point + " X：" + x + " Y：" + y);
+                                "\n" + text_point() + " X：" + x + " Y：" + y);
                     }
                 } catch (Exception e) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
@@ -295,7 +295,7 @@ public class AutoClickService {
             FindPositionConfig findPositionConfig = new FindPositionConfig();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
             findPositionConfig.setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
-                    .setContinuously(retryType_continuously.equals(retryType))
+                    .setContinuously(retryType_continuously().equals(retryType))
                     .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
@@ -313,45 +313,45 @@ public class AutoClickService {
                             .setResult(matchThreshold + " %")
                             .setX(String.valueOf(startX))
                             .setY(String.valueOf(startY))
-                            .setType(log_clickImg);
+                            .setType(log_clickImg());
                     dynamicQueue.add(clickLogBean);
                 }
                 if (matchThreshold >= clickMatchThreshold) {
                     // 匹配成功后直接执行下一个操作步骤
-                    if (clickMatched_break.equals(matchedType)) {
+                    if (clickMatched_break().equals(matchedType)) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                         return clickResultBean;
                         // 匹配成功后执行指定步骤
-                    } else if (clickMatched_step.equals(matchedType)) {
+                    } else if (clickMatched_step().equals(matchedType)) {
                         clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()))
                                 .setClickLogs(dynamicQueue.getSnapshot());
                         return clickResultBean;
                         // 匹配成功后点击匹配图像并执行指定步骤
-                    } else if (clickMatched_clickStep.equals(matchedType)) {
+                    } else if (clickMatched_clickStep().equals(matchedType)) {
                         clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()));
                         // 匹配图像存在则重复点击
-                    } else if (clickMatched_clickWhile.equals(matchedType)) {
+                    } else if (clickMatched_clickWhile().equals(matchedType)) {
                         clickResultBean.setStepIndex(-1);
                     }
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
-                } else if (retryType_break.equals(retryType) || clickMatched_clickWhile.equals(matchedType)) {
+                } else if (retryType_break().equals(retryType) || clickMatched_clickWhile().equals(matchedType)) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     return clickResultBean;
                     // 匹配失败后终止操作
-                } else if (retryType_stop.equals(retryType)) {
+                } else if (retryType_stop().equals(retryType)) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     try {
-                        throw new Exception(text_index + clickPositionVO.getIndex() + bundle.getString("taskErr") +
+                        throw new Exception(text_index() + clickPositionVO.getIndex() + bundle.getString("taskErr") +
                                 bundle.getString("maxRetry") + clickPositionVO.getClickRetryTimes() + " " + bundle.getString("unit.times") +
                                 bundle.getString("notFound") + fileName.get() +
                                 bundle.getString("closestMatchThreshold") + matchPointBean.getMatchThreshold() + " %" +
-                                "\n" + text_point + " X：" + position.x() + " Y：" + position.y());
+                                "\n" + text_point() + " X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                         throw new RuntimeException(e);
                     }
                     // 匹配失败后执行指定步骤
-                } else if (retryType_Step.equals(retryType)) {
+                } else if (retryType_Step().equals(retryType)) {
                     clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getRetryStep()))
                             .setClickLogs(dynamicQueue.getSnapshot());
                     return clickResultBean;
@@ -379,7 +379,7 @@ public class AutoClickService {
                 if (taskBean.isWaitLog()) {
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(clickInterval))
-                            .setType(log_wait);
+                            .setType(log_wait());
                     dynamicQueue.add(clickLogBean);
                 }
             }
@@ -401,7 +401,7 @@ public class AutoClickService {
                     ClickLogBean moveLog = new ClickLogBean();
                     moveLog.setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
-                            .setType(log_move);
+                            .setType(log_move());
                     dynamicQueue.add(moveLog);
                 }
                 // 执行自动流程前点击第一个起始坐标
@@ -412,7 +412,7 @@ public class AutoClickService {
                         pressLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
                                 .setClickKey(clickKey)
-                                .setType(log_press);
+                                .setType(log_press());
                         dynamicQueue.add(pressLog);
                     }
                     robot.mouseRelease(mouseButton);
@@ -421,18 +421,18 @@ public class AutoClickService {
                         releaseLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
                                 .setClickKey(clickKey)
-                                .setType(log_release);
+                                .setType(log_release());
                         dynamicQueue.add(releaseLog);
                     }
                 }
-                if (clickType_click.equals(clickType)) {
+                if (clickType_click().equals(clickType)) {
                     robot.mousePress(mouseButton);
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
                         pressLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
                                 .setClickKey(clickKey)
-                                .setType(log_press);
+                                .setType(log_press());
                         dynamicQueue.add(pressLog);
                     }
                 }
@@ -447,7 +447,7 @@ public class AutoClickService {
                 break;
             }
             // 执行长按操作
-            if (!clickType_drag.equals(clickType) && !clickType_move.equals(clickType)) {
+            if (!clickType_drag().equals(clickType) && !clickType_move().equals(clickType)) {
                 // 处理随机点击时长偏移
                 if (activation.equals(clickPositionVO.getRandomClickTime())) {
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
@@ -466,19 +466,19 @@ public class AutoClickService {
                             .setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
                             .setClickKey(clickKey)
-                            .setType(log_hold);
+                            .setType(log_hold());
                     dynamicQueue.add(clickLog);
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
-                    if (clickType_click.equals(clickType)) {
+                    if (clickType_click().equals(clickType)) {
                         robot.mouseRelease(mouseButton);
                         if (taskBean.isClickLog()) {
                             ClickLogBean releaseLog = new ClickLogBean();
                             releaseLog.setX(String.valueOf((int) finalStartX))
                                     .setY(String.valueOf((int) finalStartY))
                                     .setClickKey(clickKey)
-                                    .setType(log_release);
+                                    .setType(log_release());
                             dynamicQueue.add(releaseLog);
                         }
                     }
@@ -562,7 +562,7 @@ public class AutoClickService {
                                 clickLog.setClickKey(recordClickTypeMap.get(button))
                                         .setX(String.valueOf((int) finalX))
                                         .setY(String.valueOf((int) finalY))
-                                        .setType(log_press);
+                                        .setType(log_press());
                                 dynamicQueue.add(clickLog);
                             }
                         });
@@ -575,7 +575,7 @@ public class AutoClickService {
                                 releaseLog.setClickKey(recordClickTypeMap.get(button))
                                         .setX(String.valueOf((int) finalX))
                                         .setY(String.valueOf((int) finalY))
-                                        .setType(log_release);
+                                        .setType(log_release());
                                 dynamicQueue.add(releaseLog);
                             }
                         });
@@ -585,7 +585,7 @@ public class AutoClickService {
                         ClickLogBean moveLog = new ClickLogBean();
                         moveLog.setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
-                                .setType(log_move);
+                                .setType(log_move());
                         dynamicQueue.add(moveLog);
                     } else if (CollectionUtils.isNotEmpty(pressButtons) && taskBean.isDragLog()) {
                         List<String> clickKeys = new ArrayList<>();
@@ -597,7 +597,7 @@ public class AutoClickService {
                         moveLog.setClickKey(String.join(",", clickKeys))
                                 .setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
-                                .setType(log_drag);
+                                .setType(log_drag());
                         dynamicQueue.add(moveLog);
                     }
                     moveFuture.complete(null);
@@ -609,7 +609,7 @@ public class AutoClickService {
                     if (taskBean.isWaitLog()) {
                         ClickLogBean sleepLog = new ClickLogBean();
                         sleepLog.setClickTime(String.valueOf(remaining))
-                                .setType(log_wait);
+                                .setType(log_wait());
                         dynamicQueue.add(sleepLog);
                     }
                 }
