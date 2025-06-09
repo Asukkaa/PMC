@@ -410,13 +410,13 @@ public class ClickDetailController extends RootController {
         ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity);
         changeListeners.put(stopOpacity_Det, stopOpacityListener);
         // 限制重试后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> retryStepListener = integerRangeTextField(retryStep_Det, 1, maxIndex, tip_Step);
+        ChangeListener<String> retryStepListener = integerRangeTextField(retryStep_Det, 1, maxIndex, tip_step);
         changeListeners.put(retryStep_Det, retryStepListener);
         // 要点击的图像识别准确度设置监听
         ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity);
         changeListeners.put(clickOpacity_Det, clickOpacityListener);
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> matchedStepListener = integerRangeTextField(matchedStep_Det, 1, maxIndex, tip_Step);
+        ChangeListener<String> matchedStepListener = integerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step);
         changeListeners.put(matchedStep_Det, matchedStepListener);
         // 限制操作时长文本输入内容
         ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime);
@@ -485,7 +485,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_removeStopImgBtn, removeAll_Det);
         addToolTip(tip_randomWaitTime, randomWaitTime_Det);
         addToolTip(tip_randomClickTime, randomClickTime_Det);
-        addToolTip(tip_Step, matchedStep_Det, retryStep_Det);
+        addToolTip(tip_step, matchedStep_Det, retryStep_Det);
         addToolTip(tip_removeClickImgBtn, removeClickImg_Det);
         addToolTip(tip_randomTrajectory, randomTrajectory_Det);
         addToolTip(tip_updateClickNameBtn, updateClickName_Det);

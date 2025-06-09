@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 
@@ -135,23 +136,23 @@ public class AutoClickService {
                     if (clickType_move.equalsIgnoreCase(clickType)) {
                         clickText = "";
                     } else {
-                        clickText = "\n操作内容：" + clickKey + clickType;
+                        clickText = bundle.getString("taskInfo") + clickKey + clickType;
                     }
                     Platform.runLater(() -> {
                         String text = loopTimeText +
-                                "\n本轮进度：" + progress + "/" + dataSize +
-                                "\n将在 " + waitTime + " 毫秒后将执行: " + name +
-                                "\n目标坐标：" + " X：" + startX + " Y：" + startY + clickText +
-                                "\n单次操作时间：" + clickTime + " 毫秒" +
-                                "\n重复：" + clickNum + " 次，每次操作间隔：" + interval + " 毫秒";
+                                text_progress + progress + "/" + dataSize +
+                                text_willBe + waitTime + text_msWillBe + name +
+                                text_point + " X：" + startX + " Y：" + startY + clickText +
+                                bundle.getString("clickTime") + clickTime + " " + text_ms +
+                                bundle.getString("repeat") + clickNum + bundle.getString("interval") + interval + " " + text_ms;
                         if (StringUtils.isNotBlank(clickImgPath)) {
                             try {
                                 text = loopTimeText +
-                                        "\n本轮进度：" + progress + "/" + dataSize +
-                                        "\n将在 " + waitTime + " 毫秒后将执行: " + name +
-                                        "\n操作内容：识别目标图像：" +
+                                        text_progress + progress + "/" + dataSize +
+                                        text_willBe + waitTime + text_msWillBe + name +
+                                        bundle.getString("picTarget") +
                                         "\n" + getExistsFileName(new File(clickImgPath)) +
-                                        "\n图像匹配后 " + matchType;
+                                        bundle.getString("afterMatch") + matchType;
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -223,7 +224,7 @@ public class AutoClickService {
                 Platform.runLater(() -> {
                     try {
                         fileName.set(getExistsFileName(new File(stopPath)));
-                        String text = loopTimeText + "\n正在识别终止操作图像：\n" + fileName.get();
+                        String text = loopTimeText + bundle.getString("searchingStop") + fileName.get();
                         floatingLabel.setText(text);
                         massageLabel.setText(text);
                     } catch (IOException e) {
@@ -263,10 +264,10 @@ public class AutoClickService {
                     }
                     if (matchThreshold >= stopMatchThreshold) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
-                        throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时终止操作" +
-                                "\n匹配到终止操作图像：" + fileName.get() +
-                                "\n匹配度为：" + matchThreshold + " %" +
-                                "\n坐标 X：" + x + " Y：" + y);
+                        throw new Exception(text_index + clickPositionVO.getIndex() + bundle.getString("taskStop") +
+                                bundle.getString("findStopImg") + fileName.get() +
+                                bundle.getString("matchThreshold") + matchThreshold + " %" +
+                                "\n" + text_point + " X：" + x + " Y：" + y);
                     }
                 } catch (Exception e) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
@@ -281,7 +282,7 @@ public class AutoClickService {
             Platform.runLater(() -> {
                 try {
                     fileName.set(getExistsFileName(new File(clickPath)));
-                    String text = loopTimeText + "\n正在识别目标图像：\n" + fileName.get();
+                    String text = loopTimeText + bundle.getString("searchingClick") + fileName.get();
                     floatingLabel.setText(text);
                     massageLabel.setText(text);
                 } catch (IOException e) {
@@ -340,11 +341,11 @@ public class AutoClickService {
                 } else if (retryType_stop.equals(retryType)) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     try {
-                        throw new Exception("执行到序号为：" + clickPositionVO.getIndex() + " 的步骤时发生异常" +
-                                "\n已重试最大重试次数：" + clickPositionVO.getClickRetryTimes() + " 次" +
-                                "\n未找到匹配图像：" + fileName.get() +
-                                "\n最接近的图像匹配度为：" + matchPointBean.getMatchThreshold() + " %" +
-                                "\n坐标 X：" + position.x() + " Y：" + position.y());
+                        throw new Exception(text_index + clickPositionVO.getIndex() + bundle.getString("taskErr") +
+                                bundle.getString("maxRetry") + clickPositionVO.getClickRetryTimes() + " " + bundle.getString("unit.times") +
+                                bundle.getString("notFound") + fileName.get() +
+                                bundle.getString("closestMatchThreshold") + matchPointBean.getMatchThreshold() + " %" +
+                                "\n" + text_point + " X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                         throw new RuntimeException(e);

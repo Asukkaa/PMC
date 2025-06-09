@@ -1175,23 +1175,14 @@ public class UiUtils {
      */
     private static void copyDataMenuItem(TableView<ClickPositionVO> tableView, String copyType, Label dataNumber) {
         List<ClickPositionVO> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
-        switch (copyType) {
-            case menuItem_upCopy: {
-                addData(copiedList, upAdd, tableView, dataNumber, text_process);
-                break;
-            }
-            case menuItem_downCopy: {
-                addData(copiedList, downAdd, tableView, dataNumber, text_process);
-                break;
-            }
-            case menuItem_appendCopy: {
-                addData(copiedList, append, tableView, dataNumber, text_process);
-                break;
-            }
-            case menuItem_topCopy: {
-                addData(copiedList, topAdd, tableView, dataNumber, text_process);
-                break;
-            }
+        if (menuItem_upCopy.equals(copyType)) {
+            addData(copiedList, upAdd, tableView, dataNumber, text_process);
+        } else if (menuItem_downCopy.equals(copyType)) {
+            addData(copiedList, downAdd, tableView, dataNumber, text_process);
+        } else if (menuItem_appendCopy.equals(copyType)) {
+            addData(copiedList, append, tableView, dataNumber, text_process);
+        } else if (menuItem_topCopy.equals(copyType)) {
+            addData(copiedList, topAdd, tableView, dataNumber, text_process);
         }
     }
 

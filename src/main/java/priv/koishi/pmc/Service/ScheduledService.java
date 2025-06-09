@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getAppPath;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
@@ -64,7 +65,7 @@ public class ScheduledService {
         return new Task<>() {
             @Override
             protected Void call() throws IOException {
-                updateMessage("保存中...");
+                updateMessage(bundle.getString("saving"));
                 if (isWin) {
                     // 创建win定时任务
                     createWinLaunchdTask(timedTaskBean);
@@ -103,7 +104,7 @@ public class ScheduledService {
         return new Task<>() {
             @Override
             protected List<TimedTaskBean> call() throws Exception {
-                updateMessage("查询中...");
+                updateMessage(bundle.getString("searching"));
                 List<TimedTaskBean> taskDetails = new ArrayList<>();
                 if (isWin) {
                     getWinTaskDetails(taskDetails);
@@ -141,7 +142,7 @@ public class ScheduledService {
                             }
                         }
                     } catch (IOException e) {
-                        throw new IOException("读取 LaunchAgents 目录失败: " + launchAgentsPath, e);
+                        throw new IOException(bundle.getString("searchLaunchAgentsErr") + launchAgentsPath, e);
                     }
                 }
             }
@@ -445,7 +446,7 @@ public class ScheduledService {
         Process process = pb.start();
         String output = readProcessOutput(process);
         if (output.contains("Exception") || output.contains("错误")) {
-            throw new IOException("任务创建失败: " + output);
+            throw new IOException(bundle.getString("creatTaskErr") + output);
         }
     }
 

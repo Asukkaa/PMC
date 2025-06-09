@@ -1008,31 +1008,18 @@ public class AutoClickController extends RootController implements MousePosition
     private void insertDataMenuItem(TableView<ClickPositionVO> tableView, String insertType) {
         List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
-            switch (insertType) {
-                case menuItem_insertUp: {
-                    addClick(upAdd);
-                    break;
-                }
-                case menuItem_insertDown: {
-                    addClick(downAdd);
-                    break;
-                }
-                case menuItem_recordUp: {
-                    startRecord(upAdd);
-                    break;
-                }
-                case menuItem_recordDown: {
-                    startRecord(downAdd);
-                    break;
-                }
-                case menuItem_insertTop: {
-                    addClick(topAdd);
-                    break;
-                }
-                case menuItem_recordTop: {
-                    startRecord(topAdd);
-                    break;
-                }
+            if (menuItem_insertUp.equals(insertType)) {
+                addClick(upAdd);
+            } else if (menuItem_insertDown.equals(insertType)) {
+                addClick(downAdd);
+            } else if (menuItem_recordUp.equals(insertType)) {
+                startRecord(upAdd);
+            } else if (menuItem_recordDown.equals(insertType)) {
+                startRecord(downAdd);
+            } else if (menuItem_insertTop.equals(insertType)) {
+                addClick(topAdd);
+            } else if (menuItem_recordTop.equals(insertType)) {
+                startRecord(topAdd);
             }
         }
     }
@@ -1202,7 +1189,7 @@ public class AutoClickController extends RootController implements MousePosition
                     || !activationList.contains(clickPositionVO.getRandomClickInterval())
                     || !activationList.contains(clickPositionVO.getRandomWaitTime())
                     || !activationList.contains(clickPositionVO.getRandomClickTime())) {
-                throw new IOException(text_LackKeyData);
+                throw new IOException(text_missingKeyData);
             }
             clickPositionVO.setUuid(UUID.randomUUID().toString());
         }

@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
+import static priv.koishi.pmc.Finals.CommonFinals.text_image;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
@@ -78,10 +80,10 @@ public class ImageRecognitionService {
         File file = new File(templatePath);
         String fileName = getFileName(templatePath);
         if (StringUtils.isBlank(templatePath)) {
-            throw new Exception("图片 " + fileName + " 路径为空");
+            throw new Exception(text_image + fileName + bundle.getString("nullPath"));
         }
         if (!file.exists()) {
-            throw new Exception("图片 " + fileName + " 不存在");
+            throw new Exception(text_image + fileName + bundle.getString("noExists"));
         }
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
             // 创建带名称的线程池（便于问题排查）
@@ -92,7 +94,7 @@ public class ImageRecognitionService {
                 return t;
             })) {
                 try {
-                    String timeOutErr = "图片 " + fileName + " 匹配超时";
+                    String timeOutErr = text_image + fileName + bundle.getString("timeOut");
                     if (config.isContinuously()) {
                         while (true) {
                             Future<MatchPointBean> future = executor.submit(() ->
@@ -166,7 +168,7 @@ public class ImageRecognitionService {
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
         } catch (AWTException e) {
-            throw new Exception("屏幕图像获取失败: " + e.getMessage(), e);
+            throw new Exception(bundle.getString("screenErr") + e.getMessage(), e);
         }
         checkInterruption();
         // 初始化匹配结果存储变量
@@ -262,7 +264,7 @@ public class ImageRecognitionService {
      */
     private static void checkInterruption() throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException("操作被用户取消");
+            throw new InterruptedException(bundle.getString("cancel"));
         }
     }
 

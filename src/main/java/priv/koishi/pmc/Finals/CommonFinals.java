@@ -149,12 +149,12 @@ public class CommonFinals {
     /**
      * 自动保存文件名
      */
-    public static final String autoSaveFileName = "PMC自动导出流程";
+    public static final String autoSaveFileName = bundle.getString("autoSaveFileName");
 
     /**
      * 默认导出文件名称
      */
-    public static final String defaultOutFileName = "PMC自动操作流程";
+    public static final String defaultOutFileName = bundle.getString("defaultOutFileName");
 
     /**
      * jvm最大内存设置参数
@@ -211,11 +211,11 @@ public class CommonFinals {
 
     public static final String G = "G";
 
-    public static final String extension_file = "文件";
+    public static final String extension_file = bundle.getString("extension.file");
 
-    public static final String extension_folder = "文件夹";
+    public static final String extension_folder = bundle.getString("extension.folder");
 
-    public static final String extension_fileOrFolder = "文件或文件夹";
+    public static final String extension_fileOrFolder = bundle.getString("extension.fileOrFolder");
 
     public static final String allPng = "*.png";
 
@@ -468,363 +468,328 @@ public class CommonFinals {
     /**
      * 定时任务默认任务名称
      */
-    public static final String defaultTaskName = "自动启动任务 ";
+    public static final String defaultTaskName = bundle.getString("defaultTaskName");
 
     /**
      * 操作记录列表时间格式
      */
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public static final String tip_logsNum = "logs 文件夹下只会保留该配置所填写数量的 log 日志，不填将会保留全部日志";
+    public static final String tip_logsNum = bundle.getString("tip.logsNum");
 
-    public static final String tip_learButton = "点击将会清空列表中的数据";
+    public static final String tip_learButton = bundle.getString("tip.learButton");
 
-    public static final String tip_openDirectory = "勾选后任务结束将会打开对应文件夹";
+    public static final String tip_openDirectory = bundle.getString("tip.openDirectory");
 
-    public static final String tip_openLink = "点击即可跳转对应网盘分享页";
+    public static final String tip_openLink = bundle.getString("tip.openLink");
 
-    public static final String tip_openGitLink = "点击即可跳转对应 git 仓库";
+    public static final String tip_openGitLink = bundle.getString("tip.openGitLink");
 
-    public static final String tip_wait = "每步操作执行前等待时间，单位为毫秒，只能填自然数，不填默认为 0";
+    public static final String tip_wait = bundle.getString("tip.wait");
 
-    public static final String tip_mouseStartX = "鼠标点击位置起始横坐标，只能填自然数，不填默认为 0";
+    public static final String tip_mouseStartX = bundle.getString("tip.mouseStartX");
 
-    public static final String tip_mouseStartY = "鼠标点击位置起始纵坐标，只能填自然数，不填默认为 0";
+    public static final String tip_mouseStartY = bundle.getString("tip.mouseStartY");
 
-    public static final String tip_runClick = "点击后将会按照列表中的步骤执行自动操作，执行自动化任务时按下 esc 即可取消任务";
+    public static final String tip_runClick = bundle.getString("tip.runClick");
 
-    public static final String tip_addPosition = "点击后将会根据设置在列表中添加一条操作步骤";
+    public static final String tip_addPosition = bundle.getString("tip.addPosition");
 
-    public static final String tip_loopTime = "自动操作循环次数，只能填自然数，不填默认为 1，填 0 为无限循环";
+    public static final String tip_loopTime = bundle.getString("tip.loopTime");
 
-    public static final String tip_clickNumBer = "每步操作执行次数，点击为多次点击，长按为多次长按，只能填自然数，不填默认为 1";
+    public static final String tip_clickNumBer = bundle.getString("tip.clickNumBer");
 
-    public static final String tip_clickKey = "每步操作需要按下的键";
+    public static final String tip_clickKey = bundle.getString("tip.clickKey");
 
-    public static final String tip_clickType = "操作列表中点击加拖拽数量必须与松开操作数量一致\n设置点击图像后只能选择点击后松开或移动到设置坐标";
+    public static final String tip_clickType = bundle.getString("tip.clickType");
 
-    public static final String tip_clickTime = "每步操作中，单次操作的点击时长，单位为毫秒，只能填自然数，不填默认为 0";
+    public static final String tip_clickTime = bundle.getString("tip.clickTime");
 
-    public static final String tip_clickInterval = "每步操作中，单次操作的时间间隔，单位为毫秒，只能填自然数，不填默认为 0";
+    public static final String tip_clickInterval = bundle.getString("tip.clickInterval");
 
-    public static final String tip_clickName = "每步操作的名称，不填将给一个默认名称";
+    public static final String tip_clickName = bundle.getString("tip.clickName");
 
-    public static final String tip_outAutoClickPath = "点击可设置操作流程导出文件夹地址";
+    public static final String tip_outAutoClickPath = bundle.getString("tip.outAutoClickPath");
 
-    public static final String tip_loadAutoClick = "点击后选择要导入的操作流程即可在列表中追加";
+    public static final String tip_loadAutoClick = bundle.getString("tip.loadAutoClick");
 
-    public static final String tip_exportAutoClick = "点击即可按照设置导出文件夹与文件名导出列表中的操作流程";
+    public static final String tip_exportAutoClick = bundle.getString("tip.exportAutoClick");
 
-    public static final String tip_showWindowRun = "勾选后运行或测试自动操作结束后将会弹出本程序的窗口";
+    public static final String tip_showWindowRun = bundle.getString("tip.showWindowRun");
 
-    public static final String tip_hideWindowRecord = "勾选后录制自动操作开始前将会隐藏本程序的窗口";
+    public static final String tip_hideWindowRecord = bundle.getString("tip.hideWindowRecord");
 
-    public static final String tip_showWindowRecord = "勾选后录制自动操作结束后将会弹出本程序的窗口";
+    public static final String tip_showWindowRecord = bundle.getString("tip.showWindowRecord");
 
-    public static final String tip_mouseFloatingRun = "勾选后在运行自动操作时运行信息浮窗会跟随鼠标移动";
+    public static final String tip_mouseFloatingRun = bundle.getString("tip.mouseFloatingRun");
 
-    public static final String tip_mouseFloatingRecord = "勾选后在录制自动操作时信息浮窗会跟随鼠标移动";
+    public static final String tip_mouseFloatingRecord = bundle.getString("tip.mouseFloatingRecord");
 
-    public static final String tip_mouseFloating = "勾选后点击 显示浮窗位置 按钮所显示的浮窗会跟随鼠标移动";
+    public static final String tip_mouseFloating = bundle.getString("tip.mouseFloating");
 
-    public static final String tip_margin = "用来控制浮窗距离屏幕边界的最小距离，只能填自然数，单位为像素，不填默认为 0";
+    public static final String tip_margin = bundle.getString("tip.margin");
 
-    public static final String tip_preparationRecordTime = "在录制自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为 ";
+    public static final String tip_preparationRecordTime = bundle.getString("tip.preparationRecordTime");
 
-    public static final String tip_preparationRunTime = "在运行自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为 ";
+    public static final String tip_preparationRunTime = bundle.getString("tip.preparationRunTime");
 
-    public static final String tip_floatingRun = "勾选后在运行自动操作时将会显示一个运行信息浮窗";
+    public static final String tip_floatingRun = bundle.getString("tip.floatingRun");
 
-    public static final String tip_floatingRecord = "勾选后在录制自动操作时将会显示一个录制信息浮窗";
+    public static final String tip_floatingRecord = bundle.getString("tip.floatingRecord");
 
-    public static final String tip_setFloatingCoordinate = "点击后将会展示浮窗位置，之后按下 esc 可关闭浮窗";
+    public static final String tip_setFloatingCoordinate = bundle.getString("tip.setFloatingCoordinate");
 
-    public static final String tip_closeFloating = "点击后将会关闭浮窗";
+    public static final String tip_closeFloating = bundle.getString("tip.closeFloating");
 
-    public static final String tip_saveFloating = "点击后将会关闭浮窗并保存浮窗位置";
+    public static final String tip_saveFloating = bundle.getString("tip.saveFloating");
 
-    public static final String tip_offsetX = "浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为 ";
+    public static final String tip_offsetX = bundle.getString("tip.offsetX");
 
-    public static final String tip_offsetY = "浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为 ";
+    public static final String tip_offsetY = bundle.getString("tip.offsetY");
 
-    public static final String tip_colorPicker = "将会修改自动操作运行与录制时的信息浮窗字体颜色";
+    public static final String tip_colorPicker = bundle.getString("tip.colorPicker");
 
-    public static final String tip_thanks = "感谢吧友 @拒绝神绮99次 设计的 logo";
+    public static final String tip_thanks = bundle.getString("tip.thanks");
 
-    public static final String tip_appreciate = "感谢你的赞赏！";
+    public static final String tip_appreciate = bundle.getString("tip.appreciate");
 
-    public static final String tip_lastAutoClickSetting = "勾选后将会在程序启动时加载自动操作工具上次关闭时的设置";
+    public static final String tip_lastAutoClickSetting = bundle.getString("tip.lastAutoClickSetting");
 
-    public static final String tip_clickOpacity = "滑块将会改变当前步骤要点及的图像识别匹配度，建议设置 80% 以上";
+    public static final String tip_clickOpacity = bundle.getString("tip.clickOpacity");
 
-    public static final String tip_stopOpacity = "滑块将会改变当前步骤所有终止操作图像识别匹配度，建议设置 80% 以上";
+    public static final String tip_stopOpacity = bundle.getString("tip.stopOpacity");
 
-    public static final String tip_stopImgBtn = "点击后可添加用来终止当前步骤的图片，建议不要添加太多影响图像识别效率";
+    public static final String tip_stopImgBtn = bundle.getString("tip.stopImgBtn");
 
-    public static final String tip_defaultStopImgBtn = "创建新的操作步骤时会自动将列表中的图片加入对应步骤中，建议不要添加太多影响图像识别效率";
+    public static final String tip_defaultStopImgBtn = bundle.getString("tip.defaultStopImgBtn");
 
-    public static final String tip_clickImgBtn = "点击后可添加需要点击的图片，建议选择特征明显范围较小的图片";
+    public static final String tip_clickImgBtn = bundle.getString("tip.clickImgBtn");
 
-    public static final String tip_removeClickImgBtn = "删除需要点击的图片";
+    public static final String tip_removeClickImgBtn = bundle.getString("tip.removeClickImgBtn");
 
-    public static final String tip_removeStopImgBtn = "删除列表所有终止操作图片";
+    public static final String tip_removeStopImgBtn = bundle.getString("tip.removeStopImgBtn");
 
-    public static final String tip_updateClickNameBtn = "将当前步骤的步骤名称更改为要点击的图片名称";
+    public static final String tip_updateClickNameBtn = bundle.getString("tip.updateClickNameBtn");
 
-    public static final String tip_overtime = "只能填正整数，单位秒，不填默认为不限制，每张图片识别如果使用时间超过设置值将会直接终止操作";
+    public static final String tip_overtime = bundle.getString("tip.overtime");
 
-    public static final String tip_retrySecond = "只能填自然整数，单位秒，不填默认为 1，每张图片识别失败后将会等着当前设置值后再重试";
+    public static final String tip_retrySecond = bundle.getString("tip.retrySecond");
 
-    public static final String tip_reLaunch = "点击将会重启本程序并保存设置项";
+    public static final String tip_reLaunch = bundle.getString("tip.reLaunch");
 
-    public static final String tip_remindSave = "勾选后如果修改过操作步骤详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框";
+    public static final String tip_remindSave = bundle.getString("tip.remindSave");
 
-    public static final String tip_clickIndex = "当前步骤序号为：";
+    public static final String tip_clickIndex = bundle.getString("tip.clickIndex");
 
-    public static final String tip_tableViewSize = "当前操作步骤列表共有操作步骤数量为：";
+    public static final String tip_tableViewSize = bundle.getString("tip.tableViewSize");
 
-    public static final String tip_Step = "只能填正整数，不可为空，不可大于操作步骤列表中步骤总数，不可填当前步骤序号，目标序号变更后需重新设置";
+    public static final String tip_step = bundle.getString("tip.step");
 
-    public static final String tip_matchedType = "要识别的图像匹配成功后将会根据选项进行不同的操作";
+    public static final String tip_matchedType = bundle.getString("tip.matchedType");
 
-    public static final String tip_retryType = "要识别的图像匹配失败后将会根据选项进行不同的操作";
+    public static final String tip_retryType = bundle.getString("tip.retryType");
 
-    public static final String tip_recordMove = "勾选后将会在录制自动操作时记录鼠标没有拖拽时的移动轨迹";
+    public static final String tip_recordMove = bundle.getString("tip.recordMove");
 
-    public static final String tip_recordDrag = "勾选后将会在录制自动操作时记录鼠标拖拽状态时的移动轨迹";
+    public static final String tip_recordDrag = bundle.getString("tip.recordDrag");
 
-    public static final String tip_randomClick = "勾选后运行自动操作点击时将按设置进行点击位置的坐标偏移";
+    public static final String tip_randomClick = bundle.getString("tip.randomClick");
 
-    public static final String tip_randomTrajectory = "勾选后运行自动操作移动鼠标时将按设置进行轨迹坐标的偏移";
+    public static final String tip_randomTrajectory = bundle.getString("tip.randomTrajectory");
 
-    public static final String tip_randomClickTime = "勾选后运行自动操作点击时长将按设置的时间偏移量进行偏移";
+    public static final String tip_randomClickTime = bundle.getString("tip.randomClickTime");
 
-    public static final String tip_randomClickInterval = "勾选后运行自动操作时多次点击的操作步骤的点击间隔将按设置的时间偏移量进行偏移";
+    public static final String tip_randomClickInterval = bundle.getString("tip.randomClickInterval");
 
-    public static final String tip_randomWaitTime = "勾选后运行自动操作时每步操前的等待时间将按照设置的时间偏移量进行偏移";
+    public static final String tip_randomWaitTime = bundle.getString("tip.randomWaitTime");
 
-    public static final String tip_maxLogNum = "用来限制运行记录数量的设置，只能填正整数，不填则不限制最大记录数量";
+    public static final String tip_maxLogNum = bundle.getString("tip.maxLogNum");
 
-    public static final String tip_nextRunMemory = "下次启动程序将会按照此设置项分配程序最大运行内存，单位为GB，只能填自然数，为空将设置为默认值操作系统最大内存的1/4";
+    public static final String tip_nextRunMemory = bundle.getString("tip.nextRunMemory");
 
-    public static final String tip_hour = "只能填 0 到 23 的自然数，不填默认为 0";
+    public static final String tip_hour = bundle.getString("tip.hour");
 
-    public static final String tip_minute = "只能填 0 到 59 的自然数，不填默认为 0";
+    public static final String tip_minute = bundle.getString("tip.minute");
 
-    public static final String tip_taskName = "定时任务的名称，保存后无法修改，同名任务将会被覆盖，不填默认为 ";
+    public static final String tip_taskName = bundle.getString("tip.taskName");
 
-    public static final String tip_datePicker = "重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效";
+    public static final String tip_datePicker = bundle.getString("tip.datePicker");
 
-    public static final String tip_repeatType = "定时任务将按照此选项设置类型间隔进行运作";
+    public static final String tip_repeatType = bundle.getString("tip.repeatType");
 
-    public static final String tip_addTimedTask = "点击后将会打开定时任务设置页，设置定时任务并保存成功后将会在下面列表中显示";
+    public static final String tip_addTimedTask = bundle.getString("tip.addTimedTask");
 
-    public static final String tip_getScheduleTask = "点击后将会刷新定时任务列表，查询最新设置";
+    public static final String tip_getScheduleTask = bundle.getString("tip.getScheduleTask");
 
-    public static final String tip_deletePath = "删除所选文件";
+    public static final String tip_deletePath = bundle.getString("tip.deletePath");
 
-    public static final String tip_nextGcType = """
-            下次启动程序将会按照此设置项设置垃圾回收（GC）方式
-            G1GC：分区回收，低延迟与吞吐量平衡
-            ZGC：亚毫秒级停顿
-            ParallelGC：多线程并行回收，吞吐量优先
-            ShenandoahGC：全并发回收，停顿时间与堆大小无关
-            SerialGC：单线程回收，简单高效""";
+    public static final String tip_nextGcType = bundle.getString("tip.nextGcType");
 
-    public static final String tip_sampleInterval = """
-            在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
-            只能填自然数，单位为毫秒，数字越小越接近录制轨迹，不填默认为\s""";
+    public static final String tip_sampleInterval = bundle.getString("tip.sampleInterval");
 
-    public static final String tip_clickRetryNum = """
-            要点击的图片识别没有匹配项后将会按照设置次数再次识别
-            只能填自然数，不填默认为\s""";
+    public static final String tip_clickRetryNum = bundle.getString("tip.clickRetryNum");
 
-    public static final String tip_stopRetryNum = """
-            终止操作图片识别没有匹配项后将会按照设置次数再次识别
-            只能填自然数，不填默认为\s""";
+    public static final String tip_stopRetryNum = bundle.getString("tip.stopRetryNum");
 
-    public static final String tip_opacity = """
-            滑动将会改变录制或运行自动操作时浮窗透明度
-            透明的为 0 时 Windows 下鼠标将会点击透过浮窗
-            macOS 暂时无法实现鼠标点击透过""";
+    public static final String tip_opacity = bundle.getString("tip.opacity");
 
-    public static final String tip_recordClick = """
-            点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
-            每次鼠标点击并松开为一个步骤，每次点击间隔为操作前等待时间""";
+    public static final String tip_recordClick = bundle.getString("tip.recordClick");
 
-    public static final String tip_autoClickFileName = """
-            不用填写文件拓展名，导出文件为 .pmc 格式，如果导出文件夹已经存在同名文件不会覆盖
-            文件名不能包含  <>:"/\\|?*
-            设置为空或者不合法将会以默认名称命名，默认名称为：""";
+    public static final String tip_autoClickFileName = bundle.getString("tip.autoClickFileName");
 
-    public static final String tip_firstClick = """
-            勾选后：
-            如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作
-            如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作
-            Windows 会直接点击对应窗口的对应坐标，macOS 需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
-            建议 Windows 用户不要勾选， macOS 用户需要勾选""";
+    public static final String tip_firstClick = bundle.getString("tip.firstClick");
 
-    public static final String tip_autoSave = """
-            勾选后在程序关闭时如果列表不为空将会保存列表的所有操作步骤
-            自动保存路径为导出文件夹路径，文件名为：""";
+    public static final String tip_autoSave = bundle.getString("tip.autoSave");
 
-    public static final String tip_hideWindowRun = """
-            勾选后运行或测试自动操作开始前将会隐藏本程序的窗口
-            如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度""";
+    public static final String tip_hideWindowRun = bundle.getString("tip.hideWindowRun");
 
-    public static final String tip_NativeHookException = """
-            需要在macOS系统设置中启用辅助设备权限：
-            1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
-            2. 在左侧列表选择「辅助功能」
-            3. 点击🔒解锁设置
-            4. 删除列表中的\s""" + appName + app + """
-             （如果有的话）
-            5. 将\s""" + appName + app + """
-             添加到允许列表中
-            6. 重启\s""" + appName + app;
+    public static final String tip_NativeHookException = bundle.getString("tip.NativeHookException") +
+            "\n" + appName + app +
+            "\n" + bundle.getString("tip.ifHave") +
+            "\n" + bundle.getString("tip.addList") + appName + app;
 
-    public static final String tip_noScreenCapturePermission = """
-            需要在macOS系统设置中启用录屏与系统录音权限：
-            1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
-            2. 在左侧列表选择「录屏与系统录音」
-            3. 点击🔒解锁设置
-            4. 删除列表中的\s""" + appName + app + """
-             （如果有的话）
-            5. 将\s""" + appName + app + """
-             添加到允许列表中
-            6. 重启\s""" + appName + app;
+    public static final String tip_noScreenCapturePermission = bundle.getString("tip.noScreenCapturePermission") +
+            "\n" + appName + app +
+            "\n" + bundle.getString("tip.ifHave") +
+            "\n" + bundle.getString("tip.addList") + appName + app;
 
-    public static final String tip_randomClickX = """
-            运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标
-            单位为像素，只能填自然数，不填默认为\s""";
+    public static final String tip_randomClickX = bundle.getString("tip.randomClickX");
 
-    public static final String tip_randomClickY = """
-            运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标
-            单位为像素，只能填自然数，不填默认为\s""";
+    public static final String tip_randomClickY = bundle.getString("tip.randomClickY");
 
-    public static final String tip_randomTime = """
-            运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移
-            偏移后时间最小为0，单位为毫秒，只能填自然数，不填默认为\s""";
+    public static final String tip_randomTime = bundle.getString("tip.randomTime");
 
-    public static final String tip_clickTimeOffset = """
-            手动创建新的操作步骤时将会按照此设置先设置默认点击时长
-            单位为毫秒，只能填自然数，不填默认为\s""";
+    public static final String tip_clickTimeOffset = bundle.getString("tip.clickTimeOffset");
 
     public static final String version = "3.0.0";
 
-    public static final String buildDate = "2025年6月";
+    public static final String buildDate = "2025.06";
 
     public static final String tip_version = """
             version：%s
-            %s构建""".formatted(version, buildDate);
+            build：%s""".formatted(version, buildDate);
 
-    public static final String text_selectDirectory = "选择文件夹";
+    public static final String text_selectDirectory = bundle.getString("selectDirectory");
 
-    public static final String text_selectTemplateImg = "选择要识别的图片";
+    public static final String text_selectTemplateImg = bundle.getString("selectTemplateImg");
 
-    public static final String text_dataListNull = "列表为空";
+    public static final String text_dataListNull = bundle.getString("listText.null");
 
-    public static final String text_outPathNull = "导出文件夹位置为空，需要先设置导出文件夹位置再继续";
+    public static final String text_outPathNull = bundle.getString("outPathNull");
 
-    public static final String text_selectAutoFile = "选择自动化操作流程文件";
+    public static final String text_selectAutoFile = bundle.getString("selectAutoFile");
 
-    public static final String text_fileNotExists = "文件不存在";
+    public static final String text_fileNotExists = bundle.getString("fileNotExists");
 
-    public static final String text_nullPath = "路径不能为空";
+    public static final String text_nullPath = bundle.getString("pathNull");
 
-    public static final String text_errPathFormat = "路径格式不正确";
+    public static final String text_errPathFormat = bundle.getString("errPathFormat");
 
-    public static final String text_allHave = "共有 ";
+    public static final String text_allHave = bundle.getString("allHave");
 
-    public static final String text_data = " 组数据";
+    public static final String text_data = bundle.getString("unit.data");
 
-    public static final String text_task = " 个任务";
+    public static final String text_task = bundle.getString("unit.task");
 
-    public static final String text_img = " 张图片";
+    public static final String text_img = bundle.getString("unit.img");
 
-    public static final String text_log = " 条记录";
+    public static final String text_log = bundle.getString("unit.log");
 
-    public static final String text_process = " 步操作";
+    public static final String text_process = bundle.getString("unit.process");
 
-    public static final String text_copySuccess = "复制成功";
+    public static final String text_copySuccess = bundle.getString("copySuccess");
 
-    public static final String text_successSave = "保存成功";
+    public static final String text_successSave = bundle.getString("successSave");
 
-    public static final String text_nowValue = "当前设置值为： ";
+    public static final String text_nowValue = bundle.getString("nowValue");
 
-    public static final String text_saveSuccess = "所有数据已导出到： ";
+    public static final String text_saveSuccess = bundle.getString("saveSuccess");
 
-    public static final String text_loadSuccess = "已导入自动操作流程：";
+    public static final String text_loadSuccess = bundle.getString("loadSuccess");
 
-    public static final String text_executionTime = " 轮操作";
+    public static final String text_executionTime = bundle.getString("executionTime");
 
-    public static final String text_execution = "正在执行第 ";
+    public static final String text_execution = bundle.getString("execution");
 
-    public static final String text_cancelTask = "按下 esc 即可取消任务\n";
+    public static final String text_cancelTask = bundle.getString("cancelTask");
 
-    public static final String text_saveFloatingCoordinate = "鼠标拖拽浮窗即可移动浮窗\n按下 esc 即可保存浮窗位置";
+    public static final String text_saveFloatingCoordinate = bundle.getString("saveFloatingCoordinate");
 
-    public static final String text_escCloseFloating = "按下 esc 即可关闭浮窗";
+    public static final String text_escCloseFloating = bundle.getString("escCloseFloating");
 
-    public static final String text_closeFloating = "关闭浮窗";
+    public static final String text_closeFloating = bundle.getString("closeFloating");
 
-    public static final String text_saveCloseFloating = "关闭并保存浮窗位置";
+    public static final String text_saveCloseFloating = bundle.getString("saveCloseFloating");
 
-    public static final String text_showFloating = "显示浮窗位置";
+    public static final String text_showFloating = bundle.getString("showFloating");
 
-    public static final String text_loadAutoClick = "导入自动化流程文件：";
+    public static final String text_loadAutoClick = bundle.getString("loadAutoClick");
 
-    public static final String text_formatError = " 内容格式不正确";
+    public static final String text_formatError = bundle.getString("formatError");
 
-    public static final String text_noAutoClickList = "列表中没有要导出的自动操作流程";
+    public static final String text_noAutoClickList = bundle.getString("noAutoClickList");
 
-    public static final String text_noAutoClickToRun = "列表中没有要执行的操作";
+    public static final String text_noAutoClickToRun = bundle.getString("noAutoClickToRun");
 
-    public static final String text_LackKeyData = "导入文件缺少关键数据";
+    public static final String text_missingKeyData = bundle.getString("missingKeyData");
 
-    public static final String text_step = "步骤 ";
+    public static final String text_step = bundle.getString("step");
 
-    public static final String text_recordClicking = " 正在录制操作";
+    public static final String text_recordClicking = bundle.getString("recordClicking");
 
-    public static final String text_preparation = " 秒后开始录制操作";
+    public static final String text_preparation = bundle.getString("preparation");
 
-    public static final String text_run = " 秒后开始自动操作";
+    public static final String text_run = bundle.getString("run");
 
-    public static final String text_recorded = "已记录 ";
+    public static final String text_recorded = bundle.getString("recorded");
 
     public static final String text_mouseTrajectory = bundle.getString("autoClick.mouseTrajectory");
 
-    public static final String text_taskFailed = "出现错误，任务终止";
+    public static final String text_taskFailed = bundle.getString("taskFailed");
 
-    public static final String text_taskCancelled = "任务已取消";
+    public static final String text_taskCancelled = bundle.getString("taskCancelled");
 
-    public static final String text_taskFinished = "所有操作都已执行完毕";
+    public static final String text_taskFinished = bundle.getString("taskFinished");
 
-    public static final String text_isAdd = " (添加)";
+    public static final String text_isAdd = bundle.getString("isAdd");
 
-    public static final String text_isRecord = " (录制)";
+    public static final String text_isRecord = bundle.getString("isRecord");
 
-    public static final String text_imgExist = "图片已存在";
+    public static final String text_imgExist = bundle.getString("imgExist");
 
-    public static final String text_noImg = "无图片";
+    public static final String text_noImg = bundle.getString("noImg");
 
-    public static final String text_badImg = "图片文件缺失或损坏";
+    public static final String text_badImg = bundle.getString("badImg");
 
-    public static final String text_retryStepGreaterMax = "重试后要跳转的步骤序号不能大于列表步骤数量";
+    public static final String text_retryStepGreaterMax = bundle.getString("retryStepGreaterMax");
 
-    public static final String text_retryStepEqualIndex = "重试后要跳转的步骤序号不能等于当前步骤序号";
+    public static final String text_retryStepEqualIndex = bundle.getString("retryStepEqualIndex");
 
-    public static final String text_retryStepIsNull = "重试后要跳转的步骤序号不能为空";
+    public static final String text_retryStepIsNull = bundle.getString("retryStepIsNull");
 
-    public static final String text_matchedStepGreaterMax = "匹配后要跳转的步骤序号不能大于列表步骤数量";
+    public static final String text_matchedStepGreaterMax = bundle.getString("matchedStepGreaterMax");
 
-    public static final String text_matchedStepEqualIndex = "匹配后要跳转的步骤序号不能等于当前步骤序号";
+    public static final String text_matchedStepEqualIndex = bundle.getString("matchedStepEqualIndex");
 
-    public static final String text_matchedStepIsNull = "匹配后要跳转的步骤序号不能为空";
+    public static final String text_matchedStepIsNull = bundle.getString("matchedStepIsNull");
 
-    public static final String text_onlyLaunch = "仅启动程序";
+    public static final String text_onlyLaunch = bundle.getString("onlyLaunch");
 
     public static final String text_recordEnd = bundle.getString("autoClick.recordEnd");
+
+    public static final String text_image = bundle.getString("img");
+
+    public static final String text_progress = bundle.getString("progress");
+
+    public static final String text_willBe = bundle.getString("willBe");
+
+    public static final String text_ms = bundle.getString("unit.ms");
+
+    public static final String text_msWillBe = bundle.getString("msWillBe");
+
+    public static final String text_index = bundle.getString("taskIndex");
+
+    public static final String text_point = bundle.getString("point");
 
     public static final String key_logsNum = "logsNum";
 
@@ -986,25 +951,25 @@ public class CommonFinals {
 
     public static final String confirm_cancel = bundle.getString("confirm.cancel");
 
-    public static final String menuItem_insertUp = "插入设置步骤到所选行第一行上一行";
+    public static final String menuItem_insertUp = bundle.getString("menuItem.insertUp");
 
-    public static final String menuItem_insertDown = "插入设置步骤到所选行最后一行下一行";
+    public static final String menuItem_insertDown = bundle.getString("menuItem.insertDown");
 
-    public static final String menuItem_recordUp = "插入录制步骤到所选行第一行上一行";
+    public static final String menuItem_recordUp = bundle.getString("menuItem.recordUp");
 
-    public static final String menuItem_recordDown = "插入录制步骤到所选行最后一行下一行";
+    public static final String menuItem_recordDown = bundle.getString("menuItem.recordDown");
 
-    public static final String menuItem_insertTop = "插入设置步骤到列表顶部";
+    public static final String menuItem_insertTop = bundle.getString("menuItem.insertTop");
 
-    public static final String menuItem_recordTop = "插入录制步骤到列表顶部";
+    public static final String menuItem_recordTop = bundle.getString("menuItem.recordTop");
 
-    public static final String menuItem_upCopy = "复制所选数据到所选行第一行上方";
+    public static final String menuItem_upCopy = bundle.getString("menuItem.upCopy");
 
-    public static final String menuItem_downCopy = "复制所选数据到所选行最后一行下方";
+    public static final String menuItem_downCopy = bundle.getString("menuItem.downCopy");
 
-    public static final String menuItem_appendCopy = "复制所选数据到列表最后一行";
+    public static final String menuItem_appendCopy = bundle.getString("menuItem.appendCopy");
 
-    public static final String menuItem_topCopy = "复制所选数据到列表顶部";
+    public static final String menuItem_topCopy = bundle.getString("menuItem.topCopy");
 
     public static final String menu_detailMenu = bundle.getString("detailMenu");
 
