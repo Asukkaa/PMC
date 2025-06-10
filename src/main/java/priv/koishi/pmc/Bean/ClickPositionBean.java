@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static priv.koishi.pmc.Finals.i18nFinal.*;
+
 /**
  * 自动操作步骤类
  *
@@ -65,7 +67,13 @@ public class ClickPositionBean {
     /**
      * 操作按键
      */
+    @JsonIgnore
     String clickKey;
+
+    /**
+     * 操作按键枚举值
+     */
+    int clickKeyEnum;
 
     /**
      * 要识别的图片路径
@@ -103,7 +111,13 @@ public class ClickPositionBean {
     /**
      * 要识别的图像识别重试设置
      */
+    @JsonIgnore
     String retryType;
+
+    /**
+     * 要识别的图像识别重试设置枚举值
+     */
+    int retryTypeEnum;
 
     /**
      * 要识别的图像识别失败后要跳转的步骤序号
@@ -113,7 +127,13 @@ public class ClickPositionBean {
     /**
      * 图像识别匹配逻辑
      */
+    @JsonIgnore
     String matchedType;
+
+    /**
+     * 图像识别匹配逻辑枚举值
+     */
+    int matchedTypeEnum;
 
     /**
      * 要识别的图像匹配成功后要跳转的步骤序号
@@ -135,7 +155,13 @@ public class ClickPositionBean {
     /**
      * 操作类型
      */
+    @JsonIgnore
     String clickType;
+
+    /**
+     * 操作类型枚举值
+     */
+    int clickTypeEnum;
 
     /**
      * 横轴随机偏移量
@@ -208,6 +234,42 @@ public class ClickPositionBean {
                     .setY(y);
             moveTrajectory.add(trajectoryPointBean);
         }
+    }
+
+    /**
+     * 获取操作按键
+     *
+     * @return 操作按键对应的文本
+     */
+    public String getClickKey() {
+        return recordClickTypeMap.get(clickKeyEnum);
+    }
+
+    /**
+     * 获取要识别的图像识别重试设置
+     *
+     * @return 要识别的图像识别重试设置对应的文本
+     */
+    public String getRetryType() {
+        return retryTypeMap.get(retryTypeEnum);
+    }
+
+    /**
+     * 获取图像识别匹配逻辑
+     *
+     * @return 图像识别匹配逻辑对应的文本
+     */
+    public String getMatchedType() {
+        return matchedTypeMap.get(matchedTypeEnum);
+    }
+
+    /**
+     * 获取操作类型
+     *
+     * @return 操作类型对应的文本
+     */
+    public String getClickType() {
+        return clickTypeMap.get(clickTypeEnum);
     }
 
 }

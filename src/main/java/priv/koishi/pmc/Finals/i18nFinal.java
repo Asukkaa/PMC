@@ -4,6 +4,9 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
+import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -813,7 +816,7 @@ public class i18nFinal {
     }
 
     public static String retryType_Step() {
-        return bundle.getString("retryType.Step");
+        return bundle.getString("retryType.step");
     }
 
     /**
@@ -830,10 +833,20 @@ public class i18nFinal {
                 retryType_click(),
                 retryType_stop(),
                 retryType_break(),
-                retryType_Step()
-        );
+                retryType_Step());
         retryTypeList.clear();
         retryTypeList.addAll(newList);
+    }
+
+    public static final BidiMap<Integer, String> retryTypeMap = new DualHashBidiMap<>();
+
+    public static void updateRetryTypeMap() {
+        retryTypeMap.clear();
+        retryTypeMap.put(RetryTypeEnum.CONTINUOUSLY.ordinal(), retryType_continuously());
+        retryTypeMap.put(RetryTypeEnum.CLICK.ordinal(), retryType_click());
+        retryTypeMap.put(RetryTypeEnum.STOP.ordinal(), retryType_stop());
+        retryTypeMap.put(RetryTypeEnum.BREAK.ordinal(), retryType_break());
+        retryTypeMap.put(RetryTypeEnum.STEP.ordinal(), retryType_Step());
     }
 
     public static String clickMatched_click() {
@@ -869,10 +882,20 @@ public class i18nFinal {
                 clickMatched_click(),
                 clickMatched_break(),
                 clickMatched_step(),
-                clickMatched_clickStep()
-        );
+                clickMatched_clickStep());
         clickMatchedList.clear();
         clickMatchedList.addAll(newList);
+    }
+
+    public static final BidiMap<Integer, String> matchedTypeMap = new DualHashBidiMap<>();
+
+    public static void updateClickMatchedMap() {
+        matchedTypeMap.clear();
+        matchedTypeMap.put(MatchedTypeEnum.CLICK.ordinal(), clickMatched_click());
+        matchedTypeMap.put(MatchedTypeEnum.BREAK.ordinal(), clickMatched_break());
+        matchedTypeMap.put(MatchedTypeEnum.STEP.ordinal(), clickMatched_step());
+        matchedTypeMap.put(MatchedTypeEnum.CLICK_STEP.ordinal(), clickMatched_clickStep());
+        matchedTypeMap.put(MatchedTypeEnum.CLICK_WHILE.ordinal(), clickMatched_clickWhile());
     }
 
     public static String mouseButton_primary() {
@@ -909,8 +932,7 @@ public class i18nFinal {
                 mouseButton_secondary(),
                 mouseButton_middle(),
                 mouseButton_forward(),
-                mouseButton_back()
-        );
+                mouseButton_back());
         mouseButtonList.clear();
         mouseButtonList.addAll(newList);
     }
@@ -996,10 +1018,19 @@ public class i18nFinal {
                 clickType_move(),
                 clickType_click(),
                 clickType_drag(),
-                clickType_moveTo()
-        );
+                clickType_moveTo());
         clickTypeList.clear();
         clickTypeList.addAll(newList);
+    }
+
+    public static final BidiMap<Integer, String> clickTypeMap = new DualHashBidiMap<>();
+
+    public static void updateClickTypeMap() {
+        clickTypeMap.clear();
+        clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
+        clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());
+        clickTypeMap.put(ClickTypeEnum.DRAG.ordinal(), clickType_drag());
+        clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
     }
 
     public static final String DAILY = "DAILY";
@@ -1032,8 +1063,7 @@ public class i18nFinal {
         List<String> newList = Arrays.asList(
                 repeatType_daily(),
                 repeatType_weekly(),
-                repeatType_once()
-        );
+                repeatType_once());
         repeatTypeList.clear();
         repeatTypeList.addAll(newList);
     }
@@ -1144,6 +1174,9 @@ public class i18nFinal {
      * 更新映射文本
      */
     public static void updateAllDynamicTexts() {
+        updateRetryTypeMap();
+        updateClickMatchedMap();
+        updateClickTypeMap();
         // 更新要识别的图像识别匹配后逻辑下拉框选项
         updateClickMatchedList();
         // 更新重试逻辑下拉框选项

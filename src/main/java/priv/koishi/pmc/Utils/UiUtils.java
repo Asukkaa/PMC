@@ -1243,7 +1243,7 @@ public class UiUtils {
         List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
-                bean.setClickKey(clickKey);
+                bean.setClickKeyEnum(recordClickTypeMap.getKey(clickKey));
                 tableView.refresh();
             });
         }
@@ -1282,7 +1282,7 @@ public class UiUtils {
         List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
-                bean.setRetryType(retryType);
+                bean.setRetryTypeEnum(retryTypeMap.getKey(retryType));
                 tableView.refresh();
             });
         }

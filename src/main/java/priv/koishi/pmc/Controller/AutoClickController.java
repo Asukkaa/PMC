@@ -49,6 +49,9 @@ import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EditingCell.EditingCell;
 import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
+import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
@@ -1047,21 +1050,21 @@ public class AutoClickController extends RootController implements MousePosition
     private ClickPositionVO createClickPositionVO() {
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
+                .setMatchedTypeEnum(MatchedTypeEnum.CLICK.ordinal())
                 .setSampleInterval(Integer.parseInt(sampleInterval))
+                .setClickTypeEnum(ClickTypeEnum.CLICK.ordinal())
+                .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
+                .setClickKeyEnum(NativeMouseEvent.BUTTON1)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setRandomTrajectory(randomTrajectory)
                 .setStopImgFiles(defaultStopImgFiles)
                 .setRandomClickTime(randomClickTime)
-                .setMatchedType(clickMatched_click())
                 .setRandomWaitTime(randomWaitTime)
                 .setClickRetryTimes(clickRetryNum)
-                .setClickKey(mouseButton_primary())
                 .setStopRetryTimes(stopRetryNum)
                 .setClickTime(clickTimeOffset)
-                .setClickType(clickType_click())
-                .setRetryType(retryType_stop())
                 .setRandomClick(randomClick)
                 .setRandomTime(randomTime)
                 .setRandomX(randomClickX)
@@ -1167,7 +1170,6 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) throws IOException {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
-            String clickType = clickPositionVO.getClickType();
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null)
@@ -1181,10 +1183,10 @@ public class AutoClickController extends RootController implements MousePosition
                     || !isInIntegerRange(clickPositionVO.getRandomX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getRandomY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getRandomClickTime(), 0, null)
-                    || !clickMatchedList.contains(clickPositionVO.getMatchedType())
-                    || !runClickTypeMap.containsKey(clickPositionVO.getClickKey())
-                    || !retryTypeList.contains(clickPositionVO.getRetryType())
-                    || !clickTypeList.contains(clickType)
+                    || !matchedTypeMap.containsKey(clickPositionVO.getMatchedTypeEnum())
+                    || !recordClickTypeMap.containsKey(clickPositionVO.getClickTypeEnum())
+                    || !retryTypeMap.containsKey(clickPositionVO.getRetryTypeEnum())
+                    || !clickTypeMap.containsKey(clickPositionVO.getClickTypeEnum())
                     || !activationList.contains(clickPositionVO.getRandomClick())
                     || !activationList.contains(clickPositionVO.getRandomTrajectory())
                     || !activationList.contains(clickPositionVO.getRandomClickInterval())
@@ -1380,7 +1382,7 @@ public class AutoClickController extends RootController implements MousePosition
                     int y = (int) mousePoint.getY();
                     List<Integer> pressButtons = new CopyOnWriteArrayList<>(pressButtonList);
                     clickBean.addMovePoint(x, y, pressButtons, true);
-                    clickBean.setClickType(clickType_drag());
+                    clickBean.setClickTypeEnum(ClickTypeEnum.DRAG.ordinal());
                 }
             }
         };
@@ -1423,7 +1425,7 @@ public class AutoClickController extends RootController implements MousePosition
                             .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
-                            .setClickType(clickType_move());
+                            .setClickTypeEnum(ClickTypeEnum.MOVE.ordinal());
                     clickPositionVOS.add(movePoint);
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
@@ -1468,7 +1470,7 @@ public class AutoClickController extends RootController implements MousePosition
                 // 创建点击位置对象
                 if (pressButtonList.isEmpty()) {
                     clickBean = createClickPositionVO();
-                    clickBean.setClickKey(recordClickTypeMap.get(pressButton))
+                    clickBean.setClickKeyEnum(pressButton)
                             .setName(text_step() + dataSize + text_isRecord())
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
