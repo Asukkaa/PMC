@@ -182,6 +182,11 @@ public class TaskDetailController extends RootController {
                 Integer dayInt = dayOfWeekMap.getKey(day);
                 weekCheckBoxMap.get(DayOfWeek.of(dayInt)).setSelected(true);
             }
+        } else if (repeatType_daily().equals(repeat)) {
+            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {
+                checkBox.setSelected(true);
+                checkBox.setDisable(true);
+            });
         }
         taskNameField_TD.setText(item.getTaskName());
         taskNameField_TD.setDisable(isEdit);
@@ -439,7 +444,7 @@ public class TaskDetailController extends RootController {
     @FXML
     private void repeatTypeChange() {
         String repeatType = repeatType_TD.getValue();
-        addValueToolTip(repeatType_TD, repeatType_once(), repeatType);
+        addValueToolTip(repeatType_TD, tip_repeatType(), repeatType);
         if (repeatType_once().equals(repeatType)) {
             datePicker_TD.setDisable(false);
             datePickerAction();
