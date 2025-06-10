@@ -17,10 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
@@ -111,9 +108,14 @@ public class SettingController extends RootController implements MousePositionUp
     private Stage floatingStage;
 
     /**
-     * 顶部浮窗信息输出栏
+     * 信息浮窗信息展示栏
      */
     private Label floatingLabel;
+
+    /**
+     * 信息浮窗坐标展示栏
+     */
+    private Label floatingPosition;
 
     @FXML
     public AnchorPane anchorPane_Set;
@@ -273,12 +275,20 @@ public class SettingController extends RootController implements MousePositionUp
             // 应用限制后的坐标
             floatingStage.setX(x);
             floatingStage.setY(y);
+            String point = " X: " + x + " Y: " + y;
+            floatingPosition.setText(point);
         });
         Color labelTextFill = Color.WHITE;
         floatingLabel = new Label(text_saveFloatingCoordinate());
         floatingLabel.setTextFill(labelTextFill);
-        floatingLabel.setStyle("-fx-font-size: 18px;");
-        root.getChildren().addAll(rectangle, floatingLabel);
+        String fontSize = "-fx-font-size: 18px;";
+        floatingLabel.setStyle(fontSize);
+        floatingPosition = new Label();
+        floatingPosition.setTextFill(labelTextFill);
+        floatingPosition.setStyle(fontSize);
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(floatingPosition, floatingLabel);
+        root.getChildren().addAll(rectangle, vBox);
         Scene scene = new Scene(root, Color.TRANSPARENT);
         floatingStage = new Stage();
         // 设置透明样式
@@ -293,9 +303,13 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void showFloatingWindow() {
         Platform.runLater(() -> {
-            floatingLabel.setTextFill(colorPicker_Set.getValue());
+            Color color = colorPicker_Set.getValue();
+            floatingLabel.setTextFill(color);
+            floatingPosition.setTextFill(color);
             floatingStage.setX(floatingX);
             floatingStage.setY(floatingY);
+            String point = " X: " + floatingX + " Y: " + floatingY;
+            floatingPosition.setText(point);
             double opacity = opacity_Set.getValue();
             if (opacity == 0) {
                 rectangle.setFill(new Color(0, 0, 0, 0.01));
@@ -702,6 +716,10 @@ public class SettingController extends RootController implements MousePositionUp
                 int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, null, null);
                 int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, null, null);
                 floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                int x = (int) floatingStage.getX();
+                int y = (int) floatingStage.getY();
+                String point = " X: " + x + " Y: " + y;
+                floatingPosition.setText(point);
             }
         });
     }
