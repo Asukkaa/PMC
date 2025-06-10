@@ -7,7 +7,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.paint.Color;
 import priv.koishi.pmc.Bean.TaskBean;
 
-import static priv.koishi.pmc.Finals.CommonFinals.text_taskFailed;
+import static priv.koishi.pmc.Finals.i18nFinal.text_taskFailed;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
 

@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="priv.koishi.pmc.Controller.MainController">
     <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">

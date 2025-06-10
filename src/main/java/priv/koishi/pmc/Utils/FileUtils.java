@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 
 /**
  * 文件操作工具类

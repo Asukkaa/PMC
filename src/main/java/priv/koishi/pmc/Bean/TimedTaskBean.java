@@ -8,8 +8,8 @@ import priv.koishi.pmc.Bean.VO.Indexable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.repeatType_weekly;
-import static priv.koishi.pmc.Finals.CommonFinals.text_onlyLaunch;
+import static priv.koishi.pmc.Finals.i18nFinal.repeatType_weekly;
+import static priv.koishi.pmc.Finals.i18nFinal.text_onlyLaunch;
 
 /**
  * 定时任务数据类

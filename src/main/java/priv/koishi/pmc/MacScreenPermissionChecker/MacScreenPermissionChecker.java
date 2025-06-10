@@ -2,7 +2,7 @@ package priv.koishi.pmc.MacScreenPermissionChecker;
 
 import java.awt.*;
 
-import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapturePermission;
 
 /**

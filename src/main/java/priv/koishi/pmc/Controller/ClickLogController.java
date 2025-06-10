@@ -17,7 +17,7 @@ import priv.koishi.pmc.Bean.ClickLogBean;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static priv.koishi.pmc.Finals.CommonFinals.text_log;
+import static priv.koishi.pmc.Finals.i18nFinal.text_log;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**

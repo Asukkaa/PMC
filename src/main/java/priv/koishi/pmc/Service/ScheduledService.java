@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getAppPath;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
@@ -201,13 +202,13 @@ public class ScheduledService {
             if ("ONE TIME ONLY".equals(scheduleType)) {
                 scheduleType = ONCE;
             }
-            String repeatType = repeatTypeMap.getKey(scheduleType);
+            String repeatType = repeatTypeMap.get(scheduleType);
             String daysCN = Arrays.stream(days.split(",\\s*"))
                     .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
                     .filter(day -> !day.isEmpty())
                     // 根据 dayOfWeekMap 的键（数字星期）排序
                     .sorted(Comparator.comparingInt(day ->
-                            dayOfWeekReverseMap.getOrDefault(day, 8)))
+                            dayOfWeekReverseMap().getOrDefault(day, 8)))
                     .collect(Collectors.joining(dayOfWeekRegex));
             DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
                     .appendValue(ChronoField.HOUR_OF_DAY, 1, 2, SignStyle.NEVER)
@@ -312,7 +313,7 @@ public class ScheduledService {
                     }
                     if (CollectionUtils.isNotEmpty(weekdays)) {
                         weekdays.sort(Comparator.comparingInt(day ->
-                                dayOfWeekReverseMap.getOrDefault(day, 8)
+                                dayOfWeekReverseMap().getOrDefault(day, 8)
                         ));
                         timedTaskBean.setDays(StringUtils.join(weekdays, dayOfWeekRegex));
                     }

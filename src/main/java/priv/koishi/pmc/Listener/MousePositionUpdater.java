@@ -1,6 +1,6 @@
 package priv.koishi.pmc.Listener;
 
-import java.awt.Point;
+import java.awt.*;
 
 /**
  * 根据鼠标位置更新ui

@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;

@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
-import static priv.koishi.pmc.Finals.CommonFinals.text_image;
+import static priv.koishi.pmc.Finals.i18nFinal.text_image;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 

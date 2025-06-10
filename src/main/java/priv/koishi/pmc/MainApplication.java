@@ -27,6 +27,8 @@ import java.util.*;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.languageMap;
+import static priv.koishi.pmc.Finals.i18nFinal.updateAllDynamicTexts;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -413,6 +415,8 @@ public class MainApplication extends Application {
             Locale.setDefault(locale);
             bundle = ResourceBundle.getBundle(languagePath, locale);
         }
+        // 更新映射文本
+        updateAllDynamicTexts();
         input.close();
         // 启动时检查是否已经启动
         if (checkRunning(port, args)) {

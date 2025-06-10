@@ -44,11 +44,11 @@ import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.setControlLastConfig;
 
 /**
  * 设置页面控制器
@@ -457,19 +457,20 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_floatingRun(), floatingRun_Set);
         addToolTip(tip_margin(), floatingDistance_Set);
         addToolTip(tip_retrySecond(), retrySecond_Set);
-        addValueToolTip(maxLogNum_Set, tip_maxLogNum());
         addToolTip(lastTab_Set.getText(), lastTab_Set);
+        addValueToolTip(maxLogNum_Set, tip_maxLogNum());
         addToolTip(tip_remindSave(), remindClickSave_Set);
         addToolTip(tip_removeStopImgBtn(), removeAll_Set);
         addToolTip(tip_mouseFloating(), mouseFloating_Set);
         addToolTip(tip_hideWindowRun(), hideWindowRun_Set);
         addToolTip(tip_showWindowRun(), showWindowRun_Set);
-        addToolTip(tip_defaultStopImgBtn(), stopImgBtn_Set);
-        addToolTip(tip_floatingRecord(), floatingRecord_Set);
         addToolTip(maxWindow_Set.getText(), maxWindow_Set);
+        addToolTip(tip_defaultStopImgBtn(), stopImgBtn_Set);
+        addToolTip(tip_remindTaskSave(), remindTaskSave_Set);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Set);
-        addToolTip(tip_randomClickTime(), randomClickTime_Set);
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
+        addToolTip(tip_floatingRecord(), floatingRecord_Set);
+        addToolTip(tip_randomClickTime(), randomClickTime_Set);
         addValueToolTip(nextRunMemory_Set, tip_nextRunMemory());
         addToolTip(tip_randomTrajectory(), randomTrajectory_Set);
         addToolTip(tip_hideWindowRecord(), hideWindowRecord_Set);
@@ -482,6 +483,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
         addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
         addToolTip(tip_setFloatingCoordinate(), setFloatingCoordinate_Set);
+        addValueToolTip(language_Set, tip_language(), language_Set.getValue());
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
         addToolTip(tip_clickRetryNum() + defaultClickRetryNum, clickRetryNum_Set);
@@ -1116,6 +1118,8 @@ public class SettingController extends RootController implements MousePositionUp
 
     /**
      * 更改语言下拉框
+     *
+     * @throws IOException io异常
      */
     @FXML
     private void languageAction() throws IOException {

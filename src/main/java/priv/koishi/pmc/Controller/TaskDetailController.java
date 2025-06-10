@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
@@ -281,6 +282,7 @@ public class TaskDetailController extends RootController {
         addToolTip(tip_deletePath(), delete_TD);
         addValueToolTip(hourField_TD, tip_hour());
         addValueToolTip(minuteField_TD, tip_minute());
+        addToolTip(tip_loadAutoClickBtn(), loadAutoClick_TD);
         addValueToolTip(datePicker_TD.getEditor(), tip_datePicker());
         addValueToolTip(repeatType_TD, tip_repeatType(), repeatType_TD.getValue());
         addValueToolTip(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
