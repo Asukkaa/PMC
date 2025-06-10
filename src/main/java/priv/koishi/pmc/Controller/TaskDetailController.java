@@ -256,7 +256,7 @@ public class TaskDetailController extends RootController {
                 getTimedTaskBean();
                 if (isModified) {
                     ButtonType result = creatConfirmDialog(confirm_unSaved(), confirm_unSavedConfirm(),
-                            confirm_ok(), confirm_cancel());
+                            confirm_ok(), confirm_cancelSave());
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
@@ -439,6 +439,7 @@ public class TaskDetailController extends RootController {
     @FXML
     private void repeatTypeChange() {
         String repeatType = repeatType_TD.getValue();
+        addValueToolTip(repeatType_TD, repeatType_once(), repeatType);
         if (repeatType_once().equals(repeatType)) {
             datePicker_TD.setDisable(false);
             datePickerAction();

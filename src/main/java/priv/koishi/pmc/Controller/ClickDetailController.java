@@ -541,7 +541,7 @@ public class ClickDetailController extends RootController {
             stage.setOnCloseRequest(e -> {
                 if (isModified) {
                     ButtonType result = creatConfirmDialog(confirm_unSaved(), confirm_unSavedConfirm(),
-                            confirm_ok(), confirm_cancel());
+                            confirm_ok(), confirm_cancelSave());
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭

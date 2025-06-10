@@ -696,6 +696,22 @@ public class i18nFinal {
         return bundle.getString("confirm.ok");
     }
 
+    public static String confirm_cancelSave() {
+        return bundle.getString("confirm.cancelSave");
+    }
+
+    public static String confirm_reLaunch() {
+        return bundle.getString("confirm.reLaunch");
+    }
+
+    public static String confirm_reLaunchConfirm() {
+        return bundle.getString("confirm.reLaunchConfirm");
+    }
+
+    public static String confirm_reLaunchOk() {
+        return bundle.getString("confirm.reLaunchOk");
+    }
+
     public static String confirm_cancel() {
         return bundle.getString("confirm.cancel");
     }

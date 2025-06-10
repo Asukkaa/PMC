@@ -49,6 +49,7 @@ import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 设置页面控制器
@@ -83,6 +84,11 @@ public class SettingController extends RootController implements MousePositionUp
      * 页面标识符
      */
     private final String tabId = "_Set";
+
+    /**
+     * 页面加载完毕标志（true 加载完毕，false 未加载完毕）
+     */
+    private boolean initializedFinished;
 
     /**
      * 全局键盘监听器
@@ -210,6 +216,8 @@ public class SettingController extends RootController implements MousePositionUp
             output.close();
             // 保存JVM参数设置
             saveJVMConfig();
+            // 保存语言设置
+            updateProperties(configFile, key_language, language_Set.getValue());
         }
     }
 
@@ -627,22 +635,6 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 根据鼠标位置调整ui
-     *
-     * @param mousePoint 鼠标位置
-     */
-    @Override
-    public void onMousePositionUpdate(Point mousePoint) {
-        Platform.runLater(() -> {
-            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
-                int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, null, null);
-                int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, null, null);
-                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-            }
-        });
-    }
-
-    /**
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
@@ -677,6 +669,41 @@ public class SettingController extends RootController implements MousePositionUp
         if (StringUtils.isNotBlank(gcType)) {
             nextGcType_Set.setValue(gcType);
         }
+    }
+
+    /**
+     * 创建重启应用确认弹窗
+     */
+    private void creatReLaunchConfirm() {
+        if (initializedFinished) {
+            ButtonType result = creatConfirmDialog(confirm_reLaunch(), confirm_reLaunchConfirm(),
+                    confirm_reLaunchOk(), confirm_cancel());
+            ButtonBar.ButtonData buttonData = result.getButtonData();
+            if (!buttonData.isCancelButton()) {
+                // 重启应用
+                try {
+                    reLaunch();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据鼠标位置调整ui
+     *
+     * @param mousePoint 鼠标位置
+     */
+    @Override
+    public void onMousePositionUpdate(Point mousePoint) {
+        Platform.runLater(() -> {
+            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
+                int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, null, null);
+                int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, null, null);
+                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+            }
+        });
     }
 
     /**
@@ -717,6 +744,8 @@ public class SettingController extends RootController implements MousePositionUp
             buildContextMenu(tableView_Set, dataNumber_Set);
             // 加载完成后发布事件
             EventBus.publish(new SettingsLoadedEvent());
+            // 标记页面加载完毕
+            initializedFinished = true;
         });
     }
 
@@ -1118,12 +1147,22 @@ public class SettingController extends RootController implements MousePositionUp
 
     /**
      * 更改语言下拉框
-     *
-     * @throws IOException io异常
      */
     @FXML
-    private void languageAction() throws IOException {
-        updateProperties(configFile, key_language, language_Set.getValue());
+    private void languageAction() {
+        addValueToolTip(language_Set, tip_language(), language_Set.getValue());
+        // 创建重启确认框
+        creatReLaunchConfirm();
+    }
+
+    /**
+     * gc类型变更下拉框监听
+     */
+    @FXML
+    private void nextGcTypeAction() {
+        addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
+        // 创建重启确认框
+        creatReLaunchConfirm();
     }
 
 }

@@ -88,7 +88,7 @@
 
             <HBox spacing="5" prefWidth="350">
                 <Label prefHeight="25" text="%setting.nextGcType"/>
-                <ChoiceBox fx:id="nextGcType_Set" prefHeight="25" prefWidth="150">
+                <ChoiceBox fx:id="nextGcType_Set" onAction="#nextGcTypeAction" prefHeight="25" prefWidth="150">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="G1GC"/>
