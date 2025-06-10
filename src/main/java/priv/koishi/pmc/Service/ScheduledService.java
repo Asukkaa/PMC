@@ -4,6 +4,7 @@ import javafx.concurrent.Task;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.TimedTaskBean;
+import priv.koishi.pmc.Finals.Enum.RepeatTypeEnum;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -200,7 +201,7 @@ public class ScheduledService {
             String days = extractValue(DaysPattern, taskBlocks);
             String taskName = extractValue(taskNamePattern, taskBlocks);
             if ("ONE TIME ONLY".equals(scheduleType)) {
-                scheduleType = ONCE;
+                scheduleType = RepeatTypeEnum.ONCE.getRepeatType();
             }
             String repeatType = repeatTypeMap.get(scheduleType);
             String daysCN = Arrays.stream(days.split(",\\s*"))

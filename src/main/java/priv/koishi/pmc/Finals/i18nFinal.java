@@ -6,6 +6,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RepeatTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 
 import java.util.*;
@@ -838,8 +839,14 @@ public class i18nFinal {
         retryTypeList.addAll(newList);
     }
 
+    /**
+     * 重试逻辑下拉框选项与枚举映射
+     */
     public static final BidiMap<Integer, String> retryTypeMap = new DualHashBidiMap<>();
 
+    /**
+     * 更新重试逻辑下拉框选项与枚举映射
+     */
     public static void updateRetryTypeMap() {
         retryTypeMap.clear();
         retryTypeMap.put(RetryTypeEnum.CONTINUOUSLY.ordinal(), retryType_continuously());
@@ -887,8 +894,14 @@ public class i18nFinal {
         clickMatchedList.addAll(newList);
     }
 
+    /**
+     * 要识别的图像识别匹配后逻辑下拉框选项与枚举映射
+     */
     public static final BidiMap<Integer, String> matchedTypeMap = new DualHashBidiMap<>();
 
+    /**
+     * 更新要识别的图像识别匹配后逻辑下拉框选项与枚举映射
+     */
     public static void updateClickMatchedMap() {
         matchedTypeMap.clear();
         matchedTypeMap.put(MatchedTypeEnum.CLICK.ordinal(), clickMatched_click());
@@ -943,7 +956,7 @@ public class i18nFinal {
     public static final BidiMap<String, MouseButton> runClickTypeMap = new DualHashBidiMap<>();
 
     /**
-     * 更新自动操作的操作类型选项对应的鼠标行为（操作用
+     * 更新自动操作的操作类型选项对应的鼠标行为（操作用）
      */
     public static void updateRunClickTypeMap() {
         runClickTypeMap.clear();
@@ -1023,8 +1036,14 @@ public class i18nFinal {
         clickTypeList.addAll(newList);
     }
 
+    /**
+     * 自动操作的操作类型选项与枚举映射
+     */
     public static final BidiMap<Integer, String> clickTypeMap = new DualHashBidiMap<>();
 
+    /**
+     * 更新自动操作的操作类型选项与枚举映射
+     */
     public static void updateClickTypeMap() {
         clickTypeMap.clear();
         clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
@@ -1032,12 +1051,6 @@ public class i18nFinal {
         clickTypeMap.put(ClickTypeEnum.DRAG.ordinal(), clickType_drag());
         clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
     }
-
-    public static final String DAILY = "DAILY";
-
-    public static final String WEEKLY = "WEEKLY";
-
-    public static final String ONCE = "ONCE";
 
     public static String repeatType_daily() {
         return bundle.getString("repeatType.daily");
@@ -1078,9 +1091,9 @@ public class i18nFinal {
      */
     public static void updateRepeatTypeMap() {
         repeatTypeMap.clear();
-        repeatTypeMap.put(DAILY, repeatType_daily());
-        repeatTypeMap.put(WEEKLY, repeatType_weekly());
-        repeatTypeMap.put(ONCE, repeatType_once());
+        repeatTypeMap.put(RepeatTypeEnum.DAILY.getRepeatType(), repeatType_daily());
+        repeatTypeMap.put(RepeatTypeEnum.WEEKLY.getRepeatType(), repeatType_weekly());
+        repeatTypeMap.put(RepeatTypeEnum.ONCE.getRepeatType(), repeatType_once());
     }
 
     public static String monday() {
@@ -1174,8 +1187,11 @@ public class i18nFinal {
      * 更新映射文本
      */
     public static void updateAllDynamicTexts() {
+        // 更新重试逻辑下拉框选项与枚举映射
         updateRetryTypeMap();
+        // 更新要识别的图像识别匹配后逻辑下拉框选项与枚举映射
         updateClickMatchedMap();
+        // 更新自动操作的操作类型选项与枚举映射
         updateClickTypeMap();
         // 更新要识别的图像识别匹配后逻辑下拉框选项
         updateClickMatchedList();
