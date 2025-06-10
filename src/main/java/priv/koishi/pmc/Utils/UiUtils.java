@@ -1806,7 +1806,8 @@ public class UiUtils {
         floatingStage.setX(x);
         floatingStage.setY(y);
         // 保证浮窗一直置顶
-        showStage(floatingStage);
+        floatingStage.setAlwaysOnTop(true);
+        floatingStage.setIconified(false);
     }
 
     /**
