@@ -24,6 +24,14 @@ public class CommonFinals {
      */
     public static final String appName = "Perfect Mouse Control";
 
+    public static final String version = "3.0.0";
+
+    public static final String buildDate = "2025.06";
+
+    public static final String tip_version = """
+            version：%s
+            build：%s""".formatted(version, buildDate);
+
     /**
      * 程序logo
      */

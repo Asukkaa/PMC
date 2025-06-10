@@ -432,14 +432,6 @@ public class i18nFinal {
         return bundle.getString("tip.clickTimeOffset");
     }
 
-    public static final String version = "3.0.0";
-
-    public static final String buildDate = "2025.06";
-
-    public static final String tip_version = """
-            version：%s
-            build：%s""".formatted(version, buildDate);
-
     public static String text_selectDirectory() {
         return bundle.getString("selectDirectory");
     }
