@@ -1222,7 +1222,8 @@ public class AutoClickController extends RootController implements MousePosition
             floatingMousePosition.setText(text);
             mousePosition_Click.setText(text);
             if (floatingStage != null && floatingStage.isShowing()) {
-                if ((mouseFloatingRun.isSelected() && runClicking) || (mouseFloatingRecord.isSelected() && recordClicking)) {
+                if ((mouseFloatingRun.isSelected() && runClicking)
+                        || (mouseFloatingRecord.isSelected() && recordClicking)) {
                     floatingMove(floatingStage, mousePoint, offsetX, offsetY);
                 }
             }
@@ -1422,10 +1423,10 @@ public class AutoClickController extends RootController implements MousePosition
                     // 添加至表格
                     List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                     movePoint.setName(text_step() + index + text_isRecord())
+                            .setClickTypeEnum(ClickTypeEnum.MOVE.ordinal())
                             .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .setClickTypeEnum(ClickTypeEnum.MOVE.ordinal());
+                            .setStartY(String.valueOf(startY));
                     clickPositionVOS.add(movePoint);
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
@@ -1565,7 +1566,8 @@ public class AutoClickController extends RootController implements MousePosition
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, true);
             // 获取准备时间值
-            int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click, Integer.parseInt(defaultPreparationRecordTime), 0, null);
+            int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click,
+                    Integer.parseInt(defaultPreparationRecordTime), 0, null);
             // 开始录制
             CheckBox hideWindowRecord = settingController.hideWindowRecord_Set;
             if (hideWindowRecord.isSelected()) {
@@ -1574,7 +1576,8 @@ public class AutoClickController extends RootController implements MousePosition
             // 开启键盘监听
             startNativeKeyListener();
             // 设置浮窗文本显示准备时间
-            AtomicReference<String> text = new AtomicReference<>(text_cancelTask() + preparationTimeValue + text_preparation());
+            AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
+                    + preparationTimeValue + text_preparation());
             floatingLabel.setText(text.get());
             updateLabel(log_Click, text.get());
             // 显示浮窗

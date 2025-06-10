@@ -612,13 +612,19 @@ public class ClickDetailController extends RootController {
         String matchedType = matchedType_Det.getValue();
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
+                .setRandomClick(randomClick)
                 .setName(clickName_Det.getText())
-                .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
-                .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))
+                .setRandomWaitTime(randomWaitTime)
+                .setRandomClickTime(randomClickTime)
+                .setRandomTrajectory(randomTrajectory)
                 .setClickImgPath(clickImgPath_Det.getText())
+                .setRandomClickInterval(randomClickInterval)
+                .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
+                .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
                 .setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()))
+                .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
                 .setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)))
                 .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, null)))
                 .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, null)))
@@ -629,13 +635,7 @@ public class ClickDetailController extends RootController {
                 .setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, Integer.parseInt(defaultClickTimeOffset), 0, null)))
                 .setRandomTime(String.valueOf(setDefaultIntValue(randomTimeOffset_Det, Integer.parseInt(defaultRandomTime), 0, null)))
                 .setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(stopRetryNumDefault), 0, null)))
-                .setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(clickRetryNumDefault), 0, null)))
-                .setRandomClick(randomClick)
-                .setRandomWaitTime(randomWaitTime)
-                .setRandomClickTime(randomClickTime)
-                .setRandomTrajectory(randomTrajectory)
-                .setRandomClickInterval(randomClickInterval)
-                .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType));
+                .setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(clickRetryNumDefault), 0, null)));
         if (clickMatched_step().equals(matchedType) || clickMatched_clickStep().equals(matchedType)) {
             String matchedStep = matchedStep_Det.getText();
             if (StringUtils.isBlank(matchedStep)) {
