@@ -678,6 +678,42 @@ public class i18nFinal {
         return bundle.getString("point");
     }
 
+    public static String text_unknownListener() {
+        return bundle.getString("unknownListener");
+    }
+
+    public static String text_openDirectory() {
+        return bundle.getString("openDirectory");
+    }
+
+    public static String text_openParentDirectory() {
+        return bundle.getString("openParentDirectory");
+    }
+
+    public static String text_openFile() {
+        return bundle.getString("openFile");
+    }
+
+    public static String text_copyPath() {
+        return bundle.getString("copyPath");
+    }
+
+    public static String text_mouseClickOpen() {
+        return bundle.getString("mouseClickOpen");
+    }
+
+    public static String text_mouseClickOpenNull() {
+        return bundle.getString("mouseClickOpenNull");
+    }
+
+    public static String text_imgPath() {
+        return bundle.getString("imgPath");
+    }
+
+    public static String text_abnormal() {
+        return bundle.getString("abnormal");
+    }
+
     public static String confirm_unSaved() {
         return bundle.getString("confirm.unSaved");
     }
@@ -708,6 +744,18 @@ public class i18nFinal {
 
     public static String confirm_cancel() {
         return bundle.getString("confirm.cancel");
+    }
+
+    public static String confirm_imageExist() {
+        return bundle.getString("confirm.imageExist");
+    }
+
+    public static String confirm_imageExistConfirm() {
+        return bundle.getString("confirm.imageExistConfirm");
+    }
+
+    public static String confirm_delete() {
+        return bundle.getString("confirm.delete");
     }
 
     public static String menuItem_insertUp() {
@@ -750,20 +798,76 @@ public class i18nFinal {
         return bundle.getString("menuItem.topCopy");
     }
 
+    public static String menuItem_openSelected() {
+        return bundle.getString("menuItem.openSelected");
+    }
+
+    public static String menuItem_openDirectory() {
+        return bundle.getString("menuItem.openDirectory");
+    }
+
+    public static String menuItem_copyFilePath() {
+        return bundle.getString("menuItem.copyFilePath");
+    }
+
+    public static String menuItem_moveUp() {
+        return bundle.getString("menuItem.moveUp");
+    }
+
+    public static String menuItem_moveDown() {
+        return bundle.getString("menuItem.moveDown");
+    }
+
+    public static String menuItem_moveTop() {
+        return bundle.getString("menuItem.moveTop");
+    }
+
+    public static String menuItem_moveBottom() {
+        return bundle.getString("menuItem.moveBottom");
+    }
+
+    public static String menu_cancelSelected() {
+        return bundle.getString("menu.cancelSelected");
+    }
+
+    public static String menu_changeFirstImg() {
+        return bundle.getString("menu.changeFirstImg");
+    }
+
+    public static String menu_changeRetryType() {
+        return bundle.getString("menu.changeRetryType");
+    }
+
+    public static String menu_changeKey() {
+        return bundle.getString("menu.changeKey");
+    }
+
+    public static String menu_moveSelected() {
+        return bundle.getString("menu.moveSelected");
+    }
+
+    public static String menu_viewFile() {
+        return bundle.getString("menu.viewFile");
+    }
+
+    public static String menu_copy() {
+        return bundle.getString("menu.copy");
+    }
+
     public static String menu_detailMenu() {
-        return bundle.getString("detailMenu");
+        return bundle.getString("menu.detailMenu");
     }
 
     public static String menu_deleteMenu() {
-        return bundle.getString("deleteMenu");
+        return bundle.getString("menu.deleteMenu");
     }
 
     public static String menu_runSelectMenu() {
-        return bundle.getString("runSelectMenu");
+        return bundle.getString("menu.runSelectMenu");
     }
 
     public static String menu_addDateMenu() {
-        return bundle.getString("addDateMenu");
+        return bundle.getString("menu.addDateMenu");
     }
 
     public static String log_press() {
@@ -1170,15 +1274,21 @@ public class i18nFinal {
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
     }
 
+    public static final String zh_CN = "简体中文";
+
+    public static final String zh_TW = "繁體中文";
+
+    public static final String en = "English";
+
     /**
      * 切换语言下拉框选项
      */
     public static final BidiMap<Locale, String> languageMap = new DualHashBidiMap<>();
 
     static {
-        languageMap.put(Locale.SIMPLIFIED_CHINESE, "简体中文");
-        languageMap.put(Locale.TRADITIONAL_CHINESE, "繁體中文");
-//        languageMap.put(Locale.ENGLISH, "English");
+        languageMap.put(Locale.SIMPLIFIED_CHINESE, zh_CN);
+        languageMap.put(Locale.TRADITIONAL_CHINESE, zh_TW);
+        languageMap.put(Locale.ENGLISH, en);
     }
 
     /**

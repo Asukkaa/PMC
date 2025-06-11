@@ -12,6 +12,17 @@
     -fx-font-size: 12px;
 }
 
+.checkBox-medium {
+    -fx-cursor: hand;
+    -fx-pref-height: 25;
+    -fx-pref-width: 290;
+}
+
+.hBox-medium {
+    -fx-spacing: 5;
+    -fx-pref-width: 290;
+}
+
 .checkBox-short {
     -fx-cursor: hand;
     -fx-pref-height: 25;

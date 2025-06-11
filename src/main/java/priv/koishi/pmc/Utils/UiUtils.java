@@ -243,7 +243,7 @@ public class UiUtils {
      */
     public static File creatImgChooser(Window window, String stopImgSelectPath) {
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
-        extensionFilters.add(new FileChooser.ExtensionFilter("图片", allImageType));
+        extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
@@ -318,7 +318,7 @@ public class UiUtils {
      */
     public static Alert creatErrorAlert(String errString) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("异常信息");
+        alert.setTitle(text_abnormal());
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         setWindowLogo(stage, logoPath);
         // 创建展示异常信息的TextArea
@@ -597,7 +597,7 @@ public class UiUtils {
                     setText(null);
                     imageView.setImage(image);
                     setGraphic(imageView);
-                    setTooltip(creatTooltip(image.getUrl().replace("file:", "图片地址：")));
+                    setTooltip(creatTooltip(image.getUrl().replace("file:", text_imgPath())));
                 }
             }
 
@@ -633,7 +633,12 @@ public class UiUtils {
                     @Override
                     protected Image call() {
                         if (StringUtils.isNotBlank(path)) {
-                            return new Image("file:" + path, 200, 200, true, true, true);
+                            return new Image("file:" + path,
+                                    200,
+                                    200,
+                                    true,
+                                    true,
+                                    true);
                         } else {
                             return null;
                         }
@@ -794,7 +799,8 @@ public class UiUtils {
      * @return 监听器
      */
     public static ChangeListener<String> textFieldValueListener(TextField textField, String tip) {
-        ChangeListener<String> listener = (observable, oldValue, newValue) -> addValueToolTip(textField, tip);
+        ChangeListener<String> listener = (observable, oldValue, newValue) ->
+                addValueToolTip(textField, tip);
         textField.textProperty().addListener(listener);
         return listener;
     }
@@ -849,7 +855,8 @@ public class UiUtils {
             row.setOnDragDetected(e -> {
                 if (!row.isEmpty()) {
                     // 获取所有选中的行索引
-                    draggedIndices.setAll(tableView.getSelectionModel().getSelectedIndices().stream().sorted().collect(Collectors.toList()));
+                    draggedIndices.setAll(tableView.getSelectionModel().getSelectedIndices().stream()
+                            .sorted().collect(Collectors.toList()));
                     // 只允许非空且选中多行时拖拽
                     if (!draggedIndices.isEmpty()) {
                         Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
@@ -962,12 +969,12 @@ public class UiUtils {
      * @param <T>         表格数据项类型
      */
     public static <T> void buildMoveDataMenu(TableView<T> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("移动所选数据");
+        Menu menu = new Menu(menu_moveSelected());
         // 创建二级菜单项
-        MenuItem up = new MenuItem("所选行上移一行");
-        MenuItem down = new MenuItem("所选行下移一行");
-        MenuItem top = new MenuItem("所选行置顶");
-        MenuItem bottom = new MenuItem("所选行置底");
+        MenuItem up = new MenuItem(menuItem_moveUp());
+        MenuItem down = new MenuItem(menuItem_moveDown());
+        MenuItem top = new MenuItem(menuItem_moveTop());
+        MenuItem bottom = new MenuItem(menuItem_moveBottom());
         // 为每个菜单项添加事件处理
         up.setOnAction(event -> upMoveDataMenuItem(tableView));
         down.setOnAction(event -> downMoveDataMenuItem(tableView));
@@ -1084,11 +1091,11 @@ public class UiUtils {
      * @param contextMenu 右键菜单集合
      */
     public static void buildFilePathItem(TableView<ImgFileVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("查看文件");
+        Menu menu = new Menu(menu_viewFile());
         // 创建二级菜单项
-        MenuItem openFile = new MenuItem("打开所选文件");
-        MenuItem openDirector = new MenuItem("打开所选文件所在文件夹");
-        MenuItem copyFilePath = new MenuItem("复制文件路径");
+        MenuItem openFile = new MenuItem(menuItem_openSelected());
+        MenuItem openDirector = new MenuItem(menuItem_openDirectory());
+        MenuItem copyFilePath = new MenuItem(menuItem_copyFilePath());
         // 为每个菜单项添加事件处理
         openFile.setOnAction(event -> openFileMenuItem(tableView));
         openDirector.setOnAction(event -> openDirectorMenuItem(tableView));
@@ -1151,7 +1158,7 @@ public class UiUtils {
      * @param dataNumber  列表数据数量文本框
      */
     public static void buildCopyDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu, Label dataNumber) {
-        Menu menu = new Menu("复制所选数据");
+        Menu menu = new Menu(menu_copy());
         // 创建二级菜单项
         MenuItem upCopy = new MenuItem(menuItem_upCopy());
         MenuItem downCopy = new MenuItem(menuItem_downCopy());
@@ -1215,7 +1222,7 @@ public class UiUtils {
      * @param contextMenu 右键菜单集合
      */
     public static void buildEditClickKeyMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("更改点击按键");
+        Menu menu = new Menu(menu_changeKey());
         // 创建二级菜单项
         MenuItem primary = new MenuItem(mouseButton_primary());
         MenuItem secondary = new MenuItem(mouseButton_secondary());
@@ -1256,7 +1263,7 @@ public class UiUtils {
      * @param contextMenu 右键菜单集合
      */
     public static void buildEditRetryTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu("更改重试类型");
+        Menu menu = new Menu(menu_changeRetryType());
         // 创建二级菜单项
         MenuItem primary = new MenuItem(retryType_continuously());
         MenuItem secondary = new MenuItem(retryType_click());
@@ -1297,7 +1304,7 @@ public class UiUtils {
      * @param unit        列表数据数量单位
      */
     public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
-        MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
+        MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
         upMoveDataMenuItem.setOnAction(event -> {
             ObservableList<ImgFileVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
@@ -1311,8 +1318,11 @@ public class UiUtils {
                     boolean isExist = checkList.stream().anyMatch(bean ->
                             file.getPath().equals(bean.getPath()));
                     if (isExist) {
-                        ButtonType buttonType = creatConfirmDialog("图片已存在", "图片已存在，是否删除这张选中图片？",
-                                "删除", "不删除");
+                        ButtonType buttonType = creatConfirmDialog(
+                                confirm_imageExist(),
+                                confirm_imageExistConfirm(),
+                                confirm_delete(),
+                                confirm_cancel());
                         if (!buttonType.getButtonData().isCancelButton()) {
                             tableView.getItems().remove(selectedItem);
                         }
@@ -1340,7 +1350,7 @@ public class UiUtils {
      * @param contextMenu 右键菜单集合
      */
     public static void buildEditClickImgPathMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        MenuItem upMoveDataMenuItem = new MenuItem("更改所选项第一行的图片");
+        MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
         upMoveDataMenuItem.setOnAction(event -> {
             ObservableList<ClickPositionVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
@@ -1364,7 +1374,7 @@ public class UiUtils {
      * @param <T>         列表数据类型
      */
     public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem clearSelectedDataMenuItem = new MenuItem("取消选中");
+        MenuItem clearSelectedDataMenuItem = new MenuItem(menu_cancelSelected());
         clearSelectedDataMenuItem.setOnAction(event -> tableView.getSelectionModel().clearSelection());
         contextMenu.getItems().add(clearSelectedDataMenuItem);
     }
@@ -1578,11 +1588,11 @@ public class UiUtils {
             return null;
         }
         File file = new File(path);
-        String openText = "\n鼠标左键点击打开 ";
+        String openText = text_mouseClickOpen();
         if (!file.exists()) {
             pathLabel.getStyleClass().remove("label-button-style");
             pathLabel.getStyleClass().add("label-err-style");
-            openText = "\n文件不存在，鼠标左键点击打开 ";
+            openText = text_mouseClickOpenNull();
         } else {
             pathLabel.getStyleClass().remove("label-err-style");
             pathLabel.getStyleClass().add("label-button-style");
@@ -1634,7 +1644,7 @@ public class UiUtils {
         ContextMenu contextMenu = new ContextMenu();
         File file = new File(path);
         if ((!file.getName().contains(app) && file.isDirectory())) {
-            MenuItem openDirectoryMenuItem = new MenuItem("打开文件夹");
+            MenuItem openDirectoryMenuItem = new MenuItem(text_openDirectory());
             openDirectoryMenuItem.setOnAction(event -> {
                 try {
                     openDirectory(path);
@@ -1644,7 +1654,7 @@ public class UiUtils {
             });
             contextMenu.getItems().add(openDirectoryMenuItem);
         }
-        MenuItem openParentDirectoryMenuItem = new MenuItem("打开上级文件夹");
+        MenuItem openParentDirectoryMenuItem = new MenuItem(text_openParentDirectory());
         openParentDirectoryMenuItem.setOnAction(event -> {
             try {
                 openParentDirectory(path);
@@ -1654,7 +1664,7 @@ public class UiUtils {
         });
         contextMenu.getItems().add(openParentDirectoryMenuItem);
         if (file.isFile() && !file.getName().equals(appName + exe)) {
-            MenuItem openFileMenuItem = new MenuItem("打开文件");
+            MenuItem openFileMenuItem = new MenuItem(text_openFile());
             openFileMenuItem.setOnAction(event -> {
                 try {
                     openFile(path);
@@ -1664,7 +1674,7 @@ public class UiUtils {
             });
             contextMenu.getItems().add(openFileMenuItem);
         }
-        MenuItem copyValueMenuItem = new MenuItem("复制路径");
+        MenuItem copyValueMenuItem = new MenuItem(text_copyPath());
         contextMenu.getItems().add(copyValueMenuItem);
         valueLabel.setContextMenu(contextMenu);
         copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText()));
@@ -2061,7 +2071,7 @@ public class UiUtils {
                 case NativeMouseMotionListener nativeMouseMotionListener ->
                         GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
                 case NativeKeyListener nativeKeyListener -> GlobalScreen.removeNativeKeyListener(nativeKeyListener);
-                default -> throw new IllegalArgumentException("未知监听类型");
+                default -> throw new IllegalArgumentException(text_unknownListener());
             }
         }
     }
@@ -2078,7 +2088,7 @@ public class UiUtils {
             case NativeMouseMotionListener nativeMouseMotionListener ->
                     GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
             case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
-            default -> throw new IllegalArgumentException("未知监听类型");
+            default -> throw new IllegalArgumentException(text_unknownListener());
         }
     }
 
@@ -2114,12 +2124,26 @@ public class UiUtils {
      *
      * @param choiceBox    下拉框
      * @param defaultValue 默认值
-     * @param values       可选值
+     * @param values       可选值 List
      * @param <T>          可选值类型
      */
     public static <T> void initializeChoiceBoxItems(ChoiceBox<? super T> choiceBox, T defaultValue, List<? extends T> values) {
         choiceBox.getItems().clear();
         choiceBox.getItems().addAll(values);
+        choiceBox.setValue(defaultValue);
+    }
+
+    /**
+     * 初始化下拉框
+     *
+     * @param choiceBox    下拉框
+     * @param defaultValue 默认值
+     * @param values       可选值 Map
+     * @param <T>          可选值类型
+     */
+    public static <T> void initializeChoiceBoxItems(ChoiceBox<? super T> choiceBox, T defaultValue, Map<?, ? extends T> values) {
+        choiceBox.getItems().clear();
+        values.forEach((key, value) -> choiceBox.getItems().add(value));
         choiceBox.setValue(defaultValue);
     }
 

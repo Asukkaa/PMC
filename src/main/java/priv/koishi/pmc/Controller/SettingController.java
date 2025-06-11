@@ -46,7 +46,6 @@ import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 设置页面控制器
@@ -690,8 +689,11 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void creatReLaunchConfirm() {
         if (initializedFinished) {
-            ButtonType result = creatConfirmDialog(confirm_reLaunch(), confirm_reLaunchConfirm(),
-                    confirm_reLaunchOk(), confirm_cancel());
+            ButtonType result = creatConfirmDialog(
+                    confirm_reLaunch(),
+                    confirm_reLaunchConfirm(),
+                    confirm_reLaunchOk(),
+                    confirm_cancel());
             ButtonBar.ButtonData buttonData = result.getButtonData();
             if (!buttonData.isCancelButton()) {
                 // 重启应用
@@ -725,12 +727,22 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 初始化下拉框
+     */
+    private void setChoiceBoxItems() {
+        // 初始化语言设置下拉框
+        initializeChoiceBoxItems(language_Set, zh_CN, languageMap);
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
      */
     @FXML
     private void initialize() throws IOException {
+        // 初始化下拉框
+        setChoiceBoxItems();
         // 获取最大运行内存并展示
         getJVMConfig();
         // 读取配置文件
