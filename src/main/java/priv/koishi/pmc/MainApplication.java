@@ -405,7 +405,15 @@ public class MainApplication extends Application {
         boolean firstRun = activation.equals(firstRunValue);
         // 首次运行时如果有对应语言包则使用操作系统设置的语言
         if (firstRun) {
-            if (languageMap.get(Locale.getDefault()) == null) {
+            if (languageMap.containsKey(Locale.getDefault())) {
+                Locale locale = languageMap.getKey(prop.getProperty(key_language));
+                Locale.setDefault(locale);
+                bundle = ResourceBundle.getBundle(languagePath, locale);
+                // 处理非zh_TW的繁体中文
+            } else if (Locale.getDefault().getDisplayName().contains("繁體")) {
+                Locale.setDefault(Locale.TRADITIONAL_CHINESE);
+                bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
+            } else {
                 Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
                 bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
             }
