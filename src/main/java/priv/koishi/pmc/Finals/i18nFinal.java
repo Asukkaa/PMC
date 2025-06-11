@@ -407,17 +407,15 @@ public class i18nFinal {
     }
 
     public static String tip_NativeHookException() {
-        return bundle.getString("tip.NativeHookException") +
-                "\n" + appName + app +
-                "\n" + bundle.getString("tip.ifHave") +
-                "\n" + bundle.getString("tip.addList") + appName + app;
+        return bundle.getString("tip.NativeHookException") + appName + app +
+                bundle.getString("tip.ifHave") + appName + app +
+                bundle.getString("tip.addList") + appName + app;
     }
 
     public static String tip_noScreenCapturePermission() {
-        return bundle.getString("tip.noScreenCapturePermission") +
-                "\n" + appName + app +
-                "\n" + bundle.getString("tip.ifHave") +
-                "\n" + bundle.getString("tip.addList") + appName + app;
+        return bundle.getString("tip.noScreenCapturePermission") + appName + app +
+                bundle.getString("tip.ifHave") + appName + app +
+                bundle.getString("tip.addList") + appName + app;
     }
 
     public static String tip_randomClickX() {
