@@ -516,7 +516,9 @@ public class ClickDetailController extends RootController {
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
         stopRetryNumDefault = prop.getProperty(key_defaultStopRetryNum, defaultStopRetryNum);
+        stopRetryNumDefault = StringUtils.isEmpty(stopRetryNumDefault) ? defaultStopRetryNum : stopRetryNumDefault;
         clickRetryNumDefault = prop.getProperty(key_defaultClickRetryNum, defaultClickRetryNum);
+        clickRetryNumDefault = StringUtils.isEmpty(clickRetryNumDefault) ? defaultClickRetryNum : clickRetryNumDefault;
         input.close();
     }
 
