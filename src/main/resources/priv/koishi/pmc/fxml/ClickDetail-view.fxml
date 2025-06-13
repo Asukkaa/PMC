@@ -223,6 +223,18 @@
                             <Label maxHeight="25" text="%clickDetail.clickImgType"/>
                             <Label maxHeight="25" fx:id="clickImgType_Det"/>
                         </HBox>
+
+                        <HBox spacing="10">
+                            <Label maxHeight="25" text="%clickDetail.imgX"/>
+                            <TextField fx:id="imgX_Det" prefWidth="60" promptText="0"/>
+                            <Label maxHeight="25" text="%unit.px"/>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <Label maxHeight="25" text="%clickDetail.imgY"/>
+                            <TextField fx:id="imgY_Det" prefWidth="60" promptText="0"/>
+                            <Label maxHeight="25" text="%unit.px"/>
+                        </HBox>
                     </VBox>
                 </VBox>
             </HBox>

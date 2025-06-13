@@ -309,8 +309,8 @@ public class AutoClickService {
                 String matchedType = clickPositionVO.getMatchedType();
                 long end = System.currentTimeMillis();
                 if (!clickType_moveTo().equals(clickType)) {
-                    startX = position.x();
-                    startY = position.y();
+                    startX = position.x() + Integer.parseInt(clickPositionVO.getImgX());
+                    startY = position.y() + Integer.parseInt(clickPositionVO.getImgY());
                 }
                 int matchThreshold = matchPointBean.getMatchThreshold();
                 if (taskBean.isClickImgLog()) {

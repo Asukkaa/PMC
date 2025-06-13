@@ -201,6 +201,8 @@ public class SettingController extends RootController implements MousePositionUp
             prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
             prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
             prop.put(key_maxLogNum, maxLogNum_Set.getText());
+            prop.put(key_offsetX, offsetX_Set.getText());
+            prop.put(key_offsetY, offsetY_Set.getText());
             List<ImgFileVO> list = tableView_Set.getItems();
             int index = 0;
             while (index < 10) {

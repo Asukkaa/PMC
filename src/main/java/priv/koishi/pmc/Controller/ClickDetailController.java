@@ -37,6 +37,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 操作步骤详情页控制器
@@ -150,7 +151,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -198,6 +199,8 @@ public class ClickDetailController extends RootController {
         setPromptText();
         // 给输入框添加内容变化监听
         nodeValueChangeListener();
+        imgX_Det.setText(item.getImgX());
+        imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
         clickName_Det.setText(item.getName());
         clickKey_Det.setValue(item.getClickKey());
@@ -451,6 +454,12 @@ public class ClickDetailController extends RootController {
         // 限制要点击的图片识别失败重试次数文本输入框内容
         ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
         changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
+        // 匹配图像坐标横(X)轴偏移量文本输入框内容
+        ChangeListener<String> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
+        changeListeners.put(imgX_Det, imgXListener);
+        // 匹配图像坐标纵(Y)轴偏移量文本输入框内容
+        ChangeListener<String> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
+        changeListeners.put(imgY_Det, imgYListener);
     }
 
     /**
@@ -492,6 +501,8 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_removeClickImgBtn(), removeClickImg_Det);
         addToolTip(tip_randomTrajectory(), randomTrajectory_Det);
         addToolTip(tip_updateClickNameBtn(), updateClickName_Det);
+        addValueToolTip(imgX_Det, tip_imgX(), imgX_Det.getText());
+        addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
@@ -620,6 +631,8 @@ public class ClickDetailController extends RootController {
         String matchedType = matchedType_Det.getValue();
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
+                .setImgX(imgX_Det.getText())
+                .setImgY(imgY_Det.getText())
                 .setRandomClick(randomClick)
                 .setName(clickName_Det.getText())
                 .setRandomWaitTime(randomWaitTime)

@@ -204,6 +204,16 @@ public class ClickPositionBean {
     String randomClickInterval;
 
     /**
+     * 匹配图像坐标横轴偏移量
+     */
+    String imgX;
+
+    /**
+     * 匹配图像坐标纵轴偏移量
+     */
+    String imgY;
+
+    /**
      * 添加移动轨迹
      *
      * @param x            横坐标

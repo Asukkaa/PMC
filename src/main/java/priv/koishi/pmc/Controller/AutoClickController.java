@@ -1073,7 +1073,9 @@ public class AutoClickController extends RootController implements MousePosition
                 .setClickNum("1")
                 .setWaitTime("0")
                 .setStartX("0")
-                .setStartY("0");
+                .setStartY("0")
+                .setImgX("0")
+                .setImgY("0");
         return clickPositionVO;
     }
 

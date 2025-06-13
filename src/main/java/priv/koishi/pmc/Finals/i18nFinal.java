@@ -434,6 +434,14 @@ public class i18nFinal {
         return bundle.getString("tip.clickTimeOffset");
     }
 
+    public static String tip_imgX() {
+        return bundle.getString("tip.imgX");
+    }
+
+    public static String tip_imgY() {
+        return bundle.getString("tip.imgY");
+    }
+
     public static String text_selectDirectory() {
         return bundle.getString("selectDirectory");
     }
