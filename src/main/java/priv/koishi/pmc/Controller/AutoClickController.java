@@ -1185,6 +1185,8 @@ public class AutoClickController extends RootController implements MousePosition
                     || !isInIntegerRange(clickPositionVO.getRandomX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getRandomY(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getRandomClickTime(), 0, null)
+                    || !isInIntegerRange(clickPositionVO.getImgX(), null, null)
+                    || !isInIntegerRange(clickPositionVO.getImgY(), null, null)
                     || !matchedTypeMap.containsKey(clickPositionVO.getMatchedTypeEnum())
                     || !recordClickTypeMap.containsKey(clickPositionVO.getClickTypeEnum())
                     || !retryTypeMap.containsKey(clickPositionVO.getRetryTypeEnum())

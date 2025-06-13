@@ -631,8 +631,6 @@ public class ClickDetailController extends RootController {
         String matchedType = matchedType_Det.getValue();
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
-                .setImgX(imgX_Det.getText())
-                .setImgY(imgY_Det.getText())
                 .setRandomClick(randomClick)
                 .setName(clickName_Det.getText())
                 .setRandomWaitTime(randomWaitTime)
@@ -646,6 +644,8 @@ public class ClickDetailController extends RootController {
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
                 .setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()))
                 .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
+                .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, null, null)))
+                .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, null, null)))
                 .setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)))
                 .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, null)))
                 .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, null)))
