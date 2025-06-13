@@ -31,6 +31,11 @@ public class ClickLogBean implements Indexable {
     String date = LocalDateTime.now(ZoneId.systemDefault()).format(DTF);
 
     /**
+     * 操作名称
+     */
+    String name;
+
+    /**
      * 操作类型
      */
     String type;

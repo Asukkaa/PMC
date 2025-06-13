@@ -70,7 +70,8 @@ public class ClickLogController extends RootController {
     public TableColumn<ClickLogBean, Integer> index_Log;
 
     @FXML
-    public TableColumn<ClickLogBean, String> date_Log, type_Log, X_Log, Y_Log, clickTime_Log, clickKey_Log, result_Log;
+    public TableColumn<ClickLogBean, String> date_Log, name_Log, type_Log, X_Log, Y_Log, clickTime_Log,
+            clickKey_Log, result_Log;
 
     /**
      * 组件宽高自适应
@@ -101,8 +102,9 @@ public class ClickLogController extends RootController {
      * 设置javafx单元格宽度
      */
     private void bindPrefWidthProperty() {
-        index_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
-        date_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.3));
+        index_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.05));
+        date_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.2));
+        name_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.15));
         type_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
         X_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
         Y_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));

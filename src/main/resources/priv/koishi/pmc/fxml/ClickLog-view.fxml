@@ -19,6 +19,7 @@
             <columns>
                 <TableColumn fx:id="index_Log" text="%listText.index" sortable="false"/>
                 <TableColumn fx:id="date_Log" text="%clickLog.date_Log" sortable="false"/>
+                <TableColumn fx:id="name_Log" text="%clickLog.name_Log" sortable="false"/>
                 <TableColumn fx:id="type_Log" text="%clickLog.type_Log" sortable="false"/>
                 <TableColumn fx:id="X_Log" text="%clickLog.X_Log" sortable="false"/>
                 <TableColumn fx:id="Y_Log" text="%clickLog.Y_Log" sortable="false"/>

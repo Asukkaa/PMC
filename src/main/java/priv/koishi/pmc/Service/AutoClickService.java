@@ -180,7 +180,8 @@ public class AutoClickService {
                     if (taskBean.isWaitLog()) {
                         ClickLogBean waitLog = new ClickLogBean();
                         waitLog.setClickTime(String.valueOf(wait))
-                                .setType(log_wait());
+                                .setType(log_wait())
+                                .setName(name);
                         dynamicQueue.add(waitLog);
                     }
                     // 执行自动流程
@@ -218,6 +219,7 @@ public class AutoClickService {
         int clickNum = Integer.parseInt(clickPositionVO.getClickNum());
         double startX = Double.parseDouble(clickPositionVO.getStartX());
         double startY = Double.parseDouble(clickPositionVO.getStartY());
+        String name = clickPositionVO.getName();
         // 匹配终止操作图像
         List<ImgFileBean> stopImgFileVOS = clickPositionVO.getStopImgFiles();
         if (CollectionUtils.isNotEmpty(stopImgFileVOS)) {
@@ -262,7 +264,8 @@ public class AutoClickService {
                                 .setResult(matchThreshold + " %")
                                 .setX(String.valueOf(x))
                                 .setY(String.valueOf(y))
-                                .setType(log_stopImg());
+                                .setType(log_stopImg())
+                                .setName(name);
                         dynamicQueue.add(clickLogBean);
                     }
                     if (matchThreshold >= stopMatchThreshold) {
@@ -319,7 +322,8 @@ public class AutoClickService {
                             .setResult(matchThreshold + " %")
                             .setX(String.valueOf(position.x()))
                             .setY(String.valueOf(position.y()))
-                            .setType(log_clickImg());
+                            .setType(log_clickImg())
+                            .setName(name);
                     dynamicQueue.add(clickLogBean);
                 }
                 if (matchThreshold >= clickMatchThreshold) {
@@ -384,7 +388,8 @@ public class AutoClickService {
                 if (taskBean.isWaitLog()) {
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(clickInterval))
-                            .setType(log_wait());
+                            .setType(log_wait())
+                            .setName(name);
                     dynamicQueue.add(clickLogBean);
                 }
             }
@@ -406,7 +411,8 @@ public class AutoClickService {
                     ClickLogBean moveLog = new ClickLogBean();
                     moveLog.setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
-                            .setType(log_move());
+                            .setType(log_move())
+                            .setName(name);
                     dynamicQueue.add(moveLog);
                 }
                 // 执行自动流程前点击第一个起始坐标
@@ -417,7 +423,8 @@ public class AutoClickService {
                         pressLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
                                 .setClickKey(clickKey)
-                                .setType(log_press());
+                                .setType(log_press())
+                                .setName(name);
                         dynamicQueue.add(pressLog);
                     }
                     robot.mouseRelease(mouseButton);
@@ -425,8 +432,9 @@ public class AutoClickService {
                         ClickLogBean releaseLog = new ClickLogBean();
                         releaseLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
+                                .setType(log_release())
                                 .setClickKey(clickKey)
-                                .setType(log_release());
+                                .setName(name);
                         dynamicQueue.add(releaseLog);
                     }
                 }
@@ -437,7 +445,8 @@ public class AutoClickService {
                         pressLog.setX(String.valueOf((int) finalStartX))
                                 .setY(String.valueOf((int) finalStartY))
                                 .setClickKey(clickKey)
-                                .setType(log_press());
+                                .setType(log_press())
+                                .setName(name);
                         dynamicQueue.add(pressLog);
                     }
                 }
@@ -471,7 +480,8 @@ public class AutoClickService {
                             .setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
                             .setClickKey(clickKey)
-                            .setType(log_hold());
+                            .setType(log_hold())
+                            .setName(name);
                     dynamicQueue.add(clickLog);
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
@@ -482,8 +492,9 @@ public class AutoClickService {
                             ClickLogBean releaseLog = new ClickLogBean();
                             releaseLog.setX(String.valueOf((int) finalStartX))
                                     .setY(String.valueOf((int) finalStartY))
+                                    .setType(log_release())
                                     .setClickKey(clickKey)
-                                    .setType(log_release());
+                                    .setName(name);
                             dynamicQueue.add(releaseLog);
                         }
                     }
@@ -516,6 +527,7 @@ public class AutoClickService {
      * @throws Exception 当移动超时或线程中断时抛出
      */
     private static void executeTrajectoryPoints(Robot robot, ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) throws Exception {
+        String name = clickPositionVO.getName();
         List<TrajectoryPointBean> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
             TrajectoryPointBean lastPoint = null;
@@ -567,7 +579,8 @@ public class AutoClickService {
                                 clickLog.setClickKey(recordClickTypeMap.get(button))
                                         .setX(String.valueOf((int) finalX))
                                         .setY(String.valueOf((int) finalY))
-                                        .setType(log_press());
+                                        .setType(log_press())
+                                        .setName(name);
                                 dynamicQueue.add(clickLog);
                             }
                         });
@@ -580,7 +593,8 @@ public class AutoClickService {
                                 releaseLog.setClickKey(recordClickTypeMap.get(button))
                                         .setX(String.valueOf((int) finalX))
                                         .setY(String.valueOf((int) finalY))
-                                        .setType(log_release());
+                                        .setType(log_release())
+                                        .setName(name);
                                 dynamicQueue.add(releaseLog);
                             }
                         });
@@ -590,7 +604,8 @@ public class AutoClickService {
                         ClickLogBean moveLog = new ClickLogBean();
                         moveLog.setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
-                                .setType(log_move());
+                                .setType(log_move())
+                                .setName(name);
                         dynamicQueue.add(moveLog);
                     } else if (CollectionUtils.isNotEmpty(pressButtons) && taskBean.isDragLog()) {
                         List<String> clickKeys = new ArrayList<>();
@@ -602,7 +617,8 @@ public class AutoClickService {
                         moveLog.setClickKey(String.join(",", clickKeys))
                                 .setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
-                                .setType(log_drag());
+                                .setType(log_drag())
+                                .setName(name);
                         dynamicQueue.add(moveLog);
                     }
                     moveFuture.complete(null);
@@ -614,7 +630,8 @@ public class AutoClickService {
                     if (taskBean.isWaitLog()) {
                         ClickLogBean sleepLog = new ClickLogBean();
                         sleepLog.setClickTime(String.valueOf(remaining))
-                                .setType(log_wait());
+                                .setType(log_wait())
+                                .setName(name);
                         dynamicQueue.add(sleepLog);
                     }
                 }
