@@ -222,10 +222,13 @@ public class ClickDetailController extends RootController {
         randomClickTime_Det.setSelected(activation.equals(item.getRandomClickTime()));
         randomTrajectory_Det.setSelected(activation.equals(item.getRandomTrajectory()));
         randomClickInterval_Det.setSelected(activation.equals(item.getRandomClickInterval()));
+        ObservableList<String> clickTypeItems = clickType_Det.getItems();
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
-        ObservableList<String> clickTypeItems = clickType_Det.getItems();
-        if (clickType_drag().equals(clickType) || clickType_move().equals(clickType)) {
+        if (CollectionUtils.isEmpty(item.getMoveTrajectory())) {
+            clickTypeItems.remove(clickType_moveTrajectory());
+            clickTypeItems.remove(clickType_drag());
+        } else if (clickType_drag().equals(clickType) || clickType_moveTrajectory().equals(clickType)) {
             clickTypeItems.add(clickType);
             clickType_Det.setDisable(true);
             mouseStartX_Det.setDisable(true);

@@ -1423,7 +1423,7 @@ public class AutoClickController extends RootController implements MousePosition
                     // 添加至表格
                     List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                     movePoint.setName(text_step() + index + text_isRecord())
-                            .setClickTypeEnum(ClickTypeEnum.MOVE.ordinal())
+                            .setClickTypeEnum(ClickTypeEnum.MOVE_TRAJECTORY.ordinal())
                             .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY));

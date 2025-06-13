@@ -134,7 +134,9 @@ public class AutoClickService {
                     String matchType = clickPositionVO.getMatchedType();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     String clickText;
-                    if (clickType_move().equalsIgnoreCase(clickType)) {
+                    if (clickType_moveTrajectory().equalsIgnoreCase(clickType)
+                            || clickType_move().equalsIgnoreCase(clickType)
+                            || clickType_moveTo().equalsIgnoreCase(clickType)) {
                         clickText = "";
                     } else {
                         clickText = bundle.getString("taskInfo") + clickKey + clickType;
@@ -278,6 +280,7 @@ public class AutoClickService {
         }
         // 匹配要点击的图像
         String clickPath = clickPositionVO.getClickImgPath();
+        String clickType = clickPositionVO.getClickType();
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
@@ -305,15 +308,17 @@ public class AutoClickService {
             try (Point position = matchPointBean.getPoint()) {
                 String matchedType = clickPositionVO.getMatchedType();
                 long end = System.currentTimeMillis();
-                startX = position.x();
-                startY = position.y();
+                if (!clickType_moveTo().equals(clickType)) {
+                    startX = position.x();
+                    startY = position.y();
+                }
                 int matchThreshold = matchPointBean.getMatchThreshold();
                 if (taskBean.isClickImgLog()) {
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(end - start))
                             .setResult(matchThreshold + " %")
-                            .setX(String.valueOf(startX))
-                            .setY(String.valueOf(startY))
+                            .setX(String.valueOf(position.x()))
+                            .setY(String.valueOf(position.y()))
                             .setType(log_clickImg());
                     dynamicQueue.add(clickLogBean);
                 }
@@ -361,7 +366,6 @@ public class AutoClickService {
         }
         long clickTime = Long.parseLong(clickPositionVO.getClickTime());
         long clickInterval = Long.parseLong(clickPositionVO.getClickInterval());
-        String clickType = clickPositionVO.getClickType();
         int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
         // 按照操作次数执行
         for (int i = 0; i < clickNum; i++) {
@@ -448,7 +452,7 @@ public class AutoClickService {
                 break;
             }
             // 执行长按操作
-            if (!clickType_drag().equals(clickType) && !clickType_move().equals(clickType)) {
+            if (!clickType_drag().equals(clickType) && !clickType_moveTrajectory().equals(clickType)) {
                 // 处理随机点击时长偏移
                 if (activation.equals(clickPositionVO.getRandomClickTime())) {
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);

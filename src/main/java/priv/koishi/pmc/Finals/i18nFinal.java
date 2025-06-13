@@ -1104,6 +1104,10 @@ public class i18nFinal {
         NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
     }
 
+    public static String clickType_moveTrajectory() {
+        return bundle.getString("clickType.moveTrajectory");
+    }
+
     public static String clickType_move() {
         return bundle.getString("clickType.move");
     }
@@ -1130,6 +1134,7 @@ public class i18nFinal {
      */
     public static void updateClickTypeList() {
         List<String> newList = Arrays.asList(
+                clickType_moveTrajectory(),
                 clickType_move(),
                 clickType_click(),
                 clickType_drag(),
@@ -1148,6 +1153,7 @@ public class i18nFinal {
      */
     public static void updateClickTypeMap() {
         clickTypeMap.clear();
+        clickTypeMap.put(ClickTypeEnum.MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
         clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
         clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());
         clickTypeMap.put(ClickTypeEnum.DRAG.ordinal(), clickType_drag());

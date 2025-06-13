@@ -12,6 +12,11 @@ public enum ClickTypeEnum {
     /**
      * 带轨迹的移动
      */
+    MOVE_TRAJECTORY,
+
+    /**
+     * 仅移动
+     */
     MOVE,
 
     /**
