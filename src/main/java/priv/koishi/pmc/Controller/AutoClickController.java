@@ -857,9 +857,6 @@ public class AutoClickController extends RootController implements MousePosition
             if (matchStep > maxIndex) {
                 throw new RuntimeException(err + text_matchedStepGreaterMax());
             }
-            if (matchStep == index) {
-                throw new RuntimeException(err + text_matchedStepEqualIndex());
-            }
         }
         return err;
     }

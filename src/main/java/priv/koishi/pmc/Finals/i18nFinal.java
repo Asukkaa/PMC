@@ -642,10 +642,6 @@ public class i18nFinal {
         return bundle.getString("matchedStepGreaterMax");
     }
 
-    public static String text_matchedStepEqualIndex() {
-        return bundle.getString("matchedStepEqualIndex");
-    }
-
     public static String text_matchedStepIsNull() {
         return bundle.getString("matchedStepIsNull");
     }

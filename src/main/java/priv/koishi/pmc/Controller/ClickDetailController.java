@@ -665,9 +665,6 @@ public class ClickDetailController extends RootController {
             if (Integer.parseInt(matchedStep) > maxIndex) {
                 throw new RuntimeException(text_matchedStepGreaterMax());
             }
-            if (Integer.parseInt(matchedStep) == selectIndex) {
-                throw new RuntimeException(text_matchedStepEqualIndex());
-            }
             selectedItem.setMatchedStep(matchedStep);
         }
         String retryType = retryType_Det.getValue();
