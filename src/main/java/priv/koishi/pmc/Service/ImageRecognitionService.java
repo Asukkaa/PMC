@@ -100,12 +100,9 @@ public class ImageRecognitionService {
                             Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
-                                MatchPointBean result;
-                                if (overTime > 0) {
-                                    result = future.get(overTime, TimeUnit.SECONDS);
-                                } else {
-                                    result = future.get();
-                                }
+                                MatchPointBean result = (overTime > 0) ?
+                                        future.get(overTime, TimeUnit.SECONDS) :
+                                        future.get();
                                 if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
@@ -124,11 +121,9 @@ public class ImageRecognitionService {
                             Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
-                                if (overTime > 0) {
-                                    result = future.get(overTime, TimeUnit.SECONDS);
-                                } else {
-                                    result = future.get();
-                                }
+                                result = (overTime > 0) ?
+                                        future.get(overTime, TimeUnit.SECONDS) :
+                                        future.get();
                                 if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
