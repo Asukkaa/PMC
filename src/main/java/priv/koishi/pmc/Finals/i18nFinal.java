@@ -442,6 +442,10 @@ public class i18nFinal {
         return bundle.getString("tip.imgY");
     }
 
+    public static String tip_notExistsIndex() {
+        return bundle.getString("tip.notExistsIndex");
+    }
+
     public static String text_selectDirectory() {
         return bundle.getString("selectDirectory");
     }

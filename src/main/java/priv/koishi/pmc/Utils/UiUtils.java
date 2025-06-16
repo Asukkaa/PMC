@@ -792,6 +792,34 @@ public class UiUtils {
     }
 
     /**
+     * 限制输入框只能输入指定范围内的正整数（范围外显示警告信息）
+     *
+     * @param textField   要处理的文本输入框
+     * @param min         可输入的最小值
+     * @param max         可输入的最大值，为空则不限制
+     * @param tip         鼠标悬停提示文案
+     * @param warningNode 警告节点
+     * @return 监听器
+     */
+    public static ChangeListener<String> warnIntegerRangeTextField(TextField textField, Integer min, Integer max, String tip, Node warningNode) {
+        ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+            // 这里处理文本变化的逻辑
+            if (!isInIntegerRange(newValue, 1, null) && StringUtils.isNotBlank(newValue)) {
+                textField.setText(oldValue);
+            } else if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                textField.setStyle("-fx-text-fill: red;");
+                warningNode.setVisible(true);
+            } else {
+                textField.setStyle("-fx-text-fill: black;");
+                warningNode.setVisible(false);
+            }
+            addValueToolTip(textField, tip);
+        };
+        textField.textProperty().addListener(listener);
+        return listener;
+    }
+
+    /**
      * 监听输入框内容变化
      *
      * @param textField 要监听的文本输入框

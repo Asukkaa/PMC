@@ -136,6 +136,9 @@
                     <HBox fx:id="matchedStepHBox_Det" spacing="10">
                         <Label prefHeight="25" text="%clickDetail.matchedStep"/>
                         <TextField fx:id="matchedStep_Det" prefWidth="60"/>
+                        <ImageView fx:id="matchedStepWarning_Det" fitWidth="25" fitHeight="25" visible="false">
+                            <Image url="@../icon/Warning.png"/>
+                        </ImageView>
                     </HBox>
                 </HBox>
 
@@ -148,6 +151,9 @@
                     <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">
                         <Label prefHeight="25" text="%clickDetail.retryStep"/>
                         <TextField fx:id="retryStep_Det" prefWidth="60"/>
+                        <ImageView fx:id="retryStepWarning_Det" fitWidth="25" fitHeight="25" visible="false">
+                            <Image url="@../icon/Warning.png"/>
+                        </ImageView>
                     </HBox>
                 </HBox>
             </HBox>

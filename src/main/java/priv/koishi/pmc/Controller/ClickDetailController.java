@@ -37,7 +37,6 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 操作步骤详情页控制器
@@ -129,10 +128,10 @@ public class ClickDetailController extends RootController {
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det;
 
     @FXML
-    public ImageView clickImg_Det;
+    public Slider clickOpacity_Det, stopOpacity_Det;
 
     @FXML
-    public Slider clickOpacity_Det, stopOpacity_Det;
+    public ImageView clickImg_Det, matchedStepWarning_Det, retryStepWarning_Det;
 
     @FXML
     public ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det;
@@ -187,10 +186,6 @@ public class ClickDetailController extends RootController {
         isModified = false;
         maxIndex = selectedItem.getTableView().getItems().size();
         clickIndex_Det.setText(String.valueOf(item.getIndex()));
-        if (maxIndex == 1) {
-            retryType_Det.getItems().remove(retryType_Step());
-            matchedType_Det.getItems().removeAll(clickMatched_step(), clickMatched_clickStep());
-        }
         String tableViewSize = String.valueOf(maxIndex);
         tableViewSize_Det.setText(tableViewSize);
         // 设置鼠标悬停提示
@@ -245,7 +240,7 @@ public class ClickDetailController extends RootController {
         ObservableList<ImgFileVO> items = tableView_Det.getItems();
         if (CollectionUtils.isNotEmpty(imgFileBeans)) {
             imgFileBeans.forEach(b -> {
-                // 必须重新创建对象才能正确属性列表图片
+                // 必须重新创建对象才能正确刷新列表图片
                 ImgFileVO imgFileVO = new ImgFileVO();
                 imgFileVO.setTableView(tableView_Det)
                         .setType(b.getType())
@@ -412,18 +407,18 @@ public class ClickDetailController extends RootController {
         // 限制每步操作执行前等待时间文本输入框内容
         ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait());
         changeListeners.put(wait_Det, waitListener);
+        // 匹配图像坐标横(X)轴偏移量文本输入框内容
+        ChangeListener<String> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
+        changeListeners.put(imgX_Det, imgXListener);
+        // 匹配图像坐标纵(Y)轴偏移量文本输入框内容
+        ChangeListener<String> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
+        changeListeners.put(imgY_Det, imgYListener);
         // 停止操作图像识别准确度设置监听
         ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
         changeListeners.put(stopOpacity_Det, stopOpacityListener);
-        // 限制重试后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> retryStepListener = integerRangeTextField(retryStep_Det, 1, maxIndex, tip_step());
-        changeListeners.put(retryStep_Det, retryStepListener);
         // 要点击的图像识别准确度设置监听
         ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
         changeListeners.put(clickOpacity_Det, clickOpacityListener);
-        // 限制识别匹配后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> matchedStepListener = integerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step());
-        changeListeners.put(matchedStep_Det, matchedStepListener);
         // 限制操作时长文本输入内容
         ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
         changeListeners.put(timeClick_Det, timeClickListener);
@@ -439,6 +434,12 @@ public class ClickDetailController extends RootController {
         // 限制点击次数文本输入框内容
         ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
         changeListeners.put(clickNumBer_Det, clickNumBerListener);
+        // 限制重试后要跳转的步骤序号文本输入框内容
+        ChangeListener<String> retryStepListener = warnIntegerRangeTextField(retryStep_Det, 1, maxIndex, tip_step(), retryStepWarning_Det);
+        changeListeners.put(retryStep_Det, retryStepListener);
+        // 限制识别匹配后要跳转的步骤序号文本输入框内容
+        ChangeListener<String> matchedStepListener = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
+        changeListeners.put(matchedStep_Det, matchedStepListener);
         // 随机点击时间偏移量文本输入框内容
         ChangeListener<String> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
         changeListeners.put(randomTimeOffset_Det, randomTimeListener);
@@ -454,30 +455,24 @@ public class ClickDetailController extends RootController {
         // 限制要点击的图片识别失败重试次数文本输入框内容
         ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
         changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
-        // 匹配图像坐标横(X)轴偏移量文本输入框内容
-        ChangeListener<String> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
-        changeListeners.put(imgX_Det, imgXListener);
-        // 匹配图像坐标纵(Y)轴偏移量文本输入框内容
-        ChangeListener<String> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
-        changeListeners.put(imgY_Det, imgYListener);
     }
 
     /**
      * 设置文本输入框提示
      */
     private void setPromptText() {
+        wait_Det.setPromptText(selectedItem.getWaitTime());
         clickName_Det.setPromptText(selectedItem.getName());
+        randomClickX_Det.setPromptText(defaultRandomClickX);
+        randomClickY_Det.setPromptText(defaultRandomClickY);
+        stopRetryNum_Det.setPromptText(stopRetryNumDefault);
+        randomTimeOffset_Det.setPromptText(defaultRandomTime);
+        clickRetryNum_Det.setPromptText(clickRetryNumDefault);
         mouseStartX_Det.setPromptText(selectedItem.getStartX());
         mouseStartY_Det.setPromptText(selectedItem.getStartY());
-        wait_Det.setPromptText(selectedItem.getWaitTime());
         timeClick_Det.setPromptText(selectedItem.getClickTime());
         clickNumBer_Det.setPromptText(selectedItem.getClickNum());
         interval_Det.setPromptText(selectedItem.getClickInterval());
-        randomClickX_Det.setPromptText(defaultRandomClickX);
-        randomClickY_Det.setPromptText(defaultRandomClickY);
-        randomTimeOffset_Det.setPromptText(defaultRandomTime);
-        clickRetryNum_Det.setPromptText(clickRetryNumDefault);
-        stopRetryNum_Det.setPromptText(stopRetryNumDefault);
     }
 
     /**
@@ -511,6 +506,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_clickIndex() + clickIndex_Det.getText(), clickIndex_Det);
         addValueToolTip(clickTypeText_Det, tip_clickType(), clickType_Det.getValue());
         addToolTip(tip_clickRetryNum() + clickRetryNumDefault, clickRetryNum_Det);
+        addToolTip(tip_notExistsIndex(), matchedStepWarning_Det, retryStepWarning_Det);
         addValueToolTip(matchedType_Det, tip_matchedType(), matchedType_Det.getValue());
         addValueToolTip(randomClickX_Det, tip_randomClickX() + defaultRandomClickX);
         addValueToolTip(randomClickY_Det, tip_randomClickY() + defaultRandomClickY);
@@ -662,9 +658,6 @@ public class ClickDetailController extends RootController {
             if (StringUtils.isBlank(matchedStep)) {
                 throw new RuntimeException(text_matchedStepIsNull());
             }
-            if (Integer.parseInt(matchedStep) > maxIndex) {
-                throw new RuntimeException(text_matchedStepGreaterMax());
-            }
             selectedItem.setMatchedStep(matchedStep);
         }
         String retryType = retryType_Det.getValue();
@@ -673,9 +666,6 @@ public class ClickDetailController extends RootController {
             String retryStep = retryStep_Det.getText();
             if (StringUtils.isBlank(retryStep)) {
                 throw new RuntimeException(text_retryStepIsNull());
-            }
-            if (Integer.parseInt(retryStep) > maxIndex) {
-                throw new RuntimeException(text_retryStepGreaterMax());
             }
             if (Integer.parseInt(retryStep) == selectIndex) {
                 throw new RuntimeException(text_retryStepEqualIndex());
