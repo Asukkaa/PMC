@@ -111,7 +111,7 @@ public class AutoClickService {
             }
 
             // 执行操作流程
-            private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
+            private List<ClickLogBean> clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
                 int dataSize = tableViewItems.size();
                 floatingLabel = taskBean.getFloatingLabel();
                 massageLabel = taskBean.getMassageLabel();
@@ -189,6 +189,9 @@ public class AutoClickService {
                     int stepIndex = clickResultBean.getStepIndex();
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
+                        // 重复点击改为立刻执行
+                        clickPositionVO.setWaitTime("0");
+                        tableViewItems.set(currentStep, clickPositionVO);
                         continue;
                         // 跳转到指定步骤
                     } else if (stepIndex > 0) {
