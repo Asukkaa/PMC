@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.io.File;
@@ -190,7 +191,7 @@ public class AutoClickService {
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
                         // 重复点击改为立刻执行
-                        clickPositionVO.setRetryType(retryType_break())
+                        clickPositionVO.setRetryTypeEnum(RetryTypeEnum.BREAK.ordinal())
                                 .setWaitTime("0");
                         tableViewItems.set(currentStep, clickPositionVO);
                         continue;
