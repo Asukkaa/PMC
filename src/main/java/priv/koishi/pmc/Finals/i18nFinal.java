@@ -996,7 +996,8 @@ public class i18nFinal {
                 clickMatched_click(),
                 clickMatched_break(),
                 clickMatched_step(),
-                clickMatched_clickStep());
+                clickMatched_clickStep(),
+                clickMatched_clickWhile());
         clickMatchedList.clear();
         clickMatchedList.addAll(newList);
     }
