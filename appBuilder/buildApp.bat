@@ -44,7 +44,7 @@ if exist "%appName%" (
 )
 
 :: 执行打包
-jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%"
+jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%" --java-options "-XX:+UseZGC"
 echo 已完成 jpackage 打包
 
 :: 生成压缩包后打开目录并选中生成的应用程序文件夹

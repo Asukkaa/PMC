@@ -61,7 +61,7 @@ if [ -d "$target/$appFile" ]; then
 fi
 
 # 执行打包
-(cd "$target" && jpackage --name "$appName" --type app-image -m "$appMainClass" --runtime-image "$runtimeImage" --icon "$appIcon" --app-version "$appVersion")
+(cd "$target" && jpackage --name "$appName" --type app-image -m "$appMainClass" --runtime-image "$runtimeImage" --icon "$appIcon" --app-version "$appVersion" --java-options "-XX:+UseZGC")
 echo "已完成 jpackage 打包"
 
 # 移动动态库文件
