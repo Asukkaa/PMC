@@ -190,7 +190,8 @@ public class AutoClickService {
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
                         // 重复点击改为立刻执行
-                        clickPositionVO.setWaitTime("0");
+                        clickPositionVO.setRetryType(retryType_break())
+                                .setWaitTime("0");
                         tableViewItems.set(currentStep, clickPositionVO);
                         continue;
                         // 跳转到指定步骤
