@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
+import priv.koishi.pmc.Finals.Enum.LanguageEnum;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 
@@ -733,7 +734,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setChoiceBoxItems() {
         // 初始化语言设置下拉框
-        initializeChoiceBoxItems(language_Set, zh_CN, languageMap);
+        initializeChoiceBoxItems(language_Set, LanguageEnum.zh_CN.getString(), languageMap);
     }
 
     /**

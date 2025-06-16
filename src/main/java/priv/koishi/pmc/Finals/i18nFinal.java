@@ -4,10 +4,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
-import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
-import priv.koishi.pmc.Finals.Enum.RepeatTypeEnum;
-import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.Finals.Enum.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1288,21 +1285,15 @@ public class i18nFinal {
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
     }
 
-    public static final String zh_CN = "简体中文";
-
-    public static final String zh_TW = "繁體中文";
-
-    public static final String en = "English";
-
     /**
      * 切换语言下拉框选项
      */
     public static final BidiMap<Locale, String> languageMap = new DualHashBidiMap<>();
 
     static {
-        languageMap.put(Locale.SIMPLIFIED_CHINESE, zh_CN);
-        languageMap.put(Locale.TRADITIONAL_CHINESE, zh_TW);
-        languageMap.put(Locale.ENGLISH, en);
+        languageMap.put(Locale.SIMPLIFIED_CHINESE, LanguageEnum.zh_CN.getString());
+        languageMap.put(Locale.TRADITIONAL_CHINESE, LanguageEnum.zh_TW.getString());
+        languageMap.put(Locale.ENGLISH, LanguageEnum.en.getString());
     }
 
     /**
