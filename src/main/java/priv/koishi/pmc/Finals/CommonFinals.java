@@ -73,14 +73,14 @@ public class CommonFinals {
     public static final String configFile_Click = "config/autoClickConfig.properties";
 
     /**
-     * log文件夹目录
-     */
-    public static final String logsDir = packagePath + "logs";
-
-    /**
      * log文件夹名称
      */
     public static final String logs = "logs";
+
+    /**
+     * log文件夹目录
+     */
+    public static final String logsDir = packagePath + logs;
 
     /**
      * 用户主目录
@@ -106,6 +106,21 @@ public class CommonFinals {
      * 文件选择器默认路径
      */
     public static final String defaultFileChooserPath = desktopPath;
+
+    /**
+     * app目录
+     */
+    public static final String appDirectory = "/app";
+
+    /**
+     * Contents目录
+     */
+    public static final String contentsDirectory = "/Contents";
+
+    /**
+     * 桌面名称
+     */
+    public static final String desktop = "Desktop";
 
     /**
      * 当前程序运行操作系统名称
@@ -407,12 +422,6 @@ public class CommonFinals {
      */
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public static final String appDirectory = "/app";
-
-    public static final String contentsDirectory = "/Contents";
-
-    public static final String desktop = "Desktop";
-
     public static final String log = ".log";
 
     public static final String cfg = ".cfg";
@@ -454,6 +463,8 @@ public class CommonFinals {
     public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
 
     public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    public static final String percentage = " %";
 
     public static final String key_logsNum = "logsNum";
 

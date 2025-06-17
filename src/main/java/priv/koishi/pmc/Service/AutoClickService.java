@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.activation;
+import static priv.koishi.pmc.Finals.CommonFinals.percentage;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
@@ -148,7 +149,8 @@ public class AutoClickService {
                                 text_willBe() + waitTime + text_msWillBe() + name +
                                 text_point() + " X：" + startX + " Y：" + startY + clickText +
                                 bundle.getString("clickTime") + clickTime + " " + text_ms() +
-                                bundle.getString("repeat") + clickNum + bundle.getString("interval") + interval + " " + text_ms();
+                                bundle.getString("repeat") + clickNum + bundle.getString("interval") +
+                                interval + " " + text_ms();
                         if (StringUtils.isNotBlank(clickImgPath)) {
                             try {
                                 text = loopTimeText +
@@ -250,10 +252,11 @@ public class AutoClickService {
                         .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
                         .setTemplatePath(stopPath)
-                        .setContinuously(false);
+                        .setContinuously(false)
+                        .setName(name);
                 MatchPointBean matchPointBean;
                 try {
-                    matchPointBean = findPosition(findPositionConfig);
+                    matchPointBean = findPosition(findPositionConfig, dynamicQueue);
                 } catch (Exception e) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     throw new RuntimeException(e);
@@ -266,7 +269,7 @@ public class AutoClickService {
                     if (taskBean.isStopImgLog()) {
                         ClickLogBean clickLogBean = new ClickLogBean();
                         clickLogBean.setClickTime(String.valueOf(end - start))
-                                .setResult(matchThreshold + " %")
+                                .setResult(matchThreshold + percentage)
                                 .setX(String.valueOf(x))
                                 .setY(String.valueOf(y))
                                 .setType(log_stopImg())
@@ -277,7 +280,7 @@ public class AutoClickService {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                         throw new Exception(text_index() + clickPositionVO.getIndex() + bundle.getString("taskStop") +
                                 bundle.getString("findStopImg") + fileName.get() +
-                                bundle.getString("matchThreshold") + matchThreshold + " %" +
+                                bundle.getString("matchThreshold") + matchThreshold + percentage +
                                 "\n" + text_point() + " X：" + x + " Y：" + y);
                     }
                 } catch (Exception e) {
@@ -311,8 +314,9 @@ public class AutoClickService {
                     .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
-                    .setTemplatePath(clickPath);
-            MatchPointBean matchPointBean = findPosition(findPositionConfig);
+                    .setTemplatePath(clickPath)
+                    .setName(name);
+            MatchPointBean matchPointBean = findPosition(findPositionConfig, dynamicQueue);
             try (Point position = matchPointBean.getPoint()) {
                 String matchedType = clickPositionVO.getMatchedType();
                 long end = System.currentTimeMillis();
@@ -324,7 +328,7 @@ public class AutoClickService {
                 if (taskBean.isClickImgLog()) {
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(end - start))
-                            .setResult(matchThreshold + " %")
+                            .setResult(matchThreshold + percentage)
                             .setX(String.valueOf(position.x()))
                             .setY(String.valueOf(position.y()))
                             .setType(log_clickImg())
@@ -359,7 +363,7 @@ public class AutoClickService {
                         throw new Exception(text_index() + clickPositionVO.getIndex() + bundle.getString("taskErr") +
                                 bundle.getString("maxRetry") + clickPositionVO.getClickRetryTimes() + " " + bundle.getString("unit.times") +
                                 bundle.getString("notFound") + fileName.get() +
-                                bundle.getString("closestMatchThreshold") + matchPointBean.getMatchThreshold() + " %" +
+                                bundle.getString("closestMatchThreshold") + matchPointBean.getMatchThreshold() + percentage +
                                 "\n" + text_point() + " X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());

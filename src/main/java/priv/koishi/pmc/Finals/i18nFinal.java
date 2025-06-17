@@ -907,6 +907,10 @@ public class i18nFinal {
         return bundle.getString("log.stopImg");
     }
 
+    public static String log_findImage() {
+        return bundle.getString("log.findImage");
+    }
+
     public static String retryType_continuously() {
         return bundle.getString("retryType.continuously");
     }

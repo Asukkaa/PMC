@@ -44,4 +44,9 @@ public class FindPositionConfig {
      */
     int overTime;
 
+    /**
+     * 操作名称
+     */
+    String name;
+
 }

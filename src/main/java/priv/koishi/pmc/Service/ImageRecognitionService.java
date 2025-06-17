@@ -9,8 +9,10 @@ import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
+import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.FindPositionConfig;
 import priv.koishi.pmc.Bean.MatchPointBean;
+import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
+import static priv.koishi.pmc.Finals.CommonFinals.percentage;
+import static priv.koishi.pmc.Finals.i18nFinal.log_findImage;
 import static priv.koishi.pmc.Finals.i18nFinal.text_image;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
@@ -73,10 +77,11 @@ public class ImageRecognitionService {
      * @return Javacv Point对象
      * @throws Exception 匹配失败时抛出异常
      */
-    public static MatchPointBean findPosition(FindPositionConfig config) throws Exception {
+    public static MatchPointBean findPosition(FindPositionConfig config, DynamicQueue<? super ClickLogBean> dynamicQueue) throws Exception {
         double matchThreshold = config.getMatchThreshold();
         String templatePath = config.getTemplatePath();
         int overTime = config.getOverTime();
+        String name = config.getName();
         File file = new File(templatePath);
         String fileName = getFileName(templatePath);
         if (StringUtils.isBlank(templatePath)) {
@@ -96,13 +101,18 @@ public class ImageRecognitionService {
                 try {
                     String timeOutErr = text_image() + fileName + bundle.getString("timeOut");
                     if (config.isContinuously()) {
+                        int retry = 0;
                         while (true) {
+                            retry++;
+                            long start = System.currentTimeMillis();
                             Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
                                 MatchPointBean result = (overTime > 0) ?
                                         future.get(overTime, TimeUnit.SECONDS) :
                                         future.get();
+                                // 记录识别结果
+                                addLog(result, retry, start, name, dynamicQueue);
                                 if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
@@ -118,12 +128,15 @@ public class ImageRecognitionService {
                     } else {
                         MatchPointBean result = new MatchPointBean();
                         for (int i = 0; i <= config.getMaxRetry(); i++) {
+                            long start = System.currentTimeMillis();
                             Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(templatePath, matchThreshold));
                             try {
                                 result = (overTime > 0) ?
                                         future.get(overTime, TimeUnit.SECONDS) :
                                         future.get();
+                                // 记录识别结果
+                                addLog(result, i + 1, start, name, dynamicQueue);
                                 if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
@@ -145,6 +158,29 @@ public class ImageRecognitionService {
             } finally {
                 scheduler.shutdownNow();
             }
+        }
+    }
+
+    /**
+     * 记录识别结果
+     *
+     * @param result       识别结果
+     * @param retry        重试次数
+     * @param start        识别开始时间
+     * @param name         操作名称
+     * @param dynamicQueue 日志队列
+     */
+    private static void addLog(MatchPointBean result, int retry, long start, String name, DynamicQueue<? super ClickLogBean> dynamicQueue) {
+        if (dynamicQueue != null) {
+            long end = System.currentTimeMillis();
+            ClickLogBean clickLogBean = new ClickLogBean();
+            clickLogBean.setResult(result.getMatchThreshold() + percentage)
+                    .setType(log_findImage() + " - " + retry)
+                    .setX(String.valueOf(result.getPoint().x()))
+                    .setY(String.valueOf(result.getPoint().y()))
+                    .setClickTime(String.valueOf(end - start))
+                    .setName(name);
+            dynamicQueue.add(clickLogBean);
         }
     }
 
