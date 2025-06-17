@@ -570,6 +570,8 @@ public class CommonFinals {
 
     public static final String key_stopImgLog = "stopImgLog";
 
+    public static final String key_imgLog = "imgLog";
+
     public static final String key_maxLogNum = "maxLogNum";
 
     public static final String key_loadLastConfig = "loadLastConfig";

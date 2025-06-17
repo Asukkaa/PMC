@@ -205,6 +205,9 @@
             <CheckBox fx:id="stopImgLog_Set" onAction="#stopImgLog"
                       styleClass="checkBox-medium" text="%setting.stopImgLog_Set" selected="true"/>
 
+            <CheckBox fx:id="imgLog_Set" onAction="#imgLog"
+                      styleClass="checkBox-medium" text="%setting.imgLog_Set" selected="true"/>
+
             <HBox  styleClass="hBox-medium">
                 <Label prefHeight="25" text="%setting.maxLogNum"/>
                 <TextField fx:id="maxLogNum_Set" prefWidth="50"/>

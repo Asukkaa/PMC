@@ -149,7 +149,7 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
-            stopImgLog_Set, waitLog_Set, remindTaskSave_Set;
+            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -402,6 +402,7 @@ public class SettingController extends RootController implements MousePositionUp
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
         setControlLastConfig(overtime_Set, prop, key_overtime);
+        setControlLastConfig(imgLog_Set, prop, key_imgLog, activation);
         setControlLastConfig(moveLog_Set, prop, key_moveLog, activation);
         setControlLastConfig(dragLog_Set, prop, key_dragLog, activation);
         setControlLastConfig(waitLog_Set, prop, key_waitLog, activation);
@@ -1053,7 +1054,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 运行自动流程时记目标图像识别信息
+     * 运行自动流程时记录目标图像识别信息
      *
      * @throws IOException io异常
      */
@@ -1063,13 +1064,23 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 运行自动流程时记终止图像识别信息
+     * 运行自动流程时记录终止图像识别信息
      *
      * @throws IOException io异常
      */
     @FXML
     private void stopImgLog() throws IOException {
         setLoadLastConfigCheckBox(stopImgLog_Set, configFile_Click, key_stopImgLog);
+    }
+
+    /**
+     * 运行自动流程时记录详细的图像识别信息
+     *
+     * @throws IOException io异常
+     */
+    @FXML
+    private void imgLog() throws IOException {
+        setLoadLastConfigCheckBox(imgLog_Set, configFile_Click, key_imgLog);
     }
 
     /**

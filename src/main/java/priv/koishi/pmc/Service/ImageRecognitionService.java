@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.percentage;
 import static priv.koishi.pmc.Finals.i18nFinal.log_findImage;
 import static priv.koishi.pmc.Finals.i18nFinal.text_image;
@@ -171,7 +172,7 @@ public class ImageRecognitionService {
      * @param dynamicQueue 日志队列
      */
     private static void addLog(MatchPointBean result, int retry, long start, String name, DynamicQueue<? super ClickLogBean> dynamicQueue) {
-        if (dynamicQueue != null) {
+        if (settingController.imgLog_Set.isSelected() && dynamicQueue != null) {
             long end = System.currentTimeMillis();
             ClickLogBean clickLogBean = new ClickLogBean();
             clickLogBean.setResult(result.getMatchThreshold() + percentage)
