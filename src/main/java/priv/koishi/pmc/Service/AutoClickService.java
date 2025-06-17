@@ -192,7 +192,7 @@ public class AutoClickService {
                     int stepIndex = clickResultBean.getStepIndex();
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
-                        // 重复点击改为立刻执行
+                        // 设置重复点击时运行参数
                         clickPositionVO.setRetryTypeEnum(RetryTypeEnum.BREAK.ordinal())
                                 .setWaitTime(clickPositionVO.getClickInterval())
                                 .setClickNum("1");
