@@ -194,7 +194,8 @@ public class AutoClickService {
                     if (stepIndex == -1) {
                         // 重复点击改为立刻执行
                         clickPositionVO.setRetryTypeEnum(RetryTypeEnum.BREAK.ordinal())
-                                .setWaitTime("0");
+                                .setWaitTime(clickPositionVO.getClickInterval())
+                                .setClickNum("1");
                         tableViewItems.set(currentStep, clickPositionVO);
                         continue;
                         // 跳转到指定步骤
