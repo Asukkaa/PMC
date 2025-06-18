@@ -1123,7 +1123,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新jvm配置参数
         mainController.saveAllLastConfig();
         Platform.exit();
-        if (!isRunningFromJar()) {
+        if (!isRunningFromJar) {
             ProcessBuilder processBuilder = null;
             if (isWin) {
                 processBuilder = new ProcessBuilder(getAppPath());

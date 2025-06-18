@@ -210,7 +210,7 @@ public class FileUtils {
      */
     public static InputStream checkRunningInputStream(String path) throws IOException {
         InputStream input;
-        if (isRunningFromJar()) {
+        if (isRunningFromJar) {
             input = new FileInputStream(resourcesPath + path);
         } else {
             input = new FileInputStream(getAppResourcePath(path));
@@ -227,7 +227,7 @@ public class FileUtils {
      */
     public static OutputStream checkRunningOutputStream(String path) throws IOException {
         OutputStream output;
-        if (isRunningFromJar()) {
+        if (isRunningFromJar) {
             output = new FileOutputStream(resourcesPath + path);
         } else {
             output = new FileOutputStream(getAppResourcePath(path));
@@ -251,12 +251,12 @@ public class FileUtils {
      * @return 不同操作系统下logs文件夹地址
      */
     public static String getLogsPath() {
-        if (isRunningFromJar()) {
+        if (isRunningFromJar) {
             return userDir + File.separator + logs;
         }
         String logsPath = pmcDir + File.separator + logs;
         // 处理macos打包成.app文件后的路径
-        if (isMac && !isRunningFromJar()) {
+        if (isMac) {
             logsPath = javaHome + logsDir;
         }
         return logsPath;
@@ -521,7 +521,7 @@ public class FileUtils {
      */
     public static String getCFGPath() {
         String cfgPath;
-        if (isRunningFromJar()) {
+        if (isRunningFromJar) {
             cfgPath = appName + cfg;
         } else {
             String appPath = getAppPath();

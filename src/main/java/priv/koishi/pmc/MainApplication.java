@@ -368,7 +368,7 @@ public class MainApplication extends Application {
         bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
         System.setProperty("log.dir", getLogsPath());
         // 打包后需要手动指定日志配置文件位置
-        if (!isRunningFromJar()) {
+        if (!isRunningFromJar) {
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
         }

@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Finals;
 
 import javafx.scene.paint.Color;
+import priv.koishi.pmc.Utils.FileUtils;
 
 import java.io.File;
 import java.time.format.DateTimeFormatter;
@@ -131,6 +132,11 @@ public class CommonFinals {
      * 当前程序运行操作系统名称
      */
     public static final String systemName = System.getProperty("os.name").toLowerCase();
+
+    /**
+     * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
+     */
+    public static final boolean isRunningFromJar = FileUtils.isRunningFromJar();
 
     /**
      * win操作系统
