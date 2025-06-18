@@ -366,16 +366,9 @@ public class MainApplication extends Application {
         MainApplication.args = args;
         String languagePath = "priv.koishi.pmc.language";
         bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
+        System.setProperty("log.dir", getLogsPath());
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromJar()) {
-            String logsPath = getLogsPath();
-            File logDirectory = new File(logsPath);
-            if (!logDirectory.exists()) {
-                if (!logDirectory.mkdirs()) {
-                    throw new IOException("日志文件夹创建失败： " + logsPath);
-                }
-            }
-            System.setProperty("log.dir", logsPath);
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
         }

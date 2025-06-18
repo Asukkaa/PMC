@@ -93,6 +93,11 @@ public class CommonFinals {
     public static final String javaHome = System.getProperty("java.home");
 
     /**
+     * idea中程序运行目录
+     */
+    public static final String userDir = System.getProperty("user.dir");
+
+    /**
      * 程序根目录
      */
     public static final String pmcDir = new File(javaHome).getParent();

@@ -251,6 +251,9 @@ public class FileUtils {
      * @return 不同操作系统下logs文件夹地址
      */
     public static String getLogsPath() {
+        if (isRunningFromJar()) {
+            return userDir + File.separator + logs;
+        }
         String logsPath = pmcDir + File.separator + logs;
         // 处理macos打包成.app文件后的路径
         if (isMac && !isRunningFromJar()) {
