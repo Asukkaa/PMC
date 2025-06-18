@@ -40,6 +40,7 @@ import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
+import static priv.koishi.pmc.Utils.ListenerUtils.removeChangeListener;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -268,11 +269,7 @@ public class TaskDetailController extends RootController {
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
-                        try {
-                            saveDetail();
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                        saveDetail();
                     } else {
                         // 直接关闭
                         stage.close();
@@ -387,11 +384,10 @@ public class TaskDetailController extends RootController {
     /**
      * 保存定时任务
      *
-     * @throws IOException              任务创建失败
      * @throws IllegalArgumentException 时间格式错误
      */
     @FXML
-    private void saveDetail() throws IOException {
+    private void saveDetail() {
         TimedTaskBean timedTaskBean = getTimedTaskBean();
         if (StringUtils.isBlank(timedTaskBean.getDays())) {
             throw new IllegalArgumentException(bundle.getString("taskDetail.noWeekDay"));

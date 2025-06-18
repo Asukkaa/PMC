@@ -26,6 +26,11 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 public class FileUtils {
 
     /**
+     * 字符串格式保留两位小数
+     */
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+
+    /**
      * 获取文件类型
      *
      * @param file 文件
@@ -102,15 +107,18 @@ public class FileUtils {
      * 打开文件
      *
      * @param openPath 要打开的路径
-     * @throws IOException 文件不存在
      */
-    public static void openFile(String openPath) throws IOException {
+    public static void openFile(String openPath) {
         if (StringUtils.isNotEmpty(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
-                throw new IOException(text_fileNotExists());
+                throw new RuntimeException(text_fileNotExists());
             }
-            Desktop.getDesktop().open(file);
+            try {
+                Desktop.getDesktop().open(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -118,19 +126,22 @@ public class FileUtils {
      * 打开文件夹并选中文件
      *
      * @param openPath 要打开的路径
-     * @throws IOException 文件不存在
      */
-    public static void openDirectory(String openPath) throws IOException {
+    public static void openDirectory(String openPath) {
         if (StringUtils.isNotEmpty(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
-                throw new IOException(text_fileNotExists());
+                throw new RuntimeException(text_fileNotExists());
             }
-            if (file.isDirectory()) {
-                Desktop.getDesktop().open(file);
-            }
-            if (file.isFile()) {
-                openParentDirectory(openPath);
+            try {
+                if (file.isDirectory()) {
+                    Desktop.getDesktop().open(file);
+                }
+                if (file.isFile()) {
+                    openParentDirectory(openPath);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -139,13 +150,12 @@ public class FileUtils {
      * 打开上级目录并选中目标文件
      *
      * @param openPath 目标文件的路径
-     * @throws IOException 文件不存在
      */
-    public static void openParentDirectory(String openPath) throws IOException {
+    public static void openParentDirectory(String openPath) {
         if (StringUtils.isNotEmpty(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
-                throw new IOException(text_fileNotExists());
+                throw new RuntimeException(text_fileNotExists());
             }
             ProcessBuilder processBuilder;
             if (isWin) {
@@ -153,7 +163,11 @@ public class FileUtils {
             } else {
                 processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
             }
-            processBuilder.start();
+            try {
+                processBuilder.start();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -189,6 +203,15 @@ public class FileUtils {
      * @return 在jar环境运为true，其他环境为false
      */
     public static boolean isRunningFromJar() {
+        return "jar".equals(getRunningFrom());
+    }
+
+    /**
+     * 获取程序运行环境
+     *
+     * @return 运行环境
+     */
+    public static String getRunningFrom() {
         // 获取当前运行的JVM的类加载器
         ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         // 获取URL资源
@@ -198,7 +221,7 @@ public class FileUtils {
         if (resource != null) {
             protocol = resource.getProtocol();
         }
-        return "jar".equals(protocol);
+        return protocol;
     }
 
     /**
@@ -421,7 +444,6 @@ public class FileUtils {
         long gb = mb * kb;
         long tb = gb * kb;
         String ret = "";
-        DecimalFormat df = new DecimalFormat("0.00");
         if (size >= tb) {
             ret = df.format(size / (tb * 1.0)) + " " + TB;
         } else if (size >= gb) {

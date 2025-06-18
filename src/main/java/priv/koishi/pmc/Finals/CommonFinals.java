@@ -4,7 +4,6 @@ import javafx.scene.paint.Color;
 import priv.koishi.pmc.Utils.FileUtils;
 
 import java.io.File;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -427,11 +426,6 @@ public class CommonFinals {
      * 颜色选择器默认选中颜色
      */
     public static final String defaultColor = "0xffffffff";
-
-    /**
-     * 操作记录列表时间格式
-     */
-    public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     public static final String log = ".log";
 

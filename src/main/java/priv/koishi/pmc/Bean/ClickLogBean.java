@@ -6,8 +6,7 @@ import priv.koishi.pmc.Bean.VO.Indexable;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
-import static priv.koishi.pmc.Finals.CommonFinals.DTF;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 操作记录数据类
@@ -28,7 +27,7 @@ public class ClickLogBean implements Indexable {
     /**
      * 操作时间
      */
-    String date = LocalDateTime.now(ZoneId.systemDefault()).format(DTF);
+    String date = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
     /**
      * 操作名称

@@ -46,6 +46,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**

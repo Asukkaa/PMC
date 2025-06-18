@@ -79,6 +79,8 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParam
 import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
+import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -1145,7 +1147,7 @@ public class AutoClickController extends RootController implements MousePosition
                 clickPositionBeans = objectMapper.readValue(jsonFile,
                         objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
             } catch (MismatchedInputException | JsonParseException e) {
-                throw new IOException(text_loadAutoClick() + filePath + text_formatError());
+                throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
             }
             // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
             int index = 0;
@@ -1178,7 +1180,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param clickPositionVOS 自动流程集合
      * @param filePath         要导入的文件路径
      */
-    private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) throws IOException {
+    private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
@@ -1204,7 +1206,7 @@ public class AutoClickController extends RootController implements MousePosition
                     || !activationList.contains(clickPositionVO.getRandomClickInterval())
                     || !activationList.contains(clickPositionVO.getRandomWaitTime())
                     || !activationList.contains(clickPositionVO.getRandomClickTime())) {
-                throw new IOException(text_missingKeyData());
+                throw new RuntimeException(text_missingKeyData());
             }
             clickPositionVO.setUuid(UUID.randomUUID().toString());
         }
