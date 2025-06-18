@@ -130,7 +130,7 @@ public class AboutController extends RootController {
      */
     private void setToolTip() {
         // 版本号鼠标悬停提示
-        addToolTip(tip_version, version_Abt);
+        addToolTip(tip_version(), version_Abt);
         // 日志文件数量输入框添加鼠标悬停提示
         addValueToolTip(logsNum_Abt, tip_logsNum());
         // 赞赏按钮添加鼠标悬停提示

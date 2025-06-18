@@ -9,8 +9,7 @@ import priv.koishi.pmc.Finals.Enum.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static priv.koishi.pmc.Finals.CommonFinals.app;
-import static priv.koishi.pmc.Finals.CommonFinals.appName;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 
 /**
@@ -441,6 +440,14 @@ public class i18nFinal {
 
     public static String tip_notExistsIndex() {
         return bundle.getString("tip.notExistsIndex");
+    }
+
+    public static String tip_version() {
+        return """
+                %s：%s
+                %s：%s""".formatted(
+                bundle.getString("tip.version"), version,
+                bundle.getString("tip.buildDate"), buildDate);
     }
 
     public static String text_selectDirectory() {
