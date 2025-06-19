@@ -102,7 +102,7 @@ public class CommonFinals {
     /**
      * 程序根目录
      */
-    public static final String pmcDir = new File(javaHome).getParent();
+    public static final String rootDir = new File(javaHome).getParent();
 
     /**
      * 桌面目录
