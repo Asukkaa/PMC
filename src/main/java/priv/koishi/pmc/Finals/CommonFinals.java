@@ -32,7 +32,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.06.18";
+    public static final String buildDate = "2025.06.19";
 
     /**
      * 程序logo

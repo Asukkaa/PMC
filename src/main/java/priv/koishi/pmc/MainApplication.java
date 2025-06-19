@@ -127,11 +127,12 @@ public class MainApplication extends Application {
         if (loadPMC) {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
         } else if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
-            tabPane.getTabs().forEach(tab -> {
+            for (Tab tab : tabPane.getTabs()) {
                 if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
                     tabPane.getSelectionModel().select(tab);
+                    break;
                 }
-            });
+            }
         }
         input.close();
         // 初始化macOS系统应用菜单
