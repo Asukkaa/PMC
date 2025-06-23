@@ -1,6 +1,3 @@
-2025-06-18T15:41:37,039 [main] INFO  priv.koishi.pmc.MainApplication - ==============程序启动中====================
-2025-06-18T15:41:37,040 [main] INFO  priv.koishi.pmc.MainApplication - 启动参数数量: 0
-2025-06-18T15:41:37,836 [JavaFX Application Thread] INFO  priv.koishi.pmc.MainApplication - --------------程序启动成功-------------------
-2025-06-18T15:44:58,696 [main] INFO  priv.koishi.pmc.MainApplication - ==============程序启动中====================
-2025-06-18T15:44:58,698 [main] INFO  priv.koishi.pmc.MainApplication - 启动参数数量: 0
-2025-06-18T15:44:59,495 [JavaFX Application Thread] INFO  priv.koishi.pmc.MainApplication - --------------程序启动成功-------------------
+2025-06-24T00:59:35,694 [main] INFO  priv.koishi.pmc.MainApplication - ==============程序启动中====================
+2025-06-24T00:59:35,699 [main] INFO  priv.koishi.pmc.MainApplication - 启动参数数量: 0
+2025-06-24T00:59:36,443 [JavaFX Application Thread] INFO  priv.koishi.pmc.MainApplication - --------------程序启动成功-------------------

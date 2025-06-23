@@ -27,12 +27,12 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.0.0";
+    public static final String version = "3.1.0";
 
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.06.19";
+    public static final String buildDate = "2025.06.23";
 
     /**
      * 程序logo
@@ -105,16 +105,6 @@ public class CommonFinals {
     public static final String rootDir = new File(javaHome).getParent();
 
     /**
-     * 桌面目录
-     */
-    public static final String desktopPath = getDesktopPath();
-
-    /**
-     * 文件选择器默认路径
-     */
-    public static final String defaultFileChooserPath = desktopPath;
-
-    /**
      * app目录
      */
     public static final String appDirectory = "/app";
@@ -130,6 +120,16 @@ public class CommonFinals {
     public static final String desktop = "Desktop";
 
     /**
+     * 桌面目录
+     */
+    public static final String desktopPath = getDesktopPath();
+
+    /**
+     * 文件选择器默认路径
+     */
+    public static final String defaultFileChooserPath = desktopPath;
+
+    /**
      * 当前程序运行操作系统名称
      */
     public static final String systemName = System.getProperty("os.name").toLowerCase();
@@ -140,14 +140,24 @@ public class CommonFinals {
     public static final boolean isRunningFromJar = FileUtils.isRunningFromJar();
 
     /**
-     * win操作系统
+     * win操作系统简称
      */
-    public static final boolean isWin = systemName.contains("win");
+    public static final String win = "win";
 
     /**
-     * mac操作系统
+     * mac操作系统简称
      */
-    public static final boolean isMac = systemName.contains("mac");
+    public static final String mac = "mac";
+
+    /**
+     * 是否为win操作系统（true-win系统，false-非win系统）
+     */
+    public static final boolean isWin = systemName.contains(win);
+
+    /**
+     * 是否为mac操作系统（true-mac系统，false-非mac系统）
+     */
+    public static final boolean isMac = systemName.contains(mac);
 
     /**
      * 百度网盘地址

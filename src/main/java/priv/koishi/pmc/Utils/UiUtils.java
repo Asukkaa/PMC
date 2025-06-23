@@ -22,6 +22,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -36,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Annotate.UsedByReflection;
+import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -57,6 +59,7 @@ import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -1991,6 +1994,39 @@ public class UiUtils {
         choiceBox.getItems().clear();
         values.forEach((key, value) -> choiceBox.getItems().add(value));
         choiceBox.setValue(defaultValue);
+    }
+
+    public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(bundle.getString("update.title"));
+        alert.setHeaderText(bundle.getString("update.header") + updateInfo.getVersion());
+        // 创建包含更新信息的文本区域
+        TextArea textArea = new TextArea(updateInfo.getWhatsNew());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(textArea, 0, 0);
+        alert.getDialogPane().setContent(expContent);
+        ButtonType updateButton = new ButtonType(bundle.getString("update.updateButton"));
+        ButtonType laterButton = new ButtonType(bundle.getString("update.laterButton"),
+                ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(updateButton, laterButton);
+        // 设置窗口图标
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        setWindowLogo(stage, logoPath);
+        return alert.showAndWait();
+    }
+
+    public static void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(content);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        setWindowLogo(stage, logoPath);
+        alert.showAndWait();
     }
 
 }
