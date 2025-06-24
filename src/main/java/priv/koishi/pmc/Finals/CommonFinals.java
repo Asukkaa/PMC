@@ -160,6 +160,11 @@ public class CommonFinals {
     public static final boolean isMac = systemName.contains(mac);
 
     /**
+     * 更新服务 uniCloud 地址
+     */
+    public static final String uniCloudCheckUpdateURL = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/pmcUpdateTest";
+
+    /**
      * 百度网盘地址
      */
     public static final String baiduLink = "https://pan.baidu.com/s/1UbQx3XdUAtLBPJ6thd-H5A?pwd=3efe";
@@ -183,6 +188,16 @@ public class CommonFinals {
      * gitee地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
+
+    /**
+     * 更新临时文件目录
+     */
+    public static final String PMCTemp = File.separator + ".PMCTemp";
+
+    /**
+     * 更新临时文件解压目录
+     */
+    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
 
     /**
      * jvm最大内存设置参数
@@ -438,6 +453,10 @@ public class CommonFinals {
      * 颜色选择器默认选中颜色
      */
     public static final String defaultColor = "0xffffffff";
+
+    public static final String zip = ".zip";
+
+    public static final String dmg = ".dmg";
 
     public static final String log = ".log";
 

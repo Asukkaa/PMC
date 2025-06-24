@@ -53,3 +53,12 @@ if exist "%temp_dir%" (
     )
 )
 
+:: 自删除逻辑
+set "self=%~f0"
+call :DelayedSelfDelete
+exit /b
+
+:DelayedSelfDelete
+ping 127.0.0.1 -n 2 > nul
+del /f /q "%self%"
+exit /b
