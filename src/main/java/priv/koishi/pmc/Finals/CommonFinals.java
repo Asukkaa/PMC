@@ -27,12 +27,12 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.0.0";
+    public static final String version = "3.0.1";
 
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.06.19";
+    public static final String buildDate = "2025.06";
 
     /**
      * 程序logo
