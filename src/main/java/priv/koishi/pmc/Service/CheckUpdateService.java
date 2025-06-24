@@ -3,6 +3,7 @@ package priv.koishi.pmc.Service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.UniCloudResponse;
 import priv.koishi.pmc.Controller.AboutController;
@@ -32,6 +33,39 @@ import static priv.koishi.pmc.Utils.FileUtils.getDownloadPath;
  * Time:14:50
  */
 public class CheckUpdateService {
+
+    /**
+     * 检查是有新版本
+     *
+     * @param checkUpdateBean 检查更新信息
+     * @return true:有新版本 false:无新版本
+     */
+    public static boolean isNewVersionAvailable(CheckUpdateBean checkUpdateBean) {
+        // 无效数据视为无更新
+        if (checkUpdateBean == null ||
+                StringUtils.isBlank(checkUpdateBean.getVersion()) ||
+                StringUtils.isBlank(checkUpdateBean.getBuildDate())) {
+            return false;
+        }
+        String lastVersion = checkUpdateBean.getVersion();
+        // 检测到的最新版本
+        String[] lastVersionSplit = lastVersion.split("\\.");
+        // 当前版本
+        String[] nowVersionSplit = version.split("\\.");
+        //  比较版本号的各个位数
+        int length = Math.max(lastVersionSplit.length, nowVersionSplit.length);
+        for (int i = 0; i < length; i++) {
+            // 检测到的最新版本
+            int last = i < lastVersionSplit.length ? Integer.parseInt(lastVersionSplit[i]) : 0;
+            // 当前版本
+            int now = i < nowVersionSplit.length ? Integer.parseInt(nowVersionSplit[i]) : 0;
+            if (last != now) {
+                return last > now;
+            }
+        }
+        // 比较构建日期
+        return checkUpdateBean.getBuildDate().compareTo(buildDate) > 0;
+    }
 
     /**
      * 调用 uniCloud 查询最新版本

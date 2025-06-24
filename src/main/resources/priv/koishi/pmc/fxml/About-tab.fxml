@@ -96,9 +96,10 @@
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="检测更新："/>
+                <Label prefHeight="25" text="%update.checkUpdate"/>
                 <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" style="-fx-cursor: hand"
-                        text="检测更新"/>
+                        text="%update.checkUpdate_Abt"/>
+                <Label prefHeight="25" fx:id="checkMassage_Abt"/>
             </HBox>
 
             <HBox spacing="5">

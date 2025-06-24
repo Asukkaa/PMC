@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +31,7 @@ import java.util.Properties;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
-import static priv.koishi.pmc.Service.CheckUpdateService.checkLatestVersion;
-import static priv.koishi.pmc.Service.CheckUpdateService.downloadAndInstallUpdate;
+import static priv.koishi.pmc.Service.CheckUpdateService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -43,6 +44,8 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  */
 public class AboutController extends RootController {
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+
     @FXML
     public ImageView logo_Abt;
 
@@ -50,7 +53,7 @@ public class AboutController extends RootController {
     public TextField logsNum_Abt;
 
     @FXML
-    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt;
+    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMassage_Abt;
 
     @FXML
     public Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt,
@@ -251,13 +254,29 @@ public class AboutController extends RootController {
      */
     @FXML
     public void checkUpdate() {
+        String lastCheck = bundle.getString("update.lastCheck");
         checkLatestVersion(updateInfo -> {
             if (!updateInfo.getVersion().contains(bundle.getString("update.err"))) {
-                Optional<ButtonType> result = showUpdateDialog(updateInfo);
-                if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
-                    // 用户选择更新
-                    downloadAndInstallUpdate(updateInfo);
+                // 检查是否有新版本
+                if (isNewVersionAvailable(updateInfo)) {
+                    checkMassage_Abt.setText(bundle.getString("update.findNewVersion")
+                            + lastCheck + LocalDateTime.now().format(formatter));
+                    checkMassage_Abt.setTextFill(Color.BLUE);
+                    // 弹出更新对话框
+                    Optional<ButtonType> result = showUpdateDialog(updateInfo);
+                    if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
+                        // 用户选择更新
+                        downloadAndInstallUpdate(updateInfo);
+                    }
+                } else {
+                    checkMassage_Abt.setText(bundle.getString("update.nowIsLast")
+                            + lastCheck + LocalDateTime.now().format(formatter));
+                    checkMassage_Abt.setTextFill(Color.GREEN);
                 }
+            } else {
+                checkMassage_Abt.setText(bundle.getString("update.checkFailed")
+                        + lastCheck + LocalDateTime.now().format(formatter));
+                checkMassage_Abt.setTextFill(Color.RED);
             }
         });
     }
