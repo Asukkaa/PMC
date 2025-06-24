@@ -1799,9 +1799,11 @@ public class UiUtils {
         }
         floatingStage.setX(x);
         floatingStage.setY(y);
-        // 保证浮窗一直置顶
-        floatingStage.setAlwaysOnTop(true);
-        floatingStage.setIconified(false);
+        if (isWin) {
+            // 保证浮窗一直置顶
+            floatingStage.setAlwaysOnTop(true);
+            floatingStage.setIconified(false);
+        }
     }
 
     /**
