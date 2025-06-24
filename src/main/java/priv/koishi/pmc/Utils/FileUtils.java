@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 
 /**
  * 文件操作工具类
@@ -587,7 +588,7 @@ public class FileUtils {
         try {
             Files.createDirectories(destDir.toPath());
         } catch (IOException e) {
-            throw new IOException("无法创建目录：" + destDirectory, e);
+            throw new IOException(bundle.getString("update.creatDirErr") + destDirectory, e);
         }
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
             ZipEntry entry;
@@ -611,7 +612,7 @@ public class FileUtils {
                     try {
                         Files.createDirectories(file.toPath());
                     } catch (IOException e) {
-                        throw new IOException("无法创建目录：" + file.getAbsolutePath(), e);
+                        throw new IOException(bundle.getString("update.creatDirErr") + file.getAbsolutePath(), e);
                     }
                 } else {
                     // 确保父目录存在
@@ -620,7 +621,7 @@ public class FileUtils {
                         try {
                             Files.createDirectories(parent.toPath());
                         } catch (IOException e) {
-                            throw new IOException("无法创建父目录：" + parent.getAbsolutePath(), e);
+                            throw new IOException(bundle.getString("update.creatFatherDirErr") + parent.getAbsolutePath(), e);
                         }
                     }
                     // 处理文件条目
@@ -631,6 +632,12 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 递归删除目录
+     *
+     * @param dir 要删除的目录
+     * @throws IOException 无法删除文件或目录
+     */
     private static void deleteDirectory(File dir) throws IOException {
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
@@ -641,10 +648,17 @@ public class FileUtils {
             }
         }
         if (!dir.delete()) {
-            throw new IOException("无法删除文件或目录：" + dir.getAbsolutePath());
+            throw new IOException(bundle.getString("update.deleteErr") + dir.getAbsolutePath());
         }
     }
 
+    /**
+     * 处理zip内的文件条目
+     *
+     * @param zipIn zip输入流
+     * @param file  zip内的文件
+     * @throws IOException io异常
+     */
     private static void extractFile(ZipInputStream zipIn, File file) throws IOException {
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
             byte[] bytesIn = new byte[4096];
@@ -655,13 +669,16 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 获取操作系统下载目录
+     *
+     * @return 操作系统下载目录
+     */
     public static String getDownloadPath() {
         String downloadPath = "";
         if (isWin) {
-            // Windows 系统
             downloadPath = System.getenv("USERPROFILE") + "\\Downloads";
         } else if (isMac) {
-            // macOS 系统
             downloadPath = userHome + "/Downloads";
         }
         return Paths.get(downloadPath).normalize().toString();

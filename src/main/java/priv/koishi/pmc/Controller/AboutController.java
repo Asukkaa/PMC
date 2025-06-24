@@ -252,7 +252,7 @@ public class AboutController extends RootController {
     @FXML
     public void checkUpdate() {
         checkLatestVersion(updateInfo -> {
-            if (!updateInfo.getVersion().contains("检查失败")) {
+            if (!updateInfo.getVersion().contains(bundle.getString("update.err"))) {
                 Optional<ButtonType> result = showUpdateDialog(updateInfo);
                 if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
                     // 用户选择更新

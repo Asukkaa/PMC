@@ -14,6 +14,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -105,6 +106,9 @@ public class CheckUpdateService {
                     if (!tempDir.mkdirs()) {
                         throw new RuntimeException(bundle.getString("update.tempFileErr"));
                     }
+                }
+                if (isWin) {
+                    Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
                 }
                 // 根据操作系统确定文件扩展名
                 String extension = isWin ? zip : dmg;
