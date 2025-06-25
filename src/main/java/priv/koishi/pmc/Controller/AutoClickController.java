@@ -623,6 +623,9 @@ public class AutoClickController extends RootController implements MousePosition
         rectangle = new Rectangle(floatingWidth, floatingHeight);
         StackPane root = new StackPane();
         root.setBackground(Background.EMPTY);
+        root.setMouseTransparent(true);
+        root.setPickOnBounds(false);
+        root.setFocusTraversable(false);
         Color labelTextFill = Color.WHITE;
         floatingLabel = new Label(text_cancelTask());
         floatingLabel.setTextFill(labelTextFill);
@@ -633,9 +636,12 @@ public class AutoClickController extends RootController implements MousePosition
         root.getChildren().addAll(rectangle, vBox);
         Scene scene = new Scene(root, Color.TRANSPARENT);
         vBox.setMouseTransparent(true);
+        vBox.setFocusTraversable(false);
         floatingStage = new Stage();
         // 设置透明样式
         floatingStage.initStyle(StageStyle.TRANSPARENT);
+        floatingLabel.setMouseTransparent(true);
+        floatingMousePosition.setMouseTransparent(true);
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
