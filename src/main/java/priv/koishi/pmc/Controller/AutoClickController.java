@@ -704,23 +704,12 @@ public class AutoClickController extends RootController implements MousePosition
      * @param clickPositionVOS 自动操作流程
      * @throws IOException io异常
      */
-    private void launchClickTask(List<? extends ClickPositionVO> clickPositionVOS) throws IOException {
+    private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
         if (isFree()) {
             // 标记为正在运行自动操作
             runClicking = true;
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
-            List<ClickPositionVO> backup = new CopyOnWriteArrayList<>();
-            for (ClickPositionVO clickPositionVO : clickPositionVOS) {
-                ClickPositionVO vo = new ClickPositionVO();
-                try {
-                    // 自动拷贝父类中的属性
-                    copyProperties(clickPositionVO, vo);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-                backup.add(vo);
-            }
             clickLogs.clear();
             CheckBox firstClick = settingController.firstClick_Set;
             TextField retrySecond = settingController.retrySecond_Set;
@@ -750,7 +739,7 @@ public class AutoClickController extends RootController implements MousePosition
                     .setBindingMassageLabel(false)
                     .setDisableNodes(disableNodes)
                     .setMassageLabel(log_Click)
-                    .setBeanList(backup);
+                    .setBeanList(clickPositionVOS);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);

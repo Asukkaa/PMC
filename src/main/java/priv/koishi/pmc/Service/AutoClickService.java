@@ -30,6 +30,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.percentage;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
+import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 
 /**
@@ -113,8 +114,19 @@ public class AutoClickService {
             }
 
             // 执行操作流程
-            private List<ClickLogBean> clicks(List<ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
-                int dataSize = tableViewItems.size();
+            private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
+                List<ClickPositionVO> backup = new ArrayList<>(tableViewItems.size());
+                for (ClickPositionVO clickPositionVO : tableViewItems) {
+                    ClickPositionVO vo = new ClickPositionVO();
+                    try {
+                        // 自动拷贝父类中的属性
+                        copyProperties(clickPositionVO, vo);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                    backup.add(vo);
+                }
+                int dataSize = backup.size();
                 floatingLabel = taskBean.getFloatingLabel();
                 massageLabel = taskBean.getMassageLabel();
                 firstClick.set(taskBean.isFirstClick());
@@ -123,7 +135,7 @@ public class AutoClickService {
                 while (currentStep < dataSize) {
                     int progress = currentStep + 1;
                     updateProgress(progress, dataSize);
-                    ClickPositionVO clickPositionVO = tableViewItems.get(currentStep);
+                    ClickPositionVO clickPositionVO = backup.get(currentStep);
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
                     String waitTime = clickPositionVO.getWaitTime();
@@ -196,7 +208,7 @@ public class AutoClickService {
                         clickPositionVO.setRetryTypeEnum(RetryTypeEnum.BREAK.ordinal())
                                 .setWaitTime(clickPositionVO.getClickInterval())
                                 .setClickNum("1");
-                        tableViewItems.set(currentStep, clickPositionVO);
+                        backup.set(currentStep, clickPositionVO);
                         continue;
                         // 跳转到指定步骤
                     } else if (stepIndex > 0) {
