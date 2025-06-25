@@ -175,8 +175,8 @@ public class AutoClickService {
                                 throw new RuntimeException(e);
                             }
                         }
-                        massageLabel.setText(text);
-                        floatingLabel.setText(text);
+                        // 更新操作信息
+                        updateMassage(text);
                     });
                     long wait = Long.parseLong(waitTime);
                     // 处理随机等待时间偏移
@@ -250,8 +250,8 @@ public class AutoClickService {
                     try {
                         fileName.set(getExistsFileName(new File(stopPath)));
                         String text = loopTimeText + bundle.getString("searchingStop") + fileName.get();
-                        floatingLabel.setText(text);
-                        massageLabel.setText(text);
+                        // 更新操作信息
+                        updateMassage(text);
                     } catch (IOException e) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                         throw new RuntimeException(e);
@@ -311,8 +311,8 @@ public class AutoClickService {
                 try {
                     fileName.set(getExistsFileName(new File(clickPath)));
                     String text = loopTimeText + bundle.getString("searchingClick") + fileName.get();
-                    floatingLabel.setText(text);
-                    massageLabel.setText(text);
+                    // 更新操作信息
+                    updateMassage(text);
                 } catch (IOException e) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     throw new RuntimeException(e);
@@ -658,6 +658,20 @@ public class AutoClickService {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * 更新操作信息
+     *
+     * @param message 要更新的信息
+     */
+    private static void updateMassage(String message) {
+        if (massageLabel != null) {
+            massageLabel.setText(message);
+        }
+        if (floatingLabel != null) {
+            floatingLabel.setText(message);
         }
     }
 
