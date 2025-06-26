@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.UniCloudResponse;
 import priv.koishi.pmc.Controller.AboutController;
@@ -34,6 +36,11 @@ import static priv.koishi.pmc.Utils.FileUtils.unzip;
  * Time:14:50
  */
 public class CheckUpdateService {
+
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(CheckUpdateService.class);
 
     /**
      * 检查是有新版本
@@ -89,16 +96,19 @@ public class CheckUpdateService {
                 try (HttpClient client = HttpClient.newHttpClient()) {
                     // 构建请求体
                     String requestBody = "{\"os\":\"" + osType + "\"}";
+                    logger.info("查询版本更新，请求体: {}", requestBody);
                     HttpRequest request = HttpRequest.newBuilder()
                             .uri(URI.create(uniCloudCheckUpdateURL))
                             .header("Content-Type", "application/json")
                             .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                             .build();
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    if (response.body() == null) {
+                    logger.info("查询版本更新，响应体: {}", response);
+                    String jsonData = response.body();
+                    logger.info("查询版本更新，响应体body: {}", jsonData);
+                    if (jsonData == null) {
                         throw new IOException(bundle.getString("update.nullResponse"));
                     }
-                    String jsonData = response.body();
                     ObjectMapper objectMapper = new ObjectMapper();
                     // 配置忽略未知字段
                     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -157,6 +167,7 @@ public class CheckUpdateService {
                             .sslContext(sslContext)
                             .build()) {
                         String encodedLink = updateInfo.getDownloadLink().replace(" ", "%20");
+                        logger.info("下载更新，请求体: {}", encodedLink);
                         HttpRequest request = HttpRequest.newBuilder()
                                 .uri(URI.create(encodedLink))
                                 .GET()
@@ -177,7 +188,7 @@ public class CheckUpdateService {
                             while ((bytesRead = inputStream.read(buffer)) != -1) {
                                 // 每次循环都检查取消状态
                                 if (isCancelled()) {
-                                   break;
+                                    break;
                                 }
                                 outputStream.write(buffer, 0, bytesRead);
                                 downloadedBytes += bytesRead;
@@ -189,6 +200,7 @@ public class CheckUpdateService {
                             }
                             // 如果任务被取消，删除临时文件夹
                             if (isCancelled()) {
+                                logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
                                 Files.deleteIfExists(Path.of(PMCTempPath));
                             }
                         }
@@ -211,6 +223,7 @@ public class CheckUpdateService {
      * @param installerFile 安装程序文件
      */
     private static void executeInstaller(File installerFile) {
+        logger.info("====================准备开始安装更新======================");
         // 根据操作系统执行安装程序
         try {
             if (isWin) {
@@ -326,6 +339,7 @@ public class CheckUpdateService {
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));
+        logger.info("-------------------------开始执行更新脚本------------------------------");
         builder.start();
     }
 
