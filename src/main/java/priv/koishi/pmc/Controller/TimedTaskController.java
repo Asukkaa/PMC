@@ -14,7 +14,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
-import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +21,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -58,11 +56,6 @@ public class TimedTaskController extends RootController {
      * 详情页宽度
      */
     private int detailWidth;
-
-    /**
-     * 线程池实例
-     */
-    private static final ExecutorService executorService = ThreadPoolManager.getPool(TimedTaskController.class);
 
     /**
      * 要防重复点击的组件
@@ -226,11 +219,11 @@ public class TimedTaskController extends RootController {
         });
         task.setOnFailed(event -> {
             taskNotSuccess(taskBean, text_taskFailed());
-            Throwable ex = task.getException();
-            taskUnbind(taskBean);
-            throw new RuntimeException(ex);
+            throw new RuntimeException(task.getException());
         });
-        executorService.execute(task);
+        Thread.ofVirtual()
+                .name("task-select-vThread")
+                .start(task);
     }
 
     /**
