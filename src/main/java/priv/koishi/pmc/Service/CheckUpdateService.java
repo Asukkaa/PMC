@@ -3,6 +3,7 @@ package priv.koishi.pmc.Service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.UniCloudResponse;
@@ -16,14 +17,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.FileUtils.getDownloadPath;
 
 /**
  * 检查更新服务类
@@ -70,57 +70,55 @@ public class CheckUpdateService {
     /**
      * 调用 uniCloud 查询最新版本
      *
-     * @param callback 回调函数
+     * @return 最新版本信息
      */
-    public static void checkLatestVersion(Consumer<? super CheckUpdateBean> callback) {
-        String osType;
-        if (isWin) {
-            osType = win;
-        } else if (isMac) {
-            osType = mac;
-        } else {
-            osType = mac;
-        }
-        new Thread(() -> {
-            try (HttpClient client = HttpClient.newHttpClient()) {
-                // 构建请求体
-                String requestBody = "{\"os\":\"" + osType + "\"}";
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(uniCloudCheckUpdateURL))
-                        .header("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                        .build();
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.body() == null) {
-                    throw new IOException(bundle.getString("update.nullResponse"));
-                }
-                String jsonData = response.body();
-                ObjectMapper objectMapper = new ObjectMapper();
-                // 配置忽略未知字段
-                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                // 先解析为 UniCloudResponse
-                UniCloudResponse uniResponse = objectMapper.readValue(jsonData, UniCloudResponse.class);
-                if (uniResponse.getCode() == 200) {
-                    // 成功时提取 data 字段
-                    Platform.runLater(() -> callback.accept(uniResponse.getData()));
+    public static Task<CheckUpdateBean> checkLatestVersion() {
+        return new Task<>() {
+            @Override
+            protected CheckUpdateBean call() throws InterruptedException {
+                updateMessage(bundle.getString("update.checking"));
+                String osType;
+                if (isWin) {
+                    osType = win;
+                } else if (isMac) {
+                    osType = mac;
                 } else {
-                    // 错误处理
-                    Platform.runLater(() -> {
+                    osType = mac;
+                }
+                try (HttpClient client = HttpClient.newHttpClient()) {
+                    // 构建请求体
+                    String requestBody = "{\"os\":\"" + osType + "\"}";
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create(uniCloudCheckUpdateURL))
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                            .build();
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    if (response.body() == null) {
+                        throw new IOException(bundle.getString("update.nullResponse"));
+                    }
+                    String jsonData = response.body();
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    // 配置忽略未知字段
+                    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                    // 先解析为 UniCloudResponse
+                    UniCloudResponse uniResponse = objectMapper.readValue(jsonData, UniCloudResponse.class);
+                    if (uniResponse.getCode() == 200) {
+                        // 成功时提取 data 字段
+                        return uniResponse.getData();
+                    } else {
+                        // 错误处理
                         CheckUpdateBean errorBean = new CheckUpdateBean();
                         errorBean.setVersion(bundle.getString("update.checkError") + uniResponse.getMessage());
-                        callback.accept(errorBean);
-                    });
-                }
-            } catch (IOException e) {
-                Platform.runLater(() -> {
+                        return errorBean;
+                    }
+                } catch (IOException e) {
                     CheckUpdateBean errorBean = new CheckUpdateBean();
                     errorBean.setVersion(bundle.getString("update.checkError") + e.getMessage());
-                    callback.accept(errorBean);
-                });
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                    return errorBean;
+                }
             }
-        }).start();
+        };
     }
 
     /**
@@ -128,69 +126,77 @@ public class CheckUpdateService {
      *
      * @param updateInfo 更新信息
      */
-    public static void downloadAndInstallUpdate(CheckUpdateBean updateInfo) {
-        // 显示下载进度对话框
-        ProgressDialog progressDialog = new ProgressDialog();
-        progressDialog.show(bundle.getString("update.downloading"));
-        new Thread(() -> {
-            try {
-                // 获取应用根目录并创建temp文件夹
-                File tempDir = new File(getDownloadPath(), PMCTemp);
-                if (!tempDir.exists()) {
-                    if (!tempDir.mkdirs()) {
-                        throw new RuntimeException(bundle.getString("update.tempFileErr"));
+    public static Task<Void> downloadAndInstallUpdate(CheckUpdateBean updateInfo) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                // 显示下载进度对话框
+                ProgressDialog progressDialog = new ProgressDialog();
+                progressDialog.show(bundle.getString("update.downloading"));
+                try {
+                    // 创建temp文件夹
+                    File tempDir = new File(PMCTempPath);
+                    if (!tempDir.exists()) {
+                        if (!tempDir.mkdirs()) {
+                            throw new RuntimeException(bundle.getString("update.tempFileErr"));
+                        }
                     }
-                }
-                if (isWin) {
-                    Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
-                }
-                // 根据操作系统确定文件扩展名
-                String extension = isWin ? zip : dmg;
-                // 在temp目录创建临时文件
-                File tempFile = File.createTempFile("pmc_update_", extension, tempDir);
-                // 创建使用TLSv1.2的SSLContext
-                SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-                sslContext.init(null, null, null);
-                // 创建HttpClient，并设置SSLContext
-                try (HttpClient client = HttpClient.newBuilder()
-                        .sslContext(sslContext)
-                        .build()) {
-                    String encodedLink = updateInfo.getDownloadLink().replace(" ", "%20");
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(encodedLink))
-                            .GET()
-                            .build();
-                    // 发送请求并处理响应
-                    HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                        throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
+                    if (isWin) {
+                        Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
                     }
-                    try (InputStream inputStream = response.body();
-                         FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-                        long contentLength = response.headers()
-                                .firstValueAsLong("Content-Length")
-                                .orElse(0);
-                        byte[] buffer = new byte[8192];
-                        long downloadedBytes = 0;
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, bytesRead);
-                            downloadedBytes += bytesRead;
-                            if (contentLength > 0) {
-                                double progress = (double) downloadedBytes / contentLength;
-                                Platform.runLater(() -> progressDialog.updateProgress(progress));
+                    // 根据操作系统确定文件扩展名
+                    String extension = isWin ? zip : dmg;
+                    // 在temp目录创建临时文件
+                    File tempFile = File.createTempFile("pmc_update_", extension, tempDir);
+                    // 创建使用TLSv1.2的SSLContext
+                    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+                    sslContext.init(null, null, null);
+                    // 创建HttpClient，并设置SSLContext
+                    try (HttpClient client = HttpClient.newBuilder()
+                            .sslContext(sslContext)
+                            .build()) {
+                        String encodedLink = updateInfo.getDownloadLink().replace(" ", "%20");
+                        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(encodedLink))
+                                .GET()
+                                .build();
+                        // 发送请求并处理响应
+                        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                            throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
+                        }
+                        try (InputStream inputStream = response.body();
+                             FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+                            long contentLength = response.headers()
+                                    .firstValueAsLong("Content-Length")
+                                    .orElse(0);
+                            byte[] buffer = new byte[8192];
+                            long downloadedBytes = 0;
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, bytesRead);
+                                downloadedBytes += bytesRead;
+                                if (contentLength > 0) {
+                                    double progress = (double) downloadedBytes / contentLength;
+                                    Platform.runLater(() -> progressDialog.updateProgress(progress));
+                                }
+                            }
+                            // 如果任务被取消，删除临时文件夹
+                            if (isCancelled()) {
+                                Files.deleteIfExists(Path.of(PMCTempPath));
                             }
                         }
                     }
+                    Platform.runLater(() -> {
+                        progressDialog.close();
+                        executeInstaller(tempFile);
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-                Platform.runLater(() -> {
-                    progressDialog.close();
-                    executeInstaller(tempFile);
-                });
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                return null;
             }
-        }).start();
+        };
     }
 
     /**
@@ -283,13 +289,13 @@ public class CheckUpdateService {
      */
     private static void updateWinApp() throws IOException {
         // 获取源目录和目标目录
-        String sourceDir = getDownloadPath() + PMCTemp + PMCUpdateUnzipped;
+        String sourceDir = PMCTempPath + PMCUpdateUnzipped;
         String targetDir = getAppRootPath();
         // 创建临时批处理文件
         File batFile = File.createTempFile("pmc_update", ".bat");
         try (PrintWriter writer = new PrintWriter(batFile)) {
             // 从资源文件读取批处理脚本内容
-            try (InputStream is = AboutController.class.getResourceAsStream("/priv/koishi/pmc/script/update.bat")) {
+            try (InputStream is = AboutController.class.getResourceAsStream(resourcePath + "script/update.bat")) {
                 if (is != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                         String line;
@@ -310,7 +316,7 @@ public class CheckUpdateService {
         command.add(sourceDir);
         command.add(targetDir);
         command.add(appName + exe);
-        command.add(getDownloadPath() + PMCTemp);
+        command.add(PMCTempPath);
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));

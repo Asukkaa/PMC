@@ -1,7 +1,10 @@
 package priv.koishi.pmc.Controller;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -13,6 +16,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.CheckUpdateBean;
+import priv.koishi.pmc.Bean.TaskBean;
 
 import java.awt.*;
 import java.io.File;
@@ -21,6 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -28,11 +35,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.MainApplication.runPMCFile;
 import static priv.koishi.pmc.Service.CheckUpdateService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -44,13 +54,24 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  */
 public class AboutController extends RootController {
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+    /**
+     * 更新时间格式
+     */
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+
+    /**
+     * 要防重复点击的组件
+     */
+    private static final List<Node> disableNodes = new ArrayList<>();
 
     @FXML
     public ImageView logo_Abt;
 
     @FXML
     public TextField logsNum_Abt;
+
+    @FXML
+    public CheckBox autoCheck_Abt;
 
     @FXML
     public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMassage_Abt;
@@ -70,6 +91,8 @@ public class AboutController extends RootController {
         prop.load(input);
         // 获取日志储存数量配置
         setControlLastConfig(logsNum_Abt, prop, key_logsNum);
+        // 获取自动检查更新配置
+        setControlLastConfig(autoCheck_Abt, prop, key_autoCheck);
         title_Abt.setTextFill(Color.HOTPINK);
         title_Abt.setText(appName);
         input.close();
@@ -151,6 +174,13 @@ public class AboutController extends RootController {
     }
 
     /**
+     * 设置要防重复点击的组件
+     */
+    private void setDisableNodes() {
+        disableNodes.add(checkUpdate_Abt);
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
@@ -163,6 +193,8 @@ public class AboutController extends RootController {
         setCopyValueContextMenu(mail_Abt, bundle.getString("about.copyEmail"));
         // 设置鼠标悬停提示
         setToolTip();
+        // 设置要防重复点击的组件
+        setDisableNodes();
         // log 文件保留数量输入监听
         integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum());
         // 读取配置文件
@@ -171,6 +203,12 @@ public class AboutController extends RootController {
         setLogsPath();
         // 清理多余log文件
         deleteLogs();
+        // 检查更新
+        Platform.runLater(() -> {
+            if (autoCheck_Abt.isSelected()) {
+                checkUpdate();
+            }
+        });
     }
 
     /**
@@ -255,18 +293,45 @@ public class AboutController extends RootController {
     @FXML
     public void checkUpdate() {
         String lastCheck = bundle.getString("update.lastCheck");
-        checkLatestVersion(updateInfo -> {
+        TaskBean<?> taskBean = new TaskBean<>();
+        taskBean.setMassageLabel(checkMassage_Abt)
+                .setDisableNodes(disableNodes)
+                .setBindingMassageLabel(true);
+        Task<CheckUpdateBean> task = checkLatestVersion();
+        bindingTaskNode(task, taskBean);
+        task.setOnSucceeded(event -> {
+            taskUnbind(taskBean);
+            CheckUpdateBean updateInfo = task.getValue();
             if (!updateInfo.getVersion().contains(bundle.getString("update.err"))) {
                 // 检查是否有新版本
                 if (isNewVersionAvailable(updateInfo)) {
-                    checkMassage_Abt.setText(bundle.getString("update.findNewVersion")
+                    checkMassage_Abt.setText(bundle.getString("update.findNewVersion") + updateInfo.getVersion()
                             + lastCheck + LocalDateTime.now().format(formatter));
                     checkMassage_Abt.setTextFill(Color.BLUE);
-                    // 弹出更新对话框
-                    Optional<ButtonType> result = showUpdateDialog(updateInfo);
-                    if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
-                        // 用户选择更新
-                        downloadAndInstallUpdate(updateInfo);
+                    if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
+                        // 弹出更新对话框
+                        Optional<ButtonType> result = showUpdateDialog(updateInfo);
+                        if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
+                            // 用户选择更新
+                            Task<Void> downloadedUpdateTask = downloadAndInstallUpdate(updateInfo);
+                            Thread.ofVirtual()
+                                    .name("task-downloadedUpdate-vThread")
+                                    .start(downloadedUpdateTask);
+                            downloadedUpdateTask.setOnFailed(workerStateEvent -> {
+                                try {
+                                    Files.deleteIfExists(Path.of(PMCTempPath));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                            downloadedUpdateTask.setOnCancelled(workerStateEvent -> {
+                                try {
+                                    Files.deleteIfExists(Path.of(PMCTempPath));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        }
                     }
                 } else {
                     checkMassage_Abt.setText(bundle.getString("update.nowIsLast")
@@ -279,6 +344,24 @@ public class AboutController extends RootController {
                 checkMassage_Abt.setTextFill(Color.RED);
             }
         });
+        task.setOnFailed(event -> {
+            taskNotSuccess(taskBean, bundle.getString("update.checkFailed")
+                    + lastCheck + LocalDateTime.now().format(formatter));
+            throw new RuntimeException(task.getException());
+        });
+        Thread.ofVirtual()
+                .name("task-checkUpdate-vThread")
+                .start(task);
+    }
+
+    /**
+     * 自动检测更新开关
+     *
+     * @throws IOException 配置文件打开失败
+     */
+    @FXML
+    public void autoCheckAction() throws IOException {
+        setLoadLastConfigCheckBox(autoCheck_Abt, configFile, key_autoCheck);
     }
 
 }

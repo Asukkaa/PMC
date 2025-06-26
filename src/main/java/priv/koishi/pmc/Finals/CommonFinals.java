@@ -1,14 +1,12 @@
 package priv.koishi.pmc.Finals;
 
 import javafx.scene.paint.Color;
-import priv.koishi.pmc.Utils.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static priv.koishi.pmc.Utils.FileUtils.getCFGPath;
-import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
  * 通用常量类
@@ -125,6 +123,11 @@ public class CommonFinals {
     public static final String desktopPath = getDesktopPath();
 
     /**
+     * 下载目录
+     */
+    public static final String downloadPath = getDownloadPath();
+
+    /**
      * 文件选择器默认路径
      */
     public static final String defaultFileChooserPath = desktopPath;
@@ -137,7 +140,22 @@ public class CommonFinals {
     /**
      * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
      */
-    public static final boolean isRunningFromJar = FileUtils.isRunningFromJar();
+    public static final boolean isRunningFromJar = isRunningFromJar();
+
+    /**
+     * 更新临时文件目录
+     */
+    public static final String PMCTemp = File.separator + ".PMCTemp";
+
+    /**
+     * 更新临时文件解压目录
+     */
+    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
+
+    /**
+     * 更新临时文件目录完整地址
+     */
+    public static final String PMCTempPath = downloadPath + PMCTemp;
 
     /**
      * win操作系统简称
@@ -188,16 +206,6 @@ public class CommonFinals {
      * gitee地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
-
-    /**
-     * 更新临时文件目录
-     */
-    public static final String PMCTemp = File.separator + ".PMCTemp";
-
-    /**
-     * 更新临时文件解压目录
-     */
-    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
 
     /**
      * jvm最大内存设置参数
@@ -659,5 +667,7 @@ public class CommonFinals {
     public static final String key_language = "language";
 
     public static final String key_firstRun = "firstRun";
+
+    public static final String key_autoCheck = "autoCheck";
 
 }
