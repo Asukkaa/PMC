@@ -107,7 +107,6 @@ public class EditingCell<T> extends TableCell<T, String> {
             textField.selectAll();
             textField.requestFocus();
         }
-        textFieldValueListener(textField, tip);
     }
 
     /**
@@ -196,6 +195,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     private void createTextField() {
         textField = new TextField(getString());
         textField.setMinWidth(getWidth() - getGraphicTextGap() * 2);
+        textFieldValueListener(textField, tip);
         // 限制只能输入整数
         if (integerRange) {
             textChangeListener = (observable, oldValue, newValue) -> {

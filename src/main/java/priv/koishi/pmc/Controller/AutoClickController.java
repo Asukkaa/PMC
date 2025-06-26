@@ -623,6 +623,9 @@ public class AutoClickController extends RootController implements MousePosition
         rectangle = new Rectangle(floatingWidth, floatingHeight);
         StackPane root = new StackPane();
         root.setBackground(Background.EMPTY);
+        root.setMouseTransparent(true);
+        root.setPickOnBounds(false);
+        root.setFocusTraversable(false);
         Color labelTextFill = Color.WHITE;
         floatingLabel = new Label(text_cancelTask());
         floatingLabel.setTextFill(labelTextFill);
@@ -633,9 +636,12 @@ public class AutoClickController extends RootController implements MousePosition
         root.getChildren().addAll(rectangle, vBox);
         Scene scene = new Scene(root, Color.TRANSPARENT);
         vBox.setMouseTransparent(true);
+        vBox.setFocusTraversable(false);
         floatingStage = new Stage();
         // 设置透明样式
         floatingStage.initStyle(StageStyle.TRANSPARENT);
+        floatingLabel.setMouseTransparent(true);
+        floatingMousePosition.setMouseTransparent(true);
         // 设置始终置顶
         floatingStage.setAlwaysOnTop(true);
         floatingStage.setScene(scene);
@@ -698,23 +704,12 @@ public class AutoClickController extends RootController implements MousePosition
      * @param clickPositionVOS 自动操作流程
      * @throws IOException io异常
      */
-    private void launchClickTask(List<? extends ClickPositionVO> clickPositionVOS) throws IOException {
+    private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
         if (isFree()) {
             // 标记为正在运行自动操作
             runClicking = true;
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
-            List<ClickPositionVO> backup = new CopyOnWriteArrayList<>();
-            for (ClickPositionVO clickPositionVO : clickPositionVOS) {
-                ClickPositionVO vo = new ClickPositionVO();
-                try {
-                    // 自动拷贝父类中的属性
-                    copyProperties(clickPositionVO, vo);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-                backup.add(vo);
-            }
             clickLogs.clear();
             CheckBox firstClick = settingController.firstClick_Set;
             TextField retrySecond = settingController.retrySecond_Set;
@@ -744,7 +739,7 @@ public class AutoClickController extends RootController implements MousePosition
                     .setBindingMassageLabel(false)
                     .setDisableNodes(disableNodes)
                     .setMassageLabel(log_Click)
-                    .setBeanList(backup);
+                    .setBeanList(clickPositionVOS);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
