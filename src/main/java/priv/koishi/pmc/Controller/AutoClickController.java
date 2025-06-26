@@ -785,10 +785,11 @@ public class AutoClickController extends RootController implements MousePosition
                     runTimeline.stop();
                     runTimeline = null;
                 }
+                Throwable ex = autoClickTask.getException();
                 autoClickTask = null;
                 runClicking = false;
                 clearReferences();
-                throw new RuntimeException(autoClickTask.getException());
+                throw new RuntimeException(ex);
             });
             autoClickTask.setOnCancelled(event -> {
                 clickLogs = getNowLogs();

@@ -342,7 +342,6 @@ public class AboutController extends RootController {
                                     .name("task-downloadedUpdate-vThread")
                                     .start(downloadedUpdateTask);
                             downloadedUpdateTask.setOnFailed(workerStateEvent -> {
-                                downloadedUpdateTask = null;
                                 try {
                                     logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
                                     deleteDirectoryRecursively(Path.of(PMCTempPath));
@@ -350,7 +349,9 @@ public class AboutController extends RootController {
                                     throw new RuntimeException(e);
                                 }
                                 taskNotSuccess(taskBean, bundle.getString("update.downloadFailed"));
-                                throw new RuntimeException(downloadedUpdateTask.getException());
+                                Throwable ex = downloadedUpdateTask.getException();
+                                downloadedUpdateTask = null;
+                                throw new RuntimeException(ex);
                             });
                             downloadedUpdateTask.setOnCancelled(workerStateEvent ->
                                     downloadedUpdateTask = null);
