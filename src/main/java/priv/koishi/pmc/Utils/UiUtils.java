@@ -1998,6 +1998,12 @@ public class UiUtils {
         choiceBox.setValue(defaultValue);
     }
 
+    /**
+     * 显示更新提示框
+     *
+     * @param updateInfo 更新信息
+     * @return 用户选择的按钮类型
+     */
     public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("update.checkUpdate_Abt"));
@@ -2020,15 +2026,6 @@ public class UiUtils {
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         setWindowLogo(stage, logoPath);
         return alert.showAndWait();
-    }
-
-    public static void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(content);
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        setWindowLogo(stage, logoPath);
-        alert.showAndWait();
     }
 
 }
