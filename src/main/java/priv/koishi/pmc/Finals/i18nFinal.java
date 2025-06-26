@@ -442,6 +442,10 @@ public class i18nFinal {
         return bundle.getString("tip.notExistsIndex");
     }
 
+    public static String tip_checkUpdate_Abt() {
+        return bundle.getString("tip.checkUpdate_Abt");
+    }
+
     public static String tip_version() {
         return """
                 %s：%s

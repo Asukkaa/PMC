@@ -44,6 +44,7 @@ import static priv.koishi.pmc.Service.CheckUpdateService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
 /**
  * 关于页面控制器
@@ -172,6 +173,10 @@ public class AboutController extends RootController {
         addToolTip(tip_appreciate(), appreciate_Abt);
         // 给logo和应用名称添加鼠标悬停提示
         addToolTip(tip_thanks(), logo_Abt, title_Abt);
+        // 自动检查更新开关添加鼠标悬停提示
+        addToolTip(autoCheck_Abt.getText(), autoCheck_Abt);
+        // 检查更新按钮添加鼠标悬停提示
+        addToolTip(tip_checkUpdate_Abt(), checkUpdate_Abt);
         // 给github、gitee跳转按钮添加鼠标悬停提示
         addToolTip(tip_openGitLink(), openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
         // 给网盘跳转按钮添加鼠标悬停提示
