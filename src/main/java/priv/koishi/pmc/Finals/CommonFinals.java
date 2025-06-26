@@ -25,7 +25,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.1.0";
+    public static final String version = "2.1.0";
 
     /**
      * 程序构建日期
@@ -83,6 +83,31 @@ public class CommonFinals {
     public static final String logsDir = packagePath + logs;
 
     /**
+     * 当前程序运行操作系统名称
+     */
+    public static final String systemName = System.getProperty("os.name").toLowerCase();
+
+    /**
+     * win操作系统简称
+     */
+    public static final String win = "win";
+
+    /**
+     * mac操作系统简称
+     */
+    public static final String mac = "mac";
+
+    /**
+     * 是否为win操作系统（true-win系统，false-非win系统）
+     */
+    public static final boolean isWin = systemName.contains(win);
+
+    /**
+     * 是否为mac操作系统（true-mac系统，false-非mac系统）
+     */
+    public static final boolean isMac = systemName.contains(mac);
+
+    /**
      * 用户主目录
      */
     public static final String userHome = System.getProperty("user.home");
@@ -133,11 +158,6 @@ public class CommonFinals {
     public static final String defaultFileChooserPath = desktopPath;
 
     /**
-     * 当前程序运行操作系统名称
-     */
-    public static final String systemName = System.getProperty("os.name").toLowerCase();
-
-    /**
      * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
      */
     public static final boolean isRunningFromJar = isRunningFromJar();
@@ -156,26 +176,6 @@ public class CommonFinals {
      * 更新临时文件目录完整地址
      */
     public static final String PMCTempPath = downloadPath + PMCTemp;
-
-    /**
-     * win操作系统简称
-     */
-    public static final String win = "win";
-
-    /**
-     * mac操作系统简称
-     */
-    public static final String mac = "mac";
-
-    /**
-     * 是否为win操作系统（true-win系统，false-非win系统）
-     */
-    public static final boolean isWin = systemName.contains(win);
-
-    /**
-     * 是否为mac操作系统（true-mac系统，false-非mac系统）
-     */
-    public static final boolean isMac = systemName.contains(mac);
 
     /**
      * 更新服务 uniCloud 地址

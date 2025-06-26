@@ -405,7 +405,7 @@ public class TaskDetailController extends RootController {
         }));
         task.setOnFailed(event -> {
             taskNotSuccess(taskBean, text_taskFailed());
-            throw new RuntimeException( task.getException());
+            throw new RuntimeException(task.getException());
         });
         Thread.ofVirtual()
                 .name("task-save-vThread")

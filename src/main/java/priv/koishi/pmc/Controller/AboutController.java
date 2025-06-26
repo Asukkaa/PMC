@@ -16,6 +16,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
 
@@ -26,7 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +45,6 @@ import static priv.koishi.pmc.Service.CheckUpdateService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
 
 /**
  * 关于页面控制器
@@ -54,6 +54,11 @@ import static priv.koishi.pmc.Utils.UiUtils.addToolTip;
  * Time:16:45
  */
 public class AboutController extends RootController {
+
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(AboutController.class);
 
     /**
      * 更新时间格式
@@ -339,10 +344,13 @@ public class AboutController extends RootController {
                             downloadedUpdateTask.setOnFailed(workerStateEvent -> {
                                 downloadedUpdateTask = null;
                                 try {
-                                    Files.deleteIfExists(Path.of(PMCTempPath));
+                                    logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
+                                    deleteDirectoryRecursively(Path.of(PMCTempPath));
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
+                                taskNotSuccess(taskBean, bundle.getString("update.downloadFailed"));
+                                throw new RuntimeException(downloadedUpdateTask.getException());
                             });
                             downloadedUpdateTask.setOnCancelled(workerStateEvent ->
                                     downloadedUpdateTask = null);

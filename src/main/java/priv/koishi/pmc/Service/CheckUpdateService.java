@@ -25,8 +25,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MainApplication.bundle;
-import static priv.koishi.pmc.Utils.FileUtils.getAppRootPath;
-import static priv.koishi.pmc.Utils.FileUtils.unzip;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
  * 检查更新服务类
@@ -201,7 +200,7 @@ public class CheckUpdateService {
                             // 如果任务被取消，删除临时文件夹
                             if (isCancelled()) {
                                 logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
-                                Files.deleteIfExists(Path.of(PMCTempPath));
+                                deleteDirectoryRecursively(Path.of(PMCTempPath));
                             }
                         }
                     }
