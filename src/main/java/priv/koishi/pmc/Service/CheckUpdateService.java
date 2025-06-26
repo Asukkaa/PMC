@@ -23,7 +23,8 @@ import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MainApplication.bundle;
-import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.FileUtils.getAppRootPath;
+import static priv.koishi.pmc.Utils.FileUtils.unzip;
 
 /**
  * 检查更新服务类
@@ -174,11 +175,16 @@ public class CheckUpdateService {
                             long downloadedBytes = 0;
                             int bytesRead;
                             while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                // 每次循环都检查取消状态
+                                if (isCancelled()) {
+                                   break;
+                                }
                                 outputStream.write(buffer, 0, bytesRead);
                                 downloadedBytes += bytesRead;
                                 if (contentLength > 0) {
                                     double progress = (double) downloadedBytes / contentLength;
-                                    Platform.runLater(() -> progressDialog.updateProgress(progress));
+                                    Platform.runLater(() ->
+                                            progressDialog.updateProgress(progress, bundle.getString("update.installing")));
                                 }
                             }
                             // 如果任务被取消，删除临时文件夹

@@ -64,6 +64,11 @@ public class AboutController extends RootController {
      */
     private static final List<Node> disableNodes = new ArrayList<>();
 
+    /**
+     * 下载更新任务
+     */
+    private Task<Void> downloadedUpdateTask;
+
     @FXML
     public ImageView logo_Abt;
 
@@ -178,6 +183,15 @@ public class AboutController extends RootController {
      */
     private void setDisableNodes() {
         disableNodes.add(checkUpdate_Abt);
+    }
+
+    /**
+     * 取消更新
+     */
+    public void cancelUpdate() {
+        if (downloadedUpdateTask != null && downloadedUpdateTask.isRunning()) {
+            downloadedUpdateTask.cancel();
+        }
     }
 
     /**
@@ -313,24 +327,20 @@ public class AboutController extends RootController {
                         Optional<ButtonType> result = showUpdateDialog(updateInfo);
                         if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
                             // 用户选择更新
-                            Task<Void> downloadedUpdateTask = downloadAndInstallUpdate(updateInfo);
+                            downloadedUpdateTask = downloadAndInstallUpdate(updateInfo);
                             Thread.ofVirtual()
                                     .name("task-downloadedUpdate-vThread")
                                     .start(downloadedUpdateTask);
                             downloadedUpdateTask.setOnFailed(workerStateEvent -> {
+                                downloadedUpdateTask = null;
                                 try {
                                     Files.deleteIfExists(Path.of(PMCTempPath));
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
                             });
-                            downloadedUpdateTask.setOnCancelled(workerStateEvent -> {
-                                try {
-                                    Files.deleteIfExists(Path.of(PMCTempPath));
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
+                            downloadedUpdateTask.setOnCancelled(workerStateEvent ->
+                                    downloadedUpdateTask = null);
                         }
                     }
                 } else {

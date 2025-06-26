@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
@@ -11,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import static priv.koishi.pmc.Controller.MainController.aboutController;
 import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.UiUtils.setWindowLogo;
@@ -50,10 +52,18 @@ public class ProgressDialog {
             dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
+            dialogStage.initStyle(StageStyle.UNDECORATED);
             messageLabel = new Label(message);
             progressBar = new ProgressBar();
             progressBar.setPrefWidth(300);
-            VBox vbox = new VBox(10, messageLabel, progressBar);
+            Button cancelButton = new Button(bundle.getString("confirm.cancel"));
+            cancelButton.setOnAction(e -> {
+                // 取消更新
+                aboutController.cancelUpdate();
+                // 关闭对话框
+                close();
+            });
+            VBox vbox = new VBox(10, messageLabel, progressBar, cancelButton);
             vbox.setAlignment(Pos.CENTER);
             vbox.setPadding(new Insets(20));
             Scene scene = new Scene(vbox);
@@ -67,12 +77,13 @@ public class ProgressDialog {
      * 更新进度
      *
      * @param progress 进度
+     * @param message  提示信息
      */
-    public void updateProgress(double progress) {
+    public void updateProgress(double progress, String message) {
         Platform.runLater(() -> {
             progressBar.setProgress(progress);
             if (progress >= 1.0) {
-                messageLabel.setText(bundle.getString("update.installing"));
+                messageLabel.setText(message);
             }
         });
     }
