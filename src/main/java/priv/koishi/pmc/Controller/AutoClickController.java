@@ -1792,7 +1792,7 @@ public class AutoClickController extends RootController implements MousePosition
     public void runClick() throws Exception {
         ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
-            throw new Exception(text_noAutoClickToRun());
+            throw new RuntimeException(text_noAutoClickToRun());
         }
         // 启动自动操作流程
         launchClickTask(tableViewItems);
@@ -1850,11 +1850,11 @@ public class AutoClickController extends RootController implements MousePosition
         if (autoClickTask == null && !recordClicking) {
             List<ClickPositionBean> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isEmpty(tableViewItems)) {
-                throw new Exception(text_noAutoClickList());
+                throw new RuntimeException(text_noAutoClickList());
             }
             String outFilePath = outPath_Click.getText();
             if (StringUtils.isBlank(outFilePath)) {
-                throw new Exception(text_outPathNull());
+                throw new RuntimeException(text_outPathNull());
             }
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
             ObjectMapper objectMapper = new ObjectMapper();

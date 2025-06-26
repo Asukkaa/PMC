@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.ProgressDialog.ProgressDialog;
 
 import java.awt.*;
 import java.io.File;
@@ -326,46 +327,43 @@ public class AboutController extends RootController {
         task.setOnSucceeded(event -> {
             taskUnbind(taskBean);
             CheckUpdateBean updateInfo = task.getValue();
-            if (!updateInfo.getVersion().contains(bundle.getString("update.err"))) {
-                // 检查是否有新版本
-                if (isNewVersionAvailable(updateInfo)) {
-                    checkMassage_Abt.setText(bundle.getString("update.findNewVersion") + updateInfo.getVersion()
-                            + lastCheck + LocalDateTime.now().format(formatter));
-                    checkMassage_Abt.setTextFill(Color.BLUE);
-                    if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
-                        // 弹出更新对话框
-                        Optional<ButtonType> result = showUpdateDialog(updateInfo);
-                        if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
-                            // 用户选择更新
-                            downloadedUpdateTask = downloadAndInstallUpdate(updateInfo);
-                            Thread.ofVirtual()
-                                    .name("task-downloadedUpdate-vThread")
-                                    .start(downloadedUpdateTask);
-                            downloadedUpdateTask.setOnFailed(workerStateEvent -> {
-                                try {
-                                    logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
-                                    deleteDirectoryRecursively(Path.of(PMCTempPath));
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                taskNotSuccess(taskBean, bundle.getString("update.downloadFailed"));
-                                Throwable ex = downloadedUpdateTask.getException();
-                                downloadedUpdateTask = null;
-                                throw new RuntimeException(ex);
-                            });
-                            downloadedUpdateTask.setOnCancelled(workerStateEvent ->
-                                    downloadedUpdateTask = null);
-                        }
+            // 检查是否有新版本
+            if (isNewVersionAvailable(updateInfo)) {
+                checkMassage_Abt.setText(bundle.getString("update.findNewVersion") + updateInfo.getVersion()
+                        + lastCheck + LocalDateTime.now().format(formatter));
+                checkMassage_Abt.setTextFill(Color.BLUE);
+                if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
+                    // 弹出更新对话框
+                    Optional<ButtonType> result = showUpdateDialog(updateInfo);
+                    if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
+                        ProgressDialog progressDialog = new ProgressDialog();
+                        // 用户选择更新
+                        downloadedUpdateTask = downloadAndInstallUpdate(updateInfo, progressDialog);
+                        Thread.ofVirtual()
+                                .name("task-downloadedUpdate-vThread")
+                                .start(downloadedUpdateTask);
+                        downloadedUpdateTask.setOnFailed(workerStateEvent -> {
+                            try {
+                                logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
+                                deleteDirectoryRecursively(Path.of(PMCTempPath));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            String message = bundle.getString("update.downloadFailed");
+                            taskNotSuccess(taskBean, message);
+                            progressDialog.close();
+                            Throwable ex = downloadedUpdateTask.getException();
+                            downloadedUpdateTask = null;
+                            throw new RuntimeException(message, ex);
+                        });
+                        downloadedUpdateTask.setOnCancelled(workerStateEvent ->
+                                downloadedUpdateTask = null);
                     }
-                } else {
-                    checkMassage_Abt.setText(bundle.getString("update.nowIsLast")
-                            + lastCheck + LocalDateTime.now().format(formatter));
-                    checkMassage_Abt.setTextFill(Color.GREEN);
                 }
             } else {
-                checkMassage_Abt.setText(bundle.getString("update.checkFailed")
+                checkMassage_Abt.setText(bundle.getString("update.nowIsLast")
                         + lastCheck + LocalDateTime.now().format(formatter));
-                checkMassage_Abt.setTextFill(Color.RED);
+                checkMassage_Abt.setTextFill(Color.GREEN);
             }
         });
         task.setOnFailed(event -> {

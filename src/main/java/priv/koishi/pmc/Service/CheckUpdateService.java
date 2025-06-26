@@ -82,7 +82,7 @@ public class CheckUpdateService {
     public static Task<CheckUpdateBean> checkLatestVersion() {
         return new Task<>() {
             @Override
-            protected CheckUpdateBean call() throws InterruptedException {
+            protected CheckUpdateBean call() {
                 updateMessage(bundle.getString("update.checking"));
                 String osType;
                 if (isWin) {
@@ -122,10 +122,8 @@ public class CheckUpdateService {
                         errorBean.setVersion(bundle.getString("update.checkError") + uniResponse.getMessage());
                         return errorBean;
                     }
-                } catch (IOException e) {
-                    CheckUpdateBean errorBean = new CheckUpdateBean();
-                    errorBean.setVersion(bundle.getString("update.checkError") + e.getMessage());
-                    return errorBean;
+                } catch (Exception e) {
+                   throw new RuntimeException(bundle.getString("update.errCheck"), e);
                 }
             }
         };
@@ -134,15 +132,15 @@ public class CheckUpdateService {
     /**
      * 下载并安装更新
      *
-     * @param updateInfo 更新信息
+     * @param updateInfo     更新信息
+     * @param progressDialog 进度对话框
      */
-    public static Task<Void> downloadAndInstallUpdate(CheckUpdateBean updateInfo) {
+    public static Task<Void> downloadAndInstallUpdate(CheckUpdateBean updateInfo, ProgressDialog progressDialog) {
         return new Task<>() {
             @Override
             protected Void call() {
                 // 显示下载进度对话框
-                ProgressDialog progressDialog = new ProgressDialog();
-                progressDialog.show(bundle.getString("update.downloading"));
+                progressDialog.show(bundle.getString("update.downloading"), bundle.getString("update.downloadingUpdate"));
                 try {
                     // 创建temp文件夹
                     File tempDir = new File(PMCTempPath);
@@ -172,35 +170,42 @@ public class CheckUpdateService {
                                 .GET()
                                 .build();
                         // 发送请求并处理响应
-                        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                        HttpResponse<InputStream> response;
+                        try {
+                            response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                        } catch (Exception e) {
+                            throw new IOException(bundle.getString("update.downloadFailed"));
+                        }
+                        if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
                             throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
                         }
-                        try (InputStream inputStream = response.body();
-                             FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-                            long contentLength = response.headers()
-                                    .firstValueAsLong("Content-Length")
-                                    .orElse(0);
-                            byte[] buffer = new byte[8192];
-                            long downloadedBytes = 0;
-                            int bytesRead;
-                            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                // 每次循环都检查取消状态
+                        if (response != null) {
+                            try (InputStream inputStream = response.body();
+                                 FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+                                long contentLength = response.headers()
+                                        .firstValueAsLong("Content-Length")
+                                        .orElse(0);
+                                byte[] buffer = new byte[8192];
+                                long downloadedBytes = 0;
+                                int bytesRead;
+                                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                    // 每次循环都检查取消状态
+                                    if (isCancelled()) {
+                                        break;
+                                    }
+                                    outputStream.write(buffer, 0, bytesRead);
+                                    downloadedBytes += bytesRead;
+                                    if (contentLength > 0) {
+                                        double progress = (double) downloadedBytes / contentLength;
+                                        Platform.runLater(() ->
+                                                progressDialog.updateProgress(progress, bundle.getString("update.installing")));
+                                    }
+                                }
+                                // 如果任务被取消，删除临时文件夹
                                 if (isCancelled()) {
-                                    break;
+                                    logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
+                                    deleteDirectoryRecursively(Path.of(PMCTempPath));
                                 }
-                                outputStream.write(buffer, 0, bytesRead);
-                                downloadedBytes += bytesRead;
-                                if (contentLength > 0) {
-                                    double progress = (double) downloadedBytes / contentLength;
-                                    Platform.runLater(() ->
-                                            progressDialog.updateProgress(progress, bundle.getString("update.installing")));
-                                }
-                            }
-                            // 如果任务被取消，删除临时文件夹
-                            if (isCancelled()) {
-                                logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
-                                deleteDirectoryRecursively(Path.of(PMCTempPath));
                             }
                         }
                     }

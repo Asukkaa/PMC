@@ -1,6 +1,5 @@
 package priv.koishi.pmc.Utils;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -24,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -287,17 +287,21 @@ public class UiUtils {
         logger.error(ex, ex);
         Alert alert = creatErrorAlert(errToString(ex));
         Throwable cause = ex.getCause();
-        if (cause != null) {
-            cause = cause.getCause();
-        }
-        if (cause != null) {
-            if (cause instanceof Exception) {
-                alert.setHeaderText(cause.getMessage());
+        if (cause instanceof RuntimeException) {
+            alert.setHeaderText(cause.getMessage());
+        } else {
+            if (cause != null) {
+                cause = cause.getCause();
+            }
+            if (cause != null) {
+                if (cause instanceof Exception) {
+                    alert.setHeaderText(cause.getMessage());
+                } else {
+                    alert.setHeaderText(ex.getMessage());
+                }
             } else {
                 alert.setHeaderText(ex.getMessage());
             }
-        } else {
-            alert.setHeaderText(ex.getMessage());
         }
         // 展示弹窗
         alert.showAndWait();
@@ -321,8 +325,8 @@ public class UiUtils {
         textArea.setText(errString);
         // 创建VBox并添加TextArea
         VBox details = new VBox();
-        details.heightProperty().addListener((observable, oldValue, newValue)
-                -> Platform.runLater(() -> textArea.setPrefHeight(details.getHeight())));
+        VBox.setVgrow(textArea, Priority.ALWAYS);
+        textArea.setMaxHeight(Double.MAX_VALUE);
         details.getChildren().add(textArea);
         alert.getDialogPane().setExpandableContent(details);
         return alert;

@@ -86,10 +86,10 @@ public class ImageRecognitionService {
         File file = new File(templatePath);
         String fileName = getFileName(templatePath);
         if (StringUtils.isBlank(templatePath)) {
-            throw new Exception(text_image() + fileName + bundle.getString("nullPath"));
+            throw new RuntimeException(text_image() + fileName + bundle.getString("nullPath"));
         }
         if (!file.exists()) {
-            throw new Exception(text_image() + fileName + bundle.getString("noExists"));
+            throw new RuntimeException(text_image() + fileName + bundle.getString("noExists"));
         }
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
             // 创建带名称的线程池（便于问题排查）
@@ -120,7 +120,7 @@ public class ImageRecognitionService {
                             } catch (TimeoutException e) {
                                 // 中断当前识别
                                 future.cancel(true);
-                                throw new Exception(timeOutErr);
+                                throw new RuntimeException(timeOutErr);
                             }
                             // 等待重试间隔（不计算在超时时间内）
                             scheduler.schedule(() -> {
@@ -143,7 +143,7 @@ public class ImageRecognitionService {
                                 }
                             } catch (TimeoutException e) {
                                 future.cancel(true);
-                                throw new Exception(timeOutErr);
+                                throw new RuntimeException(timeOutErr);
                             }
                             if (i < config.getMaxRetry()) {
                                 // 等待重试间隔（不计算在超时时间内）
@@ -200,7 +200,7 @@ public class ImageRecognitionService {
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
         } catch (AWTException e) {
-            throw new Exception(bundle.getString("screenErr") + e.getMessage(), e);
+            throw new RuntimeException(bundle.getString("screenErr") + e.getMessage(), e);
         }
         checkInterruption();
         // 初始化匹配结果存储变量
