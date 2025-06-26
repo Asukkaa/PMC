@@ -785,13 +785,10 @@ public class AutoClickController extends RootController implements MousePosition
                     runTimeline.stop();
                     runTimeline = null;
                 }
-                // 获取抛出的异常
-                Throwable ex = autoClickTask.getException();
                 autoClickTask = null;
                 runClicking = false;
                 clearReferences();
-                taskUnbind(taskBean);
-                throw new RuntimeException(ex);
+                throw new RuntimeException(autoClickTask.getException());
             });
             autoClickTask.setOnCancelled(event -> {
                 clickLogs = getNowLogs();
@@ -807,7 +804,6 @@ public class AutoClickController extends RootController implements MousePosition
                 runTimeline = null;
                 runClicking = false;
                 clearReferences();
-                taskUnbind(taskBean);
             });
             if (runTimeline == null) {
                 // 获取准备时间值
