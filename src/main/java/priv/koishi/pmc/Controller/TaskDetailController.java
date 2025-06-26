@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 import priv.koishi.pmc.MessageBubble.MessageBubble;
-import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -87,11 +85,6 @@ public class TaskDetailController extends RootController {
      * 星期复选框集合
      */
     private final BidiMap<DayOfWeek, CheckBox> weekCheckBoxMap = new DualHashBidiMap<>();
-
-    /**
-     * 线程池实例
-     */
-    private static final ExecutorService executorService = ThreadPoolManager.getPool(TaskDetailController.class);
 
     /**
      * 要防重复点击的组件
@@ -412,11 +405,11 @@ public class TaskDetailController extends RootController {
         }));
         task.setOnFailed(event -> {
             taskNotSuccess(taskBean, text_taskFailed());
-            Throwable ex = task.getException();
-            taskUnbind(taskBean);
-            throw new RuntimeException(ex);
+            throw new RuntimeException( task.getException());
         });
-        executorService.execute(task);
+        Thread.ofVirtual()
+                .name("task-save-vThread")
+                .start(task);
     }
 
     /**
