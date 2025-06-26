@@ -10,7 +10,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import static priv.koishi.pmc.Controller.MainController.aboutController;
 import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
@@ -45,14 +44,14 @@ public class ProgressDialog {
      * 显示窗口
      *
      * @param message 提示信息
+     * @param title   窗口标题
      */
-    public void show(String message) {
+    public void show(String message, String title) {
         Platform.runLater(() -> {
             dialogStage = new Stage();
-            dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
-            dialogStage.initStyle(StageStyle.UNDECORATED);
+            dialogStage.setTitle(title);
             messageLabel = new Label(message);
             progressBar = new ProgressBar();
             progressBar.setPrefWidth(300);
@@ -69,6 +68,14 @@ public class ProgressDialog {
             Scene scene = new Scene(vbox);
             dialogStage.setScene(scene);
             setWindowLogo(dialogStage, logoPath);
+            // 禁用窗口关闭按钮
+            dialogStage.setOnCloseRequest(event -> {
+                // 阻止窗口关闭
+                event.consume();
+                // 执行取消操作
+                aboutController.cancelUpdate();
+                close();
+            });
             dialogStage.show();
         });
     }
