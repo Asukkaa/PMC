@@ -123,7 +123,7 @@ public class CheckUpdateService {
                         return errorBean;
                     }
                 } catch (Exception e) {
-                   throw new RuntimeException(bundle.getString("update.errCheck"), e);
+                    throw new RuntimeException(bundle.getString("update.errCheck"), e);
                 }
             }
         };
@@ -235,8 +235,7 @@ public class CheckUpdateService {
                 unzip(installerFile.getAbsolutePath(), destPath);
                 updateWinApp();
             } else if (isMac) {
-                String mountedPath = getMountedPath(installerFile);
-                updateMacApp(installerFile, mountedPath);
+                updateMacApp(installerFile, getMountedPath(installerFile));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -284,9 +283,10 @@ public class CheckUpdateService {
         File mountedVolume = new File(mountedPath);
         File appFile = new File(mountedVolume, appName + app);
         // 创建更新脚本
-        File updateScript = new File(mountedVolume, "update.sh");
-        try (PrintWriter writer = new PrintWriter(updateScript)) {
+        File updateScriptFile = new File(mountedVolume, updateScript + sh);
+        try (PrintWriter writer = new PrintWriter(updateScriptFile)) {
             writer.println("#!/bin/bash");
+            writer.println("sudo pkill -f \"/Applications/" + appName + app + "\"");
             writer.println("sudo rm -rf \"/Applications/" + appName + app + "\"");
             writer.println("sudo cp -Rf \"" + appFile.getAbsolutePath() + "\" \"/Applications/\"");
             writer.println("hdiutil detach \"" + mountedPath + "\"");
@@ -295,14 +295,13 @@ public class CheckUpdateService {
             writer.println("open -a \"/Applications/" + appName + app + "\"");
         }
         // 设置执行权限并运行
-        new ProcessBuilder("chmod", "+x", updateScript.getAbsolutePath())
+        new ProcessBuilder("chmod", "+x", updateScriptFile.getAbsolutePath())
                 .start()
                 .waitFor();
         // 使用 ProcessBuilder 执行更新脚本
         new ProcessBuilder("osascript", "-e",
-                "do shell script \"\\\"" + updateScript.getAbsolutePath() + "\\\"\" with administrator privileges")
+                "do shell script \"\\\"" + updateScriptFile.getAbsolutePath() + "\\\"\" with administrator privileges")
                 .start();
-        Platform.exit();
     }
 
     /**
@@ -315,7 +314,7 @@ public class CheckUpdateService {
         String sourceDir = PMCTempPath + PMCUpdateUnzipped;
         String targetDir = getAppRootPath();
         // 创建临时批处理文件
-        File batFile = File.createTempFile("pmc_update", ".bat");
+        File batFile = File.createTempFile(updateScript, bat);
         try (PrintWriter writer = new PrintWriter(batFile)) {
             // 从资源文件读取批处理脚本内容
             try (InputStream is = AboutController.class.getResourceAsStream(resourcePath + "script/update.bat")) {

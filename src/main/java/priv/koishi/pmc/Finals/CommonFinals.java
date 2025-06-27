@@ -83,6 +83,11 @@ public class CommonFinals {
     public static final String logsDir = packagePath + logs;
 
     /**
+     * 更新脚本名称
+     */
+    public static final String updateScript = "pmc_update";
+
+    /**
      * 当前程序运行操作系统名称
      */
     public static final String systemName = System.getProperty("os.name").toLowerCase();
@@ -461,6 +466,10 @@ public class CommonFinals {
      * 颜色选择器默认选中颜色
      */
     public static final String defaultColor = "0xffffffff";
+
+    public static final String bat = ".bat";
+
+    public static final String sh = ".sh";
 
     public static final String zip = ".zip";
 
