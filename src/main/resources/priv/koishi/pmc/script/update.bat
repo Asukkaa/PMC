@@ -31,7 +31,7 @@ if not exist "%source_dir%" (
 taskkill /f /im "%exe_name%" >nul 2>&1
 
 :: 复制更新文件
-robocopy "%source_dir%" "%target_dir%" /E /MIR /IS /IT /R:3 /W:5 /NP
+robocopy "%source_dir%" "%target_dir%" /E /MIR /IS /IT /R:3 /W:1 /NP
 
 :: 验证复制结果
 if not exist "%target_dir%\%exe_name%" (
@@ -42,16 +42,8 @@ if not exist "%target_dir%\%exe_name%" (
 start "" "%target_dir%\%exe_name%"
 
 :: 清理临时文件
-set "retry_count=0"
-:cleanup_retry
-rd /s /q "%temp_dir%" >nul 2>&1
-if exist "%temp_dir%" (
-    if !retry_count! LSS 3 (
-        set /a retry_count+=1
-        timeout /t 1 /nobreak >nul
-        goto :cleanup_retry
-    )
-)
+start /B cmd /c "rd /s /q "%temp_dir%" & del /f /q "%self%""
+exit /b
 
 :: 自删除逻辑
 set "self=%~f0"
@@ -59,6 +51,5 @@ call :DelayedSelfDelete
 exit /b
 
 :DelayedSelfDelete
-ping 127.0.0.1 -n 2 > nul
 del /f /q "%self%"
 exit /b
