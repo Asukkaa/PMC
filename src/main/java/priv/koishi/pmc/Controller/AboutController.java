@@ -376,16 +376,6 @@ public class AboutController extends RootController {
                 .start(task);
     }
 
-    @FXML
-    public void updateTest() {
-        File file = new File(PMCTempPath + File.separator + "test" + zip);
-        logger.info("测试更新： {}", file.getAbsolutePath());
-        if (!file.exists()) {
-            throw new RuntimeException("文件不存在：" + file.getAbsolutePath());
-        }
-        executeInstaller(file);
-    }
-
     /**
      * 自动检测更新开关
      *

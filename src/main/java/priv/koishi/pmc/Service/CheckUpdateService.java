@@ -285,6 +285,7 @@ public class CheckUpdateService {
                 "do shell script \"\\\"%s\\\"\" with administrator privileges",
                 updateScriptFile.getAbsolutePath()
         );
+        logger.info("-------------------------开始执行Mac更新脚本------------------------------");
         // 执行并捕获输出
         Process process = new ProcessBuilder("osascript", "-e", scriptCommand)
                 .redirectErrorStream(true)
@@ -345,7 +346,7 @@ public class CheckUpdateService {
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));
-        logger.info("-------------------------开始执行更新脚本------------------------------");
+        logger.info("-------------------------开始执行Win更新脚本------------------------------");
         builder.start();
     }
 
