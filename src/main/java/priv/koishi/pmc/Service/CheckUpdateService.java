@@ -152,10 +152,8 @@ public class CheckUpdateService {
                     if (isWin) {
                         Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
                     }
-                    // 根据操作系统确定文件扩展名
-                    String extension = isWin ? zip : dmg;
                     // 在temp目录创建临时文件
-                    File tempFile = File.createTempFile("pmc_update_", extension, tempDir);
+                    File tempFile = File.createTempFile("pmc_update_", zip, tempDir);
                     // 创建使用TLSv1.2的SSLContext
                     SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
                     sslContext.init(null, null, null);
@@ -226,16 +224,17 @@ public class CheckUpdateService {
      *
      * @param installerFile 安装程序文件
      */
-    private static void executeInstaller(File installerFile) {
+    public static void executeInstaller(File installerFile) {
         logger.info("====================准备开始安装更新======================");
-        // 根据操作系统执行安装程序
         try {
+            //解压安装程序
+            String destPath = new File(installerFile.getParentFile(), PMCUpdateUnzipped).getAbsolutePath();
+            unzip(installerFile.getAbsolutePath(), destPath);
+            // 根据操作系统执行安装程序
             if (isWin) {
-                String destPath = new File(installerFile.getParentFile(), PMCUpdateUnzipped).getAbsolutePath();
-                unzip(installerFile.getAbsolutePath(), destPath);
                 updateWinApp();
             } else if (isMac) {
-                updateMacApp(installerFile, getMountedPath(installerFile));
+                updateMacApp();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -243,65 +242,68 @@ public class CheckUpdateService {
     }
 
     /**
-     * 获取已挂载的dmg文件
-     *
-     * @param installerFile dmg文件
-     * @return 已挂载的目录
-     * @throws IOException          IO异常
-     * @throws InterruptedException 中断异常
-     */
-    private static String getMountedPath(File installerFile) throws IOException, InterruptedException {
-        // 挂载dmg文件
-        Process mountProcess = new ProcessBuilder("hdiutil", "attach", installerFile.getAbsolutePath())
-                .redirectErrorStream(true)
-                .start();
-        // 读取挂载输出
-        String mountedPath = null;
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(mountProcess.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("/Volumes/")) {
-                    // 获取第一个挂载点
-                    mountedPath = line.trim().split("\\s+")[0];
-                }
-            }
-        }
-        if (mountProcess.waitFor() != 0 || mountedPath == null) {
-            throw new RuntimeException(bundle.getString("update.dmgErr"));
-        }
-        return mountedPath;
-    }
-
-    /**
      * 更新Mac端应用
-     *
-     * @param installerFile 安装包文件
-     * @param mountedPath   挂载点路径
      */
-    private static void updateMacApp(File installerFile, String mountedPath) throws InterruptedException, IOException {
-        File mountedVolume = new File(mountedPath);
-        File appFile = new File(mountedVolume, appName + app);
-        // 创建更新脚本
-        File updateScriptFile = new File(mountedVolume, updateScript + sh);
+    private static void updateMacApp() throws IOException, InterruptedException {
+        // 获取源目录
+        String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + appName + app;
+        // 在系统临时目录创建脚本
+        File tempDir = new File(tmpdir);
+        File updateScriptFile = File.createTempFile("pmc_update_", ".sh", tempDir);
         try (PrintWriter writer = new PrintWriter(updateScriptFile)) {
             writer.println("#!/bin/bash");
-            writer.println("sudo pkill -f \"/Applications/" + appName + app + "\"");
-            writer.println("sudo rm -rf \"/Applications/" + appName + app + "\"");
-            writer.println("sudo cp -Rf \"" + appFile.getAbsolutePath() + "\" \"/Applications/\"");
-            writer.println("hdiutil detach \"" + mountedPath + "\"");
-            writer.println("rm -f \"" + installerFile.getAbsolutePath() + "\"");
-            writer.println("rm -f \"$0\"");
-            writer.println("open -a \"/Applications/" + appName + app + "\"");
+            writer.println("export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin");
+            // 终止应用
+            writer.println("/usr/bin/pkill -9 -f '" + appName + "' || true");
+            // 删除旧应用
+            writer.println("/usr/bin/sudo /bin/rm -rf \"/Applications/" + appName + ".app\"");
+            // 复制新应用
+            writer.println("/usr/bin/sudo /bin/cp -Rf \"" + sourceDir + "\" \"/Applications/\"");
+            // 修复权限
+            writer.println("/usr/bin/sudo /usr/sbin/chown -R " + sysUerName + ":staff \"/Applications/" + appName + ".app\"");
+            writer.println("/usr/bin/sudo /usr/bin/xattr -d com.apple.quarantine \"/Applications/" + appName + ".app\"");
+            writer.println("/usr/bin/sudo /bin/chmod -R 755 \"/Applications/" + appName + ".app\"");
+            // 重新签名
+            writer.println("/usr/bin/sudo /usr/bin/codesign --force --deep --sign - \"/Applications/" + appName + ".app\" || echo \"签名失败，继续执行\"");
+            // 清理
+            writer.println("/bin/rm -rf \"" + PMCTempPath + "\"");
+            writer.println("/bin/rm -f \"$0\"");
+            // 启动新应用
+            writer.println("/usr/bin/open -a \"/Applications/" + appName + ".app\"");
+            writer.println("exit 0");
         }
-        // 设置执行权限并运行
-        new ProcessBuilder("chmod", "+x", updateScriptFile.getAbsolutePath())
-                .start()
-                .waitFor();
-        // 使用 ProcessBuilder 执行更新脚本
-        new ProcessBuilder("osascript", "-e",
-                "do shell script \"\\\"" + updateScriptFile.getAbsolutePath() + "\\\"\" with administrator privileges")
+        // 设置权限
+        if (!updateScriptFile.setExecutable(true)) {
+            throw new IOException("无法设置脚本可执行权限");
+        }
+        // 验证权限
+        if (!updateScriptFile.canExecute()) {
+            throw new IOException("脚本不可执行" + updateScriptFile.getAbsolutePath());
+        }
+        // 构建执行命令
+        String scriptCommand = String.format(
+                "do shell script \"\\\"%s\\\"\" with administrator privileges",
+                updateScriptFile.getAbsolutePath()
+        );
+        // 执行并捕获输出
+        Process process = new ProcessBuilder("osascript", "-e", scriptCommand)
+                .redirectErrorStream(true)
                 .start();
+        // 读取输出
+        StringBuilder output = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                logger.info("脚本输出: {}", line);
+                output.append(line).append("\n");
+            }
+        }
+        // 等待完成
+        int exitCode = process.waitFor();
+        logger.info("脚本退出码: {}", exitCode);
+        if (exitCode != 0) {
+            throw new IOException("脚本执行失败，退出码: " + exitCode + "\n输出: " + output);
+        }
     }
 
     /**
@@ -310,8 +312,9 @@ public class CheckUpdateService {
      * @throws IOException 找不到批处理脚本
      */
     private static void updateWinApp() throws IOException {
-        // 获取源目录和目标目录
+        // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped;
+        // 获取目标目录
         String targetDir = getAppRootPath();
         // 创建临时批处理文件
         File batFile = File.createTempFile(updateScript, bat);

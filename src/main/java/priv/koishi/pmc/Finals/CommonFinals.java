@@ -30,7 +30,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.06.25";
+    public static final String buildDate = "2025.06.27";
 
     /**
      * 程序logo
@@ -153,11 +153,6 @@ public class CommonFinals {
     public static final String desktopPath = getDesktopPath();
 
     /**
-     * 下载目录
-     */
-    public static final String downloadPath = getDownloadPath();
-
-    /**
      * 文件选择器默认路径
      */
     public static final String defaultFileChooserPath = desktopPath;
@@ -166,6 +161,16 @@ public class CommonFinals {
      * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
      */
     public static final boolean isRunningFromJar = isRunningFromJar();
+
+    /**
+     * 操作系统当前用户名称
+     */
+    public static final String sysUerName = System.getProperty("user.name");
+
+    /**
+     * 操作系统临时目录
+     */
+    public static final String tmpdir = System.getProperty("java.io.tmpdir");
 
     /**
      * 更新临时文件目录
@@ -180,7 +185,7 @@ public class CommonFinals {
     /**
      * 更新临时文件目录完整地址
      */
-    public static final String PMCTempPath = downloadPath + PMCTemp;
+    public static final String PMCTempPath = tmpdir + PMCTemp;
 
     /**
      * 更新服务 uniCloud 地址
@@ -469,11 +474,7 @@ public class CommonFinals {
 
     public static final String bat = ".bat";
 
-    public static final String sh = ".sh";
-
     public static final String zip = ".zip";
-
-    public static final String dmg = ".dmg";
 
     public static final String log = ".log";
 

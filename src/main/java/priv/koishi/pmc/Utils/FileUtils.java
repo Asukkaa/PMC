@@ -669,21 +669,6 @@ public class FileUtils {
     }
 
     /**
-     * 获取操作系统下载目录
-     *
-     * @return 操作系统下载目录
-     */
-    public static String getDownloadPath() {
-        String downloadPath = "";
-        if (isWin) {
-            downloadPath = System.getenv("USERPROFILE") + "\\Downloads";
-        } else if (isMac) {
-            downloadPath = userHome + "/Downloads";
-        }
-        return Paths.get(downloadPath).normalize().toString();
-    }
-
-    /**
      * 递归删除目录
      *
      * @param path 要删除的目录
