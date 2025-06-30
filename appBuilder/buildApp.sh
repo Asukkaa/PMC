@@ -189,9 +189,9 @@ tell application "Finder"
 
             -- 定位应用程序图标
             set appItem to (first item of targetDisk whose name ends with ".app")
-            set position of appItem to {250, 200}
+            set position of appItem to {180, 200}
             set applicationsAlias to (first item of targetDisk whose name is "Applications")
-            set position of applicationsAlias to {750, 200}
+            set position of applicationsAlias to {630, 200}
 
             -- 成功标志
             set success to true
