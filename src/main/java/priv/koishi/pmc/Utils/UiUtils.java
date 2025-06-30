@@ -231,16 +231,16 @@ public class UiUtils {
      * 创建一个图片选择器（只支持png、jpg、jpeg格式）
      *
      * @param window            文件选择器窗口
-     * @param stopImgSelectPath 默认路径
+     * @param imgSelectPath 默认路径
      * @return 选择的图片
      */
-    public static File creatImgChooser(Window window, String stopImgSelectPath) {
+    public static File creatImgChooser(Window window, String imgSelectPath) {
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
-        return creatFileChooser(window, stopImgSelectPath, extensionFilters, text_selectTemplateImg());
+        return creatFileChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
     }
 
     /**
