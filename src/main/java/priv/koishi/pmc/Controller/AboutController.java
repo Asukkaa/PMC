@@ -340,7 +340,7 @@ public class AboutController extends RootController {
             CheckUpdateBean updateInfo = task.getValue();
             // 检查是否有新版本
             if (isNewVersionAvailable(updateInfo)) {
-                checkMassage_Abt.setText(bundle.getString("update.findNewVersion") + updateInfo.getVersion());
+                checkMassage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
                 //更新最后检查日期
                 updateCheckDate(Color.BLUE);
                 checkDate_Abt.setTextFill(Color.BLUE);
@@ -361,7 +361,7 @@ public class AboutController extends RootController {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
-                            String message = bundle.getString("update.downloadFailed");
+                            String message = update_downloadFailed();
                             taskNotSuccess(taskBean, message);
                             progressDialog.close();
                             Throwable ex = downloadedUpdateTask.getException();

@@ -2011,7 +2011,7 @@ public class UiUtils {
     public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("update.checkUpdate_Abt"));
-        alert.setHeaderText(bundle.getString("update.findNewVersion") + updateInfo.getVersion());
+        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion());
         // 创建包含更新信息的文本区域
         TextArea textArea = new TextArea(updateInfo.getWhatsNew());
         textArea.setEditable(false);

@@ -946,6 +946,14 @@ public class i18nFinal {
         return bundle.getString("retryType.step");
     }
 
+    public static String update_downloadFailed() {
+        return bundle.getString("update.downloadFailed");
+    }
+
+    public static String update_findNewVersion() {
+        return bundle.getString("update.findNewVersion");
+    }
+
     /**
      * 重试逻辑下拉框选项
      */

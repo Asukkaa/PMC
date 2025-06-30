@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.i18nFinal.update_downloadFailed;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -172,7 +173,7 @@ public class CheckUpdateService {
                         try {
                             response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
                         } catch (Exception e) {
-                            throw new IOException(bundle.getString("update.downloadFailed"));
+                            throw new IOException(update_downloadFailed());
                         }
                         if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
                             throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
