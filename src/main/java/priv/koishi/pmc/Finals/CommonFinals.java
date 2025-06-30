@@ -638,6 +638,8 @@ public class CommonFinals {
 
     public static final String key_lastOpenDirectory = "lastOpenDirectory";
 
+    public static final String key_lastNotOverwrite = "lastNotOverwrite";
+
     public static final String key_lastTab = "lastTab";
 
     public static final String key_lastFullWindow = "lastFullWindow";

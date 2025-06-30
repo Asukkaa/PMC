@@ -342,7 +342,7 @@ public class AutoClickController extends RootController implements MousePosition
             err_Click;
 
     @FXML
-    public CheckBox openDirectory_Click;
+    public CheckBox openDirectory_Click, notOverwrite_Click;
 
     @FXML
     public Button clearButton_Click, runClick_Click, addPosition_Click, loadAutoClick_Click,
@@ -397,6 +397,8 @@ public class AutoClickController extends RootController implements MousePosition
             prop.put(key_lastOutFileName, outFileName_Click.getText());
             String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? activation : unActivation;
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
+            String lastNotOverwriteValue = notOverwrite_Click.isSelected() ? activation : unActivation;
+            prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
             prop.put(key_lastPreparationRecordTime, preparationRecordTime_Click.getText());
             prop.put(key_lastPreparationRunTime, preparationRunTime_Click.getText());
             String outPathValue = outPath_Click.getText();
@@ -422,7 +424,10 @@ public class AutoClickController extends RootController implements MousePosition
             List<?> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                String path = notOverwritePath(outPath + File.separator + autoSaveFileName() + PMC);
+                String path = outPath + File.separator + autoSaveFileName() + PMC;
+                if (notOverwrite_Click.isSelected()) {
+                    path = notOverwritePath(path);
+                }
                 // 构建基类类型信息
                 JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
                 // 使用基类类型进行序列化
@@ -443,6 +448,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
+            setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultOutFileName());
             setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRunTime);
@@ -1106,6 +1112,7 @@ public class AutoClickController extends RootController implements MousePosition
         addToolTip(tip_recordClick(), recordClick_Click);
         addToolTip(tip_outAutoClickPath(), addOutPath_Click);
         addToolTip(tip_openDirectory(), openDirectory_Click);
+        addToolTip(tip_notOverwrite(), notOverwrite_Click);
         addToolTip(tip_loadAutoClick(), loadAutoClick_Click);
         addToolTip(tip_exportAutoClick(), exportAutoClick_Click);
         addToolTip(tip_autoClickFileName() + defaultOutFileName(), outFileName_Click);
@@ -1858,7 +1865,10 @@ public class AutoClickController extends RootController implements MousePosition
             }
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
             ObjectMapper objectMapper = new ObjectMapper();
-            String path = notOverwritePath(outFilePath + File.separator + fileName + PMC);
+            String path = outFilePath + File.separator + fileName + PMC;
+            if (notOverwrite_Click.isSelected()) {
+                path = notOverwritePath(path);
+            }
             // 构建基类类型信息
             JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
             // 使用基类类型进行序列化

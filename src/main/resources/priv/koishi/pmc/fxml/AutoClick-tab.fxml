@@ -24,6 +24,9 @@
 
             <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand"
                       text="%autoClick.openDirectory_Click"/>
+
+            <CheckBox fx:id="notOverwrite_Click" prefHeight="25" selected="true" style="-fx-cursor: hand"
+                      text="%autoClick.notOverwrite_Click"/>
         </HBox>
 
         <HBox spacing="10">

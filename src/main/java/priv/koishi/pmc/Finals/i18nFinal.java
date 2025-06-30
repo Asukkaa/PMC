@@ -66,6 +66,10 @@ public class i18nFinal {
         return bundle.getString("tip.openDirectory");
     }
 
+    public static String tip_notOverwrite() {
+        return bundle.getString("tip.notOverwrite");
+    }
+
     public static String tip_openLink() {
         return bundle.getString("tip.openLink");
     }
