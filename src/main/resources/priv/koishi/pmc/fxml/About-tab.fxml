@@ -107,8 +107,13 @@
                 <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" styleClass="checkBox-short"
                           text="%update.autoCheck_Abt"/>
 
-                <Label prefHeight="25" fx:id="checkMassage_Abt"/>
+                <Label prefHeight="25" textFill="red" text="%about.autoUpdate"/>
             </HBox>
+
+            <VBox>
+                <Label fx:id="checkMassage_Abt"/>
+                <Label fx:id="checkDate_Abt"/>
+            </VBox>
 
             <HBox spacing="5">
                 <Label prefHeight="25" text="%about.version"/>

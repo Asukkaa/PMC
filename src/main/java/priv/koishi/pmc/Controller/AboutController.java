@@ -86,7 +86,7 @@ public class AboutController extends RootController {
     public CheckBox autoCheck_Abt;
 
     @FXML
-    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMassage_Abt;
+    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMassage_Abt, checkDate_Abt;
 
     @FXML
     public Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt,
@@ -206,6 +206,17 @@ public class AboutController extends RootController {
     }
 
     /**
+     * 更新最后检查日期
+     *
+     * @param color 文字颜色
+     */
+    private void updateCheckDate(Color color) {
+        String lastCheck = bundle.getString("update.lastCheck");
+        checkDate_Abt.setText(lastCheck + LocalDateTime.now().format(formatter));
+        checkDate_Abt.setTextFill(color);
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException io异常
@@ -317,7 +328,7 @@ public class AboutController extends RootController {
      */
     @FXML
     public void checkUpdate() {
-        String lastCheck = bundle.getString("update.lastCheck");
+        checkDate_Abt.setText("");
         TaskBean<?> taskBean = new TaskBean<>();
         taskBean.setMassageLabel(checkMassage_Abt)
                 .setDisableNodes(disableNodes)
@@ -329,9 +340,10 @@ public class AboutController extends RootController {
             CheckUpdateBean updateInfo = task.getValue();
             // 检查是否有新版本
             if (isNewVersionAvailable(updateInfo)) {
-                checkMassage_Abt.setText(bundle.getString("update.findNewVersion") + updateInfo.getVersion()
-                        + lastCheck + LocalDateTime.now().format(formatter));
-                checkMassage_Abt.setTextFill(Color.BLUE);
+                checkMassage_Abt.setText(bundle.getString("update.findNewVersion") + updateInfo.getVersion());
+                //更新最后检查日期
+                updateCheckDate(Color.BLUE);
+                checkDate_Abt.setTextFill(Color.BLUE);
                 if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
                     // 弹出更新对话框
                     Optional<ButtonType> result = showUpdateDialog(updateInfo);
@@ -361,14 +373,16 @@ public class AboutController extends RootController {
                     }
                 }
             } else {
-                checkMassage_Abt.setText(bundle.getString("update.nowIsLast")
-                        + lastCheck + LocalDateTime.now().format(formatter));
+                checkMassage_Abt.setText(bundle.getString("update.nowIsLast"));
+                //更新最后检查日期
+                updateCheckDate(Color.GREEN);
                 checkMassage_Abt.setTextFill(Color.GREEN);
             }
         });
         task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, bundle.getString("update.checkFailed")
-                    + lastCheck + LocalDateTime.now().format(formatter));
+            taskNotSuccess(taskBean, bundle.getString("update.checkFailed"));
+            //更新最后检查日期
+            updateCheckDate(Color.RED);
             throw new RuntimeException(task.getException());
         });
         Thread.ofVirtual()
