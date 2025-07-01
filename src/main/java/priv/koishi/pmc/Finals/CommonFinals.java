@@ -188,9 +188,22 @@ public class CommonFinals {
     public static final String PMCTempPath = tmpdir + PMCTemp;
 
     /**
-     * 更新服务 uniCloud 地址
+     * 更新服务阿里云 uniCloud 地址
      */
-    public static final String uniCloudCheckUpdateURL = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/pmcUpdateTest";
+    public static final String uniCloudCheckUpdateURL_aliyun = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/PMCUpdate";
+
+    /**
+     * 更新服务支付宝云 uniCloud 地址
+     */
+    public static final String uniCloudCheckUpdateURL_alipay = "https://env-00jxtp3qdq80.dev-hz.cloudbasefunction.cn/PMCUpdate";
+
+    /**
+     * 检测更新URL数组
+     */
+    public static final String[] urls = {
+            uniCloudCheckUpdateURL_aliyun,
+            uniCloudCheckUpdateURL_alipay
+    };
 
     /**
      * 百度网盘地址

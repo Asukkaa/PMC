@@ -28,8 +28,13 @@ public class CheckUpdateBean {
     String whatsNew;
 
     /**
-     * 下载链接
+     * 阿里云下载链接
      */
-    String downloadLink;
+    String aliyunFileLink;
+
+    /**
+     * 支付宝云下载链接
+     */
+    String alipayFileLink;
 
 }

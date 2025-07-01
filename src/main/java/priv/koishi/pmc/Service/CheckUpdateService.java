@@ -85,47 +85,50 @@ public class CheckUpdateService {
             @Override
             protected CheckUpdateBean call() {
                 updateMessage(bundle.getString("update.checking"));
-                String osType;
-                if (isWin) {
-                    osType = win;
-                } else if (isMac) {
-                    osType = mac;
-                } else {
-                    osType = mac;
-                }
-                try (HttpClient client = HttpClient.newHttpClient()) {
-                    // 构建请求体
-                    String requestBody = "{\"os\":\"" + osType + "\"}";
-                    logger.info("查询版本更新，请求体: {}", requestBody);
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(uniCloudCheckUpdateURL))
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                            .build();
-                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    logger.info("查询版本更新，响应体: {}", response);
-                    String jsonData = response.body();
-                    logger.info("查询版本更新，响应体body: {}", jsonData);
-                    if (jsonData == null) {
-                        throw new IOException(bundle.getString("update.nullResponse"));
+                String osType = isWin ? win : mac;
+                for (int attempt = 0; attempt < urls.length; attempt++) {
+                    try (HttpClient client = HttpClient.newHttpClient()) {
+                        // 构建请求体
+                        String requestBody = "{\"os\":\"" + osType + "\"}";
+                        logger.info("查询版本更新，请求URL: {}", urls[attempt]);
+                        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(urls[attempt]))
+                                .header("Content-Type", "application/json")
+                                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                                .build();
+                        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                        logger.info("查询版本更新，响应体: {}", response);
+                        String jsonData = response.body();
+                        logger.info("查询版本更新，响应体body: {}", jsonData);
+                        if (jsonData == null) {
+                            throw new IOException(bundle.getString("update.nullResponse"));
+                        }
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        // 配置忽略未知字段
+                        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        // 先解析为 UniCloudResponse
+                        UniCloudResponse uniResponse = objectMapper.readValue(jsonData, UniCloudResponse.class);
+                        if (uniResponse.getCode() == 200) {
+                            // 成功时提取 data 字段
+                            return uniResponse.getData();
+                        } else {
+                            // 错误处理
+                            CheckUpdateBean errorBean = new CheckUpdateBean();
+                            errorBean.setVersion(bundle.getString("update.checkError") + uniResponse.getMessage());
+                            return errorBean;
+                        }
+                    } catch (Exception e) {
+                        // 判断是否需要重试
+                        if (attempt == 0) {
+                            logger.warn("主地址请求失败，准备重试备用地址", e);
+                        } else {
+                            // 最终失败处理
+                            logger.error("更新检查最终失败", e);
+                            throw new RuntimeException(bundle.getString("update.errCheck"), e);
+                        }
                     }
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    // 配置忽略未知字段
-                    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    // 先解析为 UniCloudResponse
-                    UniCloudResponse uniResponse = objectMapper.readValue(jsonData, UniCloudResponse.class);
-                    if (uniResponse.getCode() == 200) {
-                        // 成功时提取 data 字段
-                        return uniResponse.getData();
-                    } else {
-                        // 错误处理
-                        CheckUpdateBean errorBean = new CheckUpdateBean();
-                        errorBean.setVersion(bundle.getString("update.checkError") + uniResponse.getMessage());
-                        return errorBean;
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(bundle.getString("update.errCheck"), e);
                 }
+                throw new RuntimeException(bundle.getString("update.errCheck"));
             }
         };
     }
@@ -153,64 +156,85 @@ public class CheckUpdateService {
                     if (isWin) {
                         Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
                     }
-                    // 在temp目录创建临时文件
-                    File tempFile = File.createTempFile("pmc_update_", zip, tempDir);
-                    // 创建使用TLSv1.2的SSLContext
-                    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-                    sslContext.init(null, null, null);
-                    // 创建HttpClient，并设置SSLContext
-                    try (HttpClient client = HttpClient.newBuilder()
-                            .sslContext(sslContext)
-                            .build()) {
-                        String encodedLink = updateInfo.getDownloadLink().replace(" ", "%20");
-                        logger.info("下载更新，请求体: {}", encodedLink);
-                        HttpRequest request = HttpRequest.newBuilder()
-                                .uri(URI.create(encodedLink))
-                                .GET()
-                                .build();
-                        // 发送请求并处理响应
-                        HttpResponse<InputStream> response;
-                        try {
-                            response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                        } catch (Exception e) {
-                            throw new IOException(update_downloadFailed());
-                        }
-                        if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
-                            throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
-                        }
-                        if (response != null) {
-                            try (InputStream inputStream = response.body();
-                                 FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-                                long contentLength = response.headers()
-                                        .firstValueAsLong("Content-Length")
-                                        .orElse(0);
-                                byte[] buffer = new byte[8192];
-                                long downloadedBytes = 0;
-                                int bytesRead;
-                                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                    // 每次循环都检查取消状态
+                    File tempFile = null;
+                    // 下载地址数组
+                    String[] downloadLinks = {
+                            updateInfo.getAliyunFileLink(),
+                            updateInfo.getAlipayFileLink()
+                    };
+                    for (int attempt = 0; attempt < downloadLinks.length; attempt++) {
+                        // 在temp目录创建临时文件
+                        tempFile = File.createTempFile("pmc_update_", zip, tempDir);
+                        // 创建使用TLSv1.2的SSLContext
+                        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+                        sslContext.init(null, null, null);
+                        // 创建HttpClient，并设置SSLContext
+                        try (HttpClient client = HttpClient.newBuilder()
+                                .sslContext(sslContext)
+                                .build()) {
+                            String encodedLink = downloadLinks[attempt].replace(" ", "%20");
+                            logger.info("下载更新，请求体: {}", encodedLink);
+                            HttpRequest request = HttpRequest.newBuilder()
+                                    .uri(URI.create(encodedLink))
+                                    .GET()
+                                    .build();
+                            // 发送请求并处理响应
+                            HttpResponse<InputStream> response;
+                            try {
+                                response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                            } catch (Exception e) {
+                                throw new IOException(update_downloadFailed());
+                            }
+                            if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
+                                throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
+                            }
+                            if (response != null) {
+                                try (InputStream inputStream = response.body();
+                                     FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+                                    long contentLength = response.headers()
+                                            .firstValueAsLong("Content-Length")
+                                            .orElse(0);
+                                    byte[] buffer = new byte[8192];
+                                    long downloadedBytes = 0;
+                                    int bytesRead;
+                                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                        // 每次循环都检查取消状态
+                                        if (isCancelled()) {
+                                            break;
+                                        }
+                                        outputStream.write(buffer, 0, bytesRead);
+                                        downloadedBytes += bytesRead;
+                                        if (contentLength > 0) {
+                                            double progress = (double) downloadedBytes / contentLength;
+                                            Platform.runLater(() ->
+                                                    progressDialog.updateProgress(progress, bundle.getString("update.installing")));
+                                        }
+                                    }
+                                    // 如果任务被取消，删除临时文件夹
                                     if (isCancelled()) {
+                                        logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
+                                        deleteDirectoryRecursively(Path.of(PMCTempPath));
                                         break;
                                     }
-                                    outputStream.write(buffer, 0, bytesRead);
-                                    downloadedBytes += bytesRead;
-                                    if (contentLength > 0) {
-                                        double progress = (double) downloadedBytes / contentLength;
-                                        Platform.runLater(() ->
-                                                progressDialog.updateProgress(progress, bundle.getString("update.installing")));
-                                    }
                                 }
-                                // 如果任务被取消，删除临时文件夹
-                                if (isCancelled()) {
-                                    logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
-                                    deleteDirectoryRecursively(Path.of(PMCTempPath));
-                                }
+                                break;
+                            }
+                        } catch (Exception e) {
+                            logger.error("下载尝试失败", e);
+                            // 删除不完整的临时文件
+                            if (tempFile.exists()) {
+                                Files.deleteIfExists(tempFile.toPath());
+                            }
+                            // 如果是最后一次尝试，抛出异常
+                            if (attempt == downloadLinks.length - 1) {
+                                throw new IOException(update_downloadFailed(), e);
                             }
                         }
                     }
+                    File finalTempFile = tempFile;
                     Platform.runLater(() -> {
                         progressDialog.close();
-                        executeInstaller(tempFile);
+                        executeInstaller(finalTempFile);
                     });
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -302,6 +326,7 @@ public class CheckUpdateService {
         int exitCode = process.waitFor();
         logger.info("脚本退出码: {}", exitCode);
         if (exitCode != 0) {
+            logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
             deleteDirectoryRecursively(Path.of(PMCTempPath));
             deleteDirectoryRecursively(updateScriptFile.toPath());
             throw new IOException(bundle.getString("update.scriptExit") + exitCode +
