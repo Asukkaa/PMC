@@ -21,8 +21,8 @@ exports.main = async (event) => {
     const aliyunFileLink = aliyunFileLinks[clientOS];
     // 支付宝云文件存储地址
     const alipayFileLinks = {
-        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-win.zip?expire_at=1751365797&er_sign=2f512eccc9a6dec591427e19a16c930a',
-        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-mac.zip?expire_at=1751365811&er_sign=3cc02f9d7e7752efd2411504d1ebd904'
+        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-win.zip?expire_at=1751369123&er_sign=4dde3e1864c039a0811263c4c1580c37',
+        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-mac.zip?expire_at=1751369145&er_sign=3da6a8baf90fb847607ddf6aad3c67ea'
     };
     const alipayFileLink = alipayFileLinks[clientOS];
     // 验证操作系统类型
