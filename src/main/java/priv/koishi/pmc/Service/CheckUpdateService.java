@@ -279,8 +279,10 @@ public class CheckUpdateService {
         }
         // 构建执行命令
         String scriptCommand = String.format(
-                "do shell script \"\\\"%s\\\"\" with administrator privileges",
-                updateScriptFile.getAbsolutePath()
+                "do shell script \"\\\"%s\\\"\" with administrator privileges " +
+                        "with prompt \"%s\"",
+                updateScriptFile.getAbsolutePath(),
+                bundle.getString("update.password") + appName + app
         );
         logger.info("-------------------------开始执行Mac更新脚本------------------------------");
         // 执行并捕获输出
@@ -300,6 +302,8 @@ public class CheckUpdateService {
         int exitCode = process.waitFor();
         logger.info("脚本退出码: {}", exitCode);
         if (exitCode != 0) {
+            deleteDirectoryRecursively(Path.of(PMCTempPath));
+            deleteDirectoryRecursively(updateScriptFile.toPath());
             throw new IOException(bundle.getString("update.scriptExit") + exitCode +
                     bundle.getString("update.scriptOut") + output);
         }
