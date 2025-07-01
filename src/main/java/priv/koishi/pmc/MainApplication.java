@@ -364,7 +364,6 @@ public class MainApplication extends Application {
      * @throws IOException io异常
      */
     public static void main(String[] args) throws IOException {
-        System.out.println(tmpdir);
         MainApplication.args = args;
         String languagePath = "priv.koishi.pmc.language";
         bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
