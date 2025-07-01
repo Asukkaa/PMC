@@ -13,15 +13,16 @@ exports.main = async (event) => {
     }
     // 获取客户端操作系统类型
     const clientOS = requestBody.os;
-    // 定义不同系统的文件ID（在uniCloud控制台获取）
+    // 阿里云文件存储地址
     const aliyunFileLinks = {
-        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/Perfect Mouse Control 3.0.0.zip',
-        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/Perfect Mouse Control 3.0.0.dmg'
+        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/Perfect Mouse Control 3.1.0-win.zip',
+        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/Perfect Mouse Control 3.1.0-mac.zip'
     };
     const aliyunFileLink = aliyunFileLinks[clientOS];
+    // 支付宝云文件存储地址
     const alipayFileLinks = {
-        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/Perfect Mouse Control 3.0.0.zip',
-        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/Perfect Mouse Control 3.0.0.dmg'
+        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-win.zip?expire_at=1751365797&er_sign=2f512eccc9a6dec591427e19a16c930a',
+        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-mac.zip?expire_at=1751365811&er_sign=3cc02f9d7e7752efd2411504d1ebd904'
     };
     const alipayFileLink = alipayFileLinks[clientOS];
     // 验证操作系统类型
