@@ -1,6 +1,6 @@
 'use strict';
 
-exports.main = async (event, context) => {
+exports.main = async (event) => {
     // 解析请求体
     let requestBody;
     try {
