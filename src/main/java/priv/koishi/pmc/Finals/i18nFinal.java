@@ -958,6 +958,10 @@ public class i18nFinal {
         return bundle.getString("update.scriptNotFind");
     }
 
+    public static String update_errCheck() {
+        return bundle.getString("update.errCheck");
+    }
+
     /**
      * 重试逻辑下拉框选项
      */

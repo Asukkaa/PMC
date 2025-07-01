@@ -343,7 +343,7 @@ public class AboutController extends RootController {
                 checkMassage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
                 //更新最后检查日期
                 updateCheckDate(Color.BLUE);
-                checkDate_Abt.setTextFill(Color.BLUE);
+                checkMassage_Abt.setTextFill(Color.BLUE);
                 if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
                     // 弹出更新对话框
                     Optional<ButtonType> result = showUpdateDialog(updateInfo);

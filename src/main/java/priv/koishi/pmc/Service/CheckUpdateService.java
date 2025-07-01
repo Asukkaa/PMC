@@ -19,12 +19,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.i18nFinal.update_downloadFailed;
-import static priv.koishi.pmc.Finals.i18nFinal.update_scriptNotFind;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -108,14 +109,13 @@ public class CheckUpdateService {
                         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                         // 先解析为 UniCloudResponse
                         UniCloudResponse uniResponse = objectMapper.readValue(jsonData, UniCloudResponse.class);
+                        logger.info("查询版本更新，解析后的响应体: {}", uniResponse);
                         if (uniResponse.getCode() == 200) {
                             // 成功时提取 data 字段
                             return uniResponse.getData();
                         } else {
                             // 错误处理
-                            CheckUpdateBean errorBean = new CheckUpdateBean();
-                            errorBean.setVersion(bundle.getString("update.checkError") + uniResponse.getMessage());
-                            return errorBean;
+                            throw new IOException(update_errCheck());
                         }
                     } catch (Exception e) {
                         // 判断是否需要重试
@@ -124,11 +124,11 @@ public class CheckUpdateService {
                         } else {
                             // 最终失败处理
                             logger.error("更新检查最终失败", e);
-                            throw new RuntimeException(bundle.getString("update.errCheck"), e);
+                            throw new RuntimeException(update_errCheck(), e);
                         }
                     }
                 }
-                throw new RuntimeException(bundle.getString("update.errCheck"));
+                throw new RuntimeException(update_errCheck());
             }
         };
     }
@@ -142,103 +142,99 @@ public class CheckUpdateService {
     public static Task<Void> downloadAndInstallUpdate(CheckUpdateBean updateInfo, ProgressDialog progressDialog) {
         return new Task<>() {
             @Override
-            protected Void call() {
+            protected Void call() throws IOException, NoSuchAlgorithmException, KeyManagementException {
                 // 显示下载进度对话框
                 progressDialog.show(bundle.getString("update.downloading"), bundle.getString("update.downloadingUpdate"));
-                try {
-                    // 创建temp文件夹
-                    File tempDir = new File(PMCTempPath);
-                    if (!tempDir.exists()) {
-                        if (!tempDir.mkdirs()) {
-                            throw new RuntimeException(bundle.getString("update.tempFileErr"));
+                // 创建temp文件夹
+                File tempDir = new File(PMCTempPath);
+                if (!tempDir.exists()) {
+                    if (!tempDir.mkdirs()) {
+                        throw new RuntimeException(bundle.getString("update.tempFileErr"));
+                    }
+                }
+                if (isWin) {
+                    Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
+                }
+                File tempFile = null;
+                // 下载地址数组
+                String[] downloadLinks = {
+                        updateInfo.getAliyunFileLink(),
+                        updateInfo.getAlipayFileLink()
+                };
+                for (int attempt = 0; attempt < downloadLinks.length; attempt++) {
+                    // 在temp目录创建临时文件
+                    tempFile = File.createTempFile("pmc_update_", zip, tempDir);
+                    // 创建使用TLSv1.2的SSLContext
+                    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+                    sslContext.init(null, null, null);
+                    // 创建HttpClient，并设置SSLContext
+                    try (HttpClient client = HttpClient.newBuilder()
+                            .sslContext(sslContext)
+                            .build()) {
+                        String encodedLink = downloadLinks[attempt].replace(" ", "%20");
+                        logger.info("下载更新，请求体: {}", encodedLink);
+                        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(encodedLink))
+                                .GET()
+                                .build();
+                        // 发送请求并处理响应
+                        HttpResponse<InputStream> response;
+                        try {
+                            response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                        } catch (Exception e) {
+                            throw new IOException(update_downloadFailed());
                         }
-                    }
-                    if (isWin) {
-                        Files.setAttribute(tempDir.toPath(), "dos:hidden", true);
-                    }
-                    File tempFile = null;
-                    // 下载地址数组
-                    String[] downloadLinks = {
-                            updateInfo.getAliyunFileLink(),
-                            updateInfo.getAlipayFileLink()
-                    };
-                    for (int attempt = 0; attempt < downloadLinks.length; attempt++) {
-                        // 在temp目录创建临时文件
-                        tempFile = File.createTempFile("pmc_update_", zip, tempDir);
-                        // 创建使用TLSv1.2的SSLContext
-                        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-                        sslContext.init(null, null, null);
-                        // 创建HttpClient，并设置SSLContext
-                        try (HttpClient client = HttpClient.newBuilder()
-                                .sslContext(sslContext)
-                                .build()) {
-                            String encodedLink = downloadLinks[attempt].replace(" ", "%20");
-                            logger.info("下载更新，请求体: {}", encodedLink);
-                            HttpRequest request = HttpRequest.newBuilder()
-                                    .uri(URI.create(encodedLink))
-                                    .GET()
-                                    .build();
-                            // 发送请求并处理响应
-                            HttpResponse<InputStream> response;
-                            try {
-                                response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                            } catch (Exception e) {
-                                throw new IOException(update_downloadFailed());
-                            }
-                            if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
-                                throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
-                            }
-                            if (response != null) {
-                                try (InputStream inputStream = response.body();
-                                     FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-                                    long contentLength = response.headers()
-                                            .firstValueAsLong("Content-Length")
-                                            .orElse(0);
-                                    byte[] buffer = new byte[8192];
-                                    long downloadedBytes = 0;
-                                    int bytesRead;
-                                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                        // 每次循环都检查取消状态
-                                        if (isCancelled()) {
-                                            break;
-                                        }
-                                        outputStream.write(buffer, 0, bytesRead);
-                                        downloadedBytes += bytesRead;
-                                        if (contentLength > 0) {
-                                            double progress = (double) downloadedBytes / contentLength;
-                                            Platform.runLater(() ->
-                                                    progressDialog.updateProgress(progress, bundle.getString("update.installing")));
-                                        }
-                                    }
-                                    // 如果任务被取消，删除临时文件夹
+                        if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
+                            throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
+                        }
+                        if (response != null) {
+                            try (InputStream inputStream = response.body();
+                                 FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+                                long contentLength = response.headers()
+                                        .firstValueAsLong("Content-Length")
+                                        .orElse(0);
+                                byte[] buffer = new byte[8192];
+                                long downloadedBytes = 0;
+                                int bytesRead;
+                                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                    // 每次循环都检查取消状态
                                     if (isCancelled()) {
-                                        logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
-                                        deleteDirectoryRecursively(Path.of(PMCTempPath));
                                         break;
                                     }
+                                    outputStream.write(buffer, 0, bytesRead);
+                                    downloadedBytes += bytesRead;
+                                    if (contentLength > 0) {
+                                        double progress = (double) downloadedBytes / contentLength;
+                                        Platform.runLater(() ->
+                                                progressDialog.updateProgress(progress, bundle.getString("update.installing")));
+                                    }
                                 }
-                                break;
+                                // 如果任务被取消，删除临时文件夹
+                                if (isCancelled()) {
+                                    logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
+                                    deleteDirectoryRecursively(Path.of(PMCTempPath));
+                                    break;
+                                }
                             }
-                        } catch (Exception e) {
-                            logger.error("下载尝试失败", e);
-                            // 删除不完整的临时文件
-                            if (tempFile.exists()) {
-                                Files.deleteIfExists(tempFile.toPath());
-                            }
-                            // 如果是最后一次尝试，抛出异常
-                            if (attempt == downloadLinks.length - 1) {
-                                throw new IOException(update_downloadFailed(), e);
-                            }
+                            break;
+                        }
+                    } catch (Exception e) {
+                        logger.error("下载尝试失败", e);
+                        // 删除不完整的临时文件
+                        if (tempFile.exists()) {
+                            Files.deleteIfExists(tempFile.toPath());
+                        }
+                        // 如果是最后一次尝试，抛出异常
+                        if (attempt == downloadLinks.length - 1) {
+                            throw new IOException(update_downloadFailed(), e);
                         }
                     }
-                    File finalTempFile = tempFile;
-                    Platform.runLater(() -> {
-                        progressDialog.close();
-                        executeInstaller(finalTempFile);
-                    });
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
+                File finalTempFile = tempFile;
+                Platform.runLater(() -> {
+                    progressDialog.close();
+                    executeInstaller(finalTempFile);
+                });
                 return null;
             }
         };
