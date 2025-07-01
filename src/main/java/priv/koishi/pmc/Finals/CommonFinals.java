@@ -474,6 +474,8 @@ public class CommonFinals {
 
     public static final String bat = ".bat";
 
+    public static final String sh = ".sh";
+
     public static final String zip = ".zip";
 
     public static final String log = ".log";

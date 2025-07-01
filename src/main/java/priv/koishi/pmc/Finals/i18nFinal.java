@@ -954,6 +954,10 @@ public class i18nFinal {
         return bundle.getString("update.findNewVersion");
     }
 
+    public static String update_scriptNotFind() {
+        return bundle.getString("update.scriptNotFind");
+    }
+
     /**
      * 重试逻辑下拉框选项
      */

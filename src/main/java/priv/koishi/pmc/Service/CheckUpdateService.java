@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.UniCloudResponse;
-import priv.koishi.pmc.Controller.AboutController;
 import priv.koishi.pmc.ProgressDialog.ProgressDialog;
 
 import javax.net.ssl.SSLContext;
@@ -25,6 +24,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.update_downloadFailed;
+import static priv.koishi.pmc.Finals.i18nFinal.update_scriptNotFind;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -244,42 +244,38 @@ public class CheckUpdateService {
 
     /**
      * 更新Mac端应用
+     *
+     * @throws IOException          更新脚本未找到、无法设置脚本可执行权限、脚本不可执行、脚本执行失败
+     * @throws InterruptedException 脚本执行被中断
      */
     private static void updateMacApp() throws IOException, InterruptedException {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + appName + app;
         // 在系统临时目录创建脚本
-        File tempDir = new File(tmpdir);
-        File updateScriptFile = File.createTempFile("pmc_update_", ".sh", tempDir);
+        File updateScriptFile = File.createTempFile(updateScript, sh);
         try (PrintWriter writer = new PrintWriter(updateScriptFile)) {
-            writer.println("#!/bin/bash");
-            writer.println("export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin");
-            // 终止应用
-            writer.println("/usr/bin/pkill -9 -f '" + appName + "' || true");
-            // 删除旧应用
-            writer.println("/usr/bin/sudo /bin/rm -rf \"/Applications/" + appName + ".app\"");
-            // 复制新应用
-            writer.println("/usr/bin/sudo /bin/cp -Rf \"" + sourceDir + "\" \"/Applications/\"");
-            // 修复权限
-            writer.println("/usr/bin/sudo /usr/sbin/chown -R " + sysUerName + ":staff \"/Applications/" + appName + ".app\"");
-            writer.println("/usr/bin/sudo /usr/bin/xattr -d com.apple.quarantine \"/Applications/" + appName + ".app\"");
-            writer.println("/usr/bin/sudo /bin/chmod -R 755 \"/Applications/" + appName + ".app\"");
-            // 重新签名
-            writer.println("/usr/bin/sudo /usr/bin/codesign --force --deep --sign - \"/Applications/" + appName + ".app\" || echo \"签名失败，继续执行\"");
-            // 清理
-            writer.println("/bin/rm -rf \"" + PMCTempPath + "\"");
-            writer.println("/bin/rm -f \"$0\"");
-            // 启动新应用
-            writer.println("/usr/bin/open -a \"/Applications/" + appName + ".app\"");
-            writer.println("exit 0");
+            // 从资源加载脚本
+            try (InputStream is = CheckUpdateService.class.getResourceAsStream(resourcePath + "script/update.sh")) {
+                if (is != null) {
+                    new BufferedReader(new InputStreamReader(is))
+                            .lines()
+                            .forEach(line -> writer.println(line
+                                    .replace("$APP_NAME", appName)
+                                    .replace("$SOURCE_DIR", sourceDir)
+                                    .replace("$SYS_USER_NAME", sysUerName)
+                                    .replace("$TEMP_DIR", PMCTempPath)));
+                } else {
+                    throw new IOException(update_scriptNotFind());
+                }
+            }
         }
         // 设置权限
         if (!updateScriptFile.setExecutable(true)) {
-            throw new IOException("无法设置脚本可执行权限");
+            throw new IOException(bundle.getString("update.scriptNoPermission"));
         }
         // 验证权限
         if (!updateScriptFile.canExecute()) {
-            throw new IOException("脚本不可执行" + updateScriptFile.getAbsolutePath());
+            throw new IOException(bundle.getString("update.scriptCantRun") + updateScriptFile.getAbsolutePath());
         }
         // 构建执行命令
         String scriptCommand = String.format(
@@ -304,7 +300,8 @@ public class CheckUpdateService {
         int exitCode = process.waitFor();
         logger.info("脚本退出码: {}", exitCode);
         if (exitCode != 0) {
-            throw new IOException("脚本执行失败，退出码: " + exitCode + "\n输出: " + output);
+            throw new IOException(bundle.getString("update.scriptExit") + exitCode +
+                    bundle.getString("update.scriptOut") + output);
         }
     }
 
@@ -322,7 +319,7 @@ public class CheckUpdateService {
         File batFile = File.createTempFile(updateScript, bat);
         try (PrintWriter writer = new PrintWriter(batFile)) {
             // 从资源文件读取批处理脚本内容
-            try (InputStream is = AboutController.class.getResourceAsStream(resourcePath + "script/update.bat")) {
+            try (InputStream is = CheckUpdateService.class.getResourceAsStream(resourcePath + "script/update.bat")) {
                 if (is != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                         String line;
@@ -331,7 +328,7 @@ public class CheckUpdateService {
                         }
                     }
                 } else {
-                    throw new IOException(bundle.getString("update.batNotFind"));
+                    throw new IOException(update_scriptNotFind());
                 }
             }
         }
