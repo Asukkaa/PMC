@@ -100,7 +100,7 @@
             <HBox spacing="5">
                 <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="%update.checkUpdate"/>
-                    <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" style="-fx-cursor: hand"
+                    <Button fx:id="checkUpdate_Abt" onAction="#testUpdate" style="-fx-cursor: hand"
                             text="%update.checkUpdate_Abt"/>
                 </HBox>
 

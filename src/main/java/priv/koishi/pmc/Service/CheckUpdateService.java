@@ -274,7 +274,7 @@ public class CheckUpdateService {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + appName + app;
         // 获取目标目录
-        String targetDir = fullUpdate ? getAppRootPath() : libPath;
+        String targetDir = fullUpdate ? getAppRootPath() : javaHome;
         // 在系统临时目录创建脚本
         File updateScriptFile = File.createTempFile(updateScript, sh);
         try (PrintWriter writer = new PrintWriter(updateScriptFile)) {
@@ -345,7 +345,7 @@ public class CheckUpdateService {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped;
         // 获取目标目录
-        String targetDir = fullUpdate ? getAppRootPath() : libPath;
+        String targetDir = fullUpdate ? getAppRootPath() : javaHome;
         // 创建临时批处理文件
         File batFile = File.createTempFile(updateScript, bat);
         try (PrintWriter writer = new PrintWriter(batFile)) {
@@ -372,6 +372,7 @@ public class CheckUpdateService {
         command.add(targetDir);
         command.add(appName + exe);
         command.add(PMCTempPath);
+        command.add(getAppRootPath());
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));

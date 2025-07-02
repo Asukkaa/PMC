@@ -400,4 +400,10 @@ public class AboutController extends RootController {
         setLoadLastConfigCheckBox(autoCheck_Abt, configFile, key_autoCheck);
     }
 
+    @FXML
+    private void testUpdate() {
+        File file = new File(PMCTempPath + File.separator + "test" + zip);
+        executeInstaller(file, false);
+    }
+
 }

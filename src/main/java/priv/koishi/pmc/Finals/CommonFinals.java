@@ -30,7 +30,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.07.01";
+    public static final String buildDate = "2025.07.02";
 
     /**
      * 程序logo
@@ -131,11 +131,6 @@ public class CommonFinals {
      * 程序核心目录（win为根目录，mac为../runtime/Contents）
      */
     public static final String rootDir = new File(javaHome).getParent();
-
-    /**
-     * lib目录
-     */
-    public static final String libPath = javaHome + File.separator + "lib";
 
     /**
      * app目录
