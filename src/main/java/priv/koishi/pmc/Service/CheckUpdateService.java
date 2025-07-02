@@ -244,7 +244,7 @@ public class CheckUpdateService {
      * 安装程序
      *
      * @param installerFile 安装程序文件
-     * @param fullUpdate    是否为全更新(true-全量更新 false-增量更新)
+     * @param fullUpdate    是否为全量更新(true-全量更新 false-增量更新)
      */
     public static void executeInstaller(File installerFile, boolean fullUpdate) {
         logger.info("====================准备开始安装更新======================");
@@ -266,7 +266,7 @@ public class CheckUpdateService {
     /**
      * 更新Mac端应用
      *
-     * @param fullUpdate 是否为全更新(true-全量更新 false-增量更新)
+     * @param fullUpdate 是否为全量更新(true-全量更新 false-增量更新)
      * @throws IOException          更新脚本未找到、无法设置脚本可执行权限、脚本不可执行、脚本执行失败
      * @throws InterruptedException 脚本执行被中断
      */
@@ -341,7 +341,7 @@ public class CheckUpdateService {
     /**
      * 更新win端应用
      *
-     * @param fullUpdate 是否为全更新(true-全量更新 false-增量更新)
+     * @param fullUpdate 是否为全量更新(true-全量更新 false-增量更新)
      * @throws IOException 找不到批处理脚本
      */
     private static void updateWinApp(boolean fullUpdate) throws IOException {
