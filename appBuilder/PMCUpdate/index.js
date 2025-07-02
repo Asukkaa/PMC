@@ -39,7 +39,8 @@ exports.main = async (event) => {
             buildDate: "2025.07.01",
             whatsNew: "版本更新测试",
             aliyunFileLink: aliyunFileLink,
-            alipayFileLink: alipayFileLink
+            alipayFileLink: alipayFileLink,
+            fullUpdate: true
         };
         // 返回结果
         return {

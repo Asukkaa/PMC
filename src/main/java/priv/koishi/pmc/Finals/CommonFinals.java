@@ -118,7 +118,7 @@ public class CommonFinals {
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * java home目录
+     * java home目录（win为runtime目录，mac为../runtime/Contents/Home）
      */
     public static final String javaHome = System.getProperty("java.home");
 
@@ -128,9 +128,14 @@ public class CommonFinals {
     public static final String userDir = System.getProperty("user.dir");
 
     /**
-     * 程序根目录
+     * 程序核心目录（win为根目录，mac为../runtime/Contents）
      */
     public static final String rootDir = new File(javaHome).getParent();
+
+    /**
+     * lib目录
+     */
+    public static final String libPath = javaHome + File.separator + "lib";
 
     /**
      * app目录

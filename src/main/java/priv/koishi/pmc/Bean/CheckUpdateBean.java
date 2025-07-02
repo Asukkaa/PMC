@@ -37,4 +37,9 @@ public class CheckUpdateBean {
      */
     String alipayFileLink;
 
+    /**
+     * 是否全量更新（true-全量更新 false-增量更新）
+     */
+    boolean fullUpdate;
+
 }

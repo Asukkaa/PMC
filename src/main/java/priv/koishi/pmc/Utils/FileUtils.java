@@ -305,7 +305,7 @@ public class FileUtils {
     /**
      * 获取应用根目录
      *
-     * @return 应用根目录路径
+     * @return 应用根目录路径(win为应用名目录，mac为应用程序目录)
      */
     public static String getAppRootPath() {
         String appPath = getAppPath();

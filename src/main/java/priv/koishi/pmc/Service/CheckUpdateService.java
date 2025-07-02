@@ -233,7 +233,7 @@ public class CheckUpdateService {
                 File finalTempFile = tempFile;
                 Platform.runLater(() -> {
                     progressDialog.close();
-                    executeInstaller(finalTempFile);
+                    executeInstaller(finalTempFile, updateInfo.isFullUpdate());
                 });
                 return null;
             }
@@ -244,8 +244,9 @@ public class CheckUpdateService {
      * 安装程序
      *
      * @param installerFile 安装程序文件
+     * @param fullUpdate    是否为全更新(true-全量更新 false-增量更新)
      */
-    public static void executeInstaller(File installerFile) {
+    public static void executeInstaller(File installerFile, boolean fullUpdate) {
         logger.info("====================准备开始安装更新======================");
         try {
             //解压安装程序
@@ -253,9 +254,9 @@ public class CheckUpdateService {
             unzip(installerFile.getAbsolutePath(), destPath);
             // 根据操作系统执行安装程序
             if (isWin) {
-                updateWinApp();
+                updateWinApp(fullUpdate);
             } else if (isMac) {
-                updateMacApp();
+                updateMacApp(fullUpdate);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -265,12 +266,15 @@ public class CheckUpdateService {
     /**
      * 更新Mac端应用
      *
+     * @param fullUpdate 是否为全更新(true-全量更新 false-增量更新)
      * @throws IOException          更新脚本未找到、无法设置脚本可执行权限、脚本不可执行、脚本执行失败
      * @throws InterruptedException 脚本执行被中断
      */
-    private static void updateMacApp() throws IOException, InterruptedException {
+    private static void updateMacApp(boolean fullUpdate) throws IOException, InterruptedException {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + appName + app;
+        // 获取目标目录
+        String targetDir = fullUpdate ? getAppRootPath() : libPath;
         // 在系统临时目录创建脚本
         File updateScriptFile = File.createTempFile(updateScript, sh);
         try (PrintWriter writer = new PrintWriter(updateScriptFile)) {
@@ -282,6 +286,7 @@ public class CheckUpdateService {
                             .forEach(line -> writer.println(line
                                     .replace("$APP_NAME", appName)
                                     .replace("$SOURCE_DIR", sourceDir)
+                                    .replace("$TARGET_DIR", targetDir)
                                     .replace("$SYS_USER_NAME", sysUerName)
                                     .replace("$TEMP_DIR", PMCTempPath)));
                 } else {
@@ -333,13 +338,14 @@ public class CheckUpdateService {
     /**
      * 更新win端应用
      *
+     * @param fullUpdate 是否为全更新(true-全量更新 false-增量更新)
      * @throws IOException 找不到批处理脚本
      */
-    private static void updateWinApp() throws IOException {
+    private static void updateWinApp(boolean fullUpdate) throws IOException {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped;
         // 获取目标目录
-        String targetDir = getAppRootPath();
+        String targetDir = fullUpdate ? getAppRootPath() : libPath;
         // 创建临时批处理文件
         File batFile = File.createTempFile(updateScript, bat);
         try (PrintWriter writer = new PrintWriter(batFile)) {
