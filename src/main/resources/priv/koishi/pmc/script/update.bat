@@ -23,11 +23,6 @@ if %errorlevel% == 0 (
 
 :AdminSuccess
 
-:: 验证源目录
-if not exist "%source_dir%" (
-    exit /b 1
-)
-
 :: 结束JavaFX应用程序
 taskkill /f /im "%exe_name%" >nul 2>&1
 
