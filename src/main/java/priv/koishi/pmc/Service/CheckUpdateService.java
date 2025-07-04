@@ -307,10 +307,13 @@ public class CheckUpdateService {
         }
         // 构建执行命令
         String scriptCommand = String.format(
-                "do shell script \"\\\"%s\\\"\" with administrator privileges " +
-                        "with prompt \"%s\"",
+                "do shell script \"\\\"%s\\\"\" " +
+                        "with administrator privileges " +
+                        "with prompt \"%s\" " +
+                        "with icon file \"%s\"",
                 updateScriptFile.getAbsolutePath(),
-                bundle.getString("update.password") + appName + app
+                bundle.getString("update.password") + appName + app,
+                getAppPath() + "/Contents/Resources/" + appName + ".icns"
         );
         logger.info("-------------------------开始执行Mac更新脚本------------------------------");
         // 执行并捕获输出
