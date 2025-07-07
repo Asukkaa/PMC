@@ -230,7 +230,7 @@ public class UiUtils {
     /**
      * 创建一个图片选择器（只支持png、jpg、jpeg格式）
      *
-     * @param window            文件选择器窗口
+     * @param window        文件选择器窗口
      * @param imgSelectPath 默认路径
      * @return 选择的图片
      */
@@ -287,22 +287,27 @@ public class UiUtils {
         logger.error(ex, ex);
         Alert alert = creatErrorAlert(errToString(ex));
         Throwable cause = ex.getCause();
+        String message;
         if (cause instanceof RuntimeException) {
-            alert.setHeaderText(cause.getMessage());
+            message = cause.getMessage();
         } else {
             if (cause != null) {
                 cause = cause.getCause();
             }
             if (cause != null) {
                 if (cause instanceof Exception) {
-                    alert.setHeaderText(cause.getMessage());
+                    message = cause.getMessage();
                 } else {
-                    alert.setHeaderText(ex.getMessage());
+                    message = ex.getMessage();
                 }
             } else {
-                alert.setHeaderText(ex.getMessage());
+                message = ex.getMessage();
             }
         }
+        if (message.length() > 200 && !message.contains("\n")) {
+            message = message.substring(0, 200) + " ...";
+        }
+        alert.setHeaderText(message);
         // 展示弹窗
         alert.showAndWait();
     }
@@ -316,7 +321,8 @@ public class UiUtils {
     public static Alert creatErrorAlert(String errString) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(text_abnormal());
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        DialogPane dialogPane = alert.getDialogPane();
+        Stage stage = (Stage) dialogPane.getScene().getWindow();
         setWindowLogo(stage, logoPath);
         // 创建展示异常信息的TextArea
         TextArea textArea = new TextArea();
@@ -328,7 +334,7 @@ public class UiUtils {
         VBox.setVgrow(textArea, Priority.ALWAYS);
         textArea.setMaxHeight(Double.MAX_VALUE);
         details.getChildren().add(textArea);
-        alert.getDialogPane().setExpandableContent(details);
+        dialogPane.setExpandableContent(details);
         return alert;
     }
 
