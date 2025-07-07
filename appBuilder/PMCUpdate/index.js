@@ -1,14 +1,19 @@
 'use strict';
 
+const i18n = require('./i18n.js');
+
 exports.main = async (event) => {
     // 解析请求体
     let requestBody;
+    let clientLang;
     try {
         requestBody = JSON.parse(event.body);
+        // 获取客户端语言类型
+        clientLang = requestBody.lang || 'zh-CN';
     } catch (e) {
         return {
             code: 400,
-            message: "无效的JSON请求体"
+            message: i18n[clientLang].invalidJson
         };
     }
     // 获取客户端操作系统类型
@@ -68,7 +73,7 @@ exports.main = async (event) => {
     if (!aliyunFileLink || !alipayFileLink) {
         return {
             code: 400,
-            message: `无效的操作系统参数: ${clientOS}`
+            message: i18n[clientLang].invalidOS
         };
     }
     try {
@@ -76,7 +81,7 @@ exports.main = async (event) => {
         const latestVersionInfo = {
             version: serverVersion,
             buildDate: "2025.07.01",
-            whatsNew: "版本更新测试",
+            whatsNew: i18n[clientLang].whatsNew,
             aliyunFileLink: aliyunFileLink,
             alipayFileLink: alipayFileLink,
             fullUpdate: fullUpdate
