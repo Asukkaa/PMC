@@ -92,6 +92,7 @@ public class CheckUpdateService {
                         String lang = bundle.getLocale().toLanguageTag();
                         // 构建请求体 osType:操作系统简称 version:当前版本（只有前两位版本号都相同时才增量更新，其余情况都为全量更新） lang:客户端语言简称
                         String requestBody = "{\"os\":\"" + osType + "\", \"version\":\"" + version + "\", \"lang\":\"" + lang + "\"}";
+                        logger.info("查询版本更新，请求体: {}", requestBody);
                         logger.info("查询版本更新，请求URL: {}", urls[attempt]);
                         HttpRequest request = HttpRequest.newBuilder()
                                 .uri(URI.create(urls[attempt]))
