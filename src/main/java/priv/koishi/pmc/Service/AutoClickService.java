@@ -88,7 +88,7 @@ public class AutoClickService {
                     dynamicQueue.setMaxSize(maxLogNum);
                 }
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
-                int loopTime = taskBean.getLoopTime();
+                int loopTime = taskBean.getLoopTimes();
                 if (loopTime == 0) {
                     int i = 0;
                     while (!isCancelled()) {

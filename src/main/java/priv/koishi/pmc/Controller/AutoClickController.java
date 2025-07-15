@@ -708,9 +708,10 @@ public class AutoClickController extends RootController implements MousePosition
      * 启动自动操作流程
      *
      * @param clickPositionVOS 自动操作流程
+     * @param loopTimes 循环次数
      * @throws IOException io异常
      */
-    private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
+    private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
         if (isFree()) {
             // 标记为正在运行自动操作
             runClicking = true;
@@ -729,7 +730,6 @@ public class AutoClickController extends RootController implements MousePosition
             CheckBox waitLog = settingController.waitLog_Set;
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
-                    .setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
                     .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
                     .setClickImgLog(clickImgLog.isSelected())
@@ -741,11 +741,12 @@ public class AutoClickController extends RootController implements MousePosition
                     .setWaitLog(waitLog.isSelected())
                     .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
+                    .setLoopTimes(loopTimes)
                     .setProgressBar(progressBar_Click)
                     .setBindingMassageLabel(false)
                     .setDisableNodes(disableNodes)
-                    .setMassageLabel(log_Click)
-                    .setBeanList(clickPositionVOS);
+                    .setBeanList(clickPositionVOS)
+                    .setMassageLabel(log_Click);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
@@ -974,7 +975,7 @@ public class AutoClickController extends RootController implements MousePosition
             List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
                 try {
-                    launchClickTask(selectedItem);
+                    launchClickTask(selectedItem, 1);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -1802,7 +1803,7 @@ public class AutoClickController extends RootController implements MousePosition
             throw new RuntimeException(text_noAutoClickToRun());
         }
         // 启动自动操作流程
-        launchClickTask(tableViewItems);
+        launchClickTask(tableViewItems, setDefaultIntValue(loopTime_Click, 1, 0, null));
     }
 
     /**
