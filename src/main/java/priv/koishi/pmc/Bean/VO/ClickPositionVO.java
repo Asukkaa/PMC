@@ -85,7 +85,6 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
      * 异步加载并更新缩略图
      */
     private void loadThumbnailAsync() {
-        // 文件不是图片时会实时刷新列表缩略图
         try {
             if (isImgFile(new File(getClickImgPath()))) {
                 // 终止进行中的服务
@@ -100,7 +99,6 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
                 currentThumbService.start();
             } else {
                 thumb = null;
-                Platform.runLater(() -> tableView.refresh());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

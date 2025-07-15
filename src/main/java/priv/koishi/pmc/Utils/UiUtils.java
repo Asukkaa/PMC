@@ -583,6 +583,7 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
+                setTextFill(Color.BLACK);
                 if (empty) {
                     setText(null);
                     setGraphic(null);
