@@ -695,7 +695,8 @@ public class UiUtils {
      */
     public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit, boolean selected) {
         ObservableList<T> tableViewItems = tableView.getItems();
-        List<T> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
+        List<T> selectedItem = selectionModel.getSelectedItems();
         switch (addType) {
             // 在列表所选行第一行上方插入
             case upAdd: {
@@ -707,7 +708,7 @@ public class UiUtils {
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                    selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
                 }
                 break;
             }
@@ -721,7 +722,7 @@ public class UiUtils {
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                    selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
                 }
                 break;
             }
@@ -733,7 +734,7 @@ public class UiUtils {
                 tableView.scrollTo(0);
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(0, data.size());
+                    selectionModel.selectRange(0, data.size());
                 }
                 break;
             }
@@ -746,7 +747,7 @@ public class UiUtils {
                 tableView.scrollTo(tableViewItems.size());
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(lastIndex, lastIndex + data.size());
+                    selectionModel.selectRange(lastIndex, lastIndex + data.size());
                 }
                 break;
             }
@@ -1410,9 +1411,19 @@ public class UiUtils {
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
         deleteDataMenuItem.setOnAction(event -> {
-            List<T> ts = tableView.getSelectionModel().getSelectedItems();
+            TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
+            // 要删除的选中项
+            List<T> targets = selectionModel.getSelectedItems();
             ObservableList<T> items = tableView.getItems();
-            items.removeAll(ts);
+            items.removeAll(targets);
+            // 删除后的选中项
+            ObservableList<T> selectedItems = selectionModel.getSelectedItems();
+            if (selectedItems.size() > 1) {
+                // 获取首个选中行的索引
+                int selectedIndex = items.indexOf(selectedItems.getFirst());
+                // 滚动到插入位置
+                tableView.scrollTo(selectedIndex);
+            }
             updateTableViewSizeText(tableView, label, unit);
         });
         contextMenu.getItems().add(deleteDataMenuItem);
