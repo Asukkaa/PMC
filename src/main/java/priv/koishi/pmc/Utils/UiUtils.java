@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Utils;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -309,7 +310,7 @@ public class UiUtils {
         }
         alert.setHeaderText(message);
         // 展示弹窗
-        alert.showAndWait();
+        Platform.runLater(alert::show);
     }
 
     /**
@@ -1423,7 +1424,7 @@ public class UiUtils {
                 tableView.getSelectionModel().clearSelection();
                 tableView.getSelectionModel().select(selectedIndex - 1);
                 // 滚动到插入位置
-                tableView.scrollTo(selectedIndex);
+                tableView.scrollTo(selectedIndex - 1);
             }
             updateTableViewSizeText(tableView, label, unit);
         });
