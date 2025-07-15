@@ -117,6 +117,8 @@ public class EditingCell<T> extends TableCell<T, String> {
         super.cancelEdit();
         setText(getItem());
         setGraphic(null);
+        // 移除监听器
+        removeListeners();
     }
 
     /**
@@ -129,12 +131,8 @@ public class EditingCell<T> extends TableCell<T, String> {
     public void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
         if (empty) {
-            if (textField != null && textChangeListener != null) {
-                textField.textProperty().removeListener(textChangeListener);
-                textField.focusedProperty().removeListener(textFocusedPropertyListener);
-                textChangeListener = null;
-                textFocusedPropertyListener = null;
-            }
+            // 移除监听器
+            removeListeners();
             textField = null;
             setTooltip(null);
             setText(null);
@@ -174,6 +172,8 @@ public class EditingCell<T> extends TableCell<T, String> {
         super.commitEdit(newValue);
         updateItem(newValue, false);
         setTProperties(newValue);
+        // 移除监听器
+        removeListeners();
     }
 
     /**
@@ -222,6 +222,20 @@ public class EditingCell<T> extends TableCell<T, String> {
      */
     private String getString() {
         return getItem() == null ? "" : getItem();
+    }
+
+    /**
+     * 移除监听器
+     */
+    private void removeListeners() {
+        if (textField != null && textFocusedPropertyListener != null) {
+            textField.focusedProperty().removeListener(textFocusedPropertyListener);
+            textFocusedPropertyListener = null;
+        }
+        if (textField != null && textChangeListener != null) {
+            textField.textProperty().removeListener(textChangeListener);
+            textChangeListener = null;
+        }
     }
 
 }
