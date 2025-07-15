@@ -1413,14 +1413,15 @@ public class UiUtils {
         deleteDataMenuItem.setOnAction(event -> {
             TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
             // 要删除的选中项
-            List<T> targets = selectionModel.getSelectedItems();
-            ObservableList<T> items = tableView.getItems();
-            items.removeAll(targets);
-            // 删除后的选中项
             ObservableList<T> selectedItems = selectionModel.getSelectedItems();
-            if (selectedItems.size() > 1) {
-                // 获取首个选中行的索引
-                int selectedIndex = items.indexOf(selectedItems.getFirst());
+            ObservableList<T> items = tableView.getItems();
+            // 获取首个选中行的索引
+            int selectedIndex = items.indexOf(selectedItems.getFirst());
+            items.removeAll(selectedItems);
+            if (selectedIndex > 0) {
+                // 选中删除项的上一行
+                tableView.getSelectionModel().clearSelection();
+                tableView.getSelectionModel().select(selectedIndex - 1);
                 // 滚动到插入位置
                 tableView.scrollTo(selectedIndex);
             }
