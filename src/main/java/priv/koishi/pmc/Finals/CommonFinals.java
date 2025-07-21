@@ -1,14 +1,12 @@
 package priv.koishi.pmc.Finals;
 
 import javafx.scene.paint.Color;
-import priv.koishi.pmc.Utils.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static priv.koishi.pmc.Utils.FileUtils.getCFGPath;
-import static priv.koishi.pmc.Utils.FileUtils.getDesktopPath;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
  * 通用常量类
@@ -27,12 +25,12 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.0.1";
+    public static final String version = "3.1.0";
 
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.06.25";
+    public static final String buildDate = "2025.07.15";
 
     /**
      * 程序logo
@@ -85,12 +83,42 @@ public class CommonFinals {
     public static final String logsDir = packagePath + logs;
 
     /**
+     * 更新脚本名称
+     */
+    public static final String updateScript = "pmc_update";
+
+    /**
+     * 当前程序运行操作系统名称
+     */
+    public static final String systemName = System.getProperty("os.name").toLowerCase();
+
+    /**
+     * win操作系统简称
+     */
+    public static final String win = "win";
+
+    /**
+     * mac操作系统简称
+     */
+    public static final String mac = "mac";
+
+    /**
+     * 是否为win操作系统（true-win系统，false-非win系统）
+     */
+    public static final boolean isWin = systemName.contains(win);
+
+    /**
+     * 是否为mac操作系统（true-mac系统，false-非mac系统）
+     */
+    public static final boolean isMac = systemName.contains(mac);
+
+    /**
      * 用户主目录
      */
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * java home目录
+     * java home目录（win为runtime目录，mac为../runtime/Contents/Home）
      */
     public static final String javaHome = System.getProperty("java.home");
 
@@ -100,19 +128,9 @@ public class CommonFinals {
     public static final String userDir = System.getProperty("user.dir");
 
     /**
-     * 程序根目录
+     * 程序核心目录（win为根目录，mac为../runtime/Contents）
      */
     public static final String rootDir = new File(javaHome).getParent();
-
-    /**
-     * 桌面目录
-     */
-    public static final String desktopPath = getDesktopPath();
-
-    /**
-     * 文件选择器默认路径
-     */
-    public static final String defaultFileChooserPath = desktopPath;
 
     /**
      * app目录
@@ -130,24 +148,62 @@ public class CommonFinals {
     public static final String desktop = "Desktop";
 
     /**
-     * 当前程序运行操作系统名称
+     * 桌面目录
      */
-    public static final String systemName = System.getProperty("os.name").toLowerCase();
+    public static final String desktopPath = getDesktopPath();
+
+    /**
+     * 文件选择器默认路径
+     */
+    public static final String defaultFileChooserPath = desktopPath;
 
     /**
      * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
      */
-    public static final boolean isRunningFromJar = FileUtils.isRunningFromJar();
+    public static final boolean isRunningFromJar = isRunningFromJar();
 
     /**
-     * win操作系统
+     * 操作系统当前用户名称
      */
-    public static final boolean isWin = systemName.contains("win");
+    public static final String sysUerName = System.getProperty("user.name");
 
     /**
-     * mac操作系统
+     * 操作系统临时目录
      */
-    public static final boolean isMac = systemName.contains("mac");
+    public static final String tmpdir = System.getProperty("java.io.tmpdir");
+
+    /**
+     * 更新临时文件目录
+     */
+    public static final String PMCTemp = File.separator + ".PMCTemp";
+
+    /**
+     * 更新临时文件解压目录
+     */
+    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
+
+    /**
+     * 更新临时文件目录完整地址
+     */
+    public static final String PMCTempPath = tmpdir + PMCTemp;
+
+    /**
+     * 更新服务阿里云 uniCloud 地址
+     */
+    public static final String uniCloudCheckUpdateURL_aliyun = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/PMCUpdate";
+
+    /**
+     * 更新服务支付宝云 uniCloud 地址
+     */
+    public static final String uniCloudCheckUpdateURL_alipay = "https://env-00jxtp3qdq80.dev-hz.cloudbasefunction.cn/PMCUpdate";
+
+    /**
+     * 检测更新URL数组
+     */
+    public static final String[] urls = {
+            uniCloudCheckUpdateURL_aliyun,
+            uniCloudCheckUpdateURL_alipay
+    };
 
     /**
      * 百度网盘地址
@@ -429,6 +485,12 @@ public class CommonFinals {
      */
     public static final String defaultColor = "0xffffffff";
 
+    public static final String bat = ".bat";
+
+    public static final String sh = ".sh";
+
+    public static final String zip = ".zip";
+
     public static final String log = ".log";
 
     public static final String cfg = ".cfg";
@@ -591,6 +653,8 @@ public class CommonFinals {
 
     public static final String key_lastOpenDirectory = "lastOpenDirectory";
 
+    public static final String key_lastNotOverwrite = "lastNotOverwrite";
+
     public static final String key_lastTab = "lastTab";
 
     public static final String key_lastFullWindow = "lastFullWindow";
@@ -630,5 +694,7 @@ public class CommonFinals {
     public static final String key_language = "language";
 
     public static final String key_firstRun = "firstRun";
+
+    public static final String key_autoCheck = "autoCheck";
 
 }

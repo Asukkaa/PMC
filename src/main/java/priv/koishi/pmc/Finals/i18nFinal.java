@@ -66,6 +66,10 @@ public class i18nFinal {
         return bundle.getString("tip.openDirectory");
     }
 
+    public static String tip_notOverwrite() {
+        return bundle.getString("tip.notOverwrite");
+    }
+
     public static String tip_openLink() {
         return bundle.getString("tip.openLink");
     }
@@ -440,6 +444,10 @@ public class i18nFinal {
 
     public static String tip_notExistsIndex() {
         return bundle.getString("tip.notExistsIndex");
+    }
+
+    public static String tip_checkUpdate_Abt() {
+        return bundle.getString("tip.checkUpdate_Abt");
     }
 
     public static String tip_version() {
@@ -936,6 +944,22 @@ public class i18nFinal {
 
     public static String retryType_Step() {
         return bundle.getString("retryType.step");
+    }
+
+    public static String update_downloadFailed() {
+        return bundle.getString("update.downloadFailed");
+    }
+
+    public static String update_findNewVersion() {
+        return bundle.getString("update.findNewVersion");
+    }
+
+    public static String update_scriptNotFind() {
+        return bundle.getString("update.scriptNotFind");
+    }
+
+    public static String update_errCheck() {
+        return bundle.getString("update.errCheck");
     }
 
     /**

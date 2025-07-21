@@ -22,7 +22,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -36,6 +38,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Annotate.UsedByReflection;
+import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -57,6 +60,7 @@ import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -227,17 +231,17 @@ public class UiUtils {
     /**
      * 创建一个图片选择器（只支持png、jpg、jpeg格式）
      *
-     * @param window            文件选择器窗口
-     * @param stopImgSelectPath 默认路径
+     * @param window        文件选择器窗口
+     * @param imgSelectPath 默认路径
      * @return 选择的图片
      */
-    public static File creatImgChooser(Window window, String stopImgSelectPath) {
+    public static File creatImgChooser(Window window, String imgSelectPath) {
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
-        return creatFileChooser(window, stopImgSelectPath, extensionFilters, text_selectTemplateImg());
+        return creatFileChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
     }
 
     /**
@@ -284,20 +288,29 @@ public class UiUtils {
         logger.error(ex, ex);
         Alert alert = creatErrorAlert(errToString(ex));
         Throwable cause = ex.getCause();
-        if (cause != null) {
-            cause = cause.getCause();
-        }
-        if (cause != null) {
-            if (cause instanceof Exception) {
-                alert.setHeaderText(cause.getMessage());
-            } else {
-                alert.setHeaderText(ex.getMessage());
-            }
+        String message;
+        if (cause instanceof RuntimeException) {
+            message = cause.getMessage();
         } else {
-            alert.setHeaderText(ex.getMessage());
+            if (cause != null) {
+                cause = cause.getCause();
+            }
+            if (cause != null) {
+                if (cause instanceof Exception) {
+                    message = cause.getMessage();
+                } else {
+                    message = ex.getMessage();
+                }
+            } else {
+                message = ex.getMessage();
+            }
         }
+        if (message.length() > 200 && !message.contains("\n")) {
+            message = message.substring(0, 200) + " ...";
+        }
+        alert.setHeaderText(message);
         // 展示弹窗
-        alert.showAndWait();
+        Platform.runLater(alert::show);
     }
 
     /**
@@ -309,7 +322,8 @@ public class UiUtils {
     public static Alert creatErrorAlert(String errString) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(text_abnormal());
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        DialogPane dialogPane = alert.getDialogPane();
+        Stage stage = (Stage) dialogPane.getScene().getWindow();
         setWindowLogo(stage, logoPath);
         // 创建展示异常信息的TextArea
         TextArea textArea = new TextArea();
@@ -318,10 +332,10 @@ public class UiUtils {
         textArea.setText(errString);
         // 创建VBox并添加TextArea
         VBox details = new VBox();
-        details.heightProperty().addListener((observable, oldValue, newValue)
-                -> Platform.runLater(() -> textArea.setPrefHeight(details.getHeight())));
+        VBox.setVgrow(textArea, Priority.ALWAYS);
+        textArea.setMaxHeight(Double.MAX_VALUE);
         details.getChildren().add(textArea);
-        alert.getDialogPane().setExpandableContent(details);
+        dialogPane.setExpandableContent(details);
         return alert;
     }
 
@@ -569,6 +583,7 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
+                setTextFill(Color.BLACK);
                 if (empty) {
                     setText(null);
                     setGraphic(null);
@@ -682,7 +697,8 @@ public class UiUtils {
      */
     public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit, boolean selected) {
         ObservableList<T> tableViewItems = tableView.getItems();
-        List<T> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
+        List<T> selectedItem = selectionModel.getSelectedItems();
         switch (addType) {
             // 在列表所选行第一行上方插入
             case upAdd: {
@@ -694,7 +710,7 @@ public class UiUtils {
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                    selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
                 }
                 break;
             }
@@ -708,7 +724,7 @@ public class UiUtils {
                 tableView.scrollTo(selectedIndex);
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(selectedIndex, selectedIndex + data.size());
+                    selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
                 }
                 break;
             }
@@ -720,7 +736,7 @@ public class UiUtils {
                 tableView.scrollTo(0);
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(0, data.size());
+                    selectionModel.selectRange(0, data.size());
                 }
                 break;
             }
@@ -733,7 +749,7 @@ public class UiUtils {
                 tableView.scrollTo(tableViewItems.size());
                 // 选中新插入的数据
                 if (selected) {
-                    tableView.getSelectionModel().selectRange(lastIndex, lastIndex + data.size());
+                    selectionModel.selectRange(lastIndex, lastIndex + data.size());
                 }
                 break;
             }
@@ -1397,9 +1413,20 @@ public class UiUtils {
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
         deleteDataMenuItem.setOnAction(event -> {
-            List<T> ts = tableView.getSelectionModel().getSelectedItems();
+            TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
+            // 要删除的选中项
+            ObservableList<T> selectedItems = selectionModel.getSelectedItems();
             ObservableList<T> items = tableView.getItems();
-            items.removeAll(ts);
+            // 获取首个选中行的索引
+            int selectedIndex = items.indexOf(selectedItems.getFirst());
+            items.removeAll(selectedItems);
+            if (selectedIndex > 0) {
+                // 选中删除项的上一行
+                tableView.getSelectionModel().clearSelection();
+                tableView.getSelectionModel().select(selectedIndex - 1);
+                // 滚动到插入位置
+                tableView.scrollTo(selectedIndex - 1);
+            }
             updateTableViewSizeText(tableView, label, unit);
         });
         contextMenu.getItems().add(deleteDataMenuItem);
@@ -1993,6 +2020,36 @@ public class UiUtils {
         choiceBox.getItems().clear();
         values.forEach((key, value) -> choiceBox.getItems().add(value));
         choiceBox.setValue(defaultValue);
+    }
+
+    /**
+     * 显示更新提示框
+     *
+     * @param updateInfo 更新信息
+     * @return 用户选择的按钮类型
+     */
+    public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(bundle.getString("update.checkUpdate_Abt"));
+        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion());
+        // 创建包含更新信息的文本区域
+        TextArea textArea = new TextArea(updateInfo.getWhatsNew());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(textArea, 0, 0);
+        alert.getDialogPane().setContent(expContent);
+        ButtonType updateButton = new ButtonType(bundle.getString("update.updateButton"));
+        ButtonType laterButton = new ButtonType(bundle.getString("update.laterButton"),
+                ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(updateButton, laterButton);
+        // 设置窗口图标
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        setWindowLogo(stage, logoPath);
+        return alert.showAndWait();
     }
 
 }

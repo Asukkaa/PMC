@@ -7,14 +7,17 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 
 /**
  * 文件操作工具类
@@ -300,6 +303,17 @@ public class FileUtils {
     }
 
     /**
+     * 获取应用根目录
+     *
+     * @return 应用根目录路径(win为应用名目录，mac为应用程序目录)
+     */
+    public static String getAppRootPath() {
+        String appPath = getAppPath();
+        File appFile = new File(appPath);
+        return appFile.getParent();
+    }
+
+    /**
      * 获取文件不带拓展名的名称或文件夹的名称
      *
      * @param file 要获取文件名的文件
@@ -555,6 +569,127 @@ public class FileUtils {
             }
         }
         return cfgPath;
+    }
+
+    /**
+     * 解压zip
+     *
+     * @param zipFilePath   zip文件路径
+     * @param destDirectory 输出目录
+     */
+    public static void unzip(String zipFilePath, String destDirectory) throws IOException {
+        File destDir = new File(destDirectory);
+        // 如果目标目录存在，则先删除
+        if (destDir.exists()) {
+            deleteDirectory(destDir);
+        }
+        // 创建目标目录
+        try {
+            Files.createDirectories(destDir.toPath());
+        } catch (IOException e) {
+            throw new IOException(bundle.getString("update.creatDirErr") + destDirectory, e);
+        }
+        try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
+            ZipEntry entry;
+            while ((entry = zipIn.getNextEntry()) != null) {
+                String entryName = entry.getName();
+                // 规范化路径并确保目录条目正确识别
+                if (entryName.contains("\\")) {
+                    // 统一使用 Unix 风格分隔符
+                    entryName = entryName.replace('\\', '/');
+                }
+                // 使用 File 构造路径，自动处理空格和分隔符
+                File file = new File(destDir, entryName);
+                // 检查是否是目录条目
+                if (entry.isDirectory() || entryName.endsWith("/")) {
+                    // 确保目录路径以分隔符结尾
+                    String dirPath = file.getPath();
+                    if (!dirPath.endsWith(File.separator)) {
+                        file = new File(dirPath + File.separator);
+                    }
+                    // 处理目录条目
+                    try {
+                        Files.createDirectories(file.toPath());
+                    } catch (IOException e) {
+                        throw new IOException(bundle.getString("update.creatDirErr") + file.getAbsolutePath(), e);
+                    }
+                } else {
+                    // 确保父目录存在
+                    File parent = file.getParentFile();
+                    if (parent != null) {
+                        try {
+                            Files.createDirectories(parent.toPath());
+                        } catch (IOException e) {
+                            throw new IOException(bundle.getString("update.creatFatherDirErr") + parent.getAbsolutePath(), e);
+                        }
+                    }
+                    // 处理文件条目
+                    extractFile(zipIn, file);
+                }
+                zipIn.closeEntry();
+            }
+        }
+    }
+
+    /**
+     * 递归删除目录
+     *
+     * @param dir 要删除的目录
+     * @throws IOException 无法删除文件或目录
+     */
+    private static void deleteDirectory(File dir) throws IOException {
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteDirectory(file);
+                }
+            }
+        }
+        if (!dir.delete()) {
+            throw new IOException(bundle.getString("update.deleteErr") + dir.getAbsolutePath());
+        }
+    }
+
+    /**
+     * 处理zip内的文件条目
+     *
+     * @param zipIn zip输入流
+     * @param file  zip内的文件
+     * @throws IOException io异常
+     */
+    private static void extractFile(ZipInputStream zipIn, File file) throws IOException {
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
+            byte[] bytesIn = new byte[4096];
+            int read;
+            while ((read = zipIn.read(bytesIn)) != -1) {
+                bos.write(bytesIn, 0, read);
+            }
+        }
+    }
+
+    /**
+     * 递归删除目录
+     *
+     * @param path 要删除的目录
+     * @throws IOException 删除目录时发生IO异常
+     */
+    public static void deleteDirectoryRecursively(Path path) throws IOException {
+        if (Files.exists(path)) {
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }
     }
 
 }

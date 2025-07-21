@@ -16,6 +16,8 @@ module priv.koishi.pmc {
     requires org.bytedeco.opencv;
     requires com.sun.jna;
     requires jdk.localedata;
+    requires jdk.httpserver;
+    requires java.net.http;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;
@@ -33,4 +35,5 @@ module priv.koishi.pmc {
     opens priv.koishi.pmc.Bean.VO to javafx.fxml;
     exports priv.koishi.pmc.Serializer to com.fasterxml.jackson.databind;
     exports priv.koishi.pmc.Queue;
+    exports priv.koishi.pmc.ProgressDialog;
 }

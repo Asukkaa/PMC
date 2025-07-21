@@ -1,0 +1,7 @@
+{
+  "name": "pmc-test",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

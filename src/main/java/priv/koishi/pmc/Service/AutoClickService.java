@@ -88,7 +88,7 @@ public class AutoClickService {
                     dynamicQueue.setMaxSize(maxLogNum);
                 }
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
-                int loopTime = taskBean.getLoopTime();
+                int loopTime = taskBean.getLoopTimes();
                 if (loopTime == 0) {
                     int i = 0;
                     while (!isCancelled()) {
@@ -291,7 +291,7 @@ public class AutoClickService {
                     }
                     if (matchThreshold >= stopMatchThreshold) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
-                        throw new Exception(text_index() + clickPositionVO.getIndex() + bundle.getString("taskStop") +
+                        throw new RuntimeException(text_index() + clickPositionVO.getIndex() + bundle.getString("taskStop") +
                                 bundle.getString("findStopImg") + fileName.get() +
                                 bundle.getString("matchThreshold") + matchThreshold + percentage +
                                 "\n" + text_point() + " X：" + x + " Y：" + y);
@@ -373,7 +373,7 @@ public class AutoClickService {
                 } else if (retryType_stop().equals(retryType)) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     try {
-                        throw new Exception(text_index() + clickPositionVO.getIndex() + bundle.getString("taskErr") +
+                        throw new RuntimeException(text_index() + clickPositionVO.getIndex() + bundle.getString("taskErr") +
                                 bundle.getString("maxRetry") + clickPositionVO.getClickRetryTimes() + " " + bundle.getString("unit.times") +
                                 bundle.getString("notFound") + fileName.get() +
                                 bundle.getString("closestMatchThreshold") + matchPointBean.getMatchThreshold() + percentage +

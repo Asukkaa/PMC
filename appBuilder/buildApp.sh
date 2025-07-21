@@ -18,6 +18,10 @@ appMainClass="priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 runtimeImage="app"
 language="zh_CN"
 
+# 关闭正在运行的程序
+echo "强制关闭正在运行的 $appName..."
+pkill -9 -f "$appName" && echo "已强制终止 $appName" || echo "未检测到 $appName 运行进程"
+
 # 从 Java 文件提取版本号
 src="$script_dir/../src"
 javaFile="$src/main/java/priv/koishi/pmc/Finals/CommonFinals.java"

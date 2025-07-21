@@ -22,7 +22,7 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     /**
      * 自动点击任务循环次数
      */
-    int loopTime;
+    int loopTimes;
 
     /**
      * 执行自动流程前点击第一个起始坐标

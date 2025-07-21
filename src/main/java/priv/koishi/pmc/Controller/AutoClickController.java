@@ -342,7 +342,7 @@ public class AutoClickController extends RootController implements MousePosition
             err_Click;
 
     @FXML
-    public CheckBox openDirectory_Click;
+    public CheckBox openDirectory_Click, notOverwrite_Click;
 
     @FXML
     public Button clearButton_Click, runClick_Click, addPosition_Click, loadAutoClick_Click,
@@ -397,6 +397,8 @@ public class AutoClickController extends RootController implements MousePosition
             prop.put(key_lastOutFileName, outFileName_Click.getText());
             String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? activation : unActivation;
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
+            String lastNotOverwriteValue = notOverwrite_Click.isSelected() ? activation : unActivation;
+            prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
             prop.put(key_lastPreparationRecordTime, preparationRecordTime_Click.getText());
             prop.put(key_lastPreparationRunTime, preparationRunTime_Click.getText());
             String outPathValue = outPath_Click.getText();
@@ -422,7 +424,10 @@ public class AutoClickController extends RootController implements MousePosition
             List<?> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                String path = notOverwritePath(outPath + File.separator + autoSaveFileName() + PMC);
+                String path = outPath + File.separator + autoSaveFileName() + PMC;
+                if (notOverwrite_Click.isSelected()) {
+                    path = notOverwritePath(path);
+                }
                 // 构建基类类型信息
                 JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
                 // 使用基类类型进行序列化
@@ -443,6 +448,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
+            setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultOutFileName());
             setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRunTime);
@@ -702,9 +708,10 @@ public class AutoClickController extends RootController implements MousePosition
      * 启动自动操作流程
      *
      * @param clickPositionVOS 自动操作流程
+     * @param loopTimes 循环次数
      * @throws IOException io异常
      */
-    private void launchClickTask(List<ClickPositionVO> clickPositionVOS) throws IOException {
+    private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
         if (isFree()) {
             // 标记为正在运行自动操作
             runClicking = true;
@@ -723,7 +730,6 @@ public class AutoClickController extends RootController implements MousePosition
             CheckBox waitLog = settingController.waitLog_Set;
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
-                    .setLoopTime(setDefaultIntValue(loopTime_Click, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
                     .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
                     .setClickImgLog(clickImgLog.isSelected())
@@ -735,11 +741,12 @@ public class AutoClickController extends RootController implements MousePosition
                     .setWaitLog(waitLog.isSelected())
                     .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
+                    .setLoopTimes(loopTimes)
                     .setProgressBar(progressBar_Click)
                     .setBindingMassageLabel(false)
                     .setDisableNodes(disableNodes)
-                    .setMassageLabel(log_Click)
-                    .setBeanList(clickPositionVOS);
+                    .setBeanList(clickPositionVOS)
+                    .setMassageLabel(log_Click);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
@@ -785,12 +792,10 @@ public class AutoClickController extends RootController implements MousePosition
                     runTimeline.stop();
                     runTimeline = null;
                 }
-                // 获取抛出的异常
                 Throwable ex = autoClickTask.getException();
                 autoClickTask = null;
                 runClicking = false;
                 clearReferences();
-                taskUnbind(taskBean);
                 throw new RuntimeException(ex);
             });
             autoClickTask.setOnCancelled(event -> {
@@ -807,7 +812,6 @@ public class AutoClickController extends RootController implements MousePosition
                 runTimeline = null;
                 runClicking = false;
                 clearReferences();
-                taskUnbind(taskBean);
             });
             if (runTimeline == null) {
                 // 获取准备时间值
@@ -971,7 +975,7 @@ public class AutoClickController extends RootController implements MousePosition
             List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
                 try {
-                    launchClickTask(selectedItem);
+                    launchClickTask(selectedItem, 1);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -1109,6 +1113,7 @@ public class AutoClickController extends RootController implements MousePosition
         addToolTip(tip_recordClick(), recordClick_Click);
         addToolTip(tip_outAutoClickPath(), addOutPath_Click);
         addToolTip(tip_openDirectory(), openDirectory_Click);
+        addToolTip(tip_notOverwrite(), notOverwrite_Click);
         addToolTip(tip_loadAutoClick(), loadAutoClick_Click);
         addToolTip(tip_exportAutoClick(), exportAutoClick_Click);
         addToolTip(tip_autoClickFileName() + defaultOutFileName(), outFileName_Click);
@@ -1795,10 +1800,10 @@ public class AutoClickController extends RootController implements MousePosition
     public void runClick() throws Exception {
         ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
-            throw new Exception(text_noAutoClickToRun());
+            throw new RuntimeException(text_noAutoClickToRun());
         }
         // 启动自动操作流程
-        launchClickTask(tableViewItems);
+        launchClickTask(tableViewItems, setDefaultIntValue(loopTime_Click, 1, 0, null));
     }
 
     /**
@@ -1853,15 +1858,18 @@ public class AutoClickController extends RootController implements MousePosition
         if (autoClickTask == null && !recordClicking) {
             List<ClickPositionBean> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isEmpty(tableViewItems)) {
-                throw new Exception(text_noAutoClickList());
+                throw new RuntimeException(text_noAutoClickList());
             }
             String outFilePath = outPath_Click.getText();
             if (StringUtils.isBlank(outFilePath)) {
-                throw new Exception(text_outPathNull());
+                throw new RuntimeException(text_outPathNull());
             }
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
             ObjectMapper objectMapper = new ObjectMapper();
-            String path = notOverwritePath(outFilePath + File.separator + fileName + PMC);
+            String path = outFilePath + File.separator + fileName + PMC;
+            if (notOverwrite_Click.isSelected()) {
+                path = notOverwritePath(path);
+            }
             // 构建基类类型信息
             JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
             // 使用基类类型进行序列化
