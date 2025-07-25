@@ -8,6 +8,7 @@ set "target_dir=%~2"
 set "exe_name=%~3"
 set "temp_dir=%~4"
 set "app_root_Path=%~5"
+set "app_pid=%~6"
 
 :: 检查管理员权限
 net session >nul 2>&1
@@ -24,7 +25,11 @@ if %errorlevel% == 0 (
 :AdminSuccess
 
 :: 结束JavaFX应用程序
-taskkill /f /im "%exe_name%" >nul 2>&1
+if defined app_pid (
+    taskkill /f /pid %app_pid% >nul 2>&1
+) else (
+    taskkill /f /im "%exe_name%" >nul 2>&1
+)
 
 :: 复制更新文件
 robocopy "%source_dir%" "%target_dir%" /E /IS /IT /R:3 /W:1 /NP

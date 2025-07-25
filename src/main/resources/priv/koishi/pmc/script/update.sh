@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # 终止应用
-pkill -9 -f '$APP_NAME' || true
+if [ -n "$APP_PID" ]; then
+    kill -9 "$APP_PID" 2>/dev/null || true
+else
+    pkill -9 -f '$APP_NAME' || true
+fi
 
 # 替换指定目录
 rm -rf "$LIB_DIR"
