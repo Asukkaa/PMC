@@ -1018,6 +1018,10 @@ public class i18nFinal {
         return bundle.getString("clickMatched.clickWhile");
     }
 
+    public static String update_downloadingUpdate() {
+        return bundle.getString("update.downloadingUpdate");
+    }
+
     /**
      * 要识别的图像识别匹配后逻辑下拉框选项
      */

@@ -2,14 +2,14 @@ package priv.koishi.pmc.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.scene.paint.Color;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.UniCloudResponse;
-import priv.koishi.pmc.ProgressDialog.ProgressDialog;
+import priv.koishi.pmc.CustomUI.ProgressDialog.ProgressDialog;
 
 import javax.net.ssl.SSLContext;
 import java.io.*;
@@ -24,9 +24,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static priv.koishi.pmc.Controller.MainController.aboutController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.Utils.CommonUtils.getProcessId;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
@@ -146,7 +148,13 @@ public class CheckUpdateService {
             @Override
             protected Void call() throws IOException, NoSuchAlgorithmException, KeyManagementException {
                 // 显示下载进度对话框
-                progressDialog.show(bundle.getString("update.downloading"), bundle.getString("update.downloadingUpdate"));
+                progressDialog.show(bundle.getString("update.downloading"),
+                        update_downloadingUpdate(),
+                        update_downloadingUpdate(),
+                        () -> {
+                            aboutController.cancelUpdate();
+                            progressDialog.close();
+                        });
                 // 创建temp文件夹
                 File tempDir = new File(PMCTempPath);
                 if (!tempDir.exists()) {
@@ -173,7 +181,8 @@ public class CheckUpdateService {
                     try (HttpClient client = HttpClient.newBuilder()
                             .sslContext(sslContext)
                             .build()) {
-                        String encodedLink = downloadLinks[attempt].replace(" ", "%20");
+                        String downloadLink = downloadLinks[attempt];
+                        String encodedLink = downloadLink.replace(" ", "%20");
                         logger.info("下载更新，请求体: {}", encodedLink);
                         HttpRequest request = HttpRequest.newBuilder()
                                 .uri(URI.create(encodedLink))
@@ -207,8 +216,12 @@ public class CheckUpdateService {
                                     downloadedBytes += bytesRead;
                                     if (contentLength > 0) {
                                         double progress = (double) downloadedBytes / contentLength;
-                                        Platform.runLater(() ->
-                                                progressDialog.updateProgress(progress, bundle.getString("update.installing")));
+                                        int progressPercentage = (int) (progress * 100);
+                                        String massage = update_downloadingUpdate() + " : " + progressPercentage + "%";
+                                        progressDialog.updateProgress(progress, massage);
+                                        // 支付宝云可能无法显示下载进度
+                                    } else if (updateInfo.getAlipayFileLink().equals(downloadLink)) {
+                                        progressDialog.updateMassage(bundle.getString("update.isDownloading"));
                                     }
                                 }
                                 // 如果任务被取消，删除临时文件夹
@@ -233,10 +246,13 @@ public class CheckUpdateService {
                     }
                 }
                 File finalTempFile = tempFile;
-                Platform.runLater(() -> {
-                    progressDialog.close();
-                    executeInstaller(finalTempFile, updateInfo.isFullUpdate());
-                });
+                // 更新下载进度对话框功能按钮
+                progressDialog.updateButton(bundle.getString("update.installing"),
+                        () -> {
+                            progressDialog.updateButtonColor(Color.valueOf("#007AFF"), Color.WHITE);
+                            progressDialog.close();
+                            executeInstaller(finalTempFile, updateInfo.isFullUpdate());
+                        });
                 return null;
             }
         };
@@ -269,10 +285,9 @@ public class CheckUpdateService {
      * 更新Mac端应用
      *
      * @param fullUpdate 是否为全量更新(true-全量更新 false-增量更新)
-     * @throws IOException          更新脚本未找到、无法设置脚本可执行权限、脚本不可执行、脚本执行失败
-     * @throws InterruptedException 脚本执行被中断
+     * @throws Exception 更新脚本未找到、无法设置脚本可执行权限、脚本不可执行、脚本执行失败、脚本执行被中断
      */
-    private static void updateMacApp(boolean fullUpdate) throws IOException, InterruptedException {
+    private static void updateMacApp(boolean fullUpdate) throws Exception {
         // 获取源目录
         String source = fullUpdate ? appName + app : "lib";
         String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + source;
@@ -280,6 +295,7 @@ public class CheckUpdateService {
         String targetDir = fullUpdate ? getAppRootPath() : javaHome;
         // 在系统临时目录创建脚本
         File updateScriptFile = File.createTempFile(updateScript, sh);
+        String pid = getProcessId();
         try (PrintWriter writer = new PrintWriter(updateScriptFile)) {
             // 从资源加载脚本
             try (InputStream is = CheckUpdateService.class.getResourceAsStream(resourcePath + "script/update.sh")) {
@@ -293,10 +309,13 @@ public class CheckUpdateService {
                                     .replace("$TARGET_DIR", targetDir)
                                     .replace("$SYS_USER_NAME", sysUerName)
                                     .replace("$TEMP_DIR", PMCTempPath)
-                                    .replace("$APP_PATH", getAppPath())));
+                                    .replace("$APP_PATH", getAppPath())
+                                    .replace("$APP_PID", pid)));
                 } else {
                     throw new IOException(update_scriptNotFind());
                 }
+            } catch (Exception e) {
+                throw new IOException(update_scriptNotFind(), e);
             }
         }
         // 设置权限
@@ -344,9 +363,9 @@ public class CheckUpdateService {
      * 更新win端应用
      *
      * @param fullUpdate 是否为全量更新(true-全量更新 false-增量更新)
-     * @throws IOException 找不到批处理脚本
+     * @throws Exception 找不到批处理脚本、获取进程PID异常
      */
-    private static void updateWinApp(boolean fullUpdate) throws IOException {
+    private static void updateWinApp(boolean fullUpdate) throws Exception {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped;
         // 获取目标目录
@@ -378,6 +397,7 @@ public class CheckUpdateService {
         command.add(appName + exe);
         command.add(PMCTempPath);
         command.add(getAppRootPath());
+        command.add(getProcessId());
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));
