@@ -166,4 +166,17 @@ public class CommonUtils {
         }
     }
 
+    /**
+     * 获取当前进程PID
+     *
+     * @return 当前进程PID字符串
+     * @throws Exception 获取PID时抛出的异常
+     */
+    public static String getProcessId() throws Exception {
+        Class<?> processHandleClass = Class.forName("java.lang.ProcessHandle");
+        Object currentProcessHandle = processHandleClass.getMethod("current").invoke(null);
+        Object pid = processHandleClass.getMethod("pid").invoke(currentProcessHandle);
+        return String.valueOf(pid);
+    }
+
 }
