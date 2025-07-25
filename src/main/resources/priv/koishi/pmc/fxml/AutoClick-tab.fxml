@@ -44,14 +44,14 @@
             <Label prefHeight="25" text="%autoClick.preparationRecordTime"/>
             <TextField fx:id="preparationRecordTime_Click" prefWidth="50"/>
             <Label prefHeight="25" text="%unit.s"/>
-            <Button fx:id="recordClick_Click" onAction="#recordClick" style="-fx-cursor: hand"
-                    text="%autoClick.recordClick_Click"/>
+            <Button fx:id="recordClick_Click" onAction="#recordClick" text="%autoClick.recordClick_Click"
+                    styleClass="cadetblue-button"/>
 
             <Label prefHeight="25" text="%autoClick.preparationRunTime"/>
             <TextField fx:id="preparationRunTime_Click" prefWidth="50"/>
             <Label prefHeight="25" text="%unit.s"/>
-            <Button fx:id="runClick_Click" onAction="#runClick" style="-fx-cursor: hand"
-                    text="%autoClick.runClick_Click"/>
+            <Button fx:id="runClick_Click" onAction="#runClick" text="%autoClick.runClick_Click"
+                    styleClass="cornflowerblue-button"/>
 
             <Label prefHeight="25" text="%autoClick.loopTime"/>
             <TextField fx:id="loopTime_Click" prefWidth="80"/>

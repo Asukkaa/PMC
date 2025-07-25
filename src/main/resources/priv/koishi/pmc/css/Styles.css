@@ -48,3 +48,23 @@
     -fx-border-radius: 0;
     -fx-background-insets: 0;
 }
+
+.cadetblue-button {
+    -fx-background-color: cadetblue;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.cadetblue-button:hover {
+    -fx-background-color: derive(cadetblue, 20%);
+}
+
+.cornflowerblue-button {
+    -fx-background-color: cornflowerblue;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.cornflowerblue-button:hover {
+    -fx-background-color: derive(cornflowerblue, 20%);
+}
