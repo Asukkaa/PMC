@@ -87,11 +87,17 @@ public class MainController extends RootController {
      */
     public void saveAllLastConfig() throws IOException {
         // 保存自动操作工具功能最后设置
-        autoClickController.saveLastConfig();
+        if (autoClickController != null) {
+            autoClickController.saveLastConfig();
+        }
         // 保存设置功能最后设置
-        settingController.saveLastConfig();
+        if (settingController != null) {
+            settingController.saveLastConfig();
+        }
         // 保存日志文件数量设置
-        aboutController.saveLastConfig();
+        if (aboutController != null) {
+            aboutController.saveLastConfig();
+        }
         // 保存关程序闭前页面状态设置
         saveLastConfig();
     }

@@ -27,6 +27,7 @@ import java.util.*;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
 import static priv.koishi.pmc.Finals.i18nFinal.languageMap;
 import static priv.koishi.pmc.Finals.i18nFinal.updateAllDynamicTexts;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
@@ -179,7 +180,9 @@ public class MainApplication extends Application {
         // 卸载全局输入监听钩子
         GlobalScreen.unregisterNativeHook();
         // 保存设置
-        mainController.saveAllLastConfig();
+        if (mainController != null) {
+            mainController.saveAllLastConfig();
+        }
         // 关闭Socket服务
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
