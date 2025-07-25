@@ -2,8 +2,8 @@ package priv.koishi.pmc.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.paint.Color;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -150,7 +150,7 @@ public class CheckUpdateService {
                 // 显示下载进度对话框
                 progressDialog.show(bundle.getString("update.downloading"),
                         update_downloadingUpdate(),
-                        update_downloadingUpdate(),
+                        confirm_cancel(),
                         () -> {
                             aboutController.cancelUpdate();
                             progressDialog.close();
@@ -221,7 +221,8 @@ public class CheckUpdateService {
                                         progressDialog.updateProgress(progress, massage);
                                         // 支付宝云可能无法显示下载进度
                                     } else if (updateInfo.getAlipayFileLink().equals(downloadLink)) {
-                                        progressDialog.updateMassage(bundle.getString("update.isDownloading"));
+                                        Platform.runLater(() ->
+                                                progressDialog.updateMassage(bundle.getString("update.isDownloading")));
                                     }
                                 }
                                 // 如果任务被取消，删除临时文件夹
@@ -246,10 +247,10 @@ public class CheckUpdateService {
                     }
                 }
                 File finalTempFile = tempFile;
-                // 更新下载进度对话框功能按钮
+                progressDialog.updateProgress(1, bundle.getString("update.waitInstall"));
+                // 更新下载进度对话框功能按钮点击事件
                 progressDialog.updateButton(bundle.getString("update.installing"),
                         () -> {
-                            progressDialog.updateButtonColor(Color.valueOf("#007AFF"), Color.WHITE);
                             progressDialog.close();
                             executeInstaller(finalTempFile, updateInfo.isFullUpdate());
                         });

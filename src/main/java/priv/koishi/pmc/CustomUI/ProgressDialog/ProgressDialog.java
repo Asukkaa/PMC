@@ -8,9 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -103,30 +101,6 @@ public class ProgressDialog {
     }
 
     /**
-     * 更新功能按钮颜色
-     *
-     * @param buttonColor 按钮颜色
-     * @param textColor   按钮文本颜色
-     */
-    public void updateButtonColor(Color buttonColor, Color textColor) {
-        Platform.runLater(() -> {
-            button.setTextFill(textColor);
-            // 计算悬停时的颜色（变亮20%）
-            Color hoverColor = buttonColor.deriveColor(0, 1, 1.2, 1);
-            button.setBackground(Background.fill(buttonColor));
-            button.hoverProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    // 鼠标悬停时设置高亮颜色
-                    button.setBackground(Background.fill(hoverColor));
-                } else {
-                    // 鼠标离开时恢复默认颜色
-                    button.setBackground(Background.fill(buttonColor));
-                }
-            });
-        });
-    }
-
-    /**
      * 更新进度
      *
      * @param progress 进度
@@ -145,7 +119,7 @@ public class ProgressDialog {
      * @param message 提示信息
      */
     public void updateMassage(String message) {
-        Platform.runLater(() -> messageLabel.setText(message));
+        messageLabel.setText(message);
     }
 
     /**
