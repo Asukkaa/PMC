@@ -20,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.ProgressDialog.ProgressDialog;
+import priv.koishi.pmc.CustomUI.ProgressDialog.ProgressDialog;
 
 import java.awt.*;
 import java.io.File;

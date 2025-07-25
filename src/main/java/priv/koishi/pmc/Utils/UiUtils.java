@@ -44,7 +44,7 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.VO.Indexable;
 import priv.koishi.pmc.MainApplication;
-import priv.koishi.pmc.MessageBubble.MessageBubble;
+import priv.koishi.pmc.CustomUI.MessageBubble.MessageBubble;
 
 import java.awt.*;
 import java.io.File;
