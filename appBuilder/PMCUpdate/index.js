@@ -53,13 +53,13 @@ exports.main = async (event) => {
     };
     // 支付宝云全量更新文件存储地址
     const alipayAppLinks = {
-        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-win.zip?expire_at=1751528320&er_sign=fe4ee486cf7a216941ee07cdb566b526',
-        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-mac.zip?expire_at=1751528341&er_sign=aec442f74edcafcf6b45169d27ca6f59'
+        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-win.zip?expire_at=1753435054&er_sign=37346409499ef6fa340b102c4517a413',
+        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/Perfect Mouse Control 3.1.0-mac.zip?expire_at=1753435070&er_sign=f90f90c60ee28b50cb55c4e72f6d268a'
     };
     // 支付宝云增量更新文件存储地址
     const alipayLibLinks = {
-        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/lib-3.1.0-win.zip?expire_at=1751528309&er_sign=7068873b5a7774f219f1ef782e269794',
-        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/lib-3.1.0-mac.zip?expire_at=1751528286&er_sign=05e9463e66b0a676b5ad40ca999fa963'
+        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/lib-3.1.0-win.zip?expire_at=1753435080&er_sign=e88ad16768bbe4ec74948b690bc1e64e',
+        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/lib-3.1.0-mac.zip?expire_at=1753435093&er_sign=5a3ab69631a2f575678de03cd65f8682'
     };
     let aliyunFileLink, alipayFileLink;
     if (fullUpdate) {
@@ -80,7 +80,7 @@ exports.main = async (event) => {
         // 构造响应对象
         const latestVersionInfo = {
             version: serverVersion,
-            buildDate: "2025.07.01",
+            buildDate: "2025.07.25",
             whatsNew: i18n[clientLang].whatsNew,
             aliyunFileLink: aliyunFileLink,
             alipayFileLink: alipayFileLink,
