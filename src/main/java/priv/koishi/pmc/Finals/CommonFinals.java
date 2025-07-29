@@ -33,6 +33,131 @@ public class CommonFinals {
     public static final String buildDate = "2025.07.29";
 
     /**
+     * 文件后缀名：bat
+     */
+    public static final String bat = ".bat";
+
+    /**
+     * 文件后缀名：sh
+     */
+    public static final String sh = ".sh";
+
+    /**
+     * 文件后缀名：zip
+     */
+    public static final String zip = ".zip";
+
+    /**
+     * 文件后缀名：log
+     */
+    public static final String log = ".log";
+
+    /**
+     * 文件后缀名：cfg
+     */
+    public static final String cfg = ".cfg";
+
+    /**
+     * 文件后缀名匹配符：pmc
+     */
+    public static final String allPMC = "*.pmc";
+
+    /**
+     * 文件后缀名：pmc
+     */
+    public static final String PMC = ".pmc";
+
+    /**
+     * 文件后缀名：exe
+     */
+    public static final String exe = ".exe";
+
+    /**
+     * 文件后缀名：app
+     */
+    public static final String app = ".app";
+
+    /**
+     * 文件后缀名：plist
+     */
+    public static final String plist = ".plist";
+
+    /**
+     * 文件后缀名：png
+     */
+    public static final String png = ".png";
+
+    /**
+     * 文件后缀名：jpg
+     */
+    public static final String jpg = ".jpg";
+
+    /**
+     * 文件后缀名：jpeg
+     */
+    public static final String jpeg = ".jpeg";
+
+    /**
+     * 图片格式后缀名列表
+     */
+    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
+
+    /**
+     * 文件后缀名匹配符：png
+     */
+    public static final String allPng = "*.png";
+
+    /**
+     * 文件后缀名匹配符：jpg
+     */
+    public static final String allJpg = "*.jpg";
+
+    /**
+     * 文件后缀名匹配符：jpeg
+     */
+    public static final String allJpeg = "*.jpeg";
+
+    /**
+     * 图片格式后缀名匹配符列表
+     */
+    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    /**
+     * 文件大小单位：Byte
+     */
+    public static final String Byte = "Byte";
+
+    /**
+     * 文件大小单位：KB
+     */
+    public static final String KB = "KB";
+
+    /**
+     * 文件大小单位：MB
+     */
+    public static final String MB = "MB";
+
+    /**
+     * 文件大小单位：GB
+     */
+    public static final String GB = "GB";
+
+    /**
+     * 文件大小单位：TB
+     */
+    public static final String TB = "TB";
+
+    /**
+     * 文件大小单位：G
+     */
+    public static final String G = "G";
+
+    /**
+     * 单位：百分号
+     */
+    public static final String percentage = " %";
+
+    /**
      * 程序logo
      */
     public static String logoPath = "icon/PMC.png";
@@ -58,6 +183,16 @@ public class CommonFinals {
     public static String packagePath = "/bin/";
 
     /**
+     * log文件夹名称
+     */
+    public static final String logs = "logs";
+
+    /**
+     * log文件夹目录
+     */
+    public static final String logsDir = packagePath + logs;
+
+    /**
      * log4j配置文件名称
      */
     public static String log4j2 = "log4j2.xml";
@@ -71,16 +206,6 @@ public class CommonFinals {
      * 读取自动操作工具功能配置文件路径
      */
     public static final String configFile_Click = "config/autoClickConfig.properties";
-
-    /**
-     * log文件夹名称
-     */
-    public static final String logs = "logs";
-
-    /**
-     * log文件夹目录
-     */
-    public static final String logsDir = packagePath + logs;
 
     /**
      * 更新脚本名称
@@ -118,19 +243,54 @@ public class CommonFinals {
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * java home目录（win为runtime目录，mac为../runtime/Contents/Home）
-     */
-    public static final String javaHome = System.getProperty("java.home");
-
-    /**
      * idea中程序运行目录
      */
     public static final String userDir = System.getProperty("user.dir");
 
     /**
+     * java home目录（win为runtime目录，mac为../runtime/Contents/Home）
+     */
+    public static final String javaHome = System.getProperty("java.home");
+
+    /**
      * 程序核心目录（win为根目录，mac为../runtime/Contents）
      */
     public static final String rootDir = new File(javaHome).getParent();
+
+    /**
+     * 程序启动路径(win-exe 文件路径，mac-app 文件路径)
+     */
+    public static final String appLaunchPath = getAppLaunchPath();
+
+    /**
+     * 获取应用根目录(win为应用名目录，mac为应用程序目录)
+     */
+    public static final String appRootPath = new File(appLaunchPath).getParent();
+
+    /**
+     * cfg文件路径
+     */
+    public static final String cfgFilePath = getCFGPath();
+
+    /**
+     * jvm最大内存设置参数
+     */
+    public static final String Xmx = "-Xmx";
+
+    /**
+     * gc类型设置参数
+     */
+    public static final String XX = "-XX:+Use";
+
+    /**
+     * jvm参数
+     */
+    public static final List<String> jvmArgs = Arrays.asList(Xmx, XX);
+
+    /**
+     * cfg文件jvm参数头
+     */
+    public static final String javaOptions = "java-options=";
 
     /**
      * app目录
@@ -178,24 +338,14 @@ public class CommonFinals {
     public static final String PMCTemp = File.separator + ".PMCTemp";
 
     /**
-     * 更新临时文件解压目录
-     */
-    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
-
-    /**
      * 更新临时文件目录完整地址
      */
     public static final String PMCTempPath = tmpdir + PMCTemp;
 
     /**
-     * 程序启动路径(win-exe 文件路径，mac-app 文件路径)
+     * 更新临时文件解压目录
      */
-    public static final String appLaunchPath = getAppLaunchPath();
-
-    /**
-     * 获取应用根目录(win为应用名目录，mac为应用程序目录)
-     */
-    public static final String appRootPath = getAppRootPath();
+    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
 
     /**
      * 更新服务阿里云 uniCloud 地址
@@ -239,31 +389,6 @@ public class CommonFinals {
      * gitee地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
-
-    /**
-     * jvm最大内存设置参数
-     */
-    public static final String Xmx = "-Xmx";
-
-    /**
-     * gc类型设置参数
-     */
-    public static final String XX = "-XX:+Use";
-
-    /**
-     * jvm参数
-     */
-    public static final List<String> jvmArgs = Arrays.asList(Xmx, XX);
-
-    /**
-     * cfg文件jvm参数头
-     */
-    public static final String javaOptions = "java-options=";
-
-    /**
-     * cfg文件路径
-     */
-    public static final String cfgFilePath = getCFGPath();
 
     /**
      * 存在的文件路径颜色
@@ -494,56 +619,6 @@ public class CommonFinals {
      * 颜色选择器默认选中颜色
      */
     public static final String defaultColor = "0xffffffff";
-
-    public static final String bat = ".bat";
-
-    public static final String sh = ".sh";
-
-    public static final String zip = ".zip";
-
-    public static final String log = ".log";
-
-    public static final String cfg = ".cfg";
-
-    public static final String allPMC = "*.pmc";
-
-    public static final String PMC = ".pmc";
-
-    public static final String exe = ".exe";
-
-    public static final String app = ".app";
-
-    public static final String Byte = "Byte";
-
-    public static final String KB = "KB";
-
-    public static final String MB = "MB";
-
-    public static final String GB = "GB";
-
-    public static final String TB = "TB";
-
-    public static final String G = "G";
-
-    public static final String allPng = "*.png";
-
-    public static final String allJpg = "*.jpg";
-
-    public static final String allJpeg = "*.jpeg";
-
-    public static final String png = ".png";
-
-    public static final String jpg = ".jpg";
-
-    public static final String jpeg = ".jpeg";
-
-    public static final String plist = ".plist";
-
-    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
-
-    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
-
-    public static final String percentage = " %";
 
     public static final String key_logsNum = "logsNum";
 

@@ -29,7 +29,8 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.CommonUtils.getProcessId;
-import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.FileUtils.deleteDirectoryRecursively;
+import static priv.koishi.pmc.Utils.FileUtils.unzip;
 
 /**
  * 检查更新服务类
@@ -369,7 +370,7 @@ public class CheckUpdateService {
         // 获取源目录
         String sourceDir = PMCTempPath + PMCUpdateUnzipped;
         // 获取目标目录
-        String targetDir = fullUpdate ? getAppRootPath() : javaHome;
+        String targetDir = fullUpdate ? appRootPath : javaHome;
         // 创建临时批处理文件
         File batFile = File.createTempFile(updateScript, bat);
         try (PrintWriter writer = new PrintWriter(batFile)) {
@@ -396,7 +397,7 @@ public class CheckUpdateService {
         command.add(targetDir);
         command.add(appName + exe);
         command.add(PMCTempPath);
-        command.add(getAppRootPath());
+        command.add(appRootPath);
         command.add(getProcessId());
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);

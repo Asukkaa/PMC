@@ -7,7 +7,10 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -291,7 +294,7 @@ public class FileUtils {
     /**
      * 获取程序启动路径
      *
-     * @return 不同操作系统下程序启动路径(win-exe 文件路径，mac-app 文件路径)
+     * @return 不同操作系统下程序启动路径(win - exe 文件路径 ， mac - app 文件路径)
      */
     public static String getAppLaunchPath() {
         if (isWin) {
@@ -300,15 +303,6 @@ public class FileUtils {
             return javaHome.substring(0, javaHome.indexOf(app) + app.length());
         }
         return javaHome;
-    }
-
-    /**
-     * 获取应用根目录
-     *
-     * @return 应用根目录路径(win为应用名目录，mac为应用程序目录)
-     */
-    public static String getAppRootPath() {
-        return new File(appLaunchPath).getParent();
     }
 
     /**
@@ -558,7 +552,7 @@ public class FileUtils {
         if (isRunningFromJar) {
             cfgPath = appName + cfg;
         } else {
-            String appPath = getAppLaunchPath();
+            String appPath = appLaunchPath;
             String cfgFileName = "/" + appName + cfg;
             if (isWin) {
                 cfgPath = new File(appPath).getParent() + appDirectory + cfgFileName;

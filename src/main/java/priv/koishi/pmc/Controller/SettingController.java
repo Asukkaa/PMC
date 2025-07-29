@@ -42,6 +42,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
@@ -670,7 +671,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void getJVMConfig() throws IOException {
         // 获取当前运行路径
-        setPathLabel(thisPath_Set, getAppLaunchPath());
+        setPathLabel(thisPath_Set, appLaunchPath);
         long maxMemory = Runtime.getRuntime().maxMemory();
         runningMemory_Set.setText(getUnitSize(maxMemory, false));
         OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
@@ -1127,9 +1128,9 @@ public class SettingController extends RootController implements MousePositionUp
         if (!isRunningFromJar) {
             ProcessBuilder processBuilder = null;
             if (isWin) {
-                processBuilder = new ProcessBuilder(getAppLaunchPath());
+                processBuilder = new ProcessBuilder(appLaunchPath);
             } else if (isMac) {
-                processBuilder = new ProcessBuilder("open", "-n", getAppLaunchPath());
+                processBuilder = new ProcessBuilder("open", "-n", appLaunchPath);
             }
             if (processBuilder != null) {
                 processBuilder.start();
