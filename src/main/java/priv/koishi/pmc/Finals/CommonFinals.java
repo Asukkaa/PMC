@@ -269,6 +269,21 @@ public class CommonFinals {
     public static final String appRootPath = new File(appLaunchPath).getParent();
 
     /**
+     * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
+     */
+    public static final boolean isRunningFromJar = isRunningFromJar();
+
+    /**
+     * app目录
+     */
+    public static final String appDirectory = "/app";
+
+    /**
+     * Contents目录
+     */
+    public static final String contentsDirectory = "/Contents";
+
+    /**
      * cfg文件路径
      */
     public static final String cfgFilePath = getCFGPath();
@@ -299,16 +314,6 @@ public class CommonFinals {
     public static final String javaOptions = "java-options=";
 
     /**
-     * app目录
-     */
-    public static final String appDirectory = "/app";
-
-    /**
-     * Contents目录
-     */
-    public static final String contentsDirectory = "/Contents";
-
-    /**
      * 桌面名称
      */
     public static final String desktop = "Desktop";
@@ -322,11 +327,6 @@ public class CommonFinals {
      * 文件选择器默认路径
      */
     public static final String defaultFileChooserPath = desktopPath;
-
-    /**
-     * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
-     */
-    public static final boolean isRunningFromJar = isRunningFromJar();
 
     /**
      * 操作系统当前用户名称
