@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
@@ -271,6 +272,11 @@ public class CommonFinals {
      * cfg文件路径
      */
     public static final String cfgFilePath = getCFGPath();
+
+    /**
+     * 当前GC类型
+     */
+    public static final String currentGCType = getCurrentGCType();
 
     /**
      * jvm最大内存设置参数

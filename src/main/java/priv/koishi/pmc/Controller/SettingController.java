@@ -45,7 +45,6 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
-import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -683,7 +682,7 @@ public class SettingController extends RootController implements MousePositionUp
         if (StringUtils.isNotBlank(xmxValue)) {
             nextRunMemory_Set.setText(xmxValue.substring(0, xmxValue.indexOf(G)));
         }
-        gcType_Set.setText(getCurrentGCType());
+        gcType_Set.setText(currentGCType);
         String gcType = jvm.get(XX);
         if (StringUtils.isNotBlank(gcType)) {
             nextGcType_Set.setValue(gcType);
