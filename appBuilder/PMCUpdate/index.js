@@ -26,12 +26,9 @@ exports.main = async (event) => {
     let fullUpdate = false;
     if (clientVersion) {
         try {
-            // 拆分版本号为数字数组
-            const client = clientVersion.split('.').map(Number);
-            const server = serverVersion.split('.').map(Number);
-            // 检查前两位版本号是否不同
-            if (client[0] !== server[0] || client[1] !== server[1]) {
-                fullUpdate = true;
+            // 只版本号相同时为增量更新
+            if (serverVersion === clientVersion) {
+                fullUpdate = false;
             }
         } catch (e) {
             // 版本号格式错误时按全量更新处理
