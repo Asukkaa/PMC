@@ -1,16 +1,22 @@
 module.exports = {
     "zh-CN": {
-        whatsNew: "版本3.1.0：\n1.新增自动更新功能\n2.调整部分 UI 布局\n3.修复了一些 bug",
+        whatsNew: `版本3.1.1:
+        1.修复在 macOS 下更新应用后可能无法正常立刻重启的问题
+        2.更新对话框将会显示新版本的发布时间`,
         invalidJson: "无效的JSON请求体",
         invalidOS: "无效的操作系统参数"
     },
     "zh-TW": {
-        whatsNew: "版本3.1.0:\n1.新增自動更新功能\n2.調整部分UI佈局\n3.修復了一些bug",
+        whatsNew: `版本3.1.1:
+        1.修復在macOS下更新應用後可能無法正常立刻重啓的問題
+        2.更新對話方塊將會顯示新版本的發佈時間`,
         invalidJson: "無效的JSON請求體",
         invalidOS: "無效的作業系統參數"
     },
     "en": {
-        whatsNew: "Version 3.1.0: \n1. Added automatic update function \n2. Adjusted some UI layouts \n3. Fixed some bugs",
+        whatsNew: `Version 3.1.1:
+        1.Fixed an issue where updating apps on macOS may not immediately restart properly
+        2.The update dialog box will display the release time of the new version`,
         invalidJson: "Invalid JSON request body",
         invalidOS: "Invalid OS parameter"
     }
