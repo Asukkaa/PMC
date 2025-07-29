@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
-import static priv.koishi.pmc.Utils.FileUtils.getAppPath;
+import static priv.koishi.pmc.Utils.FileUtils.getAppLaunchPath;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
@@ -410,7 +410,7 @@ public class ScheduledService {
      * @throws IOException 创建失败
      */
     private static void createWinLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
-        String exePath = getAppPath();
+        String exePath = getAppLaunchPath();
         String workingDir = Paths.get(exePath).getParent().toString();
         String PMCFilePath = timedTaskBean.getPath();
         LocalDateTime triggerTime = timedTaskBean.getDateTime();
@@ -529,7 +529,7 @@ public class ScheduledService {
                 "    <array>\n" +
                 "        <string>/usr/bin/open</string>\n" +
                 "        <string>-n</string>\n" +
-                "        <string>" + getAppPath() + "</string>\n" +
+                "        <string>" + getAppLaunchPath() + "</string>\n" +
                 "        <string>--args</string>\n" +
                 "        <string>--r " + PMCFilePath + "</string>\n" +
                 "    </array>\n" +

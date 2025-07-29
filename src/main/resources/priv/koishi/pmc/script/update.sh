@@ -8,16 +8,15 @@ else
 fi
 
 # 替换指定目录
-rm -rf "$LIB_DIR"
 cp -Rf "$SOURCE_DIR" "$TARGET_DIR"
 
 # 设置权限
-chown -R $SYS_USER_NAME:staff "$TARGET_DIR"
-xattr -d com.apple.quarantine "$TARGET_DIR"
-chmod -R 755 "$TARGET_DIR"
+chown -R $SYS_USER_NAME:staff "$APP_PATH"
+xattr -d com.apple.quarantine "$APP_PATH"
+chmod -R 755 "$APP_PATH"
 
 # 重新签名
-codesign --force --deep --sign - "$TARGET_DIR"
+codesign --force --deep --sign - "$APP_PATH"
 
 # 清理
 rm -rf "$TEMP_DIR"

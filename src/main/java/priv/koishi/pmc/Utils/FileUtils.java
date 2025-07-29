@@ -291,9 +291,9 @@ public class FileUtils {
     /**
      * 获取程序启动路径
      *
-     * @return 不同操作系统下程序启动路径
+     * @return 不同操作系统下程序启动路径(win-exe 文件路径，mac-app 文件路径)
      */
-    public static String getAppPath() {
+    public static String getAppLaunchPath() {
         if (isWin) {
             return rootDir + File.separator + appName + exe;
         } else if (isMac) {
@@ -308,9 +308,7 @@ public class FileUtils {
      * @return 应用根目录路径(win为应用名目录，mac为应用程序目录)
      */
     public static String getAppRootPath() {
-        String appPath = getAppPath();
-        File appFile = new File(appPath);
-        return appFile.getParent();
+        return new File(appLaunchPath).getParent();
     }
 
     /**
@@ -560,7 +558,7 @@ public class FileUtils {
         if (isRunningFromJar) {
             cfgPath = appName + cfg;
         } else {
-            String appPath = getAppPath();
+            String appPath = getAppLaunchPath();
             String cfgFileName = "/" + appName + cfg;
             if (isWin) {
                 cfgPath = new File(appPath).getParent() + appDirectory + cfgFileName;

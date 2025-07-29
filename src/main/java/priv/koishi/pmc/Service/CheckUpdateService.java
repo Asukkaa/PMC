@@ -293,7 +293,7 @@ public class CheckUpdateService {
         String source = fullUpdate ? appName + app : "lib";
         String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + source;
         // 获取目标目录
-        String targetDir = fullUpdate ? getAppRootPath() : javaHome;
+        String targetDir = fullUpdate ? appRootPath : javaHome;
         // 在系统临时目录创建脚本
         File updateScriptFile = File.createTempFile(updateScript, sh);
         String pid = getProcessId();
@@ -304,13 +304,12 @@ public class CheckUpdateService {
                     new BufferedReader(new InputStreamReader(is))
                             .lines()
                             .forEach(line -> writer.println(line
-                                    .replace("$LIB_DIR", javaHome + File.separator + "lib")
                                     .replace("$APP_NAME", appName)
                                     .replace("$SOURCE_DIR", sourceDir)
                                     .replace("$TARGET_DIR", targetDir)
                                     .replace("$SYS_USER_NAME", sysUerName)
                                     .replace("$TEMP_DIR", PMCTempPath)
-                                    .replace("$APP_PATH", getAppPath())
+                                    .replace("$APP_PATH", appLaunchPath)
                                     .replace("$APP_PID", pid)));
                 } else {
                     throw new IOException(update_scriptNotFind());

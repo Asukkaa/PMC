@@ -188,6 +188,16 @@ public class CommonFinals {
     public static final String PMCTempPath = tmpdir + PMCTemp;
 
     /**
+     * 程序启动路径(win-exe 文件路径，mac-app 文件路径)
+     */
+    public static final String appLaunchPath = getAppLaunchPath();
+
+    /**
+     * 获取应用根目录(win为应用名目录，mac为应用程序目录)
+     */
+    public static final String appRootPath = getAppRootPath();
+
+    /**
      * 更新服务阿里云 uniCloud 地址
      */
     public static final String uniCloudCheckUpdateURL_aliyun = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/PMCUpdate";
