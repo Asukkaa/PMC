@@ -43,8 +43,8 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.VO.Indexable;
-import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.CustomUI.MessageBubble.MessageBubble;
+import priv.koishi.pmc.MainApplication;
 
 import java.awt.*;
 import java.io.File;
@@ -2031,7 +2031,8 @@ public class UiUtils {
     public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(bundle.getString("update.checkUpdate_Abt"));
-        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion());
+        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        " +
+                bundle.getString("update.releaseDate") + updateInfo.getBuildDate());
         // 创建包含更新信息的文本区域
         TextArea textArea = new TextArea(updateInfo.getWhatsNew());
         textArea.setEditable(false);
