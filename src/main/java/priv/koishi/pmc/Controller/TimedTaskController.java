@@ -30,7 +30,8 @@ import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -216,10 +217,6 @@ public class TimedTaskController extends RootController {
             if (successHandler != null) {
                 successHandler.accept(result);
             }
-        });
-        task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, text_taskFailed());
-            throw new RuntimeException(task.getException());
         });
         Thread.ofVirtual()
                 .name("task-select-vThread")

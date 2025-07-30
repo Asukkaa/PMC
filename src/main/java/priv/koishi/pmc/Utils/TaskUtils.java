@@ -7,6 +7,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.paint.Color;
 import priv.koishi.pmc.Bean.TaskBean;
 
+import static priv.koishi.pmc.Finals.i18nFinal.text_taskFailed;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
 
@@ -44,6 +45,23 @@ public class TaskUtils {
             updateLabel(massageLabel, "");
             massageLabel.textProperty().bind(task.messageProperty());
         }
+        // 设置默认的异常处理
+        throwTaskException(task, taskBean);
+    }
+
+    /**
+     * 抛出task异常
+     *
+     * @param task     有异常的线程任务
+     * @param taskBean 线程任务所需参数
+     * @throws RuntimeException 线程的异常
+     */
+    public static void throwTaskException(Task<?> task, TaskBean<?> taskBean) {
+        task.setOnFailed(event -> {
+            taskNotSuccess(taskBean, text_taskFailed());
+            // 获取抛出的异常
+            throw new RuntimeException(task.getException());
+        });
     }
 
     /**

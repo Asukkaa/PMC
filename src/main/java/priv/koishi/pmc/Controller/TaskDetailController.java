@@ -39,7 +39,8 @@ import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeChangeListener;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -403,10 +404,6 @@ public class TaskDetailController extends RootController {
                 refreshCallback.run();
             }
         }));
-        task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, text_taskFailed());
-            throw new RuntimeException(task.getException());
-        });
         Thread.ofVirtual()
                 .name("task-save-vThread")
                 .start(task);
