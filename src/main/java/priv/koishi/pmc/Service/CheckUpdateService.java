@@ -120,7 +120,7 @@ public class CheckUpdateService {
                             return uniResponse.getData();
                         } else {
                             // 错误处理
-                            throw new IOException(update_errCheck());
+                            throw new IOException(update_checkFailed());
                         }
                     } catch (Exception e) {
                         // 判断是否需要重试
@@ -129,11 +129,11 @@ public class CheckUpdateService {
                         } else {
                             // 最终失败处理
                             logger.error("更新检查最终失败", e);
-                            throw new RuntimeException(update_errCheck(), e);
+                            throw new RuntimeException(update_checkFailed(), e);
                         }
                     }
                 }
-                throw new RuntimeException(update_errCheck());
+                throw new RuntimeException(update_checkFailed());
             }
         };
     }

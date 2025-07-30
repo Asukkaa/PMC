@@ -380,7 +380,7 @@ public class AboutController extends RootController {
             }
         });
         task.setOnFailed(event -> {
-            taskNotSuccess(taskBean, bundle.getString("update.checkFailed"));
+            taskNotSuccess(taskBean, update_checkFailed());
             //更新最后检查日期
             updateCheckDate(Color.RED);
             throw new RuntimeException(task.getException());

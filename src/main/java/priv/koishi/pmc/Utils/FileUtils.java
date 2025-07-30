@@ -20,7 +20,6 @@ import java.util.zip.ZipInputStream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
 
 /**
  * 文件操作工具类
@@ -579,7 +578,7 @@ public class FileUtils {
         try {
             Files.createDirectories(destDir.toPath());
         } catch (IOException e) {
-            throw new IOException(bundle.getString("update.creatDirErr") + destDirectory, e);
+            throw new IOException(update_creatDirErr() + destDirectory, e);
         }
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
             ZipEntry entry;
@@ -603,7 +602,7 @@ public class FileUtils {
                     try {
                         Files.createDirectories(file.toPath());
                     } catch (IOException e) {
-                        throw new IOException(bundle.getString("update.creatDirErr") + file.getAbsolutePath(), e);
+                        throw new IOException(update_creatDirErr() + file.getAbsolutePath(), e);
                     }
                 } else {
                     // 确保父目录存在
@@ -612,7 +611,7 @@ public class FileUtils {
                         try {
                             Files.createDirectories(parent.toPath());
                         } catch (IOException e) {
-                            throw new IOException(bundle.getString("update.creatFatherDirErr") + parent.getAbsolutePath(), e);
+                            throw new IOException(update_creatFatherDirErr() + parent.getAbsolutePath(), e);
                         }
                     }
                     // 处理文件条目
@@ -639,7 +638,7 @@ public class FileUtils {
             }
         }
         if (!dir.delete()) {
-            throw new IOException(bundle.getString("update.deleteErr") + dir.getAbsolutePath());
+            throw new IOException(update_deleteErr() + dir.getAbsolutePath());
         }
     }
 

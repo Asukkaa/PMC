@@ -958,8 +958,20 @@ public class i18nFinal {
         return bundle.getString("update.scriptNotFind");
     }
 
-    public static String update_errCheck() {
-        return bundle.getString("update.errCheck");
+    public static String update_checkFailed() {
+        return bundle.getString("update.checkFailed");
+    }
+
+    public static String update_creatDirErr() {
+        return bundle.getString("update.creatDirErr");
+    }
+
+    public static String update_creatFatherDirErr() {
+        return bundle.getString("update.creatFatherDirErr");
+    }
+
+    public static String update_deleteErr() {
+        return bundle.getString("update.deleteErr");
     }
 
     /**
