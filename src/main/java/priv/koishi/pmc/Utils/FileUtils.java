@@ -373,7 +373,7 @@ public class FileUtils {
      *
      * @param path 要判断的文件路径
      * @return 不会重名文件路径
-     * @throws IOException 路径不能为空
+     * @throws IOException 路径不能为空、文件不存在
      */
     public static String notOverwritePath(String path) throws IOException {
         if (StringUtils.isBlank(path)) {
