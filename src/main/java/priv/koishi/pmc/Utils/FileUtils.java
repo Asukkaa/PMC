@@ -551,12 +551,11 @@ public class FileUtils {
         if (isRunningFromJar) {
             cfgPath = appName + cfg;
         } else {
-            String appPath = appLaunchPath;
             String cfgFileName = "/" + appName + cfg;
             if (isWin) {
-                cfgPath = new File(appPath).getParent() + appDirectory + cfgFileName;
+                cfgPath = appRootPath + appDirectory + cfgFileName;
             } else {
-                cfgPath = appPath + contentsDirectory + appDirectory + cfgFileName;
+                cfgPath = appLaunchPath + contentsDirectory + appDirectory + cfgFileName;
             }
         }
         return cfgPath;
