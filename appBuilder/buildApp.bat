@@ -5,6 +5,7 @@ set "source=win"
 set "target=..\target"
 set "src=..\src"
 set "bin=%target%\app\bin"
+set "lib=%target%\app\lib"
 set "appIcon=..\appBuilder\PMC.ico"
 set "appName=Perfect Mouse Control"
 set "appMainClass=priv.koishi.pmc/priv.koishi.pmc.MainApplication"
@@ -52,11 +53,22 @@ jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image
 echo 已完成 jpackage 打包
 
 :: 生成压缩包后打开目录并选中生成的应用程序文件夹
-set "zipName=%appName% %appVersion%.zip"
+set "libZipName=lib-%appVersion%-win.zip"
+if exist "%lib%" (
+    :: 压缩打包生成的文件
+    echo 正在生成压缩包: %libZipName%
+    powershell -Command "Compress-Archive -Path '%lib%' -DestinationPath \"%target%\%libZipName%\" -Force"
+    echo 压缩完成
+) else (
+    echo 错误：生成的应用程序目录不存在
+)
+
+:: 生成压缩包后打开目录并选中生成的应用程序文件夹
+set "appZipName=%appName%-%appVersion%-win.zip"
 if exist "%appPath%" (
     :: 压缩打包生成的文件
-    echo 正在生成压缩包: %zipName%
-    powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath \"%target%\%zipName%\" -Force"
+    echo 正在生成压缩包: %appZipName%
+    powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath \"%target%\%appZipName%\" -Force"
     echo 压缩完成
     echo 正在打开目录: %appPath%
     :: 打开目录并选中生成的应用程序文件夹
