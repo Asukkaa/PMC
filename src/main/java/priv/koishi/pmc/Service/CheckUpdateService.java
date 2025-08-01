@@ -29,8 +29,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.CommonUtils.getProcessId;
-import static priv.koishi.pmc.Utils.FileUtils.deleteDirectoryRecursively;
-import static priv.koishi.pmc.Utils.FileUtils.unzip;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 
 /**
  * 检查更新服务类
@@ -179,14 +178,17 @@ public class CheckUpdateService {
                     SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
                     sslContext.init(null, null, null);
                     // 创建HttpClient，并设置SSLContext
+                    Path tempPath = Path.of(PMCTempPath);
                     try (HttpClient client = HttpClient.newBuilder()
                             .sslContext(sslContext)
+                            .followRedirects(HttpClient.Redirect.ALWAYS)
                             .build()) {
                         String downloadLink = downloadLinks[attempt];
                         String encodedLink = downloadLink.replace(" ", "%20");
                         logger.info("下载更新，请求体: {}", encodedLink);
                         HttpRequest request = HttpRequest.newBuilder()
                                 .uri(URI.create(encodedLink))
+                                .header("User-Agent", "Mozilla/5.0")
                                 .GET()
                                 .build();
                         // 发送请求并处理响应
@@ -218,18 +220,19 @@ public class CheckUpdateService {
                                     if (contentLength > 0) {
                                         double progress = (double) downloadedBytes / contentLength;
                                         int progressPercentage = (int) (progress * 100);
-                                        String massage = update_downloadingUpdate() + " : " + progressPercentage + "%";
+                                        String fileSize = getUnitSize(downloadedBytes) + " / " + getUnitSize(contentLength);
+                                        String massage = update_downloadingUpdate() + " : " + fileSize + " (" + progressPercentage + "%)";
                                         progressDialog.updateProgress(progress, massage);
                                         // 支付宝云可能无法显示下载进度
                                     } else if (updateInfo.getAlipayFileLink().equals(downloadLink)) {
-                                        Platform.runLater(() ->
-                                                progressDialog.updateMassage(bundle.getString("update.isDownloading")));
+                                        String fileSize = getUnitSize(downloadedBytes);
+                                        Platform.runLater(() -> progressDialog.updateMassage(update_downloadingUpdate() + " : " + fileSize));
                                     }
                                 }
                                 // 如果任务被取消，删除临时文件夹
                                 if (isCancelled()) {
                                     logger.info("任务被取消，删除临时文件夹： {}", PMCTempPath);
-                                    deleteDirectoryRecursively(Path.of(PMCTempPath));
+                                    deleteDirectoryRecursively(tempPath);
                                     break;
                                 }
                             }
@@ -238,9 +241,7 @@ public class CheckUpdateService {
                     } catch (Exception e) {
                         logger.error("下载尝试失败", e);
                         // 删除不完整的临时文件
-                        if (tempFile.exists()) {
-                            Files.deleteIfExists(tempFile.toPath());
-                        }
+                        deleteDirectoryRecursively(tempPath);
                         // 如果是最后一次尝试，抛出异常
                         if (attempt == downloadLinks.length - 1) {
                             throw new IOException(update_downloadFailed(), e);

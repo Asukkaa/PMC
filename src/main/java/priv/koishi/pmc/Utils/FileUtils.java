@@ -420,6 +420,16 @@ public class FileUtils {
     /**
      * 根据操作系统将数值转换为文件大小
      *
+     * @param size 没带单位的文件大小
+     * @return 带单位的文件大小
+     */
+    public static String getUnitSize(long size) {
+        return getUnitSize(size, true);
+    }
+
+    /**
+     * 根据操作系统将数值转换为文件大小
+     *
      * @param size          没带单位的文件大小
      * @param distinguishOS 区分操作系统文件大小单位进制，true区分，false不区分，macos文件大小为1000进制，内存大小为1024进制
      * @return 带单位的文件大小

@@ -77,7 +77,7 @@ exports.main = async (event) => {
         // 构造响应对象
         const latestVersionInfo = {
             version: serverVersion,
-            buildDate: "2025.07.30",
+            buildDate: "2025.08.01",
             whatsNew: i18n[clientLang].whatsNew,
             aliyunFileLink: aliyunFileLink,
             alipayFileLink: alipayFileLink,
