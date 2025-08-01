@@ -54,6 +54,10 @@ echo 已完成 jpackage 打包
 
 :: 生成压缩包后打开目录并选中生成的应用程序文件夹
 set "libZipName=lib-%appVersion%-win.zip"
+if exist "%target%\lib-*.zip" (
+    echo 正在清理旧的 lib zip 文件...
+    del /q "%target%\lib-*.zip"
+)
 if exist "%lib%" (
     :: 压缩打包生成的文件
     echo 正在生成压缩包: %libZipName%
@@ -65,6 +69,10 @@ if exist "%lib%" (
 
 :: 生成压缩包后打开目录并选中生成的应用程序文件夹
 set "appZipName=%appName%-%appVersion%-win.zip"
+if exist "%target%\%appName%-*.zip" (
+    echo 正在清理旧的应用程序 zip 文件...
+    del /q "%target%\%appName%-*.zip"
+)
 if exist "%appPath%" (
     :: 压缩打包生成的文件
     echo 正在生成压缩包: %appZipName%
