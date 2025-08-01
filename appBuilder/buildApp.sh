@@ -86,6 +86,30 @@ else
     exit 1
 fi
 
+# 创建更新需要的app压缩包
+appZipFile="$target/${appName}-${appVersion}-mac.zip"
+echo "正在创建 app zip 文件：$appZipFile"
+# 清理旧文件
+rm -f "$appZipFile" 2>/dev/null
+# 执行压缩（保留符号链接和权限）
+(cd "$target" && zip -r -y "$appZipFile" "$appFile") || {
+    echo "错误：app zip 压缩失败" >&2
+    exit 1
+}
+echo "成功生成 app zip 文件：$appZipFile"
+
+# 创建更新需要的lib压缩包
+libZipFile="$target/lib-${appVersion}-mac.zip"
+echo "正在创建 lib zip 文件：$libZipFile"
+# 清理旧文件
+rm -f "$libZipFile" 2>/dev/null
+# 执行压缩（保留符号链接和权限）
+(cd "$target/app" && zip -r -y "$libZipFile" "lib") || {
+    echo "错误：lib zip 压缩失败" >&2
+    exit 1
+}
+echo "成功生成 lib zip 文件：$libZipFile"
+
 dmgName="${appName} ${appVersion}"
 volumeName="${appName}"
 dmgTemp="${target}/${dmgName}-temp.dmg"
@@ -235,6 +259,6 @@ tell application "Finder"
     set targetFolder to (POSIX file "$target") as alias
     open targetFolder -- 打开目录
     delay 1 -- 等待目录加载
-    select {POSIX file "$appFullPath" as alias, POSIX file "$dmgFinal" as alias} -- 多选文件
+    select {POSIX file "$appFullPath" as alias, POSIX file "$dmgFinal" as alias, POSIX file "$appZipFile" as alias, POSIX file "$libZipFile" as alias} -- 多选文件
 end tell
 EOL
