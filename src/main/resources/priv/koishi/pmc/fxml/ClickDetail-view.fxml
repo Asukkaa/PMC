@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
             fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
@@ -42,12 +41,14 @@
 
                 <HBox styleClass="hBox-short">
                     <Label prefHeight="25" text="%clickDetail.clickKey_Det"/>
-                    <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" onAction="#clickKeyChange"/>
+                    <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" style="-fx-cursor: hand"
+                               onAction="#clickKeyChange"/>
                 </HBox>
 
                 <HBox styleClass="hBox-short">
                     <Label fx:id="clickTypeText_Det" prefHeight="25" text="%clickDetail.clickTypeText_Det"/>
-                    <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" onAction="#clickTypeChange"/>
+                    <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" style="-fx-cursor: hand"
+                               onAction="#clickTypeChange"/>
                 </HBox>
             </HBox>
 
@@ -130,7 +131,8 @@
                 <HBox prefWidth="550" spacing="10">
                     <HBox spacing="10">
                         <Label prefHeight="25" text="%clickDetail.matchedType_Det"/>
-                        <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="210" onAction="#matchedTypeChange"/>
+                        <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="210" style="-fx-cursor: hand"
+                                   onAction="#matchedTypeChange"/>
                     </HBox>
 
                     <HBox fx:id="matchedStepHBox_Det" spacing="10">
@@ -145,7 +147,8 @@
                 <HBox spacing="10">
                     <HBox spacing="10">
                         <Label prefHeight="25" text="%clickDetail.retryType_Det"/>
-                        <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210" onAction="#retryTypeChange"/>
+                        <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210" style="-fx-cursor: hand"
+                                   onAction="#retryTypeChange"/>
                     </HBox>
 
                     <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">

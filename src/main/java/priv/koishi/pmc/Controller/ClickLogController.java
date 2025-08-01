@@ -81,7 +81,7 @@ public class ClickLogController extends RootController {
         tableView_Log.setMaxWidth(tableWidth);
         tableView_Log.setPrefWidth(tableWidth);
         tableView_Log.setPrefHeight(stage.getHeight() * 0.8);
-        nodeRightAlignment(fileNumberHBox_Log, tableWidth, dataNumber_Log);
+        regionRightAlignment(fileNumberHBox_Log, tableWidth, dataNumber_Log);
     }
 
     /**

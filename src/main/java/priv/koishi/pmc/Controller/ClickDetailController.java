@@ -173,7 +173,7 @@ public class ClickDetailController extends RootController {
         tableView_Det.setMaxWidth(tableWidth);
         tableView_Det.setPrefWidth(tableWidth);
         tableView_Det.setPrefHeight(stage.getHeight() * 0.4);
-        nodeRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
+        regionRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
         nullLabel_Det.setPrefWidth(stage.getWidth() * 0.4);
     }
 

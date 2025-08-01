@@ -105,8 +105,6 @@ public class AboutController extends RootController {
         setControlLastConfig(logsNum_Abt, prop, key_logsNum);
         // 获取自动检查更新配置
         setControlLastConfig(autoCheck_Abt, prop, key_autoCheck);
-        title_Abt.setTextFill(Color.HOTPINK);
-        title_Abt.setText(appName);
         input.close();
     }
 
@@ -223,6 +221,8 @@ public class AboutController extends RootController {
      */
     @FXML
     private void initialize() throws IOException {
+        // 设置应用名称
+        title_Abt.setText(appName);
         // 设置版本号
         version_Abt.setText(version);
         // 添加右键菜单

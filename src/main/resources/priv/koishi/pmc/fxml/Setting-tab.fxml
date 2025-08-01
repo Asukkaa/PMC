@@ -41,7 +41,8 @@
 
         <HBox spacing="10">
             <Label prefHeight="25" text="%setting.language"/>
-            <ChoiceBox fx:id="language_Set" prefHeight="25" prefWidth="150" onAction="#languageAction"/>
+            <ChoiceBox fx:id="language_Set" prefHeight="25" prefWidth="150" style="-fx-cursor: hand"
+                       onAction="#languageAction"/>
         </HBox>
 
         <Separator/>
@@ -78,7 +79,8 @@
 
             <HBox spacing="5" prefWidth="350">
                 <Label prefHeight="25" text="%setting.nextGcType"/>
-                <ChoiceBox fx:id="nextGcType_Set" onAction="#nextGcTypeAction" prefHeight="25" prefWidth="150">
+                <ChoiceBox fx:id="nextGcType_Set" onAction="#nextGcTypeAction" style="-fx-cursor: hand"
+                           prefHeight="25" prefWidth="150">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
                             <String fx:value="G1GC"/>
@@ -208,7 +210,7 @@
             <CheckBox fx:id="imgLog_Set" onAction="#imgLog"
                       styleClass="checkBox-medium" text="%setting.imgLog_Set" selected="true"/>
 
-            <HBox  styleClass="hBox-medium">
+            <HBox styleClass="hBox-medium">
                 <Label prefHeight="25" text="%setting.maxLogNum"/>
                 <TextField fx:id="maxLogNum_Set" prefWidth="50"/>
                 <Label prefHeight="25" text="%unit.number"/>
@@ -328,8 +330,10 @@
 
         <VBox spacing="10">
             <HBox fx:id="fileNumberHBox_Set" spacing="10">
-                <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" style="-fx-cursor: hand" text="%setting.stopImgBtn_Set"/>
-                <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand" text="%listText.removeAll"/>
+                <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" style="-fx-cursor: hand"
+                        text="%setting.stopImgBtn_Set"/>
+                <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand"
+                        text="%listText.removeAll"/>
 
                 <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
             </HBox>

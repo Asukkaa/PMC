@@ -24,14 +24,16 @@
 
                 <HBox spacing="5">
                     <Label prefHeight="25" text="%taskDetail.repeatType"/>
-                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefHeight="25" prefWidth="100"/>
+                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" style="-fx-cursor: hand"
+                               prefHeight="25" prefWidth="100"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="5">
                 <Label prefHeight="25" text="%taskDetail.startDate"/>
                 <HBox spacing="10">
-                    <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false" promptText="%taskDetail.datePicker_TD"/>
+                    <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false"
+                                promptText="%taskDetail.datePicker_TD"/>
                     <Label prefHeight="25" text="%taskDetail.dateTip" textFill="red"/>
                 </HBox>
             </HBox>

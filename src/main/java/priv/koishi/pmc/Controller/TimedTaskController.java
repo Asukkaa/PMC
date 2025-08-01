@@ -99,8 +99,8 @@ public class TimedTaskController extends RootController {
         double tableWidth = mainStage.getWidth() * 0.95;
         tableView_Task.setMaxWidth(tableWidth);
         tableView_Task.setPrefWidth(tableWidth);
-        nodeRightAlignment(fileNumberHBox_Task, tableWidth, dataNumber_Task);
-        nodeRightAlignment(tipHBox_Task, tableWidth, tip_Task);
+        regionRightAlignment(fileNumberHBox_Task, tableWidth, dataNumber_Task);
+        regionRightAlignment(tipHBox_Task, tableWidth, tip_Task);
     }
 
     /**
@@ -288,6 +288,7 @@ public class TimedTaskController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_Task.getText(), tip_Task);
         addToolTip(tip_addTimedTask(), addTimedTask_Task);
         addToolTip(tip_getScheduleTask(), getScheduleTask_Task);
     }

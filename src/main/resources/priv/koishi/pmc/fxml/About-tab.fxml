@@ -16,7 +16,7 @@
 
             <VBox spacing="10">
                 <HBox>
-                    <Label prefHeight="20" fx:id="title_Abt"/>
+                    <Label prefHeight="20" fx:id="title_Abt" textFill="hotpink"/>
                     <Label prefHeight="20" text="%about.aboutLabel1"/>
                 </HBox>
 

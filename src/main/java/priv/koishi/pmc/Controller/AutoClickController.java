@@ -375,11 +375,11 @@ public class AutoClickController extends RootController implements MousePosition
         double tableWidth = mainStage.getWidth() * 0.95;
         tableView_Click.setMaxWidth(tableWidth);
         tableView_Click.setPrefWidth(tableWidth);
-        nodeRightAlignment(fileNumberHBox_Click, tableWidth, dataNumber_Click);
-        nodeRightAlignment(tipHBox_Click, tableWidth, tip_Click);
-        nodeRightAlignment(cancelTipHBox_Click, tableWidth, cancelTip_Click);
+        regionRightAlignment(fileNumberHBox_Click, tableWidth, dataNumber_Click);
+        regionRightAlignment(tipHBox_Click, tableWidth, tip_Click);
+        regionRightAlignment(cancelTipHBox_Click, tableWidth, cancelTip_Click);
         if (err_Click != null) {
-            nodeRightAlignment(logHBox_Click, tableWidth, err_Click);
+            regionRightAlignment(logHBox_Click, tableWidth, err_Click);
         }
     }
 
@@ -708,7 +708,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 启动自动操作流程
      *
      * @param clickPositionVOS 自动操作流程
-     * @param loopTimes 循环次数
+     * @param loopTimes        循环次数
      * @throws IOException io异常
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
@@ -1106,6 +1106,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_Click.getText(), tip_Click);
         addToolTip(tip_runClick(), runClick_Click);
         addToolTip(tip_loopTime(), loopTime_Click);
         addToolTip(tip_learButton(), clearButton_Click);

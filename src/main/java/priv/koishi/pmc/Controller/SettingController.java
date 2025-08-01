@@ -175,8 +175,8 @@ public class SettingController extends RootController implements MousePositionUp
         double tableWidth = mainStage.getWidth() * 0.9;
         tableView_Set.setMaxWidth(tableWidth);
         tableView_Set.setPrefWidth(tableWidth);
-        nodeRightAlignment(fileNumberHBox_Set, tableWidth, dataNumber_Set);
-        nodeRightAlignment(findImgSetting_Set, tableWidth, tip_Set);
+        regionRightAlignment(fileNumberHBox_Set, tableWidth, dataNumber_Set);
+        regionRightAlignment(findImgSetting_Set, tableWidth, tip_Set);
     }
 
     /**

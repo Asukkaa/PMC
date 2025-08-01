@@ -55,6 +55,14 @@
     -fx-cursor: hand;
 }
 
+.cadetblue-button:focused {
+    -fx-border-color: #039ED3;
+    -fx-border-width: 2px;
+    -fx-border-insets: -2px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
 .cadetblue-button:hover {
     -fx-background-color: derive(cadetblue, 20%);
 }
@@ -67,4 +75,12 @@
 
 .cornflowerblue-button:hover {
     -fx-background-color: derive(cornflowerblue, 20%);
+}
+
+.cornflowerblue-button:focused {
+    -fx-border-color: #039ED3;
+    -fx-border-width: 2px;
+    -fx-border-insets: -2px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
 }
