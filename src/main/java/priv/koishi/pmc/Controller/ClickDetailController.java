@@ -702,7 +702,7 @@ public class ClickDetailController extends RootController {
     @FXML
     private void addClickImgPath(ActionEvent actionEvent) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-        File selectedFile = creatImgChooser(window, clickImgSelectPath);
+        File selectedFile = creatImgFileChooser(window, clickImgSelectPath);
         if (selectedFile != null) {
             // 更新所选文件路径显示
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,

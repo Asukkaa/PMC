@@ -180,13 +180,12 @@ public class UiUtils {
     /**
      * 创建一个文件选择器
      *
-     * @param window           文件选择器窗口
      * @param path             文件选择器初始路径
      * @param extensionFilters 要过滤的文件格式
      * @param title            文件选择器标题
      * @return 文件选择器选择的文件
      */
-    public static File creatFileChooser(Window window, String path, List<FileChooser.ExtensionFilter> extensionFilters, String title) {
+    public static FileChooser creatFileChooser(String path, List<FileChooser.ExtensionFilter> extensionFilters, String title) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
         // 设置初始目录
@@ -202,7 +201,35 @@ public class UiUtils {
         if (CollectionUtils.isNotEmpty(extensionFilters)) {
             fileChooser.getExtensionFilters().addAll(extensionFilters);
         }
+        return fileChooser;
+    }
+
+    /**
+     * 创建一个单文件选择器
+     *
+     * @param window           文件选择器窗口
+     * @param path             文件选择器初始路径
+     * @param extensionFilters 要过滤的文件格式
+     * @param title            文件选择器标题
+     * @return 文件选择器选择的文件
+     */
+    public static File creatFileChooser(Window window, String path, List<FileChooser.ExtensionFilter> extensionFilters, String title) {
+        FileChooser fileChooser = creatFileChooser(path, extensionFilters, title);
         return fileChooser.showOpenDialog(window);
+    }
+
+    /**
+     * 创建一个多文件选择器
+     *
+     * @param window           文件选择器窗口
+     * @param path             文件选择器初始路径
+     * @param extensionFilters 要过滤的文件格式
+     * @param title            文件选择器标题
+     * @return 文件选择器选择的文件
+     */
+    public static List<File> creatFilesChooser(Window window, String path, List<FileChooser.ExtensionFilter> extensionFilters, String title) {
+        FileChooser fileChooser = creatFileChooser(path, extensionFilters, title);
+        return fileChooser.showOpenMultipleDialog(window);
     }
 
     /**
@@ -226,13 +253,29 @@ public class UiUtils {
     }
 
     /**
-     * 创建一个图片选择器（只支持png、jpg、jpeg格式）
+     * 创建一个多图片选择器（只支持png、jpg、jpeg格式）
      *
      * @param window        文件选择器窗口
      * @param imgSelectPath 默认路径
      * @return 选择的图片
      */
-    public static File creatImgChooser(Window window, String imgSelectPath) {
+    public static List<File> creatImgFilesChooser(Window window, String imgSelectPath) {
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+        extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
+        extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
+        return creatFilesChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
+    }
+
+    /**
+     * 创建一个单图片选择器（只支持png、jpg、jpeg格式）
+     *
+     * @param window        文件选择器窗口
+     * @param imgSelectPath 默认路径
+     * @return 选择的图片
+     */
+    public static File creatImgFileChooser(Window window, String imgSelectPath) {
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
@@ -1329,7 +1372,7 @@ public class UiUtils {
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ImgFileVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
-                File file = creatImgChooser(window, selectedItem.getPath());
+                File file = creatImgFileChooser(window, selectedItem.getPath());
                 if (file != null) {
                     List<ImgFileVO> allImg = tableView.getItems();
                     List<ImgFileVO> checkList = new ArrayList<>(allImg);
@@ -1375,7 +1418,7 @@ public class UiUtils {
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ClickPositionVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
-                File file = creatImgChooser(window, selectedItem.getClickImgPath());
+                File file = creatImgFileChooser(window, selectedItem.getClickImgPath());
                 if (file != null) {
                     selectedItem.setClickImgPath(file.getAbsolutePath());
                     selectedItem.updateThumb();
@@ -1854,23 +1897,27 @@ public class UiUtils {
      * @return 选择的文件路径
      * @throws IOException io异常
      */
-    public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileVO> tableView, Label dataNumber, String stopImgSelectPath) throws IOException {
+    public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileVO> tableView, Label dataNumber,
+                                         String stopImgSelectPath) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-        File selectedFile = creatImgChooser(window, stopImgSelectPath);
-        if (selectedFile != null) {
+        List<File> imgFiles = creatImgFilesChooser(window, stopImgSelectPath);
+        if (CollectionUtils.isNotEmpty(imgFiles)) {
+            File selectedFile = imgFiles.getFirst();
             // 更新所选文件路径显示
             stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
             ObservableList<ImgFileVO> items = tableView.getItems();
-            boolean isExist = items.stream().anyMatch(bean -> selectedFile.getPath().equals(bean.getPath()));
-            ImgFileVO imgFileVO = new ImgFileVO();
-            if (!isExist) {
-                imgFileVO.setTableView(tableView)
-                        .setType(getExistsFileType(selectedFile))
-                        .setName(selectedFile.getName())
-                        .setPath(selectedFile.getPath());
-                items.add(imgFileVO);
-            } else {
-                new MessageBubble(text_imgExist(), 2);
+            for (File img : imgFiles) {
+                boolean isExist = items.stream().anyMatch(bean -> img.getPath().equals(bean.getPath()));
+                ImgFileVO imgFileVO = new ImgFileVO();
+                if (!isExist) {
+                    imgFileVO.setTableView(tableView)
+                            .setType(getExistsFileType(img))
+                            .setName(img.getName())
+                            .setPath(img.getPath());
+                    items.add(imgFileVO);
+                } else {
+                    new MessageBubble(text_imgExist(), 2);
+                }
             }
             tableView.refresh();
             updateTableViewSizeText(tableView, dataNumber, text_img());

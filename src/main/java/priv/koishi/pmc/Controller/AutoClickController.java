@@ -1841,11 +1841,13 @@ public class AutoClickController extends RootController implements MousePosition
             FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-            File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
-            if (selectedFile != null) {
-                inFilePath = selectedFile.getPath();
+            List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
+            if (CollectionUtils.isNotEmpty(selectedFile)) {
+                inFilePath = selectedFile.getFirst().getPath();
                 updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
-                loadPMCFile(inFilePath);
+                for (File file : selectedFile) {
+                    loadPMCFile(file.getPath());
+                }
             }
         }
     }
