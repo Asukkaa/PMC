@@ -7,7 +7,6 @@ import javafx.scene.control.TableView;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -20,11 +19,6 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class TaskBean<T> {
-
-    /**
-     * 要处理的文件夹文件
-     */
-    List<File> inFileList;
 
     /**
      * 要处理的数据
@@ -59,6 +53,6 @@ public class TaskBean<T> {
     /**
      * 是否绑定线程信息栏（true 绑定，false 不绑定）
      */
-    boolean bindingMassageLabel;
+    boolean bindingMassageLabel = true;
 
 }

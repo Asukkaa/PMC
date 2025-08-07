@@ -73,6 +73,11 @@ public class TaskDetailController extends RootController {
     private boolean isEdit;
 
     /**
+     * 页面标识符
+     */
+    private static final String tabId = "_TD";
+
+    /**
      * 详情页页面舞台
      */
     private Stage stage;
@@ -405,7 +410,7 @@ public class TaskDetailController extends RootController {
             }
         }));
         Thread.ofVirtual()
-                .name("task-save-vThread")
+                .name("task-save-vThread" + tabId)
                 .start(task);
     }
 

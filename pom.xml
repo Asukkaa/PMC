@@ -6,13 +6,13 @@
 
     <groupId>priv.Koishi</groupId>
     <artifactId>PMC</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <name>PMC</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.38</lombok.version>
-        <javafx.version>21.0.7</javafx.version>
+        <javafx.version>21.0.8</javafx.version>
     </properties>
 
     <dependencies>

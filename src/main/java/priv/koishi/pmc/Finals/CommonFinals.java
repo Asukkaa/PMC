@@ -26,7 +26,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.1.1";
+    public static final String version = "3.1.2";
 
     /**
      * 程序构建日期

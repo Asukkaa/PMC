@@ -101,6 +101,7 @@ public class TimedTaskController extends RootController {
         tableView_Task.setPrefWidth(tableWidth);
         regionRightAlignment(fileNumberHBox_Task, tableWidth, dataNumber_Task);
         regionRightAlignment(tipHBox_Task, tableWidth, tip_Task);
+        bindPrefWidthProperty();
     }
 
     /**
@@ -301,8 +302,6 @@ public class TimedTaskController extends RootController {
         // 设置要防重复点击的组件
         setDisableNodes();
         Platform.runLater(() -> {
-            // 设置javafx单元格宽度
-            bindPrefWidthProperty();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId, index_Task);
             // 设置列表通过拖拽排序行
@@ -312,6 +311,8 @@ public class TimedTaskController extends RootController {
             // 设置鼠标悬停提示
             setToolTip();
             try {
+                // 组件自适应宽高
+                adaption();
                 // 查询定时任务
                 getScheduleTask();
                 // 加载默认设置

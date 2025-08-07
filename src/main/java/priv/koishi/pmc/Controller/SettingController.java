@@ -177,6 +177,18 @@ public class SettingController extends RootController implements MousePositionUp
         tableView_Set.setPrefWidth(tableWidth);
         regionRightAlignment(fileNumberHBox_Set, tableWidth, dataNumber_Set);
         regionRightAlignment(findImgSetting_Set, tableWidth, tip_Set);
+        bindPrefWidthProperty();
+    }
+
+    /**
+     * 设置javafx单元格宽度
+     */
+    private void bindPrefWidthProperty() {
+        index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.05));
+        thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
+        name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.25));
+        path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.4));
+        type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
     }
 
     /**
@@ -653,17 +665,6 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 设置javafx单元格宽度
-     */
-    private void bindPrefWidthProperty() {
-        index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.05));
-        thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
-        name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.25));
-        path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.4));
-        type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
-    }
-
-    /**
      * 获取JVM设置并展示
      *
      * @throws IOException io异常
@@ -752,8 +753,6 @@ public class SettingController extends RootController implements MousePositionUp
         getJVMConfig();
         // 读取配置文件
         getConfig();
-        // 设置javafx单元格宽度
-        bindPrefWidthProperty();
         // 设置鼠标悬停提示
         setToolTip();
         // 设置文本输入框提示
@@ -767,6 +766,8 @@ public class SettingController extends RootController implements MousePositionUp
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
+            // 组件自适应宽高
+            adaption();
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件

@@ -82,20 +82,7 @@ public class ClickLogController extends RootController {
         tableView_Log.setPrefWidth(tableWidth);
         tableView_Log.setPrefHeight(stage.getHeight() * 0.8);
         regionRightAlignment(fileNumberHBox_Log, tableWidth, dataNumber_Log);
-    }
-
-    /**
-     * 初始化数据
-     *
-     * @param logs 操作记录
-     */
-    public void initData(List<ClickLogBean> logs) {
-        clickLogs = logs;
-        if (CollectionUtils.isNotEmpty(logs)) {
-            tableView_Log.getItems().addAll(logs);
-            updateTableViewSizeText(tableView_Log, dataNumber_Log, text_log());
-            tableView_Log.refresh();
-        }
+        bindPrefWidthProperty();
     }
 
     /**
@@ -114,14 +101,28 @@ public class ClickLogController extends RootController {
     }
 
     /**
+     * 初始化数据
+     *
+     * @param logs 操作记录
+     */
+    public void initData(List<ClickLogBean> logs) {
+        clickLogs = logs;
+        if (CollectionUtils.isNotEmpty(logs)) {
+            tableView_Log.getItems().addAll(logs);
+            updateTableViewSizeText(tableView_Log, dataNumber_Log, text_log());
+            tableView_Log.refresh();
+        }
+    }
+
+    /**
      * 页面初始化
      */
     @FXML
     private void initialize() {
-        // 设置javafx单元格宽度
-        bindPrefWidthProperty();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Log.getScene().getWindow();
+            // 组件宽高自适应
+            adaption();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Log, ClickLogBean.class, tabId, index_Log);
         });

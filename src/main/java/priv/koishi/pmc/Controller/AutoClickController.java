@@ -381,6 +381,23 @@ public class AutoClickController extends RootController implements MousePosition
         if (err_Click != null) {
             regionRightAlignment(logHBox_Click, tableWidth, err_Click);
         }
+        bindPrefWidthProperty();
+    }
+
+    /**
+     * 设置javafx单元格宽度
+     */
+    private void bindPrefWidthProperty() {
+        index_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.05));
+        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.13));
+        clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
+        clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
+        clickKey_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
+        waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
+        clickType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
+        matchedType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
+        retryType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
     }
 
     /**
@@ -528,22 +545,6 @@ public class AutoClickController extends RootController implements MousePosition
         randomWaitTime = randomWaitTimeCheckBox.isSelected() ? activation : unActivation;
         CheckBox randomClickIntervalCheckBox = settingController.randomClickInterval_Set;
         randomClickInterval = randomClickIntervalCheckBox.isSelected() ? activation : unActivation;
-    }
-
-    /**
-     * 设置javafx单元格宽度
-     */
-    private void bindPrefWidthProperty() {
-        index_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.05));
-        thumb_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        name_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.13));
-        clickTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
-        clickNum_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.07));
-        clickKey_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
-        waitTime_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.1));
-        clickType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.08));
-        matchedType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
-        retryType_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.16));
     }
 
     /**
@@ -1744,12 +1745,12 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     private void initialize() throws IOException {
-        // 设置javafx单元格宽度
-        bindPrefWidthProperty();
         // 读取配置文件
         getProperties();
         Platform.runLater(() -> {
             try {
+                // 组件自适应宽高
+                adaption();
                 // 初始化浮窗
                 initFloatingWindow();
                 // 设置鼠标悬停提示

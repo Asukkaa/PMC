@@ -175,6 +175,18 @@ public class ClickDetailController extends RootController {
         tableView_Det.setPrefHeight(stage.getHeight() * 0.4);
         regionRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
         nullLabel_Det.setPrefWidth(stage.getWidth() * 0.4);
+        bindPrefWidthProperty();
+    }
+
+    /**
+     * 设置javafx单元格宽度
+     */
+    private void bindPrefWidthProperty() {
+        index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.1));
+        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+        path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
+        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
     }
 
     /**
@@ -534,17 +546,6 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 设置javafx单元格宽度
-     */
-    private void bindPrefWidthProperty() {
-        index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.1));
-        thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
-        name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
-        path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
-        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
-    }
-
-    /**
      * 添加确认关闭确认框
      */
     private void addCloseConfirm() {
@@ -595,12 +596,12 @@ public class ClickDetailController extends RootController {
     private void initialize() throws IOException {
         // 初始化下拉框
         setChoiceBoxItems();
-        // 设置javafx单元格宽度
-        bindPrefWidthProperty();
         // 读取配置文件
         getConfig();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
+            // 组件宽高自适应
+            adaption();
             // 添加确认关闭确认框
             addCloseConfirm();
             // 添加控件监听
