@@ -260,11 +260,7 @@ public class UiUtils {
      * @return 选择的图片
      */
     public static List<File> creatImgFilesChooser(Window window, String imgSelectPath) {
-        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
-        extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
-        extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
-        extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
-        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
+        List<FileChooser.ExtensionFilter> extensionFilters = creatImgExtensionFilter();
         return creatFilesChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
     }
 
@@ -276,12 +272,22 @@ public class UiUtils {
      * @return 选择的图片
      */
     public static File creatImgFileChooser(Window window, String imgSelectPath) {
+        List<FileChooser.ExtensionFilter> extensionFilters = creatImgExtensionFilter();
+        return creatFileChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
+    }
+
+    /**
+     * 创建图片格式过滤器
+     *
+     * @return 图片格式过滤器
+     */
+    private static List<FileChooser.ExtensionFilter> creatImgExtensionFilter() {
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
         extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
-        return creatFileChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
+        return extensionFilters;
     }
 
     /**
