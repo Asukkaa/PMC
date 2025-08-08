@@ -1909,14 +1909,17 @@ public class AutoClickController extends RootController implements MousePosition
      * 拖拽释放行为
      *
      * @param dragEvent 拖拽事件
-     * @throws IOException 导入自动化流程文件内容格式不正确、导入文件缺少关键数据
      */
     @FXML
-    private void handleDrop(DragEvent dragEvent) throws IOException {
+    private void handleDrop(DragEvent dragEvent) {
         if (autoClickTask == null && !recordClicking) {
             List<File> files = dragEvent.getDragboard().getFiles();
             for (File file : files) {
-                loadPMCFile(file.getPath());
+                try {
+                    loadPMCFile(file.getPath());
+                } catch (IOException e) {
+                    showExceptionAlert(e);
+                }
             }
         }
     }
