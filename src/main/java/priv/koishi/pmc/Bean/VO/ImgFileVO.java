@@ -117,6 +117,17 @@ public class ImgFileVO extends ImgFileBean implements Indexable {
     }
 
     /**
+     * 清理资源
+     */
+    public void clearResources() {
+        if (currentThumbThread != null && currentThumbThread.isAlive()) {
+            currentThumbThread.interrupt();
+            currentThumbThread = null;
+        }
+        thumb = null;
+    }
+
+    /**
      * 为列表数据设置序号接口
      *
      * @param index 要设置的序号

@@ -122,6 +122,17 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
     }
 
     /**
+     * 清理资源
+     */
+    public void clearResources() {
+        if (currentThumbThread != null && currentThumbThread.isAlive()) {
+            currentThumbThread.interrupt();
+            currentThumbThread = null;
+        }
+        thumb = null;
+    }
+
+    /**
      * 更新缩略图
      */
     public void updateThumb() {

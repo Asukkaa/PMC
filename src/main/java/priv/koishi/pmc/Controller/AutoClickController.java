@@ -1814,7 +1814,7 @@ public class AutoClickController extends RootController implements MousePosition
     @FXML
     public void removeAll() {
         if (autoClickTask == null && !recordClicking) {
-            tableView_Click.getItems().stream().parallel().forEach(i -> i.setThumb(null));
+            tableView_Click.getItems().stream().parallel().forEach(ClickPositionVO::clearResources);
             removeTableViewData(tableView_Click, dataNumber_Click, log_Click);
         }
     }

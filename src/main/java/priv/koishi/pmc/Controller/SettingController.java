@@ -1168,7 +1168,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void removeAll() {
-        tableView_Set.getItems().stream().parallel().forEach(i -> i.setThumb(null));
+        tableView_Set.getItems().stream().parallel().forEach(ImgFileVO::clearResources);
         removeTableViewData(tableView_Set, dataNumber_Set, null);
     }
 
