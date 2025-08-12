@@ -549,10 +549,10 @@ public class ClickDetailController extends RootController {
      * 添加确认关闭确认框
      */
     private void addCloseConfirm() {
-        CheckBox remindSave = settingController.remindClickSave_Set;
         // 添加关闭请求监听
-        if (remindSave != null && remindSave.isSelected()) {
-            stage.setOnCloseRequest(e -> {
+        stage.setOnCloseRequest(e -> {
+            CheckBox remindSave = settingController.remindClickSave_Set;
+            if (remindSave != null && remindSave.isSelected()) {
                 if (isModified) {
                     ButtonType result = creatConfirmDialog(
                             confirm_unSaved(),
@@ -565,12 +565,12 @@ public class ClickDetailController extends RootController {
                         saveDetail();
                     } else {
                         // 直接关闭
-                        stage.close();
+                        closeStage();
                     }
                 }
-                removeAllListeners();
-            });
-        }
+            }
+            closeStage();
+        });
     }
 
     /**
@@ -585,6 +585,15 @@ public class ClickDetailController extends RootController {
         initializeChoiceBoxItems(clickKey_Det, mouseButton_primary(), mouseButtonList);
         // 图像识别匹配逻辑
         initializeChoiceBoxItems(matchedType_Det, clickMatched_click(), clickMatchedList);
+    }
+
+    /**
+     * 关闭页面
+     */
+    private void closeStage() {
+        removeAll();
+        removeAllListeners();
+        stage.close();
     }
 
     /**
@@ -674,7 +683,7 @@ public class ClickDetailController extends RootController {
             }
             selectedItem.setRetryStep(retryStep);
         }
-        stage.close();
+        closeStage();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();
@@ -687,7 +696,7 @@ public class ClickDetailController extends RootController {
     @FXML
     private void removeDetail() {
         selectedItem.setRemove(true);
-        stage.close();
+        closeStage();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();
@@ -757,6 +766,7 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void removeAll() {
+        tableView_Det.getItems().stream().parallel().forEach(i -> i.setThumb(null));
         removeTableViewData(tableView_Det, dataNumber_Det, null);
     }
 

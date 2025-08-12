@@ -5,8 +5,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -668,35 +666,6 @@ public class UiUtils {
                 return !new File(imgPath).exists();
             }
         });
-    }
-
-    /**
-     * 获取表格中的缩略图
-     *
-     * @param path 缩略图路径
-     * @return 表格中的缩略图对象
-     */
-    public static Service<Image> tableViewImageService(String path) {
-        return new Service<>() {
-            @Override
-            protected Task<Image> createTask() {
-                return new Task<>() {
-                    @Override
-                    protected Image call() {
-                        if (StringUtils.isNotBlank(path)) {
-                            return new Image("file:" + path,
-                                    200,
-                                    200,
-                                    true,
-                                    true,
-                                    true);
-                        } else {
-                            return null;
-                        }
-                    }
-                };
-            }
-        };
     }
 
     /**

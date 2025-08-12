@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Bean.VO;
 
 import javafx.application.Platform;
-import javafx.concurrent.Service;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import lombok.Data;
@@ -12,10 +11,8 @@ import priv.koishi.pmc.Annotate.UsedByReflection;
 import priv.koishi.pmc.Bean.ImgFileBean;
 
 import java.io.File;
-import java.io.IOException;
 
 import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
-import static priv.koishi.pmc.Utils.UiUtils.tableViewImageService;
 
 /**
  * 图片文件信息展示类
@@ -47,7 +44,7 @@ public class ImgFileVO extends ImgFileBean implements Indexable {
     /**
      * 加载缩略图线程
      */
-    private transient Service<Image> currentThumbService;
+    private transient Thread currentThumbThread;
 
     /**
      * 获取缩略图
@@ -70,24 +67,41 @@ public class ImgFileVO extends ImgFileBean implements Indexable {
      * 异步加载并更新缩略图
      */
     private void loadThumbnailAsync() {
-        // 文件不是图片时会实时刷新列表缩略图
         try {
-            if (isImgFile(new File(getPath()))) {
+            String path = getPath();
+            if (isImgFile(new File(path))) {
                 // 终止进行中的服务
-                if (currentThumbService != null && currentThumbService.isRunning()) {
-                    currentThumbService.cancel();
+                if (currentThumbThread != null && currentThumbThread.isAlive()) {
+                    currentThumbThread.interrupt();
                 }
-                currentThumbService = tableViewImageService(getPath());
-                currentThumbService.setOnSucceeded(e -> {
-                    thumb = currentThumbService.getValue();
-                    Platform.runLater(() -> tableView.refresh());
-                });
-                currentThumbService.start();
+                // 创建新的虚拟线程
+                currentThumbThread = Thread.ofVirtual()
+                        .name("thumbnail-loader-")
+                        .unstarted(() -> {
+                            try {
+                                if (StringUtils.isNotBlank(path)) {
+                                    Image image = new Image("file:" + path,
+                                            100,
+                                            100,
+                                            true,
+                                            true,
+                                            true);
+                                    Platform.runLater(() -> {
+                                        thumb = image;
+                                        tableView.refresh();
+                                    });
+                                }
+                            } catch (Exception e) {
+                                if (!Thread.currentThread().isInterrupted()) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                currentThumbThread.start();
             } else {
                 thumb = null;
-                Platform.runLater(() -> tableView.refresh());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
