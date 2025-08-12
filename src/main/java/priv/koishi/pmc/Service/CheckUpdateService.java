@@ -240,10 +240,10 @@ public class CheckUpdateService {
                         }
                     } catch (Exception e) {
                         logger.error("下载尝试失败", e);
-                        // 删除不完整的临时文件
-                        deleteDirectoryRecursively(tempPath);
                         // 如果是最后一次尝试，抛出异常
                         if (attempt == downloadLinks.length - 1) {
+                            // 删除不完整的临时文件
+                            deleteDirectoryRecursively(tempPath);
                             throw new IOException(update_downloadFailed(), e);
                         }
                     }
