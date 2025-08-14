@@ -403,6 +403,7 @@ public class TaskDetailController extends RootController {
             taskUnbind(taskBean);
             // 复制成功消息气泡
             new MessageBubble(text_successSave(), 2);
+            removeAllListeners();
             stage.close();
             // 触发列表刷新（通过回调）
             if (refreshCallback != null) {
@@ -425,6 +426,7 @@ public class TaskDetailController extends RootController {
         if (StringUtils.isNotBlank(taskName)) {
             deleteTask(taskName);
         }
+        removeAllListeners();
         stage.close();
         // 触发列表刷新（通过回调）
         if (isEdit && refreshCallback != null) {
