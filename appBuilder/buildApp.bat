@@ -52,37 +52,41 @@ if exist "%appName%" (
 jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%" --java-options "-XX:+UseZGC"
 echo 已完成 jpackage 打包
 
-:: 生成压缩包后打开目录并选中生成的应用程序文件夹
+:: 生成 lib zip
 set "libZipName=lib-%appVersion%-win.zip"
 if exist "%target%\lib-*.zip" (
     echo 正在清理旧的 lib zip 文件...
     del /q "%target%\lib-*.zip"
 )
 if exist "%lib%" (
-    :: 压缩打包生成的文件
-    echo 正在生成压缩包: %libZipName%
-    powershell -Command "Compress-Archive -Path '%lib%' -DestinationPath \"%target%\%libZipName%\" -Force"
-    echo 压缩完成
+    echo 正在生成 lib 压缩包: %libZipName%
+    start "" /B powershell -Command "Compress-Archive -Path '%lib%' -DestinationPath '%target%\%libZipName%' -Force; Set-Content -Path '%target%\lib.done' -Value 1"
 ) else (
-    echo 错误：生成的应用程序目录不存在
+    echo 错误：生成的 lib 目录不存在
 )
 
-:: 生成压缩包后打开目录并选中生成的应用程序文件夹
+:: 生成 app zip
 set "appZipName=%appName%-%appVersion%-win.zip"
 if exist "%target%\%appName%-*.zip" (
     echo 正在清理旧的应用程序 zip 文件...
     del /q "%target%\%appName%-*.zip"
 )
 if exist "%appPath%" (
-    :: 压缩打包生成的文件
-    echo 正在生成压缩包: %appZipName%
-    powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath \"%target%\%appZipName%\" -Force"
-    echo 压缩完成
-    echo 正在打开目录: %appPath%
-    :: 打开目录并选中生成的应用程序文件夹
-    explorer /select,"%appPath%"
+    echo 正在生成 app 压缩包: %appZipName%
+    start "" /B powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath '%target%\%appZipName%' -Force; Set-Content -Path '%target%\app.done' -Value 1"
 ) else (
     echo 错误：生成的应用程序目录不存在
 )
+
+:: 等待压缩完成
+echo 等待压缩任务完成...
+:WaitLoop
+if not exist "%target%\lib.done" goto :WaitLoop
+if not exist "%target%\app.done" goto :WaitLoop
+
+:: 清理标记文件并打开目录
+del "%target%\lib.done" "%target%\app.done"
+echo 压缩完成，正在打开目录: %appPath%
+explorer /select,"%appPath%"
 
 pause
