@@ -92,7 +92,7 @@ appZipFile="$target/${appName}-${appVersion}-mac.zip"
 create_app_zip() {
     echo "正在创建 app zip 文件：$appZipFile"
     # 清理旧文件
-    rm -f "$appZipFile" 2>/dev/null
+    rm -f "${target}/${appName}-"*.zip 2>/dev/null
     # 执行压缩（保留符号链接和权限）
     (cd "$target" && zip -r -y "$appZipFile" "$appFile") || {
         echo "错误：app zip 压缩失败" >&2
@@ -107,7 +107,7 @@ libZipFile="$target/lib-${appVersion}-mac.zip"
 create_lib_zip() {
     echo "正在创建 lib zip 文件：$libZipFile"
    # 清理旧文件
-    rm -f "$libZipFile" 2>/dev/null
+    rm -f "${target}/lib-"*.zip 2>/dev/null
     # 执行压缩（保留符号链接和权限）
     (cd "$target/app" && zip -r -y "$libZipFile" "lib") || {
         echo "错误：lib zip 压缩失败" >&2
@@ -133,11 +133,11 @@ create_dmg() {
 
     echo "正在检查旧 DMG 文件..."
     # 使用 find 命令检测是否存在匹配文件
-    if find "${target}" -maxdepth 1 -name "${dmgName}*.dmg" -o -name "${dmgName}-temp.dmg.sparseimage" | grep -q .; then
+    if find "${target}" -maxdepth 1 -name "${appName}*.dmg" -o -name "${appName}-temp.dmg.sparseimage" | grep -q .; then
         echo "发现存在的旧 DMG 文件，正在清理..."
-        rm -f "${target}/${dmgName}"*.dmg "${target}/${dmgName}-temp.dmg.sparseimage" >/dev/null 2>&1
-        if rm -f "${target}/${dmgName}"*.dmg "${target}/${dmgName}-temp.dmg.sparseimage" >/dev/null 2>&1; then
-            echo "已清理：以 [${dmgName}] 开头的 .dmg 和 .sparseimage 文件"
+        rm -f "${target}/${appName}"*.dmg "${target}/${appName}-temp.dmg.sparseimage" >/dev/null 2>&1
+        if rm -f "${target}/${appName}"*.dmg "${target}/${appName}-temp.dmg.sparseimage" >/dev/null 2>&1; then
+            echo "已清理：以 [${appName}] 开头的 .dmg 和 .sparseimage 文件"
         else
             echo "警告：清理旧文件时遇到问题" >&2
         fi
