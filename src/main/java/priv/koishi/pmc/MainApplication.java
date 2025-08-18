@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.Controller.MainController;
-import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.io.*;
 import java.net.BindException;
@@ -175,8 +174,6 @@ public class MainApplication extends Application {
      */
     @Override
     public void stop() throws Exception {
-        // 关闭线程池
-        ThreadPoolManager.shutdownAll();
         // 卸载全局输入监听钩子
         GlobalScreen.unregisterNativeHook();
         // 保存设置

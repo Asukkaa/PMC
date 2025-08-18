@@ -54,7 +54,6 @@ import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
-import priv.koishi.pmc.ThreadPool.ThreadPoolManager;
 
 import java.awt.*;
 import java.io.File;
@@ -65,7 +64,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -242,11 +240,6 @@ public class AutoClickController extends RootController implements MousePosition
      * 要防重复点击的组件
      */
     private static final List<Node> disableNodes = new ArrayList<>();
-
-    /**
-     * 线程池实例
-     */
-    private static final ExecutorService executorService = ThreadPoolManager.getPool(AutoClickController.class);
 
     /**
      * 自动点击任务
@@ -884,7 +877,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (preparationTimeValue == 0) {
             if (!autoClickTask.isRunning()) {
                 // 使用新线程启动
-                executorService.execute(autoClickTask);
+                new Thread(autoClickTask).start();
             }
             return runTimeline;
         }
@@ -903,7 +896,7 @@ public class AutoClickController extends RootController implements MousePosition
                 finalTimeline.stop();
                 if (!autoClickTask.isRunning()) {
                     // 使用新线程启动
-                    executorService.execute(autoClickTask);
+                    new Thread(autoClickTask).start();
                 }
             }
         }));
