@@ -15,7 +15,6 @@ import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -164,16 +163,12 @@ public class AutoClickService {
                                 bundle.getString("repeat") + clickNum + bundle.getString("interval") +
                                 interval + " " + text_ms();
                         if (StringUtils.isNotBlank(clickImgPath)) {
-                            try {
-                                text = loopTimeText +
-                                        text_progress() + progress + "/" + dataSize +
-                                        text_willBe() + waitTime + text_msWillBe() + name +
-                                        bundle.getString("picTarget") +
-                                        "\n" + getExistsFileName(new File(clickImgPath)) +
-                                        bundle.getString("afterMatch") + matchType;
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                            text = loopTimeText +
+                                    text_progress() + progress + "/" + dataSize +
+                                    text_willBe() + waitTime + text_msWillBe() + name +
+                                    bundle.getString("picTarget") +
+                                    "\n" + getExistsFileName(new File(clickImgPath)) +
+                                    bundle.getString("afterMatch") + matchType;
                         }
                         // 更新操作信息
                         updateMassage(text);
@@ -247,15 +242,10 @@ public class AutoClickService {
                 String stopPath = stopImgFileBean.getPath();
                 AtomicReference<String> fileName = new AtomicReference<>();
                 Platform.runLater(() -> {
-                    try {
-                        fileName.set(getExistsFileName(new File(stopPath)));
-                        String text = loopTimeText + bundle.getString("searchingStop") + fileName.get();
-                        // 更新操作信息
-                        updateMassage(text);
-                    } catch (IOException e) {
-                        clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
-                        throw new RuntimeException(e);
-                    }
+                    fileName.set(getExistsFileName(new File(stopPath)));
+                    String text = loopTimeText + bundle.getString("searchingStop") + fileName.get();
+                    // 更新操作信息
+                    updateMassage(text);
                 });
                 long start = System.currentTimeMillis();
                 FindPositionConfig findPositionConfig = new FindPositionConfig();
@@ -308,15 +298,10 @@ public class AutoClickService {
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
-                try {
-                    fileName.set(getExistsFileName(new File(clickPath)));
-                    String text = loopTimeText + bundle.getString("searchingClick") + fileName.get();
-                    // 更新操作信息
-                    updateMassage(text);
-                } catch (IOException e) {
-                    clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
-                    throw new RuntimeException(e);
-                }
+                fileName.set(getExistsFileName(new File(clickPath)));
+                String text = loopTimeText + bundle.getString("searchingClick") + fileName.get();
+                // 更新操作信息
+                updateMassage(text);
             });
             long start = System.currentTimeMillis();
             String retryType = clickPositionVO.getRetryType();

@@ -1365,12 +1365,8 @@ public class UiUtils {
                         }
                     } else {
                         selectedItem.setPath(file.getPath());
-                        try {
-                            selectedItem.setType(getExistsFileType(file));
-                            selectedItem.setName(getExistsFileName(file));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        selectedItem.setType(getExistsFileType(file));
+                        selectedItem.setName(getExistsFileName(file));
                     }
                     selectedItem.updateThumb();
                     updateTableViewSizeText(tableView, dataNumber, unit);
@@ -1560,9 +1556,8 @@ public class UiUtils {
      * @param prop       配置文件
      * @param key        要读取的key
      * @param dataNumber 列表数据数量
-     * @throws IOException 路径不能为空、路径格式不正确、文件不存在
      */
-    public static void setControlLastConfig(TableView<ImgFileVO> tableView, Properties prop, String key, Label dataNumber) throws IOException {
+    public static void setControlLastConfig(TableView<ImgFileVO> tableView, Properties prop, String key, Label dataNumber) {
         int index = 0;
         while (true) {
             String path = prop.getProperty(key + index);
@@ -1913,14 +1908,10 @@ public class UiUtils {
             boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
             if (!isExist) {
                 ImgFileVO imgFileVO = new ImgFileVO();
-                try {
-                    imgFileVO.setTableView(tableView)
-                            .setType(getExistsFileType(file))
-                            .setName(file.getName())
-                            .setPath(file.getPath());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                imgFileVO.setTableView(tableView)
+                        .setType(getExistsFileType(file))
+                        .setName(file.getName())
+                        .setPath(file.getPath());
                 items.add(imgFileVO);
             }
         });
@@ -1934,14 +1925,10 @@ public class UiUtils {
     public static void acceptDropImg(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         files.forEach(file -> {
-            try {
-                if (imageType.contains(getExistsFileType(file))) {
-                    // 接受拖放
-                    dragEvent.acceptTransferModes(TransferMode.COPY);
-                    dragEvent.consume();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (imageType.contains(getExistsFileType(file))) {
+                // 接受拖放
+                dragEvent.acceptTransferModes(TransferMode.COPY);
+                dragEvent.consume();
             }
         });
     }

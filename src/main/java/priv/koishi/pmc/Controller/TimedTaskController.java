@@ -155,20 +155,9 @@ public class TimedTaskController extends RootController {
             throw new RuntimeException(e);
         }
         TaskDetailController controller = loader.getController();
-        try {
-            controller.initData(item, isEdit);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // 设置保存后的回调
-        controller.setRefreshCallback(() -> {
-            try {
-                // 查询定时任务
-                getScheduleTask();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        controller.initData(item, isEdit);
+        // 查询定时任务
+        controller.setRefreshCallback(this::getScheduleTask);
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
@@ -276,11 +265,7 @@ public class TimedTaskController extends RootController {
                     throw new RuntimeException(e);
                 }
             });
-            try {
-                getScheduleTask();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            getScheduleTask();
         });
         contextMenu.getItems().add(deleteDataMenuItem);
     }
@@ -325,11 +310,9 @@ public class TimedTaskController extends RootController {
 
     /**
      * 查询定时任务
-     *
-     * @throws IOException 获取任务详情失败
      */
     @FXML
-    private void getScheduleTask() throws IOException {
+    private void getScheduleTask() {
         executeGetScheduleTask(null);
     }
 

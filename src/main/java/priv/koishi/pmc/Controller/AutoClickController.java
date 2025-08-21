@@ -1928,14 +1928,10 @@ public class AutoClickController extends RootController implements MousePosition
         if (autoClickTask == null && !recordClicking) {
             List<File> files = dragEvent.getDragboard().getFiles();
             files.forEach(file -> {
-                try {
-                    if (PMC.equals(getExistsFileType(file))) {
-                        // 接受拖放
-                        dragEvent.acceptTransferModes(TransferMode.COPY);
-                        dragEvent.consume();
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                if (PMC.equals(getExistsFileType(file))) {
+                    // 接受拖放
+                    dragEvent.acceptTransferModes(TransferMode.COPY);
+                    dragEvent.consume();
                 }
             });
         }

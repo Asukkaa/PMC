@@ -314,19 +314,19 @@ public class CheckUpdateService {
                                     .replace("$APP_PATH", appLaunchPath)
                                     .replace("$APP_PID", pid)));
                 } else {
-                    throw new IOException(update_scriptNotFind());
+                    throw new RuntimeException(update_scriptNotFind());
                 }
             } catch (Exception e) {
-                throw new IOException(update_scriptNotFind(), e);
+                throw new RuntimeException(update_scriptNotFind(), e);
             }
         }
         // 设置权限
         if (!updateScriptFile.setExecutable(true)) {
-            throw new IOException(bundle.getString("update.scriptNoPermission"));
+            throw new RuntimeException(bundle.getString("update.scriptNoPermission"));
         }
         // 验证权限
         if (!updateScriptFile.canExecute()) {
-            throw new IOException(bundle.getString("update.scriptCantRun") + updateScriptFile.getAbsolutePath());
+            throw new RuntimeException(bundle.getString("update.scriptCantRun") + updateScriptFile.getAbsolutePath());
         }
         // 构建执行命令
         String scriptCommand = String.format(
@@ -385,7 +385,7 @@ public class CheckUpdateService {
                         }
                     }
                 } else {
-                    throw new IOException(update_scriptNotFind());
+                    throw new RuntimeException(update_scriptNotFind());
                 }
             }
         }

@@ -120,9 +120,8 @@ public class ScheduledService {
              * 查询mac定时任务详情
              *
              * @param taskDetails 任务详情
-             * @throws IOException 获取任务详情失败
              */
-            private void getMacTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
+            private void getMacTaskDetails(List<? super TimedTaskBean> taskDetails) {
                 Path launchAgentsPath = Paths.get(userHome, "Library", "LaunchAgents");
                 if (Files.exists(launchAgentsPath)) {
                     // 遍历所有以 TASK_NAME 开头的 .plist 文件
@@ -143,7 +142,7 @@ public class ScheduledService {
                             }
                         }
                     } catch (IOException e) {
-                        throw new IOException(bundle.getString("searchLaunchAgentsErr") + launchAgentsPath, e);
+                        throw new RuntimeException(bundle.getString("searchLaunchAgentsErr") + launchAgentsPath, e);
                     }
                 }
             }
@@ -178,9 +177,8 @@ public class ScheduledService {
      * @param taskDetails 任务详情
      * @param exePattern  程序路径正则表达式
      * @param taskBlocks  任务文本块
-     * @throws IOException 解析失败
      */
-    private static void parseWinTaskContent(List<? super TimedTaskBean> taskDetails, Pattern exePattern, String taskBlocks) throws IOException {
+    private static void parseWinTaskContent(List<? super TimedTaskBean> taskDetails, Pattern exePattern, String taskBlocks) {
         // 只处理包含程序路径的任务块
         if (exePattern.matcher(taskBlocks).find()) {
             TimedTaskBean timedTaskBean = new TimedTaskBean();
@@ -446,7 +444,7 @@ public class ScheduledService {
         Process process = pb.start();
         String output = readProcessOutput(process);
         if (output.contains("Exception") || output.contains("错误")) {
-            throw new IOException(bundle.getString("creatTaskErr") + output);
+            throw new RuntimeException(bundle.getString("creatTaskErr") + output);
         }
     }
 

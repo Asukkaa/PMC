@@ -272,9 +272,8 @@ public class ClickDetailController extends RootController {
      * 展示要点击的图片
      *
      * @param clickImgPath 要点击的图片路径
-     * @throws IOException 文件不存在
      */
-    private void showClickImg(String clickImgPath) throws IOException {
+    private void showClickImg(String clickImgPath) {
         File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath);
         if (clickImgFile != null) {
             removeClickImg_Det.setVisible(true);
@@ -736,7 +735,7 @@ public class ClickDetailController extends RootController {
      * 删除要点击的图片
      */
     @FXML
-    public void removeClickImg() throws IOException {
+    public void removeClickImg() {
         showClickImg(null);
         clickType_Det.setDisable(false);
     }

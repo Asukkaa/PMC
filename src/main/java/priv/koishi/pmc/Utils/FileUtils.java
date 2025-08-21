@@ -40,20 +40,22 @@ public class FileUtils {
      *
      * @param file 文件
      * @return 文件类型
-     * @throws IOException 文件不存在
      */
-    public static String getExistsFileType(File file) throws IOException {
+    public static String getExistsFileType(File file) {
         if (!file.exists()) {
-            throw new IOException(text_fileNotExists());
+            throw new RuntimeException(text_fileNotExists());
         }
         if (file.isDirectory()) {
             return extension_folder();
         }
-        String filePath = file.getPath();
-        if (filePath.lastIndexOf(".") == -1) {
-            return extension_file();
+        String fileName = file.getName();
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex == -1 ||
+                lastDotIndex == 0 ||
+                lastDotIndex == fileName.length() - 1) {
+            return extension_fileOrFolder();
         }
-        return filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
+        return fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
     }
 
     /**
@@ -61,19 +63,23 @@ public class FileUtils {
      *
      * @param path 文件路径
      * @return 文件类型
-     * @throws IOException 路径不能为空、路径格式不正确
      */
-    public static String getFileType(String path) throws IOException {
+    public static String getFileType(String path) {
         if (StringUtils.isBlank(path)) {
-            throw new IOException(text_nullPath());
+            throw new RuntimeException(text_nullPath());
         }
         if (FilenameUtils.getPrefixLength(path) == -1) {
-            throw new IOException(text_errPathFormat());
+            throw new RuntimeException(text_errPathFormat());
         }
-        if (path.lastIndexOf(".") == -1) {
+        File file = new File(path);
+        String fileName = file.getName();
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex == -1 ||
+                lastDotIndex == 0 ||
+                lastDotIndex == fileName.length() - 1) {
             return extension_fileOrFolder();
         }
-        return path.substring(path.lastIndexOf(".")).toLowerCase();
+        return fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
     }
 
     /**
@@ -82,7 +88,7 @@ public class FileUtils {
      * @param file 要校验的文件
      * @return true为图片，false为非图片
      */
-    public static boolean isImgFile(File file) throws IOException {
+    public static boolean isImgFile(File file) {
         if (!file.exists()) {
             return false;
         }
@@ -309,11 +315,10 @@ public class FileUtils {
      *
      * @param file 要获取文件名的文件
      * @return 文件夹或不带拓展名的文件名称
-     * @throws IOException 文件不存在
      */
-    public static String getExistsFileName(File file) throws IOException {
+    public static String getExistsFileName(File file) {
         if (!file.exists()) {
-            throw new IOException(text_fileNotExists());
+            throw new RuntimeException(text_fileNotExists());
         }
         String fileName = file.getName();
         if (!file.isDirectory() && fileName.contains(".")) {
@@ -327,11 +332,10 @@ public class FileUtils {
      *
      * @param path 要获取文件名的文件路径
      * @return 文件夹或不带拓展名的文件名称
-     * @throws IOException 路径不能为空、路径格式不正确
      */
-    public static String getFileName(String path) throws IOException {
+    public static String getFileName(String path) {
         if (StringUtils.isBlank(path)) {
-            throw new IOException(text_nullPath());
+            throw new RuntimeException(text_nullPath());
         }
         if (FilenameUtils.getPrefixLength(path) != -1) {
             if (path.lastIndexOf(".") != -1) {
@@ -340,7 +344,7 @@ public class FileUtils {
                 return path.substring(path.lastIndexOf(File.separator) + 1);
             }
         }
-        throw new IOException(text_errPathFormat());
+        throw new RuntimeException(text_errPathFormat());
     }
 
     /**
@@ -373,11 +377,10 @@ public class FileUtils {
      *
      * @param path 要判断的文件路径
      * @return 不会重名文件路径
-     * @throws IOException 路径不能为空、文件不存在
      */
-    public static String notOverwritePath(String path) throws IOException {
+    public static String notOverwritePath(String path) {
         if (StringUtils.isBlank(path)) {
-            throw new IOException(text_nullPath());
+            throw new RuntimeException(text_nullPath());
         }
         File file = new File(path);
         if (!file.exists()) {
@@ -587,7 +590,7 @@ public class FileUtils {
         try {
             Files.createDirectories(destDir.toPath());
         } catch (IOException e) {
-            throw new IOException(update_creatDirErr() + destDirectory, e);
+            throw new RuntimeException(update_creatDirErr() + destDirectory, e);
         }
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath))) {
             ZipEntry entry;
@@ -635,9 +638,8 @@ public class FileUtils {
      * 递归删除目录
      *
      * @param dir 要删除的目录
-     * @throws IOException 无法删除文件或目录
      */
-    private static void deleteDirectory(File dir) throws IOException {
+    private static void deleteDirectory(File dir) {
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {
@@ -647,7 +649,7 @@ public class FileUtils {
             }
         }
         if (!dir.delete()) {
-            throw new IOException(update_deleteErr() + dir.getAbsolutePath());
+            throw new RuntimeException(update_deleteErr() + dir.getAbsolutePath());
         }
     }
 

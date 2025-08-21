@@ -147,9 +147,8 @@ public class TaskDetailController extends RootController {
      *
      * @param item   列表选中的数据
      * @param isEdit 是否为编辑模式
-     * @throws IOException 路径不能为空、路径格式不正确
      */
-    public void initData(TimedTaskBean item, boolean isEdit) throws IOException {
+    public void initData(TimedTaskBean item, boolean isEdit) {
         this.isEdit = isEdit;
         selectedItem = item;
         String path = item.getPath();

@@ -96,10 +96,10 @@ public class MainApplication extends Application {
      * 加载fxml页面
      *
      * @param stage 程序主舞台
-     * @throws Exception io异常、设置全局异常处理器异常
+     * @throws IOException io异常、设置全局异常处理器异常
      */
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) throws IOException {
         mainStage = stage;
         // 读取fxml页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);

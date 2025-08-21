@@ -89,11 +89,10 @@ public class DynamicQueue<E> {
      * 设置新容量
      *
      * @param newSize 新容量
-     * @throws IllegalArgumentException 容量不能小于0
      */
     public void setMaxSize(int newSize) {
         if (newSize < 0) {
-            throw new IllegalArgumentException(bundle.getString("minSize"));
+            throw new RuntimeException(bundle.getString("minSize"));
         }
         maxSize = newSize;
         synchronized (this) {
