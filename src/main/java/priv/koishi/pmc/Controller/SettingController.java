@@ -96,7 +96,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 要防重复点击的组件
      */
-    private static final List<Node> disableNodes = new ArrayList<>();
+    private final List<Node> disableNodes = new ArrayList<>();
 
     /**
      * 浮窗所在矩形

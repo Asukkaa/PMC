@@ -15,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
+import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Controller.MainController;
 
 import java.io.*;
@@ -27,10 +29,11 @@ import java.util.*;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
-import static priv.koishi.pmc.Finals.i18nFinal.languageMap;
-import static priv.koishi.pmc.Finals.i18nFinal.updateAllDynamicTexts;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -324,20 +327,16 @@ public class MainApplication extends Application {
                         TabPane tabPane = mainController.tabPane;
                         Tab autoClickTab = mainController.autoClickTab;
                         if (buttonType == appendButton) {
-                            try {
-                                autoClickController.loadPMCFile(loadPMCPath);
-                                tabPane.getSelectionModel().select(autoClickTab);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                            creatLoadedPMCTask(file, tabPane, autoClickTab);
+                            Thread.ofVirtual()
+                                    .name("loadedPMCTask-vThread")
+                                    .start(autoClickController.loadedPMCTask);
                         } else if (buttonType == clearButton) {
                             autoClickController.removeAll();
-                            try {
-                                autoClickController.loadPMCFile(loadPMCPath);
-                                tabPane.getSelectionModel().select(autoClickTab);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                            creatLoadedPMCTask(file, tabPane, autoClickTab);
+                            Thread.ofVirtual()
+                                    .name("loadedPMCTask-vThread")
+                                    .start(autoClickController.loadedPMCTask);
                         }
                     }
                 }
@@ -345,6 +344,35 @@ public class MainApplication extends Application {
                 clearArgs();
             });
         }
+    }
+
+    /**
+     * 创建加载pmc文件任务
+     *
+     * @param file         要加载的文件
+     * @param tabPane      主页面布局
+     * @param autoClickTab 自动点击页面
+     */
+    private static void creatLoadedPMCTask(File file, TabPane tabPane, Tab autoClickTab) {
+        TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(autoClickController.progressBar_Click)
+                .setMassageLabel(autoClickController.dataNumber_Click)
+                .setTableView(autoClickController.tableView_Click)
+                .setDisableNodes(autoClickController.disableNodes);
+        autoClickController.loadedPMCTask = loadPMC(taskBean, file);
+        bindingTaskNode(autoClickController.loadedPMCTask, taskBean);
+        autoClickController.loadedPMCTask.setOnSucceeded(event -> {
+            taskUnbind(taskBean);
+            List<ClickPositionVO> clickPositionVOS = autoClickController.loadedPMCTask.getValue();
+            autoClickController.addAutoClickPositions(clickPositionVOS, file.getPath());
+            tabPane.getSelectionModel().select(autoClickTab);
+            autoClickController.loadedPMCTask = null;
+        });
+        autoClickController.loadedPMCTask.setOnFailed(e -> {
+            taskNotSuccess(taskBean, text_taskFailed());
+            autoClickController.loadedPMCTask = null;
+            throw new RuntimeException(e.getSource().getException());
+        });
     }
 
     /**

@@ -62,6 +62,7 @@ public class TaskUtils {
             // 获取抛出的异常
             throw new RuntimeException(task.getException());
         });
+        task.setOnCancelled(event -> taskNotSuccess(taskBean, text_taskFailed()));
     }
 
     /**

@@ -60,7 +60,7 @@ public class TaskDetailController extends RootController {
     /**
      * 导入文件路径
      */
-    private static String inFilePath;
+    private String inFilePath;
 
     /**
      * 页面是否修改标志
@@ -71,11 +71,6 @@ public class TaskDetailController extends RootController {
      * 编辑模式标志
      */
     private boolean isEdit;
-
-    /**
-     * 页面标识符
-     */
-    private static final String tabId = "_TD";
 
     /**
      * 详情页页面舞台
@@ -95,7 +90,7 @@ public class TaskDetailController extends RootController {
     /**
      * 要防重复点击的组件
      */
-    private static final List<Node> disableNodes = new ArrayList<>();
+    private final List<Node> disableNodes = new ArrayList<>();
 
     /**
      * 更新数据用的回调函数
@@ -410,7 +405,7 @@ public class TaskDetailController extends RootController {
             }
         }));
         Thread.ofVirtual()
-                .name("task-save-vThread" + tabId)
+                .name("task-save-vThread" + "_TD")
                 .start(task);
     }
 

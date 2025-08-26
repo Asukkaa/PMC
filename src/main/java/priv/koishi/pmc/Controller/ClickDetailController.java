@@ -106,7 +106,7 @@ public class ClickDetailController extends RootController {
     /**
      * 页面标识符
      */
-    private static final String tabId = "_Det";
+    private final String tabId = "_Det";
 
     /**
      * 详情页页面舞台

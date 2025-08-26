@@ -1,9 +1,7 @@
 package priv.koishi.pmc.Controller;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -40,10 +38,7 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Bean.AutoClickTaskBean;
-import priv.koishi.pmc.Bean.ClickLogBean;
-import priv.koishi.pmc.Bean.ClickPositionBean;
-import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.CustomUI.EditingCell.EditingCell;
@@ -73,8 +68,8 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
+import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
-import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
@@ -94,12 +89,12 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 导入文件路径
      */
-    private static String inFilePath;
+    private String inFilePath;
 
     /**
      * 上次所选要点击的图片地址
      */
-    private static String clickImgSelectPath;
+    private String clickImgSelectPath;
 
     /**
      * 上次所选终止操作的图片地址
@@ -239,7 +234,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 要防重复点击的组件
      */
-    private static final List<Node> disableNodes = new ArrayList<>();
+    public final List<Node> disableNodes = new ArrayList<>();
 
     /**
      * 自动点击任务
@@ -247,9 +242,24 @@ public class AutoClickController extends RootController implements MousePosition
     public Task<List<ClickLogBean>> autoClickTask;
 
     /**
+     * 批量导入PMC文件任务
+     */
+    public Task<List<ClickPositionVO>> loadPMCFilsTask;
+
+    /**
+     * 导入PMC文件任务
+     */
+    public Task<List<ClickPositionVO>> loadedPMCTask;
+
+    /**
+     * 导出PMC文件任务
+     */
+    public Task<String> exportPMCTask;
+
+    /**
      * 页面标识符
      */
-    private static final String tabId = "_Click";
+    private final String tabId = "_Click";
 
     /**
      * 无辅助功能权限
@@ -695,7 +705,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @return true表示为空闲状态，false表示非空闲状态
      */
     public boolean isFree() {
-        return !runClicking && !recordClicking;
+        return !runClicking && !recordClicking && loadPMCFilsTask == null && loadedPMCTask == null && exportPMCTask == null;
     }
 
     /**
@@ -1127,46 +1137,17 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 导入自动操作流程文件
+     * 创建任务参数对象
      *
-     * @param filePath 文件路径
-     * @throws IOException 导入自动化流程文件内容格式不正确
+     * @return 任务参数对象
      */
-    public void loadPMCFile(String filePath) throws IOException {
-        if (autoClickTask == null && !recordClicking) {
-            // 读取 JSON 文件并转换为 List<ClickPositionBean>
-            ObjectMapper objectMapper = new ObjectMapper();
-            File jsonFile = new File(filePath);
-            List<ClickPositionBean> clickPositionBeans;
-            try {
-                clickPositionBeans = objectMapper.readValue(jsonFile,
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
-            } catch (MismatchedInputException | JsonParseException e) {
-                throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
-            }
-            // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
-            int index = 0;
-            if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
-                List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                for (ClickPositionBean bean : clickPositionBeans) {
-                    ClickPositionVO vo = new ClickPositionVO();
-                    try {
-                        // 自动拷贝父类中的属性
-                        copyProperties(bean, vo);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // 初始化子类特有属性
-                    vo.setTableView(tableView_Click)
-                            .setRemove(false)
-                            .setUuid(UUID.randomUUID().toString());
-                    vo.setIndex(index++);
-                    clickPositionVOS.add(vo);
-                }
-                // 将自动流程添加到列表中
-                addAutoClickPositions(clickPositionVOS, filePath);
-            }
-        }
+    private TaskBean<ClickPositionVO> creatTaskBean() {
+        TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(progressBar_Click)
+                .setMassageLabel(dataNumber_Click)
+                .setTableView(tableView_Click)
+                .setDisableNodes(disableNodes);
+        return taskBean;
     }
 
     /**
@@ -1175,7 +1156,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param clickPositionVOS 自动流程集合
      * @param filePath         要导入的文件路径
      */
-    private void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) {
+    public void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) {
         for (ClickPositionVO clickPositionVO : clickPositionVOS) {
             if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
                     || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
@@ -1657,6 +1638,33 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 启动加载自动操作文件任务
+     *
+     * @param files 要加载的文件
+     */
+    private void startLoadPMCTask(List<? extends File> files) {
+        TaskBean<ClickPositionVO> taskBean = creatTaskBean();
+        loadPMCFilsTask = loadPMCFils(taskBean, files);
+        bindingTaskNode(loadPMCFilsTask, taskBean);
+        loadPMCFilsTask.setOnSucceeded(event -> {
+            taskUnbind(taskBean);
+            List<ClickPositionVO> clickPositionVOS = loadPMCFilsTask.getValue();
+            String path = files.getLast().getPath();
+            addAutoClickPositions(clickPositionVOS, path);
+            loadPMCFilsTask = null;
+        });
+        loadPMCFilsTask.setOnFailed(event -> {
+            taskUnbind(taskBean);
+            taskNotSuccess(taskBean, text_taskFailed());
+            loadPMCFilsTask = null;
+            throw new RuntimeException(event.getSource().getException());
+        });
+        Thread.ofVirtual()
+                .name("loadPMCFilsTask-vThread" + tabId)
+                .start(loadPMCFilsTask);
+    }
+
+    /**
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
@@ -1711,20 +1719,32 @@ public class AutoClickController extends RootController implements MousePosition
     private void settingsLoaded(SettingsLoadedEvent event) {
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
-            Platform.runLater(() -> {
+            TaskBean<ClickPositionVO> taskBean = creatTaskBean();
+            loadedPMCTask = loadPMC(taskBean, new File(loadPMCPath));
+            loadedPMCTask.setOnSucceeded(e -> {
+                taskUnbind(taskBean);
+                List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
+                addAutoClickPositions(clickPositionVOS, loadPMCPath);
+                loadedPMCTask = null;
                 try {
-                    loadPMCFile(loadPMCPath);
+                    // 运行自动操作
                     if (runPMCFile) {
-                        tableView_Click.refresh();
-                        // 运行自动操作
                         runClick();
                     }
-                    // 清空启动参数
-                    clearArgs();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
                 }
+                // 清空启动参数
+                clearArgs();
             });
+            loadedPMCTask.setOnFailed(e -> {
+                taskNotSuccess(taskBean, text_taskFailed());
+                loadedPMCTask = null;
+                throw new RuntimeException(e.getSource().getException());
+            });
+            Thread.ofVirtual()
+                    .name("loadedPMCTask-vThread" + tabId)
+                    .start(loadedPMCTask);
         }
         // 禁用需要辅助控制权限的组件
         if (isNativeHookException) {
@@ -1806,7 +1826,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     public void removeAll() {
-        if (autoClickTask == null && !recordClicking) {
+        if (isFree()) {
             tableView_Click.getItems().stream().parallel().forEach(ClickPositionVO::clearResources);
             removeTableViewData(tableView_Click, dataNumber_Click, log_Click);
         }
@@ -1829,7 +1849,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     public void loadAutoClick(ActionEvent actionEvent) throws IOException {
-        if (autoClickTask == null && !recordClicking) {
+        if (isFree()) {
             // 读取配置文件
             getProperties();
             FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
@@ -1839,22 +1859,18 @@ public class AutoClickController extends RootController implements MousePosition
             if (CollectionUtils.isNotEmpty(selectedFile)) {
                 inFilePath = selectedFile.getFirst().getPath();
                 updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
-                for (File file : selectedFile) {
-                    loadPMCFile(file.getPath());
-                }
+                startLoadPMCTask(selectedFile);
             }
         }
     }
 
     /**
      * 导出操作流程按钮
-     *
-     * @throws Exception 列表中无要导出的自动操作流程
      */
     @FXML
-    public void exportAutoClick() throws Exception {
-        if (autoClickTask == null && !recordClicking) {
-            List<ClickPositionBean> tableViewItems = new ArrayList<>(tableView_Click.getItems());
+    public void exportAutoClick() {
+        if (isFree()) {
+            List<ClickPositionVO> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isEmpty(tableViewItems)) {
                 throw new RuntimeException(text_noAutoClickList());
             }
@@ -1862,21 +1878,28 @@ public class AutoClickController extends RootController implements MousePosition
             if (StringUtils.isBlank(outFilePath)) {
                 throw new RuntimeException(text_outPathNull());
             }
+            TaskBean<ClickPositionVO> taskBean = creatTaskBean();
+            taskBean.setMassageLabel(log_Click)
+                    .setBeanList(tableViewItems);
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
-            ObjectMapper objectMapper = new ObjectMapper();
-            String path = outFilePath + File.separator + fileName + PMC;
-            if (notOverwrite_Click.isSelected()) {
-                path = notOverwritePath(path);
-            }
-            // 构建基类类型信息
-            JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
-            // 使用基类类型进行序列化
-            objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
-            updateLabel(log_Click, text_saveSuccess() + path);
-            log_Click.setTextFill(Color.GREEN);
-            if (openDirectory_Click.isSelected()) {
-                openDirectory(path);
-            }
+            exportPMCTask = exportPMC(taskBean, fileName, outFilePath);
+            bindingTaskNode(exportPMCTask, taskBean);
+            exportPMCTask.setOnSucceeded(event -> {
+                taskUnbind(taskBean);
+                String path = exportPMCTask.getValue();
+                log_Click.setTextFill(Color.GREEN);
+                if (openDirectory_Click.isSelected()) {
+                    openDirectory(path);
+                }
+                exportPMCTask = null;
+            });
+            exportPMCTask.setOnFailed(event -> {
+                exportPMCTask = null;
+                taskNotSuccess(taskBean, text_taskFailed());
+            });
+            Thread.ofVirtual()
+                    .name("exportPMCTask-vThread" + tabId)
+                    .start(exportPMCTask);
         }
     }
 
@@ -1906,16 +1929,8 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     private void handleDrop(DragEvent dragEvent) {
-        if (autoClickTask == null && !recordClicking) {
-            List<File> files = dragEvent.getDragboard().getFiles();
-            for (File file : files) {
-                try {
-                    loadPMCFile(file.getPath());
-                } catch (IOException e) {
-                    showExceptionAlert(e);
-                }
-            }
-        }
+        List<File> files = dragEvent.getDragboard().getFiles();
+        startLoadPMCTask(files);
     }
 
     /**
@@ -1925,7 +1940,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     private void acceptDrop(DragEvent dragEvent) {
-        if (autoClickTask == null && !recordClicking) {
+        if (isFree()) {
             List<File> files = dragEvent.getDragboard().getFiles();
             files.forEach(file -> {
                 if (PMC.equals(getExistsFileType(file))) {

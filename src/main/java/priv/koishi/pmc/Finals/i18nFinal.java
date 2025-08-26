@@ -734,6 +734,14 @@ public class i18nFinal {
         return bundle.getString("abnormal");
     }
 
+    public static String text_readData() {
+        return bundle.getString("readData");
+    }
+
+    public static String text_exportData() {
+        return bundle.getString("exportData");
+    }
+
     public static String confirm_unSaved() {
         return bundle.getString("confirm.unSaved");
     }

@@ -62,14 +62,19 @@ public class AboutController extends RootController {
     private static final Logger logger = LogManager.getLogger(AboutController.class);
 
     /**
+     * 页面标识符
+     */
+    private final String tabId = "_Abt";
+
+    /**
      * 更新时间格式
      */
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
 
     /**
      * 要防重复点击的组件
      */
-    private static final List<Node> disableNodes = new ArrayList<>();
+    private final List<Node> disableNodes = new ArrayList<>();
 
     /**
      * 下载更新任务
@@ -350,7 +355,7 @@ public class AboutController extends RootController {
                         // 用户选择更新
                         downloadedUpdateTask = downloadAndInstallUpdate(updateInfo, progressDialog);
                         Thread.ofVirtual()
-                                .name("task-downloadedUpdate-vThread")
+                                .name("task-downloadedUpdate-vThread" + tabId)
                                 .start(downloadedUpdateTask);
                         downloadedUpdateTask.setOnFailed(workerStateEvent -> {
                             try {
@@ -384,7 +389,7 @@ public class AboutController extends RootController {
             throw new RuntimeException(task.getException());
         });
         Thread.ofVirtual()
-                .name("task-checkUpdate-vThread")
+                .name("task-checkUpdate-vThread" + tabId)
                 .start(task);
     }
 

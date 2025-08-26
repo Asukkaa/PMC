@@ -32,7 +32,7 @@ public class ClickLogController extends RootController {
     /**
      * 页面标识符
      */
-    private static final String tabId = "_Log";
+    private final String tabId = "_Log";
 
     /**
      * 详情页页面舞台

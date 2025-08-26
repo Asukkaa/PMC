@@ -1,5 +1,9 @@
 package priv.koishi.pmc.Service;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -15,22 +19,27 @@ import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static priv.koishi.pmc.Finals.CommonFinals.activation;
-import static priv.koishi.pmc.Finals.CommonFinals.percentage;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
+import static priv.koishi.pmc.Utils.FileUtils.notOverwritePath;
+import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
 
 /**
  * 自动点击线程任务类
@@ -65,6 +74,79 @@ public class AutoClickService {
      * 日志动态容量队列
      */
     private static DynamicQueue<ClickLogBean> dynamicQueue;
+
+
+    /**
+     * 批量加载 PMC 文件
+     *
+     * @param taskBean 线程任务参数
+     * @param files    文件列表
+     * @return PMC 文件列表
+     */
+    public static Task<List<ClickPositionVO>> loadPMCFils(TaskBean<ClickPositionVO> taskBean, List<? extends File> files) {
+        return new Task<>() {
+            @Override
+            protected List<ClickPositionVO> call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                List<ClickPositionVO> clickPositionBeans = new ArrayList<>();
+                for (File file : files) {
+                    try {
+                        clickPositionBeans = loadPMCFile(file);
+                    } catch (IOException e) {
+                        showExceptionAlert(e);
+                    }
+                }
+                taskBean.getTableView().refresh();
+                return clickPositionBeans;
+            }
+        };
+    }
+
+    /**
+     * 加载 PMC 文件
+     *
+     * @param taskBean 线程任务参数
+     * @param file     要加载的文件
+     * @return PMC 文件列表
+     */
+    public static Task<List<ClickPositionVO>> loadPMC(TaskBean<ClickPositionVO> taskBean, File file) {
+        return new Task<>() {
+            @Override
+            protected List<ClickPositionVO> call() throws IOException {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                return loadPMCFile(file);
+            }
+        };
+    }
+
+    /**
+     * 导出 PMC 文件
+     *
+     * @param taskBean    线程任务参数
+     * @param fileName    要导出的文件名
+     * @param outFilePath 导出文件夹路径
+     * @return 导出文件路径
+     */
+    public static Task<String> exportPMC(TaskBean<ClickPositionVO> taskBean, String fileName, String outFilePath) {
+        return new Task<>() {
+            @Override
+            protected String call() throws IOException {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_exportData());
+                List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
+                String path = notOverwritePath(outFilePath + File.separator + fileName + PMC);
+                ObjectMapper objectMapper = new ObjectMapper();
+                // 构建基类类型信息
+                JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
+                // 使用基类类型进行序列化
+                objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
+                updateMessage(text_saveSuccess() + path);
+                return path;
+            }
+        };
+    }
 
     /**
      * 自动点击任务线程
@@ -676,6 +758,46 @@ public class AutoClickService {
      **/
     public static List<ClickLogBean> getNowLogs() {
         return dynamicQueue.getSnapshot();
+    }
+
+    /**
+     * 导入自动操作流程文件
+     *
+     * @param jsonFile 要解析的文件
+     * @throws IOException 导入自动化流程文件内容格式不正确
+     */
+    private static List<ClickPositionVO> loadPMCFile(File jsonFile) throws IOException {
+        // 读取 JSON 文件并转换为 List<ClickPositionBean>
+        ObjectMapper objectMapper = new ObjectMapper();
+        String filePath = jsonFile.getAbsolutePath();
+        List<ClickPositionBean> clickPositionBeans;
+        try {
+            clickPositionBeans = objectMapper.readValue(jsonFile,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
+        } catch (MismatchedInputException | JsonParseException e) {
+            throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
+        }
+        // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
+        int index = 0;
+        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
+            for (ClickPositionBean bean : clickPositionBeans) {
+                ClickPositionVO vo = new ClickPositionVO();
+                try {
+                    // 自动拷贝父类中的属性
+                    copyProperties(bean, vo);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                // 初始化子类特有属性
+                vo.setTableView(autoClickController.tableView_Click)
+                        .setRemove(false)
+                        .setUuid(UUID.randomUUID().toString());
+                vo.setIndex(index++);
+                clickPositionVOS.add(vo);
+            }
+        }
+        return clickPositionVOS;
     }
 
 }
