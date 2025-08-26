@@ -18,6 +18,8 @@ import static priv.koishi.pmc.Utils.FileUtils.readAllFiles;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
 
 /**
+ * 读取文件服务类
+ *
  * @author KOISHI
  * Date:2025-08-26
  * Time:18:31

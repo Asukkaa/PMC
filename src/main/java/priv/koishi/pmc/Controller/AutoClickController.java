@@ -1121,10 +1121,11 @@ public class AutoClickController extends RootController implements MousePosition
         addToolTip(tip_learButton(), clearButton_Click);
         addToolTip(tip_addPosition(), addPosition_Click);
         addToolTip(tip_recordClick(), recordClick_Click);
+        addToolTip(tip_notOverwrite(), notOverwrite_Click);
+        addToolTip(tip_loadFolder_Click(), loadFolder_Click);
+        addToolTip(tip_loadAutoClick(), loadAutoClick_Click);
         addToolTip(tip_outAutoClickPath(), addOutPath_Click);
         addToolTip(tip_openDirectory(), openDirectory_Click);
-        addToolTip(tip_notOverwrite(), notOverwrite_Click);
-        addToolTip(tip_loadAutoClick(), loadAutoClick_Click);
         addToolTip(tip_exportAutoClick(), exportAutoClick_Click);
         addToolTip(tip_autoClickFileName() + defaultOutFileName(), outFileName_Click);
         addToolTip(tip_preparationRunTime() + defaultPreparationRunTime, preparationRunTime_Click);

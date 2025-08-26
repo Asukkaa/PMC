@@ -482,6 +482,10 @@ public class i18nFinal {
         return bundle.getString("tip.directoryNameType");
     }
 
+    public static String tip_loadFolder_Click() {
+        return bundle.getString("tip.loadFolder_Click");
+    }
+
     public static String tip_checkUpdate_Abt() {
         return bundle.getString("tip.checkUpdate_Abt");
     }
