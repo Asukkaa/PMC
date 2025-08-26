@@ -1,18 +1,21 @@
 package priv.koishi.pmc.Utils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Config.FileConfig;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DecimalFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -421,6 +424,16 @@ public class FileUtils {
     }
 
     /**
+     * 根据操作系统计算文件大小
+     *
+     * @param file 要计算的文件
+     * @return 带单位的文件大小
+     */
+    public static String getFileUnitSize(File file) {
+        return getUnitSize(file.length());
+    }
+
+    /**
      * 根据操作系统将数值转换为文件大小
      *
      * @param size 没带单位的文件大小
@@ -692,6 +705,257 @@ public class FileUtils {
                 }
             });
         }
+    }
+
+    /**
+     * 读取文件夹下的文件名称
+     *
+     * @param fileConfig 文件查询设置
+     * @return 查询到的文件列表
+     */
+    public static List<File> readAllFiles(FileConfig fileConfig) {
+        List<File> fileList = new ArrayList<>();
+        readFiles(fileConfig, fileList, new File(fileConfig.getPath()));
+        return fileList;
+    }
+
+    /**
+     * 递归读取文件夹下的文件名称
+     *
+     * @param fileConfig 文件查询设置
+     * @param fileList   上层文件夹查询的文件列表
+     * @param directory  最外层文件夹
+     */
+    public static void readFiles(FileConfig fileConfig, List<? super File> fileList, File directory) {
+        File[] files = directory.listFiles();
+        String showHideFile = fileConfig.getShowHideFile();
+        String showDirectory = fileConfig.getShowDirectory();
+        boolean recursion = fileConfig.isRecursion();
+        List<String> filterExtensionList = fileConfig.getFilterExtensionList();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    if ((text_noHideFile.equals(showHideFile) && file.isHidden()) ||
+                            (text_onlyHideFile.equals(showHideFile) && !file.isHidden())) {
+                        continue;
+                    }
+                    if (StringUtils.isEmpty(showDirectory) ||
+                            text_onlyFile.equals(showDirectory) ||
+                            text_fileDirectory.equals(showDirectory)) {
+                        String extension = getExistsFileType(file);
+                        boolean matches = CollectionUtils.isEmpty(filterExtensionList) ||
+                                filterExtensionList.contains(extension);
+                        // 反向匹配文件类型
+                        if (fileConfig.isReverseFileType()) {
+                            matches = CollectionUtils.isEmpty(filterExtensionList) ||
+                                    !filterExtensionList.contains(extension);
+                        }
+                        if (matches) {
+                            filterFileName(fileConfig, fileList, file);
+                        }
+                    }
+                    if (recursion) {
+                        readFiles(fileConfig, fileList, file);
+                    }
+                }
+                if (file.isDirectory()) {
+                    if ((text_noHideFile.equals(showHideFile) && file.isHidden()) ||
+                            (text_onlyHideFile.equals(showHideFile) && !file.isHidden())) {
+                        continue;
+                    }
+                    if (text_onlyDirectory.equals(showDirectory) ||
+                            text_fileDirectory.equals(showDirectory)) {
+                        filterFileName(fileConfig, fileList, file);
+                    }
+                    if (recursion) {
+                        readFiles(fileConfig, fileList, file);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 筛选文件名称
+     *
+     * @param fileConfig 文件查询设置
+     * @param fileList   上层文件夹查询的文件列表
+     * @param file       文件
+     */
+    private static void filterFileName(FileConfig fileConfig, List<? super File> fileList, File file) {
+        String fileNameFilter = fileConfig.getFileNameFilter();
+        if (StringUtils.isNotBlank(fileNameFilter) && file.exists()) {
+            String fileName = getExistsFileName(file);
+            // 区分大小写设置
+            if (!fileConfig.isFilterNameCase()) {
+                fileName = fileName.toLowerCase();
+                fileNameFilter = fileNameFilter.toLowerCase();
+            }
+            // 匹配文件名称
+            boolean matches = isMatchesFileName(fileConfig, fileName, fileNameFilter);
+            if (matches) {
+                fileList.add(file);
+            }
+        } else {
+            fileList.add(file);
+        }
+    }
+
+    /**
+     * 筛选文件名称
+     *
+     * @param fileConfig     文件查询设置
+     * @param fileName       文件名称
+     * @param fileNameFilter 文件名称过滤
+     * @return 是否匹配
+     */
+    private static boolean isMatchesFileName(FileConfig fileConfig, String fileName, String fileNameFilter) {
+        boolean matches = switch (fileConfig.getFileNameType()) {
+            case name_contain -> fileName.contains(fileNameFilter);
+            case name_is -> fileNameFilter.equals(fileName);
+            case name_start -> fileName.startsWith(fileNameFilter);
+            case name_end -> fileName.endsWith(fileNameFilter);
+            default -> false;
+        };
+        // 反向查询名称设置
+        if (fileConfig.isReverseFileName()) {
+            matches = !matches;
+        }
+        return matches;
+    }
+
+    /**
+     * 筛选出顶级目录
+     *
+     * @param directories 要筛选的目录
+     * @throws IOException 获取文件属性异常
+     */
+    public static List<File> filterTopDirectories(List<? extends File> directories) throws IOException {
+        List<File> topDirs = new ArrayList<>();
+        for (File dir : directories) {
+            if (!isPath(dir.getPath())) {
+                continue;
+            }
+            if (dir.isFile()) {
+                continue;
+            }
+            boolean isTop = true;
+            for (File other : directories) {
+                if (isSubdirectory(other, dir)) {
+                    isTop = false;
+                    break;
+                }
+            }
+            if (isTop && !topDirs.contains(dir)) {
+                topDirs.add(dir);
+            }
+        }
+        return topDirs;
+    }
+
+    /**
+     * 判断文件是否是子目录
+     *
+     * @param parent 父目录
+     * @param child  子目录
+     * @throws IOException 获取文件属性异常
+     */
+    public static boolean isSubdirectory(File parent, File child) throws IOException {
+        // 判断 child 是否是 parent 的子目录
+        return !parent.getCanonicalPath().equals(child.getCanonicalPath()) &&
+                child.getCanonicalPath().startsWith(parent.getCanonicalPath() + File.separator);
+    }
+
+    /**
+     * 判断路径是否合法
+     *
+     * @param path 路径
+     * @return true-合法，false非法
+     */
+    public static boolean isPath(String path) {
+        return FilenameUtils.getPrefixLength(path) != -1;
+    }
+
+    /**
+     * 获取文件修改时间
+     *
+     * @param file 要读取的文件
+     * @return 格式化后的时间字符串
+     */
+    public static String getFileUpdateTime(File file) {
+        Instant instant = Instant.ofEpochMilli(file.lastModified());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault());
+        return formatter.format(instant);
+    }
+
+    /**
+     * 获取文件创建时间
+     *
+     * @param file 要读取的文件
+     * @return 格式化后的时间字符串
+     * @throws IOException io异常
+     */
+    public static String getFileCreatTime(File file) throws IOException {
+        Path path = Paths.get(file.getPath());
+        BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+        Instant instant = attr.creationTime().toInstant();
+        ZonedDateTime creationTime = instant.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return creationTime.format(formatter);
+    }
+
+    /**
+     * 将带单位的文件大小字符串转换为课比较类型
+     *
+     * @param value 带单位的文件大小
+     * @return 不带单位的文件大小
+     */
+    public static double fileSizeCompareValue(String value) {
+        if (StringUtils.isBlank(value)) {
+            return 0;
+        }
+        String unit = value.substring(value.indexOf(" ") + 1);
+        String size = value.substring(0, value.indexOf(" "));
+        double compareValue;
+        double win = 1024;
+        double mac = 1000;
+        double kb;
+        // macOS与Windows文件大小进制不同
+        if (isMac) {
+            kb = mac;
+        } else {
+            kb = win;
+        }
+        double mb = kb * kb;
+        double gb = mb * kb;
+        double tb = gb * kb;
+        switch (unit) {
+            case Byte: {
+                compareValue = Double.parseDouble(size);
+                break;
+            }
+            case KB: {
+                compareValue = Double.parseDouble(size) * kb;
+                break;
+            }
+            case MB: {
+                compareValue = Double.parseDouble(size) * mb;
+                break;
+            }
+            case GB: {
+                compareValue = Double.parseDouble(size) * gb;
+                break;
+            }
+            case TB: {
+                compareValue = Double.parseDouble(size) * tb;
+                break;
+            }
+            default: {
+                compareValue = Double.parseDouble(size) * tb * kb;
+            }
+        }
+        return compareValue;
     }
 
 }

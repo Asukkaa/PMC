@@ -10,7 +10,7 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
 import priv.koishi.pmc.Bean.ClickLogBean;
-import priv.koishi.pmc.Bean.FindPositionConfig;
+import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.MatchPointBean;
 import priv.koishi.pmc.Queue.DynamicQueue;
 

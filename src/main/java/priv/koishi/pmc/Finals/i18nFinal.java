@@ -446,6 +446,42 @@ public class i18nFinal {
         return bundle.getString("tip.notExistsIndex");
     }
 
+    public static String tip_close() {
+        return bundle.getString("tip.close");
+    }
+
+    public static String tip_confirm() {
+        return bundle.getString("tip.confirm");
+    }
+
+    public static String tip_selectPath() {
+        return bundle.getString("tip.selectPath");
+    }
+
+    public static String tip_gotoParent() {
+        return bundle.getString("tip.gotoParent");
+    }
+
+    public static String tip_reselectButton() {
+        return bundle.getString("tip.reselectButton");
+    }
+
+    public static String tip_fileNameFilter() {
+        return bundle.getString("tip.fileNameFilter");
+    }
+
+    public static String tip_fileNameType() {
+        return bundle.getString("tip.fileNameType");
+    }
+
+    public static String tip_hideFileType() {
+        return bundle.getString("tip.hideFileType");
+    }
+
+    public static String tip_directoryNameType() {
+        return bundle.getString("tip.directoryNameType");
+    }
+
     public static String tip_checkUpdate_Abt() {
         return bundle.getString("tip.checkUpdate_Abt");
     }
@@ -630,10 +666,6 @@ public class i18nFinal {
         return bundle.getString("isRecord");
     }
 
-    public static String text_imgExist() {
-        return bundle.getString("imgExist");
-    }
-
     public static String text_noImg() {
         return bundle.getString("noImg");
     }
@@ -738,8 +770,16 @@ public class i18nFinal {
         return bundle.getString("readData");
     }
 
+    public static String text_matchImg() {
+        return bundle.getString("matchImg");
+    }
+
     public static String text_exportData() {
         return bundle.getString("exportData");
+    }
+
+    public static String text_file() {
+        return bundle.getString("file");
     }
 
     public static String confirm_unSaved() {

@@ -36,4 +36,8 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.Serializer to com.fasterxml.jackson.databind;
     exports priv.koishi.pmc.Queue;
     exports priv.koishi.pmc.CustomUI.ProgressDialog;
+    exports priv.koishi.pmc.Bean.Result;
+    opens priv.koishi.pmc.Bean.Result to javafx.fxml;
+    exports priv.koishi.pmc.Bean.Config;
+    opens priv.koishi.pmc.Bean.Config to javafx.fxml;
 }

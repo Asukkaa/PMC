@@ -34,6 +34,8 @@
                     text="%autoClick.addPosition_Click"/>
             <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand"
                     text="%autoClick.loadAutoClick_Click"/>
+            <CheckBox fx:id="loadFolder_Click" prefHeight="25" style="-fx-cursor: hand"
+                      text="%autoClick.loadFolder_Click"/>
             <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand"
                     text="%autoClick.exportAutoClick_Click"/>
             <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand"
@@ -57,8 +59,8 @@
             <TextField fx:id="loopTime_Click" prefWidth="80"/>
             <Label prefHeight="25" text="%unit.times"/>
 
-            <Button  fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand"
-                     text="%autoClick.clickLog_Click"/>
+            <Button fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand"
+                    text="%autoClick.clickLog_Click"/>
 
             <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
         </HBox>

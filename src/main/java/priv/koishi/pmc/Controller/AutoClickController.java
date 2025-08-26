@@ -39,6 +39,8 @@ import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.*;
+import priv.koishi.pmc.Bean.Config.FileChooserConfig;
+import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.CustomUI.EditingCell.EditingCell;
@@ -244,7 +246,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 批量导入PMC文件任务
      */
-    public Task<List<ClickPositionVO>> loadPMCFilsTask;
+    public Task<PMCLoadResult> loadPMCFilsTask;
 
     /**
      * 导入PMC文件任务
@@ -345,7 +347,7 @@ public class AutoClickController extends RootController implements MousePosition
             err_Click;
 
     @FXML
-    public CheckBox openDirectory_Click, notOverwrite_Click;
+    public CheckBox openDirectory_Click, notOverwrite_Click, loadFolder_Click;
 
     @FXML
     public Button clearButton_Click, runClick_Click, addPosition_Click, loadAutoClick_Click,
@@ -419,6 +421,8 @@ public class AutoClickController extends RootController implements MousePosition
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
             String lastNotOverwriteValue = notOverwrite_Click.isSelected() ? activation : unActivation;
             prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
+            String loadFolderValue = loadFolder_Click.isSelected() ? activation : unActivation;
+            prop.put(key_loadFolder, loadFolderValue);
             prop.put(key_lastPreparationRecordTime, preparationRecordTime_Click.getText());
             prop.put(key_lastPreparationRunTime, preparationRunTime_Click.getText());
             String outPathValue = outPath_Click.getText();
@@ -467,6 +471,7 @@ public class AutoClickController extends RootController implements MousePosition
         prop.load(input);
         if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
+            setControlLastConfig(loadFolder_Click, prop, key_loadFolder, unActivation);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
             setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
@@ -1648,9 +1653,10 @@ public class AutoClickController extends RootController implements MousePosition
         bindingTaskNode(loadPMCFilsTask, taskBean);
         loadPMCFilsTask.setOnSucceeded(event -> {
             taskUnbind(taskBean);
-            List<ClickPositionVO> clickPositionVOS = loadPMCFilsTask.getValue();
-            String path = files.getLast().getPath();
-            addAutoClickPositions(clickPositionVOS, path);
+            PMCLoadResult value = loadPMCFilsTask.getValue();
+            String lastPMCPath = value.lastPMCPath();
+            List<ClickPositionVO> clickPositionVOS = value.clickPositionList();
+            addAutoClickPositions(clickPositionVOS, lastPMCPath);
             loadPMCFilsTask = null;
         });
         loadPMCFilsTask.setOnFailed(event -> {
@@ -1750,6 +1756,17 @@ public class AutoClickController extends RootController implements MousePosition
         if (isNativeHookException) {
             Button saveButton = settingController.setFloatingCoordinate_Set;
             saveButton.setDisable(true);
+        }
+    }
+
+    /**
+     * 获取选择的文件
+     */
+    private void getSelectFile(List<? extends File> selectedFile) throws IOException {
+        if (CollectionUtils.isNotEmpty(selectedFile)) {
+            inFilePath = selectedFile.getFirst().getPath();
+            updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
+            startLoadPMCTask(selectedFile);
         }
     }
 
@@ -1854,12 +1871,21 @@ public class AutoClickController extends RootController implements MousePosition
             getProperties();
             FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
-            Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-            List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
-            if (CollectionUtils.isNotEmpty(selectedFile)) {
-                inFilePath = selectedFile.getFirst().getPath();
-                updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
-                startLoadPMCTask(selectedFile);
+            if (loadFolder_Click.isSelected()) {
+                FileChooserConfig fileConfig = new FileChooserConfig();
+                fileConfig.setTitle(text_selectDirectory())
+                        .setConfigPath(configFile_Click)
+                        .setPathKey(key_inFilePath)
+                        .setShowDirectory(text_onlyDirectory)
+                        .setShowHideFile(text_noHideFile)
+                        .setPath(inFilePath);
+                FileChooserController controller = chooserFiles(fileConfig);
+                // 设置回调
+                controller.setFileChooserCallback(this::getSelectFile);
+            } else {
+                Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+                List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
+                getSelectFile(selectedFile);
             }
         }
     }
@@ -1941,14 +1967,9 @@ public class AutoClickController extends RootController implements MousePosition
     @FXML
     private void acceptDrop(DragEvent dragEvent) {
         if (isFree()) {
-            List<File> files = dragEvent.getDragboard().getFiles();
-            files.forEach(file -> {
-                if (PMC.equals(getExistsFileType(file))) {
-                    // 接受拖放
-                    dragEvent.acceptTransferModes(TransferMode.COPY);
-                    dragEvent.consume();
-                }
-            });
+            // 接受拖放
+            dragEvent.acceptTransferModes(TransferMode.COPY);
+            dragEvent.consume();
         }
     }
 

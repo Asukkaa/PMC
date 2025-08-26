@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Bean;
+package priv.koishi.pmc.Bean.Config;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

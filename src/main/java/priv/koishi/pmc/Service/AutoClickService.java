@@ -16,6 +16,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.*;
+import priv.koishi.pmc.Bean.Config.FileConfig;
+import priv.koishi.pmc.Bean.Config.FindPositionConfig;
+import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
@@ -23,10 +26,7 @@ import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -85,26 +85,85 @@ public class AutoClickService {
      * @param files    文件列表
      * @return PMC 文件列表
      */
-    public static Task<List<ClickPositionVO>> loadPMCFils(TaskBean<ClickPositionVO> taskBean, List<? extends File> files) {
+    public static Task<PMCLoadResult> loadPMCFils(TaskBean<ClickPositionVO> taskBean, List<? extends File> files) {
         return new Task<>() {
             @Override
-            protected List<ClickPositionVO> call() {
+            protected PMCLoadResult call() {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 List<ClickPositionVO> clickPositionBeans = new ArrayList<>();
+                Map<String, String> imgMap = new HashMap<>();
+                String lastPMCPath = "";
                 int size = files.size();
                 updateProgress(0, size);
                 for (int i = 0; i < size; i++) {
                     File file = files.get(i);
-                    try {
-                        clickPositionBeans = loadPMCFile(file);
-                    } catch (IOException e) {
-                        showExceptionAlert(e);
+                    if (PMC.equals(getExistsFileType(file))) {
+                        lastPMCPath = file.getPath();
+                        try {
+                            clickPositionBeans = loadPMCFile(file);
+                        } catch (IOException e) {
+                            showExceptionAlert(e);
+                        }
+                    } else if (file.isDirectory()) {
+                        List<String> filterExtensionList = new ArrayList<>(imageType);
+                        filterExtensionList.add(PMC);
+                        FileConfig fileConfig = new FileConfig()
+                                .setFilterExtensionList(filterExtensionList)
+                                .setShowDirectory(text_onlyFile)
+                                .setPath(file.getPath())
+                                .setRecursion(true);
+                        for (File readFile : readAllFiles(fileConfig)) {
+                            if (PMC.equals(getExistsFileType(readFile))) {
+                                lastPMCPath = readFile.getPath();
+                                try {
+                                    clickPositionBeans = loadPMCFile(readFile);
+                                } catch (IOException e) {
+                                    showExceptionAlert(e);
+                                }
+                            } else {
+                                imgMap.put(readFile.getPath(), getExistsFileName(readFile));
+                            }
+                        }
+                    } else if (imageType.contains(getExistsFileType(file))) {
+                        imgMap.put(file.getPath(), getExistsFileName(file));
                     }
                     updateProgress(i + 1, size);
                 }
+                // 匹配图片
+                matchClickImg(imgMap, clickPositionBeans);
                 taskBean.getTableView().refresh();
-                return clickPositionBeans;
+                return new PMCLoadResult(clickPositionBeans, lastPMCPath);
+            }
+
+            // 匹配图片
+            private void matchClickImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
+                if (!imgMap.isEmpty()) {
+                    updateMessage(text_matchImg());
+                    int clickPositionBeansSize = clickPositionBeans.size();
+                    updateProgress(0, clickPositionBeansSize);
+                    for (int j = 0; j < clickPositionBeansSize; j++) {
+                        ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
+                        String clickImgPath = clickPositionVO.getClickImgPath();
+                        if (StringUtils.isNotBlank(clickImgPath)) {
+                            File file = new File(clickImgPath);
+                            if (!file.exists()) {
+                                // 通过文件获取路径可消除不同操作系统的路径分隔符的差异
+                                String imgName = getFileName(file.getPath());
+                                String imgPath = imgMap.entrySet()
+                                        .stream()
+                                        .filter(entry -> imgName.equals(entry.getValue()))
+                                        .map(Map.Entry::getKey)
+                                        .findFirst()
+                                        .orElse(null);
+                                if (StringUtils.isNotBlank(imgPath)) {
+                                    clickPositionVO.setClickImgPath(imgPath);
+                                }
+                            }
+                        }
+                        updateProgress(j + 1, clickPositionBeansSize);
+                    }
+                }
             }
         };
     }

@@ -5,8 +5,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
@@ -33,18 +35,23 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Annotate.UsedByReflection;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
+import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.VO.Indexable;
+import priv.koishi.pmc.Controller.FileChooserController;
 import priv.koishi.pmc.CustomUI.MessageBubble.MessageBubble;
 import priv.koishi.pmc.MainApplication;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -1996,6 +2003,133 @@ public class UiUtils {
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         setWindowLogo(stage, logoPath);
         return alert.showAndWait();
+    }
+
+    /**
+     * 向列表添加文件并根据文件路径去重
+     *
+     * @param files 文件列表
+     * @throws IOException io异常
+     */
+    public static void addRemoveSameFile(List<? extends File> files, boolean isAllDirectory, TableView<FileVO> tableView) throws IOException {
+        if (CollectionUtils.isNotEmpty(files)) {
+            List<FileVO> fileBeans = new ArrayList<>();
+            // 如果是所有都是目录，只保留顶层目录
+            if (isAllDirectory) {
+                files = filterTopDirectories(files);
+            }
+            for (File file : files) {
+                if (isPath(file.getPath()) && file.exists()) {
+                    FileVO fileBean = creatFileVo(tableView, file);
+                    fileBeans.add(fileBean);
+                }
+            }
+            // 根据文件路径去重
+            removeSameFilePath(tableView, fileBeans);
+        }
+    }
+
+    /**
+     * 创建文件对象
+     *
+     * @param tableView 列表对象
+     * @param file      文件对象
+     * @return 文件对象
+     * @throws IOException io异常
+     */
+    public static FileVO creatFileVo(TableView<FileVO> tableView, File file) throws IOException {
+        FileVO fileBean = new FileVO();
+        fileBean.setTableView(tableView)
+                .setUpdateDate(getFileUpdateTime(file))
+                .setCreatDate(getFileCreatTime(file))
+                .setFileType(getExistsFileType(file))
+                .setName(getExistsFileName(file))
+                .setSize(getFileUnitSize(file))
+                .setShowStatus(text_noHideFile)
+                .setPath(file.getPath());
+        return fileBean;
+    }
+
+    /**
+     * 根据文件路径去重
+     *
+     * @param tableView 列表对象
+     * @param fileBeans 要去重的文件列表
+     */
+    public static void removeSameFilePath(TableView<FileVO> tableView, List<FileVO> fileBeans) {
+        List<FileVO> currentItems = new ArrayList<>(tableView.getItems());
+        List<FileVO> filteredList = fileBeans.stream()
+                .filter(fileBean ->
+                        currentItems.stream().noneMatch(current ->
+                                current.getPath().equals(fileBean.getPath())))
+                .toList();
+        tableView.getItems().addAll(filteredList);
+        tableView.refresh();
+    }
+
+    /**
+     * 文件大小排序
+     *
+     * @param sizeColumn 要进行文件大小排序的列
+     */
+    public static void fileSizeColum(TableColumn<?, String> sizeColumn) {
+        // 自定义比较器
+        Comparator<String> customComparator = Comparator.comparingDouble(FileUtils::fileSizeCompareValue);
+        // 应用自定义比较器
+        sizeColumn.setComparator(customComparator);
+    }
+
+    /**
+     * 关闭窗口
+     *
+     * @param stage    要关闭的窗口
+     * @param runnable 关闭前的回调
+     */
+    public static void closeStage(Stage stage, Runnable runnable) {
+        if (runnable != null) {
+            runnable.run();
+        }
+        WindowEvent closeEvent = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
+        stage.fireEvent(closeEvent);
+        if (!closeEvent.isConsumed()) {
+            stage.close();
+        }
+        System.gc();
+    }
+
+    /**
+     * 使用自定义文件选择器选择文件
+     *
+     * @param fileChooserConfig 文件查询配置
+     * @return 文件选择器控制器
+     * @throws IOException io异常
+     */
+    public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
+        URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        Parent root = loader.load();
+        FileChooserController controller = loader.getController();
+        controller.initData(fileChooserConfig);
+        Stage detailStage = new Stage();
+        Properties prop = new Properties();
+        InputStream input = checkRunningInputStream(configFile);
+        prop.load(input);
+        double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1000"));
+        double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "450"));
+        input.close();
+        Scene scene = new Scene(root, with, height);
+        detailStage.setScene(scene);
+        detailStage.setTitle(fileChooserConfig.getTitle());
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        setWindowLogo(detailStage, logoPath);
+        detailStage.show();
+        // 监听窗口面板宽度变化
+        detailStage.widthProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        // 监听窗口面板高度变化
+        detailStage.heightProperty().addListener((v1, v2, v3) ->
+                Platform.runLater(controller::adaption));
+        return controller;
     }
 
 }
