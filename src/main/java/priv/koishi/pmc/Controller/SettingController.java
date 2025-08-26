@@ -6,6 +6,7 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
@@ -23,7 +24,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
@@ -32,6 +36,7 @@ import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,8 +50,11 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.Service.AutoClickService.loadImg;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -123,6 +131,9 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public HBox fileNumberHBox_Set, findImgSetting_Set;
+
+    @FXML
+    public ProgressBar progressBar_Set;
 
     @FXML
     public ColorPicker colorPicker_Set;
@@ -654,14 +665,16 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
-        Node timedStartTab = mainScene.lookup("#timedStartTab");
-        disableNodes.add(timedStartTab);
-        Node autoClickTab = mainScene.lookup("#autoClickTab");
-        disableNodes.add(autoClickTab);
-        Node settingTab = mainScene.lookup("#settingTab");
-        disableNodes.add(settingTab);
+        disableNodes.add(removeAll_Set);
+        disableNodes.add(stopImgBtn_Set);
         Node aboutTab = mainScene.lookup("#aboutTab");
         disableNodes.add(aboutTab);
+        Node settingTab = mainScene.lookup("#settingTab");
+        disableNodes.add(settingTab);
+        Node autoClickTab = mainScene.lookup("#autoClickTab");
+        disableNodes.add(autoClickTab);
+        Node timedStartTab = mainScene.lookup("#timedStartTab");
+        disableNodes.add(timedStartTab);
     }
 
     /**
@@ -713,6 +726,47 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 创建任务参数对象
+     *
+     * @return 任务参数对象
+     */
+    private TaskBean<ImgFileVO> creatTaskBean() {
+        TaskBean<ImgFileVO> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(progressBar_Set)
+                .setMassageLabel(dataNumber_Set)
+                .setTableView(tableView_Set)
+                .setDisableNodes(disableNodes);
+        return taskBean;
+    }
+
+    /**
+     * 启动加载图片任务
+     *
+     * @param files 要加载的文件
+     */
+    private void startLoadImgTask(List<? extends File> files) {
+        TaskBean<ImgFileVO> taskBean = creatTaskBean();
+        Task<Void> loadImgTask = loadImg(taskBean, files);
+        bindingTaskNode(loadImgTask, taskBean);
+        loadImgTask.setOnSucceeded(event -> {
+            taskUnbind(taskBean);
+            updateTableViewSizeText(tableView_Set, dataNumber_Set, text_img());
+            tableView_Set.refresh();
+        });
+        Thread.ofVirtual()
+                .name("loadImgTask-vThread" + tabId)
+                .start(loadImgTask);
+    }
+
+    /**
+     * 初始化下拉框
+     */
+    private void setChoiceBoxItems() {
+        // 初始化语言设置下拉框
+        initializeChoiceBoxItems(language_Set, LanguageEnum.zh_CN.getString(), languageMap);
+    }
+
+    /**
      * 根据鼠标位置调整ui
      *
      * @param mousePoint 鼠标位置
@@ -730,14 +784,6 @@ public class SettingController extends RootController implements MousePositionUp
                 floatingPosition.setText(point);
             }
         });
-    }
-
-    /**
-     * 初始化下拉框
-     */
-    private void setChoiceBoxItems() {
-        // 初始化语言设置下拉框
-        initializeChoiceBoxItems(language_Set, LanguageEnum.zh_CN.getString(), languageMap);
     }
 
     /**
@@ -1160,7 +1206,13 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {
-        stopImgSelectPath = addStopImgPaths(actionEvent, tableView_Set, dataNumber_Set, stopImgSelectPath);
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        List<File> imgFiles = creatImgFilesChooser(window, stopImgSelectPath);
+        if (CollectionUtils.isNotEmpty(imgFiles)) {
+            File selectedFile = imgFiles.getFirst();
+            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
+            startLoadImgTask(imgFiles);
+        }
     }
 
     /**
@@ -1179,7 +1231,8 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void handleDrop(DragEvent dragEvent) {
-        handleDropImg(dragEvent, tableView_Set);
+        List<File> files = dragEvent.getDragboard().getFiles();
+        startLoadImgTask(files);
     }
 
     /**

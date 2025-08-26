@@ -334,6 +334,7 @@
                         text="%setting.stopImgBtn_Set"/>
                 <Button fx:id="removeAll_Set" onAction="#removeAll" style="-fx-cursor: hand"
                         text="%listText.removeAll"/>
+                <ProgressBar fx:id="progressBar_Set" visible="false" prefWidth="200.0" progress="0.0"/>
 
                 <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
             </HBox>

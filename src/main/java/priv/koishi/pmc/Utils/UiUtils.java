@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -1855,66 +1854,6 @@ public class UiUtils {
         stage.toFront();
         stage.requestFocus();
         stage.setAlwaysOnTop(false);
-    }
-
-    /**
-     * 选择终止操作的图片
-     *
-     * @param actionEvent       点击事件
-     * @param tableView         终止操作图片列表
-     * @param dataNumber        图片数量信息栏
-     * @param stopImgSelectPath 文件选择器初始路径
-     * @return 选择的文件路径
-     * @throws IOException io异常
-     */
-    public static String addStopImgPaths(ActionEvent actionEvent, TableView<ImgFileVO> tableView, Label dataNumber,
-                                         String stopImgSelectPath) throws IOException {
-        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-        List<File> imgFiles = creatImgFilesChooser(window, stopImgSelectPath);
-        if (CollectionUtils.isNotEmpty(imgFiles)) {
-            File selectedFile = imgFiles.getFirst();
-            // 更新所选文件路径显示
-            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
-            ObservableList<ImgFileVO> items = tableView.getItems();
-            for (File img : imgFiles) {
-                boolean isExist = items.stream().anyMatch(bean -> img.getPath().equals(bean.getPath()));
-                ImgFileVO imgFileVO = new ImgFileVO();
-                if (!isExist) {
-                    imgFileVO.setTableView(tableView)
-                            .setType(getExistsFileType(img))
-                            .setName(img.getName())
-                            .setPath(img.getPath());
-                    items.add(imgFileVO);
-                } else {
-                    new MessageBubble(text_imgExist(), 2);
-                }
-            }
-            tableView.refresh();
-            updateTableViewSizeText(tableView, dataNumber, text_img());
-        }
-        return stopImgSelectPath;
-    }
-
-    /**
-     * 图片列表拖拽释放行为
-     *
-     * @param dragEvent 拖拽事件
-     * @param tableView 图片列表
-     */
-    public static void handleDropImg(DragEvent dragEvent, TableView<ImgFileVO> tableView) {
-        List<File> files = dragEvent.getDragboard().getFiles();
-        ObservableList<ImgFileVO> items = tableView.getItems();
-        files.forEach(file -> {
-            boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
-            if (!isExist) {
-                ImgFileVO imgFileVO = new ImgFileVO();
-                imgFileVO.setTableView(tableView)
-                        .setType(getExistsFileType(file))
-                        .setName(file.getName())
-                        .setPath(file.getPath());
-                items.add(imgFileVO);
-            }
-        });
     }
 
     /**

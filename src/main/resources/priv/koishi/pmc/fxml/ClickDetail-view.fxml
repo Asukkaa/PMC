@@ -249,7 +249,10 @@
             </HBox>
 
             <HBox spacing="10">
-                <Label fx:id="nullLabel_Det"/>
+                <VBox fx:id="progressBarVBox_Det">
+                    <ProgressBar fx:id="progressBar_Det" visible="false" prefWidth="200.0" progress="0.0"/>
+                </VBox>
+
                 <Button text="%detail.save" style="-fx-cursor: hand" onAction="#saveDetail"/>
                 <Button text="%clickDetail.removeDetail" style="-fx-cursor: hand" onAction="#removeDetail"/>
             </HBox>

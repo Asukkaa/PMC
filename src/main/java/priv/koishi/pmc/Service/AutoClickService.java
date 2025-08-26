@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.robot.Robot;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
@@ -36,8 +39,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
-import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
-import static priv.koishi.pmc.Utils.FileUtils.notOverwritePath;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
 
@@ -90,12 +92,16 @@ public class AutoClickService {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 List<ClickPositionVO> clickPositionBeans = new ArrayList<>();
-                for (File file : files) {
+                int size = files.size();
+                updateProgress(0, size);
+                for (int i = 0; i < size; i++) {
+                    File file = files.get(i);
                     try {
                         clickPositionBeans = loadPMCFile(file);
                     } catch (IOException e) {
                         showExceptionAlert(e);
                     }
+                    updateProgress(i + 1, size);
                 }
                 taskBean.getTableView().refresh();
                 return clickPositionBeans;
@@ -144,6 +150,40 @@ public class AutoClickService {
                 objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
                 updateMessage(text_saveSuccess() + path);
                 return path;
+            }
+        };
+    }
+
+    /**
+     * 批量加载图片文件
+     *
+     * @param taskBean 线程任务参数
+     * @param files    图片文件列表
+     */
+    public static Task<Void> loadImg(TaskBean<ImgFileVO> taskBean, List<? extends File> files) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                TableView<ImgFileVO> tableView = taskBean.getTableView();
+                ObservableList<ImgFileVO> items = tableView.getItems();
+                int size = files.size();
+                updateProgress(0, size);
+                for (int i = 0; i < size; i++) {
+                    File file = files.get(i);
+                    boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
+                    if (!isExist) {
+                        ImgFileVO imgFileVO = new ImgFileVO();
+                        imgFileVO.setTableView(tableView)
+                                .setType(getExistsFileType(file))
+                                .setName(file.getName())
+                                .setPath(file.getPath());
+                        items.add(imgFileVO);
+                    }
+                    updateProgress(i + 1, size);
+                }
+                return null;
             }
         };
     }

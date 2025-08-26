@@ -6,6 +6,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -22,6 +23,7 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 
@@ -35,8 +37,10 @@ import java.util.stream.IntStream;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Service.AutoClickService.loadImg;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -84,6 +88,16 @@ public class ClickDetailController extends RootController {
     private boolean isModified;
 
     /**
+     * 要防重复点击的组件
+     */
+    private final List<Node> disableNodes = new ArrayList<>();
+
+    /**
+     * 加载图片任务
+     */
+    private Task<Void> loadImgTask;
+
+    /**
      * 修改内容变化标志监听器
      */
     private final Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners = new WeakHashMap<>();
@@ -123,10 +137,13 @@ public class ClickDetailController extends RootController {
     public AnchorPane anchorPane_Det;
 
     @FXML
-    public VBox clickImgVBox_Det;
+    public VBox clickImgVBox_Det, progressBarVBox_Det;
 
     @FXML
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det;
+
+    @FXML
+    public ProgressBar progressBar_Det;
 
     @FXML
     public Slider clickOpacity_Det, stopOpacity_Det;
@@ -145,7 +162,7 @@ public class ClickDetailController extends RootController {
             randomWaitTime_Det;
 
     @FXML
-    public Label clickImgPath_Det, dataNumber_Det, nullLabel_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
+    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
             tableViewSize_Det, clickTypeText_Det;
 
     @FXML
@@ -174,7 +191,7 @@ public class ClickDetailController extends RootController {
         tableView_Det.setPrefWidth(tableWidth);
         tableView_Det.setPrefHeight(stage.getHeight() * 0.4);
         regionRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
-        nullLabel_Det.setPrefWidth(stage.getWidth() * 0.4);
+        progressBarVBox_Det.setPrefWidth(stage.getWidth() * 0.4);
         bindPrefWidthProperty();
     }
 
@@ -592,7 +609,61 @@ public class ClickDetailController extends RootController {
     private void closeStage() {
         removeAll();
         removeAllListeners();
+        if (loadImgTask != null && loadImgTask.isRunning()) {
+            loadImgTask.cancel();
+        }
         stage.close();
+    }
+
+    /**
+     * 创建任务参数对象
+     *
+     * @return 任务参数对象
+     */
+    private TaskBean<ImgFileVO> creatTaskBean() {
+        TaskBean<ImgFileVO> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(progressBar_Det)
+                .setMassageLabel(dataNumber_Det)
+                .setTableView(tableView_Det)
+                .setDisableNodes(disableNodes);
+        return taskBean;
+    }
+
+    /**
+     * 启动加载图片任务
+     *
+     * @param files 要加载的文件
+     */
+    private void startLoadImgTask(List<? extends File> files) {
+        TaskBean<ImgFileVO> taskBean = creatTaskBean();
+        loadImgTask = loadImg(taskBean, files);
+        bindingTaskNode(loadImgTask, taskBean);
+        loadImgTask.setOnSucceeded(event -> {
+            taskUnbind(taskBean);
+            updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img());
+            tableView_Det.refresh();
+            loadImgTask = null;
+        });
+        loadImgTask.setOnFailed(event -> {
+            taskNotSuccess(taskBean, text_taskFailed());
+            loadImgTask = null;
+            throw new RuntimeException(event.getSource().getException());
+        });
+        loadImgTask.setOnCancelled(event -> {
+            taskNotSuccess(taskBean, text_taskCancelled());
+            loadImgTask = null;
+        });
+        Thread.ofVirtual()
+                .name("loadImgTask-vThread" + tabId)
+                .start(loadImgTask);
+    }
+
+    /**
+     * 设置要防重复点击的组件
+     */
+    private void setDisableNodes() {
+        disableNodes.add(removeAll_Det);
+        disableNodes.add(stopImgBtn_Det);
     }
 
     /**
@@ -610,6 +681,8 @@ public class ClickDetailController extends RootController {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
             // 组件宽高自适应
             adaption();
+            // 设置要防重复点击的组件
+            setDisableNodes();
             // 添加确认关闭确认框
             addCloseConfirm();
             // 添加控件监听
@@ -728,7 +801,14 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {
-        stopImgSelectPath = addStopImgPaths(actionEvent, tableView_Det, dataNumber_Det, stopImgSelectPath);
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        List<File> imgFiles = creatImgFilesChooser(window, stopImgSelectPath);
+        if (CollectionUtils.isNotEmpty(imgFiles)) {
+            File selectedFile = imgFiles.getFirst();
+            // 更新所选文件路径显示
+            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
+            startLoadImgTask(imgFiles);
+        }
     }
 
     /**
@@ -747,7 +827,8 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     public void handleDrop(DragEvent dragEvent) {
-        handleDropImg(dragEvent, tableView_Det);
+        List<File> files = dragEvent.getDragboard().getFiles();
+        startLoadImgTask(files);
     }
 
     /**
