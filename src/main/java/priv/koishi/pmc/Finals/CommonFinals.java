@@ -794,32 +794,4 @@ public class CommonFinals {
 
     public static final String key_loadFolder = "loadFolder";
 
-    public static final String text_noHideFile = "不查询隐藏文件";
-
-    public static final String text_onlyHideFile = "只查询隐藏文件";
-
-    public static final String text_onlyFile = "只查询文件";
-
-    public static final String text_onlyDirectory = "只查询文件夹";
-
-    public static final String text_fileDirectory = "文件和文件夹都查询";
-
-    public static final String name_contain = "文件名包含";
-
-    public static final String name_is = "文件名为";
-
-    public static final String name_start = "文件名起始于";
-
-    public static final String name_end = "文件名结束于";
-
-    public static final String sort_Name = "按文件名称排序";
-
-    public static final String sort_creatTime = "按文件创建时间排序";
-
-    public static final String sort_updateTime = "按文件修改时间排序";
-
-    public static final String sort_size = "按文件大小排序";
-
-    public static final String sort_type = "按文件类型排序";
-
 }

@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.defaultFileChooserPath;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ReadDataService.readAllFilesTask;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -133,10 +133,24 @@ public class FileChooserController extends RootController {
             path = defaultFileChooserPath;
         }
         this.fileChooserConfig = fileChooserConfig;
-        fileFilter_FC.setValue(fileChooserConfig.getShowDirectory());
-        hideFileType_FC.setValue(fileChooserConfig.getShowHideFile());
+        String showDirectory = fileChooserConfig.getShowDirectory();
+        if (StringUtils.isNotBlank(showDirectory)) {
+            fileFilter_FC.setValue(showDirectory);
+        }
+        String fileNameType = fileChooserConfig.getFileNameType();
+        if (StringUtils.isNotBlank(fileNameType)) {
+            fileNameType_FC.setValue(fileNameType);
+        }
+        String showHideFile = fileChooserConfig.getShowHideFile();
+        if (StringUtils.isNotBlank(showHideFile)) {
+            hideFileType_FC.setValue(showHideFile);
+        }
+        reverse_FC.setSelected(fileChooserConfig.isReverseFileName());
+        fileNameFilter_FC.setText(fileChooserConfig.getFileNameFilter());
+        filterNameCase_FC.setSelected(fileChooserConfig.isFilterNameCase());
         // 设置鼠标悬停提示
         setToolTip();
+        // 设置默认选中的文件
         selectFile(new File(path));
     }
 
@@ -150,12 +164,12 @@ public class FileChooserController extends RootController {
         FileConfig fileConfig = new FileConfig();
         fileConfig.setFilterNameCase(filterNameCase_FC.isSelected())
                 .setFileNameFilter(fileNameFilter_FC.getText())
-                .setShowDirectory(fileFilter_FC.getValue())
                 .setShowHideFile(hideFileType_FC.getValue())
                 .setFileNameType(fileNameType_FC.getValue())
                 .setReverseFileName(reverse_FC.isSelected())
+                .setShowDirectory(fileFilter_FC.getValue())
+                .setSortType(sort_type())
                 .setPath(file.getPath())
-                .setSortType(sort_type)
                 .setReverseSort(true);
         TaskBean<FileVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_FC)
@@ -356,7 +370,7 @@ public class FileChooserController extends RootController {
      * @param contextMenu 右键菜单
      */
     private void buildSelectPathItem(TableView<? extends FileVO> tableView, ContextMenu contextMenu) {
-        MenuItem selectPathItem = new MenuItem("查询所选第一行文件");
+        MenuItem selectPathItem = new MenuItem(text_checkFirstFile());
         selectPathItem.setOnAction(event -> {
             FileVO selectedItem = tableView.getSelectionModel().getSelectedItems().getFirst();
             try {
@@ -441,10 +455,24 @@ public class FileChooserController extends RootController {
     }
 
     /**
+     * 初始化下拉框
+     */
+    private void setChoiceBoxItems() {
+        // 文件名查询设置
+        initializeChoiceBoxItems(fileNameType_FC, name_contain(), nameSearchTypeList);
+        // 文件与文件夹查询设置
+        initializeChoiceBoxItems(fileFilter_FC, search_fileDirectory(), searchTypeList);
+        // 隐藏文件查询设置
+        initializeChoiceBoxItems(hideFileType_FC, hide_noHideFile(), hideSearchTypeList);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
+        // 初始化下拉框
+        setChoiceBoxItems();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_FC.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
@@ -536,11 +564,11 @@ public class FileChooserController extends RootController {
             for (FileVO fileVO : selectedItems) {
                 File file = new File(fileVO.getPath());
                 String fileType = fileVO.getFileType();
-                if (text_onlyDirectory.equals(showDirectory)) {
+                if (search_onlyDirectory().equals(showDirectory)) {
                     if (extension_folder().equals(fileType)) {
                         fileVOList.add(file);
                     }
-                } else if (text_onlyFile.equals(showDirectory)) {
+                } else if (search_onlyFile().equals(showDirectory)) {
                     if (!extension_folder().equals(fileType)) {
                         List<String> filterExtensionList = fileChooserConfig.getFilterExtensionList();
                         if (CollectionUtils.isEmpty(filterExtensionList) || filterExtensionList.contains(fileType)) {

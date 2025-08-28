@@ -1877,8 +1877,8 @@ public class AutoClickController extends RootController implements MousePosition
                 fileConfig.setTitle(text_selectDirectory())
                         .setConfigPath(configFile_Click)
                         .setPathKey(key_inFilePath)
-                        .setShowDirectory(text_onlyDirectory)
-                        .setShowHideFile(text_noHideFile)
+                        .setShowDirectory(search_onlyDirectory())
+                        .setShowHideFile(hide_noHideFile())
                         .setPath(inFilePath);
                 FileChooserController controller = chooserFiles(fileConfig);
                 // 设置回调

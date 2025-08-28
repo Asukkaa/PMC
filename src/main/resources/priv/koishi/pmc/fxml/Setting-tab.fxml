@@ -346,7 +346,7 @@
 
                 <columns>
                     <TableColumn fx:id="index_Set" text="%listText.index" sortable="false"/>
-                    <TableColumn fx:id="thumb_Set" text="%stopImg.thumb" sortable="false"/>
+                    <TableColumn fx:id="thumb_Set" text="%listText.thumb" sortable="false"/>
                     <TableColumn fx:id="name_Set" text="%stopImg.name" sortable="false"/>
                     <TableColumn fx:id="path_Set" text="%stopImg.path" sortable="false"/>
                     <TableColumn fx:id="type_Set" text="%stopImg.type" sortable="false"/>

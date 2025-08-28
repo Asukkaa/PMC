@@ -2038,6 +2038,7 @@ public class UiUtils {
      * @throws IOException io异常
      */
     public static FileVO creatFileVo(TableView<FileVO> tableView, File file) throws IOException {
+        String showStatus = file.isHidden() ? text_hidden() : text_unhidden();
         FileVO fileBean = new FileVO();
         fileBean.setTableView(tableView)
                 .setUpdateDate(getFileUpdateTime(file))
@@ -2045,7 +2046,7 @@ public class UiUtils {
                 .setFileType(getExistsFileType(file))
                 .setName(getExistsFileName(file))
                 .setSize(getFileUnitSize(file))
-                .setShowStatus(text_noHideFile)
+                .setShowStatus(showStatus)
                 .setPath(file.getPath());
         return fileBean;
     }
@@ -2106,7 +2107,7 @@ public class UiUtils {
      */
     public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
         URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root = loader.load();
         FileChooserController controller = loader.getController();
         controller.initData(fileChooserConfig);

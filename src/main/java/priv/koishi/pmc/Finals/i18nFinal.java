@@ -446,42 +446,74 @@ public class i18nFinal {
         return bundle.getString("tip.notExistsIndex");
     }
 
+    /**
+     * 点击后将会关闭当前页面，不会将任何数据添加到要移动的文件列表中
+     */
     public static String tip_close() {
         return bundle.getString("tip.close");
     }
 
+    /**
+     * 点击后将会把列表中选中的文件夹添加到要移动的文件列表中，没有选中项则添加当前查询的目录
+     */
     public static String tip_confirm() {
         return bundle.getString("tip.confirm");
     }
 
+    /**
+     * 点击后可选择要查询的目录
+     */
     public static String tip_selectPath() {
         return bundle.getString("tip.selectPath");
     }
 
+    /**
+     * 点击可返回上级目录
+     */
     public static String tip_gotoParent() {
         return bundle.getString("tip.gotoParent");
     }
 
+    /**
+     * 点击将会按配置项重新查信息到列表中
+     */
     public static String tip_reselectButton() {
         return bundle.getString("tip.reselectButton");
     }
 
+    /**
+     * 将会按照这里填写的字符进行筛选
+     */
     public static String tip_fileNameFilter() {
         return bundle.getString("tip.fileNameFilter");
     }
 
+    /**
+     * 用来选择文件名匹配的方式
+     */
     public static String tip_fileNameType() {
         return bundle.getString("tip.fileNameType");
     }
 
+    /**
+     * 点击可选择隐藏文件查询逻辑
+     */
     public static String tip_hideFileType() {
         return bundle.getString("tip.hideFileType");
     }
 
+    /**
+     * 点击可选择文件与文件夹查询逻辑
+     */
     public static String tip_directoryNameType() {
         return bundle.getString("tip.directoryNameType");
     }
 
+    /**
+     * 勾选后只能选择PMC文件所在文件夹
+     * 选中文件夹后将会导入文件夹下所有的PMC文件，如果文件夹中有图片，
+     * 将会按照图片名称自动匹配未匹配到图片的要点击的图像设置
+     */
     public static String tip_loadFolder_Click() {
         return bundle.getString("tip.loadFolder_Click");
     }
@@ -782,8 +814,29 @@ public class i18nFinal {
         return bundle.getString("exportData");
     }
 
+    /**
+     * 个文件
+     */
     public static String text_file() {
         return bundle.getString("file");
+    }
+
+    /**
+     * 隐藏
+     */
+    public static String text_hidden() {
+        return bundle.getString("hidden");
+    }
+
+    /**
+     * 非隐藏
+     */
+    public static String text_unhidden() {
+        return bundle.getString("unhidden");
+    }
+
+    public static String text_checkFirstFile() {
+        return bundle.getString("checkFirstFile");
     }
 
     public static String confirm_unSaved() {
@@ -1024,6 +1077,163 @@ public class i18nFinal {
 
     public static String update_deleteErr() {
         return bundle.getString("update.deleteErr");
+    }
+
+    /**
+     * 只查询文件
+     */
+    public static String search_onlyFile() {
+        return bundle.getString("search.onlyFile");
+    }
+
+    /**
+     * 只查询文件夹
+     */
+    public static String search_onlyDirectory() {
+        return bundle.getString("search.onlyDirectory");
+    }
+
+    /**
+     * 文件和文件夹都查询
+     */
+    public static String search_fileDirectory() {
+        return bundle.getString("search.fileDirectory");
+    }
+
+    /**
+     * 文件与文件夹查询条件选项
+     */
+    public static final List<String> searchTypeList = new ArrayList<>();
+
+    /**
+     * 更新文件与文件夹查询条件选项
+     */
+    public static void updateSearchTypeList() {
+        List<String> newList = Arrays.asList(
+                search_onlyFile(),
+                search_fileDirectory(),
+                search_onlyDirectory());
+        searchTypeList.clear();
+        searchTypeList.addAll(newList);
+    }
+
+    /**
+     * 不查询隐藏文件
+     */
+    public static String hide_noHideFile() {
+        return bundle.getString("hide.noHideFile");
+    }
+
+    /**
+     * 只查询隐藏文件
+     */
+    public static String hide_onlyHideFile() {
+        return bundle.getString("hide.onlyHideFile");
+    }
+
+    /**
+     * 是否隐藏都查询
+     */
+    public static String hide_allFile() {
+        return bundle.getString("hide.allFile");
+    }
+
+    /**
+     * 隐藏文件查询设置选项
+     */
+    public static final List<String> hideSearchTypeList = new ArrayList<>();
+
+    /**
+     * 更新隐藏文件查询条件选项
+     */
+    public static void updateHideSearchTypeList() {
+        List<String> newList = Arrays.asList(
+                hide_noHideFile(),
+                hide_allFile(),
+                hide_onlyHideFile());
+        hideSearchTypeList.clear();
+        hideSearchTypeList.addAll(newList);
+    }
+
+    /**
+     * 文件名包含
+     */
+    public static String name_contain() {
+        return bundle.getString("name.contain");
+    }
+
+    /**
+     * 文件名为
+     */
+    public static String name_is() {
+        return bundle.getString("name.is");
+    }
+
+    /**
+     * 文件名起始于
+     */
+    public static String name_start() {
+        return bundle.getString("name.start");
+    }
+
+    /**
+     * 文件名结束于
+     */
+    public static String name_end() {
+        return bundle.getString("name.end");
+    }
+
+    /**
+     * 文件名查询设置选项
+     */
+    public static final List<String> nameSearchTypeList = new ArrayList<>();
+
+    /**
+     * 更新文件名查询条件选项
+     */
+    public static void updateNameSearchTypeList() {
+        List<String> newList = Arrays.asList(
+                name_contain(),
+                name_is(),
+                name_start(),
+                name_end());
+        nameSearchTypeList.clear();
+        nameSearchTypeList.addAll(newList);
+    }
+
+    /**
+     * 按文件名称排序
+     */
+    public static String sort_Name() {
+        return bundle.getString("sort.Name");
+    }
+
+    /**
+     * 按文件创建时间排序
+     */
+    public static String sort_creatTime() {
+        return bundle.getString("sort.creatTime");
+    }
+
+    /**
+     * 按文件修改时间排序
+     */
+    public static String sort_updateTime() {
+        return bundle.getString("sort.updateTime");
+    }
+
+    /**
+     * 按文件大小排序
+     */
+    public static String sort_size() {
+        return bundle.getString("sort.size");
+    }
+
+    /**
+     * 按文件类型排序
+     */
+    public static String sort_type() {
+        return bundle.getString("sort.type");
     }
 
     /**
@@ -1432,6 +1642,12 @@ public class i18nFinal {
         updateDayOfWeekName();
         // 更新定时任务星期名称与数字映射
         updateDayOfWeekMap();
+        // 更新文件名查询条件选项
+        updateNameSearchTypeList();
+        // 更新隐藏文件查询条件选项
+        updateHideSearchTypeList();
+        // 更新文件与文件夹查询条件选项
+        updateSearchTypeList();
     }
 
 }

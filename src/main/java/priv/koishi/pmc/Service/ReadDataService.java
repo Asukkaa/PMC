@@ -11,8 +11,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileType;
 import static priv.koishi.pmc.Utils.FileUtils.readAllFiles;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
@@ -55,27 +54,16 @@ public class ReadDataService {
         String sortType = fileConfig.getSortType();
         // 是否倒序排序
         boolean reverseSort = fileConfig.isReverseSort();
-        switch (sortType) {
-            case sort_Name: {
-                comparingByName(fileList, reverseSort);
-                break;
-            }
-            case sort_creatTime: {
-                comparingByCreatTime(fileList, reverseSort);
-                break;
-            }
-            case sort_updateTime: {
-                comparingByUpdateTime(fileList, reverseSort);
-                break;
-            }
-            case sort_size: {
-                comparingBySize(fileList, reverseSort);
-                break;
-            }
-            case sort_type: {
-                comparingByType(fileList, reverseSort);
-                break;
-            }
+        if (sortType.equals(sort_Name())) {
+            comparingByName(fileList, reverseSort);
+        } else if (sortType.equals(sort_creatTime())) {
+            comparingByCreatTime(fileList, reverseSort);
+        } else if (sortType.equals(sort_updateTime())) {
+            comparingByUpdateTime(fileList, reverseSort);
+        } else if (sortType.equals(sort_size())) {
+            comparingBySize(fileList, reverseSort);
+        } else if (sortType.equals(sort_type())) {
+            comparingByType(fileList, reverseSort);
         }
     }
 

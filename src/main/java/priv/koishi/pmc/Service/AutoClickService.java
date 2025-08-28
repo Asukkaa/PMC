@@ -110,7 +110,7 @@ public class AutoClickService {
                         filterExtensionList.add(PMC);
                         FileConfig fileConfig = new FileConfig()
                                 .setFilterExtensionList(filterExtensionList)
-                                .setShowDirectory(text_onlyFile)
+                                .setShowDirectory(hide_onlyHideFile())
                                 .setPath(file.getPath())
                                 .setRecursion(true);
                         for (File readFile : readAllFiles(fileConfig)) {

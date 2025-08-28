@@ -735,13 +735,13 @@ public class FileUtils {
         if (files != null) {
             for (File file : files) {
                 if (file.isFile()) {
-                    if ((text_noHideFile.equals(showHideFile) && file.isHidden()) ||
-                            (text_onlyHideFile.equals(showHideFile) && !file.isHidden())) {
+                    if ((hide_noHideFile().equals(showHideFile) && file.isHidden()) ||
+                            (hide_onlyHideFile().equals(showHideFile) && !file.isHidden())) {
                         continue;
                     }
                     if (StringUtils.isEmpty(showDirectory) ||
-                            text_onlyFile.equals(showDirectory) ||
-                            text_fileDirectory.equals(showDirectory)) {
+                            search_onlyFile().equals(showDirectory) ||
+                            search_fileDirectory().equals(showDirectory)) {
                         String extension = getExistsFileType(file);
                         boolean matches = CollectionUtils.isEmpty(filterExtensionList) ||
                                 filterExtensionList.contains(extension);
@@ -759,12 +759,12 @@ public class FileUtils {
                     }
                 }
                 if (file.isDirectory()) {
-                    if ((text_noHideFile.equals(showHideFile) && file.isHidden()) ||
-                            (text_onlyHideFile.equals(showHideFile) && !file.isHidden())) {
+                    if ((hide_noHideFile().equals(showHideFile) && file.isHidden()) ||
+                            (hide_onlyHideFile().equals(showHideFile) && !file.isHidden())) {
                         continue;
                     }
-                    if (text_onlyDirectory.equals(showDirectory) ||
-                            text_fileDirectory.equals(showDirectory)) {
+                    if (search_onlyDirectory().equals(showDirectory) ||
+                            search_fileDirectory().equals(showDirectory)) {
                         filterFileName(fileConfig, fileList, file);
                     }
                     if (recursion) {
@@ -810,13 +810,19 @@ public class FileUtils {
      * @return 是否匹配
      */
     private static boolean isMatchesFileName(FileConfig fileConfig, String fileName, String fileNameFilter) {
-        boolean matches = switch (fileConfig.getFileNameType()) {
-            case name_contain -> fileName.contains(fileNameFilter);
-            case name_is -> fileNameFilter.equals(fileName);
-            case name_start -> fileName.startsWith(fileNameFilter);
-            case name_end -> fileName.endsWith(fileNameFilter);
-            default -> false;
-        };
+        boolean matches;
+        String fileNameType = fileConfig.getFileNameType();
+        if (fileNameType.equals(name_contain())) {
+            matches = fileName.contains(fileNameFilter);
+        } else if (fileNameType.equals(name_is())) {
+            matches = fileNameFilter.equals(fileName);
+        } else if (fileNameType.equals(name_start())) {
+            matches = fileName.startsWith(fileNameFilter);
+        } else if (fileNameType.equals(name_end())) {
+            matches = fileName.endsWith(fileNameFilter);
+        } else {
+            matches = false;
+        }
         // 反向查询名称设置
         if (fileConfig.isReverseFileName()) {
             matches = !matches;

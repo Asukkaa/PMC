@@ -1,121 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.*?>
-<AnchorPane fx:id="anchorPane_FC" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/Styles.css"
-            fx:controller="priv.koishi.pmc.Controller.FileChooserController">
-    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-        <HBox spacing="10">
-            <Button fx:id="selectPathButton_FC" onAction="#selectFilePath" style="-fx-cursor: hand"
-                    text="选择要查询的文件夹"/>
-            <Label fx:id="filePath_FC" prefHeight="25" style="-fx-font-size: 15px;"/>
-        </HBox>
-
-        <HBox spacing="200">
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
+            fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.FileChooserController">
+    <AnchorPane fx:id="anchorPane_FC" stylesheets="@../css/Styles.css">
+        <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
             <HBox spacing="10">
-                <Label prefHeight="25" text="查询条件："/>
-                <ChoiceBox fx:id="fileFilter_FC" prefHeight="25" prefWidth="150" onAction="#fileFilterAction"
-                           style="-fx-cursor: hand">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="只查询文件"/>
-                            <String fx:value="文件和文件夹都查询"/>
-                            <String fx:value="只查询文件夹"/>
-                        </FXCollections>
-                    </items>
-                    <value>
-                        <String fx:value="文件和文件夹都查询"/>
-                    </value>
-                </ChoiceBox>
+                <Button fx:id="selectPathButton_FC" onAction="#selectFilePath" style="-fx-cursor: hand"
+                        text="%fileChooser.selectPathButton_FC"/>
+                <Label fx:id="filePath_FC" prefHeight="25" style="-fx-font-size: 15px;"/>
             </HBox>
 
             <HBox spacing="10">
-                <Label prefHeight="25" text="隐藏文件查询设置:"/>
-                <ChoiceBox fx:id="hideFileType_FC" prefHeight="25" prefWidth="120" onAction="#hideFileTypeAction"
-                           style="-fx-cursor: hand">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="不查询隐藏文件"/>
-                            <String fx:value="是否隐藏都查询"/>
-                            <String fx:value="只查询隐藏文件"/>
-                        </FXCollections>
-                    </items>
-                    <value>
-                        <String fx:value="不查询隐藏文件"/>
-                    </value>
-                </ChoiceBox>
-            </HBox>
-        </HBox>
+                <HBox styleClass="hBox-long">
+                    <Label prefHeight="25" text="%fileChooser.fileFilter"/>
+                    <ChoiceBox fx:id="fileFilter_FC" prefHeight="25" prefWidth="200" onAction="#fileFilterAction"
+                               style="-fx-cursor: hand"/>
+                </HBox>
 
-        <HBox spacing="40">
+                <HBox spacing="10">
+                    <Label prefHeight="25" text="%fileChooser.hideFileType"/>
+                    <ChoiceBox fx:id="hideFileType_FC" prefHeight="25" prefWidth="200" onAction="#hideFileTypeAction"
+                               style="-fx-cursor: hand"/>
+                </HBox>
+            </HBox>
+
             <HBox spacing="10">
-                <Label prefHeight="25" text="文件名查询设置:"/>
-                <ChoiceBox fx:id="fileNameType_FC" prefHeight="25" prefWidth="120" onAction="#fileNameTypeAction"
-                           style="-fx-cursor: hand">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="文件名包含"/>
-                            <String fx:value="文件名为"/>
-                            <String fx:value="文件名起始于"/>
-                            <String fx:value="文件名结束于"/>
-                        </FXCollections>
-                    </items>
-                    <value>
-                        <String fx:value="文件名包含"/>
-                    </value>
-                </ChoiceBox>
+                <HBox styleClass="hBox-long">
+                    <Label prefHeight="25" text="%fileChooser.fileNameType"/>
+                    <ChoiceBox fx:id="fileNameType_FC" prefHeight="25" prefWidth="200" onAction="#fileNameTypeAction"
+                               style="-fx-cursor: hand"/>
 
-                <TextField fx:id="fileNameFilter_FC" prefHeight="25" prefWidth="150"/>
+                    <TextField fx:id="fileNameFilter_FC" prefHeight="25" prefWidth="165"/>
+                </HBox>
+
+                <HBox spacing="30">
+                    <CheckBox fx:id="reverse_FC" style="-fx-cursor: hand" text="%fileChooser.reverse_FC"
+                              onAction="#reverseAction" prefHeight="25"/>
+
+                    <CheckBox fx:id="filterNameCase_FC" style="-fx-cursor: hand" text="%fileChooser.filterNameCase_FC"
+                              onAction="#filterNameCaseAction" prefHeight="25"/>
+                </HBox>
             </HBox>
 
-            <HBox spacing="30">
-                <CheckBox fx:id="reverse_FC" style="-fx-cursor: hand" text="反向查询文件名" onAction="#reverseAction"
-                          prefHeight="25"/>
+            <HBox fx:id="fileNumberHBox_FC" spacing="10">
+                <Button fx:id="gotoParentButton_FC" onAction="#gotoParent" styleClass="cornflowerblue-button"
+                        text="%fileChooser.gotoParentButton_FC"/>
+                <Button fx:id="refreshButton_FC" onAction="#refreshTable" styleClass="cadetblue-button"
+                        text="%listText.refresh"/>
+                <Label fx:id="tip_FC" prefHeight="25" textFill="red" text="%fileChooser.tip_FC"/>
 
-                <CheckBox fx:id="filterNameCase_FC" style="-fx-cursor: hand" text="区分文件名大小写"
-                          onAction="#filterNameCaseAction" prefHeight="25"/>
+                <Label fx:id="fileNumber_FC" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
             </HBox>
-        </HBox>
 
-        <HBox fx:id="fileNumberHBox_FC" spacing="10">
-            <Button fx:id="gotoParentButton_FC" onAction="#gotoParent" styleClass="cornflowerblue-button"
-                    text="前往上级文件夹"/>
-            <Button fx:id="refreshButton_FC" onAction="#refreshTable" styleClass="cadetblue-button" text="刷新列表"/>
-            <Label fx:id="tip_FC" prefHeight="25" textFill="red"
-                   text="双击文件夹所在数据行可查询该目录下的文件，按住shift可多选"/>
+            <TableView fx:id="tableView_FC" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+                <placeholder>
+                    <Label text="%fileChooser.tableView_FC"/>
+                </placeholder>
 
-            <Label fx:id="fileNumber_FC" alignment="CENTER_RIGHT" prefHeight="25" text="列表为空"/>
-        </HBox>
+                <columns>
+                    <TableColumn fx:id="index_FC" text="%listText.index" sortable="false"/>
+                    <TableColumn fx:id="thumb_FC" text="%listText.thumb" sortable="false"/>
+                    <TableColumn fx:id="name_FC" text="%fileChooser.name_FC"/>
+                    <TableColumn fx:id="fileType_FC" text="%fileChooser.fileType_FC"/>
+                    <TableColumn fx:id="path_FC" text="%fileChooser.path_FC"/>
+                    <TableColumn fx:id="size_FC" sortType="DESCENDING" text="%fileChooser.size_FC"/>
+                    <TableColumn fx:id="showStatus_FC" text="%fileChooser.showStatus_FC"/>
+                    <TableColumn fx:id="creatDate_FC" text="%fileChooser.creatDate_FC"/>
+                    <TableColumn fx:id="updateDate_FC" text="%fileChooser.updateDate_FC"/>
+                </columns>
+            </TableView>
 
-        <TableView fx:id="tableView_FC" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
-            <placeholder>
-                <Label text="无符合条件的文件或文件，拖拽文件或文件夹可跳转至所在目录"/>
-            </placeholder>
+            <HBox spacing="10">
+                <VBox fx:id="progressBarVBox_FC" spacing="10">
+                    <ProgressBar fx:id="progressBar_FC" visible="false" prefWidth="200.0" progress="0.0"/>
+                    <Label fx:id="log_FC" prefHeight="20"/>
+                </VBox>
 
-            <columns>
-                <TableColumn fx:id="index_FC" text="序号" sortable="false"/>
-                <TableColumn fx:id="thumb_FC" text="缩略图" sortable="false"/>
-                <TableColumn fx:id="name_FC" text="文件名称"/>
-                <TableColumn fx:id="fileType_FC" text="文件类型"/>
-                <TableColumn fx:id="path_FC" text="文件路径"/>
-                <TableColumn fx:id="size_FC" sortType="DESCENDING" text="文件大小"/>
-                <TableColumn fx:id="showStatus_FC" text="是否隐藏"/>
-                <TableColumn fx:id="creatDate_FC" text="创建时间"/>
-                <TableColumn fx:id="updateDate_FC" text="修改时间"/>
-            </columns>
-        </TableView>
-
-        <HBox spacing="10">
-            <VBox fx:id="progressBarVBox_FC" spacing="10">
-                <ProgressBar fx:id="progressBar_FC" visible="false" prefWidth="200.0" progress="0.0"/>
-                <Label fx:id="log_FC" prefHeight="20"/>
-            </VBox>
-
-            <Button fx:id="confirm_FC" text="确认选择" onAction="#confirmSelect"/>
-            <Button fx:id="close_FC" text="取消" style="-fx-cursor: hand" onAction="#closeWindow"/>
-        </HBox>
-    </VBox>
-</AnchorPane>
+                <Button fx:id="confirm_FC" text="%confirm.select" onAction="#confirmSelect"/>
+                <Button fx:id="close_FC" text="%confirm.cancel" style="-fx-cursor: hand" onAction="#closeWindow"/>
+            </HBox>
+        </VBox>
+    </AnchorPane>
+</ScrollPane>
