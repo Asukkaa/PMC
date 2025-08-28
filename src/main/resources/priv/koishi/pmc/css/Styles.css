@@ -36,6 +36,11 @@
 
 .hBox-long {
     -fx-spacing: 5;
+    -fx-pref-width: 350;
+}
+
+.hBox-veryLong {
+    -fx-spacing: 5;
     -fx-pref-width: 550;
 }
 

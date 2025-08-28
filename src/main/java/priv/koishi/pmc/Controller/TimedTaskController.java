@@ -162,7 +162,7 @@ public class TimedTaskController extends RootController {
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         String title = item.getTaskName();
-        detailStage.setTitle(title + bundle.getString("taskDetail.title"));
+        detailStage.setTitle(title + taskDetail_title());
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
@@ -201,7 +201,7 @@ public class TimedTaskController extends RootController {
         task.setOnSucceeded(event -> {
             List<TimedTaskBean> result = task.getValue();
             Platform.runLater(() -> {
-                addData(result, append, tableView_Task, dataNumber_Task, text_task(), false);
+                addData(result, append, tableView_Task, dataNumber_Task, unit_task(), false);
                 taskUnbind(taskBean);
             });
             if (successHandler != null) {

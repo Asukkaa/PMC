@@ -610,13 +610,13 @@ public class AutoClickController extends RootController implements MousePosition
             // 刷新列表
             tableView_Click.refresh();
             // 更新列表数量
-            updateTableViewSizeText(tableView_Click, dataNumber_Click, text_process());
+            updateTableViewSizeText(tableView_Click, dataNumber_Click, unit_process());
         });
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         String title = item.getName() == null ? "" : item.getName();
-        detailStage.setTitle(title + bundle.getString("clickDetail.title"));
+        detailStage.setTitle(title + clickDetail_title());
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
@@ -870,9 +870,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @throws RuntimeException 参数设置相关错误
      */
     private static String getString(ClickPositionVO clickPositionVO, int index, int maxIndex) {
-        String err = bundle.getString("autoClick.index") + index +
-                bundle.getString("autoClick.name") + clickPositionVO.getName() +
-                bundle.getString("autoClick.settingErr");
+        String err = autoClick_index() + index + autoClick_name() + clickPositionVO.getName() + autoClick_settingErr();
         if (clickMatched_clickStep().equals(clickPositionVO.getMatchedType())) {
             int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
             if (matchStep > maxIndex) {
@@ -950,7 +948,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 取消选中选项
         buildClearSelectedData(tableView_Click, contextMenu);
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, text_data());
+        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, unit_data());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView_Click);
     }
@@ -1115,6 +1113,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_clickLog(), clickLog_Click);
         addToolTip(tip_Click.getText(), tip_Click);
         addToolTip(tip_runClick(), runClick_Click);
         addToolTip(tip_loopTime(), loopTime_Click);
@@ -1193,7 +1192,7 @@ public class AutoClickController extends RootController implements MousePosition
             clickPositionVO.setUuid(UUID.randomUUID().toString());
         }
         // 向列表添加数据
-        addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, text_process());
+        addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, unit_process());
         updateLabel(log_Click, text_loadSuccess() + filePath);
         log_Click.setTextFill(Color.GREEN);
     }
@@ -1208,7 +1207,7 @@ public class AutoClickController extends RootController implements MousePosition
         Platform.runLater(() -> {
             int x = (int) mousePoint.getX();
             int y = (int) mousePoint.getY();
-            String text = bundle.getString("autoClick.nowMousePos") + " X: " + x + " Y: " + y;
+            String text = autoClick_nowMousePos() + " X: " + x + " Y: " + y;
             CheckBox mouseFloatingRun = settingController.mouseFloatingRun_Set;
             CheckBox mouseFloatingRecord = settingController.mouseFloatingRecord_Set;
             TextField offsetXTextField = settingController.offsetX_Set;
@@ -1424,7 +1423,7 @@ public class AutoClickController extends RootController implements MousePosition
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY));
                     clickPositionVOS.add(movePoint);
-                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process());
+                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
                             text_recorded() + text_mouseTrajectory();
                     log_Click.setText(log);
@@ -1522,10 +1521,9 @@ public class AutoClickController extends RootController implements MousePosition
                         // 添加至表格
                         List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                         clickPositionVOS.add(clickBean);
-                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process());
+                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                         String log = text_cancelTask() + text_recordClicking() + "\n" +
-                                text_recorded() + clickBean.getClickKey() + bundle.getString("click") +
-                                " X：" + endX + " Y：" + endY;
+                                text_recorded() + clickBean.getClickKey() + text_click() + " X：" + endX + " Y：" + endY;
                         log_Click.setText(log);
                         floatingLabel.setText(log);
                     });
@@ -1635,7 +1633,7 @@ public class AutoClickController extends RootController implements MousePosition
             List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
             clickPositionVOS.add(clickPositionVO);
             // 向列表添加数据
-            addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, text_process());
+            addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
             // 初始化信息栏
             updateLabel(log_Click, "");
             // 显示详情
@@ -1700,7 +1698,7 @@ public class AutoClickController extends RootController implements MousePosition
         isNativeHookException = true;
         runClick_Click.setDisable(true);
         recordClick_Click.setDisable(true);
-        String errorMessage = appName + bundle.getString("autoClick.noPermissions");
+        String errorMessage = appName + autoClick_noPermissions();
         if (isMac) {
             errorMessage = tip_NativeHookException();
         }
@@ -2001,7 +1999,7 @@ public class AutoClickController extends RootController implements MousePosition
         Stage detailStage = new Stage();
         Scene scene = new Scene(root, logWidth, logHeight);
         detailStage.setScene(scene);
-        detailStage.setTitle(bundle.getString("clickLog.title"));
+        detailStage.setTitle(clickLog_title());
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化

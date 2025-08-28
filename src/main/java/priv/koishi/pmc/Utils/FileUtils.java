@@ -69,7 +69,7 @@ public class FileUtils {
      */
     public static String getFileType(String path) {
         if (StringUtils.isBlank(path)) {
-            throw new RuntimeException(text_nullPath());
+            throw new RuntimeException(text_pathNull());
         }
         if (FilenameUtils.getPrefixLength(path) == -1) {
             throw new RuntimeException(text_errPathFormat());
@@ -338,7 +338,7 @@ public class FileUtils {
      */
     public static String getFileName(String path) {
         if (StringUtils.isBlank(path)) {
-            throw new RuntimeException(text_nullPath());
+            throw new RuntimeException(text_pathNull());
         }
         if (FilenameUtils.getPrefixLength(path) != -1) {
             if (path.lastIndexOf(".") != -1) {
@@ -383,7 +383,7 @@ public class FileUtils {
      */
     public static String notOverwritePath(String path) {
         if (StringUtils.isBlank(path)) {
-            throw new RuntimeException(text_nullPath());
+            throw new RuntimeException(text_pathNull());
         }
         File file = new File(path);
         if (!file.exists()) {

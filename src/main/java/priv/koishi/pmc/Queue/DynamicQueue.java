@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.Finals.i18nFinal.text_minSize;
 
 /**
  * 动态容量队列
@@ -92,7 +92,7 @@ public class DynamicQueue<E> {
      */
     public void setMaxSize(int newSize) {
         if (newSize < 0) {
-            throw new RuntimeException(bundle.getString("minSize"));
+            throw new RuntimeException(text_minSize());
         }
         maxSize = newSize;
         synchronized (this) {

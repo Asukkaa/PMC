@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
-import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.Finals.i18nFinal.text_editingCellTip;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -36,7 +36,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     /**
      * 单元格鼠标悬停提示
      */
-    private final String tip = bundle.getString("editingCellTip");
+    private final String tip = text_editingCellTip();
 
     /**
      * 输入框可输入的最小值

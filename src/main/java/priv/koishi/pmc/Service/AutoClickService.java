@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -333,23 +332,21 @@ public class AutoClickService {
                             || clickType_moveTo().equalsIgnoreCase(clickType)) {
                         clickText = "";
                     } else {
-                        clickText = bundle.getString("taskInfo") + clickKey + clickType;
+                        clickText = text_taskInfo() + clickKey + clickType;
                     }
                     Platform.runLater(() -> {
                         String text = loopTimeText +
                                 text_progress() + progress + "/" + dataSize +
                                 text_willBe() + waitTime + text_msWillBe() + name +
                                 text_point() + " X：" + startX + " Y：" + startY + clickText +
-                                bundle.getString("clickTime") + clickTime + " " + text_ms() +
-                                bundle.getString("repeat") + clickNum + bundle.getString("interval") +
-                                interval + " " + text_ms();
+                                text_clickTime() + clickTime + " " + text_ms() +
+                                text_repeat() + clickNum + text_interval() + interval + " " + text_ms();
                         if (StringUtils.isNotBlank(clickImgPath)) {
                             text = loopTimeText +
                                     text_progress() + progress + "/" + dataSize +
                                     text_willBe() + waitTime + text_msWillBe() + name +
-                                    bundle.getString("picTarget") +
-                                    "\n" + getExistsFileName(new File(clickImgPath)) +
-                                    bundle.getString("afterMatch") + matchType;
+                                    text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
+                                    text_afterMatch() + matchType;
                         }
                         // 更新操作信息
                         updateMassage(text);
@@ -424,7 +421,7 @@ public class AutoClickService {
                 AtomicReference<String> fileName = new AtomicReference<>();
                 Platform.runLater(() -> {
                     fileName.set(getExistsFileName(new File(stopPath)));
-                    String text = loopTimeText + bundle.getString("searchingStop") + fileName.get();
+                    String text = loopTimeText + text_searchingStop() + fileName.get();
                     // 更新操作信息
                     updateMassage(text);
                 });
@@ -462,9 +459,9 @@ public class AutoClickService {
                     }
                     if (matchThreshold >= stopMatchThreshold) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
-                        throw new RuntimeException(text_index() + clickPositionVO.getIndex() + bundle.getString("taskStop") +
-                                bundle.getString("findStopImg") + fileName.get() +
-                                bundle.getString("matchThreshold") + matchThreshold + percentage +
+                        throw new RuntimeException(text_index() + clickPositionVO.getIndex() + text_taskStop() +
+                                text_findStopImg() + fileName.get() +
+                                text_matchThreshold() + matchThreshold + percentage +
                                 "\n" + text_point() + " X：" + x + " Y：" + y);
                     }
                 } catch (Exception e) {
@@ -480,7 +477,7 @@ public class AutoClickService {
         if (StringUtils.isNotBlank(clickPath)) {
             Platform.runLater(() -> {
                 fileName.set(getExistsFileName(new File(clickPath)));
-                String text = loopTimeText + bundle.getString("searchingClick") + fileName.get();
+                String text = loopTimeText + text_searchingClick() + fileName.get();
                 // 更新操作信息
                 updateMassage(text);
             });
@@ -539,10 +536,10 @@ public class AutoClickService {
                 } else if (retryType_stop().equals(retryType)) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     try {
-                        throw new RuntimeException(text_index() + clickPositionVO.getIndex() + bundle.getString("taskErr") +
-                                bundle.getString("maxRetry") + clickPositionVO.getClickRetryTimes() + " " + bundle.getString("unit.times") +
-                                bundle.getString("notFound") + fileName.get() +
-                                bundle.getString("closestMatchThreshold") + matchPointBean.getMatchThreshold() + percentage +
+                        throw new RuntimeException(text_index() + clickPositionVO.getIndex() + text_taskErr() +
+                                text_maxRetry() + clickPositionVO.getClickRetryTimes() + " " + unit_times() +
+                                text_notFound() + fileName.get() +
+                                text_closestMatchThreshold() + matchPointBean.getMatchThreshold() + percentage +
                                 "\n" + text_point() + " X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());

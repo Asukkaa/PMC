@@ -26,9 +26,7 @@ import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.percentage;
-import static priv.koishi.pmc.Finals.i18nFinal.log_findImage;
-import static priv.koishi.pmc.Finals.i18nFinal.text_image;
-import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
@@ -86,10 +84,10 @@ public class ImageRecognitionService {
         File file = new File(templatePath);
         String fileName = getFileName(templatePath);
         if (StringUtils.isBlank(templatePath)) {
-            throw new RuntimeException(text_image() + fileName + bundle.getString("nullPath"));
+            throw new RuntimeException(text_image() + fileName + text_nullPath());
         }
         if (!file.exists()) {
-            throw new RuntimeException(text_image() + fileName + bundle.getString("noExists"));
+            throw new RuntimeException(text_image() + fileName + text_noExists());
         }
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
             // 创建带名称的线程池（便于问题排查）
@@ -100,7 +98,7 @@ public class ImageRecognitionService {
                 return t;
             })) {
                 try {
-                    String timeOutErr = text_image() + fileName + bundle.getString("timeOut");
+                    String timeOutErr = text_image() + fileName + text_timeOut();
                     if (config.isContinuously()) {
                         int retry = 0;
                         while (true) {
@@ -200,7 +198,7 @@ public class ImageRecognitionService {
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
         } catch (AWTException e) {
-            throw new RuntimeException(bundle.getString("screenErr") + e.getMessage(), e);
+            throw new RuntimeException(text_screenErr() + e.getMessage(), e);
         }
         checkInterruption();
         // 初始化匹配结果存储变量
@@ -296,7 +294,7 @@ public class ImageRecognitionService {
      */
     private static void checkInterruption() throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
-            throw new InterruptedException(bundle.getString("cancel"));
+            throw new InterruptedException(text_cancel());
         }
     }
 

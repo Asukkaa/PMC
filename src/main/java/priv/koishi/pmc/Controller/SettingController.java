@@ -750,7 +750,7 @@ public class SettingController extends RootController implements MousePositionUp
         bindingTaskNode(loadImgTask, taskBean);
         loadImgTask.setOnSucceeded(event -> {
             taskUnbind(taskBean);
-            updateTableViewSizeText(tableView_Set, dataNumber_Set, text_img());
+            updateTableViewSizeText(tableView_Set, dataNumber_Set, unit_img());
             tableView_Set.refresh();
         });
         Thread.ofVirtual()

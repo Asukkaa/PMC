@@ -160,7 +160,7 @@ public class AboutController extends RootController {
                         String path = r.getAbsolutePath();
                         File file = new File(path);
                         if (!file.delete()) {
-                            throw new RuntimeException(bundle.getString("about.deleteFailed") + path);
+                            throw new RuntimeException(about_deleteFailed() + path);
                         }
                     });
                 }
@@ -212,8 +212,7 @@ public class AboutController extends RootController {
      * @param color 文字颜色
      */
     private void updateCheckDate(Color color) {
-        String lastCheck = bundle.getString("update.lastCheck");
-        checkDate_Abt.setText(lastCheck + LocalDateTime.now().format(formatter));
+        checkDate_Abt.setText(update_lastCheck() + LocalDateTime.now().format(formatter));
         checkDate_Abt.setTextFill(color);
     }
 
@@ -229,7 +228,7 @@ public class AboutController extends RootController {
         // 设置版本号
         version_Abt.setText(version);
         // 添加右键菜单
-        setCopyValueContextMenu(mail_Abt, bundle.getString("about.copyEmail"));
+        setCopyValueContextMenu(mail_Abt, about_copyEmail());
         // 设置鼠标悬停提示
         setToolTip();
         // 设置要防重复点击的组件
@@ -376,7 +375,7 @@ public class AboutController extends RootController {
                     }
                 }
             } else {
-                checkMassage_Abt.setText(bundle.getString("update.nowIsLast"));
+                checkMassage_Abt.setText(update_nowIsLast());
                 //更新最后检查日期
                 updateCheckDate(Color.GREEN);
                 checkMassage_Abt.setTextFill(Color.GREEN);

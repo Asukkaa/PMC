@@ -17,7 +17,8 @@ import priv.koishi.pmc.Bean.ClickLogBean;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static priv.koishi.pmc.Finals.i18nFinal.text_log;
+import static priv.koishi.pmc.Finals.i18nFinal.tip_removeAll_Log;
+import static priv.koishi.pmc.Finals.i18nFinal.unit_log;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -109,7 +110,7 @@ public class ClickLogController extends RootController {
         clickLogs = logs;
         if (CollectionUtils.isNotEmpty(logs)) {
             tableView_Log.getItems().addAll(logs);
-            updateTableViewSizeText(tableView_Log, dataNumber_Log, text_log());
+            updateTableViewSizeText(tableView_Log, dataNumber_Log, unit_log());
             tableView_Log.refresh();
         }
     }
@@ -123,6 +124,8 @@ public class ClickLogController extends RootController {
             stage = (Stage) anchorPane_Log.getScene().getWindow();
             // 组件宽高自适应
             adaption();
+            // 添加鼠标悬停提示
+            addToolTip(tip_removeAll_Log(), removeAll_Log);
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Log, ClickLogBean.class, tabId, index_Log);
         });

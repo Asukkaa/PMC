@@ -113,7 +113,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-long">
+                <HBox styleClass="hBox-veryLong">
                     <Label prefHeight="25" text="%clickDetail.clickOpacity"/>
                     <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -162,7 +162,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-long">
+                <HBox styleClass="hBox-veryLong">
                     <Label prefHeight="25" text="%clickDetail.stopOpacity"/>
                     <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                             showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>

@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
@@ -66,7 +65,7 @@ public class ScheduledService {
         return new Task<>() {
             @Override
             protected Void call() throws IOException {
-                updateMessage(bundle.getString("saving"));
+                updateMessage(text_saving());
                 if (isWin) {
                     // 创建win定时任务
                     createWinLaunchdTask(timedTaskBean);
@@ -105,7 +104,7 @@ public class ScheduledService {
         return new Task<>() {
             @Override
             protected List<TimedTaskBean> call() throws Exception {
-                updateMessage(bundle.getString("searching"));
+                updateMessage(text_searching());
                 List<TimedTaskBean> taskDetails = new ArrayList<>();
                 if (isWin) {
                     getWinTaskDetails(taskDetails);
@@ -142,7 +141,7 @@ public class ScheduledService {
                             }
                         }
                     } catch (IOException e) {
-                        throw new RuntimeException(bundle.getString("searchLaunchAgentsErr") + launchAgentsPath, e);
+                        throw new RuntimeException(text_searchLaunchAgentsErr() + launchAgentsPath, e);
                     }
                 }
             }
@@ -444,7 +443,7 @@ public class ScheduledService {
         Process process = pb.start();
         String output = readProcessOutput(process);
         if (output.contains("Exception") || output.contains("错误")) {
-            throw new RuntimeException(bundle.getString("creatTaskErr") + output);
+            throw new RuntimeException(text_creatTaskErr() + output);
         }
     }
 

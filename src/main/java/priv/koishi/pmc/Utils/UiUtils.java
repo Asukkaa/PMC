@@ -684,7 +684,7 @@ public class UiUtils {
      */
     public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber, Label log) {
         tableView.getItems().clear();
-        updateLabel(fileNumber, text_dataListNull());
+        updateLabel(fileNumber, listText_dataListNull());
         if (log != null) {
             updateLabel(log, "");
         }
@@ -1227,13 +1227,13 @@ public class UiUtils {
     private static void copyDataMenuItem(TableView<ClickPositionVO> tableView, String copyType, Label dataNumber) {
         List<ClickPositionVO> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
         if (menuItem_upCopy().equals(copyType)) {
-            addData(copiedList, upAdd, tableView, dataNumber, text_process());
+            addData(copiedList, upAdd, tableView, dataNumber, unit_process());
         } else if (menuItem_downCopy().equals(copyType)) {
-            addData(copiedList, downAdd, tableView, dataNumber, text_process());
+            addData(copiedList, downAdd, tableView, dataNumber, unit_process());
         } else if (menuItem_appendCopy().equals(copyType)) {
-            addData(copiedList, append, tableView, dataNumber, text_process());
+            addData(copiedList, append, tableView, dataNumber, unit_process());
         } else if (menuItem_topCopy().equals(copyType)) {
-            addData(copiedList, topAdd, tableView, dataNumber, text_process());
+            addData(copiedList, topAdd, tableView, dataNumber, unit_process());
         }
     }
 
@@ -1579,7 +1579,7 @@ public class UiUtils {
             tableView.getItems().add(bean);
             index++;
         }
-        updateTableViewSizeText(tableView, dataNumber, text_img());
+        updateTableViewSizeText(tableView, dataNumber, unit_img());
     }
 
     /**
@@ -1889,7 +1889,7 @@ public class UiUtils {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
-        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, text_img());
+        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, unit_img());
         // 移动所选行选项
         buildMoveDataMenu(tableView, contextMenu);
         // 查看文件选项
@@ -1897,7 +1897,7 @@ public class UiUtils {
         // 取消选中选项
         buildClearSelectedData(tableView, contextMenu);
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, text_img());
+        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, unit_img());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView);
     }
@@ -1915,7 +1915,7 @@ public class UiUtils {
         if (tableSize > 0) {
             dataNumber.setText(text_allHave() + tableSize + dataNumberUnit);
         } else {
-            dataNumber.setText(text_dataListNull());
+            dataNumber.setText(listText_dataListNull());
         }
     }
 
@@ -1982,9 +1982,9 @@ public class UiUtils {
      */
     public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(bundle.getString("update.checkUpdate_Abt"));
+        alert.setTitle(update_checkUpdate_Abt());
         alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        " +
-                bundle.getString("update.releaseDate") + updateInfo.getBuildDate());
+                update_releaseDate() + updateInfo.getBuildDate());
         // 创建包含更新信息的文本区域
         TextArea textArea = new TextArea(updateInfo.getWhatsNew());
         textArea.setEditable(false);
@@ -1995,9 +1995,8 @@ public class UiUtils {
         expContent.setMaxWidth(Double.MAX_VALUE);
         expContent.add(textArea, 0, 0);
         alert.getDialogPane().setContent(expContent);
-        ButtonType updateButton = new ButtonType(bundle.getString("update.updateButton"));
-        ButtonType laterButton = new ButtonType(bundle.getString("update.laterButton"),
-                ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType updateButton = new ButtonType(update_updateButton());
+        ButtonType laterButton = new ButtonType(update_laterButton(), ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(updateButton, laterButton);
         // 设置窗口图标
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();

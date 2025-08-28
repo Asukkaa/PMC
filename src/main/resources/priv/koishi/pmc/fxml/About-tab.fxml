@@ -77,35 +77,35 @@
             <Label prefHeight="25" text="%about.versionUpdate"/>
             <Label prefHeight="25" text="%about.download"/>
 
-            <HBox spacing="5">
-                <HBox styleClass="hBox-short">
+            <HBox spacing="10">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%about.openBaiduLinkBtn"/>
                     <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" style="-fx-cursor: hand"
                             text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-short">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%about.openQuarkLinkBtn"/>
                     <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" style="-fx-cursor: hand"
                             text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-short">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%about.openXunleiLinkBtn"/>
                     <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" style="-fx-cursor: hand"
                             text="%about.latestVersion"/>
                 </HBox>
             </HBox>
 
-            <HBox spacing="5">
-                <HBox styleClass="hBox-short">
+            <HBox spacing="10">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%update.checkUpdate"/>
                     <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" style="-fx-cursor: hand"
                             text="%update.checkUpdate_Abt"/>
                 </HBox>
 
-                <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" styleClass="checkBox-short"
-                          text="%update.autoCheck_Abt"/>
+                <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" style="-fx-cursor: hand"
+                          prefHeight="25" prefWidth="350" text="%update.autoCheck_Abt"/>
 
                 <Label prefHeight="25" textFill="red" text="%about.autoUpdate"/>
             </HBox>

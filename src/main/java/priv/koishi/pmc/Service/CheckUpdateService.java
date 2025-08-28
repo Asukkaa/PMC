@@ -87,7 +87,7 @@ public class CheckUpdateService {
         return new Task<>() {
             @Override
             protected CheckUpdateBean call() {
-                updateMessage(bundle.getString("update.checking"));
+                updateMessage(update_checking());
                 String osType = isWin ? win : mac;
                 for (int attempt = 0; attempt < urls.length; attempt++) {
                     try (HttpClient client = HttpClient.newHttpClient()) {
@@ -106,7 +106,7 @@ public class CheckUpdateService {
                         String jsonData = response.body();
                         logger.info("查询版本更新，响应体body: {}", jsonData);
                         if (jsonData == null) {
-                            throw new IOException(bundle.getString("update.nullResponse"));
+                            throw new IOException(update_nullResponse());
                         }
                         ObjectMapper objectMapper = new ObjectMapper();
                         // 配置忽略未知字段
@@ -148,7 +148,7 @@ public class CheckUpdateService {
             @Override
             protected Void call() throws IOException, NoSuchAlgorithmException, KeyManagementException {
                 // 显示下载进度对话框
-                progressDialog.show(bundle.getString("update.downloading"),
+                progressDialog.show(update_downloading(),
                         update_downloadingUpdate(),
                         confirm_cancel(),
                         () -> {
@@ -159,7 +159,7 @@ public class CheckUpdateService {
                 File tempDir = new File(PMCTempPath);
                 if (!tempDir.exists()) {
                     if (!tempDir.mkdirs()) {
-                        throw new RuntimeException(bundle.getString("update.tempFileErr"));
+                        throw new RuntimeException(update_tempFileErr());
                     }
                 }
                 if (isWin) {
@@ -199,7 +199,7 @@ public class CheckUpdateService {
                             throw new IOException(update_downloadFailed());
                         }
                         if (response != null && (response.statusCode() < 200 || response.statusCode() >= 300)) {
-                            throw new IOException(bundle.getString("update.downloadError") + response.statusCode());
+                            throw new IOException(update_downloadError() + response.statusCode());
                         }
                         if (response != null) {
                             try (InputStream inputStream = response.body();
@@ -249,9 +249,9 @@ public class CheckUpdateService {
                     }
                 }
                 File finalTempFile = tempFile;
-                progressDialog.updateProgress(1, bundle.getString("update.waitInstall"));
+                progressDialog.updateProgress(1, update_waitInstall());
                 // 更新下载进度对话框功能按钮点击事件
-                progressDialog.updateButton(bundle.getString("update.installing"),
+                progressDialog.updateButton(update_installing(),
                         () -> {
                             progressDialog.close();
                             executeInstaller(finalTempFile, updateInfo.isFullUpdate());
@@ -322,18 +322,18 @@ public class CheckUpdateService {
         }
         // 设置权限
         if (!updateScriptFile.setExecutable(true)) {
-            throw new RuntimeException(bundle.getString("update.scriptNoPermission"));
+            throw new RuntimeException(update_scriptNoPermission());
         }
         // 验证权限
         if (!updateScriptFile.canExecute()) {
-            throw new RuntimeException(bundle.getString("update.scriptCantRun") + updateScriptFile.getAbsolutePath());
+            throw new RuntimeException(update_scriptCantRun() + updateScriptFile.getAbsolutePath());
         }
         // 构建执行命令
         String scriptCommand = String.format(
                 "do shell script \"\\\"%s\\\"\" with administrator privileges " +
                         "with prompt \"%s\"",
                 updateScriptFile.getAbsolutePath(),
-                bundle.getString("update.password") + appName + app
+                update_password() + appName + app
         );
         logger.info("-------------------------开始执行Mac更新脚本------------------------------");
         // 执行并捕获输出
@@ -356,8 +356,7 @@ public class CheckUpdateService {
             logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
             deleteDirectoryRecursively(Path.of(PMCTempPath));
             deleteDirectoryRecursively(updateScriptFile.toPath());
-            throw new IOException(bundle.getString("update.scriptExit") + exitCode +
-                    bundle.getString("update.scriptOut") + output);
+            throw new IOException(update_scriptExit() + exitCode + update_scriptOut() + output);
         }
     }
 

@@ -23,6 +23,8 @@ public class i18nFinal {
 
     /**
      * 自动保存文件名
+     *
+     * @return PMC自动导出流程
      */
     public static String autoSaveFileName() {
         return bundle.getString("autoSaveFileName");
@@ -30,28 +32,34 @@ public class i18nFinal {
 
     /**
      * 默认导出文件名称
+     *
+     * @return PMC自动操作流程
      */
     public static String defaultOutFileName() {
         return bundle.getString("defaultOutFileName");
     }
 
     /**
-     * 定时任务默认任务名称
+     * 时任务默认任务名称
+     *
+     * @return 自动启动任务
      */
     public static String defaultTaskName() {
         return bundle.getString("defaultTaskName");
     }
 
-    public static String extension_file() {
-        return bundle.getString("extension.file");
+    /**
+     * @return 运行自动操作后可点击查看操作记录
+     */
+    public static String tip_clickLog() {
+        return bundle.getString("tip.clickLog");
     }
 
-    public static String extension_folder() {
-        return bundle.getString("extension.folder");
-    }
-
-    public static String extension_fileOrFolder() {
-        return bundle.getString("extension.fileOrFolder");
+    /**
+     * @return 点击将会清除所有操作记录
+     */
+    public static String tip_removeAll_Log() {
+        return bundle.getString("tip.removeAll_Log");
     }
 
     public static String tip_logsNum() {
@@ -447,70 +455,70 @@ public class i18nFinal {
     }
 
     /**
-     * 点击后将会关闭当前页面，不会将任何数据添加到要移动的文件列表中
+     * @return 点击后将会关闭当前页面，不会将任何数据添加到要移动的文件列表中
      */
     public static String tip_close() {
         return bundle.getString("tip.close");
     }
 
     /**
-     * 点击后将会把列表中选中的文件夹添加到要移动的文件列表中，没有选中项则添加当前查询的目录
+     * @return 点击后将会把列表中选中的文件夹添加到要移动的文件列表中，没有选中项则添加当前查询的目录
      */
     public static String tip_confirm() {
         return bundle.getString("tip.confirm");
     }
 
     /**
-     * 点击后可选择要查询的目录
+     * @return 点击后可选择要查询的目录
      */
     public static String tip_selectPath() {
         return bundle.getString("tip.selectPath");
     }
 
     /**
-     * 点击可返回上级目录
+     * @return 点击可返回上级目录
      */
     public static String tip_gotoParent() {
         return bundle.getString("tip.gotoParent");
     }
 
     /**
-     * 点击将会按配置项重新查信息到列表中
+     * @return 点击将会按配置项重新查信息到列表中
      */
     public static String tip_reselectButton() {
         return bundle.getString("tip.reselectButton");
     }
 
     /**
-     * 将会按照这里填写的字符进行筛选
+     * @return 将会按照这里填写的字符进行筛选
      */
     public static String tip_fileNameFilter() {
         return bundle.getString("tip.fileNameFilter");
     }
 
     /**
-     * 用来选择文件名匹配的方式
+     * @return 用来选择文件名匹配的方式
      */
     public static String tip_fileNameType() {
         return bundle.getString("tip.fileNameType");
     }
 
     /**
-     * 点击可选择隐藏文件查询逻辑
+     * @return 点击可选择隐藏文件查询逻辑
      */
     public static String tip_hideFileType() {
         return bundle.getString("tip.hideFileType");
     }
 
     /**
-     * 点击可选择文件与文件夹查询逻辑
+     * @return 点击可选择文件与文件夹查询逻辑
      */
     public static String tip_directoryNameType() {
         return bundle.getString("tip.directoryNameType");
     }
 
     /**
-     * 勾选后只能选择PMC文件所在文件夹
+     * @return 勾选后只能选择PMC文件所在文件夹
      * 选中文件夹后将会导入文件夹下所有的PMC文件，如果文件夹中有图片，
      * 将会按照图片名称自动匹配未匹配到图片的要点击的图像设置
      */
@@ -518,10 +526,17 @@ public class i18nFinal {
         return bundle.getString("tip.loadFolder_Click");
     }
 
+    /**
+     * @return 点击即可查询最新版本，查询失败可点击上方对应的网盘按钮查询
+     */
     public static String tip_checkUpdate_Abt() {
         return bundle.getString("tip.checkUpdate_Abt");
     }
 
+    /**
+     * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
+     * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
+     */
     public static String tip_version() {
         return """
                 %s：%s
@@ -530,60 +545,60 @@ public class i18nFinal {
                 bundle.getString("tip.buildDate"), buildDate);
     }
 
+    /**
+     * @return 选择文件夹
+     */
     public static String text_selectDirectory() {
         return bundle.getString("selectDirectory");
     }
 
+    /**
+     * @return 选择要识别的图片
+     */
     public static String text_selectTemplateImg() {
         return bundle.getString("selectTemplateImg");
     }
 
-    public static String text_dataListNull() {
-        return bundle.getString("listText.null");
-    }
-
+    /**
+     * @return 导出文件夹位置为空，需要先设置导出文件夹位置再继续
+     */
     public static String text_outPathNull() {
         return bundle.getString("outPathNull");
     }
 
+    /**
+     * @return 选择自动操作流程文件
+     */
     public static String text_selectAutoFile() {
         return bundle.getString("selectAutoFile");
     }
 
+    /**
+     * @return 文件不存在
+     */
     public static String text_fileNotExists() {
         return bundle.getString("fileNotExists");
     }
 
-    public static String text_nullPath() {
+    /**
+     * @return 路径不能为空
+     */
+    public static String text_pathNull() {
         return bundle.getString("pathNull");
     }
 
+    /**
+     * @return 路径格式不正确
+     */
     public static String text_errPathFormat() {
         return bundle.getString("errPathFormat");
     }
 
+    /**
+     * @return 共有
+     */
     public static String text_allHave() {
         return bundle.getString("allHave");
-    }
-
-    public static String text_data() {
-        return bundle.getString("unit.data");
-    }
-
-    public static String text_task() {
-        return bundle.getString("unit.task");
-    }
-
-    public static String text_img() {
-        return bundle.getString("unit.img");
-    }
-
-    public static String text_log() {
-        return bundle.getString("unit.log");
-    }
-
-    public static String text_process() {
-        return bundle.getString("unit.process");
     }
 
     public static String text_copySuccess() {
@@ -815,28 +830,304 @@ public class i18nFinal {
     }
 
     /**
-     * 个文件
+     * @return 个文件
      */
     public static String text_file() {
         return bundle.getString("file");
     }
 
     /**
-     * 隐藏
+     * @return 隐藏
      */
     public static String text_hidden() {
         return bundle.getString("hidden");
     }
 
     /**
-     * 非隐藏
+     * @return 非隐藏
      */
     public static String text_unhidden() {
         return bundle.getString("unhidden");
     }
 
+    /**
+     * @return 查询所选第一行文件
+     */
     public static String text_checkFirstFile() {
         return bundle.getString("checkFirstFile");
+    }
+
+    /**
+     * @return 查询中...
+     */
+    public static String text_searching() {
+        return bundle.getString("searching");
+    }
+
+    /**
+     * @return 读取 LaunchAgents 目录失败:
+     */
+    public static String text_searchLaunchAgentsErr() {
+        return bundle.getString("searchLaunchAgentsErr");
+    }
+
+    /**
+     * @return 任务创建失败:
+     */
+    public static String text_creatTaskErr() {
+        return bundle.getString("creatTaskErr");
+    }
+
+    /**
+     * @return 保存中...
+     */
+    public static String text_saving() {
+        return bundle.getString("saving");
+    }
+
+    /**
+     * @return 路径为空
+     */
+    public static String text_nullPath() {
+        return bundle.getString("nullPath");
+    }
+
+    /**
+     * @return 不存在
+     */
+    public static String text_noExists() {
+        return bundle.getString("noExists");
+    }
+
+    /**
+     * @return 匹配超时
+     */
+    public static String text_timeOut() {
+        return bundle.getString("timeOut");
+    }
+
+    /**
+     * @return 屏幕图像获取失败:
+     */
+    public static String text_screenErr() {
+        return bundle.getString("screenErr");
+    }
+
+    /**
+     * @return 操作被用户取消:
+     */
+    public static String text_cancel() {
+        return bundle.getString("cancel");
+    }
+
+    /**
+     * @return 操作内容：
+     */
+    public static String text_taskInfo() {
+        return bundle.getString("taskInfo");
+    }
+
+    /**
+     * @return 单次操作时间：
+     */
+    public static String text_clickTime() {
+        return bundle.getString("clickTime");
+    }
+
+    /**
+     * @return 重复：
+     */
+    public static String text_repeat() {
+        return bundle.getString("repeat");
+    }
+
+    /**
+     * @return 次，每次操作间隔：
+     */
+    public static String text_interval() {
+        return bundle.getString("interval");
+    }
+
+    /**
+     * @return 操作内容：识别目标图像：
+     */
+    public static String text_picTarget() {
+        return bundle.getString("picTarget");
+    }
+
+    /**
+     * @return 图像匹配后：
+     */
+    public static String text_afterMatch() {
+        return bundle.getString("afterMatch");
+    }
+
+    /**
+     * @return 正在识别终止操作图像：
+     */
+    public static String text_searchingStop() {
+        return bundle.getString("searchingStop");
+    }
+
+    /**
+     * @return 的步骤时终止操作
+     */
+    public static String text_taskStop() {
+        return bundle.getString("taskStop");
+    }
+
+    /**
+     * @return 匹配到终止操作图像：
+     */
+    public static String text_findStopImg() {
+        return bundle.getString("findStopImg");
+    }
+
+    /**
+     * @return 匹配度为：
+     */
+    public static String text_matchThreshold() {
+        return bundle.getString("matchThreshold");
+    }
+
+    /**
+     * @return 正在识别目标图像：
+     */
+    public static String text_searchingClick() {
+        return bundle.getString("searchingClick");
+    }
+
+    /**
+     * @return 的步骤时发生异常
+     */
+    public static String text_taskErr() {
+        return bundle.getString("taskErr");
+    }
+
+    /**
+     * @return 已重试最大重试次数：
+     */
+    public static String text_maxRetry() {
+        return bundle.getString("maxRetry");
+    }
+
+    /**
+     * @return 未找到匹配图像：
+     */
+    public static String text_notFound() {
+        return bundle.getString("notFound");
+    }
+
+    /**
+     * @return 最接近匹配度为：
+     */
+    public static String text_closestMatchThreshold() {
+        return bundle.getString("closestMatchThreshold");
+    }
+
+    /**
+     * @return 容量不能小于0
+     */
+    public static String text_minSize() {
+        return bundle.getString("minSize");
+    }
+
+    /**
+     * @return 双击单元格可进行编辑
+     */
+    public static String text_editingCellTip() {
+        return bundle.getString("editingCellTip");
+    }
+
+    /**
+     * @return 点击
+     */
+    public static String text_click() {
+        return bundle.getString("click");
+    }
+
+    /**
+     * @return 步骤详情
+     */
+    public static String clickDetail_title() {
+        return bundle.getString("clickDetail.title");
+    }
+
+    /**
+     * @return 任务详情
+     */
+    public static String taskDetail_title() {
+        return bundle.getString("taskDetail.title");
+    }
+
+    /**
+     * @return 未选择任何星期
+     */
+    public static String taskDetail_noWeekDay() {
+        return bundle.getString("taskDetail.noWeekDay");
+    }
+
+    /**
+     * @return 缺少必要系统权限
+     */
+    public static String autoClick_noPermissions() {
+        return bundle.getString("autoClick.noPermissions");
+    }
+
+    /**
+     * @return 当前鼠标位置为：
+     */
+    public static String autoClick_nowMousePos() {
+        return bundle.getString("autoClick.nowMousePos");
+    }
+
+    /**
+     * @return 操作步骤设置有误
+     */
+    public static String autoClick_settingErr() {
+        return bundle.getString("autoClick.settingErr");
+    }
+
+    /**
+     * @return 名称：
+     */
+    public static String autoClick_name() {
+        return bundle.getString("autoClick.name");
+    }
+
+    /**
+     * @return 序号：
+     */
+    public static String autoClick_index() {
+        return bundle.getString("autoClick.index");
+    }
+
+    /**
+     * @return 日志文件删除失败
+     */
+    public static String about_deleteFailed() {
+        return bundle.getString("about.deleteFailed");
+    }
+
+    /**
+     * @return 复制反馈邮件
+     */
+    public static String about_copyEmail() {
+        return bundle.getString("about.copyEmail");
+    }
+
+    /**
+     * @return 运行记录
+     */
+    public static String clickLog_title() {
+        return bundle.getString("clickLog.title");
+    }
+
+    /**
+     * @return 列表为空
+     */
+    public static String listText_dataListNull() {
+        return bundle.getString("listText.null");
     }
 
     public static String confirm_unSaved() {
@@ -1051,50 +1342,328 @@ public class i18nFinal {
         return bundle.getString("retryType.step");
     }
 
+    public static String extension_file() {
+        return bundle.getString("extension.file");
+    }
+
+    public static String extension_folder() {
+        return bundle.getString("extension.folder");
+    }
+
+    public static String extension_fileOrFolder() {
+        return bundle.getString("extension.fileOrFolder");
+    }
+
+    /**
+     * @return 组数据
+     */
+    public static String unit_data() {
+        return bundle.getString("unit.data");
+    }
+
+    /**
+     * @return 个任务
+     */
+    public static String unit_task() {
+        return bundle.getString("unit.task");
+    }
+
+    /**
+     * @return 张图片
+     */
+    public static String unit_img() {
+        return bundle.getString("unit.img");
+    }
+
+    /**
+     * @return 条记录
+     */
+    public static String unit_log() {
+        return bundle.getString("unit.log");
+    }
+
+    /**
+     * @return 步操作
+     */
+    public static String unit_process() {
+        return bundle.getString("unit.process");
+    }
+
+    /**
+     * @return 次
+     */
+    public static String unit_times() {
+        return bundle.getString("unit.times");
+    }
+
+    /**
+     * @return 检查并下载更新
+     */
+    public static String update_checkUpdate_Abt() {
+        return bundle.getString("update.checkUpdate_Abt");
+    }
+
+    /**
+     * @return 下载更新失败
+     */
     public static String update_downloadFailed() {
         return bundle.getString("update.downloadFailed");
     }
 
+    /**
+     * @return 发现新版本：
+     */
     public static String update_findNewVersion() {
         return bundle.getString("update.findNewVersion");
     }
 
+    /**
+     * @return 找不到更新脚本
+     */
     public static String update_scriptNotFind() {
         return bundle.getString("update.scriptNotFind");
     }
 
+    /**
+     * @return 检查更新失败
+     */
     public static String update_checkFailed() {
         return bundle.getString("update.checkFailed");
     }
 
+    /**
+     * @return 无法创建目录：
+     */
     public static String update_creatDirErr() {
         return bundle.getString("update.creatDirErr");
     }
 
+    /**
+     * @return 无法创建父目录：
+     */
     public static String update_creatFatherDirErr() {
         return bundle.getString("update.creatFatherDirErr");
     }
 
+    /**
+     * @return 无法删除文件或目录：
+     */
     public static String update_deleteErr() {
         return bundle.getString("update.deleteErr");
     }
 
     /**
-     * 只查询文件
+     * @return 发布日期：
+     */
+    public static String update_releaseDate() {
+        return bundle.getString("update.releaseDate");
+    }
+
+    /**
+     * @return 现在更新
+     */
+    public static String update_updateButton() {
+        return bundle.getString("update.updateButton");
+    }
+
+    /**
+     * @return 稍后更新
+     */
+    public static String update_laterButton() {
+        return bundle.getString("update.laterButton");
+    }
+
+    /**
+     * @return 检查更新中...
+     */
+    public static String update_checking() {
+        return bundle.getString("update.checking");
+    }
+
+    /**
+     * @return 检查失败，响应体为空
+     */
+    public static String update_nullResponse() {
+        return bundle.getString("update.nullResponse");
+    }
+
+    /**
+     * @return 下载中...
+     */
+    public static String update_downloading() {
+        return bundle.getString("update.downloading");
+    }
+
+    /**
+     * @return 下下载更新失败，HTTP代码:
+     */
+    public static String update_downloadError() {
+        return bundle.getString("update.downloadError");
+    }
+
+    /**
+     * @return 下载完成，等待安装更新
+     */
+    public static String update_waitInstall() {
+        return bundle.getString("update.waitInstall");
+    }
+
+    /**
+     * @return 重启并安装更新
+     */
+    public static String update_installing() {
+        return bundle.getString("update.installing");
+    }
+
+    /**
+     * @return 无法设置脚本可执行权限
+     */
+    public static String update_scriptNoPermission() {
+        return bundle.getString("update.scriptNoPermission");
+    }
+
+    /**
+     * @return 脚本不可执行:
+     */
+    public static String update_scriptCantRun() {
+        return bundle.getString("update.scriptCantRun");
+    }
+
+    /**
+     * @return 更新并重启应用:
+     */
+    public static String update_password() {
+        return bundle.getString("update.password");
+    }
+
+    /**
+     * @return 创建临时文件失败
+     */
+    public static String update_tempFileErr() {
+        return bundle.getString("update.tempFileErr");
+    }
+
+    /**
+     * @return 脚本执行失败，退出码:
+     */
+    public static String update_scriptExit() {
+        return bundle.getString("update.scriptExit");
+    }
+
+    /**
+     * @return 脚本输出内容:
+     */
+    public static String update_scriptOut() {
+        return bundle.getString("update.scriptOut");
+    }
+
+    /**
+     * @return 下载更新
+     */
+    public static String update_downloadingUpdate() {
+        return bundle.getString("update.downloadingUpdate");
+    }
+
+    /**
+     * @return 最后检查时间：
+     */
+    public static String update_lastCheck() {
+        return bundle.getString("update.lastCheck");
+    }
+
+    /**
+     * @return 当前版本为最新版本
+     */
+    public static String update_nowIsLast() {
+        return bundle.getString("update.nowIsLast");
+    }
+
+    /**
+     * @return 导入pmc文件
+     */
+    public static String import_title() {
+        return bundle.getString("import.title");
+    }
+
+    /**
+     * @return 是否清空操作列表？
+     */
+    public static String import_header() {
+        return bundle.getString("import.header");
+    }
+
+    /**
+     * @return 在操作列表下方追加流程
+     */
+    public static String import_append() {
+        return bundle.getString("import.append");
+    }
+
+    /**
+     * @return 清空操作列表后导入流程
+     */
+    public static String import_clear() {
+        return bundle.getString("import.clear");
+    }
+
+    /**
+     * @return 取消导入
+     */
+    public static String import_cancel() {
+        return bundle.getString("import.cancel");
+    }
+
+    /**
+     * @return 关于
+     */
+    public static String macMenu_about() {
+        return bundle.getString("macMenu.about");
+    }
+
+    /**
+     * @return 设置...
+     */
+    public static String macMenu_settings() {
+        return bundle.getString("macMenu.settings");
+    }
+
+    /**
+     * @return 隐藏
+     */
+    public static String macMenu_hide() {
+        return bundle.getString("macMenu.hide");
+    }
+
+    /**
+     * @return 隐藏其他
+     */
+    public static String macMenu_hideOther() {
+        return bundle.getString("macMenu.hideOther");
+    }
+
+    /**
+     * @return 退出
+     */
+    public static String macMenu_quit() {
+        return bundle.getString("macMenu.quit");
+    }
+
+    /**
+     * @return 只查询文件
      */
     public static String search_onlyFile() {
         return bundle.getString("search.onlyFile");
     }
 
     /**
-     * 只查询文件夹
+     * @return 只查询文件夹
      */
     public static String search_onlyDirectory() {
         return bundle.getString("search.onlyDirectory");
     }
 
     /**
-     * 文件和文件夹都查询
+     * @return 文件和文件夹都查询
      */
     public static String search_fileDirectory() {
         return bundle.getString("search.fileDirectory");
@@ -1118,21 +1687,21 @@ public class i18nFinal {
     }
 
     /**
-     * 不查询隐藏文件
+     * @return 不查询隐藏文件
      */
     public static String hide_noHideFile() {
         return bundle.getString("hide.noHideFile");
     }
 
     /**
-     * 只查询隐藏文件
+     * @return 只查询隐藏文件
      */
     public static String hide_onlyHideFile() {
         return bundle.getString("hide.onlyHideFile");
     }
 
     /**
-     * 是否隐藏都查询
+     * @return 是否隐藏都查询
      */
     public static String hide_allFile() {
         return bundle.getString("hide.allFile");
@@ -1156,28 +1725,28 @@ public class i18nFinal {
     }
 
     /**
-     * 文件名包含
+     * @return 文件名包含
      */
     public static String name_contain() {
         return bundle.getString("name.contain");
     }
 
     /**
-     * 文件名为
+     * @return 文件名为
      */
     public static String name_is() {
         return bundle.getString("name.is");
     }
 
     /**
-     * 文件名起始于
+     * @return 文件名起始于
      */
     public static String name_start() {
         return bundle.getString("name.start");
     }
 
     /**
-     * 文件名结束于
+     * @return 文件名结束于
      */
     public static String name_end() {
         return bundle.getString("name.end");
@@ -1202,35 +1771,35 @@ public class i18nFinal {
     }
 
     /**
-     * 按文件名称排序
+     * @return 按文件名称排序
      */
     public static String sort_Name() {
         return bundle.getString("sort.Name");
     }
 
     /**
-     * 按文件创建时间排序
+     * @return 按文件创建时间排序
      */
     public static String sort_creatTime() {
         return bundle.getString("sort.creatTime");
     }
 
     /**
-     * 按文件修改时间排序
+     * @return 按文件修改时间排序
      */
     public static String sort_updateTime() {
         return bundle.getString("sort.updateTime");
     }
 
     /**
-     * 按文件大小排序
+     * @return 按文件大小排序
      */
     public static String sort_size() {
         return bundle.getString("sort.size");
     }
 
     /**
-     * 按文件类型排序
+     * @return 按文件类型排序
      */
     public static String sort_type() {
         return bundle.getString("sort.type");
@@ -1272,28 +1841,39 @@ public class i18nFinal {
         retryTypeMap.put(RetryTypeEnum.STEP.ordinal(), retryType_Step());
     }
 
+    /**
+     * @return 按操作类型设置处理匹配的图像
+     */
     public static String clickMatched_click() {
         return bundle.getString("clickMatched.click");
     }
 
+    /**
+     * @return 直接执行下一个操作步骤
+     */
     public static String clickMatched_break() {
         return bundle.getString("clickMatched.break");
     }
 
+    /**
+     * @return 跳转到指定操作步骤
+     */
     public static String clickMatched_step() {
         return bundle.getString("clickMatched.step");
     }
 
+    /**
+     * @return 点击匹配图像后跳转指定步骤
+     */
     public static String clickMatched_clickStep() {
         return bundle.getString("clickMatched.clickStep");
     }
 
+    /**
+     * @return 匹配图像存在则重复点击
+     */
     public static String clickMatched_clickWhile() {
         return bundle.getString("clickMatched.clickWhile");
-    }
-
-    public static String update_downloadingUpdate() {
-        return bundle.getString("update.downloadingUpdate");
     }
 
     /**
@@ -1332,24 +1912,39 @@ public class i18nFinal {
         matchedTypeMap.put(MatchedTypeEnum.CLICK_WHILE.ordinal(), clickMatched_clickWhile());
     }
 
+    /**
+     * @return 鼠标左键
+     */
     public static String mouseButton_primary() {
-        return bundle.getString("primary");
+        return bundle.getString("mouseButton.primary");
     }
 
+    /**
+     * @return 鼠标右键
+     */
     public static String mouseButton_secondary() {
-        return bundle.getString("secondary");
+        return bundle.getString("mouseButton.secondary");
     }
 
+    /**
+     * @return 鼠标中键
+     */
     public static String mouseButton_middle() {
-        return bundle.getString("middle");
+        return bundle.getString("mouseButton.middle");
     }
 
+    /**
+     * @return 鼠标前侧键
+     */
     public static String mouseButton_forward() {
-        return bundle.getString("forward");
+        return bundle.getString("mouseButton.forward");
     }
 
+    /**
+     * @return 鼠标后侧键
+     */
     public static String mouseButton_back() {
-        return bundle.getString("back");
+        return bundle.getString("mouseButton.back");
     }
 
     /**
@@ -1423,22 +2018,37 @@ public class i18nFinal {
         NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
     }
 
+    /**
+     * @return 带轨迹的移动
+     */
     public static String clickType_moveTrajectory() {
         return bundle.getString("clickType.moveTrajectory");
     }
 
+    /**
+     * @return 仅移动
+     */
     public static String clickType_move() {
         return bundle.getString("clickType.move");
     }
 
+    /**
+     * @return 点击后松开
+     */
     public static String clickType_click() {
         return bundle.getString("clickType.click");
     }
 
+    /**
+     * @return 拖拽
+     */
     public static String clickType_drag() {
         return bundle.getString("clickType.drag");
     }
 
+    /**
+     * @return 移动到设置坐标
+     */
     public static String clickType_moveTo() {
         return bundle.getString("clickType.moveTo");
     }
@@ -1479,14 +2089,23 @@ public class i18nFinal {
         clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
     }
 
+    /**
+     * @return 每天
+     */
     public static String repeatType_daily() {
         return bundle.getString("repeatType.daily");
     }
 
+    /**
+     * @return 每周
+     */
     public static String repeatType_weekly() {
         return bundle.getString("repeatType.weekly");
     }
 
+    /**
+     * @return 仅一次
+     */
     public static String repeatType_once() {
         return bundle.getString("repeatType.once");
     }
@@ -1523,30 +2142,51 @@ public class i18nFinal {
         repeatTypeMap.put(RepeatTypeEnum.ONCE.getRepeatType(), repeatType_once());
     }
 
+    /**
+     * @return 星期一
+     */
     public static String monday() {
         return bundle.getString("monday");
     }
 
+    /**
+     * @return 星期二
+     */
     public static String tuesday() {
         return bundle.getString("tuesday");
     }
 
+    /**
+     * @return 星期三
+     */
     public static String wednesday() {
         return bundle.getString("wednesday");
     }
 
+    /**
+     * @return 星期四
+     */
     public static String thursday() {
         return bundle.getString("thursday");
     }
 
+    /**
+     * @return 星期五
+     */
     public static String friday() {
         return bundle.getString("friday");
     }
 
+    /**
+     * @return 星期六
+     */
     public static String saturday() {
         return bundle.getString("saturday");
     }
 
+    /**
+     * @return 星期日
+     */
     public static String sunday() {
         return bundle.getString("sunday");
     }

@@ -278,7 +278,7 @@ public class ClickDetailController extends RootController {
                         .setPath(b.getPath());
                 items.add(imgFileVO);
             });
-            updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img());
+            updateTableViewSizeText(tableView_Det, dataNumber_Det, unit_img());
         }
         tableView_Det.refresh();
         String clickImgPath = item.getClickImgPath();
@@ -640,7 +640,7 @@ public class ClickDetailController extends RootController {
         bindingTaskNode(loadImgTask, taskBean);
         loadImgTask.setOnSucceeded(event -> {
             taskUnbind(taskBean);
-            updateTableViewSizeText(tableView_Det, dataNumber_Det, text_img());
+            updateTableViewSizeText(tableView_Det, dataNumber_Det, unit_img());
             tableView_Det.refresh();
             loadImgTask = null;
         });
