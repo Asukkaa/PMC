@@ -1256,7 +1256,7 @@ public class AutoClickController extends RootController implements MousePosition
                                 recordTimeline = null;
                                 Platform.runLater(() -> {
                                     log_Click.setTextFill(Color.BLUE);
-                                    log_Click.setText(text_recordEnd());
+                                    log_Click.setText(autoClick_recordEnd());
                                 });
                             }
                             // 停止运行计时
@@ -1361,7 +1361,7 @@ public class AutoClickController extends RootController implements MousePosition
             pressButtonList.clear();
             Platform.runLater(() -> {
                 log_Click.setTextFill(Color.BLUE);
-                log_Click.setText(text_recordEnd());
+                log_Click.setText(autoClick_recordEnd());
                 tableView_Click.refresh();
             });
         }
@@ -1425,7 +1425,7 @@ public class AutoClickController extends RootController implements MousePosition
                     clickPositionVOS.add(movePoint);
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
-                            text_recorded() + text_mouseTrajectory();
+                            text_recorded() + autoClick_mouseTrajectory();
                     log_Click.setText(log);
                     floatingLabel.setText(log);
                 });

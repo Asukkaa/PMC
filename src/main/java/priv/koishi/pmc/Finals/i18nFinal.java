@@ -62,394 +62,724 @@ public class i18nFinal {
         return bundle.getString("tip.removeAll_Log");
     }
 
+    /**
+     * @return logs 文件夹下只会保留该配置所填写数量的 log 日志，不填将会保留全部日志
+     */
     public static String tip_logsNum() {
         return bundle.getString("tip.logsNum");
     }
 
+    /**
+     * @return 点击将会清空列表中的数据
+     */
     public static String tip_learButton() {
         return bundle.getString("tip.learButton");
     }
 
+    /**
+     * @return 勾选后任务结束将会打开对应文件夹
+     */
     public static String tip_openDirectory() {
         return bundle.getString("tip.openDirectory");
     }
 
+    /**
+     * @return 勾选后导出的同名文件名将会自动加上数字后缀
+     */
     public static String tip_notOverwrite() {
         return bundle.getString("tip.notOverwrite");
     }
 
+    /**
+     * @return 点击即可跳转对应网盘分享页
+     */
     public static String tip_openLink() {
         return bundle.getString("tip.openLink");
     }
 
+    /**
+     * @return 点击即可跳转对应 git 仓库，如果喜欢本项目可以给作者一个 star
+     */
     public static String tip_openGitLink() {
         return bundle.getString("tip.openGitLink");
     }
 
+    /**
+     * @return 每步操作执行前等待时间，单位为毫秒，只能填自然数，不填默认为 0
+     */
     public static String tip_wait() {
         return bundle.getString("tip.wait");
     }
 
+    /**
+     * @return 鼠标点击位置起始纵坐标，只能填自然数，不填默认为 0
+     */
     public static String tip_mouseStartX() {
         return bundle.getString("tip.mouseStartX");
     }
 
+    /**
+     * @return 鼠标点击位置起始纵坐标，只能填自然数，不填默认为 0
+     */
     public static String tip_mouseStartY() {
         return bundle.getString("tip.mouseStartY");
     }
 
+    /**
+     * @return 点击后将会按照列表中的步骤执行自动操作，执行自动化任务时按下 esc 即可取消任务
+     */
     public static String tip_runClick() {
         return bundle.getString("tip.runClick");
     }
 
+    /**
+     * @return 点击后将会根据设置在列表中添加一条操作步骤
+     */
     public static String tip_addPosition() {
         return bundle.getString("tip.addPosition");
     }
 
+    /**
+     * @return 自动操作循环次数，只能填自然数，不填默认为 1，填 0 为无限循环
+     */
     public static String tip_loopTime() {
         return bundle.getString("tip.loopTime");
     }
 
+    /**
+     * @return 每步操作执行次数，点击为多次点击，长按为多次长按，只能填自然数，不填默认为 1
+     */
     public static String tip_clickNumBer() {
         return bundle.getString("tip.clickNumBer");
     }
 
+    /**
+     * @return 每步操作需要按下的键
+     */
     public static String tip_clickKey() {
         return bundle.getString("tip.clickKey");
     }
 
+    /**
+     * @return 操作列表中点击加拖拽数量必须与松开操作数量一致 设置点击图像后只能选择点击后松开或移动到设置坐标
+     */
     public static String tip_clickType() {
         return bundle.getString("tip.clickType");
     }
 
+    /**
+     * @return 每步操作中，单次操作的点击时长，单位为毫秒，只能填自然数，不填默认为 0
+     */
     public static String tip_clickTime() {
         return bundle.getString("tip.clickTime");
     }
 
+    /**
+     * @return 每步操作中，单次操作的时间间隔，单位为毫秒，只能填自然数，不填默认为 0
+     */
     public static String tip_clickInterval() {
         return bundle.getString("tip.clickInterval");
     }
 
+    /**
+     * @return 每步操作的名称，不填将给一个默认名称
+     */
     public static String tip_clickName() {
         return bundle.getString("tip.clickName");
     }
 
+    /**
+     * @return 点击可设置操作流程导出文件夹地址
+     */
     public static String tip_outAutoClickPath() {
         return bundle.getString("tip.outAutoClickPath");
     }
 
+    /**
+     * @return 点击后选择要导入的操作流程即可在列表中追加
+     */
     public static String tip_loadAutoClick() {
         return bundle.getString("tip.loadAutoClick");
     }
 
+    /**
+     * @return 点击即可按照设置导出文件夹与文件名导出列表中的操作流程
+     */
     public static String tip_exportAutoClick() {
         return bundle.getString("tip.exportAutoClick");
     }
 
+    /**
+     * @return 勾选后运行或测试自动操作结束后将会弹出本应用的窗口
+     */
     public static String tip_showWindowRun() {
         return bundle.getString("tip.showWindowRun");
     }
 
+    /**
+     * @return 勾选后录制自动操作开始前将会隐藏本应用的窗口
+     */
     public static String tip_hideWindowRecord() {
         return bundle.getString("tip.hideWindowRecord");
     }
 
+    /**
+     * @return 勾选后录制自动操作结束后将会弹出本应用的窗口
+     */
     public static String tip_showWindowRecord() {
         return bundle.getString("tip.showWindowRecord");
     }
 
+    /**
+     * @return 勾选后在运行自动操作时运行信息浮窗会跟随鼠标移动
+     */
     public static String tip_mouseFloatingRun() {
         return bundle.getString("tip.mouseFloatingRun");
     }
 
+    /**
+     * @return 勾选后在录制自动操作时信息浮窗会跟随鼠标移动
+     */
     public static String tip_mouseFloatingRecord() {
         return bundle.getString("tip.mouseFloatingRecord");
     }
 
+    /**
+     * @return 勾选后点击 显示浮窗位置 按钮所显示的浮窗会跟随鼠标移动
+     */
     public static String tip_mouseFloating() {
         return bundle.getString("tip.mouseFloating");
     }
 
+    /**
+     * @return 用来控制浮窗距离屏幕边界的最小距离，只能填自然数，单位为像素，不填默认为 0
+     */
     public static String tip_margin() {
         return bundle.getString("tip.margin");
     }
 
+    /**
+     * @return 在录制自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为
+     */
     public static String tip_preparationRecordTime() {
         return bundle.getString("tip.preparationRecordTime");
     }
 
+    /**
+     * @return 在运行自动操作前将会等待的时间，只能填自然数，单位秒，不填默认为
+     */
     public static String tip_preparationRunTime() {
         return bundle.getString("tip.preparationRunTime");
     }
 
+    /**
+     * @return 勾选后在运行自动操作时将会显示一个运行信息浮窗
+     */
     public static String tip_floatingRun() {
         return bundle.getString("tip.floatingRun");
     }
 
+    /**
+     * @return 勾选后在录制自动操作时将会显示一个录制信息浮窗
+     */
     public static String tip_floatingRecord() {
         return bundle.getString("tip.floatingRecord");
     }
 
+    /**
+     * @return 点击后将会展示浮窗位置，之后按下 esc 可关闭浮窗
+     */
     public static String tip_setFloatingCoordinate() {
         return bundle.getString("tip.setFloatingCoordinate");
     }
 
+    /**
+     * @return 点击后将会关闭浮窗
+     */
     public static String tip_closeFloating() {
         return bundle.getString("tip.closeFloating");
     }
 
+    /**
+     * @return 点击后将会关闭浮窗并保存浮窗位置
+     */
     public static String tip_saveFloating() {
         return bundle.getString("tip.saveFloating");
     }
 
+    /**
+     * @return 浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为
+     */
     public static String tip_offsetX() {
         return bundle.getString("tip.offsetX");
     }
 
+    /**
+     * @return 浮窗将会根据填写值向上下偏移，只能填整数，正数向下偏移，负数向上偏移，不填默认为
+     */
     public static String tip_offsetY() {
         return bundle.getString("tip.offsetY");
     }
 
+    /**
+     * @return 将会修改自动操作运行与录制时的信息浮窗字体颜色
+     */
     public static String tip_colorPicker() {
         return bundle.getString("tip.colorPicker");
     }
 
+    /**
+     * @return 感谢贴吧吧友 @拒绝神绮99次 设计的 logo
+     */
     public static String tip_thanks() {
         return bundle.getString("tip.thanks");
     }
 
+    /**
+     * @return 感谢你的赞赏！
+     */
     public static String tip_appreciate() {
         return bundle.getString("tip.appreciate");
     }
 
+    /**
+     * @return 勾选后将会在应用启动时加载自动操作工具上次关闭时的设置
+     */
     public static String tip_lastAutoClickSetting() {
         return bundle.getString("tip.lastAutoClickSetting");
     }
 
+    /**
+     * @return 滑块将会改变当前步骤要点及的图像识别匹配度，建议设置 80% 以上
+     */
     public static String tip_clickOpacity() {
         return bundle.getString("tip.clickOpacity");
     }
 
+    /**
+     * @return 滑块将会改变当前步骤所有终止操作图像识别匹配度，建议设置 80% 以上
+     */
     public static String tip_stopOpacity() {
         return bundle.getString("tip.stopOpacity");
     }
 
+    /**
+     * @return 点击后可添加用来终止当前步骤的图片，建议不要添加太多影响图像识别效率
+     */
     public static String tip_stopImgBtn() {
         return bundle.getString("tip.stopImgBtn");
     }
 
+    /**
+     * @return 创建新的操作步骤时会自动将列表中的图片加入对应步骤中，建议不要添加太多影响图像识别效率
+     */
     public static String tip_defaultStopImgBtn() {
         return bundle.getString("tip.defaultStopImgBtn");
     }
 
+    /**
+     * @return 点击后可添加需要点击的图片，建议选择特征明显范围较小的图片
+     */
     public static String tip_clickImgBtn() {
         return bundle.getString("tip.clickImgBtn");
     }
 
+    /**
+     * @return 删除需要点击的图片
+     */
     public static String tip_removeClickImgBtn() {
         return bundle.getString("tip.removeClickImgBtn");
     }
 
+    /**
+     * @return 删除列表所有终止操作图片
+     */
     public static String tip_removeStopImgBtn() {
         return bundle.getString("tip.removeStopImgBtn");
     }
 
+    /**
+     * @return 将当前步骤的步骤名称更改为要点击的图片名称
+     */
     public static String tip_updateClickNameBtn() {
         return bundle.getString("tip.updateClickNameBtn");
     }
 
+    /**
+     * @return 将当前步骤的步骤名称更改为要点击的图片名称
+     */
     public static String tip_overtime() {
         return bundle.getString("tip.overtime");
     }
 
+    /**
+     * @return 只能填自然整数，单位秒，不填默认为 1，每张图片识别失败后将会等着当前设置值后再重试
+     */
     public static String tip_retrySecond() {
         return bundle.getString("tip.retrySecond");
     }
 
+    /**
+     * @return 点击将会重启本应用并保存设置项
+     */
     public static String tip_reLaunch() {
         return bundle.getString("tip.reLaunch");
     }
 
+    /**
+     * @return 勾选后如果修改过操作步骤详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框
+     */
     public static String tip_remindSave() {
         return bundle.getString("tip.remindSave");
     }
 
+    /**
+     * @return 勾选后如果修改过操作定时任务详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框
+     */
     public static String tip_remindTaskSave() {
         return bundle.getString("tip.remindTaskSave");
     }
 
+    /**
+     * @return 前步骤序号为：
+     */
     public static String tip_clickIndex() {
         return bundle.getString("tip.clickIndex");
     }
 
+    /**
+     * @return 当前操作步骤列表共有操作步骤数量为：
+     */
     public static String tip_tableViewSize() {
         return bundle.getString("tip.tableViewSize");
     }
 
+    /**
+     * @return 只能填正整数，不可为空，不可大于操作步骤列表中步骤总数，不可填当前步骤序号，目标序号变更后需重新设置
+     */
     public static String tip_step() {
         return bundle.getString("tip.step");
     }
 
+    /**
+     * @return 要识别的图像匹配成功后将会根据选项进行不同的操作
+     */
     public static String tip_matchedType() {
         return bundle.getString("tip.matchedType");
     }
 
+    /**
+     * @return 要识别的图像匹配失败后将会根据选项进行不同的操作
+     */
     public static String tip_retryType() {
         return bundle.getString("tip.retryType");
     }
 
+    /**
+     * @return 勾选后将会在录制自动操作时记录鼠标没有拖拽时的移动轨迹
+     */
     public static String tip_recordMove() {
         return bundle.getString("tip.recordMove");
     }
 
+    /**
+     * @return 勾选后将会在录制自动操作时记录鼠标拖拽状态时的移动轨迹
+     */
     public static String tip_recordDrag() {
         return bundle.getString("tip.recordDrag");
     }
 
+    /**
+     * @return 勾选后运行自动操作点击时将按设置进行点击位置的坐标偏移
+     */
     public static String tip_randomClick() {
         return bundle.getString("tip.randomClick");
     }
 
+    /**
+     * @return 勾选后运行自动操作移动鼠标时将按设置进行轨迹坐标的偏移
+     */
     public static String tip_randomTrajectory() {
         return bundle.getString("tip.randomTrajectory");
     }
 
+    /**
+     * @return 勾选后运行自动操作点击时长将按设置的时间偏移量进行偏移
+     */
     public static String tip_randomClickTime() {
         return bundle.getString("tip.randomClickTime");
     }
 
+    /**
+     * @return 勾选后运行自动操作时多次点击的操作步骤的点击间隔将按设置的时间偏移量进行偏移
+     */
     public static String tip_randomClickInterval() {
         return bundle.getString("tip.randomClickInterval");
     }
 
+    /**
+     * @return 勾选后运行自动操作时每步操前的等待时间将按照设置的时间偏移量进行偏移
+     */
     public static String tip_randomWaitTime() {
         return bundle.getString("tip.randomWaitTime");
     }
 
+    /**
+     * @return 用来限制运行记录数量的设置，只能填正整数，不填则不限制最大记录数量
+     */
     public static String tip_maxLogNum() {
         return bundle.getString("tip.maxLogNum");
     }
 
+    /**
+     * @return 下次启动应用将会按照此设置项分配应用最大运行内存，单位为GB，只能填自然数，为空将设置为默认值操作系统最大内存的1/4
+     */
     public static String tip_nextRunMemory() {
         return bundle.getString("tip.nextRunMemory");
     }
 
+    /**
+     * @return 只能填 0 到 23 的自然数，不填默认为 0
+     */
     public static String tip_hour() {
         return bundle.getString("tip.hour");
     }
 
+    /**
+     * @return 只能填 0 到 59 的自然数，不填默认为 0
+     */
     public static String tip_minute() {
         return bundle.getString("tip.minute");
     }
 
+    /**
+     * @return 定时任务的名称，保存后无法修改，同名任务将会被覆盖，不填默认为
+     */
     public static String tip_taskName() {
         return bundle.getString("tip.taskName");
     }
 
+    /**
+     * @return 重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效
+     */
     public static String tip_datePicker() {
         return bundle.getString("tip.datePicker");
     }
 
+    /**
+     * @return 定时任务将按照此选项设置类型间隔进行运作
+     */
     public static String tip_repeatType() {
         return bundle.getString("tip.repeatType");
     }
 
+    /**
+     * @return 点击后将会打开定时任务设置页，设置定时任务并保存成功后将会在下面列表中显示
+     */
     public static String tip_addTimedTask() {
         return bundle.getString("tip.addTimedTask");
     }
 
+    /**
+     * @return 点击后将会刷新定时任务列表，查询最新设置
+     */
     public static String tip_getScheduleTask() {
         return bundle.getString("tip.getScheduleTask");
     }
 
+    /**
+     * @return 删除所选文件
+     */
     public static String tip_deletePath() {
         return bundle.getString("tip.deletePath");
     }
 
+    /**
+     * @return 用来设置定时启动本应用后自动执行的自动操作
+     */
     public static String tip_loadAutoClickBtn() {
         return bundle.getString("tip.loadAutoClickBtn");
     }
 
+    /**
+     * @return 次启动应用将会按照此设置项设置垃圾回收（GC）方式
+     * G1GC：分区回收，低延迟与吞吐量平衡
+     * ZGC：亚毫秒级停顿
+     * ParallelGC：多线程并行回收，吞吐量优先
+     * ShenandoahGC：全并发回收，停顿时间与堆大小无关
+     * SerialGC：单线程回收，简单高效
+     */
     public static String tip_nextGcType() {
         return bundle.getString("tip.nextGcType");
     }
 
+    /**
+     * @return 修改应用显示的语言，修改后重启应用才会生效
+     */
     public static String tip_language() {
         return bundle.getString("tip.language");
     }
 
+    /**
+     * @return 在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
+     * 只能填自然数，单位为毫秒，数字越小越接近录制轨迹，不填默认为
+     */
     public static String tip_sampleInterval() {
         return bundle.getString("tip.sampleInterval");
     }
 
+    /**
+     * @return 要点击的图片识别没有匹配项后将会按照设置次数再次识别
+     * 只能填自然数，不填默认为
+     */
     public static String tip_clickRetryNum() {
         return bundle.getString("tip.clickRetryNum");
     }
 
+    /**
+     * @return 终止操作图片识别没有匹配项后将会按照设置次数再次识别
+     * 只能填自然数，不填默认为
+     */
     public static String tip_stopRetryNum() {
         return bundle.getString("tip.stopRetryNum");
     }
 
+    /**
+     * @return 滑动将会改变录制或运行自动操作时浮窗透明度
+     * 透明的为 0 时 Windows 下鼠标将会点击透过浮窗
+     * macOS 暂时无法实现鼠标点击透过
+     */
     public static String tip_opacity() {
         return bundle.getString("tip.opacity");
     }
 
+    /**
+     * @return 点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
+     * 每次鼠标点击并松开为一个步骤，每次点击间隔为操作前等待时间
+     */
     public static String tip_recordClick() {
         return bundle.getString("tip.recordClick");
     }
 
+    /**
+     * @return 不用填写文件拓展名，导出文件为 .pmc 格式，如果导出文件夹已经存在同名文件不会覆盖
+     * 文件名不能包含  <>:"/\|?*
+     * 设置为空或者不合法将会以默认名称命名，默认名称为：
+     */
     public static String tip_autoClickFileName() {
         return bundle.getString("tip.autoClickFileName");
     }
 
+    /**
+     * @return 勾选后：
+     * 如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作
+     * 如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作
+     * Windows 一般会直接点击对应窗口的对应坐标，macOS 可能需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
+     * 建议 Windows 用户不要勾选， macOS 用户视情况勾选
+     */
     public static String tip_firstClick() {
         return bundle.getString("tip.firstClick");
     }
 
+    /**
+     * @return 勾选后在应用关闭时如果列表不为空将会保存列表的所有操作步骤
+     * 自动保存路径为导出文件夹路径，文件名为：
+     */
     public static String tip_autoSave() {
         return bundle.getString("tip.autoSave");
     }
 
+    /**
+     * @return 勾选后运行或测试自动操作开始前将会隐藏本应用的窗口
+     * 如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度
+     */
     public static String tip_hideWindowRun() {
         return bundle.getString("tip.hideWindowRun");
     }
 
+    /**
+     * @return 需要在macOS系统设置中启用辅助设备权限：
+     * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
+     * 2. 在左侧列表选择「辅助功能」
+     * 3. 点击🔒解锁设置
+     * 4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)
+     * 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中
+     * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
+     */
     public static String tip_NativeHookException() {
         return bundle.getString("tip.NativeHookException") + appName + app +
                 bundle.getString("tip.ifHave") + appName + app +
                 bundle.getString("tip.addList") + appName + app;
     }
 
+    /**
+     * @return =需要在macOS系统设置中启用录屏与系统录音权限：
+     * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
+     * 2. 在左侧列表选择「录屏与系统录音」
+     * 3. 点击🔒解锁设置
+     * 4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)
+     * 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中
+     * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
+     */
     public static String tip_noScreenCapturePermission() {
         return bundle.getString("tip.noScreenCapturePermission") + appName + app +
                 bundle.getString("tip.ifHave") + appName + app +
                 bundle.getString("tip.addList") + appName + app;
     }
 
+    /**
+     * @return 运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标
+     * 单位为像素，只能填自然数，不填默认为
+     */
     public static String tip_randomClickX() {
         return bundle.getString("tip.randomClickX");
     }
 
+    /**
+     * @return 运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标\n\
+     * 单位为像素，只能填自然数，不填默认为
+     */
     public static String tip_randomClickY() {
         return bundle.getString("tip.randomClickY");
     }
 
+    /**
+     * @return 运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移
+     * 偏移后时间最小为0，单位为毫秒，只能填自然数，不填默认为
+     */
     public static String tip_randomTime() {
         return bundle.getString("tip.randomTime");
     }
 
+    /**
+     * @return 手动创建新的操作步骤时将会按照此设置先设置默认点击时长
+     * 单位为毫秒，只能填自然数，不填默认为
+     */
     public static String tip_clickTimeOffset() {
         return bundle.getString("tip.clickTimeOffset");
     }
 
+    /**
+     * @return 目标图像识别成功后横坐标将按此设置发生偏移
+     * 单位为像素，只能填整数，不填默认为 0
+     * 向左为负数，向右为正数
+     */
     public static String tip_imgX() {
         return bundle.getString("tip.imgX");
     }
 
+    /**
+     * @return 目标图像识别成功后横纵标将按此设置发生偏移
+     * 单位为像素，只能填整数，不填默认为 0
+     * 向下为正数，向上为负数
+     */
     public static String tip_imgY() {
         return bundle.getString("tip.imgY");
     }
 
+    /**
+     * @return 所填序号不存在
+     */
     public static String tip_notExistsIndex() {
         return bundle.getString("tip.notExistsIndex");
     }
@@ -601,230 +931,381 @@ public class i18nFinal {
         return bundle.getString("allHave");
     }
 
+    /**
+     * @return 复制成功
+     */
     public static String text_copySuccess() {
         return bundle.getString("copySuccess");
     }
 
+    /**
+     * @return 保存成功
+     */
     public static String text_successSave() {
         return bundle.getString("successSave");
     }
 
+    /**
+     * @return 当前设置值为：
+     */
     public static String text_nowValue() {
         return bundle.getString("nowValue");
     }
 
+    /**
+     * @return 所有数据已导出到：
+     */
     public static String text_saveSuccess() {
         return bundle.getString("saveSuccess");
     }
 
+    /**
+     * @return 已导入自动操作流程：
+     */
     public static String text_loadSuccess() {
         return bundle.getString("loadSuccess");
     }
 
+    /**
+     * @return 轮操作
+     */
     public static String text_executionTime() {
         return bundle.getString("executionTime");
     }
 
+    /**
+     * @return 正在执行第
+     */
     public static String text_execution() {
         return bundle.getString("execution");
     }
 
+    /**
+     * @return 按下 esc 即可取消任务
+     */
     public static String text_cancelTask() {
         return bundle.getString("cancelTask");
     }
 
+    /**
+     * @return 鼠标拖拽浮窗即可移动浮窗
+     * 按下esc 即可保存浮窗位置
+     */
     public static String text_saveFloatingCoordinate() {
         return bundle.getString("saveFloatingCoordinate");
     }
 
+    /**
+     * @return 按下 esc 即可关闭浮窗
+     */
     public static String text_escCloseFloating() {
         return bundle.getString("escCloseFloating");
     }
 
+    /**
+     * @return 关闭浮窗
+     */
     public static String text_closeFloating() {
         return bundle.getString("closeFloating");
     }
 
+    /**
+     * @return 关闭并保存浮窗位置
+     */
     public static String text_saveCloseFloating() {
         return bundle.getString("saveCloseFloating");
     }
 
+    /**
+     * @return 显示浮窗位置
+     */
     public static String text_showFloating() {
         return bundle.getString("showFloating");
     }
 
+    /**
+     * @return 导入自动化流程文件：
+     */
     public static String text_loadAutoClick() {
         return bundle.getString("loadAutoClick");
     }
 
+    /**
+     * @return 内容格式不正确
+     */
     public static String text_formatError() {
         return bundle.getString("formatError");
     }
 
+    /**
+     * @return 列表中没有要导出的自动操作流程
+     */
     public static String text_noAutoClickList() {
         return bundle.getString("noAutoClickList");
     }
 
+    /**
+     * @return 列表中没有要执行的操作
+     */
     public static String text_noAutoClickToRun() {
         return bundle.getString("noAutoClickToRun");
     }
 
+    /**
+     * @return 导入文件缺少关键数据
+     */
     public static String text_missingKeyData() {
         return bundle.getString("missingKeyData");
     }
 
+    /**
+     * @return 步骤
+     */
     public static String text_step() {
         return bundle.getString("step");
     }
 
+    /**
+     * @return 正在录制操作
+     */
     public static String text_recordClicking() {
         return bundle.getString("recordClicking");
     }
 
+    /**
+     * @return 秒后开始录制操作
+     */
     public static String text_preparation() {
         return bundle.getString("preparation");
     }
 
+    /**
+     * @return 秒后开始自动操作
+     */
     public static String text_run() {
         return bundle.getString("run");
     }
 
+    /**
+     * @return 已记录
+     */
     public static String text_recorded() {
         return bundle.getString("recorded");
     }
 
-    public static String text_mouseTrajectory() {
-        return bundle.getString("autoClick.mouseTrajectory");
-    }
-
+    /**
+     * @return 出现错误，任务终止
+     */
     public static String text_taskFailed() {
         return bundle.getString("taskFailed");
     }
 
+    /**
+     * @return 任务已取消
+     */
     public static String text_taskCancelled() {
         return bundle.getString("taskCancelled");
     }
 
+    /**
+     * @return 所有操作都已执行完毕
+     */
     public static String text_taskFinished() {
         return bundle.getString("taskFinished");
     }
 
+    /**
+     * @return (添加)
+     */
     public static String text_isAdd() {
         return bundle.getString("isAdd");
     }
 
+    /**
+     * @return (录制)
+     */
     public static String text_isRecord() {
         return bundle.getString("isRecord");
     }
 
+    /**
+     * @return 无图片
+     */
     public static String text_noImg() {
         return bundle.getString("noImg");
     }
 
+    /**
+     * @return 图片文件缺失或损坏
+     */
     public static String text_badImg() {
         return bundle.getString("badImg");
     }
 
+    /**
+     * @return 重试后要跳转的步骤序号不能大于列表步骤数量
+     */
     public static String text_retryStepGreaterMax() {
         return bundle.getString("retryStepGreaterMax");
     }
 
+    /**
+     * @return 重试后要跳转的步骤序号不能等于当前步骤序号
+     */
     public static String text_retryStepEqualIndex() {
         return bundle.getString("retryStepEqualIndex");
     }
 
+    /**
+     * @return 重试后要跳转的步骤序号不能为空
+     */
     public static String text_retryStepIsNull() {
         return bundle.getString("retryStepIsNull");
     }
 
+    /**
+     * @return 匹配后要跳转的步骤序号不能大于列表步骤数量
+     */
     public static String text_matchedStepGreaterMax() {
         return bundle.getString("matchedStepGreaterMax");
     }
 
+    /**
+     * @return 匹配后要跳转的步骤序号不能为空
+     */
     public static String text_matchedStepIsNull() {
         return bundle.getString("matchedStepIsNull");
     }
 
+    /**
+     * @return 仅启动应用
+     */
     public static String text_onlyLaunch() {
         return bundle.getString("onlyLaunch");
     }
 
-    public static String text_recordEnd() {
-        return bundle.getString("autoClick.recordEnd");
-    }
-
+    /**
+     * @return 图片
+     */
     public static String text_image() {
         return bundle.getString("img");
     }
 
+    /**
+     * @return 本轮进度：
+     */
     public static String text_progress() {
         return bundle.getString("progress");
     }
 
+    /**
+     * @return 将在
+     */
     public static String text_willBe() {
         return bundle.getString("willBe");
     }
 
-    public static String text_ms() {
-        return bundle.getString("unit.ms");
-    }
-
+    /**
+     * @return 毫秒后将执行：
+     */
     public static String text_msWillBe() {
         return bundle.getString("msWillBe");
     }
 
+    /**
+     * @return 执行到序号为：
+     */
     public static String text_index() {
         return bundle.getString("taskIndex");
     }
 
+    /**
+     * @return 坐标：
+     */
     public static String text_point() {
         return bundle.getString("point");
     }
 
+    /**
+     * @return 未知监听类型
+     */
     public static String text_unknownListener() {
         return bundle.getString("unknownListener");
     }
 
+    /**
+     * @return 打开文件夹
+     */
     public static String text_openDirectory() {
         return bundle.getString("openDirectory");
     }
 
+    /**
+     * @return 打开上级文件夹
+     */
     public static String text_openParentDirectory() {
         return bundle.getString("openParentDirectory");
     }
 
+    /**
+     * @return 打开文件
+     */
     public static String text_openFile() {
         return bundle.getString("openFile");
     }
 
+    /**
+     * @return 复制路径
+     */
     public static String text_copyPath() {
         return bundle.getString("copyPath");
     }
 
+    /**
+     * @return 鼠标左键点击打开
+     */
     public static String text_mouseClickOpen() {
         return bundle.getString("mouseClickOpen");
     }
 
+    /**
+     * @return 文件不存在，鼠标左键点击打开
+     */
     public static String text_mouseClickOpenNull() {
         return bundle.getString("mouseClickOpenNull");
     }
 
+    /**
+     * @return 图片地址：
+     */
     public static String text_imgPath() {
         return bundle.getString("imgPath");
     }
 
+    /**
+     * @return 异常信息
+     */
     public static String text_abnormal() {
         return bundle.getString("abnormal");
     }
 
+    /**
+     * @return 正在读取数据
+     */
     public static String text_readData() {
         return bundle.getString("readData");
     }
 
+    /**
+     * @return 正在匹配图片
+     */
     public static String text_matchImg() {
         return bundle.getString("matchImg");
     }
 
+    /**
+     * @return 正在导出PMC自动操作流程
+     */
     public static String text_exportData() {
         return bundle.getString("exportData");
     }
@@ -1103,6 +1584,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 鼠标移动轨迹
+     */
+    public static String autoClick_mouseTrajectory() {
+        return bundle.getString("autoClick.mouseTrajectory");
+    }
+
+    /**
+     * @return 录制已结束
+     */
+    public static String autoClick_recordEnd() {
+        return bundle.getString("autoClick.recordEnd");
+    }
+
+    /**
      * @return 日志文件删除失败
      */
     public static String about_deleteFailed() {
@@ -1130,228 +1625,403 @@ public class i18nFinal {
         return bundle.getString("listText.null");
     }
 
+    /**
+     * @return 修改未保存
+     */
     public static String confirm_unSaved() {
         return bundle.getString("confirm.unSaved");
     }
 
+    /**
+     * @return 当前有未保存的修改，是否保存？
+     */
     public static String confirm_unSavedConfirm() {
         return bundle.getString("confirm.unSavedConfirm");
     }
 
+    /**
+     * @return 保存并关闭
+     */
     public static String confirm_ok() {
         return bundle.getString("confirm.ok");
     }
 
+    /**
+     * @return 直接关闭
+     */
     public static String confirm_cancelSave() {
         return bundle.getString("confirm.cancelSave");
     }
 
+    /**
+     * @return 需要重启应用
+     */
     public static String confirm_reLaunch() {
         return bundle.getString("confirm.reLaunch");
     }
 
+    /**
+     * @return 该设置需要重启应用才能修改，是否立刻重启？
+     */
     public static String confirm_reLaunchConfirm() {
         return bundle.getString("confirm.reLaunchConfirm");
     }
 
+    /**
+     * @return 立即重启
+     */
     public static String confirm_reLaunchOk() {
         return bundle.getString("confirm.reLaunchOk");
     }
 
+    /**
+     * @return 取消
+     */
     public static String confirm_cancel() {
         return bundle.getString("confirm.cancel");
     }
 
+    /**
+     * @return 图片已存在
+     */
     public static String confirm_imageExist() {
         return bundle.getString("confirm.imageExist");
     }
 
+    /**
+     * @return 图片已存在，是否删除这张选中图片？
+     */
     public static String confirm_imageExistConfirm() {
         return bundle.getString("confirm.imageExistConfirm");
     }
 
+    /**
+     * @return 删除
+     */
     public static String confirm_delete() {
         return bundle.getString("confirm.delete");
     }
 
+    /**
+     * @return 插入设置步骤到所选行第一行上一行
+     */
     public static String menuItem_insertUp() {
         return bundle.getString("menuItem.insertUp");
     }
 
+    /**
+     * @return 插入设置步骤到所选行下一行
+     */
     public static String menuItem_insertDown() {
         return bundle.getString("menuItem.insertDown");
     }
 
+    /**
+     * @return 插入录制步骤到所选行第一行上一行
+     */
     public static String menuItem_recordUp() {
         return bundle.getString("menuItem.recordUp");
     }
 
+    /**
+     * @return 插入录制步骤到所选行最后一行下一行
+     */
     public static String menuItem_recordDown() {
         return bundle.getString("menuItem.recordDown");
     }
 
+    /**
+     * @return 插入设置步骤到列表顶部
+     */
     public static String menuItem_insertTop() {
         return bundle.getString("menuItem.insertTop");
     }
 
+    /**
+     * @return 插入录制步骤到列表顶部
+     */
     public static String menuItem_recordTop() {
         return bundle.getString("menuItem.recordTop");
     }
 
+    /**
+     * @return 复制所选数据到所选行第一行上方
+     */
     public static String menuItem_upCopy() {
         return bundle.getString("menuItem.upCopy");
     }
 
+    /**
+     * @return 复制所选数据到所选行最后一行下方
+     */
     public static String menuItem_downCopy() {
         return bundle.getString("menuItem.downCopy");
     }
 
+    /**
+     * @return 复制所选数据到列表最后一行
+     */
     public static String menuItem_appendCopy() {
         return bundle.getString("menuItem.appendCopy");
     }
 
+    /**
+     * @return 复制所选数据到列表顶部
+     */
     public static String menuItem_topCopy() {
         return bundle.getString("menuItem.topCopy");
     }
 
+    /**
+     * @return 打开所选文件
+     */
     public static String menuItem_openSelected() {
         return bundle.getString("menuItem.openSelected");
     }
 
+    /**
+     * @return 打开所选文件所在文件夹
+     */
     public static String menuItem_openDirectory() {
         return bundle.getString("menuItem.openDirectory");
     }
 
+    /**
+     * @return 复制文件路径
+     */
     public static String menuItem_copyFilePath() {
         return bundle.getString("menuItem.copyFilePath");
     }
 
+    /**
+     * @return 所选行上移一行
+     */
     public static String menuItem_moveUp() {
         return bundle.getString("menuItem.moveUp");
     }
 
+    /**
+     * @return 所选行下移一行
+     */
     public static String menuItem_moveDown() {
         return bundle.getString("menuItem.moveDown");
     }
 
+    /**
+     * @return 所选行置顶
+     */
     public static String menuItem_moveTop() {
         return bundle.getString("menuItem.moveTop");
     }
 
+    /**
+     * @return 所选行置底
+     */
     public static String menuItem_moveBottom() {
         return bundle.getString("menuItem.moveBottom");
     }
 
+    /**
+     * @return 取消选中
+     */
     public static String menu_cancelSelected() {
         return bundle.getString("menu.cancelSelected");
     }
 
+    /**
+     * @return 更改所选项第一行的图片
+     */
     public static String menu_changeFirstImg() {
         return bundle.getString("menu.changeFirstImg");
     }
 
+    /**
+     * @return 更改重试类型
+     */
     public static String menu_changeRetryType() {
         return bundle.getString("menu.changeRetryType");
     }
 
+    /**
+     * @return 更改点击按键
+     */
     public static String menu_changeKey() {
         return bundle.getString("menu.changeKey");
     }
 
+    /**
+     * @return 移动所选数据
+     */
     public static String menu_moveSelected() {
         return bundle.getString("menu.moveSelected");
     }
 
+    /**
+     * @return 查看文件
+     */
     public static String menu_viewFile() {
         return bundle.getString("menu.viewFile");
     }
 
+    /**
+     * @return 复制所选数据
+     */
     public static String menu_copy() {
         return bundle.getString("menu.copy");
     }
 
+    /**
+     * @return 查看所选项第一行详情
+     */
     public static String menu_detailMenu() {
         return bundle.getString("menu.detailMenu");
     }
 
+    /**
+     * @return 删除所选数据
+     */
     public static String menu_deleteMenu() {
         return bundle.getString("menu.deleteMenu");
     }
 
+    /**
+     * @return 执行选中的步骤
+     */
     public static String menu_runSelectMenu() {
         return bundle.getString("menu.runSelectMenu");
     }
 
+    /**
+     * @return 插入数据
+     */
     public static String menu_addDateMenu() {
         return bundle.getString("menu.addDateMenu");
     }
 
+    /**
+     * @return 按下
+     */
     public static String log_press() {
         return bundle.getString("log.press");
     }
 
+    /**
+     * @return 松开
+     */
     public static String log_release() {
         return bundle.getString("log.release");
     }
 
+    /**
+     * @return 移动鼠标
+     */
     public static String log_move() {
         return bundle.getString("log.move");
     }
 
+    /**
+     * @return 长按
+     */
     public static String log_hold() {
         return bundle.getString("log.hold");
     }
 
+    /**
+     * @return 拖拽
+     */
     public static String log_drag() {
         return bundle.getString("log.drag");
     }
 
+    /**
+     * @return 等待
+     */
     public static String log_wait() {
         return bundle.getString("log.wait");
     }
 
+    /**
+     * @return 识别目标图像
+     */
     public static String log_clickImg() {
         return bundle.getString("log.clickImg");
     }
 
+    /**
+     * @return 识别终止操作图像
+     */
     public static String log_stopImg() {
         return bundle.getString("log.stopImg");
     }
 
+    /**
+     * @return 图像识别
+     */
     public static String log_findImage() {
         return bundle.getString("log.findImage");
     }
 
+    /**
+     * @return 重试直到图像出现
+     */
     public static String retryType_continuously() {
         return bundle.getString("retryType.continuously");
     }
 
+    /**
+     * @return 按设置次数重试后点击设置位置
+     */
     public static String retryType_click() {
         return bundle.getString("retryType.click");
     }
 
+    /**
+     * @return 按设置次数重试后终止操作
+     */
     public static String retryType_stop() {
         return bundle.getString("retryType.stop");
     }
 
+    /**
+     * @return 按设置次数重试后跳过本次操作
+     */
     public static String retryType_break() {
         return bundle.getString("retryType.break");
     }
 
+    /**
+     * @return 按设置次数重试后跳转指定步骤
+     */
     public static String retryType_Step() {
         return bundle.getString("retryType.step");
     }
 
+    /**
+     * @return 文件
+     */
     public static String extension_file() {
         return bundle.getString("extension.file");
     }
 
+    /**
+     * @return 文件夹
+     */
     public static String extension_folder() {
         return bundle.getString("extension.folder");
     }
 
+    /**
+     * @return 文件或文件夹
+     */
     public static String extension_fileOrFolder() {
         return bundle.getString("extension.fileOrFolder");
+    }
+
+    /**
+     * @return 毫秒
+     */
+    public static String unit_ms() {
+        return bundle.getString("unit.ms");
     }
 
     /**

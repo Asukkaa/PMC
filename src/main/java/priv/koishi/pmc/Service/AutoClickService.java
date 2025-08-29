@@ -339,8 +339,8 @@ public class AutoClickService {
                                 text_progress() + progress + "/" + dataSize +
                                 text_willBe() + waitTime + text_msWillBe() + name +
                                 text_point() + " X：" + startX + " Y：" + startY + clickText +
-                                text_clickTime() + clickTime + " " + text_ms() +
-                                text_repeat() + clickNum + text_interval() + interval + " " + text_ms();
+                                text_clickTime() + clickTime + " " + unit_ms() +
+                                text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
                         if (StringUtils.isNotBlank(clickImgPath)) {
                             text = loopTimeText +
                                     text_progress() + progress + "/" + dataSize +
