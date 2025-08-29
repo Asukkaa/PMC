@@ -56,7 +56,7 @@ public class FileUtils {
         if (lastDotIndex == -1 ||
                 lastDotIndex == 0 ||
                 lastDotIndex == fileName.length() - 1) {
-            return extension_fileOrFolder();
+            return extension_file();
         }
         return fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
     }

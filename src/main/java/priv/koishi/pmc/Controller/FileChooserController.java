@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.defaultFileChooserPath;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ReadDataService.readAllFilesTask;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -448,6 +448,10 @@ public class FileChooserController extends RootController {
             String fileType = item.getFileType();
             if (extension_folder().equals(fileType)) {
                 row.setStyle("-fx-background-color: #e6f7ff;");
+            } else if (PMC.equals(fileType)) {
+                row.setStyle("-fx-background-color: #bdf8b3;");
+            } else if (imageType.contains(fileType)) {
+                row.setStyle("-fx-background-color: #b3cff8;");
             } else {
                 row.setStyle("");
             }
