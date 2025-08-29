@@ -827,6 +827,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 填写后只会识别所填写的后缀名文件，多个文件后缀名用空格隔开，后缀名需带 '.'
+     */
+    public static String tip_filterFileType() {
+        return bundle.getString("tip.filterFileType");
+    }
+
+    /**
      * @return 用来选择文件名匹配的方式
      */
     public static String tip_fileNameType() {

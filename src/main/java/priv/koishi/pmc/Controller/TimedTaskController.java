@@ -125,7 +125,7 @@ public class TimedTaskController extends RootController {
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile_Click);
+        InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
         detailWidth = Integer.parseInt(prop.getProperty(key_taskDetailWidth, defaultTaskDetailWidth));
         detailHeight = Integer.parseInt(prop.getProperty(key_taskDetailHeight, defaultTaskDetailHeight));

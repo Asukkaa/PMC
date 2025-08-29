@@ -2132,4 +2132,29 @@ public class UiUtils {
         return controller;
     }
 
+    /**
+     * 处理要过滤的文件类型
+     *
+     * @param filterFileType 填有空格区分的要过滤的文件类型字符串的文本输入框
+     * @return 要过滤的文件类型list
+     */
+    public static List<String> getFilterExtensionList(TextField filterFileType) {
+        String filterFileTypeValue = filterFileType.getText();
+        return getFilterExtensionList(filterFileTypeValue);
+    }
+
+    /**
+     * 处理要过滤的文件类型
+     *
+     * @param filterFileTypeValue 空格区分的要过滤的文件类型字符串
+     * @return 要过滤的文件类型list
+     */
+    public static List<String> getFilterExtensionList(String filterFileTypeValue) {
+        List<String> filterExtensionList = new ArrayList<>();
+        if (StringUtils.isNotBlank(filterFileTypeValue)) {
+            filterExtensionList = Arrays.asList(filterFileTypeValue.toLowerCase().split(" "));
+        }
+        return filterExtensionList;
+    }
+
 }

@@ -44,6 +44,16 @@
                 </HBox>
             </HBox>
 
+            <HBox fx:id="fileTypeHBox_FC" visible="false" spacing="10">
+                <HBox styleClass="hBox-veryLong">
+                    <Label prefHeight="25" text="%fileChooser.filterFileType"/>
+                    <TextField fx:id="filterFileType_FC" prefHeight="20" prefWidth="350"/>
+                </HBox>
+
+                <CheckBox fx:id="reverseFileType_FC" prefHeight="25" style="-fx-cursor: hand"
+                          text="%fileChooser.reverseFileType_FC"/>
+            </HBox>
+
             <HBox fx:id="fileNumberHBox_FC" spacing="10">
                 <Button fx:id="gotoParentButton_FC" onAction="#gotoParent" styleClass="cornflowerblue-button"
                         text="%fileChooser.gotoParentButton_FC"/>

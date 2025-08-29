@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -30,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -57,9 +60,9 @@ public class FileChooserController extends RootController {
     private FileChooserConfig fileChooserConfig;
 
     /**
-     * 文件名输入框监听器
+     * 带鼠标悬停提示的内容变化监听器
      */
-    private ChangeListener<String> textFieldChangeListener;
+    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
 
     /**
      * 文件查询任务
@@ -86,19 +89,19 @@ public class FileChooserController extends RootController {
     public AnchorPane anchorPane_FC;
 
     @FXML
-    public HBox fileNumberHBox_FC;
+    public VBox progressBarVBox_FC;
 
     @FXML
-    public VBox progressBarVBox_FC;
+    public HBox fileNumberHBox_FC, fileTypeHBox_FC;
 
     @FXML
     public ProgressBar progressBar_FC;
 
     @FXML
-    public TextField fileNameFilter_FC;
+    public TextField fileNameFilter_FC, filterFileType_FC;
 
     @FXML
-    public CheckBox reverse_FC, filterNameCase_FC;
+    public CheckBox reverse_FC, filterNameCase_FC, reverseFileType_FC;
 
     @FXML
     public Label filePath_FC, fileNumber_FC, log_FC, tip_FC;
@@ -113,10 +116,10 @@ public class FileChooserController extends RootController {
     public TableView<FileVO> tableView_FC;
 
     @FXML
-    public TableColumn<FileVO, ImageView> thumb_FC;
+    public TableColumn<FileVO, Integer> index_FC;
 
     @FXML
-    public TableColumn<FileVO, Integer> index_FC;
+    public TableColumn<FileVO, ImageView> thumb_FC;
 
     @FXML
     public TableColumn<FileVO, String> name_FC, path_FC, size_FC, fileType_FC,
@@ -148,6 +151,12 @@ public class FileChooserController extends RootController {
         reverse_FC.setSelected(fileChooserConfig.isReverseFileName());
         fileNameFilter_FC.setText(fileChooserConfig.getFileNameFilter());
         filterNameCase_FC.setSelected(fileChooserConfig.isFilterNameCase());
+        List<String> filterExtensionList = fileChooserConfig.getFilterExtensionList();
+        if (CollectionUtils.isNotEmpty(filterExtensionList)) {
+            String filterExtension = String.join(" ", filterExtensionList);
+            filterFileType_FC.setText(filterExtension);
+        }
+        reverseFileType_FC.setSelected(fileChooserConfig.isReverseFileType());
         // 设置鼠标悬停提示
         setToolTip();
         // 设置默认选中的文件
@@ -162,7 +171,9 @@ public class FileChooserController extends RootController {
     private void selectFile(File file) {
         removeAll();
         FileConfig fileConfig = new FileConfig();
-        fileConfig.setFilterNameCase(filterNameCase_FC.isSelected())
+        fileConfig.setFilterExtensionList(getFilterExtensionList(filterFileType_FC))
+                .setReverseFileType(reverseFileType_FC.isSelected())
+                .setFilterNameCase(filterNameCase_FC.isSelected())
                 .setFileNameFilter(fileNameFilter_FC.getText())
                 .setShowHideFile(hideFileType_FC.getValue())
                 .setFileNameType(fileNameType_FC.getValue())
@@ -253,7 +264,9 @@ public class FileChooserController extends RootController {
         addToolTip(tip_gotoParent(), gotoParentButton_FC);
         addToolTip(tip_reselectButton(), refreshButton_FC);
         addToolTip(tip_fileNameFilter(), fileNameFilter_FC);
+        addToolTip(tip_filterFileType(), filterFileType_FC);
         addToolTip(filterNameCase_FC.getText(), filterNameCase_FC);
+        addToolTip(reverseFileType_FC.getText(), reverseFileType_FC);
         addValueToolTip(fileNameType_FC, tip_fileNameType(), fileNameType_FC.getValue());
         addValueToolTip(hideFileType_FC, tip_hideFileType(), hideFileType_FC.getValue());
         addValueToolTip(fileFilter_FC, tip_directoryNameType(), fileFilter_FC.getValue());
@@ -394,7 +407,7 @@ public class FileChooserController extends RootController {
         }
         // 清理监听器引用
         tableView_FC.setRowFactory(tv -> null);
-        fileNameFilter_FC.textProperty().removeListener(textFieldChangeListener);
+        removeAllListeners();
         ContextMenu contextMenu = tableView_FC.getContextMenu();
         if (contextMenu != null) {
             // 清除所有菜单项事件
@@ -471,6 +484,38 @@ public class FileChooserController extends RootController {
     }
 
     /**
+     * 给输入框添加内容变化监听
+     */
+    private void textFieldChangeListener() {
+        // 鼠标悬停提示输入的文件名过滤
+        ChangeListener<String> fileNameFilterChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
+        changeListeners.put(fileNameFilter_FC, fileNameFilterChangeListener);
+        // 鼠标悬停提示输入的需要识别的文件后缀名
+        ChangeListener<String> filterFileTypeChangeListener = textFieldValueListener(filterFileType_FC, tip_filterFileType());
+        changeListeners.put(filterFileType_FC, filterFileTypeChangeListener);
+    }
+
+    /**
+     * 移除所有监听器
+     */
+    @SuppressWarnings("unchecked")
+    private void removeAllListeners() {
+        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
+        changeListeners.forEach((key, listener) -> {
+            if (key instanceof ChoiceBox<?> choiceBox) {
+                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
+            } else if (key instanceof Slider slider) {
+                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
+            } else if (key instanceof TextInputControl textInput) {
+                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
+            } else if (key instanceof CheckBox checkBox) {
+                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
+            }
+        });
+        changeListeners.clear();
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
@@ -494,7 +539,7 @@ public class FileChooserController extends RootController {
             // 构建右键菜单
             tableViewContextMenu(tableView_FC);
             // 给输入框添加内容变化监听
-            textFieldChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
+            textFieldChangeListener();
         });
     }
 
@@ -615,6 +660,8 @@ public class FileChooserController extends RootController {
     @FXML
     private void fileFilterAction() {
         addValueToolTip(fileFilter_FC, tip_directoryNameType(), fileFilter_FC.getValue());
+        String showDirectory = fileFilter_FC.getValue();
+        fileTypeHBox_FC.setVisible(!search_onlyDirectory().equals(showDirectory));
         refreshTable();
     }
 
