@@ -21,7 +21,16 @@ exports.main = async (event) => {
     // 客户端当前版本
     const clientVersion = requestBody.version;
     // 服务端最新版本
-    const serverVersion = "3.1.2";
+    const serverVersion = "3.1.3";
+    // 构建日期
+    const buildDate = "2025.08.29";
+    // 获取更新信息
+    const versionInfo = i18n[clientLang];
+    // 拼接更新信息
+    const versionPrefix = versionInfo.versionPrefix;
+    const lines = versionInfo.whatsNewItems.trim().split('\n').map(line => line.trim());
+    const numberedLines = lines.map((line, index) => `\n${index + 1}. ${line}`);
+    const whatsNew = `${versionPrefix} ${serverVersion} :\n${numberedLines.join('\n')}`;
     // 版本号对比逻辑
     let fullUpdate = false;
     if (clientVersion) {
@@ -40,23 +49,23 @@ exports.main = async (event) => {
     }
     // 阿里云全量更新文件存储地址
     const aliyunAppLinks = {
-        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/win/Perfect Mouse Control-3.1.2-win.zip',
-        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/mac/Perfect Mouse Control-3.1.2-mac.zip'
+        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/win/Perfect Mouse Control-3.1.3-win.zip',
+        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/mac/Perfect Mouse Control-3.1.3-mac.zip'
     };
     // 阿里云增量更新文件存储地址
     const aliyunLibLinks = {
-        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/win/lib-3.1.2-win.zip',
-        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/mac/lib-3.1.2-mac.zip'
+        win: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/win/lib-3.1.3-win.zip',
+        mac: 'https://mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.cdn.bspapp.com/PMC/mac/lib-3.1.3-mac.zip'
     };
     // 支付宝云全量更新文件存储地址
     const alipayAppLinks = {
-        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/win/Perfect%20Mouse%20Control-3.1.2-win.zip',
-        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/mac/Perfect%20Mouse%20Control-3.1.2-mac.zip'
+        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/win/Perfect%20Mouse%20Control-3.1.3-win.zip',
+        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/mac/Perfect%20Mouse%20Control-3.1.3-mac.zip'
     };
     // 支付宝云增量更新文件存储地址
     const alipayLibLinks = {
-        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/win/lib-3.1.2-win.zip',
-        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/mac/lib-3.1.2-mac.zip'
+        win: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/win/lib-3.1.3-win.zip',
+        mac: 'https://env-00jxtp3qdq80.normal.cloudstatic.cn/PMC/mac/lib-3.1.3-mac.zip'
     };
     let aliyunFileLink, alipayFileLink;
     if (fullUpdate) {
@@ -77,8 +86,8 @@ exports.main = async (event) => {
         // 构造响应对象
         const latestVersionInfo = {
             version: serverVersion,
-            buildDate: "2025.08.14",
-            whatsNew: i18n[clientLang].whatsNew,
+            buildDate: buildDate,
+            whatsNew: whatsNew,
             aliyunFileLink: aliyunFileLink,
             alipayFileLink: alipayFileLink,
             fullUpdate: fullUpdate
