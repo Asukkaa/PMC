@@ -100,7 +100,7 @@ public class AutoClickService {
                     if (PMC.equals(getExistsFileType(file))) {
                         lastPMCPath = file.getPath();
                         try {
-                            clickPositionBeans = loadPMCFile(file);
+                            clickPositionBeans.addAll(loadPMCFile(file));
                         } catch (IOException e) {
                             showExceptionAlert(e);
                         }
@@ -109,14 +109,15 @@ public class AutoClickService {
                         filterExtensionList.add(PMC);
                         FileConfig fileConfig = new FileConfig()
                                 .setFilterExtensionList(filterExtensionList)
-                                .setShowDirectory(hide_onlyHideFile())
+                                .setShowDirectory(search_fileDirectory())
+                                .setShowHideFile(hide_noHideFile())
                                 .setPath(file.getPath())
                                 .setRecursion(true);
                         for (File readFile : readAllFiles(fileConfig)) {
                             if (PMC.equals(getExistsFileType(readFile))) {
                                 lastPMCPath = readFile.getPath();
                                 try {
-                                    clickPositionBeans = loadPMCFile(readFile);
+                                    clickPositionBeans.addAll(loadPMCFile(readFile));
                                 } catch (IOException e) {
                                     showExceptionAlert(e);
                                 }

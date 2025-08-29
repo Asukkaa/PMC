@@ -1655,7 +1655,9 @@ public class AutoClickController extends RootController implements MousePosition
             PMCLoadResult value = loadPMCFilsTask.getValue();
             String lastPMCPath = value.lastPMCPath();
             List<ClickPositionVO> clickPositionVOS = value.clickPositionList();
-            addAutoClickPositions(clickPositionVOS, lastPMCPath);
+            if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                addAutoClickPositions(clickPositionVOS, lastPMCPath);
+            }
             loadPMCFilsTask = null;
         });
         loadPMCFilsTask.setOnFailed(event -> {

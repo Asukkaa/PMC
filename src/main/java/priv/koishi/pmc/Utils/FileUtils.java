@@ -757,8 +757,7 @@ public class FileUtils {
                     if (recursion) {
                         readFiles(fileConfig, fileList, file);
                     }
-                }
-                if (file.isDirectory()) {
+                } else if (file.isDirectory()) {
                     if ((hide_noHideFile().equals(showHideFile) && file.isHidden()) ||
                             (hide_onlyHideFile().equals(showHideFile) && !file.isHidden())) {
                         continue;
