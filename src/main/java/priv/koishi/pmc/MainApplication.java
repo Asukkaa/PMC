@@ -421,9 +421,8 @@ public class MainApplication extends Application {
         prop.load(input);
         int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
         String firstRunValue = prop.getProperty(key_firstRun);
-        boolean firstRun = activation.equals(firstRunValue);
         // 首次运行时如果有对应语言包则使用操作系统设置的语言
-        if (firstRun) {
+        if (activation.equals(firstRunValue)) {
             if (languageMap.containsKey(Locale.getDefault())) {
                 Locale locale = languageMap.getKey(prop.getProperty(key_language));
                 Locale.setDefault(locale);
