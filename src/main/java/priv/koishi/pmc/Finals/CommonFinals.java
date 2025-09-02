@@ -26,12 +26,12 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.1.3";
+    public static final String version = "3.2.0";
 
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.08.29";
+    public static final String buildDate = "2025.09.02";
 
     /**
      * 文件后缀名：bat
@@ -555,6 +555,16 @@ public class CommonFinals {
      * 默认定时任务详情窗口高度
      */
     public static final String defaultTaskDetailHeight = "400";
+
+    /**
+     * 默认信息浮窗高度
+     */
+    public static final int defaultFloatingHeightInt = 160;
+
+    /**
+     * 默认信息浮窗宽度
+     */
+    public static final int defaultFloatingWidthInt = 250;
 
     /**
      * 默认信息浮窗宽度

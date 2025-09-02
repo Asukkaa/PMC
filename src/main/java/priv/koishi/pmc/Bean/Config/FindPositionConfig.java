@@ -49,4 +49,9 @@ public class FindPositionConfig {
      */
     String name;
 
+    /**
+     * 图像识别设置
+     */
+    FloatingWindowConfig floatingWindowConfig;
+
 }

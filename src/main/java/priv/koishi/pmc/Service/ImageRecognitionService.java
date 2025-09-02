@@ -11,7 +11,9 @@ import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
 import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.Config.FindPositionConfig;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.MatchPointBean;
+import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.awt.*;
@@ -105,7 +107,7 @@ public class ImageRecognitionService {
                             retry++;
                             long start = System.currentTimeMillis();
                             Future<MatchPointBean> future = executor.submit(() ->
-                                    getPoint(templatePath, matchThreshold));
+                                    getPoint(config));
                             try {
                                 MatchPointBean result = (overTime > 0) ?
                                         future.get(overTime, TimeUnit.SECONDS) :
@@ -129,7 +131,7 @@ public class ImageRecognitionService {
                         for (int i = 0; i <= config.getMaxRetry(); i++) {
                             long start = System.currentTimeMillis();
                             Future<MatchPointBean> future = executor.submit(() ->
-                                    getPoint(templatePath, matchThreshold));
+                                    getPoint(config));
                             try {
                                 result = (overTime > 0) ?
                                         future.get(overTime, TimeUnit.SECONDS) :
@@ -186,17 +188,34 @@ public class ImageRecognitionService {
     /**
      * 根据本地图片寻找屏幕坐标
      *
-     * @param templatePath   要识别的图片路径
-     * @param matchThreshold 匹配阈值
+     * @param findPositionConfig 匹配配置
      * @return Javacv Point对象
      * @throws Exception 匹配失败时抛出异常
      */
-    private static MatchPointBean getPoint(String templatePath, double matchThreshold) throws Exception {
+    private static MatchPointBean getPoint(FindPositionConfig findPositionConfig) throws Exception {
         checkInterruption();
         // 获取屏幕当前画面
         BufferedImage screenImg;
+        FloatingWindowConfig config = findPositionConfig.getFloatingWindowConfig();
+        int x = config.getX();
+        int y = config.getY();
+        int width;
+        int height;
+        if (FindImgTypeEnum.REGION.ordinal() != config.getFindImgTypeEnum()) {
+            x = 0;
+            y = 0;
+            width = screenWidth;
+            height = screenHeight;
+        } else {
+            height = config.getHeight();
+            width = config.getWidth();
+        }
         try {
-            screenImg = new Robot().createScreenCapture(new Rectangle((int) (screenWidth * dpiScale), (int) (screenHeight * dpiScale)));
+            screenImg = new Robot().createScreenCapture(new Rectangle(
+                    x,
+                    y,
+                    (int) (width * dpiScale),
+                    (int) (height * dpiScale)));
         } catch (AWTException e) {
             throw new RuntimeException(text_screenErr() + e.getMessage(), e);
         }
@@ -206,7 +225,7 @@ public class ImageRecognitionService {
         AtomicReference<Double> bestVal = new AtomicReference<>(-1.0);
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
         // 读取图片为byte数组，防止中文路径乱码
-        byte[] bytes = Files.readAllBytes(new File(templatePath).toPath());
+        byte[] bytes = Files.readAllBytes(new File(findPositionConfig.getTemplatePath()).toPath());
         try (Mat screenMat = bufferedImageToMat(screenImg);
              Mat templateMat = opencv_imgcodecs.imdecode(new Mat(bytes), opencv_imgcodecs.IMREAD_UNCHANGED)) {
             // 转换为灰度图提升处理效率
@@ -236,11 +255,11 @@ public class ImageRecognitionService {
                                         bestVal.set(maxVal.get());
                                         double templateWidth = resizedTemplate.cols();
                                         double templateHeight = resizedTemplate.rows();
-                                        int x = (int) Math.round((maxLoc.x() + templateWidth / 2.0) / scale);
-                                        int y = (int) Math.round((maxLoc.y() + templateHeight / 2.0) / scale);
-                                        x = Math.min(Math.max(x, 0), screenWidth);
-                                        y = Math.min(Math.max(y, 0), screenHeight);
-                                        bestLocRef.set(new Point(x, y));
+                                        int roundX = (int) Math.round((maxLoc.x() + templateWidth / 2.0) / scale);
+                                        int roundY = (int) Math.round((maxLoc.y() + templateHeight / 2.0) / scale);
+                                        roundX = Math.min(Math.max(roundX, 0), width);
+                                        roundY = Math.min(Math.max(roundY, 0), height);
+                                        bestLocRef.set(new Point(roundX, roundY));
                                     }
                                 }
                             }
@@ -253,7 +272,7 @@ public class ImageRecognitionService {
             matchPointBean.setPoint(bestLocRef.get())
                     .setMatchThreshold((int) (bestVal.get() * 100));
             // 匹配成功返回匹配坐标和匹配度，否则只返回匹配度
-            if (bestVal.get() >= matchThreshold / 100) {
+            if (bestVal.get() >= findPositionConfig.getMatchThreshold() / 100) {
                 return matchPointBean;
             }
         }

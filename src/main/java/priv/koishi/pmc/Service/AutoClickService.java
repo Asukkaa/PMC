@@ -420,8 +420,8 @@ public class AutoClickService {
             stopImgFileVOS.stream().parallel().forEach(stopImgFileBean -> {
                 String stopPath = stopImgFileBean.getPath();
                 AtomicReference<String> fileName = new AtomicReference<>();
+                fileName.set(getExistsFileName(new File(stopPath)));
                 Platform.runLater(() -> {
-                    fileName.set(getExistsFileName(new File(stopPath)));
                     String text = loopTimeText + text_searchingStop() + fileName.get();
                     // 更新操作信息
                     updateMassage(text);
@@ -429,7 +429,8 @@ public class AutoClickService {
                 long start = System.currentTimeMillis();
                 FindPositionConfig findPositionConfig = new FindPositionConfig();
                 double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
-                findPositionConfig.setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
+                findPositionConfig.setFloatingWindowConfig(clickPositionVO.getStopWindowConfig())
+                        .setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
                         .setMatchThreshold(stopMatchThreshold)
                         .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
@@ -476,8 +477,8 @@ public class AutoClickService {
         String clickType = clickPositionVO.getClickType();
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
+            fileName.set(getExistsFileName(new File(clickPath)));
             Platform.runLater(() -> {
-                fileName.set(getExistsFileName(new File(clickPath)));
                 String text = loopTimeText + text_searchingClick() + fileName.get();
                 // 更新操作信息
                 updateMassage(text);
@@ -486,7 +487,8 @@ public class AutoClickService {
             String retryType = clickPositionVO.getRetryType();
             FindPositionConfig findPositionConfig = new FindPositionConfig();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
-            findPositionConfig.setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
+            findPositionConfig.setFloatingWindowConfig(clickPositionVO.getClickWindowConfig())
+                    .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(retryType_continuously().equals(retryType))
                     .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)

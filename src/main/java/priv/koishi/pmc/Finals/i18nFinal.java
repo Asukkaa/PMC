@@ -1542,6 +1542,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return 保存识别区域
+     */
+    public static String clickDetail_saveRegion() {
+        return bundle.getString("clickDetail.saveRegion");
+    }
+
+    /**
+     * @return 要点击的图像识别区域
+     */
+    public static String floatingName_click() {
+        return bundle.getString("floatingName.click");
+    }
+
+    /**
+     * @return 终止操作图像识别区域
+     */
+    public static String floatingName_stop() {
+        return bundle.getString("floatingName.stop");
+    }
+
+    /**
      * @return 任务详情
      */
     public static String taskDetail_title() {
@@ -2448,6 +2469,46 @@ public class i18nFinal {
     }
 
     /**
+     * @return 识别全屏
+     */
+    public static String findImgType_all() {
+        return bundle.getString("findImgType.all");
+    }
+
+    /**
+     * @return 识别指定区域
+     */
+    public static String findImgType_region() {
+        return bundle.getString("findImgType.region");
+    }
+
+    /**
+     * 图像识别区域类型选项
+     */
+    public static final List<String> findImgTypeList = new ArrayList<>();
+
+    /**
+     * 更新图像识别区域类型选项
+     */
+    public static void updateFindImgTypeList() {
+        List<String> newList = Arrays.asList(
+                findImgType_all(),
+                findImgType_region());
+        findImgTypeList.clear();
+        findImgTypeList.addAll(newList);
+    }
+
+    /**
+     * 图像识别区域类型选项映射
+     */
+    public static final BidiMap<Integer, String> findImgTypeMap = new DualHashBidiMap<>();
+
+    static {
+        findImgTypeMap.put(FindImgTypeEnum.ALL.ordinal(), findImgType_all());
+        findImgTypeMap.put(FindImgTypeEnum.REGION.ordinal(), findImgType_region());
+    }
+
+    /**
      * @return 按文件名称排序
      */
     public static String sort_Name() {
@@ -2965,6 +3026,8 @@ public class i18nFinal {
         updateHideSearchTypeList();
         // 更新文件与文件夹查询条件选项
         updateSearchTypeList();
+        // 更新图像识别区域类型选项
+        updateFindImgTypeList();
     }
 
 }

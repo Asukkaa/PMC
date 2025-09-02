@@ -1189,13 +1189,14 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void setFloatingCoordinate() {
-        // 显示浮窗
-        if (floatingStage != null && !floatingStage.isShowing()) {
-            showFloatingWindow();
-        }
-        // 隐藏浮窗
-        if (floatingStage != null && floatingStage.isShowing()) {
-            hideFloatingWindow();
+        if (floatingStage != null) {
+            if (!floatingStage.isShowing()) {
+                // 显示浮窗
+                showFloatingWindow();
+            } else if (floatingStage.isShowing()) {
+                // 隐藏浮窗
+                hideFloatingWindow();
+            }
         }
     }
 

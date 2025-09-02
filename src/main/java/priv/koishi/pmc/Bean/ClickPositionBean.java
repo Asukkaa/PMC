@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
 import java.util.List;
@@ -212,6 +213,16 @@ public class ClickPositionBean {
      * 匹配图像坐标纵轴偏移量
      */
     String imgY;
+
+    /**
+     * 要识别的图像区域设置
+     */
+    FloatingWindowConfig clickWindowConfig;
+
+    /**
+     * 终止操作图像区域设置
+     */
+    FloatingWindowConfig stopWindowConfig;
 
     /**
      * 添加移动轨迹
