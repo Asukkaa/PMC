@@ -197,8 +197,8 @@ public class ImageRecognitionService {
         // 获取屏幕当前画面
         BufferedImage screenImg;
         FloatingWindowConfig config = findPositionConfig.getFloatingWindowConfig();
-        int x = config.getX();
-        int y = config.getY();
+        int x;
+        int y;
         int width;
         int height;
         if (FindImgTypeEnum.REGION.ordinal() != config.getFindImgTypeEnum()) {
@@ -207,6 +207,8 @@ public class ImageRecognitionService {
             width = screenWidth;
             height = screenHeight;
         } else {
+            x = config.getX();
+            y = config.getY();
             height = config.getHeight();
             width = config.getWidth();
         }
@@ -257,8 +259,8 @@ public class ImageRecognitionService {
                                         double templateHeight = resizedTemplate.rows();
                                         int roundX = (int) Math.round((maxLoc.x() + templateWidth / 2.0) / scale);
                                         int roundY = (int) Math.round((maxLoc.y() + templateHeight / 2.0) / scale);
-                                        roundX = Math.min(Math.max(roundX, 0), width);
-                                        roundY = Math.min(Math.max(roundY, 0), height);
+                                        roundX = Math.min(Math.max(roundX, x), x + width);
+                                        roundY = Math.min(Math.max(roundY, y), y + height);
                                         bestLocRef.set(new Point(roundX, roundY));
                                     }
                                 }
