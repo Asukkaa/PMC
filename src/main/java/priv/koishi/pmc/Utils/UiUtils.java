@@ -42,7 +42,7 @@ import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.VO.Indexable;
 import priv.koishi.pmc.Controller.FileChooserController;
-import priv.koishi.pmc.CustomUI.MessageBubble.MessageBubble;
+import priv.koishi.pmc.CustomUI.CustomMessageBubble.MessageBubble;
 import priv.koishi.pmc.MainApplication;
 
 import java.awt.*;

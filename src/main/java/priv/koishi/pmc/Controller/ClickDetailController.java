@@ -1,8 +1,5 @@
 package priv.koishi.pmc.Controller;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
@@ -12,21 +9,15 @@ import javafx.collections.WeakListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Screen;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -47,6 +38,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.CustomUI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
@@ -144,11 +136,6 @@ public class ClickDetailController extends RootController {
      * 浮窗配置
      */
     private FloatingWindowVO clickFloatingVO, stopFloatingVO;
-
-    /**
-     * 全局键盘监听器
-     */
-    private NativeKeyListener nativeKeyListener;
 
     /**
      * 更新数据用的回调函数
@@ -316,6 +303,11 @@ public class ClickDetailController extends RootController {
             clickFindImgType_Det.setValue(findImgTypeMap.get(clickWindowConfig.getFindImgTypeEnum()));
         }
         clickFloatingVO.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
+                .setFloatingLabelText(text_saveFindImgConfig())
+                .setShowButtonText(clickDetail_showRegion())
+                .setHideButtonText(clickDetail_saveRegion())
+                .setHideButtonToolTip(tip_closeFloating())
+                .setShowButtonToolTip(tip_showRegion())
                 .setName(floatingName_click())
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
@@ -325,10 +317,15 @@ public class ClickDetailController extends RootController {
             stopFindImgType_Det.setValue(findImgTypeMap.get(stopWindowConfig.getFindImgTypeEnum()));
         }
         stopFloatingVO.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+                .setFloatingLabelText(text_saveFindImgConfig())
+                .setShowButtonText(clickDetail_showRegion())
+                .setHideButtonText(clickDetail_saveRegion())
+                .setHideButtonToolTip(tip_closeFloating())
+                .setShowButtonToolTip(tip_showRegion())
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
-        initFloatingWindow(clickFloatingVO, stopFloatingVO);
+        createFloatingWindows(clickFloatingVO, stopFloatingVO);
     }
 
     /**
@@ -580,9 +577,9 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_updateClickNameBtn(), updateClickName_Det);
         addValueToolTip(imgX_Det, tip_imgX(), imgX_Det.getText());
         addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
+        addToolTip(tip_showRegion(), clickRegion_Det, stopRegion_Det);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
-        addToolTip(tip_setFloatingCoordinate(), clickRegion_Det, stopRegion_Det);
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
         addToolTip(tip_stopRetryNum() + stopRetryNumDefault, stopRetryNum_Det);
@@ -625,7 +622,7 @@ public class ClickDetailController extends RootController {
         stage.setOnCloseRequest(e -> {
             CheckBox remindSave = settingController.remindClickSave_Set;
             if (remindSave != null && remindSave.isSelected()) {
-                if (isModified) {
+                if (isModified || stopFloatingVO.isModified() || clickFloatingVO.isModified()) {
                     ButtonType result = creatConfirmDialog(
                             confirm_unSaved(),
                             confirm_unSavedConfirm(),
@@ -729,406 +726,6 @@ public class ClickDetailController extends RootController {
     private void setDisableNodes() {
         disableNodes.add(removeAll_Det);
         disableNodes.add(stopImgBtn_Det);
-    }
-
-    /**
-     * 初始化浮窗
-     *
-     * @param floatingConfigs 浮窗配置
-     */
-    private void initFloatingWindow(FloatingWindowVO... floatingConfigs) {
-        for (FloatingWindowVO floatingConfig : floatingConfigs) {
-            int floatingWidth = floatingConfig.getWidth();
-            int floatingHeight = floatingConfig.getHeight();
-            Label floatingPosition = new Label();
-            // 创建一个矩形作为浮窗的内容
-            Rectangle rectangle = new Rectangle(floatingWidth, floatingHeight);
-            // 设置透明度
-            rectangle.setFill(new Color(0, 0, 0, 0.5));
-            StackPane root = new StackPane();
-            root.setBackground(Background.EMPTY);
-            // 添加拖拽事件处理器
-            double[] xOffset = new double[1];
-            double[] yOffset = new double[1];
-            root.setOnMousePressed(event -> {
-                // 记录鼠标按下时的初始偏移量
-                xOffset[0] = event.getSceneX();
-                yOffset[0] = event.getSceneY();
-            });
-            Stage floatingStage = new Stage();
-            root.setOnMouseDragged(event -> {
-                isModified = true;
-                // 获取当前所在屏幕
-                Screen currentScreen = getCurrentScreen(floatingStage);
-                Rectangle2D screenBounds = currentScreen.getBounds();
-                // 计算新坐标
-                double newX = event.getScreenX() - xOffset[0];
-                double newY = event.getScreenY() - yOffset[0];
-                int h = (int) floatingStage.getHeight();
-                int w = (int) floatingStage.getWidth();
-                floatingStage.setWidth(w);
-                floatingStage.setHeight(h);
-                // 边界约束
-                newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - w));
-                newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - h));
-                int x = (int) newX;
-                int y = (int) newY;
-                // 应用限制后的坐标
-                floatingStage.setX(x);
-                floatingStage.setY(y);
-                String point = " X: " + x + " Y: " + y +
-                        "\n Width:" + w + " Height:" + h;
-                floatingPosition.setText(point);
-            });
-            Color labelTextFill = Color.WHITE;
-            String fontSize = "-fx-font-size: 18px;";
-            floatingPosition.setTextFill(labelTextFill);
-            floatingPosition.setStyle(fontSize);
-            Label floatingLabel = new Label(text_saveFindImgConfig());
-            floatingLabel.setTextFill(labelTextFill);
-            floatingLabel.setStyle(fontSize);
-            Label nameLabel = new Label(floatingConfig.getName());
-            nameLabel.setStyle(fontSize);
-            nameLabel.setTextFill(labelTextFill);
-            VBox vBox = new VBox();
-            vBox.getChildren().addAll(floatingPosition, floatingLabel, nameLabel);
-            root.getChildren().addAll(rectangle, vBox);
-            // 创建调整大小的边框区域
-            double resizeBorder = 3;
-            // 上边框 - 覆盖整个宽度
-            Rectangle resizeTop = createResizeBorder(floatingWidth, resizeBorder, Cursor.N_RESIZE);
-            StackPane.setAlignment(resizeTop, Pos.TOP_CENTER);
-            // 右边框 - 覆盖整个高度
-            Rectangle resizeRight = createResizeBorder(resizeBorder, floatingHeight, Cursor.E_RESIZE);
-            StackPane.setAlignment(resizeRight, Pos.CENTER_RIGHT);
-            // 下边框 - 覆盖整个宽度
-            Rectangle resizeBottom = createResizeBorder(floatingWidth, resizeBorder, Cursor.S_RESIZE);
-            StackPane.setAlignment(resizeBottom, Pos.BOTTOM_CENTER);
-            // 左边框 - 覆盖整个高度
-            Rectangle resizeLeft = createResizeBorder(resizeBorder, floatingHeight, Cursor.W_RESIZE);
-            StackPane.setAlignment(resizeLeft, Pos.CENTER_LEFT);
-            // 四个角落
-            Rectangle resizeTopLeft = createResizeBorder(resizeBorder, resizeBorder, Cursor.NW_RESIZE);
-            StackPane.setAlignment(resizeTopLeft, Pos.TOP_LEFT);
-            Rectangle resizeTopRight = createResizeBorder(resizeBorder, resizeBorder, Cursor.NE_RESIZE);
-            StackPane.setAlignment(resizeTopRight, Pos.TOP_RIGHT);
-            Rectangle resizeBottomLeft = createResizeBorder(resizeBorder, resizeBorder, Cursor.SW_RESIZE);
-            StackPane.setAlignment(resizeBottomLeft, Pos.BOTTOM_LEFT);
-            Rectangle resizeBottomRight = createResizeBorder(resizeBorder, resizeBorder, Cursor.SE_RESIZE);
-            StackPane.setAlignment(resizeBottomRight, Pos.BOTTOM_RIGHT);
-            // 上边框 - 调整高度，同时调整 Y
-            setupBorderResizeHandler(resizeTop, floatingStage, false, true, false, true, floatingPosition);
-            // 右边框 - 调整宽度，不调整 X
-            setupBorderResizeHandler(resizeRight, floatingStage, true, false, false, false, floatingPosition);
-            // 下边框 - 调整高度，不调整 Y
-            setupBorderResizeHandler(resizeBottom, floatingStage, false, true, false, false, floatingPosition);
-            // 左边框 - 调整宽度，同时调整 X
-            setupBorderResizeHandler(resizeLeft, floatingStage, true, false, true, false, floatingPosition);
-            setupCornerResizeHandler(resizeTopLeft, floatingStage, floatingPosition);
-            setupCornerResizeHandler(resizeTopRight, floatingStage, floatingPosition);
-            setupCornerResizeHandler(resizeBottomLeft, floatingStage, floatingPosition);
-            setupCornerResizeHandler(resizeBottomRight, floatingStage, floatingPosition);
-            // 添加所有调整大小控件到根面板
-            root.getChildren().addAll(resizeTop, resizeRight, resizeBottom, resizeLeft,
-                    resizeTopLeft, resizeTopRight, resizeBottomLeft, resizeBottomRight);
-            // 绑定边框大小到浮窗大小
-            rectangle.widthProperty().addListener((obs, oldVal, newVal) -> {
-                double width = newVal.doubleValue();
-                resizeTop.setWidth(width);
-                resizeBottom.setWidth(width);
-            });
-            rectangle.heightProperty().addListener((obs, oldVal, newVal) -> {
-                double height = newVal.doubleValue();
-                resizeRight.setHeight(height);
-                resizeLeft.setHeight(height);
-            });
-            Scene scene = new Scene(root, Color.TRANSPARENT);
-            // 设置透明样式
-            floatingStage.initStyle(StageStyle.TRANSPARENT);
-            // 设置始终置顶
-            floatingStage.setAlwaysOnTop(true);
-            floatingStage.setScene(scene);
-            floatingConfig.setFloatingPosition(floatingPosition)
-                    .setFloatingLabel(floatingLabel)
-                    .setRectangle(rectangle)
-                    .setStage(floatingStage);
-        }
-    }
-
-    /**
-     * 创建调整大小的矩形区域
-     *
-     * @param width  矩形宽度
-     * @param height 矩形高度
-     * @param cursor 鼠标光标
-     */
-    private Rectangle createResizeBorder(double width, double height, Cursor cursor) {
-        Rectangle rect = new Rectangle(width, height);
-        rect.setFill(new Color(0, 0, 0, 1));
-        rect.setCursor(cursor);
-        return rect;
-    }
-
-    /**
-     * 设置调整大小的事件处理器
-     *
-     * @param resizeRect       用来拖拽调整大小的矩形
-     * @param stage            浮窗舞台
-     * @param resizeWidth      是否调整宽度（true 调整）
-     * @param resizeHeight     是否调整高度（true 调整）
-     * @param adjustX          是否调整 X 坐标（true 调整）
-     * @param adjustY          是否调整 Y 坐标（true 调整）
-     * @param floatingPosition 浮窗位置显示栏
-     */
-    private void setupBorderResizeHandler(Rectangle resizeRect, Stage stage, boolean resizeWidth, boolean resizeHeight,
-                                          boolean adjustX, boolean adjustY, Label floatingPosition) {
-        double[] initialX = new double[1];
-        double[] initialY = new double[1];
-        double[] initialWidth = new double[1];
-        double[] initialHeight = new double[1];
-        double[] initialStageX = new double[1];
-        double[] initialStageY = new double[1];
-        resizeRect.setOnMousePressed(event -> {
-            initialX[0] = event.getScreenX();
-            initialY[0] = event.getScreenY();
-            initialWidth[0] = stage.getWidth();
-            initialHeight[0] = stage.getHeight();
-            initialStageX[0] = stage.getX();
-            initialStageY[0] = stage.getY();
-            event.consume();
-        });
-        resizeRect.setOnMouseDragged(event -> {
-            isModified = true;
-            // 获取当前所在屏幕
-            Screen currentScreen = getCurrentScreen(stage);
-            Rectangle2D screenBounds = currentScreen.getBounds();
-            double newWidth = initialWidth[0];
-            double newHeight = initialHeight[0];
-            double newX = initialStageX[0];
-            double newY = initialStageY[0];
-            if (resizeWidth) {
-                double widthDelta = event.getScreenX() - initialX[0];
-                if (adjustX) {
-                    // 左侧调整：同时改变X坐标和宽度
-                    newX = initialStageX[0] + widthDelta;
-                    newWidth = initialWidth[0] - widthDelta;
-                } else {
-                    // 右侧调整：只改变宽度
-                    newWidth = initialWidth[0] + widthDelta;
-                }
-                // 宽度边界约束
-                newWidth = Math.max(defaultFloatingWidthInt, Math.min(newWidth, screenBounds.getWidth() - newX));
-            }
-            if (resizeHeight) {
-                double heightDelta = event.getScreenY() - initialY[0];
-                if (adjustY) {
-                    // 上侧调整：同时改变Y坐标和高度
-                    newY = initialStageY[0] + heightDelta;
-                    newHeight = initialHeight[0] - heightDelta;
-                } else {
-                    // 下侧调整：只改变高度
-                    newHeight = initialHeight[0] + heightDelta;
-                }
-                // 高度边界约束
-                newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
-            }
-            // 位置边界约束
-            newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - 50));
-            newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - 50));
-            int x = (int) newX;
-            int y = (int) newY;
-            int w = (int) newWidth;
-            int h = (int) newHeight;
-            stage.setX(x);
-            stage.setY(y);
-            stage.setWidth(w);
-            stage.setHeight(h);
-            // 更新主矩形大小
-            StackPane root = (StackPane) stage.getScene().getRoot();
-            for (Node node : root.getChildren()) {
-                if (node instanceof Rectangle mainRect) {
-                    mainRect.setWidth(newWidth);
-                    mainRect.setHeight(newHeight);
-                    break;
-                }
-            }
-            String point = " X: " + x + " Y: " + y +
-                    "\n Width:" + w + " Height:" + h;
-            floatingPosition.setText(point);
-            event.consume();
-        });
-    }
-
-    /**
-     * 创建调整大小的矩形区域
-     *
-     * @param resizeRect       用来拖拽调整大小的矩形
-     * @param stage            待调整的舞台
-     * @param floatingPosition 浮窗位置显示栏
-     */
-    private void setupCornerResizeHandler(Rectangle resizeRect, Stage stage, Label floatingPosition) {
-        double[] initialX = new double[1];
-        double[] initialY = new double[1];
-        double[] initialWidth = new double[1];
-        double[] initialHeight = new double[1];
-        double[] initialStageX = new double[1];
-        double[] initialStageY = new double[1];
-        resizeRect.setOnMousePressed(event -> {
-            initialX[0] = event.getScreenX();
-            initialY[0] = event.getScreenY();
-            initialWidth[0] = stage.getWidth();
-            initialHeight[0] = stage.getHeight();
-            initialStageX[0] = stage.getX();
-            initialStageY[0] = stage.getY();
-            event.consume();
-        });
-        resizeRect.setOnMouseDragged(event -> {
-            isModified = true;
-            // 获取当前所在屏幕
-            Screen currentScreen = getCurrentScreen(stage);
-            Rectangle2D screenBounds = currentScreen.getBounds();
-            double newWidth;
-            double newHeight;
-            double newX = initialStageX[0];
-            double newY = initialStageY[0];
-            double widthDelta = event.getScreenX() - initialX[0];
-            // 根据角落位置决定调整方向
-            if (StackPane.getAlignment(resizeRect) == Pos.TOP_LEFT ||
-                    StackPane.getAlignment(resizeRect) == Pos.BOTTOM_LEFT) {
-                // 左侧角落：同时改变X坐标和宽度
-                newX = initialStageX[0] + widthDelta;
-                newWidth = initialWidth[0] - widthDelta;
-            } else {
-                // 右侧角落：只改变宽度
-                newWidth = initialWidth[0] + widthDelta;
-            }
-            double heightDelta = event.getScreenY() - initialY[0];
-            // 根据角落位置决定调整方向
-            if (StackPane.getAlignment(resizeRect) == Pos.TOP_LEFT ||
-                    StackPane.getAlignment(resizeRect) == Pos.TOP_RIGHT) {
-                // 上侧角落：同时改变Y坐标和高度
-                newY = initialStageY[0] + heightDelta;
-                newHeight = initialHeight[0] - heightDelta;
-            } else {
-                // 下侧角落：只改变高度
-                newHeight = initialHeight[0] + heightDelta;
-            }
-            // 边界约束
-            newWidth = Math.max(defaultFloatingWidthInt, Math.min(newWidth, screenBounds.getWidth() - newX));
-            newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
-            newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - 50));
-            newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - 50));
-            int x = (int) newX;
-            int y = (int) newY;
-            int w = (int) newWidth;
-            int h = (int) newHeight;
-            stage.setX(x);
-            stage.setY(y);
-            stage.setWidth(w);
-            stage.setHeight(h);
-            // 更新主矩形大小
-            StackPane root = (StackPane) stage.getScene().getRoot();
-            for (Node node : root.getChildren()) {
-                if (node instanceof Rectangle mainRect) {
-                    mainRect.setWidth(newWidth);
-                    mainRect.setHeight(newHeight);
-                    break;
-                }
-            }
-            String point = " X: " + x + " Y: " + y +
-                    "\n Width:" + w + " Height:" + h;
-            floatingPosition.setText(point);
-            event.consume();
-        });
-    }
-
-    /**
-     * 显示浮窗
-     *
-     * @param floatingConfig 浮窗配置
-     */
-    private void showFloatingWindow(FloatingWindowVO floatingConfig) {
-        Platform.runLater(() -> {
-            Stage floatingStage = floatingConfig.getStage();
-            Label floatingPosition = floatingConfig.getFloatingPosition();
-            int floatingX = floatingConfig.getX();
-            int floatingY = floatingConfig.getY();
-            int floatingWidth = floatingConfig.getWidth();
-            int floatingHeight = floatingConfig.getHeight();
-            // 改变要防重复点击的组件状态
-            changeDisableNodes(floatingConfig.getDisableNodes(), true);
-            floatingStage.setX(floatingX);
-            floatingStage.setY(floatingY);
-            floatingStage.setWidth(floatingWidth);
-            floatingStage.setHeight(floatingHeight);
-            String point = " X: " + floatingX + " Y: " + floatingY +
-                    "\n Width:" + floatingWidth + " Height:" + floatingHeight;
-            floatingPosition.setText(point);
-            Button button = floatingConfig.getButton();
-            button.setText(clickDetail_saveRegion());
-            addToolTip(tip_saveFloating(), button);
-            floatingStage.show();
-            // 监听键盘事件
-            startNativeKeyListener();
-        });
-    }
-
-    /**
-     * 隐藏浮窗
-     *
-     * @param floatingConfigs 浮窗配置
-     */
-    private void hideFloatingWindow(FloatingWindowVO... floatingConfigs) {
-        Platform.runLater(() -> {
-            for (FloatingWindowVO floatingConfig : floatingConfigs) {
-                Stage floatingStage = floatingConfig.getStage();
-                if (floatingStage != null && floatingStage.isShowing()) {
-                    int floatingX = (int) floatingStage.getX();
-                    int floatingY = (int) floatingStage.getY();
-                    int floatingWidth = (int) floatingStage.getWidth();
-                    int floatingHeight = (int) floatingStage.getHeight();
-                    floatingConfig.setWidth(floatingWidth)
-                            .setHeight(floatingHeight)
-                            .setX(floatingX)
-                            .setY(floatingY);
-                    floatingStage.hide();
-                    Button button = floatingConfig.getButton();
-                    button.setText(clickDetail_showRegion());
-                    addToolTip(tip_setFloatingCoordinate(), button);
-                    // 改变要防重复点击的组件状态
-                    changeDisableNodes(floatingConfig.getDisableNodes(), false);
-                    removeNativeListener(nativeKeyListener);
-                    floatingConfig.getStage().close();
-                }
-            }
-        });
-    }
-
-    /**
-     * 开启全局键盘监听
-     */
-    private void startNativeKeyListener() {
-        Stage clickStage = clickFloatingVO.getStage();
-        Stage stopStage = stopFloatingVO.getStage();
-        removeNativeListener(nativeKeyListener);
-        // 键盘监听器
-        nativeKeyListener = new NativeKeyListener() {
-            @Override
-            public void nativeKeyPressed(NativeKeyEvent e) {
-                Platform.runLater(() -> {
-                    // 检测快捷键 esc
-                    if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-                        if (clickStage != null && clickStage.isShowing()) {
-                            hideFloatingWindow(clickFloatingVO);
-                        }
-                        if (stopStage != null && stopStage.isShowing()) {
-                            hideFloatingWindow(stopFloatingVO);
-                        }
-                    }
-                });
-            }
-        };
-        GlobalScreen.addNativeKeyListener(nativeKeyListener);
     }
 
     /**

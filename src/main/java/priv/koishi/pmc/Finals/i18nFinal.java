@@ -294,6 +294,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 点击后将会展识别区域浮窗，之后按下 esc 可关闭浮窗
+     */
+    public static String tip_showRegion() {
+        return bundle.getString("tip.showRegion");
+    }
+
+    /**
      * @return 点击后将会关闭浮窗
      */
     public static String tip_closeFloating() {

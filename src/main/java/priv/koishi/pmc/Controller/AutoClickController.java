@@ -43,7 +43,7 @@ import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
-import priv.koishi.pmc.CustomUI.EditingCell.EditingCell;
+import priv.koishi.pmc.CustomUI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
@@ -670,8 +670,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
-        ColorPicker colorPicker = settingController.colorPicker_Set;
-        Color color = colorPicker.getValue();
+        Color color = settingController.colorPicker_Set.getValue();
         // 读取配置文件
         getProperties();
         // 获取浮窗的显示设置

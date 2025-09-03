@@ -19,7 +19,7 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
-import priv.koishi.pmc.CustomUI.MessageBubble.MessageBubble;
+import priv.koishi.pmc.CustomUI.CustomMessageBubble.MessageBubble;
 
 import java.io.File;
 import java.io.IOException;

@@ -61,6 +61,46 @@ public class FloatingWindowVO extends FloatingWindowConfig {
     List<Node> disableNodes;
 
     /**
+     * 信窗信息展示栏文本
+     */
+    String floatingLabelText;
+
+    /**
+     * 显示浮窗按钮文本
+     */
+    String showButtonText;
+
+    /**
+     * 显示浮窗按钮鼠标悬浮提示
+     */
+    String showButtonToolTip;
+
+    /**
+     * 隐藏浮窗按钮文本
+     */
+    String hideButtonText;
+
+    /**
+     * 隐藏浮窗按钮鼠标悬浮提示
+     */
+    String hideButtonToolTip;
+
+    /**
+     * 是否允许拖拽移动（true 允许）
+     */
+    boolean enableDrag = true;
+
+    /**
+     * 是否允许调整大小（true 允许）
+     */
+    boolean enableResize = true;
+
+    /**
+     * 是否被修改过（true 修改过）
+     */
+    boolean modified;
+
+    /**
      * 销毁浮窗
      */
     public void dispose() {
