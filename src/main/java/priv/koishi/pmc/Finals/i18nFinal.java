@@ -871,6 +871,14 @@ public class i18nFinal {
     }
 
     /**
+     * @return 点击可选择图像识别范围
+     *
+     */
+    public static String tip_findImgType() {
+        return bundle.getString("tip.findImgType");
+    }
+
+    /**
      * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
      * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
      */
@@ -1000,6 +1008,15 @@ public class i18nFinal {
      */
     public static String text_saveFloatingCoordinate() {
         return bundle.getString("saveFloatingCoordinate");
+    }
+
+    /**
+     * @return 拖拽浮窗边缘即可调整浮窗大小
+     * 鼠标拖拽浮窗即可移动浮窗
+     * 按下esc 即可保存浮窗位置
+     */
+    public static String text_saveFindImgConfig() {
+        return bundle.getString("saveFindImgConfig") + bundle.getString("saveFloatingCoordinate");
     }
 
     /**
@@ -1546,6 +1563,13 @@ public class i18nFinal {
      */
     public static String clickDetail_saveRegion() {
         return bundle.getString("clickDetail.saveRegion");
+    }
+
+    /**
+     * @return 显示识别区域
+     */
+    public static String clickDetail_showRegion() {
+        return bundle.getString("clickDetail.showRegion");
     }
 
     /**
@@ -2503,7 +2527,11 @@ public class i18nFinal {
      */
     public static final BidiMap<Integer, String> findImgTypeMap = new DualHashBidiMap<>();
 
-    static {
+    /**
+     * 更新图像识别区域类型选项映射
+     */
+    public static void updateFindImgTypeMap() {
+        findImgTypeMap.clear();
         findImgTypeMap.put(FindImgTypeEnum.ALL.ordinal(), findImgType_all());
         findImgTypeMap.put(FindImgTypeEnum.REGION.ordinal(), findImgType_region());
     }
@@ -3028,6 +3056,8 @@ public class i18nFinal {
         updateSearchTypeList();
         // 更新图像识别区域类型选项
         updateFindImgTypeList();
+        // 更新图像识别区域类型选项映射
+        updateFindImgTypeMap();
     }
 
 }

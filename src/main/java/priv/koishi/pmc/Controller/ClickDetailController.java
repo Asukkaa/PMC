@@ -371,7 +371,9 @@ public class ClickDetailController extends RootController {
     private void removeAllListeners() {
         clickFloatingVO.dispose();
         stopFloatingVO.dispose();
-        tableView_Det.getItems().removeListener(tableListener);
+        if (tableListener != null) {
+            tableView_Det.getItems().removeListener(tableListener);
+        }
         // 移除修改内容变化标志监听器（滑块组件专用）
         removeInvalidationListeners(weakInvalidationListeners);
         weakInvalidationListeners.clear();
@@ -410,6 +412,8 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(stopFindImgType_Det, stopFindImgType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickFindImgType_Det, clickFindImgType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         // 监听滑块改变
         ChangeListener<Number> clickOpacityListener = (obs, oldVal, newVal) ->
                 isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold());
@@ -578,6 +582,7 @@ public class ClickDetailController extends RootController {
         addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
+        addToolTip(tip_setFloatingCoordinate(), clickRegion_Det, stopRegion_Det);
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
         addToolTip(tip_stopRetryNum() + stopRetryNumDefault, stopRetryNum_Det);
@@ -590,6 +595,8 @@ public class ClickDetailController extends RootController {
         addValueToolTip(randomClickY_Det, tip_randomClickY() + defaultRandomClickY);
         addValueToolTip(randomTimeOffset_Det, tip_randomTime() + defaultRandomTime);
         addToolTip(tip_tableViewSize() + tableViewSize_Det.getText(), tableViewSize_Det);
+        addValueToolTip(stopFindImgType_Det, tip_findImgType(), stopFindImgType_Det.getValue());
+        addValueToolTip(clickFindImgType_Det, tip_findImgType(), clickFindImgType_Det.getValue());
         addValueToolTip(stopOpacity_Det, tip_stopOpacity(), String.valueOf((int) stopOpacity_Det.getValue()));
         addValueToolTip(clickOpacity_Det, tip_clickOpacity(), String.valueOf((int) clickOpacity_Det.getValue()));
     }
@@ -750,6 +757,7 @@ public class ClickDetailController extends RootController {
             });
             Stage floatingStage = new Stage();
             root.setOnMouseDragged(event -> {
+                isModified = true;
                 // 获取当前所在屏幕
                 Screen currentScreen = getCurrentScreen(floatingStage);
                 Rectangle2D screenBounds = currentScreen.getBounds();
@@ -772,7 +780,7 @@ public class ClickDetailController extends RootController {
             String fontSize = "-fx-font-size: 18px;";
             floatingPosition.setTextFill(labelTextFill);
             floatingPosition.setStyle(fontSize);
-            Label floatingLabel = new Label(text_saveFloatingCoordinate());
+            Label floatingLabel = new Label(text_saveFindImgConfig());
             floatingLabel.setTextFill(labelTextFill);
             floatingLabel.setStyle(fontSize);
             Label nameLabel = new Label(floatingConfig.getName());
@@ -845,6 +853,10 @@ public class ClickDetailController extends RootController {
 
     /**
      * 创建调整大小的矩形区域
+     *
+     * @param width  矩形宽度
+     * @param height 矩形高度
+     * @param cursor 鼠标光标
      */
     private Rectangle createResizeBorder(double width, double height, Cursor cursor) {
         Rectangle rect = new Rectangle(width, height);
@@ -855,6 +867,14 @@ public class ClickDetailController extends RootController {
 
     /**
      * 设置调整大小的事件处理器
+     *
+     * @param resizeRect       用来拖拽调整大小的矩形
+     * @param stage            浮窗舞台
+     * @param resizeWidth      是否调整宽度（true 调整）
+     * @param resizeHeight     是否调整高度（true 调整）
+     * @param adjustX          是否调整 X 坐标（true 调整）
+     * @param adjustY          是否调整 Y 坐标（true 调整）
+     * @param floatingPosition 浮窗位置显示栏
      */
     private void setupBorderResizeHandler(Rectangle resizeRect, Stage stage, boolean resizeWidth, boolean resizeHeight,
                                           boolean adjustX, boolean adjustY, Label floatingPosition) {
@@ -874,6 +894,7 @@ public class ClickDetailController extends RootController {
             event.consume();
         });
         resizeRect.setOnMouseDragged(event -> {
+            isModified = true;
             // 获取当前所在屏幕
             Screen currentScreen = getCurrentScreen(stage);
             Rectangle2D screenBounds = currentScreen.getBounds();
@@ -930,6 +951,13 @@ public class ClickDetailController extends RootController {
         });
     }
 
+    /**
+     * 创建调整大小的矩形区域
+     *
+     * @param resizeRect       用来拖拽调整大小的矩形
+     * @param stage            待调整的舞台
+     * @param floatingPosition 浮窗位置显示栏
+     */
     private void setupCornerResizeHandler(Rectangle resizeRect, Stage stage, Label floatingPosition) {
         double[] initialX = new double[1];
         double[] initialY = new double[1];
@@ -947,6 +975,7 @@ public class ClickDetailController extends RootController {
             event.consume();
         });
         resizeRect.setOnMouseDragged(event -> {
+            isModified = true;
             // 获取当前所在屏幕
             Screen currentScreen = getCurrentScreen(stage);
             Rectangle2D screenBounds = currentScreen.getBounds();
@@ -1052,7 +1081,7 @@ public class ClickDetailController extends RootController {
                             .setY(floatingY);
                     floatingStage.hide();
                     Button button = floatingConfig.getButton();
-                    button.setText(text_showFloating());
+                    button.setText(clickDetail_showRegion());
                     addToolTip(tip_setFloatingCoordinate(), button);
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(floatingConfig.getDisableNodes(), false);
@@ -1129,6 +1158,7 @@ public class ClickDetailController extends RootController {
     private void saveDetail() throws IllegalAccessException {
         clickFindImgTypeAction();
         stopFindImgTypeAction();
+        saveFloatingWindow(clickFloatingVO, stopFloatingVO);
         FloatingWindowConfig clickFloatingConfig = new FloatingWindowConfig();
         copyAllProperties(clickFloatingVO, clickFloatingConfig);
         FloatingWindowConfig stopFloatingConfig = new FloatingWindowConfig();
@@ -1193,6 +1223,23 @@ public class ClickDetailController extends RootController {
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();
+        }
+    }
+
+    /**
+     * 保存浮窗设置
+     *
+     * @param floatingVOs 浮窗设置
+     */
+    private void saveFloatingWindow(FloatingWindowVO... floatingVOs) {
+        for (FloatingWindowVO floatingVO : floatingVOs) {
+            Stage clickStage = floatingVO.getStage();
+            if (clickStage != null) {
+                floatingVO.setHeight((int) clickStage.getHeight())
+                        .setWidth((int) clickStage.getWidth())
+                        .setX((int) clickStage.getX())
+                        .setY((int) clickStage.getY());
+            }
         }
     }
 
@@ -1337,6 +1384,7 @@ public class ClickDetailController extends RootController {
     @FXML
     private void clickFindImgTypeAction() {
         String value = clickFindImgType_Det.getValue();
+        addValueToolTip(clickFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
             clickRegion_Det.setVisible(true);
             if (clickFloatingVO != null) {
@@ -1356,6 +1404,7 @@ public class ClickDetailController extends RootController {
     @FXML
     private void stopFindImgTypeAction() {
         String value = stopFindImgType_Det.getValue();
+        addValueToolTip(stopFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
             stopRegion_Det.setVisible(true);
             if (stopFloatingVO != null) {
