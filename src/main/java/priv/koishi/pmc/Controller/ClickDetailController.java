@@ -764,16 +764,20 @@ public class ClickDetailController extends RootController {
                 // 计算新坐标
                 double newX = event.getScreenX() - xOffset[0];
                 double newY = event.getScreenY() - yOffset[0];
+                int h = (int) floatingStage.getHeight();
+                int w = (int) floatingStage.getWidth();
+                floatingStage.setWidth(w);
+                floatingStage.setHeight(h);
                 // 边界约束
-                newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - floatingWidth));
-                newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - floatingHeight));
+                newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - w));
+                newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - h));
                 int x = (int) newX;
                 int y = (int) newY;
                 // 应用限制后的坐标
                 floatingStage.setX(x);
                 floatingStage.setY(y);
                 String point = " X: " + x + " Y: " + y +
-                        "\n Width:" + floatingWidth + " Height:" + floatingHeight;
+                        "\n Width:" + w + " Height:" + h;
                 floatingPosition.setText(point);
             });
             Color labelTextFill = Color.WHITE;
@@ -931,10 +935,14 @@ public class ClickDetailController extends RootController {
             // 位置边界约束
             newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - 50));
             newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - 50));
-            stage.setX(newX);
-            stage.setY(newY);
-            stage.setWidth(newWidth);
-            stage.setHeight(newHeight);
+            int x = (int) newX;
+            int y = (int) newY;
+            int w = (int) newWidth;
+            int h = (int) newHeight;
+            stage.setX(x);
+            stage.setY(y);
+            stage.setWidth(w);
+            stage.setHeight(h);
             // 更新主矩形大小
             StackPane root = (StackPane) stage.getScene().getRoot();
             for (Node node : root.getChildren()) {
@@ -944,8 +952,8 @@ public class ClickDetailController extends RootController {
                     break;
                 }
             }
-            String point = " X: " + (int) newX + " Y: " + (int) newY +
-                    "\n Width:" + (int) newWidth + " Height:" + (int) newHeight;
+            String point = " X: " + x + " Y: " + y +
+                    "\n Width:" + w + " Height:" + h;
             floatingPosition.setText(point);
             event.consume();
         });
@@ -1010,10 +1018,14 @@ public class ClickDetailController extends RootController {
             newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
             newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - 50));
             newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - 50));
-            stage.setX(newX);
-            stage.setY(newY);
-            stage.setWidth(newWidth);
-            stage.setHeight(newHeight);
+            int x = (int) newX;
+            int y = (int) newY;
+            int w = (int) newWidth;
+            int h = (int) newHeight;
+            stage.setX(x);
+            stage.setY(y);
+            stage.setWidth(w);
+            stage.setHeight(h);
             // 更新主矩形大小
             StackPane root = (StackPane) stage.getScene().getRoot();
             for (Node node : root.getChildren()) {
@@ -1023,8 +1035,8 @@ public class ClickDetailController extends RootController {
                     break;
                 }
             }
-            String point = " X: " + (int) newX + " Y: " + (int) newY +
-                    "\n Width:" + (int) newWidth + " Height:" + (int) newHeight;
+            String point = " X: " + x + " Y: " + y +
+                    "\n Width:" + w + " Height:" + h;
             floatingPosition.setText(point);
             event.consume();
         });
