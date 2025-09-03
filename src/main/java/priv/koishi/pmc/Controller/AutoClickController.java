@@ -589,7 +589,7 @@ public class AutoClickController extends RootController implements MousePosition
         item.setStopImgSelectPath(stopImgSelectPath);
         try {
             controller.initData(item);
-        } catch (IOException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         // 设置保存后的回调
@@ -1923,6 +1923,7 @@ public class AutoClickController extends RootController implements MousePosition
             exportPMCTask.setOnFailed(event -> {
                 exportPMCTask = null;
                 taskNotSuccess(taskBean, text_taskFailed());
+                throw new RuntimeException(event.getSource().getException());
             });
             Thread.ofVirtual()
                     .name("exportPMCTask-vThread" + tabId)

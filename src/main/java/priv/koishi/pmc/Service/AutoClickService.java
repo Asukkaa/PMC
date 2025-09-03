@@ -37,7 +37,7 @@ import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
-import static priv.koishi.pmc.Utils.CommonUtils.copyProperties;
+import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
@@ -300,7 +300,7 @@ public class AutoClickService {
                     ClickPositionVO vo = new ClickPositionVO();
                     try {
                         // 自动拷贝父类中的属性
-                        copyProperties(clickPositionVO, vo);
+                        copyAllProperties(clickPositionVO, vo);
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
@@ -884,7 +884,7 @@ public class AutoClickService {
                 ClickPositionVO vo = new ClickPositionVO();
                 try {
                     // 自动拷贝父类中的属性
-                    copyProperties(bean, vo);
+                    copyAllProperties(bean, vo);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }

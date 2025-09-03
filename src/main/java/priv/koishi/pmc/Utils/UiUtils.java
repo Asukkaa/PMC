@@ -1248,7 +1248,7 @@ public class UiUtils {
         selectedItem.forEach(clickPositionBean -> {
             ClickPositionVO copyClickPositionVO = new ClickPositionVO();
             try {
-                copyProperties(clickPositionBean, copyClickPositionVO);
+                copyAllProperties(clickPositionBean, copyClickPositionVO);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

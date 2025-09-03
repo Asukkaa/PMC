@@ -81,10 +81,9 @@ public class CommonUtils {
      *
      * @param source 源对象
      * @param target 目标对象
-     * @throws IllegalArgumentException 如果源对象和目标对象类型不匹配，则抛出此异常
-     * @throws IllegalAccessException   当字段访问权限不足时抛出
+     * @throws IllegalAccessException 当字段访问权限不足时抛出
      */
-    public static void copyProperties(Object source, Object target) throws IllegalAccessException {
+    public static void copyAllProperties(Object source, Object target) throws IllegalAccessException {
         Class<?> sourceClass = source.getClass();
         Class<?> targetClass = target.getClass();
         // 遍历源对象继承链

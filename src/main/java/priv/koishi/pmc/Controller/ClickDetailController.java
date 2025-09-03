@@ -50,6 +50,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
+import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -142,7 +143,7 @@ public class ClickDetailController extends RootController {
     /**
      * 浮窗配置
      */
-    private FloatingWindowVO clickFloatingConfig, stopFloatingConfig;
+    private FloatingWindowVO clickFloatingVO, stopFloatingVO;
 
     /**
      * 全局键盘监听器
@@ -234,8 +235,9 @@ public class ClickDetailController extends RootController {
      * 初始化数据
      *
      * @param item 列表选中的数据
+     * @throws IllegalAccessException 访问属性异常
      */
-    public void initData(ClickPositionVO item) throws IOException {
+    public void initData(ClickPositionVO item) throws IllegalAccessException {
         selectedItem = item;
         isModified = false;
         maxIndex = selectedItem.getTableView().getItems().size();
@@ -308,25 +310,25 @@ public class ClickDetailController extends RootController {
         String clickImgPath = item.getClickImgPath();
         showClickImg(clickImgPath);
         FloatingWindowConfig clickWindowConfig = item.getClickWindowConfig();
-        clickFloatingConfig = new FloatingWindowVO();
+        clickFloatingVO = new FloatingWindowVO();
         if (clickWindowConfig != null) {
-            clickFloatingConfig = (FloatingWindowVO) clickWindowConfig;
+            copyAllProperties(clickWindowConfig, clickFloatingVO);
             clickFindImgType_Det.setValue(findImgTypeMap.get(clickWindowConfig.getFindImgTypeEnum()));
         }
-        clickFloatingConfig.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
+        clickFloatingVO.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
                 .setName(floatingName_click())
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
-        stopFloatingConfig = new FloatingWindowVO();
+        stopFloatingVO = new FloatingWindowVO();
         if (stopWindowConfig != null) {
-            stopFloatingConfig = (FloatingWindowVO) item.getStopWindowConfig();
+            copyAllProperties(stopWindowConfig, stopFloatingVO);
             stopFindImgType_Det.setValue(findImgTypeMap.get(stopWindowConfig.getFindImgTypeEnum()));
         }
-        stopFloatingConfig.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+        stopFloatingVO.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
-        initFloatingWindow(clickFloatingConfig, stopFloatingConfig);
+        initFloatingWindow(clickFloatingVO, stopFloatingVO);
     }
 
     /**
@@ -367,8 +369,8 @@ public class ClickDetailController extends RootController {
      * 移除所有监听器
      */
     private void removeAllListeners() {
-        clickFloatingConfig.dispose();
-        stopFloatingConfig.dispose();
+        clickFloatingVO.dispose();
+        stopFloatingVO.dispose();
         tableView_Det.getItems().removeListener(tableListener);
         // 移除修改内容变化标志监听器（滑块组件专用）
         removeInvalidationListeners(weakInvalidationListeners);
@@ -625,7 +627,11 @@ public class ClickDetailController extends RootController {
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
-                        saveDetail();
+                        try {
+                            saveDetail();
+                        } catch (IllegalAccessException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     } else {
                         // 直接关闭
                         closeStage();
@@ -658,7 +664,7 @@ public class ClickDetailController extends RootController {
      * 关闭页面
      */
     private void closeStage() {
-        hideFloatingWindow(clickFloatingConfig, stopFloatingConfig);
+        hideFloatingWindow(clickFloatingVO, stopFloatingVO);
         removeAll();
         removeAllListeners();
         if (loadImgTask != null && loadImgTask.isRunning()) {
@@ -1061,8 +1067,8 @@ public class ClickDetailController extends RootController {
      * 开启全局键盘监听
      */
     private void startNativeKeyListener() {
-        Stage clickStage = clickFloatingConfig.getStage();
-        Stage stopStage = stopFloatingConfig.getStage();
+        Stage clickStage = clickFloatingVO.getStage();
+        Stage stopStage = stopFloatingVO.getStage();
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
@@ -1072,10 +1078,10 @@ public class ClickDetailController extends RootController {
                     // 检测快捷键 esc
                     if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
                         if (clickStage != null && clickStage.isShowing()) {
-                            hideFloatingWindow(clickFloatingConfig);
+                            hideFloatingWindow(clickFloatingVO);
                         }
                         if (stopStage != null && stopStage.isShowing()) {
-                            hideFloatingWindow(stopFloatingConfig);
+                            hideFloatingWindow(stopFloatingVO);
                         }
                     }
                 });
@@ -1116,9 +1122,17 @@ public class ClickDetailController extends RootController {
 
     /**
      * 保存更改并关闭详情页按钮
+     *
+     * @throws IllegalAccessException 浮窗设置类复制异常
      */
     @FXML
-    private void saveDetail() {
+    private void saveDetail() throws IllegalAccessException {
+        clickFindImgTypeAction();
+        stopFindImgTypeAction();
+        FloatingWindowConfig clickFloatingConfig = new FloatingWindowConfig();
+        copyAllProperties(clickFloatingVO, clickFloatingConfig);
+        FloatingWindowConfig stopFloatingConfig = new FloatingWindowConfig();
+        copyAllProperties(stopFloatingVO, stopFloatingConfig);
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
         String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
@@ -1325,13 +1339,13 @@ public class ClickDetailController extends RootController {
         String value = clickFindImgType_Det.getValue();
         if (findImgType_region().equals(value)) {
             clickRegion_Det.setVisible(true);
-            if (clickFloatingConfig != null) {
-                clickFloatingConfig.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+            if (clickFloatingVO != null) {
+                clickFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
             }
         } else if (findImgType_all().equals(value)) {
             clickRegion_Det.setVisible(false);
-            if (clickFloatingConfig != null) {
-                clickFloatingConfig.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+            if (clickFloatingVO != null) {
+                clickFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
             }
         }
     }
@@ -1344,13 +1358,13 @@ public class ClickDetailController extends RootController {
         String value = stopFindImgType_Det.getValue();
         if (findImgType_region().equals(value)) {
             stopRegion_Det.setVisible(true);
-            if (stopFloatingConfig != null) {
-                stopFloatingConfig.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+            if (stopFloatingVO != null) {
+                stopFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
             }
         } else if (findImgType_all().equals(value)) {
             stopRegion_Det.setVisible(false);
-            if (stopFloatingConfig != null) {
-                stopFloatingConfig.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+            if (stopFloatingVO != null) {
+                stopFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
             }
         }
     }
@@ -1360,14 +1374,14 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickRegionAction() {
-        Stage floatingStage = clickFloatingConfig.getStage();
+        Stage floatingStage = clickFloatingVO.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
-                showFloatingWindow(clickFloatingConfig);
+                showFloatingWindow(clickFloatingVO);
             } else if (floatingStage.isShowing()) {
                 // 隐藏浮窗
-                hideFloatingWindow(clickFloatingConfig);
+                hideFloatingWindow(clickFloatingVO);
             }
         }
     }
@@ -1377,14 +1391,14 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void stopRegionAction() {
-        Stage floatingStage = stopFloatingConfig.getStage();
+        Stage floatingStage = stopFloatingVO.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
-                showFloatingWindow(stopFloatingConfig);
+                showFloatingWindow(stopFloatingVO);
             } else if (floatingStage.isShowing()) {
                 // 隐藏浮窗
-                hideFloatingWindow(stopFloatingConfig);
+                hideFloatingWindow(stopFloatingVO);
             }
         }
     }
