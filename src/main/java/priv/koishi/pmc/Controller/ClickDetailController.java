@@ -367,6 +367,9 @@ public class ClickDetailController extends RootController {
      * 移除所有监听器
      */
     private void removeAllListeners() {
+        clickFloatingConfig.dispose();
+        stopFloatingConfig.dispose();
+        tableView_Det.getItems().removeListener(tableListener);
         // 移除修改内容变化标志监听器（滑块组件专用）
         removeInvalidationListeners(weakInvalidationListeners);
         weakInvalidationListeners.clear();
@@ -1048,6 +1051,7 @@ public class ClickDetailController extends RootController {
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(floatingConfig.getDisableNodes(), false);
                     removeNativeListener(nativeKeyListener);
+                    floatingConfig.getStage().close();
                 }
             }
         });

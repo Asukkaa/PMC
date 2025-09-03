@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Bean.VO;
 
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Rectangle;
@@ -58,5 +59,26 @@ public class FloatingWindowVO extends FloatingWindowConfig {
      * 要防重复点击的组件
      */
     List<Node> disableNodes;
+
+    /**
+     * 销毁浮窗
+     */
+    public void dispose() {
+        if (stage != null) {
+            // 移除事件监听器
+            if (stage.getScene() != null) {
+                Parent parent = stage.getScene().getRoot();
+                parent.setOnMousePressed(null);
+                parent.setOnMouseDragged(null);
+                // 遍历移除所有子节点的监听器
+                parent.getChildrenUnmodifiable().forEach(node -> {
+                    node.setOnMousePressed(null);
+                    node.setOnMouseDragged(null);
+                });
+            }
+            stage.close();
+            stage = null;
+        }
+    }
 
 }
