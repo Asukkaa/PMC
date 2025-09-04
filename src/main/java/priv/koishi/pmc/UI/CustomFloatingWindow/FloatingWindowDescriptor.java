@@ -1,20 +1,20 @@
-package priv.koishi.pmc.Bean.VO;
+package priv.koishi.pmc.UI.CustomFloatingWindow;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
 import java.util.List;
 
 /**
- * 浮窗配置展示类
+ * 浮窗属性类
  *
  * @author KOISHI
  * Date:2025-09-02
@@ -22,8 +22,12 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
-public class FloatingWindowVO extends FloatingWindowConfig {
+public class FloatingWindowDescriptor {
+
+    /**
+     * 浮窗基础属性配置
+     */
+    FloatingWindowConfig config;
 
     /**
      * 浮窗名称
@@ -101,6 +105,16 @@ public class FloatingWindowVO extends FloatingWindowConfig {
     boolean modified;
 
     /**
+     * 是否显示名称（true 显示）
+     */
+    boolean showName = true;
+
+    /**
+     * 浮窗文本颜色
+     */
+    Color textFill;
+
+    /**
      * 销毁浮窗
      */
     public void dispose() {
@@ -116,6 +130,7 @@ public class FloatingWindowVO extends FloatingWindowConfig {
                     node.setOnMouseDragged(null);
                 });
             }
+            FloatingWindow.floatingWindows.remove(this);
             stage.close();
             stage = null;
         }

@@ -17,6 +17,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
@@ -26,9 +27,9 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
-import priv.koishi.pmc.Bean.VO.FloatingWindowVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +39,10 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
-import static priv.koishi.pmc.CustomUI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
-import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -135,7 +135,7 @@ public class ClickDetailController extends RootController {
     /**
      * 浮窗配置
      */
-    private FloatingWindowVO clickFloatingVO, stopFloatingVO;
+    private FloatingWindowDescriptor clickFloating, stopFloating;
 
     /**
      * 更新数据用的回调函数
@@ -237,6 +237,10 @@ public class ClickDetailController extends RootController {
         setPromptText();
         // 给输入框添加内容变化监听
         nodeValueChangeListener();
+        initClickType(item);
+        initFloatingWindowConfig(item);
+        initStopImg(item.getStopImgFiles());
+        showClickImg(item.getClickImgPath());
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
@@ -263,6 +267,18 @@ public class ClickDetailController extends RootController {
         randomClickTime_Det.setSelected(activation.equals(item.getRandomClickTime()));
         randomTrajectory_Det.setSelected(activation.equals(item.getRandomTrajectory()));
         randomClickInterval_Det.setSelected(activation.equals(item.getRandomClickInterval()));
+        String retryStep = "0".equals(item.getRetryStep()) ? "" : item.getRetryStep();
+        retryStep_Det.setText(retryStep);
+        String matchedStep = "0".equals(item.getMatchedStep()) ? "" : item.getMatchedStep();
+        matchedStep_Det.setText(matchedStep);
+    }
+
+    /**
+     * 初始化操作类型相关组件
+     *
+     * @param item 列表选中的数据
+     */
+    private void initClickType(ClickPositionVO item) {
         ObservableList<String> clickTypeItems = clickType_Det.getItems();
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
@@ -275,11 +291,14 @@ public class ClickDetailController extends RootController {
             mouseStartX_Det.setDisable(true);
             mouseStartY_Det.setDisable(true);
         }
-        String retryStep = "0".equals(item.getRetryStep()) ? "" : item.getRetryStep();
-        retryStep_Det.setText(retryStep);
-        String matchedStep = "0".equals(item.getMatchedStep()) ? "" : item.getMatchedStep();
-        matchedStep_Det.setText(matchedStep);
-        List<ImgFileBean> imgFileBeans = item.getStopImgFiles();
+    }
+
+    /**
+     * 初始终止操作图片列表
+     *
+     * @param imgFileBeans 要展示的终止操作图片
+     */
+    private void initStopImg(List<? extends ImgFileBean> imgFileBeans) {
         ObservableList<ImgFileVO> items = tableView_Det.getItems();
         if (CollectionUtils.isNotEmpty(imgFileBeans)) {
             imgFileBeans.forEach(b -> {
@@ -294,38 +313,53 @@ public class ClickDetailController extends RootController {
             updateTableViewSizeText(tableView_Det, dataNumber_Det, unit_img());
         }
         tableView_Det.refresh();
-        String clickImgPath = item.getClickImgPath();
-        showClickImg(clickImgPath);
+    }
+
+    /**
+     * 初始识别区域设置相关组件
+     *
+     * @param item 列表选中的数据
+     */
+    private void initFloatingWindowConfig(ClickPositionVO item) {
         FloatingWindowConfig clickWindowConfig = item.getClickWindowConfig();
-        clickFloatingVO = new FloatingWindowVO();
+        clickFloating = createFloatingWindowDescriptor();
         if (clickWindowConfig != null) {
-            copyAllProperties(clickWindowConfig, clickFloatingVO);
+            clickFloating.setConfig(clickWindowConfig);
             clickFindImgType_Det.setValue(findImgTypeMap.get(clickWindowConfig.getFindImgTypeEnum()));
+        } else {
+            clickFloating.setConfig(new FloatingWindowConfig());
         }
-        clickFloatingVO.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
-                .setFloatingLabelText(text_saveFindImgConfig())
-                .setShowButtonText(clickDetail_showRegion())
-                .setHideButtonText(clickDetail_saveRegion())
-                .setHideButtonToolTip(tip_closeFloating())
-                .setShowButtonToolTip(tip_showRegion())
-                .setName(floatingName_click())
+        clickFloating.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
-        stopFloatingVO = new FloatingWindowVO();
+        stopFloating = createFloatingWindowDescriptor();
         if (stopWindowConfig != null) {
-            copyAllProperties(stopWindowConfig, stopFloatingVO);
+            stopFloating.setConfig(stopWindowConfig);
             stopFindImgType_Det.setValue(findImgTypeMap.get(stopWindowConfig.getFindImgTypeEnum()));
+        } else {
+            stopFloating.setConfig(new FloatingWindowConfig());
         }
-        stopFloatingVO.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+        stopFloating.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+                .setButton(stopRegion_Det);
+        // 初始化浮窗
+        createFloatingWindows(clickFloating, stopFloating);
+    }
+
+    /**
+     * 创建浮窗描初始配置
+     *
+     * @return 浮窗描初始配置
+     */
+    private FloatingWindowDescriptor createFloatingWindowDescriptor() {
+        Color textFill = settingController.colorPicker_Set.getValue();
+        return new FloatingWindowDescriptor()
                 .setFloatingLabelText(text_saveFindImgConfig())
                 .setShowButtonText(clickDetail_showRegion())
                 .setHideButtonText(clickDetail_saveRegion())
                 .setHideButtonToolTip(tip_closeFloating())
                 .setShowButtonToolTip(tip_showRegion())
                 .setName(floatingName_stop())
-                .setButton(stopRegion_Det);
-        // 初始化浮窗
-        createFloatingWindows(clickFloatingVO, stopFloatingVO);
+                .setTextFill(textFill);
     }
 
     /**
@@ -366,8 +400,8 @@ public class ClickDetailController extends RootController {
      * 移除所有监听器
      */
     private void removeAllListeners() {
-        clickFloatingVO.dispose();
-        stopFloatingVO.dispose();
+        clickFloating.dispose();
+        stopFloating.dispose();
         if (tableListener != null) {
             tableView_Det.getItems().removeListener(tableListener);
         }
@@ -622,7 +656,7 @@ public class ClickDetailController extends RootController {
         stage.setOnCloseRequest(e -> {
             CheckBox remindSave = settingController.remindClickSave_Set;
             if (remindSave != null && remindSave.isSelected()) {
-                if (isModified || stopFloatingVO.isModified() || clickFloatingVO.isModified()) {
+                if (isModified || stopFloating.isModified() || clickFloating.isModified()) {
                     ButtonType result = creatConfirmDialog(
                             confirm_unSaved(),
                             confirm_unSavedConfirm(),
@@ -668,7 +702,7 @@ public class ClickDetailController extends RootController {
      * 关闭页面
      */
     private void closeStage() {
-        hideFloatingWindow(clickFloatingVO, stopFloatingVO);
+        hideFloatingWindow(clickFloating, stopFloating);
         removeAll();
         removeAllListeners();
         if (loadImgTask != null && loadImgTask.isRunning()) {
@@ -767,11 +801,7 @@ public class ClickDetailController extends RootController {
     private void saveDetail() throws IllegalAccessException {
         clickFindImgTypeAction();
         stopFindImgTypeAction();
-        saveFloatingWindow(clickFloatingVO, stopFloatingVO);
-        FloatingWindowConfig clickFloatingConfig = new FloatingWindowConfig();
-        copyAllProperties(clickFloatingVO, clickFloatingConfig);
-        FloatingWindowConfig stopFloatingConfig = new FloatingWindowConfig();
-        copyAllProperties(stopFloatingVO, stopFloatingConfig);
+        saveFloatingWindow(clickFloating, stopFloating);
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
         String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
@@ -786,10 +816,10 @@ public class ClickDetailController extends RootController {
                 .setRandomWaitTime(randomWaitTime)
                 .setRandomClickTime(randomClickTime)
                 .setRandomTrajectory(randomTrajectory)
-                .setStopWindowConfig(stopFloatingConfig)
-                .setClickWindowConfig(clickFloatingConfig)
                 .setClickImgPath(clickImgPath_Det.getText())
                 .setRandomClickInterval(randomClickInterval)
+                .setStopWindowConfig(stopFloating.getConfig())
+                .setClickWindowConfig(clickFloating.getConfig())
                 .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))
@@ -840,14 +870,16 @@ public class ClickDetailController extends RootController {
      *
      * @param floatingVOs 浮窗设置
      */
-    private void saveFloatingWindow(FloatingWindowVO... floatingVOs) {
-        for (FloatingWindowVO floatingVO : floatingVOs) {
+    private void saveFloatingWindow(FloatingWindowDescriptor... floatingVOs) {
+        for (FloatingWindowDescriptor floatingVO : floatingVOs) {
             Stage clickStage = floatingVO.getStage();
             if (clickStage != null) {
-                floatingVO.setHeight((int) clickStage.getHeight())
+                FloatingWindowConfig config = floatingVO.getConfig()
+                        .setHeight((int) clickStage.getHeight())
                         .setWidth((int) clickStage.getWidth())
                         .setX((int) clickStage.getX())
                         .setY((int) clickStage.getY());
+                floatingVO.setConfig(config);
             }
         }
     }
@@ -996,13 +1028,17 @@ public class ClickDetailController extends RootController {
         addValueToolTip(clickFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
             clickRegion_Det.setVisible(true);
-            if (clickFloatingVO != null) {
-                clickFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+            if (clickFloating != null) {
+                FloatingWindowConfig config = clickFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                clickFloating.setConfig(config);
             }
         } else if (findImgType_all().equals(value)) {
             clickRegion_Det.setVisible(false);
-            if (clickFloatingVO != null) {
-                clickFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+            if (clickFloating != null) {
+                FloatingWindowConfig config = clickFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                clickFloating.setConfig(config);
             }
         }
     }
@@ -1016,13 +1052,17 @@ public class ClickDetailController extends RootController {
         addValueToolTip(stopFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
             stopRegion_Det.setVisible(true);
-            if (stopFloatingVO != null) {
-                stopFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+            if (stopFloating != null) {
+                FloatingWindowConfig config = stopFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                stopFloating.setConfig(config);
             }
         } else if (findImgType_all().equals(value)) {
             stopRegion_Det.setVisible(false);
-            if (stopFloatingVO != null) {
-                stopFloatingVO.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+            if (stopFloating != null) {
+                FloatingWindowConfig config = stopFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                stopFloating.setConfig(config);
             }
         }
     }
@@ -1032,14 +1072,14 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickRegionAction() {
-        Stage floatingStage = clickFloatingVO.getStage();
+        Stage floatingStage = clickFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
-                showFloatingWindow(clickFloatingVO);
+                showFloatingWindow(clickFloating);
             } else if (floatingStage.isShowing()) {
                 // 隐藏浮窗
-                hideFloatingWindow(clickFloatingVO);
+                hideFloatingWindow(clickFloating);
             }
         }
     }
@@ -1049,14 +1089,14 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void stopRegionAction() {
-        Stage floatingStage = stopFloatingVO.getStage();
+        Stage floatingStage = stopFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
-                showFloatingWindow(stopFloatingVO);
+                showFloatingWindow(stopFloating);
             } else if (floatingStage.isShowing()) {
                 // 隐藏浮窗
-                hideFloatingWindow(stopFloatingVO);
+                hideFloatingWindow(stopFloating);
             }
         }
     }

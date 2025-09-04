@@ -1,4 +1,4 @@
-package priv.koishi.pmc.CustomUI.CustomEditingCell;
+package priv.koishi.pmc.UI.CustomEditingCell;
 
 /**
  * @author KOISHI

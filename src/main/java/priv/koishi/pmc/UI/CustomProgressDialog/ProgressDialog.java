@@ -1,4 +1,4 @@
-package priv.koishi.pmc.CustomUI.CustomProgressDialog;
+package priv.koishi.pmc.UI.CustomProgressDialog;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
