@@ -638,7 +638,7 @@ public class ClickDetailController extends RootController {
     /**
      * 读取配置文件
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
@@ -768,7 +768,7 @@ public class ClickDetailController extends RootController {
     /**
      * 页面初始化
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     @FXML
     private void initialize() throws IOException {

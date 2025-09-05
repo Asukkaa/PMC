@@ -121,7 +121,7 @@ public class TimedTaskController extends RootController {
     /**
      * 加载默认设置
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();

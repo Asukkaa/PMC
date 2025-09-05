@@ -185,7 +185,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 保存设置功能最后设置
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_Set != null) {
@@ -234,7 +234,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 保存JVM参数设置
      *
-     * @throws IOException io异常
+     * @throws IOException cfg配置文件读取或写入异常
      */
     private void saveJVMConfig() throws IOException {
         String nextRunMemoryValue = nextRunMemory_Set.getText();
@@ -269,7 +269,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 初始化浮窗
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     private void initFloatingWindow() throws IOException {
         clickFloating = createFloatingWindowDescriptor()
@@ -311,6 +311,8 @@ public class SettingController extends RootController implements MousePositionUp
 
     /**
      * 为组件加载上次设置信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     private void loadControlLastConfig() throws IOException {
         Properties prop = new Properties();
@@ -381,7 +383,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 读取浮窗配置文件
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     public static void loadFloatingWindowConfig() throws IOException {
         Properties prop = new Properties();
@@ -603,7 +605,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 获取JVM设置并展示
      *
-     * @throws IOException io异常
+     * @throws IOException cfg配置文件读取异常
      */
     private void getJVMConfig() throws IOException {
         // 获取当前运行路径
@@ -721,7 +723,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 界面初始化
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常、配置文件读取异常
      */
     @FXML
     private void initialize() throws IOException {
@@ -764,7 +766,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 自动操作工具功能加载上次设置信息
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadAutoClickAction() throws IOException {
@@ -774,7 +776,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 操作步骤详情页修改后未保存提示
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadClickRemindSaveAction() throws IOException {
@@ -784,7 +786,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 定时任务详情页修改后未保存提示
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadTaskRemindSaveAction() throws IOException {
@@ -794,7 +796,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 关闭程序时自动保存列表操作步骤
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadAutoSaveAction() throws IOException {
@@ -804,7 +806,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 记住关闭前打开的页面设置
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadLastTabAction() throws IOException {
@@ -814,7 +816,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 记住窗口是否全屏设置
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadFullWindowAction() throws IOException {
@@ -824,7 +826,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 记住窗口是否最大化设置
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadMaxWindowAction() throws IOException {
@@ -834,7 +836,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 执行自动流程前最小化本程序
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadHideWindowRunAction() throws IOException {
@@ -844,7 +846,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 执行自动流程结束后弹出本程序
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadShowWindowRunAction() throws IOException {
@@ -854,7 +856,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 录制自动流程前最小化本程序
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadHideWindowRecordAction() throws IOException {
@@ -864,7 +866,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 录制自动流程结束后弹出本程序
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadShowWindowRecordAction() throws IOException {
@@ -874,7 +876,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 执行自动流程前点击第一个起始坐标
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadFirstClickAction() throws IOException {
@@ -884,7 +886,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 执行自动流程时显示信息浮窗
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadFloatingRunAction() throws IOException {
@@ -894,7 +896,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 录制自动流程时显示信息浮窗
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadFloatingRecordAction() throws IOException {
@@ -904,7 +906,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 监听并保存浮窗字体颜色
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void colorAction() throws IOException {
@@ -914,7 +916,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时信息浮窗跟随鼠标
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadMouseFloatingRunAction() throws IOException {
@@ -924,7 +926,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 录制自动流程时信息浮窗跟随鼠标
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadMouseFloatingRecordAction() throws IOException {
@@ -934,7 +936,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 录制时记录拖鼠标拽轨迹
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void recordDrag() throws IOException {
@@ -944,7 +946,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 录制时记录鼠标移动轨迹
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void recordMove() throws IOException {
@@ -954,7 +956,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行时启用随机点击坐标偏移
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void randomClick() throws IOException {
@@ -964,7 +966,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行时启用随机轨迹坐标偏移
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void randomTrajectory() throws IOException {
@@ -974,7 +976,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行时启用随机点击时长偏移
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void randomClickTime() throws IOException {
@@ -984,7 +986,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行时启用随机操作间隔时间偏移
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void randomClickInterval() throws IOException {
@@ -994,7 +996,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行时启用随机操作执行前等待时间偏移
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void randomWaitTime() throws IOException {
@@ -1004,7 +1006,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录点击信息
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void clickLog() throws IOException {
@@ -1014,7 +1016,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录移动轨迹
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void moveLog() throws IOException {
@@ -1024,7 +1026,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录拖拽轨迹
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void dragLog() throws IOException {
@@ -1034,7 +1036,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录目标图像识别信息
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void clickImgLog() throws IOException {
@@ -1044,7 +1046,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录终止图像识别信息
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void stopImgLog() throws IOException {
@@ -1054,7 +1056,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录详细的图像识别信息
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void imgLog() throws IOException {
@@ -1064,7 +1066,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 运行自动流程时记录等待信息
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void waitLog() throws IOException {
@@ -1074,7 +1076,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 显示浮窗位置时信息浮窗跟随鼠标
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void mouseFloatingAction() throws IOException {
@@ -1125,7 +1127,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 重启程序按钮
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常、重启执行失败
      */
     @FXML
     private void reLaunch() throws IOException {

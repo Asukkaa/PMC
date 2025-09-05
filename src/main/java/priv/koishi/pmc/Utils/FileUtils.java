@@ -104,7 +104,7 @@ public class FileUtils {
      * @param properties 要更新的配置文件
      * @param key        要更新的配置名
      * @param value      要更新的值
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public static void updateProperties(String properties, String key, String value) throws IOException {
         InputStream input = checkRunningInputStream(properties);
@@ -243,7 +243,7 @@ public class FileUtils {
      *
      * @param path 输入流路径
      * @return 根据不同运行环境创建的输入流
-     * @throws IOException io异常
+     * @throws IOException 文件读取异常
      */
     public static InputStream checkRunningInputStream(String path) throws IOException {
         InputStream input;
@@ -260,7 +260,7 @@ public class FileUtils {
      *
      * @param path 输出流路径
      * @return 根据不同运行环境创建的输出流
-     * @throws IOException io异常
+     * @throws IOException 文件保存异常
      */
     public static OutputStream checkRunningOutputStream(String path) throws IOException {
         OutputStream output;
@@ -494,7 +494,7 @@ public class FileUtils {
      *
      * @param optionKeys 要查询的jvm参数key
      * @return jvm参数key与对应的参数右侧的值
-     * @throws IOException 配置文件读取异常
+     * @throws IOException cfg配置文件读取异常
      */
     public static Map<String, String> getJavaOptionValue(List<String> optionKeys) throws IOException {
         Map<String, String> jvmOptions = new HashMap<>();
@@ -525,7 +525,7 @@ public class FileUtils {
      * 更新cfg文件中jvm参数设置
      *
      * @param options 要修改的jvm参数键值对
-     * @throws IOException 配置文件读取或写入异常
+     * @throws IOException cfg配置文件读取或写入异常
      */
     public static void setJavaOptionValue(Map<String, String> options) throws IOException {
         Path configPath = Path.of(cfgFilePath);
@@ -671,7 +671,7 @@ public class FileUtils {
      *
      * @param zipIn zip输入流
      * @param file  zip内的文件
-     * @throws IOException io异常
+     * @throws IOException 读取zip文件时异常
      */
     private static void extractFile(ZipInputStream zipIn, File file) throws IOException {
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
@@ -687,7 +687,7 @@ public class FileUtils {
      * 递归删除目录
      *
      * @param path 要删除的目录
-     * @throws IOException 删除目录时发生IO异常
+     * @throws IOException 删除目录异常
      */
     public static void deleteDirectoryRecursively(Path path) throws IOException {
         if (Files.exists(path)) {
@@ -899,7 +899,7 @@ public class FileUtils {
      *
      * @param file 要读取的文件
      * @return 格式化后的时间字符串
-     * @throws IOException io异常
+     * @throws IOException 文件创建时间读取异常
      */
     public static String getFileCreatTime(File file) throws IOException {
         Path path = Paths.get(file.getPath());

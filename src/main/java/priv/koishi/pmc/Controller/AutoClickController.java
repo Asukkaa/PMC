@@ -410,7 +410,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 保存最后一次配置的值
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_Click != null) {
@@ -443,7 +443,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 自动保存操作流程
      *
      * @param autoSave 自动保存开关
-     * @throws IOException io异常
+     * @throws IOException pmc文件保存异常
      */
     private void autoSave(CheckBox autoSave, String outPath) throws IOException {
         if (autoSave.isSelected()) {
@@ -465,7 +465,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 设置初始配置值为上次配置值
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     private void setLastConfig() throws IOException {
         Properties prop = new Properties();
@@ -490,7 +490,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 读取配置文件
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     private void getProperties() throws IOException {
         Properties prop = new Properties();
@@ -668,7 +668,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 显示浮窗
      *
      * @param isRun 是否为运行自动操作
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     private void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
@@ -719,7 +719,7 @@ public class AutoClickController extends RootController implements MousePosition
      *
      * @param clickPositionVOS 自动操作流程
      * @param loopTimes        循环次数
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
         if (isFree()) {
@@ -1765,6 +1765,8 @@ public class AutoClickController extends RootController implements MousePosition
 
     /**
      * 获取选择的文件
+     *
+     * @throws IOException 配置文件保存异常
      */
     private void getSelectFile(List<? extends File> selectedFile) throws IOException {
         if (CollectionUtils.isNotEmpty(selectedFile)) {
@@ -1866,7 +1868,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 导入操作流程按钮
      *
      * @param actionEvent 点击事件
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常、配置文件保存异常、页面加载失败
      */
     @FXML
     public void loadAutoClick(ActionEvent actionEvent) throws IOException {
@@ -1938,7 +1940,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 设置操作流程导出文件夹地址按钮
      *
      * @param actionEvent 点击事件
-     * @throws IOException io异常
+     * @throws IOException 配置文件读取异常、配置文件保存异常
      */
     @FXML
     private void addOutPath(ActionEvent actionEvent) throws IOException {
@@ -1988,6 +1990,8 @@ public class AutoClickController extends RootController implements MousePosition
 
     /**
      * 查看运行记录
+     *
+     * @throws IOException 页面加载失败
      */
     @FXML
     private void clickLog() throws IOException {

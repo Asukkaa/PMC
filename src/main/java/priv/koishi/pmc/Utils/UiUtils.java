@@ -881,7 +881,7 @@ public class UiUtils {
      * @param pathLabel        要展示路径的文本框
      * @param configFile       要更新的配置文件
      * @return 所选文件路径
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public static String updatePathLabel(String selectedFilePath, String filePath, String pathKey, Label pathLabel, String configFile) throws IOException {
         // 只有跟上次选的路径不一样才更新
@@ -1164,7 +1164,6 @@ public class UiUtils {
      * 打开所选文件选项
      *
      * @param tableView 文件列表
-     * @throws RuntimeException io异常
      */
     private static void openFileMenuItem(TableView<ImgFileVO> tableView) {
         List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
@@ -1175,7 +1174,6 @@ public class UiUtils {
      * 打开所选文件所在文件夹选项
      *
      * @param tableView 要添加右键菜单的列表
-     * @throws RuntimeException io异常
      */
     private static void openDirectorMenuItem(TableView<ImgFileVO> tableView) {
         List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
@@ -1624,7 +1622,6 @@ public class UiUtils {
      * @param pathLabel 文件路径文本栏
      * @param path      文件路径
      * @return 要展示路径的文件
-     * @throws RuntimeException io异常
      */
     public static File setPathLabel(Label pathLabel, String path) {
         pathLabel.setText(path);
@@ -1682,7 +1679,6 @@ public class UiUtils {
      * 给路径Label设置右键菜单
      *
      * @param valueLabel 要处理的文本栏
-     * @throws RuntimeException io异常
      */
     public static void setPathLabelContextMenu(Label valueLabel) {
         String path = valueLabel.getText();
@@ -1775,7 +1771,7 @@ public class UiUtils {
      * @param checkBox   更改配置的选项框
      * @param configFile 要更新的配置文件相对路径
      * @param key        要更新的配置
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public static void setLoadLastConfigCheckBox(CheckBox checkBox, String configFile, String key) throws IOException {
         if (checkBox.isSelected()) {
@@ -2008,7 +2004,7 @@ public class UiUtils {
      * 向列表添加文件并根据文件路径去重
      *
      * @param files 文件列表
-     * @throws IOException io异常
+     * @throws IOException 获取文件属性异常、文件创建时间读取异常
      */
     public static void addRemoveSameFile(List<? extends File> files, boolean isAllDirectory, TableView<FileVO> tableView) throws IOException {
         if (CollectionUtils.isNotEmpty(files)) {
@@ -2034,7 +2030,7 @@ public class UiUtils {
      * @param tableView 列表对象
      * @param file      文件对象
      * @return 文件对象
-     * @throws IOException io异常
+     * @throws IOException 文件创建时间读取异常
      */
     public static FileVO creatFileVo(TableView<FileVO> tableView, File file) throws IOException {
         String showStatus = file.isHidden() ? text_hidden() : text_unhidden();
@@ -2102,7 +2098,7 @@ public class UiUtils {
      *
      * @param fileChooserConfig 文件查询配置
      * @return 文件选择器控制器
-     * @throws IOException io异常
+     * @throws IOException 页面加载失败、配置文件读取异常
      */
     public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
         URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");

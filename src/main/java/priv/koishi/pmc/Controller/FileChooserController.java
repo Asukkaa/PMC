@@ -276,9 +276,8 @@ public class FileChooserController extends RootController {
      * 双击列表数据进入点击的目录
      *
      * @param fileVO 列表数据
-     * @throws IOException io异常
      */
-    private void handleFileDoubleClick(FileVO fileVO) throws IOException {
+    private void handleFileDoubleClick(FileVO fileVO) {
         if (fileVO != null) {
             // 双击文件夹时进入下级目录
             if (new File(fileVO.getPath()).isDirectory()) {
@@ -329,7 +328,6 @@ public class FileChooserController extends RootController {
      * 打开所选文件选项
      *
      * @param tableView 文件列表
-     * @throws RuntimeException io异常
      */
     private static void openFileMenuItem(TableView<FileVO> tableView) {
         List<FileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
@@ -340,7 +338,6 @@ public class FileChooserController extends RootController {
      * 打开所选文件所在文件夹选项
      *
      * @param tableView 要添加右键菜单的列表
-     * @throws RuntimeException io异常
      */
     private static void openDirectorMenuItem(TableView<FileVO> tableView) {
         List<FileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
@@ -386,11 +383,7 @@ public class FileChooserController extends RootController {
         MenuItem selectPathItem = new MenuItem(text_checkFirstFile());
         selectPathItem.setOnAction(event -> {
             FileVO selectedItem = tableView.getSelectionModel().getSelectedItems().getFirst();
-            try {
-                handleFileDoubleClick(selectedItem);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            handleFileDoubleClick(selectedItem);
         });
         contextMenu.getItems().add(selectPathItem);
     }
@@ -426,11 +419,7 @@ public class FileChooserController extends RootController {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && !row.isEmpty()) {
                     FileVO selectedFileVO = row.getItem();
-                    try {
-                        handleFileDoubleClick(selectedFileVO);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    handleFileDoubleClick(selectedFileVO);
                 }
             });
             // 更新行样式方法
@@ -602,7 +591,7 @@ public class FileChooserController extends RootController {
     /**
      * 确认选择的文件按钮
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void confirmSelect() throws IOException {

@@ -17,7 +17,7 @@ public interface FileChooserCallback {
      * 文件选择回调
      *
      * @param selectedItems 选择的文件列表
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     void onFileChooser(List<File> selectedItems) throws IOException;
 

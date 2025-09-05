@@ -83,7 +83,7 @@ public class MainController extends RootController {
     /**
      * 保存各个功能最后一次设置值
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public void saveAllLastConfig() throws IOException {
         // 保存自动操作工具功能最后设置
@@ -105,7 +105,7 @@ public class MainController extends RootController {
     /**
      * 保存关程序闭前页面状态
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     private void saveLastConfig() throws IOException {
         InputStream input = checkRunningInputStream(configFile);

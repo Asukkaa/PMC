@@ -100,7 +100,7 @@ public class MainApplication extends Application {
      * 加载fxml页面
      *
      * @param stage 程序主舞台
-     * @throws IOException io异常、设置全局异常处理器异常
+     * @throws IOException 配置文件读取异常、设置全局异常处理器异常
      */
     @Override
     public void start(Stage stage) throws IOException {
@@ -174,7 +174,7 @@ public class MainApplication extends Application {
     /**
      * 程序停止时保存设置并关闭资源
      *
-     * @throws IOException io异常、钩子异常、线程池关闭异常
+     * @throws IOException 配置文件保存异常、钩子异常、线程池关闭异常
      */
     @Override
     public void stop() throws Exception {
@@ -387,7 +387,7 @@ public class MainApplication extends Application {
      * 启动程序
      *
      * @param args 启动参数
-     * @throws IOException io异常
+     * @throws IOException log4j日志配置文件读取异常、应用配置文件读取异常
      */
     public static void main(String[] args) throws IOException {
         MainApplication.args = args;

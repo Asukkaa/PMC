@@ -501,6 +501,7 @@ public class FloatingWindow {
      * 保存浮窗设置
      *
      * @param floatingWindow 浮窗设置
+     * @throws IOException 配置文件保存异常
      */
     private static void saveFloatingCoordinate(FloatingWindowDescriptor floatingWindow) throws IOException {
         FloatingWindowConfig config = floatingWindow.getConfig();

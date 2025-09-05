@@ -100,7 +100,7 @@ public class AboutController extends RootController {
     /**
      * 读取配置文件
      *
-     * @throws IOException io异常
+     * @throws IOException 日志文件配置读取异常
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
@@ -124,7 +124,7 @@ public class AboutController extends RootController {
     /**
      * 保存日志问文件数量设置
      *
-     * @throws IOException io异常
+     * @throws IOException 配置文件保存异常
      */
     public void saveLastConfig() throws IOException {
         InputStream input = checkRunningInputStream(configFile);
@@ -219,7 +219,7 @@ public class AboutController extends RootController {
     /**
      * 界面初始化
      *
-     * @throws IOException io异常
+     * @throws IOException 日志文件配置读取异常
      */
     @FXML
     private void initialize() throws IOException {
