@@ -289,7 +289,7 @@ public class i18nFinal {
     /**
      * @return 点击后将会展示浮窗位置，之后按下 esc 可关闭浮窗
      */
-    public static String tip_setFloatingCoordinate() {
+    public static String tip_massageRegion() {
         return bundle.getString("tip.setFloatingCoordinate");
     }
 
@@ -308,7 +308,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击后将会关闭浮窗并保存浮窗位置
+     * @return 点击后将会保存并关闭浮窗设置
      */
     public static String tip_saveFloating() {
         return bundle.getString("tip.saveFloating");
@@ -1041,7 +1041,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 关闭并保存浮窗位置
+     * @return 保存并关闭浮窗设置
      */
     public static String text_saveCloseFloating() {
         return bundle.getString("saveCloseFloating");
@@ -1591,6 +1591,13 @@ public class i18nFinal {
      */
     public static String floatingName_stop() {
         return bundle.getString("floatingName.stop");
+    }
+
+    /**
+     * @return 终止操作图像识别区域
+     */
+    public static String floatingName_massage() {
+        return bundle.getString("floatingName.massage");
     }
 
     /**

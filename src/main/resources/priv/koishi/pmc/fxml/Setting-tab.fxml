@@ -262,8 +262,8 @@
 
         <HBox spacing="10">
             <HBox styleClass="hBox-medium">
-                <Button fx:id="setFloatingCoordinate_Set" onAction="#setFloatingCoordinate"
-                        style="-fx-cursor: hand" text="%setting.setFloatingCoordinate_Set"/>
+                <Button fx:id="massageRegion_Set" onAction="#massageRegionAction"
+                        style="-fx-cursor: hand" text="%setting.massageRegion_Set"/>
             </HBox>
 
             <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction"
@@ -311,6 +311,14 @@
                 <TextField fx:id="clickRetryNum_Set" prefWidth="80"/>
                 <Label prefHeight="25" text="%unit.times"/>
             </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="%clickDetail.findImgType"/>
+                <ChoiceBox fx:id="clickFindImgType_Set" prefWidth="150" style="-fx-cursor: hand"
+                           onAction="#clickFindImgTypeAction"/>
+                <Button visible="false" fx:id="clickRegion_Set" text="%clickDetail.showRegion"
+                        style="-fx-cursor: hand" onAction="#clickRegionAction"/>
+            </HBox>
         </HBox>
 
         <HBox spacing="10">
@@ -325,6 +333,14 @@
                 <Label prefHeight="25" text="%setting.stopRetryNum"/>
                 <TextField fx:id="stopRetryNum_Set" prefWidth="80"/>
                 <Label prefHeight="25" text="%unit.times"/>
+            </HBox>
+
+            <HBox spacing="5">
+                <Label prefHeight="25" text="%clickDetail.findImgType"/>
+                <ChoiceBox fx:id="stopFindImgType_Set" prefWidth="150" style="-fx-cursor: hand"
+                           onAction="#stopFindImgTypeAction"/>
+                <Button visible="false" fx:id="stopRegion_Set" text="%clickDetail.showRegion"
+                        style="-fx-cursor: hand" onAction="#stopRegionAction"/>
             </HBox>
         </HBox>
 

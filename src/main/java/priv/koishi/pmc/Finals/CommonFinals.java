@@ -527,6 +527,16 @@ public class CommonFinals {
     public static final String defaultFloatingY = "0";
 
     /**
+     * 默认要点击的图像识别类型枚举
+     */
+    public static final String defaultClickFindImgType = "0";
+
+    /**
+     * 默认终止操作图像识别类型枚举
+     */
+    public static final String defaultStopFindImgType = "0";
+
+    /**
      * 默认日志窗口宽度
      */
     public static final String defaultLogWidth = "1000";
@@ -668,9 +678,33 @@ public class CommonFinals {
 
     public static final String key_logHeight = "logHeight";
 
-    public static final String key_floatingX = "floatingX";
+    public static final String key_massageX = "massageX";
 
-    public static final String key_floatingY = "floatingY";
+    public static final String key_massageY = "massageY";
+
+    public static final String key_massageWidth = "massageWidth";
+
+    public static final String key_massageHeight = "massageHeight";
+
+    public static final String key_stopX = "stopX";
+
+    public static final String key_stopY = "stopY";
+
+    public static final String key_stopWidth = "stopWidth";
+
+    public static final String key_stopHeight = "stopHeight";
+
+    public static final String key_clickX = "clickX";
+
+    public static final String key_clickY = "clickY";
+
+    public static final String key_clickWidth = "clickWidth";
+
+    public static final String key_clickHeight = "clickHeight";
+
+    public static final String key_stopFindImgType = "stopFindImgType";
+
+    public static final String key_clickFindImgType = "clickFindImgType";
 
     public static final String key_margin = "margin";
 
@@ -697,10 +731,6 @@ public class CommonFinals {
     public static final String key_offsetX = "offsetX";
 
     public static final String key_offsetY = "offsetY";
-
-    public static final String key_floatingWidth = "floatingWidth";
-
-    public static final String key_floatingHeight = "floatingHeight";
 
     public static final String key_autoSave = "autoSave";
 

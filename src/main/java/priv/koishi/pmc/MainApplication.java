@@ -31,6 +31,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
+import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -450,6 +451,8 @@ public class MainApplication extends Application {
         }
         // 启动激活监听服务
         startActivationServer(port);
+        // 获取屏幕参数
+        refreshScreenParameters();
         launch(args);
     }
 

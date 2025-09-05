@@ -47,7 +47,7 @@ public class FloatingWindowDescriptor {
     /**
      * 信窗信息展示栏
      */
-    Label floatingLabel;
+    Label massageLabel;
 
     /**
      * 浮窗坐标展示栏
@@ -67,7 +67,7 @@ public class FloatingWindowDescriptor {
     /**
      * 信窗信息展示栏文本
      */
-    String floatingLabelText;
+    String massage;
 
     /**
      * 显示浮窗按钮文本
@@ -113,6 +113,51 @@ public class FloatingWindowDescriptor {
      * 浮窗文本颜色
      */
     Color textFill;
+
+    /**
+     * 浮窗离屏幕边界距离
+     */
+    int margin;
+
+    /**
+     * 浮窗文本大小
+     */
+    int fontSize;
+
+    /**
+     * 浮窗透明度
+     */
+    double opacity;
+
+    /**
+     * 浮窗是否可透明（true 透明）
+     */
+    boolean transparent;
+
+    /**
+     * 保存设置时浮窗横坐标key
+     */
+    String xKey;
+
+    /**
+     * 保存设置时浮窗纵坐标key
+     */
+    String yKey;
+
+    /**
+     * 浮窗保存设置时宽度key
+     */
+    String widthKey;
+
+    /**
+     * 浮窗保存设置时高度key
+     */
+    String heightKey;
+
+    /**
+     * 浮窗保存设置时配置文件路径
+     */
+    String configFile;
 
     /**
      * 销毁浮窗

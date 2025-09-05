@@ -330,6 +330,7 @@ public class ClickDetailController extends RootController {
             clickFloating.setConfig(new FloatingWindowConfig());
         }
         clickFloating.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
+                .setName(floatingName_click())
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
         stopFloating = createFloatingWindowDescriptor();
@@ -340,6 +341,7 @@ public class ClickDetailController extends RootController {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
         stopFloating.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+                .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
         createFloatingWindows(clickFloating, stopFloating);
@@ -353,13 +355,14 @@ public class ClickDetailController extends RootController {
     private FloatingWindowDescriptor createFloatingWindowDescriptor() {
         Color textFill = settingController.colorPicker_Set.getValue();
         return new FloatingWindowDescriptor()
-                .setFloatingLabelText(text_saveFindImgConfig())
+                .setHideButtonToolTip(text_saveCloseFloating())
                 .setShowButtonText(clickDetail_showRegion())
                 .setHideButtonText(clickDetail_saveRegion())
-                .setHideButtonToolTip(tip_closeFloating())
                 .setShowButtonToolTip(tip_showRegion())
-                .setName(floatingName_stop())
-                .setTextFill(textFill);
+                .setMassage(text_saveFindImgConfig())
+                .setTextFill(textFill)
+                .setFontSize(18)
+                .setOpacity(0.5);
     }
 
     /**

@@ -1,39 +1,36 @@
 package priv.koishi.pmc.Controller;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
+import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.awt.*;
 import java.io.File;
@@ -51,8 +48,10 @@ import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -67,24 +66,14 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class SettingController extends RootController implements MousePositionUpdater {
 
     /**
-     * 浮窗X坐标
+     * 信息浮窗跟随鼠标前X坐标
      */
-    private int floatingX;
+    private int lastX;
 
     /**
-     * 浮窗Y坐标
+     * 信息浮窗跟随鼠标前Y坐标
      */
-    private int floatingY;
-
-    /**
-     * 浮窗宽度
-     */
-    private int floatingWidth;
-
-    /**
-     * 浮窗高度
-     */
-    private int floatingHeight;
+    private int lastY;
 
     /**
      * 页面标识符
@@ -97,34 +86,24 @@ public class SettingController extends RootController implements MousePositionUp
     private boolean initializedFinished;
 
     /**
-     * 全局键盘监听器
-     */
-    private NativeKeyListener nativeKeyListener;
-
-    /**
      * 要防重复点击的组件
      */
     private final List<Node> disableNodes = new ArrayList<>();
 
     /**
-     * 浮窗所在矩形
+     * 要点击的图像识别区域设置
      */
-    private Rectangle rectangle;
+    public static FloatingWindowDescriptor clickFloating;
 
     /**
-     * 浮窗Stage
+     * 终止操作图像识别区域设置
      */
-    private Stage floatingStage;
+    public static FloatingWindowDescriptor stopFloating;
 
     /**
-     * 信息浮窗信息展示栏
+     * 信息浮窗设置
      */
-    private Label floatingLabel;
-
-    /**
-     * 信息浮窗坐标展示栏
-     */
-    private Label floatingPosition;
+    public static FloatingWindowDescriptor massageFloating;
 
     @FXML
     public AnchorPane anchorPane_Set;
@@ -139,13 +118,14 @@ public class SettingController extends RootController implements MousePositionUp
     public ColorPicker colorPicker_Set;
 
     @FXML
-    public ChoiceBox<String> nextGcType_Set, language_Set;
-
-    @FXML
     public Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
 
     @FXML
-    public Button setFloatingCoordinate_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set;
+    public ChoiceBox<String> nextGcType_Set, language_Set, clickFindImgType_Set, stopFindImgType_Set;
+
+    @FXML
+    public Button massageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set,
+            stopRegion_Set;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set;
@@ -212,22 +192,24 @@ public class SettingController extends RootController implements MousePositionUp
             InputStream input = checkRunningInputStream(configFile_Click);
             Properties prop = new Properties();
             prop.load(input);
-            prop.put(key_margin, floatingDistance_Set.getText());
-            prop.put(key_opacity, String.valueOf(opacity_Set.getValue()));
-            prop.put(key_clickOpacity, String.valueOf(clickOpacity_Set.getValue()));
-            prop.put(key_stopOpacity, String.valueOf(stopOpacity_Set.getValue()));
-            prop.put(key_defaultClickRetryNum, clickRetryNum_Set.getText());
-            prop.put(key_defaultStopRetryNum, stopRetryNum_Set.getText());
-            prop.put(key_retrySecond, retrySecond_Set.getText());
-            prop.put(key_overtime, overtime_Set.getText());
-            prop.put(key_sampleInterval, sampleInterval_Set.getText());
-            prop.put(key_randomClickX, randomClickX_Set.getText());
-            prop.put(key_randomClickY, randomClickY_Set.getText());
-            prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
-            prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
-            prop.put(key_maxLogNum, maxLogNum_Set.getText());
             prop.put(key_offsetX, offsetX_Set.getText());
             prop.put(key_offsetY, offsetY_Set.getText());
+            prop.put(key_overtime, overtime_Set.getText());
+            prop.put(key_maxLogNum, maxLogNum_Set.getText());
+            prop.put(key_margin, floatingDistance_Set.getText());
+            prop.put(key_retrySecond, retrySecond_Set.getText());
+            prop.put(key_randomClickX, randomClickX_Set.getText());
+            prop.put(key_randomClickY, randomClickY_Set.getText());
+            prop.put(key_sampleInterval, sampleInterval_Set.getText());
+            prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
+            prop.put(key_defaultStopRetryNum, stopRetryNum_Set.getText());
+            prop.put(key_opacity, String.valueOf(opacity_Set.getValue()));
+            prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
+            prop.put(key_defaultClickRetryNum, clickRetryNum_Set.getText());
+            prop.put(key_stopOpacity, String.valueOf(stopOpacity_Set.getValue()));
+            prop.put(key_clickOpacity, String.valueOf(clickOpacity_Set.getValue()));
+            prop.put(key_stopFindImgType, findImgTypeMap.getKey(stopFindImgType_Set.getValue()).toString());
+            prop.put(key_clickFindImgType, findImgTypeMap.getKey(clickFindImgType_Set.getValue()).toString());
             List<ImgFileVO> list = tableView_Set.getItems();
             int index = 0;
             while (index < 10) {
@@ -266,150 +248,65 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 创建浮窗描初始配置
+     *
+     * @return 浮窗描初始配置
+     */
+    private FloatingWindowDescriptor createFloatingWindowDescriptor() {
+        return new FloatingWindowDescriptor()
+                .setDisableNodes(new ArrayList<>(disableNodes))
+                .setShowButtonText(clickDetail_showRegion())
+                .setHideButtonText(clickDetail_saveRegion())
+                .setHideButtonToolTip(tip_saveFloating())
+                .setTextFill(colorPicker_Set.getValue())
+                .setShowButtonToolTip(tip_showRegion())
+                .setMassage(text_saveFindImgConfig())
+                .setConfigFile(configFile_Click)
+                .setFontSize(18)
+                .setOpacity(0.5);
+    }
+
+    /**
      * 初始化浮窗
+     *
+     * @throws IOException io异常
      */
-    private void initFloatingWindow() {
-        // 创建一个矩形作为浮窗的内容
-        rectangle = new Rectangle(floatingWidth, floatingHeight);
-        // 描边设置
-        rectangle.setStroke(new Color(0, 0, 0, 1.0));
-        // 设置透明度
-        rectangle.setFill(new Color(0, 0, 0, 0.5));
-        StackPane root = new StackPane();
-        root.setBackground(Background.EMPTY);
+    private void initFloatingWindow() throws IOException {
+        clickFloating = createFloatingWindowDescriptor()
+                .setName(floatingName_click())
+                .setHeightKey(key_clickHeight)
+                .setWidthKey(key_clickWidth)
+                .setButton(clickRegion_Set)
+                .setXKey(key_clickX)
+                .setYKey(key_clickY);
+        clickFloating.getDisableNodes().add(clickFindImgType_Set);
+        stopFloating = createFloatingWindowDescriptor()
+                .setName(floatingName_stop())
+                .setHeightKey(key_stopHeight)
+                .setWidthKey(key_stopWidth)
+                .setButton(stopRegion_Set)
+                .setXKey(key_stopX)
+                .setYKey(key_stopY);
+        stopFloating.getDisableNodes().add(stopFindImgType_Set);
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
-        // 添加拖拽事件处理器
-        double[] xOffset = new double[1];
-        double[] yOffset = new double[1];
-        root.setOnMousePressed(event -> {
-            // 记录鼠标按下时的初始偏移量
-            xOffset[0] = event.getSceneX();
-            yOffset[0] = event.getSceneY();
-        });
-        root.setOnMouseDragged(event -> {
-            // 获取当前所在屏幕
-            Screen currentScreen = getCurrentScreen(floatingStage);
-            Rectangle2D screenBounds = currentScreen.getBounds();
-            // 计算新坐标
-            double newX = event.getScreenX() - xOffset[0];
-            double newY = event.getScreenY() - yOffset[0];
-            // 边界约束
-            newX = Math.max(screenBounds.getMinX() + margin, Math.min(newX, screenBounds.getMaxX() - floatingWidth - margin));
-            newY = Math.max(screenBounds.getMinY() + margin, Math.min(newY, screenBounds.getMaxY() - floatingHeight - margin));
-            int x = (int) newX;
-            int y = (int) newY;
-            // 应用限制后的坐标
-            floatingStage.setX(x);
-            floatingStage.setY(y);
-            String point = " X: " + x + " Y: " + y;
-            floatingPosition.setText(point);
-        });
-        Color labelTextFill = Color.WHITE;
-        floatingLabel = new Label(text_saveFloatingCoordinate());
-        floatingLabel.setTextFill(labelTextFill);
-        String fontSize = "-fx-font-size: 18px;";
-        floatingLabel.setStyle(fontSize);
-        floatingPosition = new Label();
-        floatingPosition.setTextFill(labelTextFill);
-        floatingPosition.setStyle(fontSize);
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(floatingPosition, floatingLabel);
-        root.getChildren().addAll(rectangle, vBox);
-        Scene scene = new Scene(root, Color.TRANSPARENT);
-        floatingStage = new Stage();
-        // 设置透明样式
-        floatingStage.initStyle(StageStyle.TRANSPARENT);
-        // 设置始终置顶
-        floatingStage.setAlwaysOnTop(true);
-        floatingStage.setScene(scene);
-    }
-
-    /**
-     * 显示浮窗
-     */
-    private void showFloatingWindow() {
-        Platform.runLater(() -> {
-            Color color = colorPicker_Set.getValue();
-            floatingLabel.setTextFill(color);
-            floatingPosition.setTextFill(color);
-            floatingStage.setX(floatingX);
-            floatingStage.setY(floatingY);
-            String point = " X: " + floatingX + " Y: " + floatingY;
-            floatingPosition.setText(point);
-            double opacity = opacity_Set.getValue();
-            if (opacity == 0) {
-                rectangle.setFill(new Color(0, 0, 0, 0.01));
-            } else {
-                rectangle.setFill(new Color(0, 0, 0, opacity));
-            }
-            // 改变要防重复点击的组件状态
-            changeDisableNodes(disableNodes, true);
-            if (mouseFloating_Set.isSelected()) {
-                floatingLabel.setText(text_escCloseFloating());
-                setFloatingCoordinate_Set.setText(text_closeFloating());
-                addToolTip(tip_closeFloating(), setFloatingCoordinate_Set);
-            } else {
-                floatingLabel.setText(text_saveFloatingCoordinate());
-                setFloatingCoordinate_Set.setText(text_saveCloseFloating());
-                addToolTip(tip_saveFloating(), setFloatingCoordinate_Set);
-            }
-            floatingStage.show();
-            // 监听键盘事件
-            startNativeKeyListener();
-        });
-    }
-
-    /**
-     * 隐藏浮窗
-     */
-    private void hideFloatingWindow() {
-        Platform.runLater(() -> {
-            if (!mouseFloating_Set.isSelected()) {
-                try {
-                    saveFloatingCoordinate();
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            floatingStage.hide();
-            setFloatingCoordinate_Set.setText(text_showFloating());
-            addToolTip(tip_setFloatingCoordinate(), setFloatingCoordinate_Set);
-            // 改变要防重复点击的组件状态
-            changeDisableNodes(disableNodes, false);
-            removeNativeListener(nativeKeyListener);
-        });
-    }
-
-    /**
-     * 开启全局键盘监听
-     */
-    private void startNativeKeyListener() {
-        removeNativeListener(nativeKeyListener);
-        // 键盘监听器
-        nativeKeyListener = new NativeKeyListener() {
-            @Override
-            public void nativeKeyPressed(NativeKeyEvent e) {
-                Platform.runLater(() -> {
-                    if (floatingStage != null && floatingStage.isShowing()) {
-                        // 检测快捷键 esc
-                        if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-                            hideFloatingWindow();
-                        }
-                    }
-                });
-            }
-        };
-        GlobalScreen.addNativeKeyListener(nativeKeyListener);
-    }
-
-    /**
-     * 保存浮窗位置
-     */
-    private void saveFloatingCoordinate() throws IOException {
-        floatingX = (int) floatingStage.getX();
-        floatingY = (int) floatingStage.getY();
-        updateProperties(configFile_Click, key_floatingX, String.valueOf(floatingX));
-        updateProperties(configFile_Click, key_floatingY, String.valueOf(floatingY));
+        String hideButtonText = mouseFloating_Set.isSelected() ? text_closeFloating() : text_saveCloseFloating();
+        String hideButtonToolTip = mouseFloating_Set.isSelected() ? tip_closeFloating() : tip_saveFloating();
+        massageFloating = createFloatingWindowDescriptor()
+                .setShowButtonToolTip(tip_massageRegion())
+                .setHideButtonToolTip(hideButtonToolTip)
+                .setShowButtonText(text_showFloating())
+                .setHideButtonText(hideButtonText)
+                .setName(floatingName_massage())
+                .setHeightKey(key_massageHeight)
+                .setWidthKey(key_massageWidth)
+                .setButton(massageRegion_Set)
+                .setXKey(key_massageX)
+                .setYKey(key_massageY)
+                .setMargin(margin);
+        // 读取配置文件
+        loadFloatingWindowConfig();
+        // 创建浮窗
+        createFloatingWindows(clickFloating, stopFloating, massageFloating);
     }
 
     /**
@@ -470,6 +367,10 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, defaultClickTimeOffset);
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, defaultClickRetryNum);
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, defaultRandomTimeOffset);
+        int stopFindImgType = Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType));
+        stopFindImgType_Set.setValue(findImgTypeMap.get(stopFindImgType));
+        int clickFindImgType = Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType));
+        clickFindImgType_Set.setValue(findImgTypeMap.get(clickFindImgType));
         clickFileInput.close();
         String language = languageMap.get(bundle.getLocale());
         if (language != null) {
@@ -478,18 +379,34 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 读取配置文件
+     * 读取浮窗配置文件
      *
      * @throws IOException io异常
      */
-    private void getConfig() throws IOException {
+    public static void loadFloatingWindowConfig() throws IOException {
         Properties prop = new Properties();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        floatingX = Integer.parseInt(prop.getProperty(key_floatingX, defaultFloatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_floatingY, defaultFloatingY));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth, defaultFloatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight, defaultFloatingHeight));
+        FloatingWindowConfig massageConfig = new FloatingWindowConfig();
+        massageConfig.setHeight(Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight)))
+                .setWidth(Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth)))
+                .setX(Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX)))
+                .setY(Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY)));
+        massageFloating.setConfig(massageConfig);
+        FloatingWindowConfig clickConfig = new FloatingWindowConfig();
+        clickConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType)))
+                .setHeight(Integer.parseInt(prop.getProperty(key_clickHeight, defaultFloatingHeight)))
+                .setWidth(Integer.parseInt(prop.getProperty(key_clickWidth, defaultFloatingWidth)))
+                .setX(Integer.parseInt(prop.getProperty(key_clickX, defaultFloatingX)))
+                .setY(Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY)));
+        clickFloating.setConfig(clickConfig);
+        FloatingWindowConfig stopConfig = new FloatingWindowConfig();
+        stopConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType)))
+                .setHeight(Integer.parseInt(prop.getProperty(key_stopHeight, defaultFloatingHeight)))
+                .setWidth(Integer.parseInt(prop.getProperty(key_stopWidth, defaultFloatingWidth)))
+                .setX(Integer.parseInt(prop.getProperty(key_stopX, defaultFloatingX)))
+                .setY(Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY)));
+        stopFloating.setConfig(stopConfig);
         clickFileInput.close();
     }
 
@@ -514,6 +431,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_hideWindowRun(), hideWindowRun_Set);
         addToolTip(tip_showWindowRun(), showWindowRun_Set);
         addToolTip(maxWindow_Set.getText(), maxWindow_Set);
+        addToolTip(tip_massageRegion(), massageRegion_Set);
         addToolTip(tip_defaultStopImgBtn(), stopImgBtn_Set);
         addToolTip(tip_remindTaskSave(), remindTaskSave_Set);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Set);
@@ -531,7 +449,6 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
         addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
-        addToolTip(tip_setFloatingCoordinate(), setFloatingCoordinate_Set);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
@@ -592,8 +509,11 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setColorsListener() {
         colorPicker_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (floatingLabel != null) {
-                floatingLabel.setTextFill(newValue);
+            if (massageFloating != null) {
+                Label floatingLabel = massageFloating.getMassageLabel();
+                if (floatingLabel != null) {
+                    floatingLabel.setTextFill(newValue);
+                }
             }
             addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(newValue));
         });
@@ -608,11 +528,14 @@ public class SettingController extends RootController implements MousePositionUp
             if (newValue.doubleValue() != rounded) {
                 opacity_Set.setValue(rounded);
             }
-            if (rectangle != null) {
-                if (rounded == 0) {
-                    rectangle.setFill(new Color(0, 0, 0, 0.01));
-                } else {
-                    rectangle.setFill(new Color(0, 0, 0, rounded));
+            if (massageFloating != null) {
+                Rectangle rectangle = massageFloating.getRectangle();
+                if (rectangle != null) {
+                    if (rounded == 0) {
+                        rectangle.setFill(new Color(0, 0, 0, 0.01));
+                    } else {
+                        rectangle.setFill(new Color(0, 0, 0, rounded));
+                    }
                 }
             }
             addValueToolTip(opacity_Set, tip_opacity(), String.valueOf(rounded));
@@ -633,10 +556,6 @@ public class SettingController extends RootController implements MousePositionUp
         integerSliderValueListener(clickOpacity_Set, tip_clickOpacity());
         // 每张图片最大匹配时间输入框监听
         integerRangeTextField(overtime_Set, 1, null, tip_overtime());
-        // 浮窗跟随鼠标时横轴偏移量输入框监听
-        integerRangeTextField(offsetX_Set, null, null, tip_offsetX());
-        // 浮窗跟随鼠标时纵轴偏移量输入框监听
-        integerRangeTextField(offsetY_Set, null, null, tip_offsetY());
         // 最大记录数量文本输入框内容
         integerRangeTextField(maxLogNum_Set, 1, null, tip_maxLogNum());
         // 匹配失败重试间隔时间输入框监听
@@ -645,10 +564,14 @@ public class SettingController extends RootController implements MousePositionUp
         integerRangeTextField(floatingDistance_Set, 0, null, tip_margin());
         // 限制下次运行内存文本输入框内容
         integerRangeTextField(nextRunMemory_Set, 1, null, tip_nextRunMemory());
+        // 浮窗跟随鼠标时横轴偏移量输入框监听
+        integerRangeTextField(offsetX_Set, -screenWidth, screenWidth, tip_offsetX() + defaultOffsetX);
+        // 浮窗跟随鼠标时纵轴偏移量输入框监听
+        integerRangeTextField(offsetY_Set, -screenHeight, screenHeight, tip_offsetY() + defaultOffsetY);
         // 随机横坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickX_Set, 0, null, tip_randomClickX() + defaultRandomClickX);
+        integerRangeTextField(randomClickX_Set, 0, screenWidth, tip_randomClickX() + defaultRandomClickX);
         // 随机纵坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickY_Set, 0, null, tip_randomClickY() + defaultRandomClickY);
+        integerRangeTextField(randomClickY_Set, 0, screenHeight, tip_randomClickY() + defaultRandomClickY);
         // 随机点击时间偏移量文本输入框内容
         integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime() + defaultRandomTime);
         // 限制终止操作识别失败重试次数文本输入框内容
@@ -764,6 +687,10 @@ public class SettingController extends RootController implements MousePositionUp
     private void setChoiceBoxItems() {
         // 初始化语言设置下拉框
         initializeChoiceBoxItems(language_Set, LanguageEnum.zh_CN.getString(), languageMap);
+        // 停止操作图像识别区域设置
+        initializeChoiceBoxItems(stopFindImgType_Set, findImgType_all(), findImgTypeList);
+        // 要点击的图像识别区域设置
+        initializeChoiceBoxItems(clickFindImgType_Set, findImgType_all(), findImgTypeList);
     }
 
     /**
@@ -774,14 +701,19 @@ public class SettingController extends RootController implements MousePositionUp
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
         Platform.runLater(() -> {
-            if (mouseFloating_Set.isSelected() && floatingStage != null && floatingStage.isShowing()) {
-                int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, null, null);
-                int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, null, null);
-                floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                int x = (int) floatingStage.getX();
-                int y = (int) floatingStage.getY();
-                String point = " X: " + x + " Y: " + y;
-                floatingPosition.setText(point);
+            if (massageFloating != null) {
+                Stage floatingStage = massageFloating.getStage();
+                if (floatingStage != null) {
+                    if (floatingStage.isShowing() && mouseFloating_Set.isSelected()) {
+                        int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, -screenWidth, screenWidth);
+                        int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, -screenHeight, screenHeight);
+                        floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                        setPositionText(massageFloating);
+                    } else {
+                        lastX = (int) floatingStage.getX();
+                        lastY = (int) floatingStage.getY();
+                    }
+                }
             }
         });
     }
@@ -797,8 +729,6 @@ public class SettingController extends RootController implements MousePositionUp
         setChoiceBoxItems();
         // 获取最大运行内存并展示
         getJVMConfig();
-        // 读取配置文件
-        getConfig();
         // 设置鼠标悬停提示
         setToolTip();
         // 设置文本输入框提示
@@ -1149,15 +1079,46 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void mouseFloatingAction() throws IOException {
         setLoadLastConfigCheckBox(mouseFloating_Set, configFile_Click, key_mouseFloating);
-        if (floatingStage != null && floatingStage.isShowing() && mouseFloating_Set.isSelected()) {
-            floatingLabel.setText(text_escCloseFloating());
-            setFloatingCoordinate_Set.setText(text_closeFloating());
-            addToolTip(tip_closeFloating(), setFloatingCoordinate_Set);
+        if (massageFloating != null) {
+            Stage floatingStage = massageFloating.getStage();
+            if (floatingStage != null && floatingStage.isShowing()) {
+                if (mouseFloating_Set.isSelected()) {
+                    updateMassageLabel(massageFloating, text_escCloseFloating());
+                    massageRegion_Set.setText(text_closeFloating());
+                    addToolTip(tip_closeFloating(), massageRegion_Set);
+                } else {
+                    updateMassageLabel(massageFloating, text_saveFloatingCoordinate());
+                    massageRegion_Set.setText(text_saveCloseFloating());
+                    addToolTip(tip_saveFloating(), massageRegion_Set);
+                }
+            }
         }
-        if (floatingStage != null && floatingStage.isShowing() && !mouseFloating_Set.isSelected()) {
-            floatingLabel.setText(text_saveFloatingCoordinate());
-            setFloatingCoordinate_Set.setText(text_saveCloseFloating());
-            addToolTip(tip_saveFloating(), setFloatingCoordinate_Set);
+    }
+
+    /**
+     * 显示或隐藏浮窗位置
+     */
+    @FXML
+    private void massageRegionAction() {
+        Stage floatingStage = massageFloating.getStage();
+        if (floatingStage != null) {
+            if (!floatingStage.isShowing()) {
+                // 显示浮窗
+                showFloatingWindow(massageFloating);
+            } else if (floatingStage.isShowing()) {
+                // 还原鼠标跟随前的坐标
+                if (mouseFloating_Set.isSelected()) {
+                    floatingStage.setX(lastX);
+                    floatingStage.setY(lastY);
+                    massageFloating.setHideButtonText(text_closeFloating())
+                            .setHideButtonToolTip(tip_closeFloating());
+                } else {
+                    massageFloating.setHideButtonText(text_saveCloseFloating())
+                            .setHideButtonToolTip(tip_saveFloating());
+                }
+                // 隐藏浮窗
+                hideFloatingWindow(massageFloating);
+            }
         }
     }
 
@@ -1180,22 +1141,6 @@ public class SettingController extends RootController implements MousePositionUp
             }
             if (processBuilder != null) {
                 processBuilder.start();
-            }
-        }
-    }
-
-    /**
-     * 显示或隐藏浮窗位置
-     */
-    @FXML
-    private void setFloatingCoordinate() {
-        if (floatingStage != null) {
-            if (!floatingStage.isShowing()) {
-                // 显示浮窗
-                showFloatingWindow();
-            } else if (floatingStage.isShowing()) {
-                // 隐藏浮窗
-                hideFloatingWindow();
             }
         }
     }
@@ -1264,6 +1209,88 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
         // 创建重启确认框
         creatReLaunchConfirm();
+    }
+
+    /**
+     * 要点击的图像识别区域下拉框
+     */
+    @FXML
+    private void clickFindImgTypeAction() {
+        String value = clickFindImgType_Set.getValue();
+        addValueToolTip(clickFindImgType_Set, tip_findImgType(), value);
+        if (findImgType_region().equals(value)) {
+            clickRegion_Set.setVisible(true);
+            if (clickFloating != null) {
+                FloatingWindowConfig config = clickFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                clickFloating.setConfig(config);
+            }
+        } else if (findImgType_all().equals(value)) {
+            clickRegion_Set.setVisible(false);
+            if (clickFloating != null) {
+                FloatingWindowConfig config = clickFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                clickFloating.setConfig(config);
+            }
+        }
+    }
+
+    /**
+     * 终止操作图像识别区域下拉框
+     */
+    @FXML
+    private void stopFindImgTypeAction() {
+        String value = stopFindImgType_Set.getValue();
+        addValueToolTip(stopFindImgType_Set, tip_findImgType(), value);
+        if (findImgType_region().equals(value)) {
+            stopRegion_Set.setVisible(true);
+            if (stopFloating != null) {
+                FloatingWindowConfig config = stopFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                stopFloating.setConfig(config);
+            }
+        } else if (findImgType_all().equals(value)) {
+            stopRegion_Set.setVisible(false);
+            if (stopFloating != null) {
+                FloatingWindowConfig config = stopFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                stopFloating.setConfig(config);
+            }
+        }
+    }
+
+    /**
+     * 显示或隐藏要点击的图像识别区域
+     */
+    @FXML
+    private void clickRegionAction() {
+        Stage floatingStage = clickFloating.getStage();
+        if (floatingStage != null) {
+            if (!floatingStage.isShowing()) {
+                // 显示浮窗
+                showFloatingWindow(clickFloating);
+            } else if (floatingStage.isShowing()) {
+                // 隐藏浮窗
+                hideFloatingWindow(clickFloating);
+            }
+        }
+    }
+
+    /**
+     * 显示或隐藏终止操作图像识别区域
+     */
+    @FXML
+    private void stopRegionAction() {
+        Stage floatingStage = stopFloating.getStage();
+        if (floatingStage != null) {
+            if (!floatingStage.isShowing()) {
+                // 显示浮窗
+                showFloatingWindow(stopFloating);
+            } else if (floatingStage.isShowing()) {
+                // 隐藏浮窗
+                hideFloatingWindow(stopFloating);
+            }
+        }
     }
 
 }

@@ -19,14 +19,16 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.i18nFinal.clickDetail_showRegion;
-import static priv.koishi.pmc.Finals.i18nFinal.tip_setFloatingCoordinate;
+import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
+import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -69,19 +71,27 @@ public class FloatingWindow {
         FloatingWindowConfig windowConfig = config.getConfig();
         // 创建主容器
         Rectangle rectangle = new Rectangle(windowConfig.getWidth(), windowConfig.getHeight());
-        rectangle.setFill(new Color(0, 0, 0, 0.5));
+        double opacity = config.getOpacity();
+        if (!config.isTransparent() && opacity == 0) {
+            rectangle.setFill(new Color(0, 0, 0, 0.01));
+        } else {
+            rectangle.setFill(new Color(0, 0, 0, opacity));
+        }
+        config.setRectangle(rectangle);
         StackPane root = new StackPane();
         root.setBackground(Background.EMPTY);
         // 浮窗坐标信息栏
         Label floatingPosition = new Label();
         Color color = config.getTextFill();
-        String fontSize = "-fx-font-size: 18px;";
+        String fontSize = "-fx-font-size: " + config.getFontSize() + "px;";
         floatingPosition.setTextFill(color);
         floatingPosition.setStyle(fontSize);
-        Label floatingLabel = new Label(config.getFloatingLabelText());
-        floatingLabel.setTextFill(color);
-        floatingLabel.setStyle(fontSize);
+        config.setFloatingPosition(floatingPosition);
+        Label massageLabel = new Label(config.getMassage());
+        massageLabel.setTextFill(color);
+        massageLabel.setStyle(fontSize);
         String name = config.getName();
+        config.setMassageLabel(massageLabel);
         Label nameLabel = new Label();
         if (config.isShowName()) {
             nameLabel.setText(name);
@@ -89,7 +99,7 @@ public class FloatingWindow {
         nameLabel.setStyle(fontSize);
         nameLabel.setTextFill(color);
         VBox vBox = new VBox();
-        vBox.getChildren().addAll(floatingPosition, floatingLabel, nameLabel);
+        vBox.getChildren().addAll(floatingPosition, massageLabel, nameLabel);
         root.getChildren().addAll(rectangle, vBox);
         // 创建浮窗舞台
         Stage stage = new Stage();
@@ -100,31 +110,28 @@ public class FloatingWindow {
         stage.setTitle(name);
         setWindowLogo(stage, logoPath);
         stage.setOnCloseRequest(event -> floatingWindows.remove(config));
+        config.setStage(stage);
         // 根据配置决定是否启用拖拽
         if (config.isEnableDrag()) {
-            addDragHandler(root, stage, floatingPosition, config);
+            addDragHandler(root, config);
         }
         // 根据配置决定是否启用调整大小
         if (config.isEnableResize()) {
-            addResizeHandler(root, rectangle, stage, floatingPosition, config);
+            addResizeHandler(root, config);
         }
-        // 保存引用到配置中
-        config.setFloatingPosition(floatingPosition)
-                .setStage(stage)
-                .setRectangle(rectangle);
     }
 
     /**
      * 添加拖拽移动逻辑
      *
-     * @param root             根节点
-     * @param stage            浮窗舞台
-     * @param floatingPosition 浮窗坐标信息栏
-     * @param config           浮窗配置
+     * @param root   根节点
+     * @param config 浮窗配置
      */
-    private static void addDragHandler(StackPane root, Stage stage, Label floatingPosition, FloatingWindowDescriptor config) {
+    private static void addDragHandler(StackPane root, FloatingWindowDescriptor config) {
+        Stage stage = config.getStage();
         double[] xOffset = new double[1];
         double[] yOffset = new double[1];
+        int margin = config.getMargin();
         root.setOnMousePressed(event -> {
             xOffset[0] = event.getSceneX();
             yOffset[0] = event.getSceneY();
@@ -142,63 +149,61 @@ public class FloatingWindow {
             stage.setWidth(w);
             stage.setHeight(h);
             // 边界约束
-            newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - w));
-            newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - h));
+            newX = Math.max(screenBounds.getMinX() + margin, Math.min(newX, screenBounds.getMaxX() - w - margin));
+            newY = Math.max(screenBounds.getMinY() + margin, Math.min(newY, screenBounds.getMaxY() - h - margin));
             int x = (int) newX;
             int y = (int) newY;
             // 应用限制后的坐标
             stage.setX(x);
             stage.setY(y);
-            setPositionText(config, x, y, w, h, floatingPosition);
+            setPositionText(config);
         });
     }
 
     /**
      * 添加拖拽边缘调整大小逻辑
      *
-     * @param root             根节点
-     * @param stage            浮窗舞台
-     * @param floatingPosition 浮窗坐标信息栏
-     * @param config           浮窗配置
+     * @param root   根节点
+     * @param config 浮窗配置
      */
-    private static void addResizeHandler(StackPane root, Rectangle rectangle, Stage stage, Label floatingPosition, FloatingWindowDescriptor config) {
+    private static void addResizeHandler(StackPane root, FloatingWindowDescriptor config) {
+        Rectangle rectangle = config.getRectangle();
         double width = rectangle.getWidth();
         double height = rectangle.getHeight();
         // 创建调整大小的边框区域
         double resizeBorder = 3;
-        // 上边框 - 覆盖整个宽度
+        // 上边框 - 覆盖整个宽度 - 调整高度，同时调整 Y
         Rectangle resizeTop = createResizeBorder(width, resizeBorder, Cursor.N_RESIZE);
         StackPane.setAlignment(resizeTop, Pos.TOP_CENTER);
-        // 右边框 - 覆盖整个高度
+        setupBorderResizeHandler(resizeTop, false, true, false, true, config);
+        // 右边框 - 覆盖整个高度- 调整宽度，不调整 X
         Rectangle resizeRight = createResizeBorder(resizeBorder, height, Cursor.E_RESIZE);
         StackPane.setAlignment(resizeRight, Pos.CENTER_RIGHT);
-        // 下边框 - 覆盖整个宽度
+        setupBorderResizeHandler(resizeRight, true, false, false, false, config);
+        // 下边框 - 覆盖整个宽度 - 调整高度，不调整 Y
         Rectangle resizeBottom = createResizeBorder(width, resizeBorder, Cursor.S_RESIZE);
         StackPane.setAlignment(resizeBottom, Pos.BOTTOM_CENTER);
-        // 左边框 - 覆盖整个高度
+        setupBorderResizeHandler(resizeBottom, false, true, false, false, config);
+        // 左边框 - 覆盖整个高度 - 调整宽度，同时调整 X
         Rectangle resizeLeft = createResizeBorder(resizeBorder, height, Cursor.W_RESIZE);
         StackPane.setAlignment(resizeLeft, Pos.CENTER_LEFT);
-        // 四个角落
+        setupBorderResizeHandler(resizeLeft, true, false, true, false, config);
+        // 左上角
         Rectangle resizeTopLeft = createResizeBorder(resizeBorder, resizeBorder, Cursor.NW_RESIZE);
         StackPane.setAlignment(resizeTopLeft, Pos.TOP_LEFT);
+        setupCornerResizeHandler(resizeTopLeft, config);
+        // 右上角
         Rectangle resizeTopRight = createResizeBorder(resizeBorder, resizeBorder, Cursor.NE_RESIZE);
         StackPane.setAlignment(resizeTopRight, Pos.TOP_RIGHT);
+        setupCornerResizeHandler(resizeTopRight, config);
+        // 左下角
         Rectangle resizeBottomLeft = createResizeBorder(resizeBorder, resizeBorder, Cursor.SW_RESIZE);
         StackPane.setAlignment(resizeBottomLeft, Pos.BOTTOM_LEFT);
+        setupCornerResizeHandler(resizeBottomLeft, config);
+        // 右下角
         Rectangle resizeBottomRight = createResizeBorder(resizeBorder, resizeBorder, Cursor.SE_RESIZE);
         StackPane.setAlignment(resizeBottomRight, Pos.BOTTOM_RIGHT);
-        // 上边框 - 调整高度，同时调整 Y
-        setupBorderResizeHandler(resizeTop, stage, false, true, false, true, floatingPosition, config);
-        // 右边框 - 调整宽度，不调整 X
-        setupBorderResizeHandler(resizeRight, stage, true, false, false, false, floatingPosition, config);
-        // 下边框 - 调整高度，不调整 Y
-        setupBorderResizeHandler(resizeBottom, stage, false, true, false, false, floatingPosition, config);
-        // 左边框 - 调整宽度，同时调整 X
-        setupBorderResizeHandler(resizeLeft, stage, true, false, true, false, floatingPosition, config);
-        setupCornerResizeHandler(resizeTopLeft, stage, floatingPosition, config);
-        setupCornerResizeHandler(resizeTopRight, stage, floatingPosition, config);
-        setupCornerResizeHandler(resizeBottomLeft, stage, floatingPosition, config);
-        setupCornerResizeHandler(resizeBottomRight, stage, floatingPosition, config);
+        setupCornerResizeHandler(resizeBottomRight, config);
         // 添加所有调整大小控件到根面板
         root.getChildren().addAll(resizeTop, resizeRight, resizeBottom, resizeLeft,
                 resizeTopLeft, resizeTopRight, resizeBottomLeft, resizeBottomRight);
@@ -232,23 +237,22 @@ public class FloatingWindow {
     /**
      * 设置调整大小的事件处理器
      *
-     * @param resizeRect       用来拖拽调整大小的矩形
-     * @param stage            浮窗舞台
-     * @param resizeWidth      是否调整宽度（true 调整）
-     * @param resizeHeight     是否调整高度（true 调整）
-     * @param adjustX          是否调整 X 坐标（true 调整）
-     * @param adjustY          是否调整 Y 坐标（true 调整）
-     * @param floatingPosition 浮窗位置显示栏
+     * @param resizeRect   用来拖拽调整大小的矩形
+     * @param resizeWidth  是否调整宽度（true 调整）
+     * @param resizeHeight 是否调整高度（true 调整）
+     * @param adjustX      是否调整 X 坐标（true 调整）
+     * @param adjustY      是否调整 Y 坐标（true 调整）
      */
-    private static void setupBorderResizeHandler(Rectangle resizeRect, Stage stage, boolean resizeWidth,
-                                                 boolean resizeHeight, boolean adjustX, boolean adjustY,
-                                                 Label floatingPosition, FloatingWindowDescriptor config) {
+    private static void setupBorderResizeHandler(Rectangle resizeRect, boolean resizeWidth, boolean resizeHeight,
+                                                 boolean adjustX, boolean adjustY, FloatingWindowDescriptor config) {
+        Stage stage = config.getStage();
         double[] initialX = new double[1];
         double[] initialY = new double[1];
         double[] initialWidth = new double[1];
         double[] initialHeight = new double[1];
         double[] initialStageX = new double[1];
         double[] initialStageY = new double[1];
+        int margin = config.getMargin();
         resizeRect.setOnMousePressed(event -> {
             initialX[0] = event.getScreenX();
             initialY[0] = event.getScreenY();
@@ -294,8 +298,8 @@ public class FloatingWindow {
                 newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
             }
             // 位置边界约束
-            newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - 50));
-            newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - 50));
+            newX = Math.max(screenBounds.getMinX() + margin, Math.min(newX, screenBounds.getMaxX() - newWidth - margin));
+            newY = Math.max(screenBounds.getMinY() + margin, Math.min(newY, screenBounds.getMaxY() - newHeight - margin));
             int x = (int) newX;
             int y = (int) newY;
             int w = (int) newWidth;
@@ -313,7 +317,7 @@ public class FloatingWindow {
                     break;
                 }
             }
-            setPositionText(config, x, y, w, h, floatingPosition);
+            setPositionText(config);
             event.consume();
         });
     }
@@ -321,18 +325,18 @@ public class FloatingWindow {
     /**
      * 创建调整大小的矩形区域
      *
-     * @param resizeRect       用来拖拽调整大小的矩形
-     * @param stage            待调整的舞台
-     * @param floatingPosition 浮窗位置显示栏
+     * @param resizeRect 用来拖拽调整大小的矩形
+     * @param config     浮窗配置
      */
-    private static void setupCornerResizeHandler(Rectangle resizeRect, Stage stage, Label floatingPosition,
-                                                 FloatingWindowDescriptor config) {
+    private static void setupCornerResizeHandler(Rectangle resizeRect, FloatingWindowDescriptor config) {
+        Stage stage = config.getStage();
         double[] initialX = new double[1];
         double[] initialY = new double[1];
         double[] initialWidth = new double[1];
         double[] initialHeight = new double[1];
         double[] initialStageX = new double[1];
         double[] initialStageY = new double[1];
+        int margin = config.getMargin();
         resizeRect.setOnMousePressed(event -> {
             initialX[0] = event.getScreenX();
             initialY[0] = event.getScreenY();
@@ -376,8 +380,8 @@ public class FloatingWindow {
             // 边界约束
             newWidth = Math.max(defaultFloatingWidthInt, Math.min(newWidth, screenBounds.getWidth() - newX));
             newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
-            newX = Math.max(screenBounds.getMinX(), Math.min(newX, screenBounds.getMaxX() - 50));
-            newY = Math.max(screenBounds.getMinY(), Math.min(newY, screenBounds.getMaxY() - 50));
+            newX = Math.max(screenBounds.getMinX(), Math.min(newX + margin, screenBounds.getMaxX() - newWidth - margin));
+            newY = Math.max(screenBounds.getMinY(), Math.min(newY + margin, screenBounds.getMaxY() - newHeight - margin));
             int x = (int) newX;
             int y = (int) newY;
             int w = (int) newWidth;
@@ -395,7 +399,7 @@ public class FloatingWindow {
                     break;
                 }
             }
-            setPositionText(config, x, y, w, h, floatingPosition);
+            setPositionText(config);
             event.consume();
         });
     }
@@ -408,7 +412,6 @@ public class FloatingWindow {
     public static void showFloatingWindow(FloatingWindowDescriptor config) {
         Platform.runLater(() -> {
             Stage floatingStage = config.getStage();
-            Label floatingPosition = config.getFloatingPosition();
             FloatingWindowConfig windowConfig = config.getConfig();
             int x = windowConfig.getX();
             int y = windowConfig.getY();
@@ -420,7 +423,7 @@ public class FloatingWindow {
             floatingStage.setY(y);
             floatingStage.setWidth(w);
             floatingStage.setHeight(h);
-            setPositionText(config, x, y, w, h, floatingPosition);
+            setPositionText(config);
             Button button = config.getButton();
             button.setText(config.getHideButtonText());
             addToolTip(config.getHideButtonToolTip(), button);
@@ -434,9 +437,14 @@ public class FloatingWindow {
     /**
      * 填写浮窗位置显示栏
      *
-     * @param floatingPosition 浮窗位置显示栏
+     * @param config 浮窗配置
      */
-    private static void setPositionText(FloatingWindowDescriptor config, int x, int y, int w, int h, Label floatingPosition) {
+    public static void setPositionText(FloatingWindowDescriptor config) {
+        Stage floatingStage = config.getStage();
+        int x = (int) floatingStage.getX();
+        int y = (int) floatingStage.getY();
+        int w = (int) floatingStage.getWidth();
+        int h = (int) floatingStage.getHeight();
         String point = "";
         if (config.isEnableDrag()) {
             point += " X: " + x + " Y: " + y;
@@ -444,6 +452,7 @@ public class FloatingWindow {
         if (config.isEnableResize()) {
             point += "\n Width:" + w + " Height:" + h;
         }
+        Label floatingPosition = config.getFloatingPosition();
         floatingPosition.setText(point);
     }
 
@@ -467,10 +476,17 @@ public class FloatingWindow {
                             .setX(floatingX)
                             .setY(floatingY);
                     floatingConfig.setConfig(windowConfig);
+                    if (StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
+                        try {
+                            saveFloatingCoordinate(floatingConfig);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                     floatingStage.hide();
                     Button button = floatingConfig.getButton();
-                    button.setText(clickDetail_showRegion());
-                    addToolTip(tip_setFloatingCoordinate(), button);
+                    button.setText(floatingConfig.getShowButtonText());
+                    addToolTip(tip_massageRegion(), button);
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(floatingConfig.getDisableNodes(), false);
                     removeNativeListener(nativeKeyListener);
@@ -482,16 +498,37 @@ public class FloatingWindow {
     }
 
     /**
+     * 保存浮窗设置
+     *
+     * @param floatingWindow 浮窗设置
+     */
+    private static void saveFloatingCoordinate(FloatingWindowDescriptor floatingWindow) throws IOException {
+        FloatingWindowConfig config = floatingWindow.getConfig();
+        int floatingX = config.getX();
+        int floatingY = config.getY();
+        int floatingWidth = config.getWidth();
+        int floatingHeight = config.getHeight();
+        String configFile = floatingWindow.getConfigFile();
+        String xKey = floatingWindow.getXKey();
+        String yKey = floatingWindow.getYKey();
+        String widthKey = floatingWindow.getWidthKey();
+        String heightKey = floatingWindow.getHeightKey();
+        updateProperties(configFile, xKey, String.valueOf(floatingX));
+        updateProperties(configFile, yKey, String.valueOf(floatingY));
+        updateProperties(configFile, widthKey, String.valueOf(floatingWidth));
+        updateProperties(configFile, heightKey, String.valueOf(floatingHeight));
+    }
+
+    /**
      * 更新浮窗信息
      *
      * @param config 要更新的浮窗配置
      * @param text   要更新的信息
      */
-    public static void updateFloatingLabel(FloatingWindowDescriptor config, String text) {
+    public static void updateMassageLabel(FloatingWindowDescriptor config, String text) {
         Platform.runLater(() -> {
-            Label floatingPosition = config.getFloatingLabel();
-            floatingPosition.setText(text);
-            config.setFloatingLabel(floatingPosition);
+            Label massageLabel = config.getMassageLabel();
+            massageLabel.setText(text);
         });
     }
 

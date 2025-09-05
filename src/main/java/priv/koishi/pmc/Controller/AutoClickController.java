@@ -65,6 +65,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.Controller.SettingController.clickFloating;
+import static priv.koishi.pmc.Controller.SettingController.stopFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
@@ -499,10 +501,10 @@ public class AutoClickController extends RootController implements MousePosition
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath, desktopPath);
         logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
         logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
-        floatingX = Integer.parseInt(prop.getProperty(key_floatingX, defaultFloatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_floatingY, defaultFloatingY));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_floatingWidth, defaultFloatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_floatingHeight, defaultFloatingHeight));
+        floatingX = Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX));
+        floatingY = Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY));
+        floatingWidth = Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth));
+        floatingHeight = Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight));
         detailWidth = Integer.parseInt(prop.getProperty(key_clickDetailWidth, defaultClickDetailWidth));
         detailHeight = Integer.parseInt(prop.getProperty(key_clickDetailHeight, defaultClickDetailHeight));
         input.close();
@@ -1069,6 +1071,8 @@ public class AutoClickController extends RootController implements MousePosition
                 .setSampleInterval(Integer.parseInt(sampleInterval))
                 .setClickTypeEnum(ClickTypeEnum.CLICK.ordinal())
                 .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
+                .setClickWindowConfig(clickFloating.getConfig())
+                .setStopWindowConfig(stopFloating.getConfig())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setClickKeyEnum(NativeMouseEvent.BUTTON1)
@@ -1754,7 +1758,7 @@ public class AutoClickController extends RootController implements MousePosition
         }
         // 禁用需要辅助控制权限的组件
         if (isNativeHookException) {
-            Button saveButton = settingController.setFloatingCoordinate_Set;
+            Button saveButton = settingController.massageRegion_Set;
             saveButton.setDisable(true);
         }
     }
