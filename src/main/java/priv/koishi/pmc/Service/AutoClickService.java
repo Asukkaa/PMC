@@ -131,17 +131,18 @@ public class AutoClickService {
                     updateProgress(i + 1, size);
                 }
                 // 匹配图片
-                matchClickImg(imgMap, clickPositionBeans);
+                matchSameNameImg(imgMap, clickPositionBeans);
                 taskBean.getTableView().refresh();
                 return new PMCLoadResult(clickPositionBeans, lastPMCPath);
             }
 
             // 匹配图片
-            private void matchClickImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
+            private void matchSameNameImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
                 if (!imgMap.isEmpty()) {
                     updateMessage(text_matchImg());
                     int clickPositionBeansSize = clickPositionBeans.size();
                     updateProgress(0, clickPositionBeansSize);
+                    // 匹配要点击的图片
                     for (int j = 0; j < clickPositionBeansSize; j++) {
                         ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
                         String clickImgPath = clickPositionVO.getClickImgPath();
@@ -149,23 +150,48 @@ public class AutoClickService {
                             File file = new File(clickImgPath);
                             if (!file.exists()) {
                                 // 通过文件获取路径可消除不同操作系统的路径分隔符的差异
-                                String imgName = getFileName(file.getPath());
-                                String imgPath = imgMap.entrySet()
-                                        .stream()
-                                        .filter(entry -> imgName.equals(entry.getValue()))
-                                        .map(Map.Entry::getKey)
-                                        .findFirst()
-                                        .orElse(null);
+                                String imgPath = getSameNameImgPath(imgMap, file);
                                 if (StringUtils.isNotBlank(imgPath)) {
                                     clickPositionVO.setClickImgPath(imgPath);
                                 }
                             }
                         }
+                        // 匹配终止操作图片
+                        List<ImgFileBean> stopImgFiles = clickPositionVO.getStopImgFiles();
+                        stopImgFiles.forEach(stopImgFile -> {
+                            String stopImgPath = stopImgFile.getPath();
+                            if (StringUtils.isNotBlank(stopImgPath)) {
+                                File stopFile = new File(stopImgPath);
+                                if (!stopFile.exists()) {
+                                    String imgPath = getSameNameImgPath(imgMap, stopFile);
+                                    if (StringUtils.isNotBlank(imgPath)) {
+                                        stopImgFile.setPath(imgPath);
+                                    }
+                                }
+                            }
+                        });
                         updateProgress(j + 1, clickPositionBeansSize);
                     }
                 }
             }
         };
+    }
+
+    /**
+     * 获取匹配到的同名图片地址
+     *
+     * @param imgMap 要进行匹配的图片map
+     * @param img    路径改变了的图片文件
+     * @return 匹配到的图片地址
+     */
+    private static String getSameNameImgPath(Map<String, String> imgMap, File img) {
+        String imgName = getFileName(img.getPath());
+        return imgMap.entrySet()
+                .stream()
+                .filter(entry -> imgName.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
