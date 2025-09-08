@@ -982,7 +982,7 @@ public class ClickDetailController extends RootController {
     @FXML
     private void removeAll() {
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::clearResources);
-        removeTableViewData(tableView_Det, dataNumber_Det, null);
+        removeTableViewData(tableView_Det, dataNumber_Det);
     }
 
     /**

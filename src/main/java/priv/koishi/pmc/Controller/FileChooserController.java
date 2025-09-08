@@ -249,7 +249,7 @@ public class FileChooserController extends RootController {
             readAllFilesTask = null;
         }
         tableView_FC.getItems().stream().parallel().forEach(FileVO::clearResources);
-        removeTableViewData(tableView_FC, fileNumber_FC, null);
+        removeTableViewData(tableView_FC, fileNumber_FC);
     }
 
     /**

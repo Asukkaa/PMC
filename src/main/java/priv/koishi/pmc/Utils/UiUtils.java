@@ -679,15 +679,11 @@ public class UiUtils {
      *
      * @param tableView  要清空的javafx列表
      * @param fileNumber 用于展示列表数据数量的文本框
-     * @param log        用于展示任务消息的文本框
      * @param <T>        数据类型
      */
-    public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber, Label log) {
+    public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber) {
         tableView.getItems().clear();
         updateLabel(fileNumber, listText_dataListNull());
-        if (log != null) {
-            updateLabel(log, "");
-        }
         System.gc();
     }
 

@@ -136,7 +136,7 @@ public class TimedTaskController extends RootController {
      * 清空javafx列表按钮
      */
     public void removeAll() {
-        removeTableViewData(tableView_Task, dataNumber_Task, null);
+        removeTableViewData(tableView_Task, dataNumber_Task);
     }
 
     /**

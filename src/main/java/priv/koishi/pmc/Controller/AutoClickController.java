@@ -12,6 +12,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -1818,6 +1819,9 @@ public class AutoClickController extends RootController implements MousePosition
             setDisableNodes();
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
+            // 监听列表数据变化
+            tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) change ->
+                    updateLabel(log_Click, ""));
             // 表格设置为可编辑
             makeCellCanEdit();
             // 设置列表通过拖拽排序行
@@ -1851,7 +1855,7 @@ public class AutoClickController extends RootController implements MousePosition
     public void removeAll() {
         if (isFree()) {
             tableView_Click.getItems().stream().parallel().forEach(ClickPositionVO::clearResources);
-            removeTableViewData(tableView_Click, dataNumber_Click, log_Click);
+            removeTableViewData(tableView_Click, dataNumber_Click);
         }
     }
 
