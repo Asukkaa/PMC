@@ -285,7 +285,7 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="5" prefWidth="490">
+            <HBox styleClass="hBox-veryLong">
                 <Label prefHeight="25" text="%setting.retrySecond"/>
                 <TextField fx:id="retrySecond_Set" prefWidth="80"/>
                 <Label prefHeight="25" text="%unit.s"/>
@@ -299,7 +299,7 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="5" prefWidth="490">
+            <HBox styleClass="hBox-veryLong">
                 <Label prefHeight="25" text="%setting.clickOpacity"/>
                 <Slider fx:id="clickOpacity_Set" prefWidth="220" value="80" showTickLabels="true"
                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -311,18 +311,28 @@
                 <TextField fx:id="clickRetryNum_Set" prefWidth="80"/>
                 <Label prefHeight="25" text="%unit.times"/>
             </HBox>
+        </HBox>
 
-            <HBox spacing="5">
+        <HBox spacing="10">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="%clickDetail.findImgType"/>
                 <ChoiceBox fx:id="clickFindImgType_Set" prefWidth="150" style="-fx-cursor: hand"
                            onAction="#clickFindImgTypeAction"/>
-                <Button visible="false" fx:id="clickRegion_Set" text="%clickDetail.showRegion"
-                        style="-fx-cursor: hand" onAction="#clickRegionAction"/>
+            </HBox>
+
+            <HBox fx:id="clickRegionHBox_Set" spacing="10" visible="false">
+                <HBox styleClass="hBox-short">
+                    <Button fx:id="clickRegion_Set" text="%clickDetail.showRegion"
+                            style="-fx-cursor: hand" onAction="#clickRegionAction"/>
+                </HBox>
+
+                <CheckBox fx:id="clickAllRegion_Set" styleClass="checkBox-short" onAction="#clickAllRegionAction"
+                          text="%clickDetail.allRegion"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox spacing="5" prefWidth="490">
+            <HBox styleClass="hBox-veryLong">
                 <Label prefHeight="25" text="%setting.stopOpacity"/>
                 <Slider fx:id="stopOpacity_Set" prefWidth="220" value="80" showTickLabels="true"
                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -334,13 +344,23 @@
                 <TextField fx:id="stopRetryNum_Set" prefWidth="80"/>
                 <Label prefHeight="25" text="%unit.times"/>
             </HBox>
+        </HBox>
 
-            <HBox spacing="5">
+        <HBox spacing="10">
+            <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="%clickDetail.findImgType"/>
                 <ChoiceBox fx:id="stopFindImgType_Set" prefWidth="150" style="-fx-cursor: hand"
                            onAction="#stopFindImgTypeAction"/>
-                <Button visible="false" fx:id="stopRegion_Set" text="%clickDetail.showRegion"
-                        style="-fx-cursor: hand" onAction="#stopRegionAction"/>
+            </HBox>
+
+            <HBox fx:id="stopRegionHBox_Set" spacing="10" visible="false">
+                <HBox styleClass="hBox-short">
+                    <Button fx:id="stopRegion_Set" text="%clickDetail.showRegion"
+                            style="-fx-cursor: hand" onAction="#stopRegionAction"/>
+                </HBox>
+
+                <CheckBox fx:id="stopAllRegion_Set" styleClass="checkBox-short" onAction="#stopAllRegionAction"
+                          text="%clickDetail.allRegion"/>
             </HBox>
         </HBox>
 

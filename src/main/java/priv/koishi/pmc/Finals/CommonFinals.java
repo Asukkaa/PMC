@@ -31,7 +31,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.09.02";
+    public static final String buildDate = "2025.09.08";
 
     /**
      * 文件后缀名：bat
@@ -833,5 +833,9 @@ public class CommonFinals {
     public static final String key_autoCheck = "autoCheck";
 
     public static final String key_loadFolder = "loadFolder";
+
+    public static final String key_clickAllRegion = "clickAllRegion";
+
+    public static final String key_stopAllRegion = "stopAllRegion";
 
 }

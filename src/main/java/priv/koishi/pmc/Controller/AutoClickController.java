@@ -500,9 +500,9 @@ public class AutoClickController extends RootController implements MousePosition
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath, desktopPath);
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath, desktopPath);
         logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
-        logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
         floatingX = Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY));
+        logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
         floatingWidth = Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth));
         floatingHeight = Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight));
         detailWidth = Integer.parseInt(prop.getProperty(key_clickDetailWidth, defaultClickDetailWidth));
@@ -1686,14 +1686,14 @@ public class AutoClickController extends RootController implements MousePosition
         disableNodes.add(clearButton_Click);
         disableNodes.add(loadAutoClick_Click);
         disableNodes.add(exportAutoClick_Click);
+        Node timedStartTab = mainScene.lookup("#timedStartTab");
+        disableNodes.add(timedStartTab);
         Node autoClickTab = mainScene.lookup("#autoClickTab");
         disableNodes.add(autoClickTab);
         Node settingTab = mainScene.lookup("#settingTab");
         disableNodes.add(settingTab);
         Node aboutTab = mainScene.lookup("#aboutTab");
         disableNodes.add(aboutTab);
-        Node timedStartTab = mainScene.lookup("#timedStartTab");
-        disableNodes.add(timedStartTab);
     }
 
     /**

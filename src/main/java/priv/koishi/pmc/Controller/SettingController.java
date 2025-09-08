@@ -109,7 +109,7 @@ public class SettingController extends RootController implements MousePositionUp
     public AnchorPane anchorPane_Set;
 
     @FXML
-    public HBox fileNumberHBox_Set, findImgSetting_Set;
+    public HBox fileNumberHBox_Set, findImgSetting_Set, clickRegionHBox_Set, stopRegionHBox_Set;
 
     @FXML
     public ProgressBar progressBar_Set;
@@ -141,7 +141,7 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
-            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set;
+            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, clickAllRegion_Set, stopAllRegion_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -344,6 +344,8 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
+        setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, unActivation);
+        setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, unActivation);
         setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, defaultStopOpacity);
@@ -400,14 +402,16 @@ public class SettingController extends RootController implements MousePositionUp
                 .setHeight(Integer.parseInt(prop.getProperty(key_clickHeight, defaultFloatingHeight)))
                 .setWidth(Integer.parseInt(prop.getProperty(key_clickWidth, defaultFloatingWidth)))
                 .setX(Integer.parseInt(prop.getProperty(key_clickX, defaultFloatingX)))
-                .setY(Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY)));
+                .setY(Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY)))
+                .setAllRegion(prop.getProperty(key_clickAllRegion, unActivation));
         clickFloating.setConfig(clickConfig);
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
         stopConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType)))
                 .setHeight(Integer.parseInt(prop.getProperty(key_stopHeight, defaultFloatingHeight)))
                 .setWidth(Integer.parseInt(prop.getProperty(key_stopWidth, defaultFloatingWidth)))
                 .setX(Integer.parseInt(prop.getProperty(key_stopX, defaultFloatingX)))
-                .setY(Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY)));
+                .setY(Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY)))
+                .setAllRegion(prop.getProperty(key_stopAllRegion, unActivation));
         stopFloating.setConfig(stopConfig);
         clickFileInput.close();
     }
@@ -448,9 +452,11 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_lastAutoClickSetting(), loadAutoClick_Set);
         addToolTip(tip_offsetX() + defaultOffsetX, offsetX_Set);
         addToolTip(tip_offsetY() + defaultOffsetY, offsetY_Set);
+        addToolTip(tip_showRegion(), clickRegion_Set, stopRegion_Set);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
         addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
+        addToolTip(tip_allRegion(), clickAllRegion_Set, stopAllRegion_Set);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
@@ -570,14 +576,14 @@ public class SettingController extends RootController implements MousePositionUp
         integerRangeTextField(offsetX_Set, -screenWidth, screenWidth, tip_offsetX() + defaultOffsetX);
         // 浮窗跟随鼠标时纵轴偏移量输入框监听
         integerRangeTextField(offsetY_Set, -screenHeight, screenHeight, tip_offsetY() + defaultOffsetY);
-        // 随机横坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickX_Set, 0, screenWidth, tip_randomClickX() + defaultRandomClickX);
-        // 随机纵坐标偏移量文本输入框内容
-        integerRangeTextField(randomClickY_Set, 0, screenHeight, tip_randomClickY() + defaultRandomClickY);
         // 随机点击时间偏移量文本输入框内容
         integerRangeTextField(randomTimeOffset_Set, 0, null, tip_randomTime() + defaultRandomTime);
         // 限制终止操作识别失败重试次数文本输入框内容
         integerRangeTextField(stopRetryNum_Set, 0, null, tip_stopRetryNum() + defaultStopRetryNum);
+        // 随机横坐标偏移量文本输入框内容
+        integerRangeTextField(randomClickX_Set, 0, screenWidth, tip_randomClickX() + defaultRandomClickX);
+        // 随机纵坐标偏移量文本输入框内容
+        integerRangeTextField(randomClickY_Set, 0, screenHeight, tip_randomClickY() + defaultRandomClickY);
         // 限制要点击的图片识别失败重试次数文本输入框内容
         integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum() + defaultClickRetryNum);
         // 限制鼠标轨迹采样间隔文本输入框内容
@@ -1074,6 +1080,30 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 终止操作图像第一次识别失败后改为识别整个屏幕
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void stopAllRegionAction() throws IOException {
+        String allRegion = stopAllRegion_Set.isSelected() ? activation : unActivation;
+        stopFloating.getConfig().setAllRegion(allRegion);
+        setLoadLastConfigCheckBox(stopAllRegion_Set, configFile_Click, key_stopAllRegion);
+    }
+
+    /**
+     * 要点击的图像第一次识别失败后改为识别整个屏幕
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void clickAllRegionAction() throws IOException {
+        String allRegion = clickAllRegion_Set.isSelected() ? activation : unActivation;
+        clickFloating.getConfig().setAllRegion(allRegion);
+        setLoadLastConfigCheckBox(clickAllRegion_Set, configFile_Click, key_clickAllRegion);
+    }
+
+    /**
      * 显示浮窗位置时信息浮窗跟随鼠标
      *
      * @throws IOException 配置文件保存异常
@@ -1221,14 +1251,14 @@ public class SettingController extends RootController implements MousePositionUp
         String value = clickFindImgType_Set.getValue();
         addValueToolTip(clickFindImgType_Set, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            clickRegion_Set.setVisible(true);
+            clickRegionHBox_Set.setVisible(true);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 clickFloating.setConfig(config);
             }
         } else if (findImgType_all().equals(value)) {
-            clickRegion_Set.setVisible(false);
+            clickRegionHBox_Set.setVisible(false);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
@@ -1245,14 +1275,14 @@ public class SettingController extends RootController implements MousePositionUp
         String value = stopFindImgType_Set.getValue();
         addValueToolTip(stopFindImgType_Set, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            stopRegion_Set.setVisible(true);
+            stopRegionHBox_Set.setVisible(true);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 stopFloating.setConfig(config);
             }
         } else if (findImgType_all().equals(value)) {
-            stopRegion_Set.setVisible(false);
+            stopRegionHBox_Set.setVisible(false);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());

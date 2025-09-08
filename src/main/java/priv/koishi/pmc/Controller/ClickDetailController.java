@@ -150,7 +150,8 @@ public class ClickDetailController extends RootController {
     public VBox clickImgVBox_Det, progressBarVBox_Det;
 
     @FXML
-    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det;
+    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det,
+            clickRegionHBox_Det, stopRegionHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -171,7 +172,7 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
-            randomWaitTime_Det;
+            randomWaitTime_Det, clickAllRegion_Det, stopAllRegion_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
@@ -326,6 +327,7 @@ public class ClickDetailController extends RootController {
         if (clickWindowConfig != null) {
             clickFloating.setConfig(clickWindowConfig);
             clickFindImgType_Det.setValue(findImgTypeMap.get(clickWindowConfig.getFindImgTypeEnum()));
+            clickAllRegion_Det.setSelected(activation.equals(clickWindowConfig.getAllRegion()));
         } else {
             clickFloating.setConfig(new FloatingWindowConfig());
         }
@@ -337,6 +339,7 @@ public class ClickDetailController extends RootController {
         if (stopWindowConfig != null) {
             stopFloating.setConfig(stopWindowConfig);
             stopFindImgType_Det.setValue(findImgTypeMap.get(stopWindowConfig.getFindImgTypeEnum()));
+            stopAllRegion_Det.setSelected(activation.equals(stopWindowConfig.getAllRegion()));
         } else {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
@@ -442,6 +445,8 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(randomClickX_Det, randomClickX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickY_Det, randomClickY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickAllRegion_Det, clickAllRegion_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickTime_Det, randomClickTime_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
@@ -616,6 +621,7 @@ public class ClickDetailController extends RootController {
         addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
         addToolTip(tip_showRegion(), clickRegion_Det, stopRegion_Det);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
+        addToolTip(tip_allRegion(), clickAllRegion_Det, stopAllRegion_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
@@ -806,10 +812,14 @@ public class ClickDetailController extends RootController {
         stopFindImgTypeAction();
         saveFloatingWindow(clickFloating, stopFloating);
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
+        String stopAllRegion = stopAllRegion_Det.isSelected() ? activation : unActivation;
+        String clickAllRegion = clickAllRegion_Det.isSelected() ? activation : unActivation;
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
         String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
         String randomTrajectory = randomTrajectory_Det.isSelected() ? activation : unActivation;
         String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
+        stopFloating.getConfig().setAllRegion(stopAllRegion);
+        clickFloating.getConfig().setAllRegion(clickAllRegion);
         int selectIndex = selectedItem.getIndex();
         String matchedType = matchedType_Det.getValue();
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
@@ -1030,14 +1040,14 @@ public class ClickDetailController extends RootController {
         String value = clickFindImgType_Det.getValue();
         addValueToolTip(clickFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            clickRegion_Det.setVisible(true);
+            clickRegionHBox_Det.setVisible(true);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 clickFloating.setConfig(config);
             }
         } else if (findImgType_all().equals(value)) {
-            clickRegion_Det.setVisible(false);
+            clickRegionHBox_Det.setVisible(false);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
@@ -1054,14 +1064,14 @@ public class ClickDetailController extends RootController {
         String value = stopFindImgType_Det.getValue();
         addValueToolTip(stopFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            stopRegion_Det.setVisible(true);
+            stopRegionHBox_Det.setVisible(true);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 stopFloating.setConfig(config);
             }
         } else if (findImgType_all().equals(value)) {
-            stopRegion_Det.setVisible(false);
+            stopRegionHBox_Det.setVisible(false);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());

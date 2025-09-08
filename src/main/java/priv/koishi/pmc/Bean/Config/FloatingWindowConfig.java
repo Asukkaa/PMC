@@ -43,6 +43,11 @@ public class FloatingWindowConfig {
     int findImgTypeEnum;
 
     /**
+     * 第一次识别失败后改为识别整个屏幕（1 改变识别范围， 0 不改变识别范围）
+     */
+    String allRegion;
+
+    /**
      * 获取浮窗宽度
      *
      * @return 浮窗宽度

@@ -1420,12 +1420,12 @@ public class UiUtils {
      * 删除所选数据选项
      *
      * @param tableView   要添加右键菜单的列表
-     * @param label       列表对应的统计信息展示栏
+     * @param dataNumber  列表对应的统计信息展示栏
      * @param contextMenu 右键菜单集合
      * @param unit        统计信息展示栏数量单位
      * @param <T>         列表数据类型
      */
-    public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label label, ContextMenu contextMenu, String unit) {
+    public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label dataNumber, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
         deleteDataMenuItem.setOnAction(event -> {
             TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
@@ -1442,7 +1442,7 @@ public class UiUtils {
                 // 滚动到插入位置
                 tableView.scrollTo(selectedIndex - 1);
             }
-            updateTableViewSizeText(tableView, label, unit);
+            updateTableViewSizeText(tableView, dataNumber, unit);
         });
         contextMenu.getItems().add(deleteDataMenuItem);
     }

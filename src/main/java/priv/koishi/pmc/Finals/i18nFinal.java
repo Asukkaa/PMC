@@ -886,6 +886,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 勾选后第一次识别失败后，后续重试时识别区域将会改为整个屏幕
+     */
+    public static String tip_allRegion() {
+        return bundle.getString("tip.allRegion");
+    }
+
+    /**
      * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
      * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
      */

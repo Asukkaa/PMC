@@ -54,4 +54,9 @@ public class FindPositionConfig {
      */
     FloatingWindowConfig floatingWindowConfig;
 
+    /**
+     * 当前识别次数
+     */
+    int findTime;
+
 }

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.Finals.CommonFinals.activation;
 import static priv.koishi.pmc.Finals.CommonFinals.percentage;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
@@ -102,10 +103,12 @@ public class ImageRecognitionService {
                 try {
                     String timeOutErr = text_image() + fileName + text_timeOut();
                     if (config.isContinuously()) {
-                        int retry = 0;
+                        int findTime = 0;
+                        // 重试直到匹配
                         while (true) {
-                            retry++;
                             long start = System.currentTimeMillis();
+                            findTime++;
+                            config.setFindTime(findTime);
                             Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(config));
                             try {
@@ -113,7 +116,7 @@ public class ImageRecognitionService {
                                         future.get(overTime, TimeUnit.SECONDS) :
                                         future.get();
                                 // 记录识别结果
-                                addLog(result, retry, start, name, dynamicQueue);
+                                addLog(result, findTime, start, name, dynamicQueue);
                                 if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
@@ -128,8 +131,11 @@ public class ImageRecognitionService {
                         }
                     } else {
                         MatchPointBean result = new MatchPointBean();
+                        // 按规定次数重试
                         for (int i = 0; i <= config.getMaxRetry(); i++) {
                             long start = System.currentTimeMillis();
+                            int findTime = i + 1;
+                            config.setFindTime(findTime);
                             Future<MatchPointBean> future = executor.submit(() ->
                                     getPoint(config));
                             try {
@@ -137,7 +143,7 @@ public class ImageRecognitionService {
                                         future.get(overTime, TimeUnit.SECONDS) :
                                         future.get();
                                 // 记录识别结果
-                                addLog(result, i + 1, start, name, dynamicQueue);
+                                addLog(result, findTime, start, name, dynamicQueue);
                                 if (result.getMatchThreshold() >= matchThreshold) {
                                     return result;
                                 }
@@ -207,10 +213,18 @@ public class ImageRecognitionService {
             width = screenWidth;
             height = screenHeight;
         } else {
-            x = config.getX();
-            y = config.getY();
-            height = config.getHeight();
-            width = config.getWidth();
+            // 识别次数大于1且开启全屏重试
+            if (findPositionConfig.getFindTime() > 1 && activation.equals(config.getAllRegion())) {
+                x = 0;
+                y = 0;
+                width = screenWidth;
+                height = screenHeight;
+            } else {
+                x = config.getX();
+                y = config.getY();
+                height = config.getHeight();
+                width = config.getWidth();
+            }
         }
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle(

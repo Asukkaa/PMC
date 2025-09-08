@@ -3,275 +3,304 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
-            fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
-    <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
-        <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
-            <HBox spacing="10">
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.clickIndex"/>
-                    <Label prefHeight="25" fx:id="clickIndex_Det"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.tableViewSize"/>
-                    <Label prefHeight="25" fx:id="tableViewSize_Det"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.clickName"/>
-                    <TextField fx:id="clickName_Det"/>
-                </HBox>
-
-                <Label prefHeight="25" textFill="red" text="%clickDetail.tip"/>
-            </HBox>
-
-            <HBox spacing="10">
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.mouseStartX"/>
-                    <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="%unit.px"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.mouseStartY"/>
-                    <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="%unit.px"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.clickKey_Det"/>
-                    <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" style="-fx-cursor: hand"
-                               onAction="#clickKeyChange"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label fx:id="clickTypeText_Det" prefHeight="25" text="%clickDetail.clickTypeText_Det"/>
-                    <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" style="-fx-cursor: hand"
-                               onAction="#clickTypeChange"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.wait"/>
-                    <TextField fx:id="wait_Det" prefWidth="80"/>
-                    <Label prefHeight="25" text="%unit.ms"/>
-                </HBox>
-
-                <HBox fx:id="clickTypeHBox_Det" spacing="10">
-                    <HBox styleClass="hBox-short">
-                        <Label prefHeight="25" text="%clickDetail.clickNumBer"/>
-                        <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
-                        <Label prefHeight="25" text="%unit.times"/>
-                    </HBox>
-
-                    <HBox styleClass="hBox-short">
-                        <Label prefHeight="25" text="%clickDetail.timeClick"/>
-                        <TextField fx:id="timeClick_Det" prefWidth="80"/>
-                        <Label prefHeight="25" text="%unit.ms"/>
-                    </HBox>
-
-                    <HBox styleClass="hBox-short">
-                        <Label prefHeight="25" text="%clickDetail.interval"/>
-                        <TextField fx:id="interval_Det" prefWidth="80"/>
-                        <Label prefHeight="25" text="%unit.ms"/>
-                    </HBox>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
-
-                <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short" text="%randomTrajectory"/>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.randomClickX"/>
-                    <TextField fx:id="randomClickX_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="%unit.px"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.randomClickY"/>
-                    <TextField fx:id="randomClickY_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="%unit.px"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short" text="%randomClickTime"/>
-
-                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short" text="%randomClickInterval"/>
-
-                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short" text="%randomWaitTime"/>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.randomTimeOffset"/>
-                    <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="%unit.ms"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <HBox styleClass="hBox-veryLong">
-                    <Label prefHeight="25" text="%clickDetail.clickOpacity"/>
-                    <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
-                            showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
-                    <Label prefHeight="25" text="\%"/>
-                </HBox>
-
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.clickRetryNum"/>
-                    <TextField fx:id="clickRetryNum_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="%unit.times"/>
-                </HBox>
-
-                <HBox spacing="5">
-                    <Label prefHeight="25" text="%clickDetail.findImgType"/>
-                    <ChoiceBox fx:id="clickFindImgType_Det" prefWidth="150" style="-fx-cursor: hand"
-                               onAction="#clickFindImgTypeAction"/>
-                    <Button visible="false" fx:id="clickRegion_Det" text="%clickDetail.showRegion"
-                            style="-fx-cursor: hand" onAction="#clickRegionAction"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="10">
-                <HBox prefWidth="550" spacing="10">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
+                <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
                     <HBox spacing="10">
-                        <Label prefHeight="25" text="%clickDetail.matchedType_Det"/>
-                        <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="210" style="-fx-cursor: hand"
-                                   onAction="#matchedTypeChange"/>
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.clickIndex"/>
+                            <Label prefHeight="25" fx:id="clickIndex_Det"/>
+                        </HBox>
+
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.tableViewSize"/>
+                            <Label prefHeight="25" fx:id="tableViewSize_Det"/>
+                        </HBox>
+
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.clickName"/>
+                            <TextField fx:id="clickName_Det"/>
+                        </HBox>
+
+                        <Label prefHeight="25" textFill="red" text="%clickDetail.tip"/>
                     </HBox>
 
-                    <HBox fx:id="matchedStepHBox_Det" spacing="10">
-                        <Label prefHeight="25" text="%clickDetail.matchedStep"/>
-                        <TextField fx:id="matchedStep_Det" prefWidth="60"/>
-                        <ImageView fx:id="matchedStepWarning_Det" fitWidth="25" fitHeight="25" visible="false">
-                            <Image url="@../icon/Warning.png"/>
-                        </ImageView>
-                    </HBox>
-                </HBox>
-
-                <HBox spacing="10">
                     <HBox spacing="10">
-                        <Label prefHeight="25" text="%clickDetail.retryType_Det"/>
-                        <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210" style="-fx-cursor: hand"
-                                   onAction="#retryTypeChange"/>
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.mouseStartX"/>
+                            <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
+                            <Label prefHeight="25" text="%unit.px"/>
+                        </HBox>
+
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.mouseStartY"/>
+                            <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
+                            <Label prefHeight="25" text="%unit.px"/>
+                        </HBox>
+
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.clickKey_Det"/>
+                            <ChoiceBox fx:id="clickKey_Det" prefHeight="25" prefWidth="120" style="-fx-cursor: hand"
+                                       onAction="#clickKeyChange"/>
+                        </HBox>
+
+                        <HBox styleClass="hBox-short">
+                            <Label fx:id="clickTypeText_Det" prefHeight="25" text="%clickDetail.clickTypeText_Det"/>
+                            <ChoiceBox fx:id="clickType_Det" prefHeight="25" prefWidth="120" style="-fx-cursor: hand"
+                                       onAction="#clickTypeChange"/>
+                        </HBox>
                     </HBox>
 
-                    <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">
-                        <Label prefHeight="25" text="%clickDetail.retryStep"/>
-                        <TextField fx:id="retryStep_Det" prefWidth="60"/>
-                        <ImageView fx:id="retryStepWarning_Det" fitWidth="25" fitHeight="25" visible="false">
-                            <Image url="@../icon/Warning.png"/>
-                        </ImageView>
-                    </HBox>
-                </HBox>
-            </HBox>
+                    <HBox spacing="10">
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.wait"/>
+                            <TextField fx:id="wait_Det" prefWidth="80"/>
+                            <Label prefHeight="25" text="%unit.ms"/>
+                        </HBox>
 
-            <HBox spacing="10">
-                <HBox styleClass="hBox-veryLong">
-                    <Label prefHeight="25" text="%clickDetail.stopOpacity"/>
-                    <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
-                            showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
-                    <Label prefHeight="25" text="\%"/>
-                </HBox>
+                        <HBox fx:id="clickTypeHBox_Det" spacing="10">
+                            <HBox styleClass="hBox-short">
+                                <Label prefHeight="25" text="%clickDetail.clickNumBer"/>
+                                <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
+                                <Label prefHeight="25" text="%unit.times"/>
+                            </HBox>
 
-                <HBox styleClass="hBox-short">
-                    <Label prefHeight="25" text="%clickDetail.stopRetryNum"/>
-                    <TextField fx:id="stopRetryNum_Det" prefWidth="50"/>
-                    <Label prefHeight="25" text="%unit.times"/>
-                </HBox>
+                            <HBox styleClass="hBox-short">
+                                <Label prefHeight="25" text="%clickDetail.timeClick"/>
+                                <TextField fx:id="timeClick_Det" prefWidth="80"/>
+                                <Label prefHeight="25" text="%unit.ms"/>
+                            </HBox>
 
-                <HBox spacing="5">
-                    <Label prefHeight="25" text="%clickDetail.findImgType"/>
-                    <ChoiceBox fx:id="stopFindImgType_Det" prefWidth="150" style="-fx-cursor: hand"
-                               onAction="#stopFindImgTypeAction"/>
-                    <Button visible="false" fx:id="stopRegion_Det" text="%clickDetail.showRegion"
-                            style="-fx-cursor: hand" onAction="#stopRegionAction"/>
-                </HBox>
-            </HBox>
-
-            <HBox spacing="20">
-                <VBox spacing="10">
-                    <HBox fx:id="fileNumberHBox_Det" spacing="10">
-                        <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath" style="-fx-cursor: hand"
-                                text="%clickDetail.stopImgBtn_Det"/>
-                        <Button fx:id="removeAll_Det" onAction="#removeAll" style="-fx-cursor: hand"
-                                text="%listText.removeAll"/>
-
-                        <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
+                            <HBox styleClass="hBox-short">
+                                <Label prefHeight="25" text="%clickDetail.interval"/>
+                                <TextField fx:id="interval_Det" prefWidth="80"/>
+                                <Label prefHeight="25" text="%unit.ms"/>
+                            </HBox>
+                        </HBox>
                     </HBox>
 
-                    <TableView fx:id="tableView_Det" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
-                        <placeholder>
-                            <Label text="%clickDetail.tableView_Det"/>
-                        </placeholder>
+                    <HBox spacing="10">
+                        <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
 
-                        <columns>
-                            <TableColumn fx:id="index_Det" text="%listText.index" sortable="false"/>
-                            <TableColumn fx:id="thumb_Det" text="%listText.thumb" sortable="false"/>
-                            <TableColumn fx:id="name_Det" text="%stopImg.name" sortable="false"/>
-                            <TableColumn fx:id="path_Det" text="%stopImg.path" sortable="false"/>
-                            <TableColumn fx:id="type_Det" text="%stopImg.type" sortable="false"/>
-                        </columns>
-                    </TableView>
-                </VBox>
+                        <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short" text="%randomTrajectory"/>
 
-                <VBox spacing="10">
-                    <HBox spacing="5">
-                        <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath" style="-fx-cursor: hand"
-                                text="%clickDetail.clickImgBtn_Det"/>
-                        <Label fx:id="clickImgPath_Det" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.randomClickX"/>
+                            <TextField fx:id="randomClickX_Det" prefWidth="50"/>
+                            <Label prefHeight="25" text="%unit.px"/>
+                        </HBox>
 
-                        <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
-                                styleClass="img-button-style" visible="false">
-                            <graphic>
-                                <ImageView>
-                                    <Image url="@../icon/Trash.png"/>
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.randomClickY"/>
+                            <TextField fx:id="randomClickY_Det" prefWidth="50"/>
+                            <Label prefHeight="25" text="%unit.px"/>
+                        </HBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short" text="%randomClickTime"/>
+
+                        <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short"
+                                  text="%randomClickInterval"/>
+
+                        <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short" text="%randomWaitTime"/>
+
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.randomTimeOffset"/>
+                            <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
+                            <Label prefHeight="25" text="%unit.ms"/>
+                        </HBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <HBox styleClass="hBox-veryLong">
+                            <Label prefHeight="25" text="%clickDetail.clickOpacity"/>
+                            <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
+                                    showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
+                            <Label prefHeight="25" text="\%"/>
+                        </HBox>
+
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.clickRetryNum"/>
+                            <TextField fx:id="clickRetryNum_Det" prefWidth="50"/>
+                            <Label prefHeight="25" text="%unit.times"/>
+                        </HBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.findImgType"/>
+                            <ChoiceBox fx:id="clickFindImgType_Det" prefWidth="150" style="-fx-cursor: hand"
+                                       onAction="#clickFindImgTypeAction"/>
+                        </HBox>
+
+                        <HBox fx:id="clickRegionHBox_Det" spacing="10" visible="false">
+                            <HBox styleClass="hBox-short">
+                                <Button fx:id="clickRegion_Det" text="%clickDetail.showRegion"
+                                        style="-fx-cursor: hand" onAction="#clickRegionAction"/>
+                            </HBox>
+
+                            <CheckBox fx:id="clickAllRegion_Det" styleClass="checkBox-short"
+                                      text="%clickDetail.allRegion"/>
+                        </HBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <HBox prefWidth="550" spacing="10">
+                            <HBox spacing="10">
+                                <Label prefHeight="25" text="%clickDetail.matchedType_Det"/>
+                                <ChoiceBox fx:id="matchedType_Det" prefHeight="25" prefWidth="210"
+                                           style="-fx-cursor: hand" onAction="#matchedTypeChange"/>
+                            </HBox>
+
+                            <HBox fx:id="matchedStepHBox_Det" spacing="10">
+                                <Label prefHeight="25" text="%clickDetail.matchedStep"/>
+                                <TextField fx:id="matchedStep_Det" prefWidth="60"/>
+                                <ImageView fx:id="matchedStepWarning_Det" fitWidth="25" fitHeight="25" visible="false">
+                                    <Image url="@../icon/Warning.png"/>
                                 </ImageView>
-                            </graphic>
-                        </Button>
+                            </HBox>
+                        </HBox>
+
+                        <HBox spacing="10">
+                            <HBox spacing="10">
+                                <Label prefHeight="25" text="%clickDetail.retryType_Det"/>
+                                <ChoiceBox fx:id="retryType_Det" prefHeight="25" prefWidth="210"
+                                           style="-fx-cursor: hand" onAction="#retryTypeChange"/>
+                            </HBox>
+
+                            <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">
+                                <Label prefHeight="25" text="%clickDetail.retryStep"/>
+                                <TextField fx:id="retryStep_Det" prefWidth="60"/>
+                                <ImageView fx:id="retryStepWarning_Det" fitWidth="25" fitHeight="25" visible="false">
+                                    <Image url="@../icon/Warning.png"/>
+                                </ImageView>
+                            </HBox>
+                        </HBox>
                     </HBox>
 
-                    <VBox fx:id="clickImgVBox_Det" visible="false" spacing="10">
-                        <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200" preserveRatio="true"/>
-
-                        <HBox spacing="10">
-                            <Label maxHeight="25" text="%clickDetail.clickImgName"/>
-                            <Label maxHeight="25" fx:id="clickImgName_Det"/>
-                            <Button fx:id="updateClickName_Det" onAction="#updateClickName"
-                                    text="%clickDetail.updateClickName_Det" style="-fx-cursor: hand"/>
+                    <HBox spacing="10">
+                        <HBox styleClass="hBox-veryLong">
+                            <Label prefHeight="25" text="%clickDetail.stopOpacity"/>
+                            <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
+                                    showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
+                            <Label prefHeight="25" text="\%"/>
                         </HBox>
 
-                        <HBox spacing="10">
-                            <Label maxHeight="25" text="%clickDetail.clickImgType"/>
-                            <Label maxHeight="25" fx:id="clickImgType_Det"/>
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.stopRetryNum"/>
+                            <TextField fx:id="stopRetryNum_Det" prefWidth="50"/>
+                            <Label prefHeight="25" text="%unit.times"/>
+                        </HBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <HBox styleClass="hBox-short">
+                            <Label prefHeight="25" text="%clickDetail.findImgType"/>
+                            <ChoiceBox fx:id="stopFindImgType_Det" prefWidth="150" style="-fx-cursor: hand"
+                                       onAction="#stopFindImgTypeAction"/>
                         </HBox>
 
-                        <HBox spacing="10">
-                            <Label maxHeight="25" text="%clickDetail.imgX"/>
-                            <TextField fx:id="imgX_Det" prefWidth="60" promptText="0"/>
-                            <Label maxHeight="25" text="%unit.px"/>
-                        </HBox>
+                        <HBox fx:id="stopRegionHBox_Det" spacing="10" visible="false">
+                            <HBox styleClass="hBox-short">
+                                <Button fx:id="stopRegion_Det" text="%clickDetail.showRegion"
+                                        style="-fx-cursor: hand" onAction="#stopRegionAction"/>
+                            </HBox>
 
-                        <HBox spacing="10">
-                            <Label maxHeight="25" text="%clickDetail.imgY"/>
-                            <TextField fx:id="imgY_Det" prefWidth="60" promptText="0"/>
-                            <Label maxHeight="25" text="%unit.px"/>
+                            <CheckBox fx:id="stopAllRegion_Det" styleClass="checkBox-short"
+                                      text="%clickDetail.allRegion"/>
                         </HBox>
-                    </VBox>
+                    </HBox>
+
+                    <HBox spacing="20">
+                        <VBox spacing="10">
+                            <HBox fx:id="fileNumberHBox_Det" spacing="10">
+                                <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath" style="-fx-cursor: hand"
+                                        text="%clickDetail.stopImgBtn_Det"/>
+                                <Button fx:id="removeAll_Det" onAction="#removeAll" style="-fx-cursor: hand"
+                                        text="%listText.removeAll"/>
+
+                                <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" prefHeight="25"
+                                       text="%listText.null"/>
+                            </HBox>
+
+                            <TableView fx:id="tableView_Det" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+                                <placeholder>
+                                    <Label text="%clickDetail.tableView_Det"/>
+                                </placeholder>
+
+                                <columns>
+                                    <TableColumn fx:id="index_Det" text="%listText.index" sortable="false"/>
+                                    <TableColumn fx:id="thumb_Det" text="%listText.thumb" sortable="false"/>
+                                    <TableColumn fx:id="name_Det" text="%stopImg.name" sortable="false"/>
+                                    <TableColumn fx:id="path_Det" text="%stopImg.path" sortable="false"/>
+                                    <TableColumn fx:id="type_Det" text="%stopImg.type" sortable="false"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+
+                        <VBox spacing="10">
+                            <HBox spacing="5">
+                                <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath" style="-fx-cursor: hand"
+                                        text="%clickDetail.clickImgBtn_Det"/>
+                                <Label fx:id="clickImgPath_Det" prefHeight="25" prefWidth="300"
+                                       style="-fx-font-size: 15px;"/>
+
+                                <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
+                                        styleClass="img-button-style" visible="false">
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@../icon/Trash.png"/>
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                            </HBox>
+
+                            <VBox fx:id="clickImgVBox_Det" visible="false" spacing="10">
+                                <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200" preserveRatio="true"/>
+
+                                <HBox spacing="10">
+                                    <Label maxHeight="25" text="%clickDetail.clickImgName"/>
+                                    <Label maxHeight="25" fx:id="clickImgName_Det"/>
+                                    <Button fx:id="updateClickName_Det" onAction="#updateClickName"
+                                            text="%clickDetail.updateClickName_Det" style="-fx-cursor: hand"/>
+                                </HBox>
+
+                                <HBox spacing="10">
+                                    <Label maxHeight="25" text="%clickDetail.clickImgType"/>
+                                    <Label maxHeight="25" fx:id="clickImgType_Det"/>
+                                </HBox>
+
+                                <HBox spacing="10">
+                                    <Label maxHeight="25" text="%clickDetail.imgX"/>
+                                    <TextField fx:id="imgX_Det" prefWidth="60" promptText="0"/>
+                                    <Label maxHeight="25" text="%unit.px"/>
+                                </HBox>
+
+                                <HBox spacing="10">
+                                    <Label maxHeight="25" text="%clickDetail.imgY"/>
+                                    <TextField fx:id="imgY_Det" prefWidth="60" promptText="0"/>
+                                    <Label maxHeight="25" text="%unit.px"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                    </HBox>
                 </VBox>
-            </HBox>
+            </AnchorPane>
+        </ScrollPane>
+    </center>
 
-            <HBox spacing="10">
-                <VBox fx:id="progressBarVBox_Det">
-                    <ProgressBar fx:id="progressBar_Det" visible="false" prefWidth="200.0" progress="0.0"/>
-                </VBox>
+    <bottom>
+        <HBox spacing="10" style="-fx-padding: 10">
+            <VBox fx:id="progressBarVBox_Det">
+                <ProgressBar fx:id="progressBar_Det" visible="false" prefWidth="200.0" progress="0.0"/>
+            </VBox>
 
-                <Button text="%detail.save" style="-fx-cursor: hand" onAction="#saveDetail"/>
-                <Button text="%clickDetail.removeDetail" style="-fx-cursor: hand" onAction="#removeDetail"/>
-            </HBox>
-        </VBox>
-    </AnchorPane>
-</ScrollPane>
+            <Button text="%detail.save" style="-fx-cursor: hand" onAction="#saveDetail"/>
+            <Button text="%clickDetail.removeDetail" style="-fx-cursor: hand" onAction="#removeDetail"/>
+        </HBox>
+    </bottom>
+</BorderPane>
