@@ -1,11 +1,11 @@
-package priv.koishi.pmc.Native.GlobalWindowMonitor;
+package priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Native.CoreGraphics;
+import priv.koishi.pmc.JnaNative.CoreGraphics;
 
 import java.util.ArrayList;
 import java.util.List;

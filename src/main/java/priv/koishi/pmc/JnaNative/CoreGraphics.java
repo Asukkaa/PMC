@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Native;
+package priv.koishi.pmc.JnaNative;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;

@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Native.GlobalWindowMonitor;
+package priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
