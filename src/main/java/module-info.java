@@ -18,6 +18,7 @@ module priv.koishi.pmc {
     requires jdk.localedata;
     requires jdk.httpserver;
     requires java.net.http;
+    requires com.sun.jna.platform;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;
