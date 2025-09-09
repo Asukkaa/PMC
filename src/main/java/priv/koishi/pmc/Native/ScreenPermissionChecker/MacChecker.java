@@ -1,4 +1,6 @@
-package priv.koishi.pmc.MacScreenPermissionChecker;
+package priv.koishi.pmc.Native.ScreenPermissionChecker;
+
+import priv.koishi.pmc.Native.CoreGraphics;
 
 import java.awt.*;
 
@@ -12,7 +14,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapture
  * Date 2025/04/21
  * Time 14:30
  */
-public class MacScreenPermissionChecker {
+public class MacChecker {
 
     /**
      * 检查macOS屏幕录制权限方法

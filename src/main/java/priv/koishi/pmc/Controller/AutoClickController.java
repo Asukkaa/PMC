@@ -70,7 +70,7 @@ import static priv.koishi.pmc.Controller.SettingController.clickFloating;
 import static priv.koishi.pmc.Controller.SettingController.stopFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MacScreenPermissionChecker.MacScreenPermissionChecker.hasScreenCapturePermission;
+import static priv.koishi.pmc.Native.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
