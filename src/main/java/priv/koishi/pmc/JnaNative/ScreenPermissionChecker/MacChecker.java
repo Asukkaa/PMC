@@ -1,6 +1,6 @@
 package priv.koishi.pmc.JnaNative.ScreenPermissionChecker;
 
-import priv.koishi.pmc.JnaNative.CoreGraphics;
+import priv.koishi.pmc.JnaNative.JnaLibrary.CoreGraphics;
 
 import java.awt.*;
 

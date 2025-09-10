@@ -4,9 +4,12 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.ptr.PointerByReference;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.JnaNative.CoreGraphics;
-import priv.koishi.pmc.JnaNative.Foundation;
+import priv.koishi.pmc.JnaNative.JnaLibrary.Accessibility;
+import priv.koishi.pmc.JnaNative.JnaLibrary.CoreGraphics;
+import priv.koishi.pmc.JnaNative.JnaStructure.CGPoint;
+import priv.koishi.pmc.JnaNative.JnaStructure.CGSize;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,8 +39,10 @@ public class WindowMonitor {
             System.out.println(info);
         }
         System.out.println("-----------------");
-        Thread.sleep(10000);
-        System.out.println(getFocusWindowInfo2());
+        Thread.sleep(5000);
+        if (isMac) {
+            System.out.println(getFocusWindowInfoUsingAccessibility());
+        }
     }
 
     /**
@@ -269,9 +274,7 @@ public class WindowMonitor {
      * 创建CFString对象
      */
     private static Pointer createCFString(String str) {
-        Foundation foundation = Foundation.INSTANCE;
-        // UTF-8 encoding
-        return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
+        return Accessibility.createCFString(str);
     }
 
     /**
@@ -326,6 +329,149 @@ public class WindowMonitor {
             return focusWindow;
         } catch (Exception e) {
             System.err.println("获取焦点窗口信息时出错: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public static WindowInfo getFocusWindowInfoUsingAccessibility() {
+        try {
+            // 1. 获取前台应用的PID
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e",
+                    "tell application \"System Events\" to get unix id of first application process whose frontmost is true"});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String pidStr = reader.readLine();
+            process.waitFor();
+            if (pidStr == null || pidStr.trim().isEmpty()) {
+                return null;
+            }
+            int frontAppPid = Integer.parseInt(pidStr.trim());
+            // 2. 为这个PID创建AXUIElement应用对象
+            Pointer axApp = Accessibility.INSTANCE.AXUIElementCreateApplication(frontAppPid);
+            if (axApp == null) {
+                System.err.println("无法为PID创建AXUIElement: " + frontAppPid);
+                return null;
+            }
+            try {
+                // 3. 查询该应用的焦点窗口属性
+                PointerByReference focusedWindowRef = new PointerByReference();
+                int errCode = Accessibility.INSTANCE.AXUIElementCopyAttributeValue(
+                        axApp, Accessibility.kAXFocusedWindowAttribute, focusedWindowRef);
+                if (errCode != 0 || focusedWindowRef.getValue() == null) {
+                    System.err.println("无法获取焦点窗口 (错误码: " + errCode + ")");
+                    return null;
+                }
+                Pointer axFocusedWindow = focusedWindowRef.getValue();
+                try {
+                    // 4. 从焦点窗口元素中提取我们需要的信息
+                    String title = getStringAttribute(axFocusedWindow, Accessibility.kAXTitleAttribute);
+                    // 使用新的getPositionAndSize方法获取位置和大小
+                    int[] x = new int[1], y = new int[1];
+                    int[] width = new int[1], height = new int[1];
+                    if (!getPositionAndSize(axFocusedWindow, x, y, width, height)) {
+                        return null;
+                    }
+                    // 5. 构建并返回WindowInfo对象
+                    String processPath = getProcessPathByPid(frontAppPid);
+                    String processName = getProcessNameByPid(frontAppPid);
+                    return new WindowInfo()
+                            .setId(Pointer.nativeValue(axFocusedWindow))
+                            .setPid(frontAppPid)
+                            .setProcessName(processName)
+                            .setProcessPath(processPath)
+                            .setTitle(title)
+                            .setX(x[0])
+                            .setY(y[0])
+                            .setWidth(width[0])
+                            .setHeight(height[0]);
+                } finally {
+                    if (axFocusedWindow != null) {
+                        Accessibility.INSTANCE.CFRelease(axFocusedWindow);
+                    }
+                }
+            } finally {
+                Accessibility.INSTANCE.CFRelease(axApp);
+            }
+        } catch (Exception e) {
+            System.err.println("Accessibility API 调用失败: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // 辅助函数：从AXUIElement获取字符串属性
+    private static String getStringAttribute(Pointer element, Pointer attribute) {
+        PointerByReference valueRef = new PointerByReference();
+        int err = Accessibility.INSTANCE.AXUIElementCopyAttributeValue(element, attribute, valueRef);
+        if (err == 0 && valueRef.getValue() != null) {
+            try {
+                // 简化处理，实际需要将CFStringRef转换为Java String
+                byte[] buffer = new byte[255];
+                Accessibility.INSTANCE.CFStringGetCString(valueRef.getValue(), buffer, buffer.length, 0x08000100);
+                return Native.toString(buffer, "UTF-8");
+            } finally {
+                Accessibility.INSTANCE.CFRelease(valueRef.getValue());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 从AXUIElement中获取位置和大小信息
+     */
+    private static boolean getPositionAndSize(Pointer axElement, int[] x, int[] y, int[] width, int[] height) {
+        try {
+            Accessibility ax = Accessibility.INSTANCE;
+            // 获取位置
+            PointerByReference positionValueRef = new PointerByReference();
+            int errPos = ax.AXUIElementCopyAttributeValue(axElement, Accessibility.kAXPositionAttribute, positionValueRef);
+
+            if (errPos == 0 && positionValueRef.getValue() != null) {
+                CGPoint point = new CGPoint();
+                boolean success = ax.AXValueGetValue(positionValueRef.getValue(), Accessibility.kAXValueTypeCGPoint, point);
+                if (success) {
+                    x[0] = (int) Math.round(point.x);
+                    y[0] = (int) Math.round(point.y);
+                }
+                ax.CFRelease(positionValueRef.getValue());
+            } else {
+                System.err.println("获取位置属性失败，错误码: " + errPos);
+                return false;
+            }
+            // 获取大小
+            PointerByReference sizeValueRef = new PointerByReference();
+            int errSize = ax.AXUIElementCopyAttributeValue(axElement, Accessibility.kAXSizeAttribute, sizeValueRef);
+            if (errSize == 0 && sizeValueRef.getValue() != null) {
+                CGSize size = new CGSize();
+                boolean success = ax.AXValueGetValue(sizeValueRef.getValue(), Accessibility.kAXValueTypeCGSize, size);
+                if (success) {
+                    width[0] = (int) Math.round(size.width);
+                    height[0] = (int) Math.round(size.height);
+                    return true;
+                }
+                ax.CFRelease(sizeValueRef.getValue());
+            } else {
+                System.err.println("获取大小属性失败，错误码: " + errSize);
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("获取位置和大小信息时出错: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 通过进程ID获取进程名称
+     */
+    private static String getProcessNameByPid(int pid) {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String name = reader.readLine();
+            process.waitFor();
+            if (name != null && !name.trim().isEmpty()) {
+                return name.trim();
+            }
+        } catch (Exception e) {
+            System.err.println("通过PID获取进程名失败: " + e.getMessage());
         }
         return null;
     }
