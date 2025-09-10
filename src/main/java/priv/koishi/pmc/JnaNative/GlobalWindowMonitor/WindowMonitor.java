@@ -271,4 +271,57 @@ public class WindowMonitor {
         return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
     }
 
+    /**
+     * 获取焦点窗口
+     */
+    public static WindowInfo getFocusedWindowWithAccessibilityAPI() {
+        try {
+            CoreGraphics cg = CoreGraphics.INSTANCE;
+            // 获取前台应用PID
+            String script = "tell application \"System Events\" to get the unix id of the first process whose frontmost is true";
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String pidStr = reader.readLine();
+            if (pidStr != null) {
+                int pid = Integer.parseInt(pidStr.trim());
+                // 创建应用的可访问性元素
+                Pointer applicationElement = cg.AXUIElementCreateApplication(pid);
+                if (applicationElement != null) {
+                    // 获取窗口属性
+                    Pointer[] windowAttrValue = new Pointer[1];
+                    int result = cg.AXUIElementCopyAttributeValue(applicationElement, "AXFocusedWindow", windowAttrValue);
+                    if (result == 0 && windowAttrValue[0] != null) {
+                        // 获取窗口标题
+                        Pointer[] titleValue = new Pointer[1];
+                        cg.AXUIElementCopyAttributeValue(windowAttrValue[0], "AXTitle", titleValue);
+
+                        String title = null;
+                        if (titleValue[0] != null) {
+                            title = cg.CFStringGetCStringPtr(titleValue[0], 0x08000100);
+                            cg.CFRelease(titleValue[0]);
+                        }
+                        // 获取窗口位置和大小
+                        Pointer[] positionValue = new Pointer[1];
+                        Pointer[] sizeValue = new Pointer[1];
+                        cg.AXUIElementCopyAttributeValue(windowAttrValue[0], "AXPosition", positionValue);
+                        cg.AXUIElementCopyAttributeValue(windowAttrValue[0], "AXSize", sizeValue);
+                        // 清理资源
+                        cg.CFRelease(windowAttrValue[0]);
+                        cg.CFRelease(applicationElement);
+                        // 创建并返回 WindowInfo 对象
+                        WindowInfo focusedWindow = new WindowInfo();
+                        focusedWindow.setPid(pid);
+                        focusedWindow.setTitle(title);
+                        // 设置位置和大小等信息...
+                        return focusedWindow;
+                    }
+                    cg.CFRelease(applicationElement);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("使用Accessibility API获取焦点窗口时出错: " + e.getMessage());
+        }
+        return null;
+    }
+
 }

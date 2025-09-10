@@ -52,4 +52,12 @@ public interface CoreGraphics extends Library {
 
     boolean CFNumberGetValue(Pointer number, int type, int[] value);
 
+    Pointer AXUIElementCreateApplication(int pid);
+
+    int AXUIElementCopyAttributeValue(Pointer element, String attribute, Pointer[] value);
+
+    int AXUIElementCopyAttributeNames(Pointer element, Pointer[] names);
+
+    String CFStringRefToJavaString(Pointer cfStringRef);
+
 }
