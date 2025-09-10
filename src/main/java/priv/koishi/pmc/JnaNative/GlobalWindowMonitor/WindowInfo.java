@@ -15,9 +15,9 @@ import lombok.experimental.Accessors;
 public class WindowInfo {
 
     /**
-     * 窗口标题
+     * 窗口唯一标识（Windows为HWND的数值，macOS为CGWindowID）
      */
-    String title;
+    long id;
 
     /**
      * 窗口横坐标
@@ -38,5 +38,25 @@ public class WindowInfo {
      * 窗口高度
      */
     int height;
+
+    /**
+     * 窗口进程ID
+     */
+    int pid;
+
+    /**
+     * 窗口进程名称
+     */
+    String processName;
+
+    /**
+     * 窗口进程路径
+     */
+    String processPath;
+
+    /**
+     * 窗口标题
+     */
+    String title;
 
 }

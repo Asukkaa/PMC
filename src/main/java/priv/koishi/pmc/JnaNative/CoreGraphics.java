@@ -18,19 +18,38 @@ public interface CoreGraphics extends Library {
      */
     CoreGraphics INSTANCE = Native.load("CoreGraphics", CoreGraphics.class);
 
+    int kCGWindowListOptionAll = 0;
+
+    int kCGWindowListOptionOnScreenOnly = 1;
+
+    int kCGWindowListOptionOnScreenAboveWindow = 2;
+
+    int kCGWindowListOptionOnScreenBelowWindow = 4;
+
+    int kCGWindowListExcludeDesktopElements = 0x10;
+
     /**
      * macOS 10.15+ 检测屏幕录制权限专用API
      */
     byte CGPreflightScreenCaptureAccess();
 
-    Pointer CGWindowListCreate(int option, int relativeToWindow);
-
-    void CFRelease(Pointer ptr);
+    Pointer CGWindowListCopyWindowInfo(int option, int relativeToWindow);
 
     int CFArrayGetCount(Pointer array);
 
     Pointer CFArrayGetValueAtIndex(Pointer array, int index);
 
-    Pointer CGWindowListCreateImage(Pointer array, int imageOption);
+    void CFRelease(Pointer ref);
+
+    /**
+     * 获取窗口属性值
+     */
+    Pointer CFDictionaryGetValue(Pointer dict, Pointer key);
+
+    String CFStringGetCStringPtr(Pointer cfStr, int encoding);
+
+    boolean CFNumberGetValue(Pointer number, int type, double[] value);
+
+    boolean CFNumberGetValue(Pointer number, int type, int[] value);
 
 }
