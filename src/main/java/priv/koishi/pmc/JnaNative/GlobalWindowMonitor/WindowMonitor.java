@@ -324,4 +324,30 @@ public class WindowMonitor {
         return null;
     }
 
+    public static WindowInfo getMacFocusedWindow() {
+        try {
+            // 获取前台应用PID
+            String script = "tell application \"System Events\" to get the unix id of the first process whose frontmost is true";
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String pidStr = reader.readLine();
+
+            if (pidStr != null) {
+                int pid = Integer.parseInt(pidStr.trim());
+
+                // 获取该应用的所有窗口并找出焦点窗口
+                List<WindowInfo> windows = getMacWindowInfo();
+                for (WindowInfo window : windows) {
+                    if (window.getPid() == pid) {
+                        // 这里可以根据需要添加更多判断条件来确定哪个是焦点窗口
+                        return window;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("获取焦点窗口时出错: " + e.getMessage());
+        }
+        return null;
+    }
+
 }
