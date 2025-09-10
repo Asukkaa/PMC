@@ -43,4 +43,5 @@ module priv.koishi.pmc {
     opens priv.koishi.pmc.Bean.Config to javafx.fxml;
     opens priv.koishi.pmc.UI.CustomFloatingWindow to javafx.fxml;
     exports priv.koishi.pmc.UI.CustomFloatingWindow;
+    opens priv.koishi.pmc.JnaNative.JnaStructure to com.sun.jna;
 }

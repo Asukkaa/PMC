@@ -49,6 +49,7 @@ import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
@@ -70,6 +71,7 @@ import static priv.koishi.pmc.Controller.SettingController.clickFloating;
 import static priv.koishi.pmc.Controller.SettingController.stopFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getFocusWindowInfoUsingAccessibility;
 import static priv.koishi.pmc.JnaNative.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
@@ -2025,6 +2027,15 @@ public class AutoClickController extends RootController implements MousePosition
         // 设置css样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
+    }
+
+    @FXML
+    public void testAction() {
+        WindowInfo windowInfo = getFocusWindowInfoUsingAccessibility();
+        if (windowInfo == null) {
+            throw new RuntimeException("窗口获取失败");
+        }
+        updateLabel(log_Click, windowInfo.getProcessName());
     }
 
 }

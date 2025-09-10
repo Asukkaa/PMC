@@ -6,6 +6,8 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.ptr.PointerByReference;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.JnaNative.JnaLibrary.Accessibility;
 import priv.koishi.pmc.JnaNative.JnaLibrary.CoreGraphics;
 import priv.koishi.pmc.JnaNative.JnaStructure.CGPoint;
@@ -28,6 +30,11 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
  */
 public class WindowMonitor {
 
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(WindowMonitor.class);
+
     public static void main(String[] args) throws InterruptedException {
         List<WindowInfo> windows = new ArrayList<>();
         if (isWin) {
@@ -39,7 +46,7 @@ public class WindowMonitor {
             System.out.println(info);
         }
         System.out.println("-----------------");
-        Thread.sleep(5000);
+//        Thread.sleep(5000);
         if (isMac) {
             System.out.println(getFocusWindowInfoUsingAccessibility());
         }
@@ -348,8 +355,8 @@ public class WindowMonitor {
             // 2. 为这个PID创建AXUIElement应用对象
             Pointer axApp = Accessibility.INSTANCE.AXUIElementCreateApplication(frontAppPid);
             if (axApp == null) {
-                System.err.println("无法为PID创建AXUIElement: " + frontAppPid);
-                return null;
+                logger.error("无法为PID创建AXUIElement: {}", frontAppPid);
+                throw new RuntimeException("无法为PID创建AXUIElement: " + frontAppPid);
             }
             try {
                 // 3. 查询该应用的焦点窗口属性
@@ -357,8 +364,8 @@ public class WindowMonitor {
                 int errCode = Accessibility.INSTANCE.AXUIElementCopyAttributeValue(
                         axApp, Accessibility.kAXFocusedWindowAttribute, focusedWindowRef);
                 if (errCode != 0 || focusedWindowRef.getValue() == null) {
-                    System.err.println("无法获取焦点窗口 (错误码: " + errCode + ")");
-                    return null;
+                    logger.error("无法获取焦点窗口 (错误码: {})", errCode);
+                    throw new RuntimeException("无法获取焦点窗口 (错误码: " + errCode + ")");
                 }
                 Pointer axFocusedWindow = focusedWindowRef.getValue();
                 try {
@@ -368,7 +375,8 @@ public class WindowMonitor {
                     int[] x = new int[1], y = new int[1];
                     int[] width = new int[1], height = new int[1];
                     if (!getPositionAndSize(axFocusedWindow, x, y, width, height)) {
-                        return null;
+                        logger.error("从AXUIElement中获取位置和大小信息失败");
+                        throw new RuntimeException("从AXUIElement中获取位置和大小信息失败");
                     }
                     // 5. 构建并返回WindowInfo对象
                     String processPath = getProcessPathByPid(frontAppPid);
@@ -392,9 +400,9 @@ public class WindowMonitor {
                 Accessibility.INSTANCE.CFRelease(axApp);
             }
         } catch (Exception e) {
-            System.err.println("Accessibility API 调用失败: " + e.getMessage());
+            logger.error("Accessibility API 调用失败: {}", e.getMessage());
+            throw new RuntimeException("Accessibility API 调用失败: " + e.getMessage());
         }
-        return null;
     }
 
     // 辅助函数：从AXUIElement获取字符串属性
@@ -433,8 +441,8 @@ public class WindowMonitor {
                 }
                 ax.CFRelease(positionValueRef.getValue());
             } else {
-                System.err.println("获取位置属性失败，错误码: " + errPos);
-                return false;
+                logger.error("获取位置属性失败: {}", errPos);
+                throw new RuntimeException("获取位置属性失败，错误码: " + errPos);
             }
             // 获取大小
             PointerByReference sizeValueRef = new PointerByReference();
@@ -449,12 +457,13 @@ public class WindowMonitor {
                 }
                 ax.CFRelease(sizeValueRef.getValue());
             } else {
-                System.err.println("获取大小属性失败，错误码: " + errSize);
+                logger.error("获取大小属性失败: {}", errSize);
+                throw new RuntimeException("获取大小属性失败，错误码: " + errSize);
             }
             return false;
         } catch (Exception e) {
-            System.err.println("获取位置和大小信息时出错: " + e.getMessage());
-            return false;
+            logger.error("获取位置和大小信息时出错: {}", e.getMessage());
+            throw new RuntimeException("获取位置和大小信息时出错: " + e.getMessage());
         }
     }
 
@@ -471,7 +480,8 @@ public class WindowMonitor {
                 return name.trim();
             }
         } catch (Exception e) {
-            System.err.println("通过PID获取进程名失败: " + e.getMessage());
+            logger.error("通过PID获取进程名失败: {}", e.getMessage());
+            throw new RuntimeException("通过PID获取进程名失败: " + e.getMessage());
         }
         return null;
     }
