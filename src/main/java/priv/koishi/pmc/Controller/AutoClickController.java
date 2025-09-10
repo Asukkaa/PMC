@@ -71,7 +71,7 @@ import static priv.koishi.pmc.Controller.SettingController.clickFloating;
 import static priv.koishi.pmc.Controller.SettingController.stopFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getFocusWindowInfoUsingAccessibility;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMacFocusWindowInfo;
 import static priv.koishi.pmc.JnaNative.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
@@ -2030,8 +2030,9 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     @FXML
-    public void testAction() {
-        WindowInfo windowInfo = getFocusWindowInfoUsingAccessibility();
+    public void testAction() throws Exception {
+        Thread.sleep(5000);
+        WindowInfo windowInfo = getMacFocusWindowInfo();
         if (windowInfo == null) {
             throw new RuntimeException("窗口获取失败");
         }
