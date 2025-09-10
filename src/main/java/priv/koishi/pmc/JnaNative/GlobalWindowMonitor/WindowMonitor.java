@@ -289,18 +289,19 @@ public class WindowMonitor {
      */
     public static String getFocusWindowInfo1() {
         try {
-            String script = "tell application \"System Events\"\n" +
-                    "set frontApp to first application process whose frontmost is true\n" +
-                    "set appName to name of frontApp\n" +
-                    "try\n" +
-                    "set windowName to name of front window of frontApp\n" +
-                    "set windowPosition to position of front window of frontApp\n" +
-                    "set windowSize to size of front window of frontApp\n" +
-                    "return appName & \"||\" & windowName & \"||\" & windowPosition & \"||\" & windowSize\n" +
-                    "on error errMsg\n" +
-                    "return appName & \"||\" & \"\" & \"||\" & \"\" & \"||\" & \"\"\n" +
-                    "end try\n" +
-                    "end tell";
+            String script = """
+                    tell application "System Events"
+                    set frontApp to first application process whose frontmost is true
+                    set appName to name of frontApp
+                    try
+                    set windowName to name of front window of frontApp
+                    set windowPosition to position of front window of frontApp
+                    set windowSize to size of front window of frontApp
+                    return appName & "||" & windowName & "||" & windowPosition & "||" & windowSize
+                    on error errMsg
+                    return appName & "||" & "" & "||" & "" & "||" & ""
+                    end try
+                    end tell""";
             Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String result = reader.readLine();
@@ -342,46 +343,64 @@ public class WindowMonitor {
 
     public static WindowInfo getFocusWindowInfoUsingAccessibility() {
         try {
+            logger.info("开始使用 Accessibility API 获取焦点窗口信息");
+
             // 1. 获取前台应用的PID
-            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e",
-                    "tell application \"System Events\" to get unix id of first application process whose frontmost is true"});
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String pidStr = reader.readLine();
-            process.waitFor();
-            if (pidStr == null || pidStr.trim().isEmpty()) {
+            int frontAppPid = getFrontAppPid();
+            if (frontAppPid == -1) {
+                logger.error("无法获取前台应用PID");
                 return null;
             }
-            int frontAppPid = Integer.parseInt(pidStr.trim());
+            logger.info("前台应用PID: {}", frontAppPid);
+
             // 2. 为这个PID创建AXUIElement应用对象
             Pointer axApp = Accessibility.INSTANCE.AXUIElementCreateApplication(frontAppPid);
             if (axApp == null) {
                 logger.error("无法为PID创建AXUIElement: {}", frontAppPid);
-                throw new RuntimeException("无法为PID创建AXUIElement: " + frontAppPid);
+                return null;
             }
+            logger.info("成功创建AXUIElement应用对象");
+
             try {
                 // 3. 查询该应用的焦点窗口属性
                 PointerByReference focusedWindowRef = new PointerByReference();
                 int errCode = Accessibility.INSTANCE.AXUIElementCopyAttributeValue(
                         axApp, Accessibility.kAXFocusedWindowAttribute, focusedWindowRef);
+
+                logger.info("获取焦点窗口属性错误码: {}", errCode);
+
                 if (errCode != 0 || focusedWindowRef.getValue() == null) {
                     logger.error("无法获取焦点窗口 (错误码: {})", errCode);
-                    throw new RuntimeException("无法获取焦点窗口 (错误码: " + errCode + ")");
+
+                    // 尝试获取所有窗口，然后选择主窗口作为备选
+                    return getMainWindowFromApplication(axApp, frontAppPid);
                 }
+
                 Pointer axFocusedWindow = focusedWindowRef.getValue();
+                logger.info("成功获取焦点窗口引用");
+
                 try {
                     // 4. 从焦点窗口元素中提取我们需要的信息
                     String title = getStringAttribute(axFocusedWindow, Accessibility.kAXTitleAttribute);
+                    logger.info("窗口标题: {}", title);
+
                     // 使用新的getPositionAndSize方法获取位置和大小
                     int[] x = new int[1], y = new int[1];
                     int[] width = new int[1], height = new int[1];
+
                     if (!getPositionAndSize(axFocusedWindow, x, y, width, height)) {
-                        logger.error("从AXUIElement中获取位置和大小信息失败");
-                        throw new RuntimeException("从AXUIElement中获取位置和大小信息失败");
+                        logger.error("无法获取窗口位置和大小");
+                        return null;
                     }
+
+                    logger.info("窗口位置: ({}, {})", x[0], y[0]);
+                    logger.info("窗口大小: {}x{}", width[0], height[0]);
+
                     // 5. 构建并返回WindowInfo对象
                     String processPath = getProcessPathByPid(frontAppPid);
                     String processName = getProcessNameByPid(frontAppPid);
-                    return new WindowInfo()
+
+                    WindowInfo result = new WindowInfo()
                             .setId(Pointer.nativeValue(axFocusedWindow))
                             .setPid(frontAppPid)
                             .setProcessName(processName)
@@ -391,18 +410,109 @@ public class WindowMonitor {
                             .setY(y[0])
                             .setWidth(width[0])
                             .setHeight(height[0]);
+
+                    logger.info("成功创建WindowInfo对象");
+                    return result;
+
                 } finally {
                     if (axFocusedWindow != null) {
                         Accessibility.INSTANCE.CFRelease(axFocusedWindow);
                     }
                 }
             } finally {
-                Accessibility.INSTANCE.CFRelease(axApp);
+                if (axApp != null) {
+                    Accessibility.INSTANCE.CFRelease(axApp);
+                }
             }
         } catch (Exception e) {
-            logger.error("Accessibility API 调用失败: {}", e.getMessage());
-            throw new RuntimeException("Accessibility API 调用失败: " + e.getMessage());
+            logger.error("Accessibility API 调用失败: {}", e.getMessage(), e);
+            return null;
         }
+    }
+
+    /**
+     * 从应用程序获取主窗口（备用方法）
+     */
+    private static WindowInfo getMainWindowFromApplication(Pointer axApp, int pid) {
+        PointerByReference windowsRef = new PointerByReference();
+        try {
+            logger.info("尝试获取主窗口作为备选");
+
+            int errCode = Accessibility.INSTANCE.AXUIElementCopyAttributeValue(
+                    axApp, Accessibility.kAXWindowsAttribute, windowsRef);
+
+            if (errCode != 0 || windowsRef.getValue() == null) {
+                logger.error("无法获取窗口列表 (错误码: {})", errCode);
+                return null;
+            }
+
+            // 使用 CoreGraphics 的方法获取数组信息
+            int windowCount = CoreGraphics.INSTANCE.CFArrayGetCount(windowsRef.getValue());
+            logger.info("找到 {} 个窗口", windowCount);
+
+            if (windowCount == 0) {
+                return null;
+            }
+
+            // 获取第一个窗口（通常是主窗口）
+            Pointer firstWindow = CoreGraphics.INSTANCE.CFArrayGetValueAtIndex(windowsRef.getValue(), 0);
+
+            // 获取窗口信息
+            String title = getStringAttribute(firstWindow, Accessibility.kAXTitleAttribute);
+            logger.info("主窗口标题: {}", title);
+
+            int[] x = new int[1], y = new int[1];
+            int[] width = new int[1], height = new int[1];
+
+            if (!getPositionAndSize(firstWindow, x, y, width, height)) {
+                return null;
+            }
+
+            String processPath = getProcessPathByPid(pid);
+            String processName = getProcessNameByPid(pid);
+
+            WindowInfo result = new WindowInfo()
+                    .setId(Pointer.nativeValue(firstWindow))
+                    .setPid(pid)
+                    .setProcessName(processName)
+                    .setProcessPath(processPath)
+                    .setTitle(title)
+                    .setX(x[0])
+                    .setY(y[0])
+                    .setWidth(width[0])
+                    .setHeight(height[0]);
+
+            logger.info("使用主窗口作为焦点窗口");
+            return result;
+
+        } catch (Exception e) {
+            logger.error("获取主窗口失败: {}", e.getMessage(), e);
+            return null;
+        } finally {
+            // 释放 windowsRef 中的值
+            if (windowsRef.getValue() != null) {
+                CoreGraphics.INSTANCE.CFRelease(windowsRef.getValue());
+            }
+        }
+    }
+
+    /**
+     * 获取前台应用的PID
+     */
+    private static int getFrontAppPid() {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e",
+                    "tell application \"System Events\" to get unix id of first application process whose frontmost is true"});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String pidStr = reader.readLine();
+            process.waitFor();
+            if (pidStr != null && !pidStr.trim().isEmpty()) {
+                return Integer.parseInt(pidStr.trim());
+            }
+        } catch (Exception e) {
+            logger.error("获取前台应用PID失败: {}", e.getMessage(), e);
+        }
+        return -1;
     }
 
     // 辅助函数：从AXUIElement获取字符串属性
