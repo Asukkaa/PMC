@@ -25,7 +25,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
  */
 public class WindowMonitor {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         List<WindowInfo> windows = new ArrayList<>();
         if (isWin) {
             windows = getWinWindowInfo();
@@ -35,6 +35,9 @@ public class WindowMonitor {
         for (WindowInfo info : windows) {
             System.out.println(info);
         }
+        System.out.println("-----------------");
+        Thread.sleep(10000);
+        System.out.println(getFocusWindowInfo2());
     }
 
     /**
@@ -272,80 +275,57 @@ public class WindowMonitor {
     }
 
     /**
-     * 获取焦点窗口
+     * 获取Mac焦点窗口
      */
-    public static WindowInfo getFocusedWindowWithAccessibilityAPI() {
+    public static String getFocusWindowInfo1() {
         try {
-            CoreGraphics cg = CoreGraphics.INSTANCE;
-            // 获取前台应用PID
-            String script = "tell application \"System Events\" to get the unix id of the first process whose frontmost is true";
+            String script = "tell application \"System Events\"\n" +
+                    "set frontApp to first application process whose frontmost is true\n" +
+                    "set appName to name of frontApp\n" +
+                    "try\n" +
+                    "set windowName to name of front window of frontApp\n" +
+                    "set windowPosition to position of front window of frontApp\n" +
+                    "set windowSize to size of front window of frontApp\n" +
+                    "return appName & \"||\" & windowName & \"||\" & windowPosition & \"||\" & windowSize\n" +
+                    "on error errMsg\n" +
+                    "return appName & \"||\" & \"\" & \"||\" & \"\" & \"||\" & \"\"\n" +
+                    "end try\n" +
+                    "end tell";
             Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String pidStr = reader.readLine();
-            if (pidStr != null) {
-                int pid = Integer.parseInt(pidStr.trim());
-                // 创建应用的可访问性元素
-                Pointer applicationElement = cg.AXUIElementCreateApplication(pid);
-                if (applicationElement != null) {
-                    // 获取窗口属性
-                    Pointer[] windowAttrValue = new Pointer[1];
-                    int result = cg.AXUIElementCopyAttributeValue(applicationElement, "AXFocusedWindow", windowAttrValue);
-                    if (result == 0 && windowAttrValue[0] != null) {
-                        // 获取窗口标题
-                        Pointer[] titleValue = new Pointer[1];
-                        cg.AXUIElementCopyAttributeValue(windowAttrValue[0], "AXTitle", titleValue);
-
-                        String title = null;
-                        if (titleValue[0] != null) {
-                            title = cg.CFStringGetCStringPtr(titleValue[0], 0x08000100);
-                            cg.CFRelease(titleValue[0]);
-                        }
-                        // 获取窗口位置和大小
-                        Pointer[] positionValue = new Pointer[1];
-                        Pointer[] sizeValue = new Pointer[1];
-                        cg.AXUIElementCopyAttributeValue(windowAttrValue[0], "AXPosition", positionValue);
-                        cg.AXUIElementCopyAttributeValue(windowAttrValue[0], "AXSize", sizeValue);
-                        // 清理资源
-                        cg.CFRelease(windowAttrValue[0]);
-                        cg.CFRelease(applicationElement);
-                        // 创建并返回 WindowInfo 对象
-                        WindowInfo focusedWindow = new WindowInfo();
-                        focusedWindow.setPid(pid);
-                        focusedWindow.setTitle(title);
-                        // 设置位置和大小等信息...
-                        return focusedWindow;
-                    }
-                    cg.CFRelease(applicationElement);
-                }
-            }
+            String result = reader.readLine();
+            process.waitFor();
+            return result;
         } catch (Exception e) {
-            System.err.println("使用Accessibility API获取焦点窗口时出错: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
-    public static WindowInfo getMacFocusedWindow() {
+    public static WindowInfo getFocusWindowInfo2() {
+        List<WindowInfo> allWindows = getMacWindowInfo();
+        if (allWindows.isEmpty()) {
+            return null;
+        }
         try {
-            // 获取前台应用PID
-            String script = "tell application \"System Events\" to get the unix id of the first process whose frontmost is true";
-            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
+            // 使用 AppleScript 获取当前焦点应用的名称
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e",
+                    "tell application \"System Events\" to get name of first application process whose frontmost is true"});
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String pidStr = reader.readLine();
-
-            if (pidStr != null) {
-                int pid = Integer.parseInt(pidStr.trim());
-
-                // 获取该应用的所有窗口并找出焦点窗口
-                List<WindowInfo> windows = getMacWindowInfo();
-                for (WindowInfo window : windows) {
-                    if (window.getPid() == pid) {
-                        // 这里可以根据需要添加更多判断条件来确定哪个是焦点窗口
-                        return window;
+            String frontAppName = reader.readLine().trim();
+            process.waitFor();
+            // 查找属于该应用且最可能是焦点窗口的窗口, 通常焦点窗口是应用的最上层窗口
+            WindowInfo focusWindow = null;
+            for (WindowInfo window : allWindows) {
+                if (frontAppName.equals(window.getProcessName())) {
+                    // 这里可以根据需要添加更多判断条件
+                    if (focusWindow == null || window.getTitle() != null) {
+                        focusWindow = window;
                     }
                 }
             }
+            return focusWindow;
         } catch (Exception e) {
-            System.err.println("获取焦点窗口时出错: " + e.getMessage());
+            System.err.println("获取焦点窗口信息时出错: " + e.getMessage());
         }
         return null;
     }
