@@ -5,7 +5,8 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
- * 调用macOS图形相关接口
+ * 调用 macOS CoreGraphics 框架原生接口的 JNA 接口定义。
+ * 提供访问窗口管理、屏幕捕获权限检测等相关功能。
  *
  * @author koishi
  * Date 2025/04/21
@@ -14,42 +15,86 @@ import com.sun.jna.Pointer;
 public interface CoreGraphics extends Library {
 
     /**
-     * 调用本地 api
+     * 调用本地 CoreGraphics api
      */
     CoreGraphics INSTANCE = Native.load("CoreGraphics", CoreGraphics.class);
 
-    int kCGWindowListOptionAll = 0;
-
-    int kCGWindowListOptionOnScreenOnly = 1;
-
-    int kCGWindowListOptionOnScreenAboveWindow = 2;
-
-    int kCGWindowListOptionOnScreenBelowWindow = 4;
-
-    int kCGWindowListExcludeDesktopElements = 0x10;
-
     /**
-     * macOS 10.15+ 检测屏幕录制权限专用API
+     * 检测当前应用是否具有屏幕录制权限（macOS 10.15+）
+     *
+     * @return 非零表示有权限，0表示无权限
      */
     byte CGPreflightScreenCaptureAccess();
 
+    /**
+     * 获取窗口信息列表
+     *
+     * @param option           窗口列表选项，可使用上述 kCGWindowListOption* 常量
+     * @param relativeToWindow 相对窗口的ID，如果为0则忽略
+     * @return 包含窗口信息的CFArrayRef指针
+     */
     Pointer CGWindowListCopyWindowInfo(int option, int relativeToWindow);
 
+    /**
+     * 获取CFArray中的元素数量
+     *
+     * @param array CFArrayRef指针
+     * @return 数组中的元素个数
+     */
     int CFArrayGetCount(Pointer array);
 
+    /**
+     * 获取CFArray中指定索引的元素
+     *
+     * @param array CFArrayRef指针
+     * @param index 元素索引
+     * @return 指向元素的指针
+     */
     Pointer CFArrayGetValueAtIndex(Pointer array, int index);
 
+    /**
+     * 释放Core Foundation对象
+     *
+     * @param ref 需要释放的对象指针
+     */
     void CFRelease(Pointer ref);
 
     /**
-     * 获取窗口属性值
+     * 从CFDictionary中获取指定键对应的值
+     *
+     * @param dict CFDictionaryRef指针
+     * @param key  键的CFStringRef指针
+     * @return 值的指针，如果键不存在则返回null
      */
     Pointer CFDictionaryGetValue(Pointer dict, Pointer key);
 
+    /**
+     * 将CFString转换为C字符串指针
+     *
+     * @param cfStr    CFStringRef指针
+     * @param encoding 字符串编码格式
+     * @return C字符串指针，如果转换失败则返回null
+     */
     String CFStringGetCStringPtr(Pointer cfStr, int encoding);
 
+    /**
+     * 从CFNumber中获取double类型的值
+     *
+     * @param number CFNumberRef指针
+     * @param type   CFNumber类型标识
+     * @param value  用于存储结果的double数组
+     * @return 成功获取返回true，否则返回false
+     */
     boolean CFNumberGetValue(Pointer number, int type, double[] value);
 
+    /**
+     * 从CFNumber中获取int类型的值
+     *
+     * @param number CFNumberRef指针
+     * @param type   CFNumber类型标识
+     * @param value  用于存储结果的int数组
+     * @return 成功获取返回true，否则返回false
+     */
     boolean CFNumberGetValue(Pointer number, int type, int[] value);
 
 }

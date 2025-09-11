@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
+import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
 
 /**
  * 窗口信息获取
@@ -26,19 +28,9 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 public class WindowMonitor {
 
     public static void main(String[] args) throws Exception {
-        List<WindowInfo> windows = new ArrayList<>();
-        if (isWin) {
-            windows = getWinWindowInfo();
-        } else if (isMac) {
-            windows = getMacWindowInfo();
-        }
-        for (WindowInfo info : windows) {
-            System.out.println(info);
-        }
-        System.out.println("-----------------");
-//        Thread.sleep(5000);
         if (isMac) {
             System.out.println(getMacFocusWindowInfo());
+            System.out.println(getMainWindowInfoByAppBundlePath("/System/Applications/iPhone Mirroring.app"));
         }
     }
 
@@ -92,17 +84,137 @@ public class WindowMonitor {
     }
 
     /**
-     * 获取Mac窗口信息
+     * 通过进程 ID 获取 macOS 进程地址
      *
+     * @param pid 进程ID
+     * @return 进程地址
+     */
+    private static String getMacProcessPathByPid(int pid) {
+        try {
+            // 使用ps命令通过PID获取进程名称
+            Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            String name = reader.readLine();
+            if (name != null && !name.trim().isEmpty()) {
+                return name.trim();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    /**
+     * 创建CFString对象
+     *
+     * @param str 要创建的CFString键
+     * @return CFString对象
+     */
+    private static Pointer createCFString(String str) {
+        Foundation foundation = Foundation.INSTANCE;
+        return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
+    }
+
+    /**
+     * 获取Mac聚焦窗口信息
+     *
+     * @return 窗口信息
+     * @throws Exception 无法获取当前焦点应用信息
+     */
+    public static WindowInfo getMacFocusWindowInfo() throws Exception {
+        // 使用 AppleScript 获取当前焦点窗口的详细信息
+        String script = """
+                tell application "System Events"
+                    set frontApp to first application process whose frontmost is true
+                    set appName to name of frontApp
+                    set appPID to unix id of frontApp
+                    -- 尝试获取焦点窗口的信息
+                    try
+                        set frontWindow to front window of frontApp
+                        set windowId to id of frontWindow
+                        set windowName to name of frontWindow
+                        set windowPosition to position of frontWindow
+                        set windowSize to size of frontWindow
+                        return appName & "||" & appPID & "||" & windowId & "||" & windowName & "||" & ¬
+                            (item 1 of windowPosition) & "||" & (item 2 of windowPosition) & "||" & ¬
+                            (item 1 of windowSize) & "||" & (item 2 of windowSize)
+                    on error
+                        -- 如果无法获取窗口详细信息，只返回应用信息
+                        return appName & "||" & appPID & "||||||||"
+                    end try
+                end tell""";
+        Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String readLine = reader.readLine();
+        if (readLine == null) {
+            throw new RuntimeException("无法获取当前焦点应用信息");
+        }
+        String[] appInfo = readLine.split("\\|\\|");
+        if (appInfo.length < 2) {
+            throw new RuntimeException("无法解析焦点应用信息");
+        }
+        String frontAppName = appInfo[0].trim();
+        int frontAppPid = Integer.parseInt(appInfo[1].trim());
+        // 获取进程路径
+        String processPath = getMacProcessPathByPid(frontAppPid);
+        if (processPath != null && StringUtils.isBlank(frontAppName)) {
+            frontAppName = processPath.substring(processPath.lastIndexOf(File.separator) + 1);
+        }
+        if (processPath != null && processPath.contains(app)) {
+            processPath = processPath.substring(0, processPath.lastIndexOf(app) + app.length());
+        }
+        // 创建窗口信息对象
+        WindowInfo focusWindow = new WindowInfo()
+                .setProcessName(frontAppName)
+                .setProcessPath(processPath)
+                .setPid(frontAppPid);
+        // 如果成功获取了窗口详细信息，填充窗口属性
+        if (appInfo.length >= 9 && !appInfo[2].isEmpty()) {
+            try {
+                long windowId = Long.parseLong(appInfo[2].trim());
+                String windowTitle = appInfo[3].trim();
+                int x = Integer.parseInt(appInfo[4].trim());
+                int y = Integer.parseInt(appInfo[5].trim());
+                int width = Integer.parseInt(appInfo[6].trim());
+                int height = Integer.parseInt(appInfo[7].trim());
+                focusWindow.setTitle(windowTitle)
+                        .setHeight(height)
+                        .setWidth(width)
+                        .setId(windowId)
+                        .setX(x)
+                        .setY(y);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("无法解析窗口信息");
+            }
+        }
+        process.waitFor();
+        return focusWindow;
+    }
+
+    /**
+     * 根据进程路径获取主窗口信息
+     *
+     * @param appBundlePath 进程路径
+     * @return 窗口信息，如果没有找到则返回null
+     */
+    public static WindowInfo getMainWindowInfoByAppBundlePath(String appBundlePath) {
+        List<WindowInfo> windows = getWindowInfoByAppBundlePathUsingCG(appBundlePath);
+        return windows.isEmpty() ? null : windows.getFirst();
+    }
+
+    /**
+     * 使用 Core Graphics API 根据应用程序Bundle路径获取窗口信息
+     *
+     * @param appBundlePath 应用程序Bundle路径（.app结尾）
      * @return 窗口信息列表
      */
-    public static List<WindowInfo> getMacWindowInfo() {
-        List<WindowInfo> windowList = new ArrayList<>();
+    public static List<WindowInfo> getWindowInfoByAppBundlePathUsingCG(String appBundlePath) {
+        List<WindowInfo> result = new ArrayList<>();
         try {
             CoreGraphics cg = CoreGraphics.INSTANCE;
-            // 获取屏幕上所有窗口
             Pointer windowArray = cg.CGWindowListCopyWindowInfo(
-                    CoreGraphics.kCGWindowListOptionOnScreenOnly | CoreGraphics.kCGWindowListExcludeDesktopElements,
+                    ON_SCREEN_ONLY.getValue() | EXCLUDE_DESKTOP_ELEMENTS.getValue(),
                     0);
             if (windowArray != null) {
                 try {
@@ -113,43 +225,37 @@ public class WindowMonitor {
                     Pointer kCGWindowOwnerPID = createCFString("kCGWindowOwnerPID");
                     Pointer kCGWindowBounds = createCFString("kCGWindowBounds");
                     Pointer kCGWindowLayer = createCFString("kCGWindowLayer");
-                    Pointer kCGWindowAlpha = createCFString("kCGWindowAlpha");
                     Pointer kCGWindowNumber = createCFString("kCGWindowNumber");
                     // 定义Core Foundation类型常量
                     final int kCFNumberIntType = 9;
                     final int kCFNumberDoubleType = 13;
                     for (int i = 0; i < count; i++) {
                         Pointer windowInfo = cg.CFArrayGetValueAtIndex(windowArray, i);
-                        Pointer windowIdValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowNumber);
-                        long windowId = 0;
-                        if (windowInfo != null) {
+                        // 获取进程ID
+                        Pointer pidValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerPID);
+                        int pid = 0;
+                        if (pidValue != null) {
+                            int[] pidArr = new int[1];
+                            if (cg.CFNumberGetValue(pidValue, kCFNumberIntType, pidArr)) {
+                                pid = pidArr[0];
+                            }
+                        }
+                        // 根据PID获取进程路径
+                        String process = getMacProcessPathByPid(pid);
+                        // 检查进程路径是否匹配
+                        if (process != null && process.startsWith(appBundlePath)) {
+                            // 获取窗口ID
+                            Pointer windowIdValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowNumber);
+                            long windowId = 0;
                             if (windowIdValue != null) {
                                 int[] idArr = new int[1];
                                 if (cg.CFNumberGetValue(windowIdValue, kCFNumberIntType, idArr)) {
                                     windowId = idArr[0];
                                 }
                             }
-                            // 检查窗口是否可见（Alpha > 0）
-                            Pointer alphaValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowAlpha);
-                            if (alphaValue != null) {
-                                double[] alpha = new double[1];
-                                if (cg.CFNumberGetValue(alphaValue, kCFNumberDoubleType, alpha) && alpha[0] == 0) {
-                                    continue; // 跳过完全透明的窗口
-                                }
-                            }
-                            // 获取窗口层级
-                            Pointer layerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowLayer);
-                            int layer = -1;
-                            if (layerValue != null) {
-                                int[] layerArr = new int[1];
-                                if (cg.CFNumberGetValue(layerValue, kCFNumberIntType, layerArr)) {
-                                    layer = layerArr[0];
-                                }
-                            }
                             // 获取窗口边界
                             Pointer boundsValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowBounds);
                             if (boundsValue != null) {
-                                // 创建临时的CFString键
                                 Pointer xKey = createCFString("X");
                                 Pointer yKey = createCFString("Y");
                                 Pointer widthKey = createCFString("Width");
@@ -176,40 +282,34 @@ public class WindowMonitor {
                                         int y = (int) Math.round(yArr[0]);
                                         int width = (int) Math.round(widthArr[0]);
                                         int height = (int) Math.round(heightArr[0]);
-                                        // 获取进程ID
-                                        Pointer pidValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerPID);
-                                        int pid = 0;
-                                        if (pidValue != null) {
-                                            int[] pidArr = new int[1];
-                                            if (cg.CFNumberGetValue(pidValue, kCFNumberIntType, pidArr)) {
-                                                pid = pidArr[0];
-                                            }
-                                        }
-                                        // 获取应用程序名称
-                                        String process;
-                                        String processName = null;
-                                        String processPath = null;
-                                        // 获取窗口进程路径和名称
-                                        if (pid != 0) {
-                                            process = getProcessPathByPid(pid);
-                                            if (process != null && process.contains(app)) {
-                                                processPath = process.substring(0, process.lastIndexOf(app) + app.length());
-                                            }
-                                            Pointer ownerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerName);
-                                            if (ownerValue != null) {
-                                                processName = cg.CFStringGetCStringPtr(ownerValue, 0x08000100);
-                                            }
-                                            if (process != null && StringUtils.isBlank(processName)) {
-                                                processName = process.substring(process.lastIndexOf(File.separator) + 1);
-                                            }
-                                        }
                                         // 获取窗口标题
                                         Pointer titleValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowName);
                                         String title = null;
                                         if (titleValue != null) {
                                             title = cg.CFStringGetCStringPtr(titleValue, 0x08000100);
                                         }
-                                        // 过滤条件：有效大小、非系统窗口、非桌面元素
+                                        // 获取应用程序名称
+                                        Pointer ownerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerName);
+                                        String processName = null;
+                                        String processPath = null;
+                                        if (ownerValue != null) {
+                                            processName = cg.CFStringGetCStringPtr(ownerValue, 0x08000100);
+                                        }
+                                        if (StringUtils.isBlank(processName)) {
+                                            processName = process.substring(process.lastIndexOf(File.separator) + 1);
+                                        }
+                                        if (process.contains(app)) {
+                                            processPath = process.substring(0, process.lastIndexOf(app) + app.length());
+                                        }
+                                        // 获取窗口层级
+                                        Pointer layerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowLayer);
+                                        int layer = -1;
+                                        if (layerValue != null) {
+                                            int[] layerArr = new int[1];
+                                            if (cg.CFNumberGetValue(layerValue, kCFNumberIntType, layerArr)) {
+                                                layer = layerArr[0];
+                                            }
+                                        }
                                         if (width > 0 && height > 0 && layer >= 0 && layer <= 100 &&
                                                 !macSysNoWindowPath.contains(processPath) &&
                                                 StringUtils.isNotBlank(processPath)) {
@@ -223,7 +323,7 @@ public class WindowMonitor {
                                                     .setPid(pid)
                                                     .setX(x)
                                                     .setY(y);
-                                            windowList.add(windowInfoObj);
+                                            result.add(windowInfoObj);
                                         }
                                     }
                                 }
@@ -236,94 +336,15 @@ public class WindowMonitor {
                     cg.CFRelease(kCGWindowOwnerPID);
                     cg.CFRelease(kCGWindowBounds);
                     cg.CFRelease(kCGWindowLayer);
-                    cg.CFRelease(kCGWindowAlpha);
                     cg.CFRelease(kCGWindowNumber);
                 } finally {
                     cg.CFRelease(windowArray);
                 }
             }
         } catch (Exception e) {
-            System.err.println("获取Mac窗口信息时出错: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-        return windowList;
-    }
-
-    /**
-     * 通过进程ID获取进程地址
-     */
-    private static String getProcessPathByPid(int pid) {
-        try {
-            // 使用ps命令通过PID获取进程名称
-            Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-            String name = reader.readLine();
-            if (name != null && !name.trim().isEmpty()) {
-                return name.trim();
-            }
-        } catch (Exception e) {
-            System.err.println("通过PID获取进程名失败: " + e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * 创建CFString对象
-     */
-    private static Pointer createCFString(String str) {
-        Foundation foundation = Foundation.INSTANCE;
-        return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
-    }
-
-    public static WindowInfo getMacFocusWindowInfo() throws Exception {
-        // 使用 AppleScript 获取当前焦点应用的进程ID和名称
-        String script = """
-                tell application "System Events"
-                set frontApp to first application process whose frontmost is true
-                set appName to name of frontApp
-                set appPID to unix id of frontApp
-                return appName & "||" & appPID
-                end tell""";
-        Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String readLine = reader.readLine();
-        if (readLine == null) {
-            throw new RuntimeException("无法获取当前焦点应用信息");
-        }
-        String[] appInfo = readLine.split("\\|\\|");
-        if (appInfo.length < 2) {
-            throw new RuntimeException("无法解析焦点应用信息");
-        }
-        String frontAppName = appInfo[0].trim();
-        int frontAppPid = Integer.parseInt(appInfo[1].trim());
-        process.waitFor();
-        // 获取进程路径
-        String processPath = getProcessPathByPid(frontAppPid);
-        List<WindowInfo> allWindows = getMacWindowInfo();
-        if (allWindows.isEmpty()) {
-            return null;
-        }
-        // 查找属于该应用且最可能是焦点窗口的窗口
-        WindowInfo focusWindow = null;
-        for (WindowInfo window : allWindows) {
-            if (frontAppPid == window.getPid() && frontAppName.equals(window.getProcessName())) {
-                // 优先选择有标题的窗口
-                if (focusWindow == null ||
-                        (window.getTitle() != null && !window.getTitle().isEmpty())) {
-                    focusWindow = window;
-                    // 设置进程路径
-                    focusWindow.setProcessPath(processPath);
-                }
-            }
-        }
-        // 如果没有找到匹配的窗口，创建一个基本的信息对象
-        if (focusWindow == null) {
-            focusWindow = new WindowInfo()
-                    .setPid(frontAppPid)
-                    .setProcessName(frontAppName)
-                    .setProcessPath(processPath);
-        }
-        return focusWindow;
+        return result;
     }
 
 }

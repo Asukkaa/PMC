@@ -1474,6 +1474,11 @@ public class AutoClickController extends RootController implements MousePosition
                         updateMassageLabel(massageFloating, log);
                     });
                 }
+                try {
+                    System.out.println(getMacFocusWindowInfo());
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }
