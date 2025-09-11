@@ -134,6 +134,7 @@ public class FloatingWindow {
         double[] xOffset = new double[1];
         double[] yOffset = new double[1];
         int margin = config.getMargin();
+        root.setCursor(Cursor.MOVE);
         root.setOnMousePressed(event -> {
             xOffset[0] = event.getSceneX();
             yOffset[0] = event.getSceneY();
