@@ -261,9 +261,7 @@ public class SettingController extends RootController implements MousePositionUp
                 .setTextFill(colorPicker_Set.getValue())
                 .setShowButtonToolTip(tip_showRegion())
                 .setMassage(text_saveFindImgConfig())
-                .setConfigFile(configFile_Click)
-                .setFontSize(18)
-                .setOpacity(0.5);
+                .setConfigFile(configFile_Click);
     }
 
     /**
@@ -716,7 +714,7 @@ public class SettingController extends RootController implements MousePositionUp
                         int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, -screenWidth, screenWidth);
                         int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, -screenHeight, screenHeight);
                         floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                        setPositionText(massageFloating);
+                        setPositionText(massageFloating, "");
                     } else {
                         lastX = (int) floatingStage.getX();
                         lastY = (int) floatingStage.getY();

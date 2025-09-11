@@ -13,6 +13,9 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
 import java.util.List;
 
+import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingHeightInt;
+import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingWidthInt;
+
 /**
  * 浮窗属性类
  *
@@ -90,12 +93,12 @@ public class FloatingWindowDescriptor {
     String hideButtonToolTip;
 
     /**
-     * 是否允许拖拽移动（true 允许）
+     * 是否允许拖拽移动（true 允许，默认允许）
      */
     boolean enableDrag = true;
 
     /**
-     * 是否允许调整大小（true 允许）
+     * 是否允许调整大小（true 允许，默认允许）
      */
     boolean enableResize = true;
 
@@ -105,14 +108,14 @@ public class FloatingWindowDescriptor {
     boolean modified;
 
     /**
-     * 是否显示名称（true 显示）
+     * 是否显示名称（true 显示，默认显示）
      */
     boolean showName = true;
 
     /**
-     * 浮窗文本颜色
+     * 浮窗文本颜色（默认百色）
      */
-    Color textFill;
+    Color textFill = Color.WHITE;
 
     /**
      * 浮窗离屏幕边界距离
@@ -120,14 +123,14 @@ public class FloatingWindowDescriptor {
     int margin;
 
     /**
-     * 浮窗文本大小
+     * 浮窗文本大小（默认 18）
      */
-    int fontSize;
+    int fontSize = 18;
 
     /**
-     * 浮窗透明度
+     * 浮窗透明度（默认 0.5）
      */
-    double opacity;
+    double opacity = 0.5;
 
     /**
      * 浮窗是否可透明（true 透明）
@@ -158,6 +161,16 @@ public class FloatingWindowDescriptor {
      * 浮窗保存设置时配置文件路径
      */
     String configFile;
+
+    /**
+     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidthInt}）
+     */
+    int minWidth = defaultFloatingWidthInt;
+
+    /**
+     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingHeightInt}）
+     */
+    int minHeight = defaultFloatingHeightInt;
 
     /**
      * 销毁浮窗

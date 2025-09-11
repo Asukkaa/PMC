@@ -4,6 +4,7 @@ import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
@@ -26,7 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
@@ -101,6 +102,7 @@ public class FloatingWindow {
         VBox vBox = new VBox();
         vBox.getChildren().addAll(floatingPosition, massageLabel, nameLabel);
         root.getChildren().addAll(rectangle, vBox);
+        StackPane.setMargin(vBox, new Insets(5, 0, 0, 5));
         // 创建浮窗舞台
         Stage stage = new Stage();
         Scene scene = new Scene(root, Color.TRANSPARENT);
@@ -132,6 +134,7 @@ public class FloatingWindow {
         double[] xOffset = new double[1];
         double[] yOffset = new double[1];
         int margin = config.getMargin();
+        root.setCursor(Cursor.MOVE);
         root.setOnMousePressed(event -> {
             xOffset[0] = event.getSceneX();
             yOffset[0] = event.getSceneY();
@@ -156,7 +159,7 @@ public class FloatingWindow {
             // 应用限制后的坐标
             stage.setX(x);
             stage.setY(y);
-            setPositionText(config);
+            setPositionText(config, "");
         });
     }
 
@@ -282,7 +285,7 @@ public class FloatingWindow {
                     newWidth = initialWidth[0] + widthDelta;
                 }
                 // 宽度边界约束
-                newWidth = Math.max(defaultFloatingWidthInt, Math.min(newWidth, screenBounds.getWidth() - newX));
+                newWidth = Math.max(config.getMinWidth(), Math.min(newWidth, screenBounds.getWidth() - newX));
             }
             if (resizeHeight) {
                 double heightDelta = event.getScreenY() - initialY[0];
@@ -295,7 +298,7 @@ public class FloatingWindow {
                     newHeight = initialHeight[0] + heightDelta;
                 }
                 // 高度边界约束
-                newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
+                newHeight = Math.max(config.getMinHeight(), Math.min(newHeight, screenBounds.getHeight() - newY));
             }
             // 位置边界约束
             newX = Math.max(screenBounds.getMinX() + margin, Math.min(newX, screenBounds.getMaxX() - newWidth - margin));
@@ -317,7 +320,7 @@ public class FloatingWindow {
                     break;
                 }
             }
-            setPositionText(config);
+            setPositionText(config, "");
             event.consume();
         });
     }
@@ -378,8 +381,8 @@ public class FloatingWindow {
                 newHeight = initialHeight[0] + heightDelta;
             }
             // 边界约束
-            newWidth = Math.max(defaultFloatingWidthInt, Math.min(newWidth, screenBounds.getWidth() - newX));
-            newHeight = Math.max(defaultFloatingHeightInt, Math.min(newHeight, screenBounds.getHeight() - newY));
+            newWidth = Math.max(config.getMinWidth(), Math.min(newWidth, screenBounds.getWidth() - newX));
+            newHeight = Math.max(config.getMinHeight(), Math.min(newHeight, screenBounds.getHeight() - newY));
             newX = Math.max(screenBounds.getMinX(), Math.min(newX + margin, screenBounds.getMaxX() - newWidth - margin));
             newY = Math.max(screenBounds.getMinY(), Math.min(newY + margin, screenBounds.getMaxY() - newHeight - margin));
             int x = (int) newX;
@@ -399,7 +402,7 @@ public class FloatingWindow {
                     break;
                 }
             }
-            setPositionText(config);
+            setPositionText(config, "");
             event.consume();
         });
     }
@@ -423,10 +426,12 @@ public class FloatingWindow {
             floatingStage.setY(y);
             floatingStage.setWidth(w);
             floatingStage.setHeight(h);
-            setPositionText(config);
+            setPositionText(config, "");
             Button button = config.getButton();
-            button.setText(config.getHideButtonText());
-            addToolTip(config.getHideButtonToolTip(), button);
+            if (button != null) {
+                button.setText(config.getHideButtonText());
+                addToolTip(config.getHideButtonToolTip(), button);
+            }
             floatingStage.show();
             // 监听键盘事件
             startNativeKeyListener();
@@ -438,19 +443,20 @@ public class FloatingWindow {
      * 填写浮窗位置显示栏
      *
      * @param config 浮窗配置
+     * @param text   要更新的文本
      */
-    public static void setPositionText(FloatingWindowDescriptor config) {
+    public static void setPositionText(FloatingWindowDescriptor config, String text) {
         Stage floatingStage = config.getStage();
         int x = (int) floatingStage.getX();
         int y = (int) floatingStage.getY();
         int w = (int) floatingStage.getWidth();
         int h = (int) floatingStage.getHeight();
-        String point = "";
+        String point = text;
         if (config.isEnableDrag()) {
-            point += " X: " + x + " Y: " + y;
+            point += "X: " + x + " Y: " + y;
         }
         if (config.isEnableResize()) {
-            point += "\n Width:" + w + " Height:" + h;
+            point += "\nWidth:" + w + " Height:" + h;
         }
         Label floatingPosition = config.getFloatingPosition();
         floatingPosition.setText(point);
@@ -485,8 +491,10 @@ public class FloatingWindow {
                     }
                     floatingStage.hide();
                     Button button = floatingConfig.getButton();
-                    button.setText(floatingConfig.getShowButtonText());
-                    addToolTip(tip_massageRegion(), button);
+                    if (button != null) {
+                        button.setText(floatingConfig.getShowButtonText());
+                        addToolTip(tip_massageRegion(), button);
+                    }
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(floatingConfig.getDisableNodes(), false);
                     removeNativeListener(nativeKeyListener);
@@ -530,6 +538,29 @@ public class FloatingWindow {
         Platform.runLater(() -> {
             Label massageLabel = config.getMassageLabel();
             massageLabel.setText(text);
+        });
+    }
+
+    /**
+     * 更新浮窗设置
+     *
+     * @param config 浮窗配置
+     */
+    public static void updateWindowConfig(FloatingWindowDescriptor config) {
+        Platform.runLater(() -> {
+            Label massageLabel = config.getMassageLabel();
+            Label floatingPosition = config.getFloatingPosition();
+            Color color = config.getTextFill();
+            massageLabel.setTextFill(color);
+            floatingPosition.setTextFill(color);
+            Rectangle rectangle = config.getRectangle();
+            double opacity = config.getOpacity();
+            System.out.println(opacity);
+            if (!config.isTransparent() && opacity == 0) {
+                rectangle.setFill(new Color(0, 0, 0, 0.01));
+            } else {
+                rectangle.setFill(new Color(0, 0, 0, opacity));
+            }
         });
     }
 

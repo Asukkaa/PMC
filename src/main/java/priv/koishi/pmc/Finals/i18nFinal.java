@@ -1601,7 +1601,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 终止操作图像识别区域
+     * @return 信息展示栏区域
      */
     public static String floatingName_massage() {
         return bundle.getString("floatingName.massage");
