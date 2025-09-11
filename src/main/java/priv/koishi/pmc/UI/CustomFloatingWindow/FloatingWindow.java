@@ -415,6 +415,7 @@ public class FloatingWindow {
     public static void showFloatingWindow(FloatingWindowDescriptor config) {
         Platform.runLater(() -> {
             Stage floatingStage = config.getStage();
+            Rectangle rectangle = config.getRectangle();
             FloatingWindowConfig windowConfig = config.getConfig();
             int x = windowConfig.getX();
             int y = windowConfig.getY();
@@ -422,10 +423,10 @@ public class FloatingWindow {
             int h = windowConfig.getHeight();
             // 改变要防重复点击的组件状态
             changeDisableNodes(config.getDisableNodes(), true);
-            floatingStage.setX(x);
-            floatingStage.setY(y);
-            floatingStage.setWidth(w);
-            floatingStage.setHeight(h);
+            rectangle.setX(x);
+            rectangle.setY(y);
+            rectangle.setWidth(w);
+            rectangle.setHeight(h);
             setPositionText(config, "");
             Button button = config.getButton();
             if (button != null) {
@@ -546,7 +547,7 @@ public class FloatingWindow {
      *
      * @param config 浮窗配置
      */
-    public static void updateWindowConfig(FloatingWindowDescriptor config) {
+    public static void updateFloatingWindow(FloatingWindowDescriptor config) {
         Platform.runLater(() -> {
             Label massageLabel = config.getMassageLabel();
             Label floatingPosition = config.getFloatingPosition();
@@ -555,7 +556,6 @@ public class FloatingWindow {
             floatingPosition.setTextFill(color);
             Rectangle rectangle = config.getRectangle();
             double opacity = config.getOpacity();
-            System.out.println(opacity);
             if (!config.isTransparent() && opacity == 0) {
                 rectangle.setFill(new Color(0, 0, 0, 0.01));
             } else {
