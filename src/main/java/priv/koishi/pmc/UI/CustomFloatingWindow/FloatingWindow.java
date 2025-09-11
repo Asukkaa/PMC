@@ -556,7 +556,6 @@ public class FloatingWindow {
             floatingPosition.setTextFill(color);
             Rectangle rectangle = config.getRectangle();
             double opacity = config.getOpacity();
-            System.out.println(opacity);
             if (!config.isTransparent() && opacity == 0) {
                 rectangle.setFill(new Color(0, 0, 0, 0.01));
             } else {
