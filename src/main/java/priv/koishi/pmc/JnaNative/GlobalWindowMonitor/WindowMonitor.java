@@ -2,8 +2,8 @@ package priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.*;
+import com.sun.jna.ptr.IntByReference;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.JnaNative.JnaLibrary.CoreGraphics;
 import priv.koishi.pmc.JnaNative.JnaLibrary.Foundation;
@@ -17,6 +17,8 @@ import java.util.List;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
+import static priv.koishi.pmc.Service.ImageRecognitionService.dpiScale;
+import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 
 /**
  * 窗口信息获取
@@ -28,59 +30,192 @@ import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
 public class WindowMonitor {
 
     public static void main(String[] args) throws Exception {
-        if (isMac) {
+        refreshScreenParameters();
+        Thread.sleep(1000);
+        if (isWin) {
+            System.out.println(getWinFocusWindowInfo());
+            System.out.println("-----------------------------");
+            System.out.println(getMainWinWindowInfo("F:\\Steam\\bin\\cef\\cef.win7x64\\steamwebhelper.exe"));
+        } else if (isMac) {
             System.out.println(getMacFocusWindowInfo());
-            System.out.println(getMainWindowInfoByAppBundlePath("/System/Applications/iPhone Mirroring.app"));
+            System.out.println(getMainMacWindowInfo("/System/Applications/iPhone Mirroring.app"));
         }
     }
 
     /**
-     * 获取win窗口信息
+     * 获取 win 焦点窗口信息
      *
+     * @return 焦点窗口信息
+     */
+    public static WindowInfo getWinFocusWindowInfo() {
+        User32 user32 = User32.INSTANCE;
+        Psapi psapi = Psapi.INSTANCE;
+        Kernel32 kernel32 = Kernel32.INSTANCE;
+        WinDef.HWND hwnd = user32.GetForegroundWindow();
+        if (hwnd == null) {
+            return null;
+        }
+        // 获取窗口标题
+        char[] titleChars = new char[512];
+        user32.GetWindowText(hwnd, titleChars, titleChars.length);
+        String title = Native.toString(titleChars);
+        // 获取窗口位置和大小
+        WinDef.RECT rect = new WinDef.RECT();
+        if (!user32.GetWindowRect(hwnd, rect)) {
+            return null;
+        }
+        int x = (int) (rect.left / dpiScale);
+        int y = (int) (rect.top / dpiScale);
+        int width = (int) ((rect.right - rect.left) / dpiScale);
+        int height = (int) ((rect.bottom - rect.top) / dpiScale);
+        // 获取进程ID - 使用IntByReference而不是DWORDByReference
+        IntByReference pidRef = new IntByReference();
+        user32.GetWindowThreadProcessId(hwnd, pidRef);
+        int pid = pidRef.getValue();
+        // 获取进程名称和路径
+        String processName = null;
+        String processPath = null;
+        try {
+            WinNT.HANDLE processHandle = kernel32.OpenProcess(
+                    Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ,
+                    false,
+                    pid
+            );
+            if (processHandle != null) {
+                try {
+                    // 使用char数组作为缓冲区
+                    char[] pathChars = new char[1024];
+                    int result = psapi.GetModuleFileNameExW(processHandle, null, pathChars, pathChars.length);
+                    if (result > 0) {
+                        processPath = new String(pathChars, 0, result);
+                        File file = new File(processPath);
+                        processName = file.getName();
+                    }
+                } finally {
+                    kernel32.CloseHandle(processHandle);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        // 获取窗口句柄的数值表示
+        long windowId = Pointer.nativeValue(hwnd.getPointer());
+        return new WindowInfo()
+                .setProcessName(processName)
+                .setProcessPath(processPath)
+                .setHeight(height)
+                .setWidth(width)
+                .setId(windowId)
+                .setTitle(title)
+                .setPid(pid)
+                .setX(x)
+                .setY(y);
+    }
+
+    /**
+     * 根据 win 进程路径获取主窗口信息
+     *
+     * @param processPath 进程路径
+     * @return 窗口信息，如果没有找到则返回null
+     */
+    public static WindowInfo getMainWinWindowInfo(String processPath) {
+        List<WindowInfo> windows = getWinWindowInfos(processPath);
+        return windows.isEmpty() ? null : windows.getFirst();
+    }
+
+    /**
+     * 根据 win 进程路径获取窗口信息
+     *
+     * @param processPath 进程路径
      * @return 窗口信息列表
      */
-    public static List<WindowInfo> getWinWindowInfo() {
-        List<WindowInfo> windowList = new ArrayList<>();
+    public static List<WindowInfo> getWinWindowInfos(String processPath) {
+        List<WindowInfo> result = new ArrayList<>();
         User32 user32 = User32.INSTANCE;
+        Psapi psapi = Psapi.INSTANCE;
+        Kernel32 kernel32 = Kernel32.INSTANCE;
         // 使用回调枚举所有顶级窗口
         user32.EnumWindows((hwnd, data) -> {
             // 跳过不可见窗口
             if (!user32.IsWindowVisible(hwnd)) {
                 return true;
             }
-            char[] titleChars = new char[512];
-            user32.GetWindowText(hwnd, titleChars, titleChars.length);
-            String title = Native.toString(titleChars);
-            if (StringUtils.isNotBlank(title)) {
+            // 获取进程ID - 使用IntByReference而不是DWORDByReference
+            IntByReference pidRef = new IntByReference();
+            user32.GetWindowThreadProcessId(hwnd, pidRef);
+            int pid = pidRef.getValue();
+            // 获取进程路径
+            String windowProcessPath = getWinProcessPathByPid(pid, psapi, kernel32);
+            // 检查进程路径是否匹配
+            if (windowProcessPath != null && windowProcessPath.equalsIgnoreCase(processPath)) {
+                // 获取窗口标题
+                char[] titleChars = new char[512];
+                user32.GetWindowText(hwnd, titleChars, titleChars.length);
+                String title = Native.toString(titleChars);
                 // 获取窗口位置和大小
                 WinDef.RECT rect = new WinDef.RECT();
                 if (user32.GetWindowRect(hwnd, rect)) {
-                    int x = rect.left;
-                    int y = rect.top;
-                    int width = rect.right - x;
-                    int height = rect.bottom - y;
+                    int x = (int) (rect.left / dpiScale);
+                    int y = (int) (rect.top / dpiScale);
+                    int width = (int) ((rect.right - rect.left) / dpiScale);
+                    int height = (int) ((rect.bottom - rect.top) / dpiScale);
                     if (width > 0 && height > 0) {
-                        // 获取进程ID
-                        WinDef.DWORDByReference pidRef = new WinDef.DWORDByReference();
-                        int pid = pidRef.getValue().intValue();
+                        // 获取进程名称
+                        File file = new File(windowProcessPath);
+                        String processName = file.getName();
                         // 获取窗口句柄的数值表示
                         long windowId = Pointer.nativeValue(hwnd.getPointer());
                         WindowInfo windowInfo = new WindowInfo()
+                                .setProcessName(processName)
+                                .setProcessPath(processPath)
                                 .setHeight(height)
                                 .setWidth(width)
-                                .setTitle(title)
                                 .setId(windowId)
+                                .setTitle(title)
                                 .setPid(pid)
                                 .setX(x)
                                 .setY(y);
-                        windowList.add(windowInfo);
+                        result.add(windowInfo);
                     }
                 }
             }
             // 继续枚举
             return true;
         }, null);
-        return windowList;
+        return result;
+    }
+
+    /**
+     * 通过进程 ID 获取 Win 进程路径
+     *
+     * @param pid      进程 ID，要查询路径的进程的唯一标识符
+     * @param psapi    Psapi 库实例，用于调用 GetModuleFileNameExW 等进程信息查询函数
+     * @param kernel32 Kernel32 库实例，用于调用 OpenProcess 和 CloseHandle 等进程操作函数
+     * @return 进程的完整路径，如果无法获取则返回 null
+     */
+    private static String getWinProcessPathByPid(int pid, Psapi psapi, Kernel32 kernel32) {
+        try {
+            WinNT.HANDLE processHandle = kernel32.OpenProcess(
+                    Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ,
+                    false,
+                    pid
+            );
+            if (processHandle != null) {
+                try {
+                    // 使用char数组作为缓冲区
+                    char[] pathChars = new char[1024];
+                    int result = psapi.GetModuleFileNameExW(processHandle, null, pathChars, pathChars.length);
+                    if (result > 0) {
+                        return new String(pathChars, 0, result);
+                    }
+                } finally {
+                    kernel32.CloseHandle(processHandle);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     /**
@@ -106,10 +241,10 @@ public class WindowMonitor {
     }
 
     /**
-     * 创建CFString对象
+     * 创建 CFString 对象
      *
-     * @param str 要创建的CFString键
-     * @return CFString对象
+     * @param str 要创建的 CFString 键
+     * @return CFString 对象
      */
     private static Pointer createCFString(String str) {
         Foundation foundation = Foundation.INSTANCE;
@@ -117,7 +252,7 @@ public class WindowMonitor {
     }
 
     /**
-     * 获取Mac聚焦窗口信息
+     * 获取 Mac 聚焦窗口信息
      *
      * @return 窗口信息
      * @throws Exception 无法获取当前焦点应用信息
@@ -193,23 +328,23 @@ public class WindowMonitor {
     }
 
     /**
-     * 根据进程路径获取主窗口信息
+     * 根据 mac 进程路径获取主窗口信息
      *
-     * @param appBundlePath 进程路径
+     * @param appPath app 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public static WindowInfo getMainWindowInfoByAppBundlePath(String appBundlePath) {
-        List<WindowInfo> windows = getWindowInfoByAppBundlePathUsingCG(appBundlePath);
+    public static WindowInfo getMainMacWindowInfo(String appPath) {
+        List<WindowInfo> windows = getMacWindowInfos(appPath);
         return windows.isEmpty() ? null : windows.getFirst();
     }
 
     /**
      * 使用 Core Graphics API 根据应用程序Bundle路径获取窗口信息
      *
-     * @param appBundlePath 应用程序Bundle路径（.app结尾）
+     * @param appPath 应用程序Bundle路径（.app结尾）
      * @return 窗口信息列表
      */
-    public static List<WindowInfo> getWindowInfoByAppBundlePathUsingCG(String appBundlePath) {
+    public static List<WindowInfo> getMacWindowInfos(String appPath) {
         List<WindowInfo> result = new ArrayList<>();
         try {
             CoreGraphics cg = CoreGraphics.INSTANCE;
@@ -243,7 +378,7 @@ public class WindowMonitor {
                         // 根据PID获取进程路径
                         String process = getMacProcessPathByPid(pid);
                         // 检查进程路径是否匹配
-                        if (process != null && process.startsWith(appBundlePath)) {
+                        if (process != null && process.startsWith(appPath)) {
                             // 获取窗口ID
                             Pointer windowIdValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowNumber);
                             long windowId = 0;
