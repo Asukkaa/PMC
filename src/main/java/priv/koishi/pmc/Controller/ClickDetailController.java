@@ -363,9 +363,7 @@ public class ClickDetailController extends RootController {
                 .setHideButtonText(clickDetail_saveRegion())
                 .setShowButtonToolTip(tip_showRegion())
                 .setMassage(text_saveFindImgConfig())
-                .setTextFill(textFill)
-                .setFontSize(18)
-                .setOpacity(0.5);
+                .setTextFill(textFill);
     }
 
     /**
