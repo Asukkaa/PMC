@@ -45,6 +45,11 @@ public class WindowInfo {
     int pid;
 
     /**
+     * 窗口层级
+     */
+    int layer;
+
+    /**
      * 窗口进程名称
      */
     String processName;

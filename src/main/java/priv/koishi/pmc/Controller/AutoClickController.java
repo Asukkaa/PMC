@@ -75,6 +75,7 @@ import static priv.koishi.pmc.Controller.SettingController.clickFloating;
 import static priv.koishi.pmc.Controller.SettingController.stopFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getFocusWindowInfo;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMacFocusWindowInfo;
 import static priv.koishi.pmc.JnaNative.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
@@ -1474,11 +1475,7 @@ public class AutoClickController extends RootController implements MousePosition
                         updateMassageLabel(massageFloating, log);
                     });
                 }
-                try {
-                    System.out.println(getMacFocusWindowInfo());
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+                System.out.println(getFocusWindowInfo());
             }
         }
     }

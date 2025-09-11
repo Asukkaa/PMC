@@ -38,8 +38,24 @@ public class WindowMonitor {
             System.out.println(getMainWinWindowInfo("F:\\Steam\\bin\\cef\\cef.win7x64\\steamwebhelper.exe"));
         } else if (isMac) {
             System.out.println(getMacFocusWindowInfo());
-            System.out.println(getMainMacWindowInfo("/System/Applications/iPhone Mirroring.app"));
+            System.out.println("-----------------------------");
+            System.out.println(getMainMacWindowInfo("/Applications/Perfect Mouse Control.app"));
         }
+    }
+
+    /**
+     * 获取焦点窗口信息
+     *
+     * @return 焦点窗口信息
+     */
+    public static WindowInfo getFocusWindowInfo() {
+        WindowInfo windowInfo = null;
+        if (isWin) {
+            windowInfo = getWinFocusWindowInfo();
+        } else if (isMac) {
+            windowInfo = getMacFocusWindowInfo();
+        }
+        return windowInfo;
     }
 
     /**
@@ -252,79 +268,41 @@ public class WindowMonitor {
     }
 
     /**
-     * 获取 Mac 聚焦窗口信息
+     * 获取 Mac 聚焦窗口信息（使用 Core Graphics API）
      *
      * @return 窗口信息
-     * @throws Exception 无法获取当前焦点应用信息
      */
-    public static WindowInfo getMacFocusWindowInfo() throws Exception {
-        // 使用 AppleScript 获取当前焦点窗口的详细信息
-        String script = """
-                tell application "System Events"
-                    set frontApp to first application process whose frontmost is true
-                    set appName to name of frontApp
-                    set appPID to unix id of frontApp
-                    -- 尝试获取焦点窗口的信息
-                    try
-                        set frontWindow to front window of frontApp
-                        set windowId to id of frontWindow
-                        set windowName to name of frontWindow
-                        set windowPosition to position of frontWindow
-                        set windowSize to size of frontWindow
-                        return appName & "||" & appPID & "||" & windowId & "||" & windowName & "||" & ¬
-                            (item 1 of windowPosition) & "||" & (item 2 of windowPosition) & "||" & ¬
-                            (item 1 of windowSize) & "||" & (item 2 of windowSize)
-                    on error
-                        -- 如果无法获取窗口详细信息，只返回应用信息
-                        return appName & "||" & appPID & "||||||||"
-                    end try
-                end tell""";
-        Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String readLine = reader.readLine();
-        if (readLine == null) {
-            throw new RuntimeException("无法获取当前焦点应用信息");
-        }
-        String[] appInfo = readLine.split("\\|\\|");
-        if (appInfo.length < 2) {
-            throw new RuntimeException("无法解析焦点应用信息");
-        }
-        String frontAppName = appInfo[0].trim();
-        int frontAppPid = Integer.parseInt(appInfo[1].trim());
-        // 获取进程路径
-        String processPath = getMacProcessPathByPid(frontAppPid);
-        if (processPath != null && StringUtils.isBlank(frontAppName)) {
-            frontAppName = processPath.substring(processPath.lastIndexOf(File.separator) + 1);
-        }
-        if (processPath != null && processPath.contains(app)) {
-            processPath = processPath.substring(0, processPath.lastIndexOf(app) + app.length());
-        }
-        // 创建窗口信息对象
-        WindowInfo focusWindow = new WindowInfo()
-                .setProcessName(frontAppName)
-                .setProcessPath(processPath)
-                .setPid(frontAppPid);
-        // 如果成功获取了窗口详细信息，填充窗口属性
-        if (appInfo.length >= 9 && !appInfo[2].isEmpty()) {
-            try {
-                long windowId = Long.parseLong(appInfo[2].trim());
-                String windowTitle = appInfo[3].trim();
-                int x = Integer.parseInt(appInfo[4].trim());
-                int y = Integer.parseInt(appInfo[5].trim());
-                int width = Integer.parseInt(appInfo[6].trim());
-                int height = Integer.parseInt(appInfo[7].trim());
-                focusWindow.setTitle(windowTitle)
-                        .setHeight(height)
-                        .setWidth(width)
-                        .setId(windowId)
-                        .setX(x)
-                        .setY(y);
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("无法解析窗口信息");
+    public static WindowInfo getMacFocusWindowInfo() {
+        WindowInfo result;
+        try {
+            // 使用 AppleScript 获取当前焦点应用的 PID
+            String script = """
+                    tell application "System Events"
+                        set frontApp to first application process whose frontmost is true
+                        set appPID to unix id of frontApp
+                        return appPID
+                    end tell""";
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String pidStr = reader.readLine();
+            if (pidStr == null) {
+                throw new RuntimeException("无法获取当前焦点应用PID");
             }
+            int frontAppPid = Integer.parseInt(pidStr.trim());
+            process.waitFor();
+            // 获取进程路径
+            String processPath = getMacProcessPathByPid(frontAppPid);
+            if (processPath == null) {
+                throw new RuntimeException("无法获取焦点应用路径");
+            }
+            if (processPath.contains(app)) {
+                processPath = processPath.substring(0, processPath.lastIndexOf(app) + app.length());
+            }
+            result = getMainMacWindowInfo(processPath);
+        } catch (Exception e) {
+            throw new RuntimeException("获取Mac焦点窗口信息失败", e);
         }
-        process.waitFor();
-        return focusWindow;
+        return result;
     }
 
     /**
@@ -455,6 +433,7 @@ public class WindowMonitor {
                                                     .setWidth(width)
                                                     .setTitle(title)
                                                     .setId(windowId)
+                                                    .setLayer(layer)
                                                     .setPid(pid)
                                                     .setX(x)
                                                     .setY(y);
