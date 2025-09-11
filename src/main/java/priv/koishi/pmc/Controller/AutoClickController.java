@@ -30,11 +30,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
@@ -52,6 +54,8 @@ import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.awt.*;
 import java.io.File;
@@ -75,6 +79,7 @@ import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
@@ -165,16 +170,6 @@ public class AutoClickController extends RootController implements MousePosition
      * 浮窗Y坐标
      */
     private int floatingY;
-
-    /**
-     * 浮窗宽度
-     */
-    private int floatingWidth;
-
-    /**
-     * 浮窗高度
-     */
-    private int floatingHeight;
 
     /**
      * 鼠标轨迹采样间隔
@@ -317,24 +312,9 @@ public class AutoClickController extends RootController implements MousePosition
     private NativeKeyListener nativeKeyListener;
 
     /**
-     * 浮窗Stage
+     * 信息浮窗设置
      */
-    private Stage floatingStage;
-
-    /**
-     * 顶部浮窗信息输出栏
-     */
-    private Label floatingLabel;
-
-    /**
-     * 顶部浮窗鼠标位置信息栏
-     */
-    private Label floatingMousePosition;
-
-    /**
-     * 浮窗所在矩形
-     */
-    private Rectangle rectangle;
+    public static FloatingWindowDescriptor massageFloating;
 
     @FXML
     public AnchorPane anchorPane_Click;
@@ -504,8 +484,6 @@ public class AutoClickController extends RootController implements MousePosition
         floatingX = Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX));
         floatingY = Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY));
         logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
-        floatingWidth = Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth));
-        floatingHeight = Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight));
         detailWidth = Integer.parseInt(prop.getProperty(key_clickDetailWidth, defaultClickDetailWidth));
         detailHeight = Integer.parseInt(prop.getProperty(key_clickDetailHeight, defaultClickDetailHeight));
         input.close();
@@ -637,32 +615,16 @@ public class AutoClickController extends RootController implements MousePosition
      * 初始化浮窗
      */
     private void initFloatingWindow() {
-        // 创建一个矩形作为浮窗的内容
-        rectangle = new Rectangle(floatingWidth, floatingHeight);
-        StackPane root = new StackPane();
-        root.setBackground(Background.EMPTY);
-        root.setMouseTransparent(true);
-        root.setPickOnBounds(false);
-        root.setFocusTraversable(false);
-        Color labelTextFill = Color.WHITE;
-        floatingLabel = new Label(text_cancelTask());
-        floatingLabel.setTextFill(labelTextFill);
-        floatingMousePosition = new Label();
-        floatingMousePosition.setTextFill(labelTextFill);
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(floatingMousePosition, floatingLabel);
-        root.getChildren().addAll(rectangle, vBox);
-        Scene scene = new Scene(root, Color.TRANSPARENT);
-        vBox.setMouseTransparent(true);
-        vBox.setFocusTraversable(false);
-        floatingStage = new Stage();
-        // 设置透明样式
-        floatingStage.initStyle(StageStyle.TRANSPARENT);
-        floatingLabel.setMouseTransparent(true);
-        floatingMousePosition.setMouseTransparent(true);
-        // 设置始终置顶
-        floatingStage.setAlwaysOnTop(true);
-        floatingStage.setScene(scene);
+        massageFloating = new FloatingWindowDescriptor();
+        massageFloating.setConfig(SettingController.massageFloating.getConfig())
+                .setName(floatingName_massage())
+                .setEnableResize(false)
+                .setTransparent(true)
+                .setEnableDrag(false)
+                .setShowName(false)
+                .setFontSize(14);
+        // 创建浮窗
+        createFloatingWindows(massageFloating);
     }
 
     /**
@@ -674,8 +636,6 @@ public class AutoClickController extends RootController implements MousePosition
     private void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
         Color color = settingController.colorPicker_Set.getValue();
-        // 读取配置文件
-        getProperties();
         // 获取浮窗的显示设置
         CheckBox floatingRun = settingController.floatingRun_Set;
         CheckBox floatingRecord = settingController.floatingRecord_Set;
@@ -683,27 +643,17 @@ public class AutoClickController extends RootController implements MousePosition
         Slider slider = settingController.opacity_Set;
         if (isShow) {
             Platform.runLater(() -> {
-                if (floatingStage != null && !floatingStage.isShowing()) {
-                    floatingLabel.setTextFill(color);
-                    floatingMousePosition.setTextFill(color);
-                    rectangle.setOpacity(slider.getValue());
-                    floatingStage.setX(floatingX);
-                    floatingStage.setY(floatingY);
-                    floatingStage.show();
+                if (massageFloating != null) {
+                    massageFloating.setOpacity(slider.getValue())
+                            .setTextFill(color)
+                            .getConfig()
+                            .setX(floatingX)
+                            .setY(floatingY);
+                    updateWindowConfig(massageFloating);
+                    FloatingWindow.showFloatingWindow(massageFloating);
                 }
             });
         }
-    }
-
-    /**
-     * 隐藏浮窗
-     */
-    private void hideFloatingWindow() {
-        Platform.runLater(() -> {
-            if (floatingStage != null && floatingStage.isShowing()) {
-                floatingStage.hide();
-            }
-        });
     }
 
     /**
@@ -739,6 +689,7 @@ public class AutoClickController extends RootController implements MousePosition
             CheckBox clickImgLog = settingController.clickImgLog_Set;
             CheckBox stopImgLog = settingController.stopImgLog_Set;
             CheckBox waitLog = settingController.waitLog_Set;
+            Label floatingLabel = massageFloating.getMassageLabel();
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
@@ -777,7 +728,7 @@ public class AutoClickController extends RootController implements MousePosition
                 taskUnbind(taskBean);
                 log_Click.setTextFill(Color.GREEN);
                 log_Click.setText(text_taskFinished());
-                hideFloatingWindow();
+                hideFloatingWindow(massageFloating);
                 CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     showStage(mainStage);
@@ -791,7 +742,7 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask.setOnFailed(event -> {
                 clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskFailed());
-                hideFloatingWindow();
+                hideFloatingWindow(massageFloating);
                 CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     showStage(mainStage);
@@ -812,7 +763,7 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask.setOnCancelled(event -> {
                 clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskCancelled());
-                hideFloatingWindow();
+                hideFloatingWindow(massageFloating);
                 CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     showStage(mainStage);
@@ -904,7 +855,7 @@ public class AutoClickController extends RootController implements MousePosition
             preparationTime.getAndDecrement();
             if (preparationTime.get() > 0) {
                 String text = text_cancelTask() + preparationTime + text_run();
-                floatingLabel.setText(text);
+                updateMassageLabel(massageFloating, text);
                 log_Click.setText(text);
             } else {
                 // 停止 Timeline
@@ -1209,21 +1160,24 @@ public class AutoClickController extends RootController implements MousePosition
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
         Platform.runLater(() -> {
-            int x = (int) mousePoint.getX();
-            int y = (int) mousePoint.getY();
-            String text = autoClick_nowMousePos() + " X: " + x + " Y: " + y;
-            CheckBox mouseFloatingRun = settingController.mouseFloatingRun_Set;
-            CheckBox mouseFloatingRecord = settingController.mouseFloatingRecord_Set;
-            TextField offsetXTextField = settingController.offsetX_Set;
-            int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
-            TextField offsetYTextField = settingController.offsetY_Set;
-            int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
-            floatingMousePosition.setText(text);
-            mousePosition_Click.setText(text);
-            if (floatingStage != null && floatingStage.isShowing()) {
-                if ((mouseFloatingRun.isSelected() && runClicking)
-                        || (mouseFloatingRecord.isSelected() && recordClicking)) {
-                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+            if (massageFloating != null) {
+                Stage floatingStage = massageFloating.getStage();
+                int x = (int) mousePoint.getX();
+                int y = (int) mousePoint.getY();
+                String text = autoClick_nowMousePos() + "X: " + x + " Y: " + y;
+                CheckBox mouseFloatingRun = settingController.mouseFloatingRun_Set;
+                CheckBox mouseFloatingRecord = settingController.mouseFloatingRecord_Set;
+                TextField offsetXTextField = settingController.offsetX_Set;
+                int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
+                TextField offsetYTextField = settingController.offsetY_Set;
+                int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
+                setPositionText(massageFloating, text);
+                mousePosition_Click.setText(text);
+                if (floatingStage != null && floatingStage.isShowing()) {
+                    if ((mouseFloatingRun.isSelected() && runClicking)
+                            || (mouseFloatingRecord.isSelected() && recordClicking)) {
+                        floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                    }
                 }
             }
         });
@@ -1275,7 +1229,7 @@ public class AutoClickController extends RootController implements MousePosition
                             }
                             // 改变要防重复点击的组件状态
                             changeDisableNodes(disableNodes, false);
-                            hideFloatingWindow();
+                            hideFloatingWindow(massageFloating);
                             // 弹出程序主窗口
                             CheckBox showWindowRecord = settingController.showWindowRecord_Set;
                             if (showWindowRecord.isSelected()) {
@@ -1431,7 +1385,7 @@ public class AutoClickController extends RootController implements MousePosition
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
                             text_recorded() + autoClick_mouseTrajectory();
                     log_Click.setText(log);
-                    floatingLabel.setText(log);
+                    updateMassageLabel(massageFloating, log);
                 });
             }
         }
@@ -1529,7 +1483,7 @@ public class AutoClickController extends RootController implements MousePosition
                         String log = text_cancelTask() + text_recordClicking() + "\n" +
                                 text_recorded() + clickBean.getClickKey() + text_click() + " X：" + endX + " Y：" + endY;
                         log_Click.setText(log);
-                        floatingLabel.setText(log);
+                        updateMassageLabel(massageFloating, log);
                     });
                 }
             }
@@ -1576,7 +1530,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparationTimeValue + text_preparation());
-            floatingLabel.setText(text.get());
+            updateMassageLabel(massageFloating, text.get());
             updateLabel(log_Click, text.get());
             // 显示浮窗
             try {
@@ -1592,7 +1546,7 @@ public class AutoClickController extends RootController implements MousePosition
                 recordingStartTime = System.currentTimeMillis();
                 // 更新浮窗文本
                 text.set(text_cancelTask() + text_recordClicking());
-                floatingLabel.setText(text.get());
+                updateMassageLabel(massageFloating, text.get());
                 log_Click.setText(text.get());
             } else {
                 AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
@@ -1613,7 +1567,7 @@ public class AutoClickController extends RootController implements MousePosition
                         // 更新浮窗文本
                         text.set(text_cancelTask() + text_recordClicking());
                     }
-                    floatingLabel.setText(text.get());
+                    updateMassageLabel(massageFloating, text.get());
                     log_Click.setText(text.get());
                 }));
                 // 设置 Timeline 的循环次数
