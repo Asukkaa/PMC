@@ -162,16 +162,6 @@ public class AutoClickController extends RootController implements MousePosition
     private int logWidth;
 
     /**
-     * 浮窗X坐标
-     */
-    private int floatingX;
-
-    /**
-     * 浮窗Y坐标
-     */
-    private int floatingY;
-
-    /**
      * 鼠标轨迹采样间隔
      */
     private String sampleInterval;
@@ -481,8 +471,6 @@ public class AutoClickController extends RootController implements MousePosition
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath, desktopPath);
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath, desktopPath);
         logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
-        floatingX = Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX));
-        floatingY = Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY));
         logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
         detailWidth = Integer.parseInt(prop.getProperty(key_clickDetailWidth, defaultClickDetailWidth));
         detailHeight = Integer.parseInt(prop.getProperty(key_clickDetailHeight, defaultClickDetailHeight));
@@ -644,12 +632,10 @@ public class AutoClickController extends RootController implements MousePosition
         if (isShow) {
             Platform.runLater(() -> {
                 if (massageFloating != null) {
-                    massageFloating.setOpacity(slider.getValue())
-                            .setTextFill(color)
-                            .getConfig()
-                            .setX(floatingX)
-                            .setY(floatingY);
-                    updateWindowConfig(massageFloating);
+                    massageFloating.setConfig(SettingController.massageFloating.getConfig())
+                            .setOpacity(slider.getValue())
+                            .setTextFill(color);
+                    updateFloatingWindow(massageFloating);
                     FloatingWindow.showFloatingWindow(massageFloating);
                 }
             });
