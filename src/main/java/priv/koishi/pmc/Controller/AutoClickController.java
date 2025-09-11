@@ -1157,12 +1157,12 @@ public class AutoClickController extends RootController implements MousePosition
                 int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
                 TextField offsetYTextField = settingController.offsetY_Set;
                 int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
-                setPositionText(massageFloating, text);
                 mousePosition_Click.setText(text);
                 if (floatingStage != null && floatingStage.isShowing()) {
+                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
                     if ((mouseFloatingRun.isSelected() && runClicking)
                             || (mouseFloatingRecord.isSelected() && recordClicking)) {
-                        floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                        setPositionText(massageFloating, text);
                     }
                 }
             }

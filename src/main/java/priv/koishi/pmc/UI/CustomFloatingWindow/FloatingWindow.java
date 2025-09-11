@@ -448,10 +448,32 @@ public class FloatingWindow {
      */
     public static void setPositionText(FloatingWindowDescriptor config, String text) {
         Stage floatingStage = config.getStage();
-        int x = (int) floatingStage.getX();
-        int y = (int) floatingStage.getY();
-        int w = (int) floatingStage.getWidth();
-        int h = (int) floatingStage.getHeight();
+        if (floatingStage.isShowing()) {
+            int x = (int) floatingStage.getX();
+            int y = (int) floatingStage.getY();
+            int w = (int) floatingStage.getWidth();
+            int h = (int) floatingStage.getHeight();
+            updateText(config, text, x, y, w, h);
+        } else {
+            int x = config.getConfig().getX();
+            int y = config.getConfig().getY();
+            int w = config.getConfig().getWidth();
+            int h = config.getConfig().getHeight();
+            updateText(config, text, x, y, w, h);
+        }
+    }
+
+    /**
+     * 更新浮窗属性信息
+     *
+     * @param config 浮窗配置
+     * @param text   要更新的文本
+     * @param x      浮窗X坐标
+     * @param y      浮窗Y坐标
+     * @param w      浮窗宽度
+     * @param h      浮窗高度
+     */
+    private static void updateText(FloatingWindowDescriptor config, String text, int x, int y, int w, int h) {
         String point = text;
         if (config.isEnableDrag()) {
             point += "X: " + x + " Y: " + y;
