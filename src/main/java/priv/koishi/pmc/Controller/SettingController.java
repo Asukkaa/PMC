@@ -293,6 +293,7 @@ public class SettingController extends RootController implements MousePositionUp
                 .setShowButtonToolTip(tip_massageRegion())
                 .setHideButtonToolTip(hideButtonToolTip)
                 .setShowButtonText(text_showFloating())
+                .setOpacity(opacity_Set.getValue())
                 .setHideButtonText(hideButtonText)
                 .setName(floatingName_massage())
                 .setHeightKey(key_massageHeight)
