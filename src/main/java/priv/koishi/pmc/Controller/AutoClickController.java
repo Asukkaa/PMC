@@ -43,6 +43,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -51,7 +52,7 @@ import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
-import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
@@ -75,8 +76,10 @@ import static priv.koishi.pmc.Controller.SettingController.clickFloating;
 import static priv.koishi.pmc.Controller.SettingController.stopFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getFocusWindowInfo;
-import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMacFocusWindowInfo;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.ClickWindowMouseListener.updateWindowInfo;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.ClickWindowMouseListener.windowInfo;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.findingWindow;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.startClickWindowMouseListener;
 import static priv.koishi.pmc.JnaNative.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
@@ -307,7 +310,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 信息浮窗设置
      */
-    public static FloatingWindowDescriptor massageFloating;
+    public static FloatingWindowDescriptor massageFloating, windowInfoFloating;
 
     @FXML
     public AnchorPane anchorPane_Click;
@@ -320,7 +323,7 @@ public class AutoClickController extends RootController implements MousePosition
 
     @FXML
     public Label mousePosition_Click, dataNumber_Click, log_Click, tip_Click, cancelTip_Click, outPath_Click,
-            err_Click;
+            err_Click, windowInfo_Click;
 
     @FXML
     public CheckBox openDirectory_Click, notOverwrite_Click, loadFolder_Click;
@@ -330,7 +333,8 @@ public class AutoClickController extends RootController implements MousePosition
             exportAutoClick_Click, addOutPath_Click, recordClick_Click, clickLog_Click;
 
     @FXML
-    public TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
+    public TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click,
+            preparationWindowTime_Click;
 
     @FXML
     public TableView<ClickPositionVO> tableView_Click;
@@ -606,25 +610,29 @@ public class AutoClickController extends RootController implements MousePosition
      * 初始化浮窗
      */
     private void initFloatingWindow() {
-        massageFloating = new FloatingWindowDescriptor();
-        massageFloating.setConfig(SettingController.massageFloating.getConfig())
+        massageFloating = new FloatingWindowDescriptor()
+                .setConfig(SettingController.massageFloating.getConfig())
                 .setName(floatingName_massage())
                 .setEnableResize(false)
                 .setTransparent(true)
                 .setEnableDrag(false)
                 .setShowName(false)
                 .setFontSize(14);
+        windowInfoFloating = new FloatingWindowDescriptor()
+                .setConfig(new FloatingWindowConfig())
+                .setName("自动操作目标窗口")
+                .setEnableResize(false)
+                .setEnableDrag(false);
         // 创建浮窗
-        createFloatingWindows(massageFloating);
+        createFloatingWindows(massageFloating, windowInfoFloating);
     }
 
     /**
      * 显示浮窗
      *
      * @param isRun 是否为运行自动操作
-     * @throws IOException 配置文件读取异常
      */
-    private void showFloatingWindow(boolean isRun) throws IOException {
+    public static void showFloatingWindow(boolean isRun) {
         // 获取浮窗的文本颜色设置
         Color color = settingController.colorPicker_Set.getValue();
         // 获取浮窗的显示设置
@@ -651,7 +659,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @return true表示为空闲状态，false表示非空闲状态
      */
     public boolean isFree() {
-        return !runClicking && !recordClicking && loadPMCFilsTask == null && loadedPMCTask == null && exportPMCTask == null;
+        return !runClicking && !recordClicking && loadPMCFilsTask == null && loadedPMCTask == null && exportPMCTask == null && !findingWindow;
     }
 
     /**
@@ -865,46 +873,117 @@ public class AutoClickController extends RootController implements MousePosition
      * 构建右键菜单
      */
     private void buildContextMenu() {
-        // 添加右键菜单
-        ContextMenu contextMenu = new ContextMenu();
+        // 添加列表右键菜单
+        ContextMenu tableMenu = new ContextMenu();
         // 查看详情选项
-        buildDetailMenuItem(tableView_Click, contextMenu);
+        buildDetailMenuItem(tableMenu);
         // 修改所选项要点击的图片地址
-        buildEditClickImgPathMenu(tableView_Click, contextMenu);
+        buildEditClickImgPathMenu(tableView_Click, tableMenu);
         // 测试点击选项
-        MenuItem menuItem = buildClickTestMenuItem(tableView_Click, contextMenu);
+        MenuItem menuItem = buildClickTestMenuItem(tableMenu);
         // 没有运行必要权限则无法点击
         if (isNativeHookException || noScreenCapturePermission) {
             menuItem.setDisable(true);
         }
         // 移动所选行选项
-        buildMoveDataMenu(tableView_Click, contextMenu);
+        buildMoveDataMenu(tableView_Click, tableMenu);
         // 修改点击按键
-        buildEditClickKeyMenu(tableView_Click, contextMenu);
+        buildEditClickKeyMenu(tableView_Click, tableMenu);
         // 修改重试类型
-        buildEditRetryTypeMenu(tableView_Click, contextMenu);
+        buildEditRetryTypeMenu(tableView_Click, tableMenu);
         // 插入数据选项
-        insertDataMenu(tableView_Click, contextMenu);
+        insertDataMenu(tableMenu);
         // 复制数据选项
-        buildCopyDataMenu(tableView_Click, contextMenu, dataNumber_Click);
+        buildCopyDataMenu(tableView_Click, tableMenu, dataNumber_Click);
         // 取消选中选项
-        buildClearSelectedData(tableView_Click, contextMenu);
+        buildClearSelectedData(tableView_Click, tableMenu);
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, contextMenu, unit_data());
+        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, tableMenu, unit_data());
         // 为列表添加右键菜单并设置可选择多行
-        setContextMenu(contextMenu, tableView_Click);
+        setContextMenu(tableMenu, tableView_Click);
+        // 添加窗口信息右键菜单
+        ContextMenu windowInfoMenu = new ContextMenu();
+        // 更新窗口信息选项
+        buildUpdateDataMenu(windowInfoMenu);
+        // 显示窗口位置信息
+        buildShowDataMenu(windowInfoMenu);
+        // 删除窗信息据选项
+        buildDeleteDataMenu(windowInfoMenu);
+        // 为窗口信息栏添加右键菜单
+        windowInfo_Click.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                windowInfoMenu.show(windowInfo_Click, event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    /**
+     * 更新窗口数据选项
+     *
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildUpdateDataMenu(ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem("更新窗口数据");
+        menuItem.setOnAction(e -> updateWindowInfo());
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 显示窗口位置信息
+     *
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildShowDataMenu(ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem("展示窗口位置");
+        menuItem.setOnAction(e -> {
+            updateWindowInfo();
+            if (windowInfo != null) {
+                mainStage.setIconified(true);
+                String info = "按下 esc 即可关闭浮窗" + "\n" +
+                        "进程名称：" + windowInfo.getProcessName() + "\n" +
+                        "窗口进程 ID：" + windowInfo.getPid() + "\n" +
+                        "进程路径：" + windowInfo.getProcessPath() + "\n" +
+                        "窗口标题：" + windowInfo.getTitle() + "\n" +
+                        "窗口位置： X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                        "窗口大小： W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+                windowInfoFloating.setMassage(info)
+                        .getConfig()
+                        .setHeight(windowInfo.getHeight())
+                        .setWidth(windowInfo.getWidth())
+                        .setX(windowInfo.getX())
+                        .setY(windowInfo.getY());
+                // 改变要防重复点击的组件状态
+                changeDisableNodes(disableNodes, true);
+                FloatingWindow.showFloatingWindow(windowInfoFloating);
+                WindowMonitor.startNativeKeyListener();
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 删除窗口信息
+     *
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildDeleteDataMenu(ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem("删除窗口信息");
+        menuItem.setOnAction(e -> Platform.runLater(() -> {
+            windowInfo_Click.setText("");
+            windowInfo = null;
+        }));
+        contextMenu.getItems().add(menuItem);
     }
 
     /**
      * 查看所选项第一行详情选项
      *
-     * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void buildDetailMenuItem(TableView<? extends ClickPositionVO> tableView, ContextMenu contextMenu) {
+    private void buildDetailMenuItem(ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_detailMenu());
         detailItem.setOnAction(e -> {
-            ClickPositionVO selected = tableView.getSelectionModel().getSelectedItems().getFirst();
+            ClickPositionVO selected = tableView_Click.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 showDetail(selected);
             }
@@ -915,13 +994,12 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 执行选中的步骤选项
      *
-     * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private MenuItem buildClickTestMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+    private MenuItem buildClickTestMenuItem(ContextMenu contextMenu) {
         MenuItem menuItem = new MenuItem(menu_runSelectMenu());
         menuItem.setOnAction(event -> {
-            List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
+            List<ClickPositionVO> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
                 try {
                     launchClickTask(selectedItem, 1);
@@ -937,10 +1015,9 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 插入数据选项
      *
-     * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    private void insertDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+    private void insertDataMenu(ContextMenu contextMenu) {
         Menu menu = new Menu(menu_addDateMenu());
         // 创建二级菜单项
         MenuItem insertUp = new MenuItem(menuItem_insertUp());
@@ -950,12 +1027,12 @@ public class AutoClickController extends RootController implements MousePosition
         MenuItem insertTop = new MenuItem(menuItem_insertTop());
         MenuItem recordTop = new MenuItem(menuItem_recordTop());
         // 为每个菜单项添加事件处理
-        insertUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertUp()));
-        insertDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertDown()));
-        recordUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordUp()));
-        recordDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordDown()));
-        insertTop.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertTop()));
-        recordTop.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordTop()));
+        insertUp.setOnAction(event -> insertDataMenuItem(menuItem_insertUp()));
+        insertDown.setOnAction(event -> insertDataMenuItem(menuItem_insertDown()));
+        recordUp.setOnAction(event -> insertDataMenuItem(menuItem_recordUp()));
+        recordDown.setOnAction(event -> insertDataMenuItem(menuItem_recordDown()));
+        insertTop.setOnAction(event -> insertDataMenuItem(menuItem_insertTop()));
+        recordTop.setOnAction(event -> insertDataMenuItem(menuItem_recordTop()));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(insertUp, insertDown, recordUp, recordDown, insertTop, recordTop);
         contextMenu.getItems().add(menu);
@@ -964,11 +1041,10 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 插入数据选项二级菜单选项
      *
-     * @param tableView  要处理的数据列表
      * @param insertType 数据插入类型
      */
-    private void insertDataMenuItem(TableView<ClickPositionVO> tableView, String insertType) {
-        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
+    private void insertDataMenuItem(String insertType) {
+        List<ClickPositionVO> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             if (menuItem_insertUp().equals(insertType)) {
                 addClick(upAdd);
@@ -1163,7 +1239,7 @@ public class AutoClickController extends RootController implements MousePosition
                 mousePosition_Click.setText(text);
                 if (floatingStage != null && floatingStage.isShowing()) {
                     floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                    if ((mouseFloatingRun.isSelected() && runClicking)
+                    if ((mouseFloatingRun.isSelected() && runClicking) || findingWindow
                             || (mouseFloatingRecord.isSelected() && recordClicking)) {
                         setPositionText(massageFloating, text);
                     }
@@ -1183,10 +1259,10 @@ public class AutoClickController extends RootController implements MousePosition
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
                     // 仅在自动操作与录制情况下才监听键盘
-                    if (recordClicking || runClicking) {
+                    if (recordClicking || runClicking || findingWindow) {
                         // 检测快捷键 esc
                         if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-                            if (nativeMouseListener instanceof CustomMouseListener cmListener) {
+                            if (nativeMouseListener instanceof RecordClickingMouseListener cmListener) {
                                 // 停止轨迹记录
                                 cmListener.stopRecording();
                             }
@@ -1238,9 +1314,9 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 鼠标监听器
+     * 鼠标录制监听器
      */
-    private class CustomMouseListener implements NativeMouseListener {
+    private class RecordClickingMouseListener implements NativeMouseListener {
 
         /**
          * 记录点击时刻
@@ -1285,7 +1361,7 @@ public class AutoClickController extends RootController implements MousePosition
         /**
          * 构造器
          */
-        private CustomMouseListener(int addType) {
+        private RecordClickingMouseListener(int addType) {
             this.addType = addType;
         }
 
@@ -1475,7 +1551,6 @@ public class AutoClickController extends RootController implements MousePosition
                         updateMassageLabel(massageFloating, log);
                     });
                 }
-                System.out.println(getFocusWindowInfo());
             }
         }
     }
@@ -1489,7 +1564,7 @@ public class AutoClickController extends RootController implements MousePosition
         removeNativeListener(nativeMouseListener);
         // 读取设置页面设置的值
         getSetting();
-        CustomMouseListener listener = new CustomMouseListener(addType);
+        RecordClickingMouseListener listener = new RecordClickingMouseListener(addType);
         nativeMouseListener = listener;
         // 注册监听器
         addNativeListener(listener);
@@ -1510,7 +1585,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 获取准备时间值
             int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click,
                     Integer.parseInt(defaultPreparationRecordTime), 0, null);
-            // 开始录制
+            // 隐藏主窗口
             CheckBox hideWindowRecord = settingController.hideWindowRecord_Set;
             if (hideWindowRecord.isSelected()) {
                 mainStage.setIconified(true);
@@ -1523,11 +1598,7 @@ public class AutoClickController extends RootController implements MousePosition
             updateMassageLabel(massageFloating, text.get());
             updateLabel(log_Click, text.get());
             // 显示浮窗
-            try {
-                showFloatingWindow(false);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            showFloatingWindow(false);
             recordTimeline = new Timeline();
             if (preparationTimeValue == 0) {
                 // 开启鼠标监听
@@ -1972,13 +2043,20 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     @FXML
-    public void testAction() throws Exception {
-        Thread.sleep(5000);
-        WindowInfo windowInfo = getMacFocusWindowInfo();
-        if (windowInfo == null) {
-            throw new RuntimeException("窗口获取失败");
+    public void clickWindowAction() {
+        if (isFree()) {
+            // 改变要防重复点击的组件状态
+            changeDisableNodes(disableNodes, true);
+            // 隐藏主窗口
+            CheckBox hideWindowRecord = settingController.hideWindowRecord_Set;
+            if (hideWindowRecord.isSelected()) {
+                mainStage.setIconified(true);
+            }
+            // 获取准备时间值
+            int preparationTimeValue = setDefaultIntValue(preparationWindowTime_Click,
+                    Integer.parseInt(defaultPreparationRecordTime), 0, null);
+            startClickWindowMouseListener(massageFloating, preparationTimeValue);
         }
-        updateLabel(log_Click, windowInfo.getProcessName());
     }
 
 }

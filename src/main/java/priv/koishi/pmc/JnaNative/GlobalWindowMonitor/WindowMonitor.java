@@ -1,24 +1,44 @@
 package priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.scene.control.CheckBox;
+import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.JnaNative.JnaLibrary.CoreGraphics;
-import priv.koishi.pmc.JnaNative.JnaLibrary.Foundation;
+import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
+import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
+import static priv.koishi.pmc.Controller.AutoClickController.showFloatingWindow;
+import static priv.koishi.pmc.Controller.AutoClickController.windowInfoFloating;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
+import static priv.koishi.pmc.Finals.i18nFinal.text_cancelTask;
+import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.dpiScale;
-import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.hideFloatingWindow;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
+import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
+import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.UiUtils.showStage;
 
 /**
  * 窗口信息获取
@@ -29,17 +49,135 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParam
  */
 public class WindowMonitor {
 
-    public static void main(String[] args) throws Exception {
-        refreshScreenParameters();
-        Thread.sleep(1000);
-        if (isWin) {
-            System.out.println(getWinFocusWindowInfo());
-            System.out.println("-----------------------------");
-            System.out.println(getMainWinWindowInfo("F:\\Steam\\bin\\cef\\cef.win7x64\\steamwebhelper.exe"));
-        } else if (isMac) {
-            System.out.println(getMacFocusWindowInfo());
-            System.out.println("-----------------------------");
-            System.out.println(getMainMacWindowInfo("/Applications/Perfect Mouse Control.app"));
+    /**
+     * 全局鼠标监听器
+     */
+    private static ClickWindowMouseListener clickWindowMouseListener;
+
+    /**
+     * 全局键盘监听器
+     */
+    private static NativeKeyListener nativeKeyListener;
+
+    /**
+     * 正在寻找窗口（true 寻找中）
+     */
+    public static boolean findingWindow;
+
+    /**
+     * 寻找窗口计时器
+     */
+    public static Timeline findingWindowTimeline;
+
+    /**
+     * 开启全局键盘监听
+     */
+    public static void startNativeKeyListener() {
+        // 移除可能存在的旧监听器
+        removeNativeListener(nativeKeyListener);
+        // 键盘监听器
+        nativeKeyListener = new NativeKeyListener() {
+            @Override
+            public void nativeKeyPressed(NativeKeyEvent e) {
+                // 检测快捷键 esc
+                if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                    if (findingWindow) {
+                        // 停止记录鼠标点击监听器
+                        stopClickWindowMouseListener();
+                        // 停止录制计时
+                        if (findingWindowTimeline != null) {
+                            findingWindowTimeline.stop();
+                            findingWindowTimeline = null;
+                        }
+                        // 停止寻找窗口标记
+                        findingWindow = false;
+                        // 弹出程序主窗口
+                        CheckBox showWindowRecord = settingController.showWindowRecord_Set;
+                        if (showWindowRecord.isSelected()) {
+                            showStage(mainStage);
+                        }
+                    } else if (windowInfoFloating != null) {
+                        // 关闭窗口信息浮窗
+                        hideFloatingWindow(windowInfoFloating);
+                        showStage(mainStage);
+                    }
+                    // 移除键盘监听器
+                    removeNativeListener(nativeKeyListener);
+                    // 改变要防重复点击的组件状态
+                    changeDisableNodes(autoClickController.disableNodes, false);
+                }
+            }
+        };
+        // 注册监听器
+        addNativeListener(nativeKeyListener);
+    }
+
+    /**
+     * 开启记录焦点窗口鼠标点击监听器
+     *
+     * @param massageFloating 状态信息窗口
+     * @param preparation     准备时间
+     */
+    public static void startClickWindowMouseListener(FloatingWindowDescriptor massageFloating, int preparation) {
+        if (autoClickController.isFree()) {
+            // 移除可能存在的旧监听器
+            removeNativeListener(clickWindowMouseListener);
+            // 启动寻找窗口标记
+            findingWindow = true;
+            // 启动键盘监听器
+            startNativeKeyListener();
+            // 设置浮窗文本显示准备时间
+            AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
+                    + preparation + " 秒后开始记录窗口信息");
+            updateMassageLabel(massageFloating, text.get());
+            // 显示浮窗
+            showFloatingWindow(false);
+            findingWindowTimeline = new Timeline();
+            if (preparation == 0) {
+                // 创建新监听器
+                clickWindowMouseListener = new ClickWindowMouseListener(massageFloating);
+                // 注册监听器
+                addNativeListener(clickWindowMouseListener);
+                // 更新浮窗文本
+                text.set(text_cancelTask() + "正在记录窗口信息");
+                updateMassageLabel(massageFloating, text.get());
+            } else {
+                AtomicInteger preparationTime = new AtomicInteger(preparation);
+                // 创建 Timeline 来实现倒计时
+                Timeline finalTimeline = findingWindowTimeline;
+                findingWindowTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                    preparationTime.getAndDecrement();
+                    if (preparationTime.get() > 0) {
+                        text.set(text_cancelTask() + preparationTime + " 秒后开始记录窗口信息");
+                    } else {
+                        // 创建新监听器
+                        clickWindowMouseListener = new ClickWindowMouseListener(massageFloating);
+                        // 注册监听器
+                        addNativeListener(clickWindowMouseListener);
+                        // 停止 Timeline
+                        finalTimeline.stop();
+                        // 更新浮窗文本
+                        text.set(text_cancelTask() + "正在记录窗口信息");
+                    }
+                    updateMassageLabel(massageFloating, text.get());
+                }));
+                // 设置 Timeline 的循环次数
+                findingWindowTimeline.setCycleCount(preparation);
+                // 启动 Timeline
+                findingWindowTimeline.play();
+            }
+        }
+    }
+
+    /**
+     * 停止记录焦点窗口鼠标点击监听器
+     */
+    public static void stopClickWindowMouseListener() {
+        if (findingWindow) {
+            if (clickWindowMouseListener != null) {
+                removeNativeListener(clickWindowMouseListener);
+                clickWindowMouseListener = null;
+            }
         }
     }
 
@@ -54,6 +192,22 @@ public class WindowMonitor {
             windowInfo = getWinFocusWindowInfo();
         } else if (isMac) {
             windowInfo = getMacFocusWindowInfo();
+        }
+        return windowInfo;
+    }
+
+    /**
+     * 根据进程路径获取主窗口信息
+     *
+     * @param processPath 进程路径
+     * @return 窗口信息，如果没有找到则返回null
+     */
+    public static WindowInfo getMainWindowInfo(String processPath) {
+        WindowInfo windowInfo = null;
+        if (isWin) {
+            windowInfo = getMainWinWindowInfo(processPath);
+        } else if (isMac) {
+            windowInfo = getMainMacWindowInfo(processPath);
         }
         return windowInfo;
     }

@@ -427,6 +427,11 @@ public class FloatingWindow {
             rectangle.setY(y);
             rectangle.setWidth(w);
             rectangle.setHeight(h);
+            floatingStage.setX(x);
+            floatingStage.setY(y);
+            floatingStage.setWidth(w);
+            floatingStage.setHeight(h);
+            config.getMassageLabel().setText(config.getMassage());
             setPositionText(config, "");
             Button button = config.getButton();
             if (button != null) {
