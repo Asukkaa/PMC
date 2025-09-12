@@ -243,8 +243,8 @@ public class WindowMonitor {
         user32.GetWindowThreadProcessId(hwnd, pidRef);
         int pid = pidRef.getValue();
         // 获取进程名称和路径
-        String processName = null;
-        String processPath = null;
+        String processName = "";
+        String processPath = "";
         try {
             WinNT.HANDLE processHandle = kernel32.OpenProcess(
                     Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ,
@@ -551,14 +551,14 @@ public class WindowMonitor {
                                         int height = (int) Math.round(heightArr[0]);
                                         // 获取窗口标题
                                         Pointer titleValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowName);
-                                        String title = null;
+                                        String title = "";
                                         if (titleValue != null) {
                                             title = cg.CFStringGetCStringPtr(titleValue, 0x08000100);
                                         }
                                         // 获取应用程序名称
                                         Pointer ownerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerName);
-                                        String processName = null;
-                                        String processPath = null;
+                                        String processName = "";
+                                        String processPath = "";
                                         if (ownerValue != null) {
                                             processName = cg.CFStringGetCStringPtr(ownerValue, 0x08000100);
                                         }
