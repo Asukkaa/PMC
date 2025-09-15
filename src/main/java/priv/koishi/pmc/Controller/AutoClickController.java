@@ -614,6 +614,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setConfig(SettingController.massageFloating.getConfig())
                 .setName(floatingName_massage())
                 .setEnableResize(false)
+                .setAddCloseKey(false)
                 .setTransparent(true)
                 .setEnableDrag(false)
                 .setShowName(false)
@@ -622,6 +623,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setConfig(new FloatingWindowConfig())
                 .setName("自动操作目标窗口")
                 .setEnableResize(false)
+                .setAddCloseKey(false)
                 .setEnableDrag(false);
         // 创建浮窗
         createFloatingWindows(massageFloating, windowInfoFloating);
@@ -778,7 +780,7 @@ public class AutoClickController extends RootController implements MousePosition
                         Integer.parseInt(defaultPreparationRunTime), 0, null);
                 // 设置浮窗文本显示准备时间
                 String text = text_cancelTask() + preparationTimeValue + text_run();
-                floatingLabel.setText(text);
+                updateMassageLabel(massageFloating, text);
                 log_Click.setText(text);
                 showFloatingWindow(true);
                 // 延时执行任务
@@ -2055,7 +2057,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 获取准备时间值
             int preparationTimeValue = setDefaultIntValue(preparationWindowTime_Click,
                     Integer.parseInt(defaultPreparationRecordTime), 0, null);
-            startClickWindowMouseListener(massageFloating, preparationTimeValue);
+            startClickWindowMouseListener(preparationTimeValue);
         }
     }
 

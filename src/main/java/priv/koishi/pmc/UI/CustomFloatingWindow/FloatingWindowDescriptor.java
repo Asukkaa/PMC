@@ -1,5 +1,6 @@
 package priv.koishi.pmc.UI.CustomFloatingWindow;
 
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -163,14 +164,24 @@ public class FloatingWindowDescriptor {
     String configFile;
 
     /**
-     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidthInt}）
+     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidth}）
      */
     int minWidth = defaultFloatingWidthInt;
 
     /**
-     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingHeightInt}）
+     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingHeight}）
      */
     int minHeight = defaultFloatingHeightInt;
+
+    /**
+     * 浮窗是否添加关闭快捷键键（true 添加）
+     */
+    boolean addCloseKey = true;
+
+    /**
+     * 浮窗关闭快捷键键值（默认 {@link com.github.kwhat.jnativehook.keyboard.NativeKeyEvent#VC_ESCAPE}）
+     */
+    int closeKeyEvent = NativeKeyEvent.VC_ESCAPE;
 
     /**
      * 销毁浮窗

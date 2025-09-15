@@ -13,7 +13,6 @@ import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
 import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
-import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,8 +22,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.AutoClickController.showFloatingWindow;
-import static priv.koishi.pmc.Controller.AutoClickController.windowInfoFloating;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -79,32 +78,33 @@ public class WindowMonitor {
         nativeKeyListener = new NativeKeyListener() {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
-                // 检测快捷键 esc
-                if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-                    if (findingWindow) {
-                        // 停止记录鼠标点击监听器
-                        stopClickWindowMouseListener();
-                        // 停止录制计时
-                        if (findingWindowTimeline != null) {
-                            findingWindowTimeline.stop();
-                            findingWindowTimeline = null;
+                if (massageFloating != null) {
+                    // 检测快捷键 esc
+                    if (e.getKeyCode() == massageFloating.getCloseKeyEvent()) {
+                        // 检测是否正在查找窗口
+                        if (findingWindow) {
+                            // 停止记录鼠标点击监听器
+                            stopClickWindowMouseListener();
+                            // 停止录制计时
+                            if (findingWindowTimeline != null) {
+                                findingWindowTimeline.stop();
+                                findingWindowTimeline = null;
+                            }
+                            // 停止寻找窗口标记
+                            findingWindow = false;
+                            // 弹出程序主窗口
+                            CheckBox showWindowRecord = settingController.showWindowRecord_Set;
+                            if (showWindowRecord.isSelected()) {
+                                showStage(mainStage);
+                            }
                         }
-                        // 停止寻找窗口标记
-                        findingWindow = false;
-                        // 弹出程序主窗口
-                        CheckBox showWindowRecord = settingController.showWindowRecord_Set;
-                        if (showWindowRecord.isSelected()) {
-                            showStage(mainStage);
-                        }
-                    } else if (windowInfoFloating != null) {
                         // 关闭窗口信息浮窗
-                        hideFloatingWindow(windowInfoFloating);
-                        showStage(mainStage);
+                        hideFloatingWindow(massageFloating);
+                        // 移除键盘监听器
+                        removeNativeListener(nativeKeyListener);
+                        // 改变要防重复点击的组件状态
+                        changeDisableNodes(autoClickController.disableNodes, false);
                     }
-                    // 移除键盘监听器
-                    removeNativeListener(nativeKeyListener);
-                    // 改变要防重复点击的组件状态
-                    changeDisableNodes(autoClickController.disableNodes, false);
                 }
             }
         };
@@ -115,23 +115,22 @@ public class WindowMonitor {
     /**
      * 开启记录焦点窗口鼠标点击监听器
      *
-     * @param massageFloating 状态信息窗口
-     * @param preparation     准备时间
+     * @param preparation 准备时间
      */
-    public static void startClickWindowMouseListener(FloatingWindowDescriptor massageFloating, int preparation) {
+    public static void startClickWindowMouseListener(int preparation) {
         if (autoClickController.isFree()) {
             // 移除可能存在的旧监听器
             removeNativeListener(clickWindowMouseListener);
             // 启动寻找窗口标记
             findingWindow = true;
-            // 启动键盘监听器
-            startNativeKeyListener();
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparation + " 秒后开始记录窗口信息");
             updateMassageLabel(massageFloating, text.get());
             // 显示浮窗
             showFloatingWindow(false);
+            // 启动键盘监听器
+            startNativeKeyListener();
             findingWindowTimeline = new Timeline();
             if (preparation == 0) {
                 // 创建新监听器

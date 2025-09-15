@@ -440,7 +440,9 @@ public class FloatingWindow {
             }
             floatingStage.show();
             // 监听键盘事件
-            startNativeKeyListener();
+            if (config.isAddCloseKey()) {
+                startNativeKeyListener(config);
+            }
             floatingWindows.add(config);
         });
     }
@@ -595,7 +597,7 @@ public class FloatingWindow {
     /**
      * 开启全局键盘监听
      */
-    private static void startNativeKeyListener() {
+    private static void startNativeKeyListener(FloatingWindowDescriptor config) {
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
@@ -603,7 +605,7 @@ public class FloatingWindow {
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
                     // 检测快捷键 esc
-                    if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                    if (e.getKeyCode() == config.getCloseKeyEvent()) {
                         floatingWindows.forEach(floatingConfig -> {
                             Stage stage = floatingConfig.getStage();
                             if (stage != null && stage.isShowing()) {

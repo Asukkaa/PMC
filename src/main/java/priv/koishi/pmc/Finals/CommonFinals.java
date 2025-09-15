@@ -581,15 +581,6 @@ public class CommonFinals {
      */
     public static final String defaultTaskDetailHeight = "400";
 
-    /**
-     * 默认信息浮窗高度
-     */
-    public static final int defaultFloatingHeightInt = 160;
-
-    /**
-     * 默认信息浮窗宽度
-     */
-    public static final int defaultFloatingWidthInt = 250;
 
     /**
      * 默认信息浮窗宽度
@@ -600,6 +591,16 @@ public class CommonFinals {
      * 默认信息浮窗高度
      */
     public static final String defaultFloatingHeight = "160";
+
+    /**
+     * 默认信息浮窗高度
+     */
+    public static final int defaultFloatingHeightInt = Integer.parseInt(defaultFloatingHeight);
+
+    /**
+     * 默认信息浮窗宽度
+     */
+    public static final int defaultFloatingWidthInt = Integer.parseInt(defaultFloatingWidth);
 
     /**
      * 默认应用窗口宽度
