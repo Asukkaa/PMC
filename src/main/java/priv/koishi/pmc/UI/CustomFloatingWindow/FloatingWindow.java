@@ -561,6 +561,7 @@ public class FloatingWindow {
         Platform.runLater(() -> {
             Label massageLabel = config.getMassageLabel();
             massageLabel.setText(text);
+            config.setMassage(text);
         });
     }
 
