@@ -359,8 +359,8 @@ public class ClickDetailController extends RootController {
         Color textFill = settingController.colorPicker_Set.getValue();
         return new FloatingWindowDescriptor()
                 .setHideButtonToolTip(text_saveCloseFloating())
-                .setShowButtonText(clickDetail_showRegion())
-                .setHideButtonText(clickDetail_saveRegion())
+                .setShowButtonText(findImgSet_showRegion())
+                .setHideButtonText(findImgSet_saveRegion())
                 .setShowButtonToolTip(tip_showRegion())
                 .setMassage(text_saveFindImgConfig())
                 .setTextFill(textFill);

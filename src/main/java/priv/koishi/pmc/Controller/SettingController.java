@@ -108,7 +108,7 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public HBox fileNumberHBox_Set, findImgSetting_Set, clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set,
-            clickWindowInfoHBox_Set;
+            clickWindowInfoHBox_Set, stopRegionInfoHBox_Set, clickRegionInfoHBox_Set;
 
     @FXML
     public ProgressBar progressBar_Set;
@@ -255,8 +255,8 @@ public class SettingController extends RootController implements MousePositionUp
     private FloatingWindowDescriptor createFloatingWindowDescriptor() {
         return new FloatingWindowDescriptor()
                 .setDisableNodes(new ArrayList<>(disableNodes))
-                .setShowButtonText(clickDetail_showRegion())
-                .setHideButtonText(clickDetail_saveRegion())
+                .setShowButtonText(findImgSet_showRegion())
+                .setHideButtonText(findImgSet_saveRegion())
                 .setHideButtonToolTip(tip_saveFloating())
                 .setTextFill(colorPicker_Set.getValue())
                 .setShowButtonToolTip(tip_showRegion())
@@ -1372,14 +1372,26 @@ public class SettingController extends RootController implements MousePositionUp
         String value = clickFindImgType_Set.getValue();
         addValueToolTip(clickFindImgType_Set, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            clickRegionHBox_Set.setVisible(true);
+            clickRegionInfoHBox_Set.setVisible(true);
+            clickRegionInfoHBox_Set.getChildren().removeAll(clickRegionHBox_Set, clickWindowInfoHBox_Set);
+            clickRegionInfoHBox_Set.getChildren().add(clickRegionHBox_Set);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 clickFloating.setConfig(config);
             }
+        } else if (findImgType_window().equals(value)) {
+            clickRegionInfoHBox_Set.setVisible(true);
+            clickRegionInfoHBox_Set.getChildren().removeAll(clickRegionHBox_Set, clickWindowInfoHBox_Set);
+            clickRegionInfoHBox_Set.getChildren().add(clickWindowInfoHBox_Set);
+            if (clickFloating != null) {
+                FloatingWindowConfig config = clickFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                clickFloating.setConfig(config);
+            }
         } else if (findImgType_all().equals(value)) {
-            clickRegionHBox_Set.setVisible(false);
+            clickRegionInfoHBox_Set.setVisible(false);
+            clickRegionInfoHBox_Set.getChildren().removeAll(clickRegionHBox_Set, clickWindowInfoHBox_Set);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
@@ -1396,14 +1408,26 @@ public class SettingController extends RootController implements MousePositionUp
         String value = stopFindImgType_Set.getValue();
         addValueToolTip(stopFindImgType_Set, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            stopRegionHBox_Set.setVisible(true);
+            stopRegionInfoHBox_Set.setVisible(true);
+            stopRegionInfoHBox_Set.getChildren().removeAll(stopRegionHBox_Set, stopWindowInfoHBox_Set);
+            stopRegionInfoHBox_Set.getChildren().add(stopRegionHBox_Set);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 stopFloating.setConfig(config);
             }
+        } else if (findImgType_window().equals(value)) {
+            stopRegionInfoHBox_Set.setVisible(true);
+            stopRegionInfoHBox_Set.getChildren().removeAll(stopRegionHBox_Set, stopWindowInfoHBox_Set);
+            stopRegionInfoHBox_Set.getChildren().add(stopWindowInfoHBox_Set);
+            if (stopFloating != null) {
+                FloatingWindowConfig config = stopFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                stopFloating.setConfig(config);
+            }
         } else if (findImgType_all().equals(value)) {
-            stopRegionHBox_Set.setVisible(false);
+            stopRegionInfoHBox_Set.setVisible(false);
+            stopRegionInfoHBox_Set.getChildren().removeAll(stopRegionHBox_Set, stopWindowInfoHBox_Set);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());

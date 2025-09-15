@@ -15,6 +15,11 @@ public enum FindImgTypeEnum {
     /**
      * 识别指定区域
      */
-    REGION
+    REGION,
+
+    /**
+     * 识别指定窗口
+     */
+    WINDOW
 
 }

@@ -1578,15 +1578,15 @@ public class i18nFinal {
     /**
      * @return 保存识别区域
      */
-    public static String clickDetail_saveRegion() {
-        return bundle.getString("clickDetail.saveRegion");
+    public static String findImgSet_saveRegion() {
+        return bundle.getString("findImgSet.saveRegion");
     }
 
     /**
      * @return 显示识别区域
      */
-    public static String clickDetail_showRegion() {
-        return bundle.getString("clickDetail.showRegion");
+    public static String findImgSet_showRegion() {
+        return bundle.getString("findImgSet.showRegion");
     }
 
     /**
@@ -2524,6 +2524,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 识别指定窗口
+     */
+    public static String findImgType_window() {
+        return bundle.getString("findImgType.window");
+    }
+
+    /**
      * @return 识别指定区域
      */
     public static String findImgType_region() {
@@ -2541,7 +2548,8 @@ public class i18nFinal {
     public static void updateFindImgTypeList() {
         List<String> newList = Arrays.asList(
                 findImgType_all(),
-                findImgType_region());
+                findImgType_region(),
+                findImgType_window());
         findImgTypeList.clear();
         findImgTypeList.addAll(newList);
     }
@@ -2558,6 +2566,7 @@ public class i18nFinal {
         findImgTypeMap.clear();
         findImgTypeMap.put(FindImgTypeEnum.ALL.ordinal(), findImgType_all());
         findImgTypeMap.put(FindImgTypeEnum.REGION.ordinal(), findImgType_region());
+        findImgTypeMap.put(FindImgTypeEnum.WINDOW.ordinal(), findImgType_window());
     }
 
     /**
