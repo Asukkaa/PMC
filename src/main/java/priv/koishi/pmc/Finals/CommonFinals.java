@@ -29,6 +29,11 @@ public class CommonFinals {
     public static final String version = "4.0.0";
 
     /**
+     * jdk 版本
+     */
+    public static final String jdkVersion = System.getProperty("java.vendor") + " " + System.getProperty("java.vm.version");
+
+    /**
      * 程序构建日期
      */
     public static final String buildDate = "2025.09.15";
@@ -269,9 +274,9 @@ public class CommonFinals {
     public static final String appRootPath = new File(appLaunchPath).getParent();
 
     /**
-     * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
+     * 判断程序是否在 IDEA 中运行(在 IDEA 环境运为true，其他环境为false)
      */
-    public static final boolean isRunningFromJar = isRunningFromIDEA();
+    public static final boolean isRunningFromIDEA = isRunningFromIDEA();
 
     /**
      * app目录
