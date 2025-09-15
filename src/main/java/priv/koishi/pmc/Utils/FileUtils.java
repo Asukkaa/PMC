@@ -241,7 +241,7 @@ public class FileUtils {
      */
     public static InputStream checkRunningInputStream(String path) throws IOException {
         InputStream input;
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             input = new FileInputStream(resourcesPath + path);
         } else {
             input = new FileInputStream(getAppResourcePath(path));
@@ -258,7 +258,7 @@ public class FileUtils {
      */
     public static OutputStream checkRunningOutputStream(String path) throws IOException {
         OutputStream output;
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             output = new FileOutputStream(resourcesPath + path);
         } else {
             output = new FileOutputStream(getAppResourcePath(path));
@@ -282,7 +282,7 @@ public class FileUtils {
      * @return 不同操作系统下logs文件夹地址
      */
     public static String getLogsPath() {
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             return userDir + File.separator + logs;
         }
         String logsPath = rootDir + File.separator + logs;
@@ -568,7 +568,7 @@ public class FileUtils {
      */
     public static String getCFGPath() {
         String cfgPath;
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             cfgPath = appName + cfg;
         } else {
             String cfgFileName = "/" + appName + cfg;

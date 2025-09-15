@@ -28,7 +28,7 @@ import java.util.*;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
+import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
@@ -395,7 +395,7 @@ public class MainApplication extends Application {
         bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
         System.setProperty("log.dir", getLogsPath());
         // 打包后需要手动指定日志配置文件位置
-        if (!isRunningFromJar) {
+        if (!isRunningFromIDEA) {
             ConfigurationSource source = new ConfigurationSource(new FileInputStream(getAppResourcePath(log4j2)));
             Configurator.initialize(null, source);
         }

@@ -44,7 +44,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
+import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
@@ -1163,7 +1163,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新jvm配置参数
         mainController.saveAllLastConfig();
         Platform.exit();
-        if (!isRunningFromJar) {
+        if (!isRunningFromIDEA) {
             ProcessBuilder processBuilder = null;
             if (isWin) {
                 processBuilder = new ProcessBuilder(appLaunchPath);
