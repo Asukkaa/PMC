@@ -427,7 +427,7 @@ public class ClickDetailController extends RootController {
      */
     private void addModificationListeners() {
         // 通用内容变化监听
-        InvalidationListener invalidationListener = obs -> isModified = true;
+        InvalidationListener invalidationListener = _ -> isModified = true;
         // 绑定所有输入控件
         registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -452,7 +452,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(stopFindImgType_Det, stopFindImgType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickFindImgType_Det, clickFindImgType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         // 监听滑块改变
-        ChangeListener<Number> clickOpacityListener = (obs, oldVal, newVal) ->
+        ChangeListener<Number> clickOpacityListener = (_, _, newVal) ->
                 isModified = newVal.doubleValue() != Double.parseDouble(selectedItem.getClickMatchThreshold());
         registerWeakListener(stopOpacity_Det, stopOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
         registerWeakListener(clickOpacity_Det, clickOpacity_Det.valueProperty(), clickOpacityListener, weakChangeListeners);
@@ -660,7 +660,7 @@ public class ClickDetailController extends RootController {
      */
     private void addCloseConfirm() {
         // 添加关闭请求监听
-        stage.setOnCloseRequest(e -> {
+        stage.setOnCloseRequest(_ -> {
             CheckBox remindSave = settingController.remindClickSave_Set;
             if (remindSave != null && remindSave.isSelected()) {
                 if (isModified || stopFloating.isModified() || clickFloating.isModified()) {
@@ -741,7 +741,7 @@ public class ClickDetailController extends RootController {
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         loadImgTask = loadImg(taskBean, files);
         bindingTaskNode(loadImgTask, taskBean);
-        loadImgTask.setOnSucceeded(event -> {
+        loadImgTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tableView_Det, dataNumber_Det, unit_img());
             tableView_Det.refresh();
@@ -752,7 +752,7 @@ public class ClickDetailController extends RootController {
             loadImgTask = null;
             throw new RuntimeException(event.getSource().getException());
         });
-        loadImgTask.setOnCancelled(event -> {
+        loadImgTask.setOnCancelled(_ -> {
             taskNotSuccess(taskBean, text_taskCancelled());
             loadImgTask = null;
         });

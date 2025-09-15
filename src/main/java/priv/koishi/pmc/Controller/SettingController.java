@@ -515,7 +515,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 监听颜色选择器设置变化
      */
     private void setColorsListener() {
-        colorPicker_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
+        colorPicker_Set.valueProperty().addListener((_, _, newValue) -> {
             if (massageFloating != null) {
                 Label floatingLabel = massageFloating.getMassageLabel();
                 if (floatingLabel != null) {
@@ -530,7 +530,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 监听数值滑动条内容变化
      */
     private void sliderValueListener() {
-        opacity_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
+        opacity_Set.valueProperty().addListener((_, _, newValue) -> {
             double rounded = Math.round(newValue.doubleValue() * 10) / 10.0;
             if (newValue.doubleValue() != rounded) {
                 opacity_Set.setValue(rounded);
@@ -678,7 +678,7 @@ public class SettingController extends RootController implements MousePositionUp
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         Task<Void> loadImgTask = loadImg(taskBean, files);
         bindingTaskNode(loadImgTask, taskBean);
-        loadImgTask.setOnSucceeded(event -> {
+        loadImgTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tableView_Set, dataNumber_Set, unit_img());
             tableView_Set.refresh();

@@ -31,7 +31,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.09.11";
+    public static final String buildDate = "2025.09.15";
 
     /**
      * 文件后缀名：bat
@@ -271,7 +271,7 @@ public class CommonFinals {
     /**
      * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
      */
-    public static final boolean isRunningFromJar = isRunningFromJar();
+    public static final boolean isRunningFromJar = isRunningFromIDEA();
 
     /**
      * app目录

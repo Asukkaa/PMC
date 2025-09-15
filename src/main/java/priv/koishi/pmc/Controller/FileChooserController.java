@@ -189,7 +189,7 @@ public class FileChooserController extends RootController {
                 .setTableView(tableView_FC);
         readAllFilesTask = readAllFilesTask(taskBean, fileConfig);
         bindingTaskNode(readAllFilesTask, taskBean);
-        readAllFilesTask.setOnSucceeded(event -> {
+        readAllFilesTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             try {
                 addRemoveSameFile(readAllFilesTask.getValue(), false, tableView_FC);
@@ -316,9 +316,9 @@ public class FileChooserController extends RootController {
         MenuItem openDirector = new MenuItem(menuItem_openDirectory());
         MenuItem copyFilePath = new MenuItem(menuItem_copyFilePath());
         // 为每个菜单项添加事件处理
-        openFile.setOnAction(event -> openFileMenuItem(tableView));
-        openDirector.setOnAction(event -> openDirectorMenuItem(tableView));
-        copyFilePath.setOnAction(event -> copyFilePathItem(tableView));
+        openFile.setOnAction(_ -> openFileMenuItem(tableView));
+        openDirector.setOnAction(_ -> openDirectorMenuItem(tableView));
+        copyFilePath.setOnAction(_ -> copyFilePathItem(tableView));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(openFile, openDirector, copyFilePath);
         contextMenu.getItems().add(menu);
@@ -381,7 +381,7 @@ public class FileChooserController extends RootController {
      */
     private void buildSelectPathItem(TableView<? extends FileVO> tableView, ContextMenu contextMenu) {
         MenuItem selectPathItem = new MenuItem(text_checkFirstFile());
-        selectPathItem.setOnAction(event -> {
+        selectPathItem.setOnAction(_ -> {
             FileVO selectedItem = tableView.getSelectionModel().getSelectedItems().getFirst();
             handleFileDoubleClick(selectedItem);
         });
@@ -399,7 +399,7 @@ public class FileChooserController extends RootController {
             throw new RuntimeException(ex);
         }
         // 清理监听器引用
-        tableView_FC.setRowFactory(tv -> null);
+        tableView_FC.setRowFactory(_ -> null);
         removeAllListeners();
         ContextMenu contextMenu = tableView_FC.getContextMenu();
         if (contextMenu != null) {
@@ -413,7 +413,7 @@ public class FileChooserController extends RootController {
      * 设置列表双击事件
      */
     private void setRowDoubleClick() {
-        tableView_FC.setRowFactory(tv -> {
+        tableView_FC.setRowFactory(_ -> {
             TableRow<FileVO> row = new TableRow<>();
             // 双击事件
             row.setOnMouseClicked(event -> {
@@ -423,9 +423,9 @@ public class FileChooserController extends RootController {
                 }
             });
             // 更新行样式方法
-            row.itemProperty().addListener((obs, oldItem, newItem) ->
+            row.itemProperty().addListener((_, _, _) ->
                     updateRowStyle(row));
-            row.selectedProperty().addListener((obs, wasSelected, isSelected) ->
+            row.selectedProperty().addListener((_, _, _) ->
                     updateRowStyle(row));
             return row;
         });
@@ -514,7 +514,7 @@ public class FileChooserController extends RootController {
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_FC.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
-            stage.setOnCloseRequest(e -> closeRequest());
+            stage.setOnCloseRequest(_ -> closeRequest());
             // 组件自适应宽高
             adaption();
             // 设置要防重复点击的组件

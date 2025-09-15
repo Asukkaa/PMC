@@ -899,9 +899,11 @@ public class i18nFinal {
     public static String tip_version() {
         return """
                 %s：%s
-                %s：%s""".formatted(
+                %s：%s
+                JDK %s：%s""".formatted(
                 bundle.getString("tip.version"), version,
-                bundle.getString("tip.buildDate"), buildDate);
+                bundle.getString("tip.buildDate"), buildDate,
+                bundle.getString("tip.version"), System.getProperty("java.vendor") + " " + System.getProperty("java.vm.version"));
     }
 
     /**

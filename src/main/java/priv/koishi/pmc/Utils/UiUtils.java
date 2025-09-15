@@ -621,7 +621,7 @@ public class UiUtils {
     public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<? super T, ? extends Image> thumbSupplier) {
         column.setCellValueFactory(cellData ->
                 new SimpleObjectProperty<>(thumbSupplier.apply(cellData.getValue())));
-        column.setCellFactory(col -> new TableCell<>() {
+        column.setCellFactory(_ -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
 
             {
@@ -784,7 +784,7 @@ public class UiUtils {
      * @return 监听器
      */
     public static ChangeListener<Number> integerSliderValueListener(Slider slider, String tip) {
-        ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
+        ChangeListener<Number> listener = (_, _, newValue) -> {
             int rounded = newValue.intValue();
             slider.setValue(rounded);
             addValueToolTip(slider, tip, String.valueOf(rounded));
@@ -803,7 +803,7 @@ public class UiUtils {
      * @return 监听器
      */
     public static ChangeListener<String> integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
-        ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+        ChangeListener<String> listener = (_, oldValue, newValue) -> {
             // 这里处理文本变化的逻辑
             if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
                 textField.setText(oldValue);
@@ -825,7 +825,7 @@ public class UiUtils {
      * @return 监听器
      */
     public static ChangeListener<String> warnIntegerRangeTextField(TextField textField, Integer min, Integer max, String tip, Node warningNode) {
-        ChangeListener<String> listener = (observable, oldValue, newValue) -> {
+        ChangeListener<String> listener = (_, oldValue, newValue) -> {
             // 这里处理文本变化的逻辑
             if (!isInIntegerRange(newValue, 1, null) && StringUtils.isNotBlank(newValue)) {
                 textField.setText(oldValue);
@@ -850,7 +850,7 @@ public class UiUtils {
      * @return 监听器
      */
     public static ChangeListener<String> textFieldValueListener(TextField textField, String tip) {
-        ChangeListener<String> listener = (observable, oldValue, newValue) ->
+        ChangeListener<String> listener = (_, _, _) ->
                 addValueToolTip(textField, tip);
         textField.textProperty().addListener(listener);
         return listener;
@@ -899,7 +899,7 @@ public class UiUtils {
      */
     @SuppressWarnings("unchecked")
     public static <T> void tableViewDragRow(TableView<T> tableView) {
-        tableView.setRowFactory(tv -> {
+        tableView.setRowFactory(_ -> {
             TableRow<T> row = new TableRow<>();
             ObservableList<Integer> draggedIndices = FXCollections.observableArrayList();
             // 拖拽检测
@@ -1027,10 +1027,10 @@ public class UiUtils {
         MenuItem top = new MenuItem(menuItem_moveTop());
         MenuItem bottom = new MenuItem(menuItem_moveBottom());
         // 为每个菜单项添加事件处理
-        up.setOnAction(event -> upMoveDataMenuItem(tableView));
-        down.setOnAction(event -> downMoveDataMenuItem(tableView));
-        top.setOnAction(event -> topMoveDataMenuItem(tableView));
-        bottom.setOnAction(event -> bottomMoveDataMenuItem(tableView));
+        up.setOnAction(_ -> upMoveDataMenuItem(tableView));
+        down.setOnAction(_ -> downMoveDataMenuItem(tableView));
+        top.setOnAction(_ -> topMoveDataMenuItem(tableView));
+        bottom.setOnAction(_ -> bottomMoveDataMenuItem(tableView));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(up, down, top, bottom);
         contextMenu.getItems().add(menu);
@@ -1148,9 +1148,9 @@ public class UiUtils {
         MenuItem openDirector = new MenuItem(menuItem_openDirectory());
         MenuItem copyFilePath = new MenuItem(menuItem_copyFilePath());
         // 为每个菜单项添加事件处理
-        openFile.setOnAction(event -> openFileMenuItem(tableView));
-        openDirector.setOnAction(event -> openDirectorMenuItem(tableView));
-        copyFilePath.setOnAction(event -> copyFilePathItem(tableView));
+        openFile.setOnAction(_ -> openFileMenuItem(tableView));
+        openDirector.setOnAction(_ -> openDirectorMenuItem(tableView));
+        copyFilePath.setOnAction(_ -> copyFilePathItem(tableView));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(openFile, openDirector, copyFilePath);
         contextMenu.getItems().add(menu);
@@ -1202,10 +1202,10 @@ public class UiUtils {
         MenuItem appendCopy = new MenuItem(menuItem_appendCopy());
         MenuItem topCopy = new MenuItem(menuItem_topCopy());
         // 为每个菜单项添加事件处理
-        upCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_upCopy(), dataNumber));
-        downCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_downCopy(), dataNumber));
-        appendCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber));
-        topCopy.setOnAction(event -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber));
+        upCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_upCopy(), dataNumber));
+        downCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_downCopy(), dataNumber));
+        appendCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber));
+        topCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(upCopy, downCopy, appendCopy, topCopy);
         contextMenu.getItems().add(menu);
@@ -1267,11 +1267,11 @@ public class UiUtils {
         MenuItem forward = new MenuItem(mouseButton_forward());
         MenuItem back = new MenuItem(mouseButton_back());
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_primary()));
-        secondary.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_secondary()));
-        middle.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_middle()));
-        forward.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_forward()));
-        back.setOnAction(event -> updateClickKeyMenuItem(tableView, mouseButton_back()));
+        primary.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_primary()));
+        secondary.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_secondary()));
+        middle.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_middle()));
+        forward.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_forward()));
+        back.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_back()));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(primary, secondary, middle, forward, back);
         contextMenu.getItems().add(menu);
@@ -1307,10 +1307,10 @@ public class UiUtils {
         MenuItem middle = new MenuItem(retryType_stop());
         MenuItem forward = new MenuItem(retryType_break());
         // 为每个菜单项添加事件处理
-        primary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_continuously()));
-        secondary.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_click()));
-        middle.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_stop()));
-        forward.setOnAction(event -> updateRetryTypeMenuItem(tableView, retryType_break()));
+        primary.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_continuously()));
+        secondary.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_click()));
+        middle.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_stop()));
+        forward.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_break()));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(primary, secondary, middle, forward);
         contextMenu.getItems().add(menu);
@@ -1342,7 +1342,7 @@ public class UiUtils {
      */
     public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
         MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
-        upMoveDataMenuItem.setOnAction(event -> {
+        upMoveDataMenuItem.setOnAction(_ -> {
             ObservableList<ImgFileVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ImgFileVO selectedItem = selectedItems.getFirst();
@@ -1384,7 +1384,7 @@ public class UiUtils {
      */
     public static void buildEditClickImgPathMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
-        upMoveDataMenuItem.setOnAction(event -> {
+        upMoveDataMenuItem.setOnAction(_ -> {
             ObservableList<ClickPositionVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ClickPositionVO selectedItem = selectedItems.getFirst();
@@ -1408,7 +1408,7 @@ public class UiUtils {
      */
     public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
         MenuItem clearSelectedDataMenuItem = new MenuItem(menu_cancelSelected());
-        clearSelectedDataMenuItem.setOnAction(event -> tableView.getSelectionModel().clearSelection());
+        clearSelectedDataMenuItem.setOnAction(_ -> tableView.getSelectionModel().clearSelection());
         contextMenu.getItems().add(clearSelectedDataMenuItem);
     }
 
@@ -1423,7 +1423,7 @@ public class UiUtils {
      */
     public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label dataNumber, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
-        deleteDataMenuItem.setOnAction(event -> {
+        deleteDataMenuItem.setOnAction(_ -> {
             TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
             // 要删除的选中项
             ObservableList<T> selectedItems = selectionModel.getSelectedItems();
@@ -1682,21 +1682,21 @@ public class UiUtils {
         File file = new File(path);
         if ((!file.getName().contains(app) && file.isDirectory())) {
             MenuItem openDirectoryMenuItem = new MenuItem(text_openDirectory());
-            openDirectoryMenuItem.setOnAction(event -> openDirectory(path));
+            openDirectoryMenuItem.setOnAction(_ -> openDirectory(path));
             contextMenu.getItems().add(openDirectoryMenuItem);
         }
         MenuItem openParentDirectoryMenuItem = new MenuItem(text_openParentDirectory());
-        openParentDirectoryMenuItem.setOnAction(event -> openParentDirectory(path));
+        openParentDirectoryMenuItem.setOnAction(_ -> openParentDirectory(path));
         contextMenu.getItems().add(openParentDirectoryMenuItem);
         if (file.isFile() && !file.getName().equals(appName + exe)) {
             MenuItem openFileMenuItem = new MenuItem(text_openFile());
-            openFileMenuItem.setOnAction(event -> openFile(path));
+            openFileMenuItem.setOnAction(_ -> openFile(path));
             contextMenu.getItems().add(openFileMenuItem);
         }
         MenuItem copyValueMenuItem = new MenuItem(text_copyPath());
         contextMenu.getItems().add(copyValueMenuItem);
         valueLabel.setContextMenu(contextMenu);
-        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText()));
+        copyValueMenuItem.setOnAction(_ -> copyText(valueLabel.getText()));
         valueLabel.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
                 contextMenu.show(valueLabel, event.getScreenX(), event.getScreenY());
@@ -1721,7 +1721,7 @@ public class UiUtils {
             }
         });
         // 设置右键菜单行为
-        copyValueMenuItem.setOnAction(event -> copyText(valueLabel.getText()));
+        copyValueMenuItem.setOnAction(_ -> copyText(valueLabel.getText()));
     }
 
     /**
@@ -1933,7 +1933,7 @@ public class UiUtils {
             }
         });
         // 给日期选择框添加鼠标点击事件
-        datePicker.getEditor().setOnMouseClicked(e -> {
+        datePicker.getEditor().setOnMouseClicked(_ -> {
             if (!datePicker.isShowing()) {
                 datePicker.show();
             }
@@ -1964,7 +1964,7 @@ public class UiUtils {
      */
     public static <T> void initializeChoiceBoxItems(ChoiceBox<? super T> choiceBox, T defaultValue, Map<?, ? extends T> values) {
         choiceBox.getItems().clear();
-        values.forEach((key, value) -> choiceBox.getItems().add(value));
+        values.forEach((_, value) -> choiceBox.getItems().add(value));
         choiceBox.setValue(defaultValue);
     }
 
@@ -2118,10 +2118,10 @@ public class UiUtils {
         setWindowLogo(detailStage, logoPath);
         detailStage.show();
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) ->
+        detailStage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) ->
+        detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         return controller;
     }

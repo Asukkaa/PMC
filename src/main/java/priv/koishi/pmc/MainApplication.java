@@ -142,12 +142,12 @@ public class MainApplication extends Application {
         // 初始化macOS系统应用菜单
         initMenu(tabPane);
         // 监听窗口面板宽度变化
-        stage.widthProperty().addListener((v1, v2, v3) ->
+        stage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(mainController::mainAdaption));
         // 监听窗口面板高度变化
-        stage.heightProperty().addListener((v1, v2, v3) ->
+        stage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(mainController::mainAdaption));
-        stage.setOnCloseRequest(event -> {
+        stage.setOnCloseRequest(_ -> {
             try {
                 stop();
             } catch (Exception e) {
@@ -167,7 +167,7 @@ public class MainApplication extends Application {
     public void init() throws Exception {
         super.init();
         // 在init()方法中设置全局异常处理器
-        Platform.runLater(() -> Thread.setDefaultUncaughtExceptionHandler((e, exception) ->
+        Platform.runLater(() -> Thread.setDefaultUncaughtExceptionHandler((_, exception) ->
                 showExceptionAlert(exception)));
     }
 
@@ -201,7 +201,7 @@ public class MainApplication extends Application {
      */
     private void initMenu(TabPane tabPane) {
         MenuItem about = new MenuItem(macMenu_about() + appName);
-        about.setOnAction(e -> {
+        about.setOnAction(_ -> {
             // 只有在程序空闲时才弹出程序窗口
             if (autoClickController.isFree()) {
                 tabPane.getSelectionModel().select(mainController.aboutTab);
@@ -210,7 +210,7 @@ public class MainApplication extends Application {
         });
         MenuItem setting = new MenuItem(macMenu_settings());
         setting.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.META_DOWN));
-        setting.setOnAction(e -> {
+        setting.setOnAction(_ -> {
             // 只有在程序空闲时才弹出程序窗口
             if (autoClickController.isFree()) {
                 tabPane.getSelectionModel().select(mainController.settingTab);
@@ -359,7 +359,7 @@ public class MainApplication extends Application {
                 .setDisableNodes(autoClickController.disableNodes);
         autoClickController.loadedPMCTask = loadPMC(taskBean, file);
         bindingTaskNode(autoClickController.loadedPMCTask, taskBean);
-        autoClickController.loadedPMCTask.setOnSucceeded(event -> {
+        autoClickController.loadedPMCTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             List<ClickPositionVO> clickPositionVOS = autoClickController.loadedPMCTask.getValue();
             autoClickController.addAutoClickPositions(clickPositionVOS, file.getPath());

@@ -170,13 +170,13 @@ public class TaskDetailController extends RootController {
         repeatType_TD.setValue(repeat);
         if (repeatType_weekly().equals(repeat)) {
             String days = item.getDays();
-            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setSelected(false));
+            weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setSelected(false));
             for (String day : days.split(dayOfWeekRegex)) {
                 Integer dayInt = dayOfWeekMap.getKey(day);
                 weekCheckBoxMap.get(DayOfWeek.of(dayInt)).setSelected(true);
             }
         } else if (repeatType_daily().equals(repeat)) {
-            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {
+            weekCheckBoxMap.forEach((_, checkBox) -> {
                 checkBox.setSelected(true);
                 checkBox.setDisable(true);
             });
@@ -250,7 +250,7 @@ public class TaskDetailController extends RootController {
         CheckBox remindSave = settingController.remindTaskSave_Set;
         // 添加关闭请求监听
         if (remindSave != null && remindSave.isSelected()) {
-            stage.setOnCloseRequest(e -> {
+            stage.setOnCloseRequest(_ -> {
                 getTimedTaskBean();
                 if (isModified) {
                     ButtonType result = creatConfirmDialog(
@@ -283,7 +283,7 @@ public class TaskDetailController extends RootController {
         addValueToolTip(datePicker_TD.getEditor(), tip_datePicker());
         addValueToolTip(repeatType_TD, tip_repeatType(), repeatType_TD.getValue());
         addValueToolTip(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
-        weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> addToolTip(checkBox.getText(), checkBox));
+        weekCheckBoxMap.forEach((_, checkBox) -> addToolTip(checkBox.getText(), checkBox));
     }
 
     /**
@@ -392,7 +392,7 @@ public class TaskDetailController extends RootController {
         // 创建定时任务
         Task<Void> task = createTask(timedTaskBean);
         bindingTaskNode(task, taskBean);
-        task.setOnSucceeded(event -> Platform.runLater(() -> {
+        task.setOnSucceeded(_ -> Platform.runLater(() -> {
             taskUnbind(taskBean);
             // 复制成功消息气泡
             new MessageBubble(text_successSave(), 2);
@@ -437,16 +437,16 @@ public class TaskDetailController extends RootController {
         if (repeatType_once().equals(repeatType)) {
             datePicker_TD.setDisable(false);
             datePickerAction();
-            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(true));
+            weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setDisable(true));
         } else if (repeatType_weekly().equals(repeatType)) {
             datePicker_TD.setValue(LocalDate.now());
             datePicker_TD.setDisable(true);
             datePickerAction();
-            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> checkBox.setDisable(false));
+            weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setDisable(false));
         } else if (repeatType_daily().equals(repeatType)) {
             datePicker_TD.setValue(LocalDate.now());
             datePicker_TD.setDisable(true);
-            weekCheckBoxMap.forEach((dayOfWeek, checkBox) -> {
+            weekCheckBoxMap.forEach((_, checkBox) -> {
                 checkBox.setSelected(true);
                 checkBox.setDisable(true);
             });
@@ -459,7 +459,7 @@ public class TaskDetailController extends RootController {
     @FXML
     private void datePickerAction() {
         DayOfWeek dayOfWeek = datePicker_TD.getValue().getDayOfWeek();
-        weekCheckBoxMap.forEach((day, checkBox) -> checkBox.setSelected(false));
+        weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setSelected(false));
         weekCheckBoxMap.get(dayOfWeek).setSelected(true);
     }
 

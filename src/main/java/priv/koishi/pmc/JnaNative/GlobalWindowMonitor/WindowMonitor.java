@@ -145,7 +145,7 @@ public class WindowMonitor {
                 AtomicInteger preparationTime = new AtomicInteger(preparation);
                 // 创建 Timeline 来实现倒计时
                 Timeline finalTimeline = findingWindowTimeline;
-                findingWindowTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                findingWindowTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
                     preparationTime.getAndDecrement();
                     if (preparationTime.get() > 0) {
                         text.set(text_cancelTask() + preparationTime + " 秒后开始记录窗口信息");
@@ -305,7 +305,7 @@ public class WindowMonitor {
         Psapi psapi = Psapi.INSTANCE;
         Kernel32 kernel32 = Kernel32.INSTANCE;
         // 使用回调枚举所有顶级窗口
-        user32.EnumWindows((hwnd, data) -> {
+        user32.EnumWindows((hwnd, _) -> {
             // 跳过不可见窗口
             if (!user32.IsWindowVisible(hwnd)) {
                 return true;

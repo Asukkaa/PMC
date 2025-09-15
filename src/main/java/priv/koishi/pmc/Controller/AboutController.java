@@ -337,7 +337,7 @@ public class AboutController extends RootController {
                 .setBindingMassageLabel(true);
         Task<CheckUpdateBean> task = checkLatestVersion();
         bindingTaskNode(task, taskBean);
-        task.setOnSucceeded(event -> {
+        task.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             CheckUpdateBean updateInfo = task.getValue();
             // 检查是否有新版本
@@ -356,7 +356,7 @@ public class AboutController extends RootController {
                         Thread.ofVirtual()
                                 .name("task-downloadedUpdate-vThread" + tabId)
                                 .start(downloadedUpdateTask);
-                        downloadedUpdateTask.setOnFailed(workerStateEvent -> {
+                        downloadedUpdateTask.setOnFailed(_ -> {
                             try {
                                 logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
                                 deleteDirectoryRecursively(Path.of(PMCTempPath));
@@ -370,8 +370,7 @@ public class AboutController extends RootController {
                             downloadedUpdateTask = null;
                             throw new RuntimeException(message, ex);
                         });
-                        downloadedUpdateTask.setOnCancelled(workerStateEvent ->
-                                downloadedUpdateTask = null);
+                        downloadedUpdateTask.setOnCancelled(_ -> downloadedUpdateTask = null);
                     }
                 }
             } else {
@@ -381,7 +380,7 @@ public class AboutController extends RootController {
                 checkMassage_Abt.setTextFill(Color.GREEN);
             }
         });
-        task.setOnFailed(event -> {
+        task.setOnFailed(_ -> {
             taskNotSuccess(taskBean, update_checkFailed());
             //更新最后检查日期
             updateCheckDate(Color.RED);

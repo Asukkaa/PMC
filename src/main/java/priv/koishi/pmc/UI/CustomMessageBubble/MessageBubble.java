@@ -67,7 +67,7 @@ public class MessageBubble extends Label implements MousePositionUpdater {
         bubbleStage.setX(mousePoint.getX() + offsetX);
         bubbleStage.setY(mousePoint.getY() + offsetY);
         // 自动关闭
-        new Timeline(new KeyFrame(Duration.seconds(time), e -> {
+        new Timeline(new KeyFrame(Duration.seconds(time), _ -> {
             bubbleStage.close();
             MousePositionListener.getInstance().removeListener(this);
         })).play();
