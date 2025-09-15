@@ -94,11 +94,10 @@ public class FloatingWindow {
         String name = config.getName();
         config.setMassageLabel(massageLabel);
         Label nameLabel = new Label();
-        if (config.isShowName()) {
-            nameLabel.setText(name);
-        }
+        nameLabel.setText(name);
         nameLabel.setStyle(fontSize);
         nameLabel.setTextFill(color);
+        config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.getChildren().addAll(floatingPosition, massageLabel, nameLabel);
         root.getChildren().addAll(rectangle, vBox);
@@ -438,12 +437,13 @@ public class FloatingWindow {
                 button.setText(config.getHideButtonText());
                 addToolTip(config.getHideButtonToolTip(), button);
             }
+            config.getNameeLabel().setVisible(config.isShowName());
             floatingStage.show();
             // 监听键盘事件
             if (config.isAddCloseKey()) {
-                startNativeKeyListener(config);
+                startNativeKeyListener();
+                floatingWindows.add(config);
             }
-            floatingWindows.add(config);
         });
     }
 
@@ -597,7 +597,7 @@ public class FloatingWindow {
     /**
      * 开启全局键盘监听
      */
-    private static void startNativeKeyListener(FloatingWindowDescriptor config) {
+    private static void startNativeKeyListener() {
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
@@ -605,7 +605,7 @@ public class FloatingWindow {
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
                     // 检测快捷键 esc
-                    if (e.getKeyCode() == config.getCloseKeyEvent()) {
+                    if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
                         floatingWindows.forEach(floatingConfig -> {
                             Stage stage = floatingConfig.getStage();
                             if (stage != null && stage.isShowing()) {

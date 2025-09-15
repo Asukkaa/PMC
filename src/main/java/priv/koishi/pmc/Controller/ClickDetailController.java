@@ -795,7 +795,7 @@ public class ClickDetailController extends RootController {
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             // 构建右键菜单
-            buildContextMenu(tableView_Det, dataNumber_Det);
+            buildTableViewContextMenu(tableView_Det, dataNumber_Det);
         });
     }
 

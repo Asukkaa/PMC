@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -28,6 +29,8 @@ import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
@@ -91,25 +94,21 @@ public class SettingController extends RootController implements MousePositionUp
     private final List<Node> disableNodes = new ArrayList<>();
 
     /**
-     * 要点击的图像识别区域设置
+     * 浮窗设置
      */
-    public static FloatingWindowDescriptor clickFloating;
+    public static FloatingWindowDescriptor clickFloating, stopFloating, massageFloating, windowInfoFloating;
 
     /**
-     * 终止操作图像识别区域设置
+     * 窗口信息获取器
      */
-    public static FloatingWindowDescriptor stopFloating;
-
-    /**
-     * 信息浮窗设置
-     */
-    public static FloatingWindowDescriptor massageFloating;
+    public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
 
     @FXML
     public AnchorPane anchorPane_Set;
 
     @FXML
-    public HBox fileNumberHBox_Set, findImgSetting_Set, clickRegionHBox_Set, stopRegionHBox_Set;
+    public HBox fileNumberHBox_Set, findImgSetting_Set, clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set,
+            clickWindowInfoHBox_Set;
 
     @FXML
     public ProgressBar progressBar_Set;
@@ -128,20 +127,21 @@ public class SettingController extends RootController implements MousePositionUp
             stopRegion_Set;
 
     @FXML
-    public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set;
+    public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set,
+            clickWindowInfo_Set, stopWindowInfo_Set;
 
     @FXML
-    public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set,
-            retrySecond_Set, overtime_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set,
-            randomTimeOffset_Set, maxLogNum_Set, nextRunMemory_Set;
+    public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
+            retrySecond_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set, maxLogNum_Set,
+            randomTimeOffset_Set, nextRunMemory_Set, findClickWindowWait_Set, findStopWindowWait_Set;
 
     @FXML
-    public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set,
-            hideWindowRecord_Set, showWindowRecord_Set, firstClick_Set, floatingRun_Set, floatingRecord_Set,
+    public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, firstClick_Set,
+            hideWindowRecord_Set, showWindowRecord_Set, floatingRun_Set, floatingRecord_Set, randomClickTime_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
-            autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, randomClickTime_Set,
+            autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
-            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, clickAllRegion_Set, stopAllRegion_Set;
+            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -302,10 +302,16 @@ public class SettingController extends RootController implements MousePositionUp
                 .setXKey(key_massageX)
                 .setYKey(key_massageY)
                 .setMargin(margin);
+        windowInfoFloating = new FloatingWindowDescriptor()
+                .setConfig(new FloatingWindowConfig())
+                .setName("自动操作目标窗口")
+                .setEnableResize(false)
+                .setAddCloseKey(false)
+                .setEnableDrag(false);
         // 读取配置文件
         loadFloatingWindowConfig();
         // 创建浮窗
-        createFloatingWindows(clickFloating, stopFloating, massageFloating);
+        createFloatingWindows(clickFloating, stopFloating, massageFloating, windowInfoFloating);
     }
 
     /**
@@ -700,6 +706,120 @@ public class SettingController extends RootController implements MousePositionUp
         initializeChoiceBoxItems(clickFindImgType_Set, findImgType_all(), findImgTypeList);
     }
 
+
+    /**
+     * 构建右键菜单
+     */
+    private void buildContextMenu() {
+        // 构建表格右键菜单
+        buildTableViewContextMenu(tableView_Set, dataNumber_Set);
+        // 构建窗口信息栏右键菜单
+        buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor);
+        buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor);
+    }
+
+    /**
+     * 构建窗口信息栏右键菜单
+     *
+     * @param label         窗口信息栏
+     * @param windowMonitor 窗口监视器
+     */
+    private void buildWindowInfoMenu(Label label, WindowMonitor windowMonitor) {
+        // 添加窗口信息右键菜单
+        ContextMenu windowInfoMenu = new ContextMenu();
+        // 更新窗口信息选项
+        buildUpdateDataMenu(windowInfoMenu, windowMonitor);
+        // 显示窗口位置信息
+        buildShowDataMenu(windowInfoMenu, windowMonitor);
+        // 删除窗信息据选项
+        buildDeleteDataMenu(windowInfoMenu, windowMonitor);
+        // 为窗口信息栏添加右键菜单
+        label.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                windowInfoMenu.show(label, event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    /**
+     * 更新窗口数据选项
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private void buildUpdateDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem("更新窗口数据");
+        menuItem.setOnAction(_ -> windowMonitor.updateWindowInfo());
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 显示窗口位置信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private void buildShowDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem("展示窗口位置");
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            WindowInfo windowInfo = windowMonitor.windowInfo;
+            if (windowInfo != null) {
+                mainStage.setIconified(true);
+                String info = "按下 esc 即可关闭浮窗" + "\n" +
+                        "进程名称：" + windowInfo.getProcessName() + "\n" +
+                        "窗口进程 ID：" + windowInfo.getPid() + "\n" +
+                        "进程路径：" + windowInfo.getProcessPath() + "\n" +
+                        "窗口标题：" + windowInfo.getTitle() + "\n" +
+                        "窗口位置： X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                        "窗口大小： W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+                windowInfoFloating.setMassage(info)
+                        .getConfig()
+                        .setHeight(windowInfo.getHeight())
+                        .setWidth(windowInfo.getWidth())
+                        .setX(windowInfo.getX())
+                        .setY(windowInfo.getY());
+                // 改变要防重复点击的组件状态
+                changeDisableNodes(disableNodes, true);
+                showFloatingWindow(windowInfoFloating);
+                windowMonitor.startNativeKeyListener();
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 删除窗口信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private void buildDeleteDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem("删除窗口信息");
+        menuItem.setOnAction(_ -> Platform.runLater(windowMonitor::removeWindowInfo));
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 初始化窗口信息获取器
+     */
+    private void initWindowMonitor() {
+        stopWindowMonitor = new WindowMonitor(stopWindowInfo_Set, disableNodes);
+        clickWindowMonitor = new WindowMonitor(clickWindowInfo_Set, disableNodes);
+    }
+
+    /**
+     * 正在获取当前窗口信息
+     *
+     * @return true 正在获取当前窗口信息
+     */
+    public boolean findingWindow() {
+        if (clickWindowMonitor == null || stopWindowMonitor == null) {
+            return false;
+        }
+        return clickWindowMonitor.findingWindow || stopWindowMonitor.findingWindow;
+    }
+
     /**
      * 根据鼠标位置调整ui
      *
@@ -746,6 +866,8 @@ public class SettingController extends RootController implements MousePositionUp
         loadControlLastConfig();
         // 初始化浮窗
         initFloatingWindow();
+        // 初始化窗口监控器
+        initWindowMonitor();
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
@@ -760,7 +882,7 @@ public class SettingController extends RootController implements MousePositionUp
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
             // 构建右键菜单
-            buildContextMenu(tableView_Set, dataNumber_Set);
+            buildContextMenu();
             // 加载完成后发布事件
             EventBus.publish(new SettingsLoadedEvent());
             // 标记页面加载完毕
@@ -1321,6 +1443,44 @@ public class SettingController extends RootController implements MousePositionUp
                 // 隐藏浮窗
                 hideFloatingWindow(stopFloating);
             }
+        }
+    }
+
+    /**
+     * 获取要点击的窗口信息
+     */
+    @FXML
+    public void findClickWindowAction() {
+        // 改变要防重复点击的组件状态
+        changeDisableNodes(disableNodes, true);
+        // 隐藏主窗口
+        if (hideWindowRecord_Set.isSelected()) {
+            mainStage.setIconified(true);
+        }
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(findClickWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        if (clickWindowMonitor != null) {
+            clickWindowMonitor.startClickWindowMouseListener(preparation);
+        }
+    }
+
+    /**
+     * 获取终止操作窗口信息
+     */
+    @FXML
+    public void findStopWindowAction() {
+        // 改变要防重复点击的组件状态
+        changeDisableNodes(disableNodes, true);
+        // 隐藏主窗口
+        if (hideWindowRecord_Set.isSelected()) {
+            mainStage.setIconified(true);
+        }
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(findClickWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
+            stopWindowMonitor.startClickWindowMouseListener(preparation);
         }
     }
 

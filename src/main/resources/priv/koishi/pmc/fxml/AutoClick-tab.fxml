@@ -40,12 +40,6 @@
                     text="%autoClick.exportAutoClick_Click"/>
             <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand"
                     text="%listText.removeAll"/>
-
-            <Label prefHeight="25" text="记录窗口前等待时间："/>
-            <TextField fx:id="preparationWindowTime_Click" promptText="3" prefWidth="80"/>
-            <Button text="点击记录窗口信息" onAction="#clickWindowAction"/>
-            <Label prefHeight="25" text="记录到的窗口："/>
-            <Label prefHeight="25" textFill="cornflowerblue" fx:id="windowInfo_Click"/>
         </HBox>
 
         <HBox fx:id="fileNumberHBox_Click" spacing="10">

@@ -329,6 +329,14 @@
                 <CheckBox fx:id="clickAllRegion_Set" styleClass="checkBox-short" onAction="#clickAllRegionAction"
                           text="%clickDetail.allRegion"/>
             </HBox>
+
+            <HBox fx:id="clickWindowInfoHBox_Set" spacing="10">
+                <Label prefHeight="25" text="记录窗口准备时间："/>
+                <TextField fx:id="findClickWindowWait_Set" promptText="3" prefWidth="80"/>
+                <Button text="点击记录窗口信息" onAction="#findClickWindowAction"/>
+                <Label prefHeight="25" text="记录到的窗口："/>
+                <Label prefHeight="25" textFill="cornflowerblue" fx:id="clickWindowInfo_Set"/>
+            </HBox>
         </HBox>
 
         <HBox spacing="10">
@@ -361,6 +369,14 @@
 
                 <CheckBox fx:id="stopAllRegion_Set" styleClass="checkBox-short" onAction="#stopAllRegionAction"
                           text="%clickDetail.allRegion"/>
+            </HBox>
+
+            <HBox fx:id="stopWindowInfoHBox_Set" spacing="10">
+                <Label prefHeight="25" text="记录窗口准备时间："/>
+                <TextField fx:id="findStopWindowWait_Set" promptText="3" prefWidth="80"/>
+                <Button text="点击记录窗口信息" onAction="#findStopWindowAction"/>
+                <Label prefHeight="25" text="记录到的窗口："/>
+                <Label prefHeight="25" textFill="cornflowerblue" fx:id="stopWindowInfo_Set"/>
             </HBox>
         </HBox>
 

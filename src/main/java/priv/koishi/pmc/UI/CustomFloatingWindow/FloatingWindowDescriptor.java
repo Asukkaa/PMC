@@ -1,6 +1,5 @@
 package priv.koishi.pmc.UI.CustomFloatingWindow;
 
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -57,6 +56,11 @@ public class FloatingWindowDescriptor {
      * 浮窗坐标展示栏
      */
     Label floatingPosition;
+
+    /**
+     * 浮窗名称展示栏
+     */
+    Label nameeLabel;
 
     /**
      * 修改设置的按钮
@@ -177,11 +181,6 @@ public class FloatingWindowDescriptor {
      * 浮窗是否添加关闭快捷键键（true 添加）
      */
     boolean addCloseKey = true;
-
-    /**
-     * 浮窗关闭快捷键键值（默认 {@link com.github.kwhat.jnativehook.keyboard.NativeKeyEvent#VC_ESCAPE}）
-     */
-    int closeKeyEvent = NativeKeyEvent.VC_ESCAPE;
 
     /**
      * 销毁浮窗

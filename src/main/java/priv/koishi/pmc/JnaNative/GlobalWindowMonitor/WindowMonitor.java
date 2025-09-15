@@ -8,7 +8,10 @@ import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.util.Duration;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
@@ -26,6 +29,7 @@ import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.AutoClickController.showFloatingWindow;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
@@ -36,8 +40,7 @@ import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.hideFloatin
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
-import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
-import static priv.koishi.pmc.Utils.UiUtils.showStage;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 窗口信息获取
@@ -51,60 +54,124 @@ public class WindowMonitor {
     /**
      * 全局鼠标监听器
      */
-    private static ClickWindowMouseListener clickWindowMouseListener;
+    public ClickWindowMouseListener clickWindowMouseListener;
 
     /**
      * 全局键盘监听器
      */
-    private static NativeKeyListener nativeKeyListener;
+    private NativeKeyListener nativeKeyListener;
 
     /**
      * 正在寻找窗口（true 寻找中）
      */
-    public static boolean findingWindow;
+    public boolean findingWindow;
 
     /**
      * 寻找窗口计时器
      */
-    public static Timeline findingWindowTimeline;
+    private Timeline findingWindowTimeline;
+
+    /**
+     * 关联的标签，用于显示窗口信息
+     */
+    private final Label infoLabel;
+
+    /**
+     * 要防重复点击的组件
+     */
+    private final List<? extends Node> disableNodes;
+
+    /**
+     * 窗口信息
+     */
+    public WindowInfo windowInfo;
+
+    /**
+     * 构造函数
+     *
+     * @param infoLabel    用于显示窗口信息的标签
+     * @param disableNodes 要防重复点击的组件
+     */
+    public WindowMonitor(Label infoLabel, List<? extends Node> disableNodes) {
+        this.infoLabel = infoLabel;
+        this.disableNodes = disableNodes;
+    }
+
+    /**
+     * 显示窗口信息
+     */
+    public void showWindowInfo() {
+        Platform.runLater(() -> {
+            infoLabel.setText(windowInfo.getProcessName());
+            String info = "进程名称：" + windowInfo.getProcessName() + "\n" +
+                    "进程路径：" + windowInfo.getProcessPath() + "\n" +
+                    "窗口标题：" + windowInfo.getTitle() + "\n" +
+                    "窗口位置： X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                    "窗口大小： W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+            addToolTip(info, infoLabel);
+        });
+    }
+
+    /**
+     * 更新窗口信息
+     */
+    public void updateWindowInfo() {
+        if (windowInfo != null) {
+            windowInfo = getMainWindowInfo(windowInfo.getProcessPath());
+            showWindowInfo();
+        }
+    }
+
+    /**
+     * 删除窗口信息
+     */
+    public void removeWindowInfo() {
+        windowInfo = null;
+        infoLabel.setText("");
+    }
 
     /**
      * 开启全局键盘监听
      */
-    public static void startNativeKeyListener() {
+    public void startNativeKeyListener() {
         // 移除可能存在的旧监听器
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
-                if (massageFloating != null) {
-                    // 检测快捷键 esc
-                    if (e.getKeyCode() == massageFloating.getCloseKeyEvent()) {
-                        // 检测是否正在查找窗口
-                        if (findingWindow) {
-                            // 停止记录鼠标点击监听器
-                            stopClickWindowMouseListener();
-                            // 停止录制计时
-                            if (findingWindowTimeline != null) {
-                                findingWindowTimeline.stop();
-                                findingWindowTimeline = null;
-                            }
-                            // 停止寻找窗口标记
-                            findingWindow = false;
-                            // 弹出程序主窗口
-                            CheckBox showWindowRecord = settingController.showWindowRecord_Set;
-                            if (showWindowRecord.isSelected()) {
-                                showStage(mainStage);
-                            }
+                // 检测快捷键 esc
+                if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                    // 检测是否正在查找窗口
+                    if (findingWindow) {
+                        // 停止记录鼠标点击监听器
+                        stopClickWindowMouseListener();
+                        // 停止录制计时
+                        if (findingWindowTimeline != null) {
+                            findingWindowTimeline.stop();
+                            findingWindowTimeline = null;
                         }
-                        // 关闭窗口信息浮窗
-                        hideFloatingWindow(massageFloating);
-                        // 移除键盘监听器
-                        removeNativeListener(nativeKeyListener);
-                        // 改变要防重复点击的组件状态
-                        changeDisableNodes(autoClickController.disableNodes, false);
+                        // 停止寻找窗口标记
+                        findingWindow = false;
+                        // 弹出程序主窗口
+                        CheckBox showWindowRecord = settingController.showWindowRecord_Set;
+                        if (showWindowRecord.isSelected()) {
+                            showStage(mainStage);
+                        }
+                        if (massageFloating != null) {
+                            // 关闭窗口信息浮窗
+                            hideFloatingWindow(massageFloating);
+                        }
+                    } else if (windowInfoFloating != null) {
+                        // 关闭目标窗口信息浮窗
+                        hideFloatingWindow(windowInfoFloating);
+                        showStage(mainStage);
                     }
+                    // 移除键盘监听器
+                    removeNativeListener(nativeKeyListener);
+                    // 改变要防重复点击的组件状态
+                    changeDisableNodes(disableNodes, false);
+
                 }
             }
         };
@@ -117,7 +184,7 @@ public class WindowMonitor {
      *
      * @param preparation 准备时间
      */
-    public static void startClickWindowMouseListener(int preparation) {
+    public void startClickWindowMouseListener(int preparation) {
         if (autoClickController.isFree()) {
             // 移除可能存在的旧监听器
             removeNativeListener(clickWindowMouseListener);
@@ -134,7 +201,7 @@ public class WindowMonitor {
             findingWindowTimeline = new Timeline();
             if (preparation == 0) {
                 // 创建新监听器
-                clickWindowMouseListener = new ClickWindowMouseListener(massageFloating);
+                clickWindowMouseListener = new ClickWindowMouseListener(massageFloating, this);
                 // 注册监听器
                 addNativeListener(clickWindowMouseListener);
                 // 更新浮窗文本
@@ -150,7 +217,7 @@ public class WindowMonitor {
                         text.set(text_cancelTask() + preparationTime + " 秒后开始记录窗口信息");
                     } else {
                         // 创建新监听器
-                        clickWindowMouseListener = new ClickWindowMouseListener(massageFloating);
+                        clickWindowMouseListener = new ClickWindowMouseListener(massageFloating, this);
                         // 注册监听器
                         addNativeListener(clickWindowMouseListener);
                         // 停止 Timeline
@@ -171,7 +238,7 @@ public class WindowMonitor {
     /**
      * 停止记录焦点窗口鼠标点击监听器
      */
-    public static void stopClickWindowMouseListener() {
+    public void stopClickWindowMouseListener() {
         if (findingWindow) {
             if (clickWindowMouseListener != null) {
                 removeNativeListener(clickWindowMouseListener);
@@ -185,7 +252,7 @@ public class WindowMonitor {
      *
      * @return 焦点窗口信息
      */
-    public static WindowInfo getFocusWindowInfo() {
+    public WindowInfo getFocusWindowInfo() {
         WindowInfo windowInfo = null;
         if (isWin) {
             windowInfo = getWinFocusWindowInfo();
@@ -201,7 +268,7 @@ public class WindowMonitor {
      * @param processPath 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public static WindowInfo getMainWindowInfo(String processPath) {
+    public WindowInfo getMainWindowInfo(String processPath) {
         WindowInfo windowInfo = null;
         if (isWin) {
             windowInfo = getMainWinWindowInfo(processPath);
@@ -216,7 +283,7 @@ public class WindowMonitor {
      *
      * @return 焦点窗口信息
      */
-    public static WindowInfo getWinFocusWindowInfo() {
+    public WindowInfo getWinFocusWindowInfo() {
         User32 user32 = User32.INSTANCE;
         Psapi psapi = Psapi.INSTANCE;
         Kernel32 kernel32 = Kernel32.INSTANCE;
@@ -287,7 +354,7 @@ public class WindowMonitor {
      * @param processPath 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public static WindowInfo getMainWinWindowInfo(String processPath) {
+    public WindowInfo getMainWinWindowInfo(String processPath) {
         List<WindowInfo> windows = getWinWindowInfos(processPath);
         return windows.isEmpty() ? null : windows.getFirst();
     }
@@ -298,7 +365,7 @@ public class WindowMonitor {
      * @param processPath 进程路径
      * @return 窗口信息列表
      */
-    public static List<WindowInfo> getWinWindowInfos(String processPath) {
+    public List<WindowInfo> getWinWindowInfos(String processPath) {
         List<WindowInfo> result = new ArrayList<>();
         User32 user32 = User32.INSTANCE;
         Psapi psapi = Psapi.INSTANCE;
@@ -362,7 +429,7 @@ public class WindowMonitor {
      * @param kernel32 Kernel32 库实例，用于调用 OpenProcess 和 CloseHandle 等进程操作函数
      * @return 进程的完整路径，如果无法获取则返回 null
      */
-    private static String getWinProcessPathByPid(int pid, Psapi psapi, Kernel32 kernel32) {
+    private String getWinProcessPathByPid(int pid, Psapi psapi, Kernel32 kernel32) {
         try {
             WinNT.HANDLE processHandle = kernel32.OpenProcess(
                     Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ,
@@ -393,7 +460,7 @@ public class WindowMonitor {
      * @param pid 进程ID
      * @return 进程地址
      */
-    private static String getMacProcessPathByPid(int pid) {
+    private String getMacProcessPathByPid(int pid) {
         try {
             // 使用ps命令通过PID获取进程名称
             Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
@@ -415,7 +482,7 @@ public class WindowMonitor {
      * @param str 要创建的 CFString 键
      * @return CFString 对象
      */
-    private static Pointer createCFString(String str) {
+    private Pointer createCFString(String str) {
         Foundation foundation = Foundation.INSTANCE;
         return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
     }
@@ -425,7 +492,7 @@ public class WindowMonitor {
      *
      * @return 窗口信息
      */
-    public static WindowInfo getMacFocusWindowInfo() {
+    public WindowInfo getMacFocusWindowInfo() {
         WindowInfo result;
         try {
             // 使用 AppleScript 获取当前焦点应用的 PID
@@ -464,7 +531,7 @@ public class WindowMonitor {
      * @param appPath app 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public static WindowInfo getMainMacWindowInfo(String appPath) {
+    public WindowInfo getMainMacWindowInfo(String appPath) {
         List<WindowInfo> windows = getMacWindowInfos(appPath);
         return windows.isEmpty() ? null : windows.getFirst();
     }
@@ -475,7 +542,7 @@ public class WindowMonitor {
      * @param appPath 应用程序Bundle路径（.app结尾）
      * @return 窗口信息列表
      */
-    public static List<WindowInfo> getMacWindowInfos(String appPath) {
+    public List<WindowInfo> getMacWindowInfos(String appPath) {
         List<WindowInfo> result = new ArrayList<>();
         try {
             CoreGraphics cg = CoreGraphics.INSTANCE;

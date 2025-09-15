@@ -1874,12 +1874,12 @@ public class UiUtils {
     }
 
     /**
-     * 构建右键菜单
+     * 构建表格右键菜单
      *
      * @param tableView  要添加右键菜单的列表
      * @param dataNumber 数据数量信息栏
      */
-    public static void buildContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
+    public static void buildTableViewContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
