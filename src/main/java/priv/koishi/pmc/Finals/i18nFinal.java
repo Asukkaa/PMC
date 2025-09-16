@@ -1695,6 +1695,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 未设置目标窗口
+     */
+    public static String findImgSet_noWindow() {
+        return bundle.getString("findImgSet.noWindow");
+    }
+
+    /**
      * @return 显示识别区域
      */
     public static String findImgSet_showRegion() {

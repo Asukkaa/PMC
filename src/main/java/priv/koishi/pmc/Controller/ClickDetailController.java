@@ -873,6 +873,8 @@ public class ClickDetailController extends RootController {
                 .setRandomClickInterval(randomClickInterval)
                 .setStopWindowConfig(stopFloating.getConfig())
                 .setClickWindowConfig(clickFloating.getConfig())
+                .setStopWindowInfo(stopWindowMonitor.getWindowInfo())
+                .setClickWindowInfo(clickWindowMonitor.getWindowInfo())
                 .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))

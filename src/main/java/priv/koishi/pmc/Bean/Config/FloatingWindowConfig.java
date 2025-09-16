@@ -2,6 +2,7 @@ package priv.koishi.pmc.Bean.Config;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 
 /**
  * 浮窗配置类
@@ -43,5 +44,10 @@ public class FloatingWindowConfig {
      * 第一次识别失败后改为识别整个屏幕（1 改变识别范围， 0 不改变识别范围）
      */
     String allRegion;
+
+    /**
+     * 目标窗口信息
+     */
+    WindowInfo windowInfo;
 
 }

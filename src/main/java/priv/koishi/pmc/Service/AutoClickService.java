@@ -18,10 +18,12 @@ import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FileConfig;
 import priv.koishi.pmc.Bean.Config.FindPositionConfig;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.io.File;
@@ -453,10 +455,13 @@ public class AutoClickService {
                     updateMassage(text);
                 });
                 long start = System.currentTimeMillis();
-                FindPositionConfig findPositionConfig = new FindPositionConfig();
                 double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
-                findPositionConfig.setFloatingWindowConfig(clickPositionVO.getStopWindowConfig())
+                WindowInfo stopWindowInfo = clickPositionVO.getStopWindowInfo();
+                FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
+                stopWindowConfig.setWindowInfo(stopWindowInfo);
+                FindPositionConfig findPositionConfig = new FindPositionConfig()
                         .setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
+                        .setFloatingWindowConfig(stopWindowConfig)
                         .setMatchThreshold(stopMatchThreshold)
                         .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
@@ -511,11 +516,14 @@ public class AutoClickService {
             });
             long start = System.currentTimeMillis();
             String retryType = clickPositionVO.getRetryType();
-            FindPositionConfig findPositionConfig = new FindPositionConfig();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
-            findPositionConfig.setFloatingWindowConfig(clickPositionVO.getClickWindowConfig())
+            WindowInfo clickWindowInfo = clickPositionVO.getClickWindowInfo();
+            FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+            clickWindowConfig.setWindowInfo(clickWindowInfo);
+            FindPositionConfig findPositionConfig = new FindPositionConfig()
                     .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(retryType_continuously().equals(retryType))
+                    .setFloatingWindowConfig(clickWindowConfig)
                     .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
