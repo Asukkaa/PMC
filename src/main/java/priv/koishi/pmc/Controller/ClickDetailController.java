@@ -29,6 +29,7 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.io.File;
@@ -39,8 +40,10 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -138,6 +141,11 @@ public class ClickDetailController extends RootController {
     private FloatingWindowDescriptor clickFloating, stopFloating;
 
     /**
+     * 窗口信息获取器
+     */
+    public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
+
+    /**
      * 更新数据用的回调函数
      */
     @Setter
@@ -150,8 +158,9 @@ public class ClickDetailController extends RootController {
     public VBox clickImgVBox_Det, progressBarVBox_Det;
 
     @FXML
-    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det,
-            clickRegionHBox_Det, stopRegionHBox_Det;
+    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
+            stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det,
+            stopWindowInfoHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -175,13 +184,13 @@ public class ClickDetailController extends RootController {
             randomWaitTime_Det, clickAllRegion_Det, stopAllRegion_Det;
 
     @FXML
-    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
-            tableViewSize_Det, clickTypeText_Det;
+    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, findClickWindowWait_Det, findStopWindowWait_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -238,9 +247,13 @@ public class ClickDetailController extends RootController {
         setPromptText();
         // 给输入框添加内容变化监听
         nodeValueChangeListener();
+        // 初始化操作类型相关组件
         initClickType(item);
+        // 初始识别区域设置相关组件
         initFloatingWindowConfig(item);
+        // 初始终止操作图片列表
         initStopImg(item.getStopImgFiles());
+        // 展示要点击的图片
         showClickImg(item.getClickImgPath());
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
@@ -317,6 +330,18 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 初始化窗口信息获取器
+     */
+    private void initWindowMonitor() {
+        stopWindowMonitor = new WindowMonitor(stopWindowInfo_Det, disableNodes, stage);
+        stopWindowMonitor.setWindowInfo(selectedItem.getStopWindowInfo());
+        stopWindowMonitor.updateWindowInfo();
+        clickWindowMonitor = new WindowMonitor(clickWindowInfo_Det, disableNodes, stage);
+        clickWindowMonitor.setWindowInfo(selectedItem.getClickWindowInfo());
+        clickWindowMonitor.updateWindowInfo();
+    }
+
+    /**
      * 初始识别区域设置相关组件
      *
      * @param item 列表选中的数据
@@ -347,7 +372,7 @@ public class ClickDetailController extends RootController {
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
-        createFloatingWindows(clickFloating, stopFloating);
+        createFloatingWindows(clickFloating, stopFloating, windowInfoFloating);
     }
 
     /**
@@ -716,6 +741,9 @@ public class ClickDetailController extends RootController {
             loadImgTask.cancel();
         }
         stage.close();
+        if (mainStage.isIconified()) {
+            showStage(mainStage);
+        }
     }
 
     /**
@@ -770,6 +798,18 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 构建右键菜单
+     */
+    private void buildContextMenu() {
+        // 构建表格右键菜单
+        buildTableViewContextMenu(tableView_Det, dataNumber_Det);
+        List<Stage> stages = List.of(stage, mainStage);
+        // 构建窗口信息栏右键菜单
+        buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, disableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Det, clickWindowMonitor, disableNodes, stages);
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -782,6 +822,8 @@ public class ClickDetailController extends RootController {
         getConfig();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
+            // 初始化窗口监控器
+            initWindowMonitor();
             // 组件宽高自适应
             adaption();
             // 设置要防重复点击的组件
@@ -795,7 +837,7 @@ public class ClickDetailController extends RootController {
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             // 构建右键菜单
-            buildTableViewContextMenu(tableView_Det, dataNumber_Det);
+            buildContextMenu();
         });
     }
 
@@ -1038,14 +1080,26 @@ public class ClickDetailController extends RootController {
         String value = clickFindImgType_Det.getValue();
         addValueToolTip(clickFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            clickRegionHBox_Det.setVisible(true);
+            clickRegionInfoHBox_Det.setVisible(true);
+            clickRegionInfoHBox_Det.getChildren().removeAll(clickRegionHBox_Det, clickWindowInfoHBox_Det);
+            clickRegionInfoHBox_Det.getChildren().add(clickRegionHBox_Det);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 clickFloating.setConfig(config);
             }
+        } else if (findImgType_window().equals(value)) {
+            clickRegionInfoHBox_Det.setVisible(true);
+            clickRegionInfoHBox_Det.getChildren().removeAll(clickRegionHBox_Det, clickWindowInfoHBox_Det);
+            clickRegionInfoHBox_Det.getChildren().add(clickWindowInfoHBox_Det);
+            if (clickFloating != null) {
+                FloatingWindowConfig config = clickFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                clickFloating.setConfig(config);
+            }
         } else if (findImgType_all().equals(value)) {
-            clickRegionHBox_Det.setVisible(false);
+            clickRegionInfoHBox_Det.setVisible(false);
+            clickRegionInfoHBox_Det.getChildren().removeAll(clickRegionHBox_Det, clickWindowInfoHBox_Det);
             if (clickFloating != null) {
                 FloatingWindowConfig config = clickFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
@@ -1062,14 +1116,26 @@ public class ClickDetailController extends RootController {
         String value = stopFindImgType_Det.getValue();
         addValueToolTip(stopFindImgType_Det, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            stopRegionHBox_Det.setVisible(true);
+            stopRegionInfoHBox_Det.setVisible(true);
+            stopRegionInfoHBox_Det.getChildren().removeAll(stopRegionHBox_Det, stopWindowInfoHBox_Det);
+            stopRegionInfoHBox_Det.getChildren().add(stopRegionHBox_Det);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 stopFloating.setConfig(config);
             }
+        } else if (findImgType_window().equals(value)) {
+            stopRegionInfoHBox_Det.setVisible(true);
+            stopRegionInfoHBox_Det.getChildren().removeAll(stopRegionHBox_Det, stopWindowInfoHBox_Det);
+            stopRegionInfoHBox_Det.getChildren().add(stopWindowInfoHBox_Det);
+            if (stopFloating != null) {
+                FloatingWindowConfig config = stopFloating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                stopFloating.setConfig(config);
+            }
         } else if (findImgType_all().equals(value)) {
-            stopRegionHBox_Det.setVisible(false);
+            stopRegionInfoHBox_Det.setVisible(false);
+            stopRegionInfoHBox_Det.getChildren().removeAll(stopRegionHBox_Det, stopWindowInfoHBox_Det);
             if (stopFloating != null) {
                 FloatingWindowConfig config = stopFloating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
@@ -1109,6 +1175,42 @@ public class ClickDetailController extends RootController {
                 // 隐藏浮窗
                 hideFloatingWindow(stopFloating);
             }
+        }
+    }
+
+    /**
+     * 获取要点击的窗口信息
+     */
+    @FXML
+    public void findClickWindowAction() {
+        // 改变要防重复点击的组件状态
+        changeDisableNodes(disableNodes, true);
+        // 隐藏窗口
+        mainStage.setIconified(true);
+        stage.setIconified(true);
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(findClickWindowWait_Det,
+                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        if (clickWindowMonitor != null) {
+            clickWindowMonitor.startClickWindowMouseListener(preparation);
+        }
+    }
+
+    /**
+     * 获取终止操作窗口信息
+     */
+    @FXML
+    public void findStopWindowAction() {
+        // 改变要防重复点击的组件状态
+        changeDisableNodes(disableNodes, true);
+        // 隐藏窗口
+        mainStage.setIconified(true);
+        stage.setIconified(true);
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(findClickWindowWait_Det,
+                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
+            stopWindowMonitor.startClickWindowMouseListener(preparation);
         }
     }
 

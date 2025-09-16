@@ -10,9 +10,11 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
 import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
@@ -28,13 +30,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.AutoClickController.showFloatingWindow;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
-import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
-import static priv.koishi.pmc.Finals.i18nFinal.text_cancelTask;
-import static priv.koishi.pmc.MainApplication.mainStage;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.dpiScale;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.hideFloatingWindow;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
@@ -84,17 +84,26 @@ public class WindowMonitor {
     /**
      * 窗口信息
      */
-    public WindowInfo windowInfo;
+    @Getter
+    @Setter
+    private WindowInfo windowInfo;
+
+    /**
+     * 需要弹出的窗口
+     */
+    private final Stage stage;
 
     /**
      * 构造函数
      *
      * @param infoLabel    用于显示窗口信息的标签
      * @param disableNodes 要防重复点击的组件
+     * @param stage        需要弹出的窗口
      */
-    public WindowMonitor(Label infoLabel, List<? extends Node> disableNodes) {
+    public WindowMonitor(Label infoLabel, List<? extends Node> disableNodes, Stage stage) {
         this.infoLabel = infoLabel;
         this.disableNodes = disableNodes;
+        this.stage = stage;
     }
 
     /**
@@ -102,13 +111,15 @@ public class WindowMonitor {
      */
     public void showWindowInfo() {
         Platform.runLater(() -> {
-            infoLabel.setText(windowInfo.getProcessName());
-            String info = "进程名称：" + windowInfo.getProcessName() + "\n" +
-                    "进程路径：" + windowInfo.getProcessPath() + "\n" +
-                    "窗口标题：" + windowInfo.getTitle() + "\n" +
-                    "窗口位置： X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
-                    "窗口大小： W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
-            addToolTip(info, infoLabel);
+            if (windowInfo != null) {
+                infoLabel.setText(windowInfo.getProcessName());
+                String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                        findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
+                        findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                        findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                        findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+                addToolTip(info, infoLabel);
+            }
         });
     }
 
@@ -153,19 +164,16 @@ public class WindowMonitor {
                         }
                         // 停止寻找窗口标记
                         findingWindow = false;
-                        // 弹出程序主窗口
-                        CheckBox showWindowRecord = settingController.showWindowRecord_Set;
-                        if (showWindowRecord.isSelected()) {
-                            showStage(mainStage);
-                        }
+                        autoClickController.findingWindow = false;
                         if (massageFloating != null) {
                             // 关闭窗口信息浮窗
                             hideFloatingWindow(massageFloating);
                         }
+                        showStage(stage);
                     } else if (windowInfoFloating != null) {
                         // 关闭目标窗口信息浮窗
                         hideFloatingWindow(windowInfoFloating);
-                        showStage(mainStage);
+                        showStage(stage);
                     }
                     // 移除键盘监听器
                     removeNativeListener(nativeKeyListener);
@@ -190,9 +198,10 @@ public class WindowMonitor {
             removeNativeListener(clickWindowMouseListener);
             // 启动寻找窗口标记
             findingWindow = true;
+            autoClickController.findingWindow = true;
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
-                    + preparation + " 秒后开始记录窗口信息");
+                    + preparation + findImgSet_wait());
             updateMassageLabel(massageFloating, text.get());
             // 显示浮窗
             showFloatingWindow(false);
@@ -205,7 +214,7 @@ public class WindowMonitor {
                 // 注册监听器
                 addNativeListener(clickWindowMouseListener);
                 // 更新浮窗文本
-                text.set(text_cancelTask() + "正在记录窗口信息");
+                text.set(text_cancelTask() + findImgSet_recording());
                 updateMassageLabel(massageFloating, text.get());
             } else {
                 AtomicInteger preparationTime = new AtomicInteger(preparation);
@@ -214,7 +223,7 @@ public class WindowMonitor {
                 findingWindowTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
                     preparationTime.getAndDecrement();
                     if (preparationTime.get() > 0) {
-                        text.set(text_cancelTask() + preparationTime + " 秒后开始记录窗口信息");
+                        text.set(text_cancelTask() + preparationTime + findImgSet_wait());
                     } else {
                         // 创建新监听器
                         clickWindowMouseListener = new ClickWindowMouseListener(massageFloating, this);
@@ -223,7 +232,7 @@ public class WindowMonitor {
                         // 停止 Timeline
                         finalTimeline.stop();
                         // 更新浮窗文本
-                        text.set(text_cancelTask() + "正在记录窗口信息");
+                        text.set(text_cancelTask() + findImgSet_recording());
                     }
                     updateMassageLabel(massageFloating, text.get());
                 }));

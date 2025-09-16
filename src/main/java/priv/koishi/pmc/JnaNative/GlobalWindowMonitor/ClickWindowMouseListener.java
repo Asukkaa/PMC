@@ -4,6 +4,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
 
 /**
@@ -30,7 +31,6 @@ public class ClickWindowMouseListener implements NativeMouseListener {
      */
     private final WindowMonitor windowMonitor;
 
-
     /**
      * 构造函数
      *
@@ -53,7 +53,7 @@ public class ClickWindowMouseListener implements NativeMouseListener {
             return;
         }
         if (massageFloating != null) {
-            updateMassageLabel(massageFloating, "松开鼠标即可记录窗口信息");
+            updateMassageLabel(massageFloating, findImgSet_released());
         }
     }
 
@@ -70,10 +70,15 @@ public class ClickWindowMouseListener implements NativeMouseListener {
         try {
             if (massageFloating != null) {
                 processingEvent = true;
-                updateMassageLabel(massageFloating, "正在记录窗口信息");
-                windowMonitor.windowInfo = windowMonitor.getFocusWindowInfo();
-                windowMonitor.showWindowInfo();
-                updateMassageLabel(massageFloating, "已记录窗口信息" + windowMonitor.windowInfo.getProcessName());
+                updateMassageLabel(massageFloating, findImgSet_finding());
+                WindowInfo windowInfo = windowMonitor.getFocusWindowInfo();
+                if (windowInfo != null) {
+                    windowMonitor.setWindowInfo(windowInfo);
+                    windowMonitor.showWindowInfo();
+                    updateMassageLabel(massageFloating, findImgSet_getInfo() + windowInfo.getProcessName());
+                } else {
+                    updateMassageLabel(massageFloating, findImgSet_notFind());
+                }
             }
         } finally {
             processingEvent = false;

@@ -1583,6 +1583,118 @@ public class i18nFinal {
     }
 
     /**
+     * @return 自动操作目标窗口
+     */
+    public static String findImgSet_tagetWindow() {
+        return bundle.getString("findImgSet.tagetWindow");
+    }
+
+    /**
+     * @return 更新窗口数据
+     */
+    public static String findImgSet_updateWindow() {
+        return bundle.getString("findImgSet.updateWindow");
+    }
+
+    /**
+     * @return 展示窗口位置
+     */
+    public static String findImgSet_showWindow() {
+        return bundle.getString("findImgSet.showWindow");
+    }
+
+    /**
+     * @return 删除窗口信息
+     */
+    public static String findImgSet_deleteWindow() {
+        return bundle.getString("findImgSet.deleteWindow");
+    }
+
+    /**
+     * @return 进程名称：
+     */
+    public static String findImgSet_PName() {
+        return bundle.getString("findImgSet.PName");
+    }
+
+    /**
+     * @return 窗口标题：
+     */
+    public static String findImgSet_windowTitle() {
+        return bundle.getString("findImgSet.windowTitle");
+    }
+
+    /**
+     * @return 窗口位置：
+     */
+    public static String findImgSet_windowLocation() {
+        return bundle.getString("findImgSet.windowLocation");
+    }
+
+    /**
+     * @return 窗口大小：
+     */
+    public static String findImgSet_windowSize() {
+        return bundle.getString("findImgSet.windowSize");
+    }
+
+    /**
+     * @return 进程 ID：
+     */
+    public static String findImgSet_PID() {
+        return bundle.getString("findImgSet.PID");
+    }
+
+    /**
+     * @return 进程路径：
+     */
+    public static String findImgSet_windowPath() {
+        return bundle.getString("findImgSet.windowPath");
+    }
+
+    /**
+     * @return 正在记录窗口信息
+     */
+    public static String findImgSet_finding() {
+        return bundle.getString("findImgSet.finding");
+    }
+
+    /**
+     * @return 已记录窗口信息
+     */
+    public static String findImgSet_getInfo() {
+        return bundle.getString("findImgSet.getInfo");
+    }
+
+    /**
+     * @return 未找到窗口信息请重试
+     */
+    public static String findImgSet_notFind() {
+        return bundle.getString("findImgSet.notFind");
+    }
+
+    /**
+     * @return 松开鼠标即可记录窗口信息
+     */
+    public static String findImgSet_released() {
+        return bundle.getString("findImgSet.released");
+    }
+
+    /**
+     * @return 正在记录窗口信息
+     */
+    public static String findImgSet_recording() {
+        return bundle.getString("findImgSet.recording");
+    }
+
+    /**
+     * @return 秒后开始记录窗口信息
+     */
+    public static String findImgSet_wait() {
+        return bundle.getString("findImgSet.wait");
+    }
+
+    /**
      * @return 显示识别区域
      */
     public static String findImgSet_showRegion() {

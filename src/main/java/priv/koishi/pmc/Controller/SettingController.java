@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -29,7 +28,6 @@ import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
-import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
@@ -304,7 +302,7 @@ public class SettingController extends RootController implements MousePositionUp
                 .setMargin(margin);
         windowInfoFloating = new FloatingWindowDescriptor()
                 .setConfig(new FloatingWindowConfig())
-                .setName("自动操作目标窗口")
+                .setName(findImgSet_tagetWindow())
                 .setEnableResize(false)
                 .setAddCloseKey(false)
                 .setEnableDrag(false);
@@ -713,111 +711,18 @@ public class SettingController extends RootController implements MousePositionUp
     private void buildContextMenu() {
         // 构建表格右键菜单
         buildTableViewContextMenu(tableView_Set, dataNumber_Set);
+        List<Stage> stages = List.of(mainStage);
         // 构建窗口信息栏右键菜单
-        buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor);
-        buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor);
-    }
-
-    /**
-     * 构建窗口信息栏右键菜单
-     *
-     * @param label         窗口信息栏
-     * @param windowMonitor 窗口监视器
-     */
-    private void buildWindowInfoMenu(Label label, WindowMonitor windowMonitor) {
-        // 添加窗口信息右键菜单
-        ContextMenu windowInfoMenu = new ContextMenu();
-        // 更新窗口信息选项
-        buildUpdateDataMenu(windowInfoMenu, windowMonitor);
-        // 显示窗口位置信息
-        buildShowDataMenu(windowInfoMenu, windowMonitor);
-        // 删除窗信息据选项
-        buildDeleteDataMenu(windowInfoMenu, windowMonitor);
-        // 为窗口信息栏添加右键菜单
-        label.setOnMousePressed(event -> {
-            if (event.isSecondaryButtonDown()) {
-                windowInfoMenu.show(label, event.getScreenX(), event.getScreenY());
-            }
-        });
-    }
-
-    /**
-     * 更新窗口数据选项
-     *
-     * @param contextMenu   右键菜单集合
-     * @param windowMonitor 窗口监视器
-     */
-    private void buildUpdateDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
-        MenuItem menuItem = new MenuItem("更新窗口数据");
-        menuItem.setOnAction(_ -> windowMonitor.updateWindowInfo());
-        contextMenu.getItems().add(menuItem);
-    }
-
-    /**
-     * 显示窗口位置信息
-     *
-     * @param contextMenu   右键菜单集合
-     * @param windowMonitor 窗口监视器
-     */
-    private void buildShowDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
-        MenuItem menuItem = new MenuItem("展示窗口位置");
-        menuItem.setOnAction(_ -> {
-            windowMonitor.updateWindowInfo();
-            WindowInfo windowInfo = windowMonitor.windowInfo;
-            if (windowInfo != null) {
-                mainStage.setIconified(true);
-                String info = "按下 esc 即可关闭浮窗" + "\n" +
-                        "进程名称：" + windowInfo.getProcessName() + "\n" +
-                        "窗口进程 ID：" + windowInfo.getPid() + "\n" +
-                        "进程路径：" + windowInfo.getProcessPath() + "\n" +
-                        "窗口标题：" + windowInfo.getTitle() + "\n" +
-                        "窗口位置： X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
-                        "窗口大小： W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
-                windowInfoFloating.setMassage(info)
-                        .getConfig()
-                        .setHeight(windowInfo.getHeight())
-                        .setWidth(windowInfo.getWidth())
-                        .setX(windowInfo.getX())
-                        .setY(windowInfo.getY());
-                // 改变要防重复点击的组件状态
-                changeDisableNodes(disableNodes, true);
-                showFloatingWindow(windowInfoFloating);
-                windowMonitor.startNativeKeyListener();
-            }
-        });
-        contextMenu.getItems().add(menuItem);
-    }
-
-    /**
-     * 删除窗口信息
-     *
-     * @param contextMenu   右键菜单集合
-     * @param windowMonitor 窗口监视器
-     */
-    private void buildDeleteDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
-        MenuItem menuItem = new MenuItem("删除窗口信息");
-        menuItem.setOnAction(_ -> Platform.runLater(windowMonitor::removeWindowInfo));
-        contextMenu.getItems().add(menuItem);
+        buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, disableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, disableNodes, stages);
     }
 
     /**
      * 初始化窗口信息获取器
      */
     private void initWindowMonitor() {
-        stopWindowMonitor = new WindowMonitor(stopWindowInfo_Set, disableNodes);
-        clickWindowMonitor = new WindowMonitor(clickWindowInfo_Set, disableNodes);
-    }
-
-    /**
-     * 正在获取当前窗口信息
-     *
-     * @return true 正在获取当前窗口信息
-     */
-    public boolean findingWindow() {
-        if (clickWindowMonitor == null || stopWindowMonitor == null) {
-            return false;
-        }
-        return clickWindowMonitor.findingWindow || stopWindowMonitor.findingWindow;
+        stopWindowMonitor = new WindowMonitor(stopWindowInfo_Set, disableNodes, mainStage);
+        clickWindowMonitor = new WindowMonitor(clickWindowInfo_Set, disableNodes, mainStage);
     }
 
     /**
@@ -1478,9 +1383,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, true);
         // 隐藏主窗口
-        if (hideWindowRecord_Set.isSelected()) {
-            mainStage.setIconified(true);
-        }
+        mainStage.setIconified(true);
         // 获取准备时间值
         int preparation = setDefaultIntValue(findClickWindowWait_Set,
                 Integer.parseInt(defaultPreparationRecordTime), 0, null);
@@ -1497,9 +1400,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, true);
         // 隐藏主窗口
-        if (hideWindowRecord_Set.isSelected()) {
-            mainStage.setIconified(true);
-        }
+        mainStage.setIconified(true);
         // 获取准备时间值
         int preparation = setDefaultIntValue(findClickWindowWait_Set,
                 Integer.parseInt(defaultPreparationRecordTime), 0, null);

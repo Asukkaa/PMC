@@ -42,6 +42,8 @@ import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.VO.Indexable;
 import priv.koishi.pmc.Controller.FileChooserController;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -59,9 +61,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -1894,6 +1898,94 @@ public class UiUtils {
         buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, unit_img());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView);
+    }
+
+    /**
+     * 构建窗口信息栏右键菜单
+     *
+     * @param label         窗口信息栏
+     * @param windowMonitor 窗口监视器
+     * @param disableNodes  要防重复点击的组件
+     * @param stages        需要隐藏的窗口
+     */
+    public static void buildWindowInfoMenu(Label label, WindowMonitor windowMonitor,
+                                           List<? extends Node> disableNodes, List<? extends Stage> stages) {
+        // 添加窗口信息右键菜单
+        ContextMenu windowInfoMenu = new ContextMenu();
+        // 更新窗口信息选项
+        buildUpdateDataMenu(windowInfoMenu, windowMonitor);
+        // 显示窗口位置信息
+        buildShowDataMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
+        // 删除窗信息据选项
+        buildDeleteDataMenu(windowInfoMenu, windowMonitor);
+        // 为窗口信息栏添加右键菜单
+        label.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                windowInfoMenu.show(label, event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    /**
+     * 更新窗口数据选项
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildUpdateDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_updateWindow());
+        menuItem.setOnAction(_ -> windowMonitor.updateWindowInfo());
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 显示窗口位置信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     * @param disableNodes  要防重复点击的组件
+     * @param stages        需要隐藏的窗口
+     */
+    private static void buildShowDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor,
+                                          List<? extends Node> disableNodes, List<? extends Stage> stages) {
+        MenuItem menuItem = new MenuItem(findImgSet_showWindow());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            WindowInfo windowInfo = windowMonitor.getWindowInfo();
+            if (windowInfo != null) {
+                stages.forEach(stage -> stage.setIconified(true));
+                String info = text_escCloseFloating() + "\n" +
+                        findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                        findImgSet_PID() + windowInfo.getPid() + "\n" +
+                        findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
+                        findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                        findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                        findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+                windowInfoFloating.setMassage(info)
+                        .getConfig()
+                        .setHeight(windowInfo.getHeight())
+                        .setWidth(windowInfo.getWidth())
+                        .setX(windowInfo.getX())
+                        .setY(windowInfo.getY());
+                // 改变要防重复点击的组件状态
+                changeDisableNodes(disableNodes, true);
+                showFloatingWindow(windowInfoFloating);
+                windowMonitor.startNativeKeyListener();
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 删除窗口信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildDeleteDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_deleteWindow());
+        menuItem.setOnAction(_ -> Platform.runLater(windowMonitor::removeWindowInfo));
+        contextMenu.getItems().add(menuItem);
     }
 
     /**

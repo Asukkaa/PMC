@@ -70,8 +70,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
-import static priv.koishi.pmc.Controller.SettingController.clickFloating;
-import static priv.koishi.pmc.Controller.SettingController.stopFloating;
+import static priv.koishi.pmc.Controller.SettingController.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
@@ -275,6 +274,11 @@ public class AutoClickController extends RootController implements MousePosition
      * 正在运行自动操作标识
      */
     private boolean runClicking;
+
+    /**
+     * 正在获取当前窗口信息标志（true 正在获取窗口信息）
+     */
+    public boolean findingWindow;
 
     /**
      * 录制时间线
@@ -1000,11 +1004,13 @@ public class AutoClickController extends RootController implements MousePosition
     private ClickPositionVO createClickPositionVO() {
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
-                .setMatchedTypeEnum(MatchedTypeEnum.CLICK.ordinal())
+                .setClickWindowInfo(clickWindowMonitor.getWindowInfo())
+                .setStopWindowInfo(stopWindowMonitor.getWindowInfo())
                 .setSampleInterval(Integer.parseInt(sampleInterval))
+                .setMatchedTypeEnum(MatchedTypeEnum.CLICK.ordinal())
+                .setClickWindowConfig(clickFloating.getConfig())
                 .setClickTypeEnum(ClickTypeEnum.CLICK.ordinal())
                 .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
-                .setClickWindowConfig(clickFloating.getConfig())
                 .setStopWindowConfig(stopFloating.getConfig())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
@@ -1153,11 +1159,12 @@ public class AutoClickController extends RootController implements MousePosition
                 TextField offsetYTextField = settingController.offsetY_Set;
                 int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
                 mousePosition_Click.setText(text);
+                mainStage.setTitle(appName + " - " + text);
                 if (floatingStage != null && floatingStage.isShowing()) {
                     floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                    if ((mouseFloatingRun.isSelected() && runClicking) || settingController.findingWindow()
+                    if ((mouseFloatingRun.isSelected() && runClicking) || findingWindow
                             || (mouseFloatingRecord.isSelected() && recordClicking)) {
-                        setPositionText(massageFloating, text);
+                        setPositionText(massageFloating, autoClick_nowMousePos() + "\nX: " + x + " Y: " + y);
                     }
                 }
             }
