@@ -166,10 +166,10 @@ public class TimedTaskController extends RootController {
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) ->
+        detailStage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) ->
+        detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 设置css样式
         setWindowCss(scene, stylesCss);
@@ -198,7 +198,7 @@ public class TimedTaskController extends RootController {
                 .setMassageLabel(log_Task);
         Task<List<TimedTaskBean>> task = getTaskDetailsTask();
         bindingTaskNode(task, taskBean);
-        task.setOnSucceeded(event -> {
+        task.setOnSucceeded(_ -> {
             List<TimedTaskBean> result = task.getValue();
             Platform.runLater(() -> {
                 addData(result, append, tableView_Task, dataNumber_Task, unit_task(), false);
@@ -239,7 +239,7 @@ public class TimedTaskController extends RootController {
      */
     private void buildDetailMenuItem(TableView<? extends TimedTaskBean> tableView, ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_detailMenu());
-        detailItem.setOnAction(e -> {
+        detailItem.setOnAction(_ -> {
             TimedTaskBean selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 showDetail(selected, true);
@@ -256,7 +256,7 @@ public class TimedTaskController extends RootController {
      */
     private void buildDeleteDataMenuItem(TableView<TimedTaskBean> tableView, ContextMenu contextMenu) {
         MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
-        deleteDataMenuItem.setOnAction(event -> {
+        deleteDataMenuItem.setOnAction(_ -> {
             List<TimedTaskBean> ts = tableView.getSelectionModel().getSelectedItems();
             ts.forEach(item -> {
                 try {
@@ -321,7 +321,7 @@ public class TimedTaskController extends RootController {
      */
     @FXML
     public void addTimedTask() {
-        executeGetScheduleTask(result -> Platform.runLater(() -> {
+        executeGetScheduleTask(_ -> Platform.runLater(() -> {
             int dataSize = tableView_Task.getItems().size() + 1;
             TimedTaskBean newTask = new TimedTaskBean()
                     .setTaskName(defaultTaskName() + dataSize)

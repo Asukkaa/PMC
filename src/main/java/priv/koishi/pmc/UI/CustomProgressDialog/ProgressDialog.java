@@ -92,7 +92,7 @@ public class ProgressDialog {
     public void updateButton(String buttonText, Runnable onClickAction) {
         Platform.runLater(() -> {
             button.setText(buttonText);
-            button.setOnAction(e -> {
+            button.setOnAction(_ -> {
                 if (onClickAction != null) {
                     onClickAction.run();
                 }

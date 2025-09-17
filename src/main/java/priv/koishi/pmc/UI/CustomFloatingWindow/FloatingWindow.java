@@ -111,7 +111,7 @@ public class FloatingWindow {
         stage.setScene(scene);
         stage.setTitle(name);
         setWindowLogo(stage, logoPath);
-        stage.setOnCloseRequest(event -> floatingWindows.remove(config));
+        stage.setOnCloseRequest(_ -> floatingWindows.remove(config));
         config.setStage(stage);
         // 根据配置决定是否启用拖拽
         if (config.isEnableDrag()) {
@@ -211,12 +211,12 @@ public class FloatingWindow {
         root.getChildren().addAll(resizeTop, resizeRight, resizeBottom, resizeLeft,
                 resizeTopLeft, resizeTopRight, resizeBottomLeft, resizeBottomRight);
         // 绑定边框大小到浮窗大小
-        rectangle.widthProperty().addListener((obs, oldVal, newVal) -> {
+        rectangle.widthProperty().addListener((_, _, newVal) -> {
             double w = newVal.doubleValue();
             resizeTop.setWidth(w);
             resizeBottom.setWidth(w);
         });
-        rectangle.heightProperty().addListener((obs, oldVal, newVal) -> {
+        rectangle.heightProperty().addListener((_, _, newVal) -> {
             double h = newVal.doubleValue();
             resizeRight.setHeight(h);
             resizeLeft.setHeight(h);

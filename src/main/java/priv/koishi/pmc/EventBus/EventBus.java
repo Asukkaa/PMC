@@ -30,7 +30,7 @@ public class EventBus {
      * @param <T>       事件类型
      */
     public static <T> void subscribe(Class<T> eventType, Consumer<T> listener) {
-        listeners.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>()).add(listener);
+        listeners.computeIfAbsent(eventType, _ -> new CopyOnWriteArrayList<>()).add(listener);
     }
 
     /**

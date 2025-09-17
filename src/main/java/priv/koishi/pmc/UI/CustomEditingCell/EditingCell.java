@@ -215,7 +215,7 @@ public class EditingCell<T> extends TableCell<T, String> {
             stringChangeListener = textFieldValueListener(textField, tip);
             // 限制只能输入整数
             if (integerRange) {
-                textChangeListener = (observable, oldValue, newValue) -> {
+                textChangeListener = (_, oldValue, newValue) -> {
                     if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
                         textField.setText(oldValue);
                     }
@@ -223,7 +223,7 @@ public class EditingCell<T> extends TableCell<T, String> {
                 textField.textProperty().addListener(textChangeListener);
             }
             // 输入框失去焦点时,提交编辑
-            textFocusedPropertyListener = (ob, old, now) -> {
+            textFocusedPropertyListener = (_, _, now) -> {
                 if (!now) {
                     commitEdit(textField.getText());
                 }

@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.ProtectionDomain;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -212,12 +213,12 @@ public class FileUtils {
     }
 
     /**
-     * 判断程序是否打包运行
+     * 判断程序是否在 idea 中运行
      *
-     * @return 在jar环境运为true，其他环境为false
+     * @return 在 idea 环境运为 true，其他环境为 false
      */
-    public static boolean isRunningFromJar() {
-        return "jar".equals(getRunningFrom());
+    public static boolean isRunningFromIDEA() {
+        return "file".equals(getRunningFrom());
     }
 
     /**
@@ -226,16 +227,9 @@ public class FileUtils {
      * @return 运行环境
      */
     public static String getRunningFrom() {
-        // 获取当前运行的JVM的类加载器
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        // 获取URL资源
-        URL resource = classLoader.getResource("");
-        // 检查URL的协议是否是jar或者file协议，file协议表示不是从JAR中加载
-        String protocol = null;
-        if (resource != null) {
-            protocol = resource.getProtocol();
-        }
-        return protocol;
+        ProtectionDomain protectionDomain = FileUtils.class.getProtectionDomain();
+        URL codeSourceLocation = protectionDomain.getCodeSource().getLocation();
+        return codeSourceLocation.getProtocol();
     }
 
     /**
@@ -247,7 +241,7 @@ public class FileUtils {
      */
     public static InputStream checkRunningInputStream(String path) throws IOException {
         InputStream input;
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             input = new FileInputStream(resourcesPath + path);
         } else {
             input = new FileInputStream(getAppResourcePath(path));
@@ -264,7 +258,7 @@ public class FileUtils {
      */
     public static OutputStream checkRunningOutputStream(String path) throws IOException {
         OutputStream output;
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             output = new FileOutputStream(resourcesPath + path);
         } else {
             output = new FileOutputStream(getAppResourcePath(path));
@@ -288,7 +282,7 @@ public class FileUtils {
      * @return 不同操作系统下logs文件夹地址
      */
     public static String getLogsPath() {
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             return userDir + File.separator + logs;
         }
         String logsPath = rootDir + File.separator + logs;
@@ -574,7 +568,7 @@ public class FileUtils {
      */
     public static String getCFGPath() {
         String cfgPath;
-        if (isRunningFromJar) {
+        if (isRunningFromIDEA) {
             cfgPath = appName + cfg;
         } else {
             String cfgFileName = "/" + appName + cfg;

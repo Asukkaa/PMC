@@ -44,7 +44,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromJar;
+import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
@@ -515,7 +515,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 监听颜色选择器设置变化
      */
     private void setColorsListener() {
-        colorPicker_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
+        colorPicker_Set.valueProperty().addListener((_, _, newValue) -> {
             if (massageFloating != null) {
                 Label floatingLabel = massageFloating.getMassageLabel();
                 if (floatingLabel != null) {
@@ -530,7 +530,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 监听数值滑动条内容变化
      */
     private void sliderValueListener() {
-        opacity_Set.valueProperty().addListener((observable, oldValue, newValue) -> {
+        opacity_Set.valueProperty().addListener((_, _, newValue) -> {
             double rounded = Math.round(newValue.doubleValue() * 10) / 10.0;
             if (newValue.doubleValue() != rounded) {
                 opacity_Set.setValue(rounded);
@@ -678,7 +678,7 @@ public class SettingController extends RootController implements MousePositionUp
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         Task<Void> loadImgTask = loadImg(taskBean, files);
         bindingTaskNode(loadImgTask, taskBean);
-        loadImgTask.setOnSucceeded(event -> {
+        loadImgTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tableView_Set, dataNumber_Set, unit_img());
             tableView_Set.refresh();
@@ -1163,7 +1163,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新jvm配置参数
         mainController.saveAllLastConfig();
         Platform.exit();
-        if (!isRunningFromJar) {
+        if (!isRunningFromIDEA) {
             ProcessBuilder processBuilder = null;
             if (isWin) {
                 processBuilder = new ProcessBuilder(appLaunchPath);

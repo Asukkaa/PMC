@@ -29,9 +29,14 @@ public class CommonFinals {
     public static final String version = "3.2.0";
 
     /**
+     * jdk 版本
+     */
+    public static final String jdkVersion = System.getProperty("java.vendor") + " " + System.getProperty("java.vm.version");
+
+    /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.09.11";
+    public static final String buildDate = "2025.09.17";
 
     /**
      * 文件后缀名：bat
@@ -269,9 +274,9 @@ public class CommonFinals {
     public static final String appRootPath = new File(appLaunchPath).getParent();
 
     /**
-     * 判断程序是否打包运行(在jar环境运为true，其他环境为false)
+     * 判断程序是否在 idea 中运行(在 idea 环境运为 true，其他环境为 false)
      */
-    public static final boolean isRunningFromJar = isRunningFromJar();
+    public static final boolean isRunningFromIDEA = isRunningFromIDEA();
 
     /**
      * app目录

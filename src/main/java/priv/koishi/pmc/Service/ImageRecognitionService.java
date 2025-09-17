@@ -207,7 +207,7 @@ public class ImageRecognitionService {
         int y;
         int width;
         int height;
-        if (FindImgTypeEnum.REGION.ordinal() != config.getFindImgTypeEnum()) {
+        if (FindImgTypeEnum.ALL.ordinal() == config.getFindImgTypeEnum()) {
             x = 0;
             y = 0;
             width = screenWidth;
@@ -230,8 +230,8 @@ public class ImageRecognitionService {
             screenImg = new Robot().createScreenCapture(new Rectangle(
                     x,
                     y,
-                    (int) (width * dpiScale),
-                    (int) (height * dpiScale)));
+                    width,
+                    height));
         } catch (AWTException e) {
             throw new RuntimeException(text_screenErr() + e.getMessage(), e);
         }
@@ -260,6 +260,10 @@ public class ImageRecognitionService {
                             resize(dpiAdjustedTemplate, resizedTemplate,
                                     new Size((int) (dpiAdjustedTemplate.cols() * scale),
                                             (int) (dpiAdjustedTemplate.rows() * scale)));
+                            // 检查模板尺寸是否合法
+                            if (resizedTemplate.cols() > screenGray.cols() || resizedTemplate.rows() > screenGray.rows()) {
+                                return;
+                            }
                             // 执行模板匹配并获取最大匹配值位置
                             matchTemplate(screenGray, resizedTemplate, result, TM_CCOEFF_NORMED);
                             try (Point maxLoc = new Point()) {
@@ -271,11 +275,11 @@ public class ImageRecognitionService {
                                         bestVal.set(maxVal.get());
                                         double templateWidth = resizedTemplate.cols();
                                         double templateHeight = resizedTemplate.rows();
-                                        int roundX = (int) Math.round((maxLoc.x() + templateWidth / 2.0) / scale);
-                                        int roundY = (int) Math.round((maxLoc.y() + templateHeight / 2.0) / scale);
-                                        roundX = Math.min(Math.max(roundX, x), x + width);
-                                        roundY = Math.min(Math.max(roundY, y), y + height);
-                                        bestLocRef.set(new Point(roundX, roundY));
+                                        double relX = (maxLoc.x() + templateWidth / 2.0) / scale;
+                                        double relY = (maxLoc.y() + templateHeight / 2.0) / scale;
+                                        int absX = (int) Math.round(relX) + x;
+                                        int absY = (int) Math.round(relY) + y;
+                                        bestLocRef.set(new Point(absX, absY));
                                     }
                                 }
                             }

@@ -529,13 +529,13 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
-        name_Click.setCellFactory((tableColumn) ->
+        name_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setName));
-        waitTime_Click.setCellFactory((tableColumn) ->
+        waitTime_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
-        clickTime_Click.setCellFactory((tableColumn) ->
+        clickTime_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
-        clickNum_Click.setCellFactory((tableColumn) ->
+        clickNum_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
     }
 
@@ -589,10 +589,10 @@ public class AutoClickController extends RootController implements MousePosition
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) ->
+        detailStage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) ->
+        detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 设置css样式
         setWindowCss(scene, stylesCss);
@@ -708,7 +708,7 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask = autoClick(taskBean, robot);
             // 绑定带进度条的线程
             bindingTaskNode(autoClickTask, taskBean);
-            autoClickTask.setOnSucceeded(event -> {
+            autoClickTask.setOnSucceeded(_ -> {
                 clickLogs = autoClickTask.getValue();
                 clearReferences();
                 taskUnbind(taskBean);
@@ -725,7 +725,7 @@ public class AutoClickController extends RootController implements MousePosition
                 runTimeline = null;
                 runClicking = false;
             });
-            autoClickTask.setOnFailed(event -> {
+            autoClickTask.setOnFailed(_ -> {
                 clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskFailed());
                 hideFloatingWindow(massageFloating);
@@ -746,7 +746,7 @@ public class AutoClickController extends RootController implements MousePosition
                 clearReferences();
                 throw new RuntimeException(ex);
             });
-            autoClickTask.setOnCancelled(event -> {
+            autoClickTask.setOnCancelled(_ -> {
                 clickLogs = getNowLogs();
                 taskNotSuccess(taskBean, text_taskCancelled());
                 hideFloatingWindow(massageFloating);
@@ -837,7 +837,7 @@ public class AutoClickController extends RootController implements MousePosition
         AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
         // 创建 Timeline 来实现倒计时
         Timeline finalTimeline = runTimeline;
-        runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+        runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
             preparationTime.getAndDecrement();
             if (preparationTime.get() > 0) {
                 String text = text_cancelTask() + preparationTime + text_run();
@@ -900,7 +900,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void buildDetailMenuItem(TableView<? extends ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_detailMenu());
-        detailItem.setOnAction(e -> {
+        detailItem.setOnAction(_ -> {
             ClickPositionVO selected = tableView.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 showDetail(selected);
@@ -917,7 +917,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private MenuItem buildClickTestMenuItem(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
         MenuItem menuItem = new MenuItem(menu_runSelectMenu());
-        menuItem.setOnAction(event -> {
+        menuItem.setOnAction(_ -> {
             List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
                 try {
@@ -947,12 +947,12 @@ public class AutoClickController extends RootController implements MousePosition
         MenuItem insertTop = new MenuItem(menuItem_insertTop());
         MenuItem recordTop = new MenuItem(menuItem_recordTop());
         // 为每个菜单项添加事件处理
-        insertUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertUp()));
-        insertDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertDown()));
-        recordUp.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordUp()));
-        recordDown.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordDown()));
-        insertTop.setOnAction(event -> insertDataMenuItem(tableView, menuItem_insertTop()));
-        recordTop.setOnAction(event -> insertDataMenuItem(tableView, menuItem_recordTop()));
+        insertUp.setOnAction(_ -> insertDataMenuItem(tableView, menuItem_insertUp()));
+        insertDown.setOnAction(_ -> insertDataMenuItem(tableView, menuItem_insertDown()));
+        recordUp.setOnAction(_ -> insertDataMenuItem(tableView, menuItem_recordUp()));
+        recordDown.setOnAction(_ -> insertDataMenuItem(tableView, menuItem_recordDown()));
+        insertTop.setOnAction(_ -> insertDataMenuItem(tableView, menuItem_insertTop()));
+        recordTop.setOnAction(_ -> insertDataMenuItem(tableView, menuItem_recordTop()));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(insertUp, insertDown, recordUp, recordDown, insertTop, recordTop);
         contextMenu.getItems().add(menu);
@@ -1538,7 +1538,7 @@ public class AutoClickController extends RootController implements MousePosition
                 AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
                 // 创建 Timeline 来实现倒计时
                 Timeline finalTimeline = recordTimeline;
-                recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+                recordTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
                     preparationTime.getAndDecrement();
                     if (preparationTime.get() > 0) {
                         text.set(text_cancelTask() + preparationTime + text_preparation());
@@ -1594,7 +1594,7 @@ public class AutoClickController extends RootController implements MousePosition
         TaskBean<ClickPositionVO> taskBean = creatTaskBean();
         loadPMCFilsTask = loadPMCFils(taskBean, files);
         bindingTaskNode(loadPMCFilsTask, taskBean);
-        loadPMCFilsTask.setOnSucceeded(event -> {
+        loadPMCFilsTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             PMCLoadResult value = loadPMCFilsTask.getValue();
             String lastPMCPath = value.lastPMCPath();
@@ -1672,7 +1672,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
             loadedPMCTask = loadPMC(taskBean, new File(loadPMCPath));
-            loadedPMCTask.setOnSucceeded(e -> {
+            loadedPMCTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
                 addAutoClickPositions(clickPositionVOS, loadPMCPath);
@@ -1760,7 +1760,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 自动填充javafx表格
             autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
             // 监听列表数据变化
-            tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) change ->
+            tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) _ ->
                     updateLabel(log_Click, ""));
             // 表格设置为可编辑
             makeCellCanEdit();
@@ -1860,7 +1860,7 @@ public class AutoClickController extends RootController implements MousePosition
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
             exportPMCTask = exportPMC(taskBean, fileName, outFilePath);
             bindingTaskNode(exportPMCTask, taskBean);
-            exportPMCTask.setOnSucceeded(event -> {
+            exportPMCTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 String path = exportPMCTask.getValue();
                 log_Click.setTextFill(Color.GREEN);
@@ -1957,10 +1957,10 @@ public class AutoClickController extends RootController implements MousePosition
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((v1, v2, v3) ->
+        detailStage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((v1, v2, v3) ->
+        detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 设置css样式
         setWindowCss(scene, stylesCss);

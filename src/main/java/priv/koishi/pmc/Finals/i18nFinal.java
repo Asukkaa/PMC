@@ -895,13 +895,16 @@ public class i18nFinal {
     /**
      * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
      * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
+     * JDK版本：Oracle Corporation 25+36-3489
      */
     public static String tip_version() {
         return """
                 %s：%s
-                %s：%s""".formatted(
+                %s：%s
+                JDK %s：%s""".formatted(
                 bundle.getString("tip.version"), version,
-                bundle.getString("tip.buildDate"), buildDate);
+                bundle.getString("tip.buildDate"), buildDate,
+                bundle.getString("tip.version"), jdkVersion);
     }
 
     /**
