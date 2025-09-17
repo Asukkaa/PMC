@@ -928,7 +928,7 @@ public class ClickDetailController extends RootController {
     private void saveFloatingWindow(FloatingWindowDescriptor... floatingVOs) {
         for (FloatingWindowDescriptor floatingVO : floatingVOs) {
             Stage clickStage = floatingVO.getStage();
-            if (clickStage != null) {
+            if (clickStage != null && clickStage.isShowing()) {
                 FloatingWindowConfig config = floatingVO.getConfig()
                         .setHeight((int) clickStage.getHeight())
                         .setWidth((int) clickStage.getWidth())
