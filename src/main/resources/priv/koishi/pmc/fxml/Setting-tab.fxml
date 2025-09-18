@@ -19,6 +19,9 @@
 
             <CheckBox fx:id="maxWindow_Set" onAction="#loadMaxWindowAction"
                       styleClass="checkBox-medium" selected="true" text="%setting.maxWindow_Set"/>
+
+            <CheckBox fx:id="titleCoordinate_Set" onAction="#titleCoordinate"
+                      styleClass="checkBox-medium" selected="true" text="%setting.titleCoordinate_Set"/>
         </HBox>
 
         <Separator/>
@@ -299,7 +302,7 @@
 
             <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="%findImgSet.waitTime"/>
-                <TextField fx:id="findWindowWait_Set" promptText="3" prefWidth="50"/>
+                <TextField fx:id="findWindowWait_Set" prefWidth="50"/>
                 <Label prefHeight="25" text="%unit.s"/>
             </HBox>
         </HBox>

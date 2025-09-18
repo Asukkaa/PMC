@@ -1158,8 +1158,13 @@ public class AutoClickController extends RootController implements MousePosition
                 int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
                 TextField offsetYTextField = settingController.offsetY_Set;
                 int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
+                CheckBox titleCoordinateSet = settingController.titleCoordinate_Set;
                 mousePosition_Click.setText(text);
-                mainStage.setTitle(appName + " - " + text);
+                if (titleCoordinateSet != null && titleCoordinateSet.isSelected()) {
+                    mainStage.setTitle(appName + " - " + text);
+                } else {
+                    mainStage.setTitle(appName);
+                }
                 if (floatingStage != null && floatingStage.isShowing()) {
                     floatingMove(floatingStage, mousePoint, offsetX, offsetY);
                     if ((mouseFloatingRun.isSelected() && runClicking) || findingWindow
@@ -1412,11 +1417,11 @@ public class AutoClickController extends RootController implements MousePosition
                 // 创建点击位置对象
                 if (pressButtonList.isEmpty()) {
                     clickBean = createClickPositionVO();
-                    clickBean.setClickKeyEnum(pressButton)
-                            .setName(text_step() + dataSize + text_isRecord())
+                    clickBean.setName(text_step() + dataSize + text_isRecord())
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY));
+                            .setStartY(String.valueOf(startY))
+                            .setClickKeyEnum(pressButton);
                 }
                 // 记录按下的按键
                 pressButtonList.add(pressButton);

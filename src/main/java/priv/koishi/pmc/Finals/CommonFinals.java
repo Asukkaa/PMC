@@ -859,4 +859,7 @@ public class CommonFinals {
 
     public static final String key_stopAllRegion = "stopAllRegion";
 
+    public static final String key_findWindowWait = "findWindowWait";
+
+    public static final String key_titleCoordinate = "titleCoordinate";
 }

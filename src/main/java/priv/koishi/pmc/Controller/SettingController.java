@@ -139,7 +139,7 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
-            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set;
+            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -198,6 +198,7 @@ public class SettingController extends RootController implements MousePositionUp
             prop.put(key_retrySecond, retrySecond_Set.getText());
             prop.put(key_randomClickX, randomClickX_Set.getText());
             prop.put(key_randomClickY, randomClickY_Set.getText());
+            prop.put(key_findWindowWait, findWindowWait_Set.getText());
             prop.put(key_sampleInterval, sampleInterval_Set.getText());
             prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
             prop.put(key_defaultStopRetryNum, stopRetryNum_Set.getText());
@@ -355,6 +356,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, unActivation);
         setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, activation);
         setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, activation);
+        setControlLastConfig(titleCoordinate_Set, prop, key_titleCoordinate, activation);
         setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, unActivation);
         setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, activation);
         setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, activation);
@@ -368,6 +370,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, activation);
         setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, activation);
         setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval, defaultSampleInterval);
+        setControlLastConfig(findWindowWait_Set, prop, key_findWindowWait, defaultFindWindowWait);
         setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, unActivation);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, defaultStopRetryNum);
         setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
@@ -458,6 +461,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_showRegion(), clickRegion_Set, stopRegion_Set);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
+        addToolTip(titleCoordinate_Set.getText(), titleCoordinate_Set);
         addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
         addToolTip(tip_allRegion(), clickAllRegion_Set, stopAllRegion_Set);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
@@ -487,6 +491,7 @@ public class SettingController extends RootController implements MousePositionUp
         randomTimeOffset_Set.setPromptText(defaultRandomTime);
         clickRetryNum_Set.setPromptText(defaultClickRetryNum);
         sampleInterval_Set.setPromptText(defaultSampleInterval);
+        findWindowWait_Set.setPromptText(defaultFindWindowWait);
         offsetX_Set.setPromptText(String.valueOf(defaultOffsetX));
         offsetY_Set.setPromptText(String.valueOf(defaultOffsetY));
         clickTimeOffset_Set.setPromptText(defaultClickTimeOffset);
@@ -963,6 +968,16 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void loadMouseFloatingRecordAction() throws IOException {
         setLoadLastConfigCheckBox(mouseFloatingRecord_Set, configFile_Click, key_mouseFloatingRecord);
+    }
+
+    /**
+     * 应用主界面标题栏展示鼠标位置
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void titleCoordinate() throws IOException {
+        setLoadLastConfigCheckBox(titleCoordinate_Set, configFile_Click, key_titleCoordinate);
     }
 
     /**
