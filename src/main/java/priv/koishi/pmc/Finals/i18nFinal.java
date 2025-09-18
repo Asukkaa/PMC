@@ -1541,6 +1541,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 未知GC类型:
+     */
+    public static String text_unknowGC() {
+        return bundle.getString("unknowGC");
+    }
+
+    /**
      * @return 最接近匹配度为：
      */
     public static String text_closestMatchThreshold() {
