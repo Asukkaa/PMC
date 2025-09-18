@@ -324,8 +324,7 @@ public class WindowMonitor {
             WinNT.HANDLE processHandle = kernel32.OpenProcess(
                     Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ,
                     false,
-                    pid
-            );
+                    pid);
             if (processHandle != null) {
                 try {
                     // 使用char数组作为缓冲区
