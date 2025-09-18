@@ -78,19 +78,19 @@
             <Label prefHeight="25" text="%about.download"/>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-long">
+                <HBox styleClass="hBox-medium">
                     <Label prefHeight="25" text="%about.openBaiduLinkBtn"/>
                     <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" style="-fx-cursor: hand"
                             text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-long">
+                <HBox styleClass="hBox-medium">
                     <Label prefHeight="25" text="%about.openQuarkLinkBtn"/>
                     <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" style="-fx-cursor: hand"
                             text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-long">
+                <HBox styleClass="hBox-medium">
                     <Label prefHeight="25" text="%about.openXunleiLinkBtn"/>
                     <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" style="-fx-cursor: hand"
                             text="%about.latestVersion"/>
@@ -98,7 +98,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-long">
+                <HBox styleClass="hBox-medium">
                     <Label prefHeight="25" text="%update.checkUpdate"/>
                     <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" style="-fx-cursor: hand"
                             text="%update.checkUpdate_Abt"/>

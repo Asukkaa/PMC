@@ -452,8 +452,8 @@ public class AutoClickController extends RootController implements MousePosition
             setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultOutFileName());
-            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRunTime);
-            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, defaultPreparationRecordTime);
+            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRun);
+            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, defaultPreparationRecord);
         }
         if (StringUtils.isBlank(outPath_Click.getText())) {
             setPathLabel(outPath_Click, defaultFileChooserPath);
@@ -767,7 +767,7 @@ public class AutoClickController extends RootController implements MousePosition
             if (runTimeline == null) {
                 // 获取准备时间值
                 int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click,
-                        Integer.parseInt(defaultPreparationRunTime), 0, null);
+                        Integer.parseInt(defaultPreparationRun), 0, null);
                 // 设置浮窗文本显示准备时间
                 String text = text_cancelTask() + preparationTimeValue + text_run();
                 updateMassageLabel(massageFloating, text);
@@ -1046,9 +1046,9 @@ public class AutoClickController extends RootController implements MousePosition
         // 限制循环次数文本输入框内容
         integerRangeTextField(loopTime_Click, 0, null, tip_loopTime());
         // 限制运行准备时间文本输入框内容
-        integerRangeTextField(preparationRunTime_Click, 0, null, tip_preparationRunTime() + defaultPreparationRunTime);
+        integerRangeTextField(preparationRunTime_Click, 0, null, tip_preparationRunTime() + defaultPreparationRun);
         // 限制录制准备时间文本输入框内容
-        integerRangeTextField(preparationRecordTime_Click, 0, null, tip_preparationRecordTime() + defaultPreparationRecordTime);
+        integerRangeTextField(preparationRecordTime_Click, 0, null, tip_preparationRecordTime() + defaultPreparationRecord);
     }
 
     /**
@@ -1069,8 +1069,8 @@ public class AutoClickController extends RootController implements MousePosition
         addToolTip(tip_openDirectory(), openDirectory_Click);
         addToolTip(tip_exportAutoClick(), exportAutoClick_Click);
         addToolTip(tip_autoClickFileName() + defaultOutFileName(), outFileName_Click);
-        addToolTip(tip_preparationRunTime() + defaultPreparationRunTime, preparationRunTime_Click);
-        addToolTip(tip_preparationRecordTime() + defaultPreparationRecordTime, preparationRecordTime_Click);
+        addToolTip(tip_preparationRunTime() + defaultPreparationRun, preparationRunTime_Click);
+        addToolTip(tip_preparationRecordTime() + defaultPreparationRecord, preparationRecordTime_Click);
     }
 
     /**
@@ -1079,8 +1079,8 @@ public class AutoClickController extends RootController implements MousePosition
     private void setPromptText() {
         loopTime_Click.setPromptText(defaultLoopTime);
         outFileName_Click.setPromptText(defaultOutFileName());
-        preparationRunTime_Click.setPromptText(defaultPreparationRunTime);
-        preparationRecordTime_Click.setPromptText(defaultPreparationRecordTime);
+        preparationRunTime_Click.setPromptText(defaultPreparationRun);
+        preparationRecordTime_Click.setPromptText(defaultPreparationRecord);
     }
 
     /**
@@ -1507,7 +1507,7 @@ public class AutoClickController extends RootController implements MousePosition
             changeDisableNodes(disableNodes, true);
             // 获取准备时间值
             int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click,
-                    Integer.parseInt(defaultPreparationRecordTime), 0, null);
+                    Integer.parseInt(defaultPreparationRecord), 0, null);
             // 隐藏主窗口
             CheckBox hideWindowRecord = settingController.hideWindowRecord_Set;
             if (hideWindowRecord.isSelected()) {

@@ -522,14 +522,19 @@ public class CommonFinals {
     public static final String defaultStopRetryNum = "0";
 
     /**
+     * 默认设置目标窗口准备时间
+     */
+    public static final String defaultFindWindowWait = "3";
+
+    /**
      * 默认录制准备时间
      */
-    public static final String defaultPreparationRecordTime = "3";
+    public static final String defaultPreparationRecord = "3";
 
     /**
      * 默认运行准备时间
      */
-    public static final String defaultPreparationRunTime = "3";
+    public static final String defaultPreparationRun = "3";
 
     /**
      * 默认悬信息浮窗位置横坐标

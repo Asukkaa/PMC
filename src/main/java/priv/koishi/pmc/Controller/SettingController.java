@@ -131,7 +131,7 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
             retrySecond_Set, sampleInterval_Set, randomClickX_Set, randomClickY_Set, clickTimeOffset_Set, maxLogNum_Set,
-            randomTimeOffset_Set, nextRunMemory_Set, findClickWindowWait_Set, findStopWindowWait_Set;
+            randomTimeOffset_Set, nextRunMemory_Set, findWindowWait_Set;
 
     @FXML
     public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, firstClick_Set,
@@ -1385,8 +1385,8 @@ public class SettingController extends RootController implements MousePositionUp
         // 隐藏主窗口
         mainStage.setIconified(true);
         // 获取准备时间值
-        int preparation = setDefaultIntValue(findClickWindowWait_Set,
-                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        int preparation = setDefaultIntValue(findWindowWait_Set,
+                Integer.parseInt(defaultFindWindowWait), 0, null);
         if (clickWindowMonitor != null) {
             clickWindowMonitor.startClickWindowMouseListener(preparation);
         }
@@ -1402,8 +1402,8 @@ public class SettingController extends RootController implements MousePositionUp
         // 隐藏主窗口
         mainStage.setIconified(true);
         // 获取准备时间值
-        int preparation = setDefaultIntValue(findClickWindowWait_Set,
-                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        int preparation = setDefaultIntValue(findWindowWait_Set,
+                Integer.parseInt(defaultFindWindowWait), 0, null);
         if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
             stopWindowMonitor.startClickWindowMouseListener(preparation);
         }

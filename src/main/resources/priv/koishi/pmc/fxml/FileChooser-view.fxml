@@ -13,7 +13,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-veryLong">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%fileChooser.fileFilter"/>
                     <ChoiceBox fx:id="fileFilter_FC" prefHeight="25" prefWidth="200" onAction="#fileFilterAction"
                                style="-fx-cursor: hand"/>
@@ -27,7 +27,7 @@
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-veryLong">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%fileChooser.fileNameType"/>
                     <ChoiceBox fx:id="fileNameType_FC" prefHeight="25" prefWidth="200" onAction="#fileNameTypeAction"
                                style="-fx-cursor: hand"/>
@@ -45,7 +45,7 @@
             </HBox>
 
             <HBox fx:id="fileTypeHBox_FC" visible="false" spacing="10">
-                <HBox styleClass="hBox-veryLong">
+                <HBox styleClass="hBox-long">
                     <Label prefHeight="25" text="%fileChooser.filterFileType"/>
                     <TextField fx:id="filterFileType_FC" prefHeight="20" prefWidth="350"/>
                 </HBox>

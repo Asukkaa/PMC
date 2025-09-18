@@ -18,30 +18,35 @@
     -fx-pref-width: 290;
 }
 
-.hBox-medium {
-    -fx-spacing: 5;
-    -fx-pref-width: 290;
-}
-
 .checkBox-short {
     -fx-cursor: hand;
     -fx-pref-height: 25;
     -fx-pref-width: 270;
 }
 
-.hBox-short {
+.hBox-veryShort {
     -fx-spacing: 5;
     -fx-pref-width: 270;
 }
 
-.hBox-long {
+.hBox-short {
+    -fx-spacing: 5;
+    -fx-pref-width: 290;
+}
+
+.hBox-medium {
     -fx-spacing: 5;
     -fx-pref-width: 350;
 }
 
+.hBox-long {
+    -fx-spacing: 5;
+    -fx-pref-width: 500;
+}
+
 .hBox-veryLong {
     -fx-spacing: 5;
-    -fx-pref-width: 550;
+    -fx-pref-width: 600;
 }
 
 .img-button-style {

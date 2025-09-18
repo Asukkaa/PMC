@@ -190,7 +190,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, findClickWindowWait_Det, findStopWindowWait_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -1191,8 +1191,8 @@ public class ClickDetailController extends RootController {
         mainStage.setIconified(true);
         stage.setIconified(true);
         // 获取准备时间值
-        int preparation = setDefaultIntValue(findClickWindowWait_Det,
-                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecord), 0, null);
         if (clickWindowMonitor != null) {
             clickWindowMonitor.startClickWindowMouseListener(preparation);
         }
@@ -1209,8 +1209,8 @@ public class ClickDetailController extends RootController {
         mainStage.setIconified(true);
         stage.setIconified(true);
         // 获取准备时间值
-        int preparation = setDefaultIntValue(findClickWindowWait_Det,
-                Integer.parseInt(defaultPreparationRecordTime), 0, null);
+        int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecord), 0, null);
         if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
             stopWindowMonitor.startClickWindowMouseListener(preparation);
         }
