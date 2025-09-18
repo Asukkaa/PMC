@@ -9,7 +9,7 @@
 
 自动流程文件为 .pmc 文件，本质为 json 文件，更改文件拓展名只为方便过滤可导入的文件。
 
-本项目打包工具为 maven javafx:jlink 插件 + jpackage ，使用 jdk 版本为 Oracle OpenJDK 25 。
+本项目打包工具为 maven javafx:jlink 插件 + jpackage ，使用 jdk 版本为 Amazon Corretto 25 。
 
 ## 项目背景
 

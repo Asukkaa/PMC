@@ -635,7 +635,12 @@ public class SettingController extends RootController implements MousePositionUp
         if (StringUtils.isNotBlank(xmxValue)) {
             nextRunMemory_Set.setText(xmxValue.substring(0, xmxValue.indexOf(G)));
         }
-        gcType_Set.setText(currentGCType);
+        if (currentGCType.contains(text_unknowGC())) {
+            gcType_Set.setText(text_unknowGC());
+        } else {
+            gcType_Set.setText(currentGCType);
+        }
+        addToolTip(currentGCType, gcType_Set);
         String gcType = jvm.get(XX);
         if (StringUtils.isNotBlank(gcType)) {
             nextGcType_Set.setValue(gcType);
