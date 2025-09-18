@@ -663,9 +663,9 @@ public class FileUtils {
     /**
      * 处理zip内的文件条目
      *
-     * @param zipIn zip输入流
-     * @param file  zip内的文件
-     * @throws IOException 读取zip文件时异常
+     * @param zipIn zip 输入流
+     * @param file  zip 内的文件
+     * @throws IOException 读取 zip 文件时异常
      */
     private static void extractFile(ZipInputStream zipIn, File file) throws IOException {
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {

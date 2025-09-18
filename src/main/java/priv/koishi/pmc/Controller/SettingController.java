@@ -619,7 +619,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 获取JVM设置并展示
      *
-     * @throws IOException cfg配置文件读取异常
+     * @throws IOException cfg 配置文件读取异常
      */
     private void getJVMConfig() throws IOException {
         // 获取当前运行路径
