@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.Finals.i18nFinal.text_unknowGC;
+
 /**
  * @author KOISHI
  * Date:2024-10-10
@@ -154,14 +156,14 @@ public class CommonUtils {
             return "G1GC";
         } else if (gcNames.contains("PS Scavenge") || gcNames.contains("PS MarkSweep")) {
             return "ParallelGC";
-        } else if (gcNames.contains("ZGC Cycles") || gcNames.contains("ZGC Pauses")) {
+        } else if (gcNames.contains("ZGC Cycles") || gcNames.contains("ZGC Pauses") || gcNames.contains("ZGC Minor Cycles")) {
             return "ZGC";
         } else if (gcNames.contains("Shenandoah Pauses") || gcNames.contains("Shenandoah Cycles")) {
             return "ShenandoahGC";
         } else if (gcNames.contains("Copy") || gcNames.contains("MarkSweepCompact")) {
             return "SerialGC";
         } else {
-            return "未知GC类型: " + String.join(", ", gcNames);
+            return text_unknowGC() + String.join(", ", gcNames);
         }
     }
 
