@@ -43,6 +43,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -80,6 +81,7 @@ import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
@@ -1003,14 +1005,20 @@ public class AutoClickController extends RootController implements MousePosition
      * @return clickPositionVO 具有默认值的自动操作步骤类
      */
     private ClickPositionVO createClickPositionVO() {
+        FloatingWindowConfig clickConfig = new FloatingWindowConfig();
+        FloatingWindowConfig stopConfig = new FloatingWindowConfig();
+        try {
+            copyAllProperties(clickFloating.getConfig(), clickConfig);
+            copyAllProperties(stopFloating.getConfig(), stopConfig);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setMatchedTypeEnum(MatchedTypeEnum.CLICK.ordinal())
                 .setSampleInterval(Integer.parseInt(sampleInterval))
                 .setClickTypeEnum(ClickTypeEnum.CLICK.ordinal())
                 .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
-                .setClickWindowConfig(clickFloating.getConfig())
-                .setStopWindowConfig(stopFloating.getConfig())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setClickKeyEnum(NativeMouseEvent.BUTTON1)
@@ -1020,6 +1028,8 @@ public class AutoClickController extends RootController implements MousePosition
                 .setRandomClickTime(randomClickTime)
                 .setRandomWaitTime(randomWaitTime)
                 .setClickRetryTimes(clickRetryNum)
+                .setClickWindowConfig(clickConfig)
+                .setStopWindowConfig(stopConfig)
                 .setStopRetryTimes(stopRetryNum)
                 .setClickTime(clickTimeOffset)
                 .setRandomClick(randomClick)
