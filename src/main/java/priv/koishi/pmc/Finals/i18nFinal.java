@@ -893,6 +893,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 用来设置窗口识别的准备时间，只能填自然数，单位秒，不填默认为
+     */
+    public static String tip_findWindowWait() {
+        return bundle.getString("tip.findWindowWait");
+    }
+
+    /**
+     * @return 点击后可开始记录需要识别的窗口
+     */
+    public static String tip_findWindow() {
+        return bundle.getString("tip.findWindow");
+    }
+
+    /**
      * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
      * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
      * JDK版本：Oracle Corporation 25+36-3489

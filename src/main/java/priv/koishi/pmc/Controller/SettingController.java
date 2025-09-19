@@ -122,7 +122,7 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Button massageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set,
-            stopRegion_Set;
+            stopRegion_Set, clickWindow_Set, stopWindow_Set;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set,
@@ -397,27 +397,39 @@ public class SettingController extends RootController implements MousePositionUp
         Properties prop = new Properties();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
+        int massageX = Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX));
+        int massageY = Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY));
+        int massageWidth = Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth));
+        int massageHeight = Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight));
         FloatingWindowConfig massageConfig = new FloatingWindowConfig();
-        massageConfig.setHeight(Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight)))
-                .setWidth(Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth)))
-                .setX(Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX)))
-                .setY(Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY)));
+        massageConfig.setHeight(Math.max(1, Math.min(massageHeight, screenHeight)))
+                .setWidth(Math.max(1, Math.min(massageWidth, screenHeight)))
+                .setX(Math.max(0, Math.min(massageX, screenWidth)))
+                .setY(Math.max(0, Math.min(massageY, screenHeight)));
         massageFloating.setConfig(massageConfig);
+        int clickHeight = Integer.parseInt(prop.getProperty(key_clickHeight, defaultFloatingHeight));
+        int clickWidth = Integer.parseInt(prop.getProperty(key_clickWidth, defaultFloatingWidth));
+        int clickX = Integer.parseInt(prop.getProperty(key_clickX, defaultFloatingX));
+        int clickY = Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY));
         FloatingWindowConfig clickConfig = new FloatingWindowConfig();
         clickConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType)))
-                .setHeight(Integer.parseInt(prop.getProperty(key_clickHeight, defaultFloatingHeight)))
-                .setWidth(Integer.parseInt(prop.getProperty(key_clickWidth, defaultFloatingWidth)))
-                .setX(Integer.parseInt(prop.getProperty(key_clickX, defaultFloatingX)))
-                .setY(Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY)))
-                .setAllRegion(prop.getProperty(key_clickAllRegion, unActivation));
+                .setAllRegion(prop.getProperty(key_clickAllRegion, unActivation))
+                .setHeight(Math.max(1, Math.min(clickHeight, screenHeight)))
+                .setWidth(Math.max(1, Math.min(clickWidth, screenHeight)))
+                .setX(Math.max(0, Math.min(clickX, screenWidth)))
+                .setY(Math.max(0, Math.min(clickY, screenHeight)));
         clickFloating.setConfig(clickConfig);
+        int stopHeight = Integer.parseInt(prop.getProperty(key_stopHeight, defaultFloatingHeight));
+        int stopWidth = Integer.parseInt(prop.getProperty(key_stopWidth, defaultFloatingWidth));
+        int stopX = Integer.parseInt(prop.getProperty(key_stopX, defaultFloatingX));
+        int stopY = Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY));
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
         stopConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType)))
-                .setHeight(Integer.parseInt(prop.getProperty(key_stopHeight, defaultFloatingHeight)))
-                .setWidth(Integer.parseInt(prop.getProperty(key_stopWidth, defaultFloatingWidth)))
-                .setX(Integer.parseInt(prop.getProperty(key_stopX, defaultFloatingX)))
-                .setY(Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY)))
-                .setAllRegion(prop.getProperty(key_stopAllRegion, unActivation));
+                .setAllRegion(prop.getProperty(key_stopAllRegion, unActivation))
+                .setHeight(Math.max(1, Math.min(stopHeight, screenHeight)))
+                .setWidth(Math.max(1, Math.min(stopWidth, screenHeight)))
+                .setX(Math.max(0, Math.min(stopX, screenWidth)))
+                .setY(Math.max(0, Math.min(stopY, screenHeight)));
         stopFloating.setConfig(stopConfig);
         clickFileInput.close();
     }
@@ -472,6 +484,7 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(randomClickX_Set, tip_randomClickX() + defaultRandomClickX);
         addValueToolTip(randomClickY_Set, tip_randomClickY() + defaultRandomClickY);
         addValueToolTip(randomTimeOffset_Set, tip_randomTime() + defaultRandomTime);
+        addToolTip(tip_findWindowWait() + defaultFindWindowWait, findWindowWait_Set);
         addValueToolTip(opacity_Set, tip_opacity(), String.valueOf(opacity_Set.getValue()));
         addValueToolTip(clickTimeOffset_Set, tip_clickTimeOffset() + defaultClickTimeOffset);
         addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(colorPicker_Set.getValue()));
@@ -596,6 +609,8 @@ public class SettingController extends RootController implements MousePositionUp
         integerRangeTextField(clickRetryNum_Set, 0, null, tip_clickRetryNum() + defaultClickRetryNum);
         // 限制鼠标轨迹采样间隔文本输入框内容
         integerRangeTextField(sampleInterval_Set, 0, null, tip_sampleInterval() + defaultSampleInterval);
+        // 限制默认窗口识别的准备时间文本输入框内容
+        integerRangeTextField(findWindowWait_Set, 0, null, tip_findWindowWait() + defaultFindWindowWait);
         // 限制默认单次点击时长文本输入框内容
         integerRangeTextField(clickTimeOffset_Set, 0, null, tip_clickTimeOffset() + defaultClickTimeOffset);
     }

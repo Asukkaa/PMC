@@ -241,7 +241,8 @@
         <HBox spacing="10">
             <HBox styleClass="hBox-short">
                 <Label prefHeight="25" text="%setting.colorPicker"/>
-                <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#colorAction"/>
+                <ColorPicker fx:id="colorPicker_Set" prefWidth="120" style="-fx-cursor: hand"
+                             onAction="#colorAction"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
@@ -341,7 +342,8 @@
                 </HBox>
 
                 <HBox fx:id="clickWindowInfoHBox_Set" spacing="10">
-                    <Button text="%findImgSet.getWindow" style="-fx-cursor: hand" onAction="#findClickWindowAction"/>
+                    <Button fx:id="clickWindow_Set" text="%findImgSet.getWindow" style="-fx-cursor: hand"
+                            onAction="#findClickWindowAction"/>
                     <Label prefHeight="25" text="%findImgSet.windowInfo"/>
                     <Label prefHeight="25" maxWidth="500" textFill="cornflowerblue" fx:id="clickWindowInfo_Set"/>
                 </HBox>
@@ -382,7 +384,8 @@
                 </HBox>
 
                 <HBox fx:id="stopWindowInfoHBox_Set" spacing="10">
-                    <Button text="%findImgSet.getWindow" style="-fx-cursor: hand" onAction="#findStopWindowAction"/>
+                    <Button fx:id="stopWindow_Set" text="%findImgSet.getWindow" style="-fx-cursor: hand"
+                            onAction="#findStopWindowAction"/>
                     <Label prefHeight="25" maxWidth="500" text="%findImgSet.windowInfo"/>
                     <Label prefHeight="25" textFill="cornflowerblue" fx:id="stopWindowInfo_Set"/>
                 </HBox>
