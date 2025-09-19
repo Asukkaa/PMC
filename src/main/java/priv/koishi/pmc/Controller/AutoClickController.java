@@ -1021,11 +1021,11 @@ public class AutoClickController extends RootController implements MousePosition
                 copyAllProperties(clickWindowMonitor.getWindowInfo(), windowInfo);
                 clickConfig.setWindowInfo(windowInfo);
             }
-            copyAllProperties(stopFloating.getConfig(), clickConfig);
+            copyAllProperties(stopFloating.getConfig(), stopConfig);
             if (stopConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
                 WindowInfo windowInfo = new WindowInfo();
                 copyAllProperties(stopWindowMonitor.getWindowInfo(), windowInfo);
-                clickConfig.setWindowInfo(windowInfo);
+                stopConfig.setWindowInfo(windowInfo);
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
