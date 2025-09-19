@@ -1275,6 +1275,62 @@ public class i18nFinal {
     }
 
     /**
+     * @return 检查到序号为：
+     */
+    public static String text_checkIndex() {
+        return bundle.getString("checkIndex");
+    }
+
+    /**
+     * @return 无法获取到要点击的窗口信息
+     */
+    public static String text_noClickWindowInfo() {
+        return bundle.getString("noClickWindowInfo");
+    }
+
+    /**
+     * @return 无法获取到终止操作窗口信息
+     */
+    public static String text_noStopWindowInfo() {
+        return bundle.getString("noStopWindowInfo");
+    }
+
+    /**
+     * @return 正在检查图像识别范围设置
+     */
+    public static String text_checkingWindowInfo() {
+        return bundle.getString("checkingWindowInfo");
+    }
+
+    /**
+     * @return 正在获取最新的目标窗口信息
+     */
+    public static String text_gettingWindowInfo() {
+        return bundle.getString("gettingWindowInfo");
+    }
+
+    /**
+     * @return 正在更新目标窗口信息
+     */
+    public static String text_updatingWindowInfo() {
+        return bundle.getString("updatingWindowInfo");
+    }
+
+    /**
+     * @return 图像识别范围设置异常
+     */
+    public static String text_windowInfoErr() {
+        return bundle.getString("windowInfoErr");
+    }
+
+    /**
+     * @return 未记录窗口信息
+     */
+    public static String text_windowInfoNull() {
+        return bundle.getString("windowInfoNull");
+    }
+
+    /**
      * @return 坐标：
      */
     public static String text_point() {

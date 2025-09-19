@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
-import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
 import java.util.List;
@@ -224,16 +223,6 @@ public class ClickPositionBean {
      * 终止操作图像区域设置
      */
     FloatingWindowConfig stopWindowConfig;
-
-    /**
-     * 目标窗口信息
-     */
-    WindowInfo clickWindowInfo;
-
-    /**
-     * 终止操作窗口信息
-     */
-    WindowInfo stopWindowInfo;
 
     /**
      * 添加移动轨迹

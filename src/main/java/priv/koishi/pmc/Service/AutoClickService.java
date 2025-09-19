@@ -22,6 +22,7 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Queue.DynamicQueue;
@@ -38,11 +39,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
+import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
-import static priv.koishi.pmc.Utils.UiUtils.showExceptionAlert;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 自动点击线程任务类
@@ -296,6 +298,12 @@ public class AutoClickService {
                     dynamicQueue.setMaxSize(maxLogNum);
                 }
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
+                // 校验并更新识别范围设置
+                List<String> errs = updateWindowInfos(tableViewItems);
+                if (CollectionUtils.isNotEmpty(errs)) {
+                    Platform.runLater(() -> showStageAlert(errs, text_windowInfoErr(), mainStage));
+                    return null;
+                }
                 int loopTime = taskBean.getLoopTimes();
                 if (loopTime == 0) {
                     int i = 0;
@@ -321,7 +329,103 @@ public class AutoClickService {
                 return clickLogBeans;
             }
 
-            // 执行操作流程
+            /**
+             * 更新窗口信息
+             *
+             * @param tableViewItems 自动操作设置列表
+             * @return 错误信息
+             */
+            private List<String> updateWindowInfos(List<? extends ClickPositionVO> tableViewItems) {
+                Set<String> processPaths = new HashSet<>();
+                int tableSize = tableViewItems.size();
+                updateMassage(text_checkingWindowInfo());
+                List<String> errs = new ArrayList<>();
+                updateProgress(0, tableSize);
+                for (int i = 0; i < tableSize; i++) {
+                    updateProgress(i + 1, tableSize);
+                    ClickPositionVO clickPositionVO = tableViewItems.get(i);
+                    String err = text_checkIndex() + clickPositionVO.getIndex() + text_taskErr();
+                    if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
+                        FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                        if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                            WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
+                            if (clickInfo == null || StringUtils.isBlank(clickInfo.getProcessPath())) {
+                                errs.add(err + text_noClickWindowInfo());
+                            } else {
+                                processPaths.add(clickInfo.getProcessPath());
+                            }
+                        }
+                    }
+                    if (CollectionUtils.isNotEmpty(clickPositionVO.getStopImgFiles())) {
+                        FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
+                        if (stopWindowConfig != null && stopWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                            WindowInfo stopInfo = stopWindowConfig.getWindowInfo();
+                            if (stopInfo == null || StringUtils.isBlank(stopInfo.getProcessPath())) {
+                                errs.add(err + text_noStopWindowInfo());
+                            } else {
+                                processPaths.add(stopInfo.getProcessPath());
+                            }
+                        }
+                    }
+                }
+                Map<String, WindowInfo> windowInfoMap = new HashMap<>();
+                int pathSize = processPaths.size();
+                updateMassage(text_gettingWindowInfo());
+                updateProgress(0, pathSize);
+                for (int i = 0; i < pathSize; i++) {
+                    updateProgress(i + 1, pathSize);
+                    String processPath = processPaths.toArray(new String[0])[i];
+                    try {
+                        WindowInfo windowInfo = getMainWindowInfo(processPath);
+                        if (windowInfo != null) {
+                            windowInfoMap.put(processPath, windowInfo);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                updateMassage(text_updatingWindowInfo());
+                updateProgress(0, tableSize);
+                for (int i = 0; i < tableSize; i++) {
+                    updateProgress(i + 1, tableSize);
+                    ClickPositionVO clickPositionVO = tableViewItems.get(i);
+                    String err = text_checkIndex() + clickPositionVO.getIndex() + text_taskErr();
+                    if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
+                        FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                        if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                            WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
+                            WindowInfo windowInfo = windowInfoMap.get(clickInfo.getProcessPath());
+                            if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
+                                errs.add(err + text_noClickWindowInfo());
+                            } else {
+                                clickWindowConfig.setWindowInfo(windowInfo);
+                                clickPositionVO.setClickWindowConfig(clickWindowConfig);
+                            }
+                        }
+                    }
+                    if (CollectionUtils.isNotEmpty(clickPositionVO.getStopImgFiles())) {
+                        FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
+                        if (stopWindowConfig != null && stopWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                            WindowInfo stopInfo = stopWindowConfig.getWindowInfo();
+                            WindowInfo windowInfo = windowInfoMap.get(stopInfo.getProcessPath());
+                            if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
+                                errs.add(err + text_noStopWindowInfo());
+                            } else {
+                                stopWindowConfig.setWindowInfo(windowInfo);
+                                clickPositionVO.setStopWindowConfig(stopWindowConfig);
+                            }
+                        }
+                    }
+                }
+                return errs;
+            }
+
+            /**
+             * 执行操作流程
+             *
+             * @param tableViewItems 自动操作设置列表
+             * @param loopTimeText 循环信息文案
+             */
             private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
                 List<ClickPositionVO> backup = new ArrayList<>(tableViewItems.size());
                 for (ClickPositionVO clickPositionVO : tableViewItems) {
@@ -456,9 +560,7 @@ public class AutoClickService {
                 });
                 long start = System.currentTimeMillis();
                 double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
-                WindowInfo stopWindowInfo = clickPositionVO.getStopWindowInfo();
                 FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
-                stopWindowConfig.setWindowInfo(stopWindowInfo);
                 FindPositionConfig findPositionConfig = new FindPositionConfig()
                         .setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
                         .setFloatingWindowConfig(stopWindowConfig)
@@ -517,9 +619,7 @@ public class AutoClickService {
             long start = System.currentTimeMillis();
             String retryType = clickPositionVO.getRetryType();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
-            WindowInfo clickWindowInfo = clickPositionVO.getClickWindowInfo();
             FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
-            clickWindowConfig.setWindowInfo(clickWindowInfo);
             FindPositionConfig findPositionConfig = new FindPositionConfig()
                     .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(retryType_continuously().equals(retryType))

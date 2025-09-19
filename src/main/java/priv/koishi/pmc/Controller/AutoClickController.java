@@ -43,14 +43,17 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
+import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
+import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
@@ -79,6 +82,7 @@ import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
@@ -713,15 +717,21 @@ public class AutoClickController extends RootController implements MousePosition
             bindingTaskNode(autoClickTask, taskBean);
             autoClickTask.setOnSucceeded(_ -> {
                 clickLogs = autoClickTask.getValue();
-                clearReferences();
-                taskUnbind(taskBean);
-                log_Click.setTextFill(Color.GREEN);
-                log_Click.setText(text_taskFinished());
-                hideFloatingWindow(massageFloating);
-                CheckBox showWindowRun = settingController.showWindowRun_Set;
-                if (showWindowRun.isSelected()) {
-                    showStage(mainStage);
+                if (clickLogs == null) {
+                    taskNotSuccess(taskBean, text_taskFailed());
+                } else {
+                    taskUnbind(taskBean);
+                    log_Click.setTextFill(Color.GREEN);
+                    log_Click.setText(text_taskFinished());
+                    CheckBox showWindowRun = settingController.showWindowRun_Set;
+                    if (showWindowRun.isSelected()) {
+                        if (mainStage.isIconified()) {
+                            showStage(mainStage);
+                        }
+                    }
                 }
+                clearReferences();
+                hideFloatingWindow(massageFloating);
                 // 移除键盘监听器
                 removeNativeListener(nativeKeyListener);
                 autoClickTask = null;
@@ -766,15 +776,15 @@ public class AutoClickController extends RootController implements MousePosition
             });
             if (runTimeline == null) {
                 // 获取准备时间值
-                int preparationTimeValue = setDefaultIntValue(preparationRunTime_Click,
+                int preparation = setDefaultIntValue(preparationRunTime_Click,
                         Integer.parseInt(defaultPreparationRun), 0, null);
                 // 设置浮窗文本显示准备时间
-                String text = text_cancelTask() + preparationTimeValue + text_run();
+                String text = text_cancelTask() + preparation + text_run();
                 updateMassageLabel(massageFloating, text);
                 log_Click.setText(text);
                 showFloatingWindow(true);
                 // 延时执行任务
-                runTimeline = executeRunTimeLine(preparationTimeValue);
+                runTimeline = executeRunTimeLine(preparation);
             }
         }
     }
@@ -825,11 +835,11 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 延时执行任务
      *
-     * @param preparationTimeValue 准备时间
+     * @param preparation 准备时间
      * @return runTimeline 运行时间线
      */
-    private Timeline executeRunTimeLine(int preparationTimeValue) {
-        if (preparationTimeValue == 0) {
+    private Timeline executeRunTimeLine(int preparation) {
+        if (preparation == 0) {
             if (!autoClickTask.isRunning()) {
                 // 使用新线程启动
                 new Thread(autoClickTask).start();
@@ -837,7 +847,7 @@ public class AutoClickController extends RootController implements MousePosition
             return runTimeline;
         }
         runTimeline = new Timeline();
-        AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
+        AtomicInteger preparationTime = new AtomicInteger(preparation);
         // 创建 Timeline 来实现倒计时
         Timeline finalTimeline = runTimeline;
         runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
@@ -856,7 +866,7 @@ public class AutoClickController extends RootController implements MousePosition
             }
         }));
         // 设置 Timeline 的循环次数
-        runTimeline.setCycleCount(preparationTimeValue);
+        runTimeline.setCycleCount(preparation);
         runTimeline.play();
         return runTimeline;
     }
@@ -1002,16 +1012,30 @@ public class AutoClickController extends RootController implements MousePosition
      * @return clickPositionVO 具有默认值的自动操作步骤类
      */
     private ClickPositionVO createClickPositionVO() {
+        FloatingWindowConfig clickConfig = new FloatingWindowConfig();
+        FloatingWindowConfig stopConfig = new FloatingWindowConfig();
+        try {
+            copyAllProperties(clickFloating.getConfig(), clickConfig);
+            if (clickConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                WindowInfo windowInfo = new WindowInfo();
+                copyAllProperties(clickWindowMonitor.getWindowInfo(), windowInfo);
+                clickConfig.setWindowInfo(windowInfo);
+            }
+            copyAllProperties(stopFloating.getConfig(), clickConfig);
+            if (stopConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                WindowInfo windowInfo = new WindowInfo();
+                copyAllProperties(stopWindowMonitor.getWindowInfo(), windowInfo);
+                clickConfig.setWindowInfo(windowInfo);
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
-                .setClickWindowInfo(clickWindowMonitor.getWindowInfo())
-                .setStopWindowInfo(stopWindowMonitor.getWindowInfo())
                 .setSampleInterval(Integer.parseInt(sampleInterval))
                 .setMatchedTypeEnum(MatchedTypeEnum.CLICK.ordinal())
-                .setClickWindowConfig(clickFloating.getConfig())
                 .setClickTypeEnum(ClickTypeEnum.CLICK.ordinal())
                 .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
-                .setStopWindowConfig(stopFloating.getConfig())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
                 .setClickKeyEnum(NativeMouseEvent.BUTTON1)
@@ -1021,6 +1045,8 @@ public class AutoClickController extends RootController implements MousePosition
                 .setRandomClickTime(randomClickTime)
                 .setRandomWaitTime(randomWaitTime)
                 .setClickRetryTimes(clickRetryNum)
+                .setClickWindowConfig(clickConfig)
+                .setStopWindowConfig(stopConfig)
                 .setStopRetryTimes(stopRetryNum)
                 .setClickTime(clickTimeOffset)
                 .setRandomClick(randomClick)

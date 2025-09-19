@@ -31,6 +31,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.activation;
 import static priv.koishi.pmc.Finals.CommonFinals.percentage;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
@@ -206,42 +207,49 @@ public class ImageRecognitionService {
         FloatingWindowConfig config = findPositionConfig.getFloatingWindowConfig();
         int x;
         int y;
-        int width;
-        int height;
+        int w;
+        int h;
         if (FindImgTypeEnum.ALL.ordinal() == config.getFindImgTypeEnum()) {
             x = 0;
             y = 0;
-            width = screenWidth;
-            height = screenHeight;
+            w = screenWidth;
+            h = screenHeight;
         } else if (FindImgTypeEnum.WINDOW.ordinal() == config.getFindImgTypeEnum()) {
             WindowInfo windowInfo = config.getWindowInfo();
             if (windowInfo == null) {
                 throw new RuntimeException(findImgSet_noWindow());
             }
+            // 实时刷新
+            if (windowInfo.isAlwaysRefresh()) {
+                windowInfo = getMainWindowInfo(windowInfo.getProcessPath());
+                if (windowInfo == null) {
+                    throw new RuntimeException(findImgSet_noWindow());
+                }
+            }
             x = windowInfo.getX();
             y = windowInfo.getY();
-            width = windowInfo.getWidth();
-            height = windowInfo.getHeight();
+            w = windowInfo.getWidth();
+            h = windowInfo.getHeight();
         } else {
             // 识别次数大于1且开启全屏重试
             if (findPositionConfig.getFindTime() > 1 && activation.equals(config.getAllRegion())) {
                 x = 0;
                 y = 0;
-                width = screenWidth;
-                height = screenHeight;
+                w = screenWidth;
+                h = screenHeight;
             } else {
                 x = config.getX();
                 y = config.getY();
-                height = config.getHeight();
-                width = config.getWidth();
+                h = config.getHeight();
+                w = config.getWidth();
             }
         }
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle(
-                    x,
-                    y,
-                    width,
-                    height));
+                    Math.max(0, Math.min(x, screenWidth)),
+                    Math.max(0, Math.min(y, screenHeight)),
+                    Math.max(1, Math.min(w, screenWidth - x)),
+                    Math.max(1, Math.min(h, screenHeight - y))));
         } catch (AWTException e) {
             throw new RuntimeException(text_screenErr() + e.getMessage(), e);
         }

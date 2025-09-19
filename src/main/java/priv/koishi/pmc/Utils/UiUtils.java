@@ -1862,6 +1862,28 @@ public class UiUtils {
     }
 
     /**
+     * 弹出界面和错误弹窗
+     *
+     * @param errs  错误详情
+     * @param title 错误标题
+     * @param stage 错误弹窗的父窗口
+     */
+    public static void showStageAlert(List<String> errs, String title, Stage stage) {
+        if (stage.isIconified()) {
+            stage.setIconified(false);
+            stage.show();
+            stage.toFront();
+            stage.requestFocus();
+        }
+        Alert alert = creatErrorAlert(String.join("\n", errs));
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.initOwner(stage);
+        alertStage.setAlwaysOnTop(true);
+        alert.setHeaderText(title);
+        alert.showAndWait();
+    }
+
+    /**
      * 图片列表拖拽中行为
      *
      * @param dragEvent 拖拽事件

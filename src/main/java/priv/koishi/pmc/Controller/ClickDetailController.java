@@ -29,6 +29,7 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
@@ -143,7 +144,7 @@ public class ClickDetailController extends RootController {
     /**
      * 窗口信息获取器
      */
-    public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
+    public static WindowMonitor windowMonitorClick, stopWindowMonitor;
 
     /**
      * 更新数据用的回调函数
@@ -177,7 +178,7 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det,
-            clickRegion_Det, stopRegion_Det;
+            clickRegion_Det, stopRegion_Det, clickWindow_Det, stopWindow_Det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
@@ -334,11 +335,11 @@ public class ClickDetailController extends RootController {
      */
     private void initWindowMonitor() {
         stopWindowMonitor = new WindowMonitor(stopWindowInfo_Det, disableNodes, stage);
-        stopWindowMonitor.setWindowInfo(selectedItem.getStopWindowInfo());
+        stopWindowMonitor.setWindowInfo(selectedItem.getStopWindowConfig().getWindowInfo());
         stopWindowMonitor.updateWindowInfo();
-        clickWindowMonitor = new WindowMonitor(clickWindowInfo_Det, disableNodes, stage);
-        clickWindowMonitor.setWindowInfo(selectedItem.getClickWindowInfo());
-        clickWindowMonitor.updateWindowInfo();
+        windowMonitorClick = new WindowMonitor(clickWindowInfo_Det, disableNodes, stage);
+        windowMonitorClick.setWindowInfo(selectedItem.getClickWindowConfig().getWindowInfo());
+        windowMonitorClick.updateWindowInfo();
     }
 
     /**
@@ -642,6 +643,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_updateClickNameBtn(), updateClickName_Det);
         addValueToolTip(imgX_Det, tip_imgX(), imgX_Det.getText());
         addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
+        addToolTip(tip_findWindow(), clickWindow_Det, stopWindow_Det);
         addToolTip(tip_showRegion(), clickRegion_Det, stopRegion_Det);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
         addToolTip(tip_allRegion(), clickAllRegion_Det, stopAllRegion_Det);
@@ -806,7 +808,75 @@ public class ClickDetailController extends RootController {
         List<Stage> stages = List.of(stage, mainStage);
         // 构建窗口信息栏右键菜单
         buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, disableNodes, stages);
-        buildWindowInfoMenu(clickWindowInfo_Det, clickWindowMonitor, disableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, disableNodes, stages);
+    }
+
+    /**
+     * 保存浮窗设置
+     *
+     * @param floatingVOs 浮窗设置
+     */
+    private void saveFloatingWindow(FloatingWindowDescriptor... floatingVOs) {
+        for (FloatingWindowDescriptor floatingVO : floatingVOs) {
+            Stage stage = floatingVO.getStage();
+            if (stage != null && stage.isShowing()) {
+                FloatingWindowConfig config = floatingVO.getConfig()
+                        .setHeight((int) stage.getHeight())
+                        .setWidth((int) stage.getWidth())
+                        .setX((int) stage.getX())
+                        .setY((int) stage.getY());
+                floatingVO.setConfig(config);
+            }
+        }
+    }
+
+    /**
+     * 更新浮窗配置
+     *
+     * @param findImgTypeDet    识别区域设置下拉框
+     * @param regionInfoHBoxDet 设置指定识别区域的组件所在容器
+     * @param regionHBoxDet     选项识别指定范围相关设置的组件所在容器
+     * @param windowInfoHBoxDet 选项识别指定窗口相关设置的组件所在容器
+     * @param floating          识别范围展示浮窗
+     * @param windowMonitor     窗口监控
+     */
+    private void updateFloatingWindowConfig(ChoiceBox<String> findImgTypeDet, HBox regionInfoHBoxDet, HBox regionHBoxDet,
+                                            HBox windowInfoHBoxDet, FloatingWindowDescriptor floating,
+                                            WindowMonitor windowMonitor, boolean checkWindowInfo) {
+        String value = findImgTypeDet.getValue();
+        addValueToolTip(findImgTypeDet, tip_findImgType(), value);
+        if (findImgType_region().equals(value)) {
+            regionInfoHBoxDet.setVisible(true);
+            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            regionInfoHBoxDet.getChildren().add(regionHBoxDet);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                floating.setConfig(config);
+            }
+        } else if (findImgType_window().equals(value)) {
+            regionInfoHBoxDet.setVisible(true);
+            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            regionInfoHBoxDet.getChildren().add(windowInfoHBoxDet);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                floating.setConfig(config);
+                WindowInfo windowInfo = windowMonitor.getWindowInfo();
+                if (checkWindowInfo && windowInfo == null) {
+                    throw new RuntimeException(text_windowInfoNull());
+                }
+                config.setWindowInfo(windowInfo);
+            }
+        } else if (findImgType_all().equals(value)) {
+            regionInfoHBoxDet.setVisible(false);
+            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                floating.setConfig(config);
+            }
+        }
     }
 
     /**
@@ -848,8 +918,10 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void saveDetail() throws IllegalAccessException {
-        clickFindImgTypeAction();
-        stopFindImgTypeAction();
+        updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
+                clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
+        updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
+                stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
         saveFloatingWindow(clickFloating, stopFloating);
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
         String stopAllRegion = stopAllRegion_Det.isSelected() ? activation : unActivation;
@@ -873,8 +945,6 @@ public class ClickDetailController extends RootController {
                 .setRandomClickInterval(randomClickInterval)
                 .setStopWindowConfig(stopFloating.getConfig())
                 .setClickWindowConfig(clickFloating.getConfig())
-                .setStopWindowInfo(stopWindowMonitor.getWindowInfo())
-                .setClickWindowInfo(clickWindowMonitor.getWindowInfo())
                 .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))
@@ -917,25 +987,6 @@ public class ClickDetailController extends RootController {
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();
-        }
-    }
-
-    /**
-     * 保存浮窗设置
-     *
-     * @param floatingVOs 浮窗设置
-     */
-    private void saveFloatingWindow(FloatingWindowDescriptor... floatingVOs) {
-        for (FloatingWindowDescriptor floatingVO : floatingVOs) {
-            Stage clickStage = floatingVO.getStage();
-            if (clickStage != null && clickStage.isShowing()) {
-                FloatingWindowConfig config = floatingVO.getConfig()
-                        .setHeight((int) clickStage.getHeight())
-                        .setWidth((int) clickStage.getWidth())
-                        .setX((int) clickStage.getX())
-                        .setY((int) clickStage.getY());
-                floatingVO.setConfig(config);
-            }
         }
     }
 
@@ -1079,35 +1130,8 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickFindImgTypeAction() {
-        String value = clickFindImgType_Det.getValue();
-        addValueToolTip(clickFindImgType_Det, tip_findImgType(), value);
-        if (findImgType_region().equals(value)) {
-            clickRegionInfoHBox_Det.setVisible(true);
-            clickRegionInfoHBox_Det.getChildren().removeAll(clickRegionHBox_Det, clickWindowInfoHBox_Det);
-            clickRegionInfoHBox_Det.getChildren().add(clickRegionHBox_Det);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
-                clickFloating.setConfig(config);
-            }
-        } else if (findImgType_window().equals(value)) {
-            clickRegionInfoHBox_Det.setVisible(true);
-            clickRegionInfoHBox_Det.getChildren().removeAll(clickRegionHBox_Det, clickWindowInfoHBox_Det);
-            clickRegionInfoHBox_Det.getChildren().add(clickWindowInfoHBox_Det);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
-                clickFloating.setConfig(config);
-            }
-        } else if (findImgType_all().equals(value)) {
-            clickRegionInfoHBox_Det.setVisible(false);
-            clickRegionInfoHBox_Det.getChildren().removeAll(clickRegionHBox_Det, clickWindowInfoHBox_Det);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
-                clickFloating.setConfig(config);
-            }
-        }
+        updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
+                clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, false);
     }
 
     /**
@@ -1115,35 +1139,8 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void stopFindImgTypeAction() {
-        String value = stopFindImgType_Det.getValue();
-        addValueToolTip(stopFindImgType_Det, tip_findImgType(), value);
-        if (findImgType_region().equals(value)) {
-            stopRegionInfoHBox_Det.setVisible(true);
-            stopRegionInfoHBox_Det.getChildren().removeAll(stopRegionHBox_Det, stopWindowInfoHBox_Det);
-            stopRegionInfoHBox_Det.getChildren().add(stopRegionHBox_Det);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
-                stopFloating.setConfig(config);
-            }
-        } else if (findImgType_window().equals(value)) {
-            stopRegionInfoHBox_Det.setVisible(true);
-            stopRegionInfoHBox_Det.getChildren().removeAll(stopRegionHBox_Det, stopWindowInfoHBox_Det);
-            stopRegionInfoHBox_Det.getChildren().add(stopWindowInfoHBox_Det);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
-                stopFloating.setConfig(config);
-            }
-        } else if (findImgType_all().equals(value)) {
-            stopRegionInfoHBox_Det.setVisible(false);
-            stopRegionInfoHBox_Det.getChildren().removeAll(stopRegionHBox_Det, stopWindowInfoHBox_Det);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
-                stopFloating.setConfig(config);
-            }
-        }
+        updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
+                stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, false);
     }
 
     /**
@@ -1193,8 +1190,8 @@ public class ClickDetailController extends RootController {
         // 获取准备时间值
         int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
                 Integer.parseInt(defaultPreparationRecord), 0, null);
-        if (clickWindowMonitor != null) {
-            clickWindowMonitor.startClickWindowMouseListener(preparation);
+        if (windowMonitorClick != null) {
+            windowMonitorClick.startClickWindowMouseListener(preparation);
         }
     }
 

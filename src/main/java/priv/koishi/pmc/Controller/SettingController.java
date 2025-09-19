@@ -1423,7 +1423,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 获取准备时间值
         int preparation = setDefaultIntValue(findWindowWait_Set,
                 Integer.parseInt(defaultFindWindowWait), 0, null);
-        if (clickWindowMonitor != null) {
+        if (clickWindowMonitor != null && !clickWindowMonitor.findingWindow) {
             clickWindowMonitor.startClickWindowMouseListener(preparation);
         }
     }

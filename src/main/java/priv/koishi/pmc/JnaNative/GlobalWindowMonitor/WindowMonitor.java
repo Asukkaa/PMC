@@ -277,7 +277,7 @@ public class WindowMonitor {
      * @param processPath 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public WindowInfo getMainWindowInfo(String processPath) {
+    public static WindowInfo getMainWindowInfo(String processPath) {
         WindowInfo windowInfo = null;
         if (isWin) {
             windowInfo = getMainWinWindowInfo(processPath);
@@ -362,7 +362,7 @@ public class WindowMonitor {
      * @param processPath 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public WindowInfo getMainWinWindowInfo(String processPath) {
+    public static WindowInfo getMainWinWindowInfo(String processPath) {
         List<WindowInfo> windows = getWinWindowInfos(processPath);
         return windows.isEmpty() ? null : windows.getFirst();
     }
@@ -373,7 +373,7 @@ public class WindowMonitor {
      * @param processPath 进程路径
      * @return 窗口信息列表
      */
-    public List<WindowInfo> getWinWindowInfos(String processPath) {
+    public static List<WindowInfo> getWinWindowInfos(String processPath) {
         List<WindowInfo> result = new ArrayList<>();
         User32 user32 = User32.INSTANCE;
         Psapi psapi = Psapi.INSTANCE;
@@ -437,7 +437,7 @@ public class WindowMonitor {
      * @param kernel32 Kernel32 库实例，用于调用 OpenProcess 和 CloseHandle 等进程操作函数
      * @return 进程的完整路径，如果无法获取则返回 null
      */
-    private String getWinProcessPathByPid(int pid, Psapi psapi, Kernel32 kernel32) {
+    private static String getWinProcessPathByPid(int pid, Psapi psapi, Kernel32 kernel32) {
         try {
             WinNT.HANDLE processHandle = kernel32.OpenProcess(
                     Kernel32.PROCESS_QUERY_INFORMATION | Kernel32.PROCESS_VM_READ,
@@ -468,7 +468,7 @@ public class WindowMonitor {
      * @param pid 进程ID
      * @return 进程地址
      */
-    private String getMacProcessPathByPid(int pid) {
+    private static String getMacProcessPathByPid(int pid) {
         try {
             // 使用ps命令通过PID获取进程名称
             Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
@@ -490,7 +490,7 @@ public class WindowMonitor {
      * @param str 要创建的 CFString 键
      * @return CFString 对象
      */
-    private Pointer createCFString(String str) {
+    private static Pointer createCFString(String str) {
         Foundation foundation = Foundation.INSTANCE;
         return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
     }
@@ -539,7 +539,7 @@ public class WindowMonitor {
      * @param appPath app 进程路径
      * @return 窗口信息，如果没有找到则返回null
      */
-    public WindowInfo getMainMacWindowInfo(String appPath) {
+    public static WindowInfo getMainMacWindowInfo(String appPath) {
         List<WindowInfo> windows = getMacWindowInfos(appPath);
         return windows.isEmpty() ? null : windows.getFirst();
     }
@@ -550,7 +550,7 @@ public class WindowMonitor {
      * @param appPath 应用程序Bundle路径（.app结尾）
      * @return 窗口信息列表
      */
-    public List<WindowInfo> getMacWindowInfos(String appPath) {
+    public static List<WindowInfo> getMacWindowInfos(String appPath) {
         List<WindowInfo> result = new ArrayList<>();
         try {
             CoreGraphics cg = CoreGraphics.INSTANCE;
