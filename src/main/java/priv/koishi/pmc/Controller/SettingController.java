@@ -471,6 +471,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_offsetX() + defaultOffsetX, offsetX_Set);
         addToolTip(tip_offsetY() + defaultOffsetY, offsetY_Set);
         addToolTip(tip_showRegion(), clickRegion_Set, stopRegion_Set);
+        addToolTip(tip_findWindow(), clickWindow_Set, stopWindow_Set);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
         addToolTip(titleCoordinate_Set.getText(), titleCoordinate_Set);
