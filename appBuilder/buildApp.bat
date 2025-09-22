@@ -49,7 +49,9 @@ if exist "%appName%" (
 )
 
 :: 执行打包
-jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" --app-version "%appVersion%" --java-options "-XX:+UseZGC"
+jpackage --name "%appName%" --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" --icon "%appIcon%" ^
+--app-version "%appVersion%" --java-options "-XX:+UseZGC" ^
+--java-options "--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv"
 echo 已完成 jpackage 打包
 
 :: 生成 lib zip

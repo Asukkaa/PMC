@@ -19,6 +19,7 @@ module priv.koishi.pmc {
     requires jdk.httpserver;
     requires java.net.http;
     requires com.sun.jna.platform;
+    requires jdk.naming.dns;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;

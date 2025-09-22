@@ -1,5 +1,5 @@
 #!/bin/sh
-JLINK_VM_OPTIONS=
+JLINK_VM_OPTIONS=--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv
 DIR=`dirname $0`
 cd $DIR
 $DIR/java $JLINK_VM_OPTIONS -m priv.koishi.pmc/priv.koishi.pmc.MainApplication "$@"
