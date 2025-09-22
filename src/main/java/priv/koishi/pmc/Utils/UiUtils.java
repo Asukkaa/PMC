@@ -716,7 +716,8 @@ public class UiUtils {
      * @param selected       true 表示选中添加的数据，false 表示不选中添加的数据
      * @param <T>            数据类型
      */
-    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit, boolean selected) {
+    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber,
+                                   String dataNumberUnit, boolean selected) {
         ObservableList<T> tableViewItems = tableView.getItems();
         TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
         List<T> selectedItem = selectionModel.getSelectedItems();

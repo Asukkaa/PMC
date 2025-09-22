@@ -139,7 +139,8 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
-            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set;
+            stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
+            updateStopWindow_Set, updateClickWindow_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -366,6 +367,8 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory, unActivation);
         setControlLastConfig(offsetX_Set, prop, key_offsetX, String.valueOf(defaultOffsetX));
         setControlLastConfig(offsetY_Set, prop, key_offsetY, String.valueOf(defaultOffsetY));
+        setControlLastConfig(updateStopWindow_Set, prop, key_updateStopWindow, unActivation);
+        setControlLastConfig(updateClickWindow_Set, prop, key_updateClickWindow, unActivation);
         setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, activation);
         setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, activation);
         setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, activation);
@@ -480,6 +483,7 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
+        addToolTip(tip_alwaysRefresh(), updateStopWindow_Set, updateClickWindow_Set);
         addToolTip(tip_clickRetryNum() + defaultClickRetryNum, clickRetryNum_Set);
         addToolTip(tip_sampleInterval() + defaultSampleInterval, sampleInterval_Set);
         addValueToolTip(randomClickX_Set, tip_randomClickX() + defaultRandomClickX);
@@ -1163,6 +1167,26 @@ public class SettingController extends RootController implements MousePositionUp
         String allRegion = clickAllRegion_Set.isSelected() ? activation : unActivation;
         clickFloating.getConfig().setAllRegion(allRegion);
         setLoadLastConfigCheckBox(clickAllRegion_Set, configFile_Click, key_clickAllRegion);
+    }
+
+    /**
+     * 要点击的图像窗口信息实时更新开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void updateClickWindowAction() throws IOException {
+        setLoadLastConfigCheckBox(updateClickWindow_Set, configFile_Click, key_updateClickWindow);
+    }
+
+    /**
+     * 终止操作图像窗口信息实时更新开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void updateStopWindowAction() throws IOException {
+        setLoadLastConfigCheckBox(updateStopWindow_Set, configFile_Click, key_updateStopWindow);
     }
 
     /**

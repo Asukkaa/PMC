@@ -64,9 +64,4 @@ public class WindowInfo {
      */
     String title;
 
-    /**
-     * 窗口是否需要实时刷新（true 开启实时刷新）
-     */
-    boolean alwaysRefresh;
-
 }

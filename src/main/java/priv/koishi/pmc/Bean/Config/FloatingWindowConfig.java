@@ -50,4 +50,9 @@ public class FloatingWindowConfig {
      */
     WindowInfo windowInfo;
 
+    /**
+     * 窗口是否需要实时刷新（1 开启实时刷新 0 关闭实时刷新）
+     */
+    String alwaysRefresh;
+
 }

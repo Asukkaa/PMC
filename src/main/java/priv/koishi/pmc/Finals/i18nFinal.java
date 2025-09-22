@@ -705,6 +705,15 @@ public class i18nFinal {
     }
 
     /**
+     * @return 勾选后将会在图像识别前自动更新窗口信息
+     * 建议在窗口位置和大小不会改变的情况下不要勾选
+     * 启动自动操作时将会自动更新一次窗口信息
+     */
+    public static String tip_alwaysRefresh() {
+        return bundle.getString("tip.alwaysRefresh");
+    }
+
+    /**
      * @return 需要在macOS系统设置中启用辅助设备权限：
      * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
      * 2. 在左侧列表选择「辅助功能」

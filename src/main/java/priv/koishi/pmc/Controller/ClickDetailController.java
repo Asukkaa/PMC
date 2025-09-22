@@ -177,12 +177,12 @@ public class ClickDetailController extends RootController {
             stopFindImgType_Det;
 
     @FXML
-    public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det,
-            clickRegion_Det, stopRegion_Det, clickWindow_Det, stopWindow_Det;
+    public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
+            updateClickName_Det, clickWindow_Det, stopWindow_Det;
 
     @FXML
-    public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
-            randomWaitTime_Det, clickAllRegion_Det, stopAllRegion_Det;
+    public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
+            stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
@@ -335,10 +335,16 @@ public class ClickDetailController extends RootController {
      */
     private void initWindowMonitor() {
         stopWindowMonitor = new WindowMonitor(stopWindowInfo_Det, disableNodes, stage);
-        stopWindowMonitor.setWindowInfo(selectedItem.getStopWindowConfig().getWindowInfo());
+        FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
+        WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
+        updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
+        stopWindowMonitor.setWindowInfo(stopWindowInfo);
         stopWindowMonitor.updateWindowInfo();
         windowMonitorClick = new WindowMonitor(clickWindowInfo_Det, disableNodes, stage);
-        windowMonitorClick.setWindowInfo(selectedItem.getClickWindowConfig().getWindowInfo());
+        FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
+        WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
+        updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
+        windowMonitorClick.setWindowInfo(clickWindowInfo);
         windowMonitorClick.updateWindowInfo();
     }
 
@@ -652,6 +658,7 @@ public class ClickDetailController extends RootController {
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
         addToolTip(tip_stopRetryNum() + stopRetryNumDefault, stopRetryNum_Det);
         addToolTip(tip_clickIndex() + clickIndex_Det.getText(), clickIndex_Det);
+        addToolTip(tip_alwaysRefresh(), updateStopWindow_Det, updateClickWindow_Det);
         addValueToolTip(clickTypeText_Det, tip_clickType(), clickType_Det.getValue());
         addToolTip(tip_clickRetryNum() + clickRetryNumDefault, clickRetryNum_Det);
         addToolTip(tip_notExistsIndex(), matchedStepWarning_Det, retryStepWarning_Det);
@@ -739,6 +746,8 @@ public class ClickDetailController extends RootController {
         hideFloatingWindow(clickFloating, stopFloating);
         removeAll();
         removeAllListeners();
+        windowMonitorClick = null;
+        stopWindowMonitor = null;
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
@@ -839,6 +848,7 @@ public class ClickDetailController extends RootController {
      * @param windowInfoHBoxDet 选项识别指定窗口相关设置的组件所在容器
      * @param floating          识别范围展示浮窗
      * @param windowMonitor     窗口监控
+     * @param checkWindowInfo   是否检查窗口信息为空（true 校验空值）
      */
     private void updateFloatingWindowConfig(ChoiceBox<String> findImgTypeDet, HBox regionInfoHBoxDet, HBox regionHBoxDet,
                                             HBox windowInfoHBoxDet, FloatingWindowDescriptor floating,
@@ -862,11 +872,13 @@ public class ClickDetailController extends RootController {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
                 floating.setConfig(config);
-                WindowInfo windowInfo = windowMonitor.getWindowInfo();
-                if (checkWindowInfo && windowInfo == null) {
-                    throw new RuntimeException(text_windowInfoNull());
+                if (windowMonitor != null) {
+                    WindowInfo windowInfo = windowMonitor.getWindowInfo();
+                    if (checkWindowInfo && windowInfo == null) {
+                        throw new RuntimeException(text_windowInfoNull());
+                    }
+                    config.setWindowInfo(windowInfo);
                 }
-                config.setWindowInfo(windowInfo);
             }
         } else if (findImgType_all().equals(value)) {
             regionInfoHBoxDet.setVisible(false);
@@ -929,9 +941,15 @@ public class ClickDetailController extends RootController {
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
         String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
         String randomTrajectory = randomTrajectory_Det.isSelected() ? activation : unActivation;
+        String stopWindowUpdate = updateStopWindow_Det.isSelected() ? activation : unActivation;
+        String clickWindowUpdate = updateClickWindow_Det.isSelected() ? activation : unActivation;
         String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
-        stopFloating.getConfig().setAllRegion(stopAllRegion);
-        clickFloating.getConfig().setAllRegion(clickAllRegion);
+        FloatingWindowConfig stopFloatingConfig = stopFloating.getConfig();
+        FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
+        stopFloatingConfig.setAllRegion(stopAllRegion)
+                .setAlwaysRefresh(stopWindowUpdate);
+        clickFloatingConfig.setAllRegion(clickAllRegion)
+                .setAlwaysRefresh(clickWindowUpdate);
         int selectIndex = selectedItem.getIndex();
         String matchedType = matchedType_Det.getValue();
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
@@ -941,10 +959,10 @@ public class ClickDetailController extends RootController {
                 .setRandomWaitTime(randomWaitTime)
                 .setRandomClickTime(randomClickTime)
                 .setRandomTrajectory(randomTrajectory)
+                .setStopWindowConfig(stopFloatingConfig)
+                .setClickWindowConfig(clickFloatingConfig)
                 .setClickImgPath(clickImgPath_Det.getText())
                 .setRandomClickInterval(randomClickInterval)
-                .setStopWindowConfig(stopFloating.getConfig())
-                .setClickWindowConfig(clickFloating.getConfig())
                 .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))

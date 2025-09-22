@@ -862,4 +862,9 @@ public class CommonFinals {
     public static final String key_findWindowWait = "findWindowWait";
 
     public static final String key_titleCoordinate = "titleCoordinate";
+
+    public static final String key_updateClickWindow = "updateClickWindow";
+
+    public static final String key_updateStopWindow = "updateStopWindow";
+
 }

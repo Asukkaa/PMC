@@ -220,7 +220,7 @@ public class ImageRecognitionService {
                 throw new RuntimeException(findImgSet_noWindow());
             }
             // 实时刷新
-            if (windowInfo.isAlwaysRefresh()) {
+            if (activation.equals(config.getAlwaysRefresh())) {
                 windowInfo = getMainWindowInfo(windowInfo.getProcessPath());
                 if (windowInfo == null) {
                     throw new RuntimeException(findImgSet_noWindow());
