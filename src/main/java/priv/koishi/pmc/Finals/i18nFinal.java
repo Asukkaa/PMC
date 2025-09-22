@@ -1396,6 +1396,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 文件不存在
+     */
+    public static String text_mouseClickNull() {
+        return bundle.getString("mouseClickNull");
+    }
+
+    /**
      * @return 图片地址：
      */
     public static String text_imgPath() {

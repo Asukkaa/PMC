@@ -1670,6 +1670,10 @@ public class UiUtils {
                 }
             }
         });
+        if (StringUtils.isBlank(openPath)) {
+            openPath = "";
+            openText = text_mouseClickNull();
+        }
         addToolTip(path + openText + openPath, pathLabel);
         // 设置右键菜单
         setPathLabelContextMenu(pathLabel);
