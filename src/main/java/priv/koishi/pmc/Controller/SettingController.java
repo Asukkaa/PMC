@@ -28,6 +28,7 @@ import priv.koishi.pmc.EventBus.EventBus;
 import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
@@ -90,6 +91,8 @@ public class SettingController extends RootController implements MousePositionUp
      * 要防重复点击的组件
      */
     private final List<Node> disableNodes = new ArrayList<>();
+
+    private String clickWindowPath, stopWindowPath;
 
     /**
      * 浮窗设置
@@ -219,6 +222,22 @@ public class SettingController extends RootController implements MousePositionUp
             for (int i = 0; i < list.size(); i++) {
                 ImgFileVO bean = list.get(i);
                 prop.put(key_defaultStopImg + i, bean.getPath());
+            }
+            if (clickWindowMonitor != null) {
+                WindowInfo windowInfo = clickWindowMonitor.getWindowInfo();
+                String processPath = "";
+                if (windowInfo != null) {
+                    processPath = windowInfo.getProcessPath();
+                }
+                prop.put(key_clickWindowPath, processPath);
+            }
+            if (stopWindowMonitor != null) {
+                WindowInfo windowInfo = stopWindowMonitor.getWindowInfo();
+                String processPath = "";
+                if (windowInfo != null) {
+                    processPath = windowInfo.getProcessPath();
+                }
+                prop.put(key_stopWindowPath, processPath);
             }
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
@@ -384,6 +403,8 @@ public class SettingController extends RootController implements MousePositionUp
         stopFindImgType_Set.setValue(findImgTypeMap.get(stopFindImgType));
         int clickFindImgType = Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType));
         clickFindImgType_Set.setValue(findImgTypeMap.get(clickFindImgType));
+        clickWindowPath = prop.getProperty(key_clickWindowPath);
+        stopWindowPath = prop.getProperty(key_stopWindowPath);
         clickFileInput.close();
         String language = languageMap.get(bundle.getLocale());
         if (language != null) {
@@ -752,7 +773,13 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void initWindowMonitor() {
         stopWindowMonitor = new WindowMonitor(stopWindowInfo_Set, disableNodes, mainStage);
+        if (StringUtils.isNotBlank(stopWindowPath)) {
+            stopWindowMonitor.updateWindowInfo(stopWindowPath);
+        }
         clickWindowMonitor = new WindowMonitor(clickWindowInfo_Set, disableNodes, mainStage);
+        if (StringUtils.isNotBlank(clickWindowPath)) {
+            clickWindowMonitor.updateWindowInfo(clickWindowPath);
+        }
     }
 
     /**
@@ -801,13 +828,13 @@ public class SettingController extends RootController implements MousePositionUp
         loadControlLastConfig();
         // 初始化浮窗
         initFloatingWindow();
-        // 初始化窗口监控器
-        initWindowMonitor();
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
             // 组件自适应宽高
             adaption();
+            // 初始化窗口监控器
+            initWindowMonitor();
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件

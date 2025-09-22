@@ -867,4 +867,8 @@ public class CommonFinals {
 
     public static final String key_updateStopWindow = "updateStopWindow";
 
+    public static final String key_clickWindowPath = "clickWindowPath";
+
+    public static final String key_stopWindowPath = "stopWindowPath";
+
 }

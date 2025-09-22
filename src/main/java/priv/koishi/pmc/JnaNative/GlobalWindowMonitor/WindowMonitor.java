@@ -128,9 +128,18 @@ public class WindowMonitor {
      */
     public void updateWindowInfo() {
         if (windowInfo != null) {
-            windowInfo = getMainWindowInfo(windowInfo.getProcessPath());
-            showWindowInfo();
+            updateWindowInfo(windowInfo.getProcessPath());
         }
+    }
+
+    /**
+     * 更新窗口信息
+     *
+     * @param processPath 窗口进程路径
+     */
+    public void updateWindowInfo(String processPath) {
+        windowInfo = getMainWindowInfo(processPath);
+        showWindowInfo();
     }
 
     /**
