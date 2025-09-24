@@ -42,6 +42,11 @@ public class MacChecker {
         }
     }
 
+    /**
+     * 校验 macOS 自动化权限
+     *
+     * @return true 拥有权限
+     */
     public static boolean hasAutomationPermission() {
         // 非macOS系统直接返回true
         if (!isMac) {
@@ -59,6 +64,9 @@ public class MacChecker {
         }
     }
 
+    /**
+     * 申请 macOS 自动化权限
+     */
     public static void getAutomationPermission() {
         if (isMac) {
             String script = "tell application \"System Events\" to get name of processes";
