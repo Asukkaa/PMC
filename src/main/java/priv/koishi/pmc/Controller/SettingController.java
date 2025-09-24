@@ -48,6 +48,8 @@ import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.getAutomationPermission;
+import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomationPermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
@@ -783,6 +785,15 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 禁用需要截屏相关权限的组件
+     */
+    private void setNoPermissionLog() {
+        clickWindow_Set.setDisable(true);
+        stopWindow_Set.setDisable(true);
+        getAutomationPermission();
+    }
+
+    /**
      * 根据鼠标位置调整ui
      *
      * @param mousePoint 鼠标位置
@@ -831,6 +842,10 @@ public class SettingController extends RootController implements MousePositionUp
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
+            if (!hasAutomationPermission()) {
+                // 禁用需要截屏相关权限的组件
+                setNoPermissionLog();
+            }
             // 组件自适应宽高
             adaption();
             // 初始化窗口监控器

@@ -76,7 +76,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.JnaNative.ScreenPermissionChecker.MacChecker.hasScreenCapturePermission;
+import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadPMC;

@@ -21,6 +21,7 @@ import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -520,12 +521,7 @@ public class WindowMonitor {
                         return appPID
                     end tell""";
             Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String pidStr = reader.readLine();
-            if (pidStr == null) {
-                throw new RuntimeException("无法获取当前焦点应用PID");
-            }
-            int frontAppPid = Integer.parseInt(pidStr.trim());
+            int frontAppPid = getMacFrontAppPid(process);
             process.waitFor();
             // 获取进程路径
             String processPath = getMacProcessPathByPid(frontAppPid);
@@ -540,6 +536,27 @@ public class WindowMonitor {
             throw new RuntimeException("获取Mac焦点窗口信息失败", e);
         }
         return result;
+    }
+
+    /**
+     * 获取 Mac 焦点窗口进程 pid
+     *
+     * @param process pid 查询命令进程
+     * @throws IOException 命令结果读取异常
+     */
+    private static int getMacFrontAppPid(Process process) throws IOException {
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        String error = errorReader.readLine();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String pidStr = reader.readLine();
+        if (pidStr == null) {
+            String err = "无法获取当前焦点应用PID:";
+            if (error != null) {
+                err = err + error;
+            }
+            throw new RuntimeException(err);
+        }
+        return Integer.parseInt(pidStr.trim());
     }
 
     /**

@@ -1,4 +1,4 @@
-package priv.koishi.pmc.JnaNative.ScreenPermissionChecker;
+package priv.koishi.pmc.JnaNative.PermissionChecker;
 
 import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
 
@@ -39,6 +39,37 @@ public class MacChecker {
             // 截图失败认为没有权限
         } catch (AWTException e) {
             return false;
+        }
+    }
+
+    public static boolean hasAutomationPermission() {
+        // 非macOS系统直接返回true
+        if (!isMac) {
+            return true;
+        }
+        try {
+            String script = "tell application \"System Events\" to get name of every process";
+            Process process = Runtime.getRuntime().exec(new String[]{
+                    "osascript", "-e", script
+            });
+            process.waitFor();
+            return process.exitValue() == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static void getAutomationPermission() {
+        if (isMac) {
+            String script = "tell application \"System Events\" to get name of processes";
+            try {
+                Process process = Runtime.getRuntime().exec(new String[]{
+                        "osascript", "-e", script
+                });
+                process.waitFor();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
