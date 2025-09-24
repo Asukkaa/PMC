@@ -11,7 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.40</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <javafx.version>25</javafx.version>
     </properties>
 
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.25.1</version>
+            <version>2.25.2</version>
         </dependency>
 
         <dependency>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-platform</artifactId>
-            <version>5.17.0</version>
+            <version>5.18.0</version>
         </dependency>
     </dependencies>
 
