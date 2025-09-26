@@ -48,7 +48,6 @@ import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.getAutomationPermission;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomationPermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
@@ -790,7 +789,6 @@ public class SettingController extends RootController implements MousePositionUp
     private void setNoPermissionLog() {
         clickWindow_Set.setDisable(true);
         stopWindow_Set.setDisable(true);
-        getAutomationPermission();
     }
 
     /**

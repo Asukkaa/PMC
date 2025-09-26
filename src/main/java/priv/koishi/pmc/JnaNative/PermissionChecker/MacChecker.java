@@ -64,21 +64,4 @@ public class MacChecker {
         }
     }
 
-    /**
-     * 申请 macOS 自动化权限
-     */
-    public static void getAutomationPermission() {
-        if (isMac) {
-            String script = "tell application \"System Events\" to get name of processes";
-            try {
-                Process process = Runtime.getRuntime().exec(new String[]{
-                        "osascript", "-e", script
-                });
-                process.waitFor();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
 }

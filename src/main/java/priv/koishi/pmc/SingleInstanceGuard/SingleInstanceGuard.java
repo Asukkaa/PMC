@@ -87,7 +87,7 @@ public class SingleInstanceGuard {
      * @param port 激活信号端口
      * @return true表示已有实例运行，false表示当前是首个实例
      */
-    public static boolean checkRunning(int port,String[] args ) {
+    public static boolean checkRunning(int port, String[] args) {
         try {
             // 获取锁文件路径
             Path lockPath = getLockFilePath();
