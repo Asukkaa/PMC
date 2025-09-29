@@ -114,7 +114,7 @@ public class AboutController extends RootController {
     }
 
     /**
-     * 获取logs文件夹路径并展示
+     * 获取 logs 文件夹路径并展示
      */
     private void setLogsPath() {
         String logsPath = getLogsPath();
@@ -139,7 +139,7 @@ public class AboutController extends RootController {
     }
 
     /**
-     * 清理多余log文件
+     * 清理多余 log 文件
      */
     private void deleteLogs() {
         String logsNumValue = logsNum_Abt.getText();
@@ -280,7 +280,7 @@ public class AboutController extends RootController {
     }
 
     /**
-     * 打开GitHub链接
+     * 打开 GitHub 链接
      *
      * @throws Exception 链接打开失败
      */
@@ -290,7 +290,7 @@ public class AboutController extends RootController {
     }
 
     /**
-     * 打开Gitee链接
+     * 打开 Gitee 链接
      *
      * @throws Exception 链接打开失败
      */

@@ -15,7 +15,7 @@ import java.io.File;
 import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 
 /**
- * javafx列表展示文件信息类
+ * javaFX列表展示文件信息类
  *
  * @author KOISHI
  * Date 2024-10-01

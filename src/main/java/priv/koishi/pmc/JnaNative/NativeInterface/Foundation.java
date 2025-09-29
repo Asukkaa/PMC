@@ -20,12 +20,12 @@ public interface Foundation extends Library {
     Foundation INSTANCE = Native.load("Foundation", Foundation.class);
 
     /**
-     * 使用C字符串创建CFString对象
+     * 使用 C 字符串创建 CFString 对象
      *
-     * @param alloc    分配器，通常传入Pointer.NULL使用默认分配器
-     * @param str      要转换的Java字符串
+     * @param alloc    分配器，通常传入 Pointer.NULL 使用默认分配器
+     * @param str      要转换的 Java 字符串
      * @param encoding 字符串编码格式
-     * @return 新创建的CFStringRef指针，需要调用CFRelease释放
+     * @return 新创建的 CFStringRef 指针，需要调用 CFRelease 释放
      */
     Pointer CFStringCreateWithCString(Pointer alloc, String str, int encoding);
 

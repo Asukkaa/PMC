@@ -27,7 +27,7 @@ public class CommonUtils {
      * @param str 要校验的字符串
      * @param min 最小值，为空则不限制
      * @param max 最大值，为空则不限制
-     * @return 在设置范围内为true，不在范围内为false
+     * @return 在设置范围内为 true，不在范围内为 false
      */
     public static boolean isInIntegerRange(String str, Integer min, Integer max) {
         if (StringUtils.isEmpty(str)) {
@@ -145,9 +145,9 @@ public class CommonUtils {
     }
 
     /**
-     * 获取当前GC类型
+     * 获取当前 GC 类型
      *
-     * @return 当前GC类型
+     * @return 当前 GC 类型
      */
     public static String getCurrentGCType() {
         List<String> gcNames = ManagementFactory.getGarbageCollectorMXBeans().stream()
@@ -168,10 +168,10 @@ public class CommonUtils {
     }
 
     /**
-     * 获取当前进程PID
+     * 获取当前进程 PID
      *
-     * @return 当前进程PID字符串
-     * @throws Exception 获取PID时抛出的异常
+     * @return 当前进程 PID 字符串
+     * @throws Exception 获取 PID 时抛出的异常
      */
     public static String getProcessId() throws Exception {
         Class<?> processHandleClass = Class.forName("java.lang.ProcessHandle");

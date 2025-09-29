@@ -1,4 +1,4 @@
-package priv.koishi.pmc.EventBus;
+package priv.koishi.pmc.Event;
 
 import javafx.application.Platform;
 

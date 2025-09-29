@@ -86,7 +86,7 @@ public class TimedTaskBean implements Indexable {
      * 判断两个定时任务数据是否相同
      *
      * @param bean 要判断的定时任务数据
-     * @return true表示相同，false表示不同
+     * @return true 表示相同，false 表示不同
      */
     public boolean equals(TimedTaskBean bean) {
         if (bean == this) {

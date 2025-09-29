@@ -31,14 +31,29 @@ public class ImgFileBean {
      */
     StringProperty path = new SimpleStringProperty();
 
+    /**
+     * 获取图片地址绑定
+     *
+     * @return 图片地址绑定
+     */
     public StringProperty pathProperty() {
         return path;
     }
 
+    /**
+     * 获取图片地址字符串
+     *
+     * @return 图片地址字符串
+     */
     public String getPath() {
         return path.get();
     }
 
+    /**
+     * 设置图片地址字符串
+     *
+     * @param path 图片地址字符串
+     */
     public void setPath(String path) {
         this.path.set(path);
     }

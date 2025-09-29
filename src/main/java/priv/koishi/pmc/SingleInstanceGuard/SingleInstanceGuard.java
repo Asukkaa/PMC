@@ -38,8 +38,7 @@ public class SingleInstanceGuard {
     /**
      * 单例应用实例锁文件名
      *
-     * <p>用于通过文件锁机制保证应用单实例运行的锁定文件名，
-     * 默认使用隐藏文件".app_instance.lock"</p>
+     * <p>用于通过文件锁机制保证应用单实例运行的锁定文件名， 默认使用隐藏文件 .app_instance.lock</p>
      */
     private static final String LOCK_FILE_NAME = ".app_instance.lock";
 
@@ -60,24 +59,21 @@ public class SingleInstanceGuard {
     /**
      * 单例文件锁对象
      *
-     * <p>通过FileLock实现跨进程的排他锁，
-     * 用于保证同一时间只有一个应用实例运行</p>
+     * <p>通过 FileLock 实现跨进程的排他锁， 用于保证同一时间只有一个应用实例运行</p>
      */
     private static FileLock fileLock;
 
     /**
      * 文件通道对象
      *
-     * <p>与文件锁关联的NIO文件通道，
-     * 用于维护文件锁的生命周期</p>
+     * <p>与文件锁关联的 NIO 文件通道，用于维护文件锁的生命周期</p>
      */
     private static FileChannel lockChannel;
 
     /**
      * 定时任务调度器
      *
-     * <p>ScheduledExecutorService实例，
-     * 用于定期执行文件锁心跳维持任务</p>
+     * <p>ScheduledExecutorService 实例， 用于定期执行文件锁心跳维持任务</p>
      */
     private static ScheduledExecutorService scheduler;
 
@@ -85,7 +81,7 @@ public class SingleInstanceGuard {
      * 检查应用实例是否已运行
      *
      * @param port 激活信号端口
-     * @return true表示已有实例运行，false表示当前是首个实例
+     * @return true-已有实例运行，false-当前是首个实例
      */
     public static boolean checkRunning(int port, String[] args) {
         try {
@@ -154,7 +150,7 @@ public class SingleInstanceGuard {
     /**
      * 启动心跳守护线程
      *
-     * @return true表示心跳线程启动成功，false表示启动失败
+     * @return true-心跳线程启动成功，false-启动失败
      */
     private static boolean startHeartbeat() {
         try {
@@ -204,7 +200,7 @@ public class SingleInstanceGuard {
     }
 
     /**
-     * 注册JVM关闭钩子
+     * 注册 JVM 关闭钩子
      */
     private static void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

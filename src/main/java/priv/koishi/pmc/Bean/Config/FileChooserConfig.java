@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 public class FileChooserConfig extends FileConfig {
 
     /**
-     * 要更新的路径配置key
+     * 要更新的路径配置 key
      */
     String pathKey;
 

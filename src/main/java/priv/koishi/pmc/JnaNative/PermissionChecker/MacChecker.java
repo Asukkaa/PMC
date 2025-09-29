@@ -8,7 +8,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapturePermission;
 
 /**
- * macOS屏幕录制权限检查工具
+ * macOS 屏幕录制权限检查工具
  *
  * @author koishi
  * Date 2025/04/21
@@ -17,7 +17,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapture
 public class MacChecker {
 
     /**
-     * 检查macOS屏幕录制权限方法
+     * 检查 macOS 屏幕录制权限方法
      */
     public static boolean hasScreenCapturePermission() {
         // 非macOS系统直接返回true

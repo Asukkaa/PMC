@@ -29,6 +29,9 @@ public class RootController extends CommonProperties {
 
     /**
      * 获取控制器实例
+     *
+     * @param type 要获取的控制器的类
+     * @param <T>  控制器类型
      */
     public static <T extends RootController> T getController(Class<T> type) {
         WeakReference<RootController> ref = controllers.get(type);

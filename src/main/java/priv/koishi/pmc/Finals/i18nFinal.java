@@ -609,11 +609,11 @@ public class i18nFinal {
     }
 
     /**
-     * @return 次启动应用将会按照此设置项设置垃圾回收（GC）方式
-     * G1GC：分区回收，低延迟与吞吐量平衡
-     * ZGC：亚毫秒级停顿
-     * ParallelGC：多线程并行回收，吞吐量优先
-     * ShenandoahGC：全并发回收，停顿时间与堆大小无关
+     * @return <p>下次启动应用将会按照此设置项设置垃圾回收（GC）方式</p>
+     * <p>G1GC：分区回收，低延迟与吞吐量平衡</p>
+     * <p>ZGC：亚毫秒级停顿</p>
+     * <p>ParallelGC：多线程并行回收，吞吐量优先</p>
+     * <p>ShenandoahGC：全并发回收，停顿时间与堆大小无关</p>
      * SerialGC：单线程回收，简单高效
      */
     public static String tip_nextGcType() {
@@ -628,7 +628,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
+     * @return <p>在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹</p>
      * 只能填自然数，单位为毫秒，数字越小越接近录制轨迹，不填默认为
      */
     public static String tip_sampleInterval() {
@@ -636,7 +636,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 要点击的图片识别没有匹配项后将会按照设置次数再次识别
+     * @return <p>要点击的图片识别没有匹配项后将会按照设置次数再次识别</p>
      * 只能填自然数，不填默认为
      */
     public static String tip_clickRetryNum() {
@@ -644,7 +644,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 终止操作图片识别没有匹配项后将会按照设置次数再次识别
+     * @return <p>终止操作图片识别没有匹配项后将会按照设置次数再次识别</p>
      * 只能填自然数，不填默认为
      */
     public static String tip_stopRetryNum() {
@@ -652,8 +652,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 滑动将会改变录制或运行自动操作时浮窗透明度
-     * 透明的为 0 时 Windows 下鼠标将会点击透过浮窗
+     * @return <p>滑动将会改变录制或运行自动操作时浮窗透明度</p>
+     * <p>透明的为 0 时 Windows 下鼠标将会点击透过浮窗</p>
      * macOS 暂时无法实现鼠标点击透过
      */
     public static String tip_opacity() {
@@ -661,7 +661,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
+     * @return <p>点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作</p>
      * 每次鼠标点击并松开为一个步骤，每次点击间隔为操作前等待时间
      */
     public static String tip_recordClick() {
@@ -669,8 +669,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 不用填写文件拓展名，导出文件为 .pmc 格式，如果导出文件夹已经存在同名文件不会覆盖
-     * 文件名不能包含  <>:"/\|?*
+     * @return <p>不用填写文件拓展名，导出文件为 .pmc 格式，如果导出文件夹已经存在同名文件不会覆盖</p>
+     * <p>文件名不能包含  <>:"/\|?*</p>
      * 设置为空或者不合法将会以默认名称命名，默认名称为：
      */
     public static String tip_autoClickFileName() {
@@ -678,10 +678,10 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后：
-     * 如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作
-     * 如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作
-     * Windows 一般会直接点击对应窗口的对应坐标，macOS 可能需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
+     * @return <p>勾选后：</p>
+     * <p>如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作</p>
+     * <p>如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作</p>
+     * <p>Windows 一般会直接点击对应窗口的对应坐标，macOS 可能需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标</p>
      * 建议 Windows 用户不要勾选， macOS 用户视情况勾选
      */
     public static String tip_firstClick() {
@@ -689,7 +689,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后在应用关闭时如果列表不为空将会保存列表的所有操作步骤
+     * @return <p>勾选后在应用关闭时如果列表不为空将会保存列表的所有操作步骤</p>
      * 自动保存路径为导出文件夹路径，文件名为：
      */
     public static String tip_autoSave() {
@@ -697,7 +697,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后运行或测试自动操作开始前将会隐藏本应用的窗口
+     * @return <p>勾选后运行或测试自动操作开始前将会隐藏本应用的窗口</p>
      * 如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度
      */
     public static String tip_hideWindowRun() {
@@ -705,8 +705,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后将会在图像识别前自动更新窗口信息
-     * 建议在窗口位置和大小不会改变的情况下不要勾选
+     * @return <p>勾选后将会在图像识别前自动更新窗口信息</p>
+     * <p>建议在窗口位置和大小不会改变的情况下不要勾选</p>
      * 启动自动操作时将会自动更新一次窗口信息
      */
     public static String tip_alwaysRefresh() {
@@ -714,12 +714,12 @@ public class i18nFinal {
     }
 
     /**
-     * @return 需要在macOS系统设置中启用辅助设备权限：
-     * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
-     * 2. 在左侧列表选择「辅助功能」
-     * 3. 点击🔒解锁设置
-     * 4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)
-     * 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中
+     * @return <p>需要在macOS系统设置中启用辅助设备权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]</p>
+     * <p>2. 在左侧列表选择「辅助功能」</p>
+     * <p>3. 点击🔒解锁设置</p>
+     * <p>4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>5. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
      * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_NativeHookException() {
@@ -729,12 +729,12 @@ public class i18nFinal {
     }
 
     /**
-     * @return =需要在macOS系统设置中启用录屏与系统录音权限：
-     * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
-     * 2. 在左侧列表选择「录屏与系统录音」
-     * 3. 点击🔒解锁设置
-     * 4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)
-     * 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中
+     * @return <p>需要在macOS系统设置中启用录屏与系统录音权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]</p>
+     * <p>2. 在左侧列表选择「录屏与系统录音」</p>
+     * <p>3. 点击🔒解锁设置</p>
+     * <p>4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>5. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
      * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_noScreenCapturePermission() {
@@ -744,7 +744,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标
+     * @return <p>运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标</p>
      * 单位为像素，只能填自然数，不填默认为
      */
     public static String tip_randomClickX() {
@@ -752,7 +752,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标\n\
+     * @return <p>运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标</p>
      * 单位为像素，只能填自然数，不填默认为
      */
     public static String tip_randomClickY() {
@@ -760,7 +760,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移
+     * @return <p>运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移</p>
      * 偏移后时间最小为0，单位为毫秒，只能填自然数，不填默认为
      */
     public static String tip_randomTime() {
@@ -768,7 +768,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 手动创建新的操作步骤时将会按照此设置先设置默认点击时长
+     * @return <p>手动创建新的操作步骤时将会按照此设置先设置默认点击时长</p>
      * 单位为毫秒，只能填自然数，不填默认为
      */
     public static String tip_clickTimeOffset() {
@@ -776,8 +776,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 目标图像识别成功后横坐标将按此设置发生偏移
-     * 单位为像素，只能填整数，不填默认为 0
+     * @return <p>目标图像识别成功后横坐标将按此设置发生偏移</p>
+     * <p>单位为像素，只能填整数，不填默认为 0</p>
      * 向左为负数，向右为正数
      */
     public static String tip_imgX() {
@@ -785,8 +785,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 目标图像识别成功后横纵标将按此设置发生偏移
-     * 单位为像素，只能填整数，不填默认为 0
+     * @return <p>目标图像识别成功后横纵标将按此设置发生偏移</p>
+     * <p>单位为像素，只能填整数，不填默认为 0</p>
      * 向下为正数，向上为负数
      */
     public static String tip_imgY() {
@@ -871,8 +871,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后只能选择PMC文件所在文件夹
-     * 选中文件夹后将会导入文件夹下所有的PMC文件，如果文件夹中有图片，
+     * @return <p>勾选后只能选择 PMC 文件所在文件夹</p>
+     * <p>选中文件夹后将会导入文件夹下所有的 PMC 文件，如果文件夹中有图片，</p>
      * 将会按照图片名称自动匹配未匹配到图片的要点击的图像设置
      */
     public static String tip_loadFolder_Click() {
@@ -916,8 +916,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
-     * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
+     * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
+     * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Oracle Corporation 25+36-3489
      */
     public static String tip_version() {
@@ -1043,7 +1043,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 鼠标拖拽浮窗即可移动浮窗
+     * @return <p>鼠标拖拽浮窗即可移动浮窗</p>
      * 按下esc 即可保存浮窗位置
      */
     public static String text_saveFloatingCoordinate() {
@@ -1051,9 +1051,9 @@ public class i18nFinal {
     }
 
     /**
-     * @return 拖拽浮窗边缘即可调整浮窗大小
-     * 鼠标拖拽浮窗即可移动浮窗
-     * 按下esc 即可保存浮窗位置
+     * @return <p>拖拽浮窗边缘即可调整浮窗大小</p>
+     * <p>鼠标拖拽浮窗即可移动浮窗</p>
+     * 按下 esc 即可保存浮窗位置
      */
     public static String text_saveFindImgConfig() {
         return bundle.getString("saveFindImgConfig") + bundle.getString("saveFloatingCoordinate");
@@ -1641,7 +1641,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 容量不能小于0
+     * @return 容量不能小于 0
      */
     public static String text_minSize() {
         return bundle.getString("minSize");

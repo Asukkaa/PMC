@@ -17,7 +17,7 @@ import java.util.List;
 public class ClickResultBean {
 
     /**
-     * 要跳转的步骤索引，0为不跳转，-1为再次执行
+     * 要跳转的步骤索引，0 为不跳转，-1 为再次执行
      */
     int stepIndex;
 

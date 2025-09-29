@@ -5,7 +5,7 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import java.util.List;
 
 /**
- * pmc文件导入结果类
+ * pmc 文件导入结果类
  *
  * @author KOISHI
  * Date:2025-08-26

@@ -116,7 +116,7 @@ public class ScheduledService {
             }
 
             /**
-             * 查询mac定时任务详情
+             * 查询 mac 定时任务详情
              *
              * @param taskDetails 任务详情
              */
@@ -147,7 +147,7 @@ public class ScheduledService {
             }
 
             /**
-             * 查询win定时任务详情
+             * 查询 win 定时任务详情
              *
              * @param taskDetails 任务详情
              * @throws IOException 获取任务详情失败
@@ -171,7 +171,7 @@ public class ScheduledService {
     }
 
     /**
-     * 解析win定时任务内容
+     * 解析 win 定时任务内容
      *
      * @param taskDetails 任务详情
      * @param exePattern  程序路径正则表达式
@@ -239,10 +239,10 @@ public class ScheduledService {
 
 
     /**
-     * 解析mac定时任务详情
+     * 解析 mac 定时任务详情
      *
      * @param taskDetails 任务详情
-     * @param plistPath   plist文件路径
+     * @param plistPath   plist 文件路径
      * @throws IOException 获取任务详情失败
      */
     private static void parseMacTaskContent(List<? super TimedTaskBean> taskDetails, Path plistPath) throws IOException {
@@ -400,7 +400,7 @@ public class ScheduledService {
     }
 
     /**
-     * 创建win定时任务
+     * 创建 win 定时任务
      *
      * @param timedTaskBean 定时任务信息
      * @throws IOException 创建失败
@@ -448,7 +448,7 @@ public class ScheduledService {
     }
 
     /**
-     * 创建mac定时任务
+     * 创建 mac 定时任务
      *
      * @param timedTaskBean 定时任务信息
      * @throws IOException 创建失败

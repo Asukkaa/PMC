@@ -87,7 +87,7 @@ public class ClickLogController extends RootController {
     }
 
     /**
-     * 设置javafx单元格宽度
+     * 设置 javaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.05));
@@ -126,7 +126,7 @@ public class ClickLogController extends RootController {
             adaption();
             // 添加鼠标悬停提示
             addToolTip(tip_removeAll_Log(), removeAll_Log);
-            // 自动填充javafx表格
+            // 自动填充 javaFX 表格
             autoBuildTableViewData(tableView_Log, ClickLogBean.class, tabId, index_Log);
         });
     }

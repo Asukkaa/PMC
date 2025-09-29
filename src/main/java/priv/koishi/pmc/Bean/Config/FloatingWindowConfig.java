@@ -16,12 +16,12 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 public class FloatingWindowConfig {
 
     /**
-     * 浮窗X坐标
+     * 浮窗 X 坐标
      */
     int x;
 
     /**
-     * 浮窗Y坐标
+     * 浮窗 Y 坐标
      */
     int y;
 

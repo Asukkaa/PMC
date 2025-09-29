@@ -90,7 +90,7 @@ public class FileUtils {
      * 校验文件是否为图片
      *
      * @param file 要校验的文件
-     * @return true为图片，false为非图片
+     * @return true-图片，false-非图片
      */
     public static boolean isImgFile(File file) {
         if (!file.exists()) {
@@ -187,10 +187,10 @@ public class FileUtils {
     }
 
     /**
-     * 验证文件名是否符合Windows和UNIX文件系统的命名规则。
+     * 验证文件名是否符合 Windows 和 UNIX 文件系统的命名规则
      *
      * @param fileName 待验证的文件名
-     * @return 如果文件名有效，返回true；否则返回false。
+     * @return 如果文件名有效，返回 true 否则返回 false
      */
     public static boolean isValidFileName(String fileName) {
         if (StringUtils.isEmpty(fileName)) {
@@ -277,9 +277,9 @@ public class FileUtils {
     }
 
     /**
-     * 获取logs文件夹地址
+     * 获取 logs 文件夹地址
      *
-     * @return 不同操作系统下logs文件夹地址
+     * @return 不同操作系统下 logs 文件夹地址
      */
     public static String getLogsPath() {
         if (isRunningFromIDEA) {
@@ -441,7 +441,7 @@ public class FileUtils {
      * 根据操作系统将数值转换为文件大小
      *
      * @param size          没带单位的文件大小
-     * @param distinguishOS 区分操作系统文件大小单位进制，true区分，false不区分，macos文件大小为1000进制，内存大小为1024进制
+     * @param distinguishOS 区分操作系统文件大小单位进制，true 区分，false 不区分，macos 文件大小为 1000 进制，内存大小为 1024 进制
      * @return 带单位的文件大小
      */
     public static String getUnitSize(long size, boolean distinguishOS) {
@@ -484,11 +484,11 @@ public class FileUtils {
     }
 
     /**
-     * 根据jvm参数key读取cfg文件对应设置值
+     * 根据 jvm 参数 key 读取 cfg 文件对应设置值
      *
-     * @param optionKeys 要查询的jvm参数key
-     * @return jvm参数key与对应的参数右侧的值
-     * @throws IOException cfg配置文件读取异常
+     * @param optionKeys 要查询的 jvm 参数 key
+     * @return jvm 参数 key 与对应的参数右侧的值
+     * @throws IOException cfg 配置文件读取异常
      */
     public static Map<String, String> getJavaOptionValue(List<String> optionKeys) throws IOException {
         Map<String, String> jvmOptions = new HashMap<>();
@@ -516,10 +516,10 @@ public class FileUtils {
     }
 
     /**
-     * 更新cfg文件中jvm参数设置
+     * 更新 cfg 文件中 jvm 参数设置
      *
-     * @param options 要修改的jvm参数键值对
-     * @throws IOException cfg配置文件读取或写入异常
+     * @param options 要修改的 jvm 参数键值对
+     * @throws IOException cfg 配置文件读取或写入异常
      */
     public static void setJavaOptionValue(Map<String, String> options) throws IOException {
         Path configPath = Path.of(cfgFilePath);
@@ -562,9 +562,9 @@ public class FileUtils {
     }
 
     /**
-     * 获取cfg文件路径
+     * 获取 cfg 文件路径
      *
-     * @return cfg文件路径
+     * @return cfg 文件路径
      */
     public static String getCFGPath() {
         String cfgPath;
@@ -582,9 +582,9 @@ public class FileUtils {
     }
 
     /**
-     * 解压zip
+     * 解压 zip 文件
      *
-     * @param zipFilePath   zip文件路径
+     * @param zipFilePath   zip 文件路径
      * @param destDirectory 输出目录
      */
     public static void unzip(String zipFilePath, String destDirectory) throws IOException {
@@ -661,7 +661,7 @@ public class FileUtils {
     }
 
     /**
-     * 处理zip内的文件条目
+     * 处理 zip 内的文件条目
      *
      * @param zipIn zip 输入流
      * @param file  zip 内的文件
@@ -869,7 +869,7 @@ public class FileUtils {
      * 判断路径是否合法
      *
      * @param path 路径
-     * @return true-合法，false非法
+     * @return true-合法，false-非法
      */
     public static boolean isPath(String path) {
         return FilenameUtils.getPrefixLength(path) != -1;

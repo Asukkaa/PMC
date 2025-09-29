@@ -475,8 +475,8 @@ public class FloatingWindow {
      *
      * @param config 浮窗配置
      * @param text   要更新的文本
-     * @param x      浮窗X坐标
-     * @param y      浮窗Y坐标
+     * @param x      浮窗 X 坐标
+     * @param y      浮窗 Y 坐标
      * @param w      浮窗宽度
      * @param h      浮窗高度
      */

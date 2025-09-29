@@ -16,10 +16,10 @@ import java.io.IOException;
 public class DoubleStringToIntSerializer extends JsonSerializer<String> {
 
     /**
-     * json序列化时将非整数字符串转为整数
+     * json 序列化时将非整数字符串转为整数
      *
      * @param value    待序列化的字符串
-     * @param gen      json生成器
+     * @param gen      json 生成器
      * @param provider 序列化提供者
      */
     @Override

@@ -104,7 +104,7 @@ public class UiUtils {
      * 设置永久显示的鼠标停留提示框参数
      *
      * @param tip 提示文案
-     * @return 设置参数后的Tooltip对象
+     * @return 设置参数后的 Tooltip 对象
      */
     public static Tooltip creatTooltip(String tip) {
         return creatTooltip(tip, Duration.INDEFINITE);
@@ -115,7 +115,7 @@ public class UiUtils {
      *
      * @param tip      提示文案
      * @param duration 显示时长
-     * @return 设置参数后的Tooltip对象
+     * @return 设置参数后的 Tooltip 对象
      */
     public static Tooltip creatTooltip(String tip, Duration duration) {
         Tooltip tooltip = new Tooltip(tip);
@@ -261,7 +261,7 @@ public class UiUtils {
     }
 
     /**
-     * 创建一个多图片选择器（只支持png、jpg、jpeg格式）
+     * 创建一个多图片选择器（只支持 png、jpg、jpeg 格式）
      *
      * @param window        文件选择器窗口
      * @param imgSelectPath 默认路径
@@ -273,7 +273,7 @@ public class UiUtils {
     }
 
     /**
-     * 创建一个单图片选择器（只支持png、jpg、jpeg格式）
+     * 创建一个单图片选择器（只支持 png、jpg、jpeg 格式）
      *
      * @param window        文件选择器窗口
      * @param imgSelectPath 默认路径
@@ -415,41 +415,41 @@ public class UiUtils {
     }
 
     /**
-     * 给窗口设置logo
+     * 给窗口设置 logo
      *
-     * @param stage 要设置logo的窗口
-     * @param path  logo路径
+     * @param stage 要设置 logo 的窗口
+     * @param path  logo 路径
      */
     public static void setWindowLogo(Stage stage, String path) {
         stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource(path)).toString()));
     }
 
     /**
-     * 设置窗口css样式
+     * 设置窗口 css 样式
      *
      * @param scene     要设置样式的场景
-     * @param stylesCss css文件路径
+     * @param stylesCss css 文件路径
      */
     public static void setWindowCss(Scene scene, String stylesCss) {
         scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource(stylesCss)).toExternalForm());
     }
 
     /**
-     * 为javafx单元格赋值并添加鼠标悬停提示
+     * 为 javaFX 单元格赋值并添加鼠标悬停提示
      *
-     * @param tableColumn 要处理的javafx列表列
-     * @param param       javafx列表列对应的数据属性名
+     * @param tableColumn 要处理的 javaFX 列表列
+     * @param param       javaFX 列表列对应的数据属性名
      */
     public static void buildCellValue(TableColumn<?, ?> tableColumn, String param) {
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(param));
-        // 为javafx单元格和表头添加鼠标悬停提示
+        // 为 javaFX 单元格和表头添加鼠标悬停提示
         addTableCellToolTip(tableColumn);
     }
 
     /**
-     * 自定义单元格工厂，为单元格添加Tooltip
+     * 自定义单元格工厂，为单元格添加 Tooltip
      *
-     * @param column 要处理的javafx表格单元格
+     * @param column 要处理的 javaFX 表格单元格
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
@@ -477,7 +477,7 @@ public class UiUtils {
     /**
      * 为表头添加鼠标悬停提示
      *
-     * @param column 要处理的javafx表格列
+     * @param column 要处理的 javaFX 表格列
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
@@ -488,7 +488,7 @@ public class UiUtils {
     /**
      * 为表头添加鼠标悬停提示
      *
-     * @param column  要处理的javafx表格列
+     * @param column  要处理的 javaFX 表格列
      * @param tooltip 要展示的提示文案
      * @param <S>     表格单元格数据类型
      * @param <T>     表格单元格类型
@@ -505,13 +505,13 @@ public class UiUtils {
     }
 
     /**
-     * 根据bean属性名自动填充javafx表格
+     * 根据 bean 属性名自动填充 javaFX 表格
      *
-     * @param tableView   要处理的javafx表格
-     * @param beanClass   要处理的javafx表格的数据bean类
-     * @param tabId       用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
+     * @param tableView   要处理的 javaFX 表格
+     * @param beanClass   要处理的 javaFX 表格的数据 bean 类
+     * @param tabId       用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 javaFX 列表的列对应的 id
      * @param indexColumn 序号列
-     * @param <T>         要处理的javafx表格的数据bean类
+     * @param <T>         要处理的 javaFX 表格的数据 bean 类
      */
     @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
@@ -557,10 +557,10 @@ public class UiUtils {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());
-                        // 为javafx单元格和表头添加鼠标悬停提示
+                        // 为 javaFX 单元格和表头添加鼠标悬停提示
                         addTableCellToolTip(pathColumn);
                     } else {
-                        // 为javafx单元格赋值并添加鼠标悬停提示
+                        // 为 javaFX 单元格赋值并添加鼠标悬停提示
                         buildCellValue(m, fieldName);
                     }
                 }
@@ -679,9 +679,9 @@ public class UiUtils {
     }
 
     /**
-     * 清空javafx列表数据
+     * 清空 javaFX 列表数据
      *
-     * @param tableView  要清空的javafx列表
+     * @param tableView  要清空的 javaFX 列表
      * @param fileNumber 用于展示列表数据数量的文本框
      * @param <T>        数据类型
      */
@@ -862,7 +862,7 @@ public class UiUtils {
     }
 
     /**
-     * 修改label信息
+     * 修改 label 信息
      *
      * @param label 要修改的文本栏
      * @param text  要修改的文本
@@ -878,7 +878,7 @@ public class UiUtils {
      *
      * @param selectedFilePath 本次所选的文件路径
      * @param filePath         上次选的文件路径
-     * @param pathKey          配置文件中路径的key
+     * @param pathKey          配置文件中路径的 key
      * @param pathLabel        要展示路径的文本框
      * @param configFile       要更新的配置文件
      * @return 所选文件路径
@@ -1492,8 +1492,8 @@ public class UiUtils {
     /**
      * 改变要防重复点击的组件状态
      *
-     * @param taskBean 包含防重复点击组件列表的taskBean
-     * @param disable  可点击状态，true设置为不可点击，false设置为可点击
+     * @param taskBean 包含防重复点击组件列表的 taskBean
+     * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
      */
     public static void changeDisableNodes(TaskBean<?> taskBean, boolean disable) {
         List<Node> disableNodes = taskBean.getDisableNodes();
@@ -1504,7 +1504,7 @@ public class UiUtils {
      * 改变要防重复点击的组件状态
      *
      * @param disableNodes 防重复点击组件列表
-     * @param disable      可点击状态，true设置为不可点击，false设置为可点击
+     * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
      */
     public static void changeDisableNodes(List<? extends Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
@@ -1521,7 +1521,7 @@ public class UiUtils {
      *
      * @param control 需要处理的组件
      * @param prop    配置文件
-     * @param key     要读取的key
+     * @param key     要读取的 key
      */
     public static void setControlLastConfig(Control control, Properties prop, String key) {
         setControlLastConfig(control, prop, key, "");
@@ -1532,7 +1532,7 @@ public class UiUtils {
      *
      * @param control      需要处理的组件
      * @param prop         配置文件
-     * @param key          要读取的key
+     * @param key          要读取的 key
      * @param defaultValue 默认值
      */
     @SuppressWarnings("unchecked")
@@ -1559,7 +1559,7 @@ public class UiUtils {
      *
      * @param tableView  需要处理的列表
      * @param prop       配置文件
-     * @param key        要读取的key
+     * @param key        要读取的 key
      * @param dataNumber 列表数据数量
      */
     public static void setControlLastConfig(TableView<ImgFileVO> tableView, Properties prop, String key, Label dataNumber) {
@@ -1586,7 +1586,7 @@ public class UiUtils {
      *
      * @param label 需要处理的文本框
      * @param prop  配置文件
-     * @param key   要读取的key
+     * @param key   要读取的 key
      */
     public static void setControlLastConfig(Label label, Properties prop, String key) {
         String lastValue = prop.getProperty(key);
@@ -1600,8 +1600,8 @@ public class UiUtils {
      *
      * @param colorPicker    颜色选择器
      * @param prop           配置文件
-     * @param colorKey       选中的颜色key
-     * @param colorCustomKey 保存的自定义颜色key
+     * @param colorKey       选中的颜色 key
+     * @param colorCustomKey 保存的自定义颜色 key
      */
     public static void setColorPickerConfig(ColorPicker colorPicker, Properties prop, String colorKey, String colorCustomKey) {
         String selectColor = prop.getProperty(colorKey, defaultColor);
@@ -1681,7 +1681,7 @@ public class UiUtils {
     }
 
     /**
-     * 给路径Label设置右键菜单
+     * 给路径 Label 设置右键菜单
      *
      * @param valueLabel 要处理的文本栏
      */
@@ -1714,7 +1714,7 @@ public class UiUtils {
     }
 
     /**
-     * 添加复制Label值右键菜单
+     * 添加复制 Label 值右键菜单
      *
      * @param valueLabel 要处理的文本栏
      * @param text       右键菜单文本
@@ -1754,7 +1754,7 @@ public class UiUtils {
     /**
      * 指定组件设置右对齐
      *
-     * @param hBox           组件所在hBox
+     * @param hBox           组件所在 hBox
      * @param alignmentWidth 右对齐参考组件宽度
      * @param region         要设置右对齐的组件
      */
@@ -1808,8 +1808,8 @@ public class UiUtils {
      *
      * @param floatingStage 浮窗
      * @param mousePoint    鼠标位置
-     * @param offsetX       x轴偏移量
-     * @param offsetY       y轴偏移量
+     * @param offsetX       x 轴偏移量
+     * @param offsetY       y 轴偏移量
      */
     public static void floatingMove(Stage floatingStage, Point mousePoint, int offsetX, int offsetY) {
         // 获取当前所在屏幕

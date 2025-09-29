@@ -49,7 +49,7 @@ public class CheckUpdateService {
      * 检查是有新版本
      *
      * @param checkUpdateBean 检查更新信息
-     * @return true:有新版本 false:无新版本
+     * @return true-有新版本 false-无新版本
      */
     public static boolean isNewVersionAvailable(CheckUpdateBean checkUpdateBean) {
         // 无效数据视为无更新
@@ -285,7 +285,7 @@ public class CheckUpdateService {
     }
 
     /**
-     * 更新Mac端应用
+     * 更新 Mac 端应用
      *
      * @param fullUpdate 是否为全量更新(true-全量更新 false-增量更新)
      * @throws Exception 更新脚本未找到、无法设置脚本可执行权限、脚本不可执行、脚本执行失败、脚本执行被中断
@@ -335,7 +335,7 @@ public class CheckUpdateService {
                 updateScriptFile.getAbsolutePath(),
                 update_password() + appName + app
         );
-        logger.info("-------------------------开始执行Mac更新脚本------------------------------");
+        logger.info("-------------------------开始执行 Mac 更新脚本------------------------------");
         // 执行并捕获输出
         Process process = new ProcessBuilder("osascript", "-e", scriptCommand)
                 .redirectErrorStream(true)
@@ -361,10 +361,10 @@ public class CheckUpdateService {
     }
 
     /**
-     * 更新win端应用
+     * 更新 win 端应用
      *
      * @param fullUpdate 是否为全量更新(true-全量更新 false-增量更新)
-     * @throws Exception 找不到批处理脚本、获取进程PID异常
+     * @throws Exception 找不到批处理脚本、获取进程 PID 异常
      */
     private static void updateWinApp(boolean fullUpdate) throws Exception {
         // 获取源目录
@@ -402,7 +402,7 @@ public class CheckUpdateService {
         // 执行批处理
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));
-        logger.info("-------------------------开始执行Win更新脚本------------------------------");
+        logger.info("-------------------------开始执行 Win 更新脚本------------------------------");
         builder.start();
     }
 

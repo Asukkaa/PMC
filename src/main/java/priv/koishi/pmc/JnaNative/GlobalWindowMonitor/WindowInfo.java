@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 public class WindowInfo {
 
     /**
-     * 窗口唯一标识（Windows为HWND的数值，macOS为CGWindowID）
+     * 窗口唯一标识（Windows 为 HWND 的数值，macOS 为 CGWindowID）
      */
     long id;
 

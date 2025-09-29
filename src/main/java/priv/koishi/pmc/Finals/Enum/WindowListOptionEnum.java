@@ -33,7 +33,7 @@ public enum WindowListOptionEnum {
     ON_SCREEN_BELOW_WINDOW(4),
 
     /**
-     * 排除桌面元素（如Dock、菜单栏等）
+     * 排除桌面元素（如 Dock、菜单栏等）
      */
     EXCLUDE_DESKTOP_ELEMENTS(0x10);
 

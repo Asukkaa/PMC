@@ -15,7 +15,7 @@ import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
- * 可编辑的javafx列表单元格
+ * 可编辑的 javaFX 列表单元格
  *
  * @author KOISHI
  * Date:2024-11-04
@@ -29,7 +29,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     private TextField textField;
 
     /**
-     * 用于引入lambda表达式的对象
+     * 用于引入 lambda 表达式的对象
      */
     private final ItemConsumer<? super T> itemConsumer;
 
@@ -74,18 +74,18 @@ public class EditingCell<T> extends TableCell<T, String> {
     private String tableColumnText;
 
     /**
-     * 构造EditingCell对象,并且明确将该cell的值保存进相应的JavaBean的属性值的方法
+     * 构造 EditingCell 对象,并且明确将该 cell 的值保存进相应的 JavaBean 的属性值的方法
      *
-     * @param itemConsumer 用于引入lambda表达式的对象
+     * @param itemConsumer 用于引入 lambda 表达式的对象
      */
     public EditingCell(ItemConsumer<? super T> itemConsumer) {
         this.itemConsumer = itemConsumer;
     }
 
     /**
-     * 构造EditingCell对象,并且明确将该cell的值保存进相应的JavaBean的属性值的方法
+     * 构造 EditingCell 对象,并且明确将该 cell 的值保存进相应的 JavaBean 的属性值的方法
      *
-     * @param itemConsumer 用于引入lambda表达式的对象
+     * @param itemConsumer 用于引入 lambda 表达式的对象
      * @param integerRange 输入框是否限制只能输入整数
      * @param min          输入框可输入的最小值
      * @param max          输入框可输入的最大值
@@ -185,7 +185,7 @@ public class EditingCell<T> extends TableCell<T, String> {
 
     /**
      * 将编辑后的对象属性进行保存.
-     * 如果不将属性保存到cell所在表格的ObservableList集合中对象的相应属性中,
+     * 如果不将属性保存到 cell 所在表格的 ObservableList 集合中对象的相应属性中,
      * 则只是改变了表格显示的值,一旦表格刷新,则仍会表示旧值.
      *
      * @param newValue 新值

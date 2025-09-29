@@ -47,8 +47,8 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
-import priv.koishi.pmc.EventBus.EventBus;
-import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
+import priv.koishi.pmc.Event.EventBus;
+import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
@@ -370,7 +370,7 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 设置javafx单元格宽度
+     * 设置 javaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.05));
@@ -421,7 +421,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 自动保存操作流程
      *
      * @param autoSave 自动保存开关
-     * @throws IOException pmc文件保存异常
+     * @throws IOException pmc 文件保存异常
      */
     private void autoSave(CheckBox autoSave, String outPath) throws IOException {
         if (autoSave.isSelected()) {
@@ -652,7 +652,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 判断程序是否为空闲状态
      *
-     * @return true表示为空闲状态，false表示非空闲状态
+     * @return true 表示为空闲状态，false 表示非空闲状态
      */
     public boolean isFree() {
         return !runClicking && !recordClicking && loadPMCFilsTask == null && loadedPMCTask == null && exportPMCTask == null;
@@ -1176,7 +1176,7 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 根据鼠标位置调整ui
+     * 根据鼠标位置调整 ui
      *
      * @param mousePoint 鼠标位置
      */
@@ -1796,7 +1796,7 @@ public class AutoClickController extends RootController implements MousePosition
             MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
-            // 自动填充javafx表格
+            // 自动填充 javaFX 表格
             autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
             // 监听列表数据变化
             tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) _ ->
@@ -1828,7 +1828,7 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 清空javafx列表按钮
+     * 清空 javaFX 列表按钮
      */
     @FXML
     public void removeAll() {

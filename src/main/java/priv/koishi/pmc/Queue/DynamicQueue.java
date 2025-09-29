@@ -47,7 +47,7 @@ public class DynamicQueue<E> {
     }
 
     /**
-     * 调整delegate的大小以确保不超过预设的最大容量maxSize。
+     * 调整 delegate 的大小以确保不超过预设的最大容量 maxSize
      */
     private void adjustSize() {
         if (approximateSize.get() > maxSize) {

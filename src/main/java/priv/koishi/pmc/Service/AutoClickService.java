@@ -140,7 +140,12 @@ public class AutoClickService {
                 return new PMCLoadResult(clickPositionBeans, lastPMCPath);
             }
 
-            // 匹配图片
+            /**
+             * 匹配图片
+             *
+             * @param imgMap 文件夹中用于匹配的图片
+             * @param clickPositionBeans 需要匹配的自动操作步骤
+             */
             private void matchSameNameImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
                 if (!imgMap.isEmpty()) {
                     updateMessage(text_matchImg());
@@ -184,7 +189,7 @@ public class AutoClickService {
     /**
      * 获取匹配到的同名图片地址
      *
-     * @param imgMap 要进行匹配的图片map
+     * @param imgMap 要进行匹配的图片 map
      * @param img    路径改变了的图片文件
      * @return 匹配到的图片地址
      */
@@ -281,6 +286,7 @@ public class AutoClickService {
      * 自动点击任务线程
      *
      * @param taskBean 线程任务参数
+     * @param robot    Robot 实例
      * @return 执行记录
      */
     public static Task<List<ClickLogBean>> autoClick(AutoClickTaskBean taskBean, Robot robot) {
@@ -532,7 +538,7 @@ public class AutoClickService {
      * 按照操作设置执行操作
      *
      * @param clickPositionVO 操作设置
-     * @param robot           Robot实例
+     * @param robot           Robot 实例
      * @param loopTimeText    信息浮窗日志
      * @param taskBean        线程任务参数
      * @return 执行结果

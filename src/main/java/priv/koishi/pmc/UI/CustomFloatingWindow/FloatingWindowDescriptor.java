@@ -43,7 +43,7 @@ public class FloatingWindowDescriptor {
     Rectangle rectangle;
 
     /**
-     * 浮窗Stage
+     * 浮窗 Stage
      */
     Stage stage;
 

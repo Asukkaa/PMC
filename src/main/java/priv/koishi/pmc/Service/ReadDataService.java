@@ -71,7 +71,7 @@ public class ReadDataService {
      * 按文件类型排序
      *
      * @param fileList    要排序的文件
-     * @param reverseSort 是否倒序标识，true倒序，false为正序
+     * @param reverseSort 是否倒序标识，true-倒序，false-正序
      */
     private static void comparingByType(List<File> fileList, boolean reverseSort) {
         Comparator<File> comparator = (o1, o2) -> {
@@ -90,7 +90,7 @@ public class ReadDataService {
      * 按文件大小排序
      *
      * @param fileList    要排序的文件
-     * @param reverseSort 是否倒序标识，true倒序，false为正序
+     * @param reverseSort 是否倒序标识，true-倒序，false-正序
      */
     private static void comparingBySize(List<File> fileList, boolean reverseSort) {
         Comparator<File> comparator = Comparator.comparing(File::length);
@@ -105,7 +105,7 @@ public class ReadDataService {
      * 按文件修改时间排序
      *
      * @param fileList    要排序的文件
-     * @param reverseSort 是否倒序标识，true倒序，false为正序
+     * @param reverseSort 是否倒序标识，true-倒序，false-正序
      */
     private static void comparingByUpdateTime(List<File> fileList, boolean reverseSort) {
         Comparator<File> comparator = Comparator.comparing(File::lastModified);
@@ -123,7 +123,7 @@ public class ReadDataService {
      * 按文件创建时间排序
      *
      * @param fileList    要排序的文件
-     * @param reverseSort 是否倒序标识，true倒序，false为正序
+     * @param reverseSort 是否倒序标识，true-倒序，false-正序
      */
     private static void comparingByCreatTime(List<File> fileList, boolean reverseSort) {
         Comparator<File> comparator = (o1, o2) -> {
@@ -146,7 +146,7 @@ public class ReadDataService {
      * 按文件名称排序
      *
      * @param fileList    要排序的文件
-     * @param reverseSort 是否倒序标识，true倒序，false为正序
+     * @param reverseSort 是否倒序标识，true-倒序，false-正序
      */
     private static void comparingByName(List<File> fileList, boolean reverseSort) {
         Comparator<File> comparator = Comparator.comparing(File::getName);

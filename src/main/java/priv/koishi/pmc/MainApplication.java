@@ -62,22 +62,22 @@ public class MainApplication extends Application {
     public static Scene mainScene;
 
     /**
-     * 用来激活已运行的窗口的Socket服务
+     * 用来激活已运行的窗口的 Socket 服务
      */
     private static ServerSocket serverSocket;
 
     /**
-     * 程序启动后要自动加载的pmc文件路径
+     * 程序启动后要自动加载的 pmc 文件路径
      */
     public static String loadPMCPath;
 
     /**
-     * 程序启动后运行pmc流程标志（true-运行 false-不运行）
+     * 程序启动后运行 pmc 流程标志（true-运行 false-不运行）
      */
     public static boolean runPMCFile;
 
     /**
-     * 重新启动后自动加载过pmc文件标志（true-加载过 false-没有加载过）
+     * 重新启动后自动加载过 pmc 文件标志（true-加载过 false-没有加载过）
      */
     public static boolean loadPMC;
 
@@ -97,7 +97,7 @@ public class MainApplication extends Application {
     public static ResourceBundle bundle;
 
     /**
-     * 加载fxml页面
+     * 加载 fxml 页面
      *
      * @param stage 程序主舞台
      * @throws IOException 配置文件读取异常、设置全局异常处理器异常
@@ -188,14 +188,14 @@ public class MainApplication extends Application {
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
         }
-        // 停止 javafx ui 线程
+        // 停止 javaFX ui 线程
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);
     }
 
     /**
-     * 初始化macOS系统应用菜单
+     * 初始化 macOS 系统应用菜单
      *
      * @param tabPane 程序页面基础布局
      */
@@ -345,7 +345,7 @@ public class MainApplication extends Application {
     }
 
     /**
-     * 创建加载pmc文件任务
+     * 创建加载 pmc 文件任务
      *
      * @param file         要加载的文件
      * @param tabPane      主页面布局

@@ -78,7 +78,7 @@ public class ImageRecognitionService {
      * 根据本地图片寻找屏幕坐标
      *
      * @param config 匹配配置
-     * @return Javacv Point对象
+     * @return Javacv Point 对象
      * @throws Exception 匹配失败时抛出异常
      */
     public static MatchPointBean findPosition(FindPositionConfig config, DynamicQueue<? super ClickLogBean> dynamicQueue) throws Exception {
@@ -197,7 +197,7 @@ public class ImageRecognitionService {
      * 根据本地图片寻找屏幕坐标
      *
      * @param findPositionConfig 匹配配置
-     * @return Javacv Point对象
+     * @return Javacv Point 对象
      * @throws Exception 匹配失败时抛出异常
      */
     private static MatchPointBean getPoint(FindPositionConfig findPositionConfig) throws Exception {
@@ -318,10 +318,10 @@ public class ImageRecognitionService {
     }
 
     /**
-     * BufferedImage转Mat
+     * BufferedImage 转 Mat
      *
      * @param image 需要转换的图片
-     * @return Mat对象
+     * @return Mat 对象
      */
     private static Mat bufferedImageToMat(BufferedImage image) {
         // 转换为标准的3通道BGR格式
@@ -358,7 +358,7 @@ public class ImageRecognitionService {
     /**
      * 检查是否能正常截图
      *
-     * @return true: 可以截图，false: 无法截图
+     * @return true-可以截图，false-无法截图
      */
     public static boolean checkScreenCapturePermission() {
         refreshScreenParameters();

@@ -43,6 +43,8 @@ import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
+ * 自定义文件选择器控制器
+ *
  * @author KOISHI
  * Date:2025-08-04
  * Time:22:12

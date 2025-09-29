@@ -344,7 +344,7 @@ public class TaskDetailController extends RootController {
     /**
      * 设置定时任务要执行的流程
      *
-     * @throws IOException io异
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadAutoClick(ActionEvent actionEvent) throws IOException {
@@ -364,7 +364,7 @@ public class TaskDetailController extends RootController {
     }
 
     /**
-     * 删除要执行的PMC文件路径
+     * 删除要执行的 PMC 文件路径
      */
     @FXML
     private void removePath() {

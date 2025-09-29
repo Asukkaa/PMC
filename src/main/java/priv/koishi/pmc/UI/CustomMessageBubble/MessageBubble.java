@@ -75,7 +75,7 @@ public class MessageBubble extends Label implements MousePositionUpdater {
     }
 
     /**
-     * 根据鼠标位置调整ui
+     * 根据鼠标位置调整 ui
      *
      * @param mousePoint 鼠标位置
      */

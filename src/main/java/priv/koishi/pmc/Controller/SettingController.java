@@ -24,8 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
-import priv.koishi.pmc.EventBus.EventBus;
-import priv.koishi.pmc.EventBus.SettingsLoadedEvent;
+import priv.koishi.pmc.Event.EventBus;
+import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
@@ -69,12 +69,12 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class SettingController extends RootController implements MousePositionUpdater {
 
     /**
-     * 信息浮窗跟随鼠标前X坐标
+     * 信息浮窗跟随鼠标前 X 坐标
      */
     private int lastX;
 
     /**
-     * 信息浮窗跟随鼠标前Y坐标
+     * 信息浮窗跟随鼠标前 Y 坐标
      */
     private int lastY;
 
@@ -175,7 +175,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 设置javafx单元格宽度
+     * 设置 javaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.05));
@@ -252,9 +252,9 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 保存JVM参数设置
+     * 保存 JVM 参数设置
      *
-     * @throws IOException cfg配置文件读取或写入异常
+     * @throws IOException cfg 配置文件读取或写入异常
      */
     private void saveJVMConfig() throws IOException {
         String nextRunMemoryValue = nextRunMemory_Set.getText();
@@ -659,7 +659,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 获取JVM设置并展示
+     * 获取 JVM 设置并展示
      *
      * @throws IOException cfg 配置文件读取异常
      */
@@ -792,7 +792,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 根据鼠标位置调整ui
+     * 根据鼠标位置调整 ui
      *
      * @param mousePoint 鼠标位置
      */
@@ -852,7 +852,7 @@ public class SettingController extends RootController implements MousePositionUp
             MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
-            // 自动填充javafx表格
+            // 自动填充 javaFX 表格
             autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId, index_Set);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);

@@ -1,6 +1,8 @@
 package priv.koishi.pmc.Finals.Enum;
 
 /**
+ * 图像识别范围枚举类
+ *
  * @author KOISHI
  * Date:2025-09-02
  * Time:18:49

@@ -164,12 +164,12 @@ public class CommonFinals {
     public static final String percentage = " %";
 
     /**
-     * 程序logo
+     * 程序 logo
      */
     public static String logoPath = "icon/PMC.png";
 
     /**
-     * css样式文件路径
+     * css 样式文件路径
      */
     public static String stylesCss = "css/Styles.css";
 
@@ -184,27 +184,27 @@ public class CommonFinals {
     public static String resourcesPath = "src/main/resources" + resourcePath;
 
     /**
-     * jpackage打包后的资源文件路径
+     * jpackage 打包后的资源文件路径
      */
     public static String packagePath = "/bin/";
 
     /**
-     * log文件夹名称
+     * log 文件夹名称
      */
     public static final String logs = "logs";
 
     /**
-     * log文件夹目录
+     * log 文件夹目录
      */
     public static final String logsDir = packagePath + logs;
 
     /**
-     * log4j配置文件名称
+     * log4j 配置文件名称
      */
     public static String log4j2 = "log4j2.xml";
 
     /**
-     * app配置文件路径
+     * app 配置文件路径
      */
     public static final String configFile = "config/config.properties";
 
@@ -224,22 +224,22 @@ public class CommonFinals {
     public static final String systemName = System.getProperty("os.name").toLowerCase();
 
     /**
-     * win操作系统简称
+     * win 操作系统简称
      */
     public static final String win = "win";
 
     /**
-     * mac操作系统简称
+     * mac 操作系统简称
      */
     public static final String mac = "mac";
 
     /**
-     * 是否为win操作系统（true-win系统，false-非win系统）
+     * 是否为 win 操作系统（true-win 系统，false-非 win 系统）
      */
     public static final boolean isWin = systemName.contains(win);
 
     /**
-     * 是否为mac操作系统（true-mac系统，false-非mac系统）
+     * 是否为 mac 操作系统（true-mac 系统，false-非 mac 系统）
      */
     public static final boolean isMac = systemName.contains(mac);
 
@@ -249,17 +249,17 @@ public class CommonFinals {
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * idea中程序运行目录
+     * idea 中程序运行目录
      */
     public static final String userDir = System.getProperty("user.dir");
 
     /**
-     * java home目录（win为runtime目录，mac为../runtime/Contents/Home）
+     * java home 目录（win 为 runtime 目录，mac 为 ../runtime/Contents/Home）
      */
     public static final String javaHome = System.getProperty("java.home");
 
     /**
-     * 程序核心目录（win为根目录，mac为../runtime/Contents）
+     * 程序核心目录（win 为根目录，mac 为 ../runtime/Contents）
      */
     public static final String rootDir = new File(javaHome).getParent();
 
@@ -269,52 +269,52 @@ public class CommonFinals {
     public static final String appLaunchPath = getAppLaunchPath();
 
     /**
-     * 获取应用根目录(win为应用名目录，mac为应用程序目录)
+     * 获取应用根目录(win 为应用名目录，mac 为应用程序目录)
      */
     public static final String appRootPath = new File(appLaunchPath).getParent();
 
     /**
-     * 判断程序是否在 IDEA 中运行(在 IDEA 环境运为true，其他环境为false)
+     * 判断程序是否在 IDEA 中运行(在 IDEA 环境运为 true，其他环境为 false)
      */
     public static final boolean isRunningFromIDEA = isRunningFromIDEA();
 
     /**
-     * app目录
+     * app 目录
      */
     public static final String appDirectory = "/app";
 
     /**
-     * Contents目录
+     * Contents 目录
      */
     public static final String contentsDirectory = "/Contents";
 
     /**
-     * cfg文件路径
+     * cfg 文件路径
      */
     public static final String cfgFilePath = getCFGPath();
 
     /**
-     * 当前GC类型
+     * 当前 GC类 型
      */
     public static final String currentGCType = getCurrentGCType();
 
     /**
-     * jvm最大内存设置参数
+     * jvm 最大内存设置参数
      */
     public static final String Xmx = "-Xmx";
 
     /**
-     * gc类型设置参数
+     * gc 类型设置参数
      */
     public static final String XX = "-XX:+Use";
 
     /**
-     * jvm参数
+     * jvm 参数
      */
     public static final List<String> jvmArgs = Arrays.asList(Xmx, XX);
 
     /**
-     * cfg文件jvm参数头
+     * cfg 文件 jvm 参数头
      */
     public static final String javaOptions = "java-options=";
 
@@ -359,7 +359,7 @@ public class CommonFinals {
     public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
 
     /**
-     * macOS要排除窗口识别的进程地址
+     * macOS 要排除窗口识别的进程地址
      */
     public static final List<String> macSysNoWindowPath = Arrays.asList(
             "/System/Library/CoreServices/Spotlight.app",
@@ -379,7 +379,7 @@ public class CommonFinals {
     public static final String uniCloudCheckUpdateURL_alipay = "https://env-00jxtp3qdq80.dev-hz.cloudbasefunction.cn/PMCUpdate";
 
     /**
-     * 检测更新URL数组
+     * 检测更新 URL 数组
      */
     public static final String[] urls = {
             uniCloudCheckUpdateURL_aliyun,
@@ -402,12 +402,12 @@ public class CommonFinals {
     public static final String xunleiLink = "https://pan.xunlei.com/s/VOKjQlqFxTDbJNN7yRA_DLVgA1?pwd=gx3q#";
 
     /**
-     * github地址
+     * github 地址
      */
     public static final String githubLink = "https://github.com/Asukkaa/PMC";
 
     /**
-     * gitee地址
+     * gitee 地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
