@@ -657,6 +657,9 @@ public class WindowMonitor {
                                         if (titleValue != null) {
                                             title = cg.CFStringGetCStringPtr(titleValue, 0x08000100);
                                         }
+                                        if (title == null) {
+                                            title = "";
+                                        }
                                         // 获取应用程序名称
                                         Pointer ownerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerName);
                                         String processName = "";
