@@ -306,6 +306,10 @@
                 <TextField fx:id="findWindowWait_Set" prefWidth="50"/>
                 <Label prefHeight="25" text="%unit.s"/>
             </HBox>
+
+            <HBox fx:id="noPermissionHBox_Set" visible="false" styleClass="hBox-short">
+                <Label prefHeight="25" textFill="red" text="%noAutomationPermission"/>
+            </HBox>
         </HBox>
 
         <HBox>

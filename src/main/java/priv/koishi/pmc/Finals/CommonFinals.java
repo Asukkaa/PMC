@@ -36,7 +36,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.09.15";
+    public static final String buildDate = "2025.09.29";
 
     /**
      * 文件后缀名：bat
@@ -569,7 +569,7 @@ public class CommonFinals {
     /**
      * 默认操作步骤详情窗口宽度
      */
-    public static final String defaultClickDetailWidth = "1200";
+    public static final String defaultClickDetailWidth = "1300";
 
     /**
      * 默认操作步骤详情窗口高度
@@ -585,7 +585,6 @@ public class CommonFinals {
      * 默认定时任务详情窗口高度
      */
     public static final String defaultTaskDetailHeight = "400";
-
 
     /**
      * 默认信息浮窗宽度

@@ -128,6 +128,10 @@
                             <TextField fx:id="clickRetryNum_Det" prefWidth="50"/>
                             <Label prefHeight="25" text="%unit.times"/>
                         </HBox>
+
+                        <HBox fx:id="noPermissionHBox_Det" visible="false" styleClass="hBox-veryShort">
+                            <Label prefHeight="25" textFill="red" text="%noAutomationPermission"/>
+                        </HBox>
                     </HBox>
 
                     <HBox spacing="10">

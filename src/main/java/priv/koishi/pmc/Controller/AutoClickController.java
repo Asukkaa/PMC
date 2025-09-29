@@ -260,7 +260,7 @@ public class AutoClickController extends RootController implements MousePosition
     private boolean isNativeHookException;
 
     /**
-     * 无录屏与录音权限
+     * 无录屏与录音权限（true-无权限 false-有权限）
      */
     private boolean noScreenCapturePermission;
 

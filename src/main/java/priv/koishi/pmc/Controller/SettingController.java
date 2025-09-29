@@ -89,10 +89,18 @@ public class SettingController extends RootController implements MousePositionUp
     private boolean initializedFinished;
 
     /**
+     * 无自动化权限（true-无权限 false-有权限）
+     */
+    public static boolean noAutomationPermission;
+
+    /**
      * 要防重复点击的组件
      */
     private final List<Node> disableNodes = new ArrayList<>();
 
+    /**
+     * 窗口进程地址
+     */
     private String clickWindowPath, stopWindowPath;
 
     /**
@@ -110,7 +118,7 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public HBox fileNumberHBox_Set, findImgSetting_Set, clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set,
-            clickWindowInfoHBox_Set, stopRegionInfoHBox_Set, clickRegionInfoHBox_Set;
+            clickWindowInfoHBox_Set, stopRegionInfoHBox_Set, clickRegionInfoHBox_Set, noPermissionHBox_Set;
 
     @FXML
     public ProgressBar progressBar_Set;
@@ -756,7 +764,6 @@ public class SettingController extends RootController implements MousePositionUp
         initializeChoiceBoxItems(clickFindImgType_Set, findImgType_all(), findImgTypeList);
     }
 
-
     /**
      * 构建右键菜单
      */
@@ -784,11 +791,13 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 禁用需要截屏相关权限的组件
+     * 禁用需要自动化权限的组件
      */
     private void setNoPermissionLog() {
-        clickWindow_Set.setDisable(true);
+        noAutomationPermission = true;
         stopWindow_Set.setDisable(true);
+        clickWindow_Set.setDisable(true);
+        noPermissionHBox_Set.setVisible(true);
     }
 
     /**
@@ -840,8 +849,9 @@ public class SettingController extends RootController implements MousePositionUp
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
+            // 建议自动化权限
             if (!hasAutomationPermission()) {
-                // 禁用需要截屏相关权限的组件
+                // 禁用需要自动化权限的组件
                 setNoPermissionLog();
             }
             // 组件自适应宽高

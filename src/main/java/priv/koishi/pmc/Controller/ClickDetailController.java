@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -161,7 +162,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
             stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det,
-            stopWindowInfoHBox_Det;
+            stopWindowInfoHBox_Det, noPermissionHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -892,6 +893,15 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 禁用需要自动化权限的组件
+     */
+    private void setNoPermissionLog() {
+        stopWindow_Det.setDisable(true);
+        clickWindow_Det.setDisable(true);
+        noPermissionHBox_Det.setVisible(true);
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -908,6 +918,10 @@ public class ClickDetailController extends RootController {
             initWindowMonitor();
             // 组件宽高自适应
             adaption();
+            // 禁用需要自动化权限的组件
+            if (noAutomationPermission) {
+                setNoPermissionLog();
+            }
             // 设置要防重复点击的组件
             setDisableNodes();
             // 添加确认关闭确认框
