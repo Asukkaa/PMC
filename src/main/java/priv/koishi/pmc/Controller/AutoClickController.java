@@ -314,6 +314,8 @@ public class AutoClickController extends RootController implements MousePosition
      */
     public static FloatingWindowDescriptor massageFloating;
 
+    public static double tableViewHeight = 0.6;
+
     @FXML
     public AnchorPane anchorPane_Click;
 
@@ -355,7 +357,7 @@ public class AutoClickController extends RootController implements MousePosition
     public void adaption() {
         // 设置组件高度
         double stageHeight = mainStage.getHeight();
-        tableView_Click.setPrefHeight(stageHeight * 0.5);
+        tableView_Click.setPrefHeight(stageHeight * tableViewHeight);
         // 设置组件宽度
         double tableWidth = mainStage.getWidth() * 0.95;
         tableView_Click.setMaxWidth(tableWidth);
@@ -1683,6 +1685,8 @@ public class AutoClickController extends RootController implements MousePosition
         isNativeHookException = true;
         runClick_Click.setDisable(true);
         recordClick_Click.setDisable(true);
+        tableViewHeight = 0.5;
+        adaption();
         String errorMessage = appName + autoClick_noPermissions();
         if (isMac) {
             errorMessage = tip_NativeHookException();
@@ -1697,6 +1701,8 @@ public class AutoClickController extends RootController implements MousePosition
     private void setNoScreenCapturePermissionLog() {
         noScreenCapturePermission = true;
         runClick_Click.setDisable(true);
+        tableViewHeight = 0.5;
+        adaption();
         err_Click.setText(tip_noScreenCapturePermission());
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
     }

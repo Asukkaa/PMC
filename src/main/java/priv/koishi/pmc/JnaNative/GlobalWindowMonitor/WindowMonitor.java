@@ -139,8 +139,10 @@ public class WindowMonitor {
      * @param processPath 窗口进程路径
      */
     public void updateWindowInfo(String processPath) {
-        windowInfo = getMainWindowInfo(processPath);
-        showWindowInfo();
+        if (StringUtils.isNotBlank(processPath)) {
+            windowInfo = getMainWindowInfo(processPath);
+            showWindowInfo();
+        }
     }
 
     /**
