@@ -285,7 +285,7 @@ public class WindowMonitor {
      * 根据进程路径获取主窗口信息
      *
      * @param processPath 进程路径
-     * @return 窗口信息，如果没有找到则返回null
+     * @return 窗口信息，如果没有找到则返回 null
      */
     public static WindowInfo getMainWindowInfo(String processPath) {
         WindowInfo windowInfo = null;
@@ -370,7 +370,7 @@ public class WindowMonitor {
      * 根据 win 进程路径获取主窗口信息
      *
      * @param processPath 进程路径
-     * @return 窗口信息，如果没有找到则返回null
+     * @return 窗口信息，如果没有找到则返回 null
      */
     public static WindowInfo getMainWinWindowInfo(String processPath) {
         List<WindowInfo> windows = getWinWindowInfos(processPath);
@@ -475,7 +475,7 @@ public class WindowMonitor {
     /**
      * 通过进程 ID 获取 macOS 进程地址
      *
-     * @param pid 进程ID
+     * @param pid 进程 ID
      * @return 进程地址
      */
     private static String getMacProcessPathByPid(int pid) {
@@ -526,14 +526,14 @@ public class WindowMonitor {
             // 获取进程路径
             String processPath = getMacProcessPathByPid(frontAppPid);
             if (processPath == null) {
-                throw new RuntimeException("无法获取焦点应用路径");
+                throw new RuntimeException(text_geFocusPathErr());
             }
             if (processPath.contains(app)) {
                 processPath = processPath.substring(0, processPath.lastIndexOf(app) + app.length());
             }
             result = getMainMacWindowInfo(processPath);
         } catch (Exception e) {
-            throw new RuntimeException("获取Mac焦点窗口信息失败", e);
+            throw new RuntimeException(text_getMacFocusErr(), e);
         }
         return result;
     }
@@ -550,7 +550,7 @@ public class WindowMonitor {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String pidStr = reader.readLine();
         if (pidStr == null) {
-            String err = "无法获取当前焦点应用PID:";
+            String err = text_getPidErr();
             if (error != null) {
                 err = err + error;
             }
@@ -563,7 +563,7 @@ public class WindowMonitor {
      * 根据 mac 进程路径获取主窗口信息
      *
      * @param appPath app 进程路径
-     * @return 窗口信息，如果没有找到则返回null
+     * @return 窗口信息，如果没有找到则返回 null
      */
     public static WindowInfo getMainMacWindowInfo(String appPath) {
         List<WindowInfo> windows = getMacWindowInfos(appPath);
@@ -571,9 +571,9 @@ public class WindowMonitor {
     }
 
     /**
-     * 使用 Core Graphics API 根据应用程序Bundle路径获取窗口信息
+     * 使用 Core Graphics API 根据应用程序 Bundle 路径获取窗口信息
      *
-     * @param appPath 应用程序Bundle路径（.app结尾）
+     * @param appPath 应用程序 Bundle 路径（ .app 结尾）
      * @return 窗口信息列表
      */
     public static List<WindowInfo> getMacWindowInfos(String appPath) {
