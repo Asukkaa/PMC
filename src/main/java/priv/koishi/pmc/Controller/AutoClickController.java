@@ -314,6 +314,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     public static FloatingWindowDescriptor massageFloating;
 
+    /**
+     * 列表高度占用主界面的百分比
+     */
     public static double tableViewHeight = 0.6;
 
     @FXML
