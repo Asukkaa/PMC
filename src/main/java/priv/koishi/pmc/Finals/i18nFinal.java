@@ -714,13 +714,12 @@ public class i18nFinal {
     }
 
     /**
-     * @return <p>需要在macOS系统设置中启用辅助设备权限：</p>
-     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]</p>
-     * <p>2. 在左侧列表选择「辅助功能」</p>
-     * <p>3. 点击🔒解锁设置</p>
-     * <p>4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
-     * <p>5. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
-     * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
+     * @return <p>需要在 macOS 系统设置中启用辅助功能权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 辅助功能]</p>
+     * <p>2. 点击🔒解锁设置</p>
+     * <p>3. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>4. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
+     * 5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_NativeHookException() {
         return bundle.getString("tip.NativeHookException") + appName + app +
@@ -729,18 +728,33 @@ public class i18nFinal {
     }
 
     /**
-     * @return <p>需要在macOS系统设置中启用录屏与系统录音权限：</p>
-     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]</p>
-     * <p>2. 在左侧列表选择「录屏与系统录音」</p>
-     * <p>3. 点击🔒解锁设置</p>
-     * <p>4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
-     * <p>5. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
-     * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
+     * @return <p>需要在 macOS 系统设置中启用录屏与系统录音权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 录屏与系统录音]</p>
+     * <p>2. 点击🔒解锁设置</p>
+     * <p>3. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>4. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
+     * 5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_noScreenCapturePermission() {
         return bundle.getString("tip.noScreenCapturePermission") + appName + app +
                 bundle.getString("tip.ifHave") + appName + app +
                 bundle.getString("tip.addList") + appName + app;
+    }
+
+    /**
+     * @return <p>需要在 macOS 系统设置中启用自动化权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 自动化]</p>
+     * <p>2. 点击🔒解锁设置</p>
+     * <p>3. 选择列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>4. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 的 System Events 选项开启</p>
+     * <p>5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}</p>
+     * 如果列表中没有 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 尝试重新安装应用后开启权限
+     */
+    public static String tip_noAutomationPermission() {
+        return bundle.getString("tip.noAutomationPermission") + appName + app +
+                bundle.getString("tip.ifHave") + appName + app +
+                bundle.getString("tip.activeSystemEvents") + appName + app +
+                bundle.getString("tip.ifNotHave") + appName + app + bundle.getString("tip.reinstall");
     }
 
     /**

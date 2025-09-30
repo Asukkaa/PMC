@@ -187,7 +187,7 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
-            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det;
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -899,6 +899,7 @@ public class ClickDetailController extends RootController {
         stopWindow_Det.setDisable(true);
         clickWindow_Det.setDisable(true);
         noPermissionHBox_Det.setVisible(true);
+        addToolTip(tip_noAutomationPermission(), noPermission_Det);
     }
 
     /**

@@ -138,7 +138,7 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set,
-            clickWindowInfo_Set, stopWindowInfo_Set;
+            clickWindowInfo_Set, stopWindowInfo_Set, noPermission_Set;
 
     @FXML
     public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
@@ -798,6 +798,7 @@ public class SettingController extends RootController implements MousePositionUp
         stopWindow_Set.setDisable(true);
         clickWindow_Set.setDisable(true);
         noPermissionHBox_Set.setVisible(true);
+        addToolTip(tip_noAutomationPermission(), noPermission_Set);
     }
 
     /**

@@ -308,7 +308,7 @@
             </HBox>
 
             <HBox fx:id="noPermissionHBox_Set" visible="false" styleClass="hBox-short">
-                <Label prefHeight="25" textFill="red" text="%noAutomationPermission"/>
+                <Label fx:id="noPermission_Set" prefHeight="25" textFill="red" text="%noAutomationPermission"/>
             </HBox>
         </HBox>
 

@@ -130,7 +130,8 @@
                         </HBox>
 
                         <HBox fx:id="noPermissionHBox_Det" visible="false" styleClass="hBox-veryShort">
-                            <Label prefHeight="25" textFill="red" text="%noAutomationPermission"/>
+                            <Label fx:id="noPermission_Det" prefHeight="25" textFill="red"
+                                   text="%noAutomationPermission"/>
                         </HBox>
                     </HBox>
 
