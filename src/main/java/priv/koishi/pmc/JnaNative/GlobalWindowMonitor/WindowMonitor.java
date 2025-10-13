@@ -11,6 +11,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
@@ -113,6 +114,7 @@ public class WindowMonitor {
     public void showWindowInfo() {
         Platform.runLater(() -> {
             if (windowInfo != null) {
+                infoLabel.setTextFill(Color.CORNFLOWERBLUE);
                 infoLabel.setText(windowInfo.getProcessName());
                 String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
                         findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
@@ -120,6 +122,12 @@ public class WindowMonitor {
                         findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
                         findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
                 addToolTip(info, infoLabel);
+            } else {
+                String text = infoLabel.getText();
+                if (StringUtils.isNotEmpty(text)) {
+                    infoLabel.setTextFill(Color.RED);
+                    addToolTip(text_noWindowInfo(), infoLabel);
+                }
             }
         });
     }

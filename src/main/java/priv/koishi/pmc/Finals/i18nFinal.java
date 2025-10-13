@@ -1711,6 +1711,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 无法获取窗口信息，窗口可能已经关闭
+     */
+    public static String text_noWindowInfo() {
+        return bundle.getString("noWindowInfo");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

@@ -22,7 +22,9 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Queue.DynamicQueue;
@@ -357,15 +359,16 @@ public class AutoClickService {
                     int index = clickPositionVO.getIndex();
                     String err = autoClick_index() + index + autoClick_name() + clickPositionVO.getName() + autoClick_settingErr();
                     boolean isErr = false;
-                    String matchedType = clickPositionVO.getMatchedType();
-                    if (clickMatched_clickStep().equals(matchedType) || clickMatched_step().equals(matchedType)) {
+                    int matchedType = clickPositionVO.getMatchedTypeEnum();
+                    if (MatchedTypeEnum.STEP.ordinal() == matchedType ||
+                            MatchedTypeEnum.CLICK_STEP.ordinal() == matchedType) {
                         int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
                         if (matchStep > maxIndex) {
                             err += text_matchedStepGreaterMax();
                             isErr = true;
                         }
                     }
-                    if (retryType_Step().equals(clickPositionVO.getRetryType())) {
+                    if (RetryTypeEnum.STEP.ordinal() == clickPositionVO.getRetryTypeEnum()) {
                         int retryStep = Integer.parseInt(clickPositionVO.getRetryStep());
                         if (retryStep > maxIndex) {
                             err += text_retryStepGreaterMax();
@@ -528,19 +531,17 @@ public class AutoClickService {
                     String waitTime = clickPositionVO.getWaitTime();
                     String clickTime = clickPositionVO.getClickTime();
                     String name = clickPositionVO.getName();
-                    String clickKey = clickPositionVO.getClickKey();
-                    String clickType = clickPositionVO.getClickType();
+                    int clickType = clickPositionVO.getClickTypeEnum();
                     String interval = clickPositionVO.getClickInterval();
                     String clickImgPath = clickPositionVO.getClickImgPath();
-                    String matchType = clickPositionVO.getMatchedType();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     String clickText;
-                    if (clickType_moveTrajectory().equalsIgnoreCase(clickType)
-                            || clickType_move().equalsIgnoreCase(clickType)
-                            || clickType_moveTo().equalsIgnoreCase(clickType)) {
+                    if (ClickTypeEnum.MOVE_TRAJECTORY.ordinal() == clickType ||
+                            ClickTypeEnum.MOVE.ordinal() == clickType ||
+                            ClickTypeEnum.MOVETO.ordinal() == clickType) {
                         clickText = "";
                     } else {
-                        clickText = text_taskInfo() + clickKey + clickType;
+                        clickText = text_taskInfo() + clickPositionVO.getClickKey() + clickPositionVO.getClickType();
                     }
                     Platform.runLater(() -> {
                         String text = loopTimeText +
@@ -554,7 +555,7 @@ public class AutoClickService {
                                     text_progress() + progress + "/" + dataSize +
                                     text_willBe() + waitTime + text_msWillBe() + name +
                                     text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
-                                    text_afterMatch() + matchType;
+                                    text_afterMatch() + clickPositionVO.getMatchedType();
                         }
                         // 更新操作信息
                         updateMassage(text);
@@ -697,7 +698,7 @@ public class AutoClickService {
         }
         // 匹配要点击的图像
         String clickPath = clickPositionVO.getClickImgPath();
-        String clickType = clickPositionVO.getClickType();
+        int clickType = clickPositionVO.getClickTypeEnum();
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             fileName.set(getExistsFileName(new File(clickPath)));
@@ -707,12 +708,12 @@ public class AutoClickService {
                 updateMassage(text);
             });
             long start = System.currentTimeMillis();
-            String retryType = clickPositionVO.getRetryType();
+            int retryType = clickPositionVO.getRetryTypeEnum();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
             FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
             FindPositionConfig findPositionConfig = new FindPositionConfig()
                     .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
-                    .setContinuously(retryType_continuously().equals(retryType))
+                    .setContinuously(RetryTypeEnum.CONTINUOUSLY.ordinal() == retryType)
                     .setFloatingWindowConfig(clickWindowConfig)
                     .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)
@@ -721,9 +722,9 @@ public class AutoClickService {
                     .setName(name);
             MatchPointBean matchPointBean = findPosition(findPositionConfig, dynamicQueue);
             try (Point position = matchPointBean.getPoint()) {
-                String matchedType = clickPositionVO.getMatchedType();
+                int matchedType = clickPositionVO.getMatchedTypeEnum();
                 long end = System.currentTimeMillis();
-                if (!clickType_moveTo().equals(clickType)) {
+                if (ClickTypeEnum.MOVETO.ordinal() != clickType) {
                     startX = position.x() + Integer.parseInt(clickPositionVO.getImgX());
                     startY = position.y() + Integer.parseInt(clickPositionVO.getImgY());
                 }
@@ -740,27 +741,28 @@ public class AutoClickService {
                 }
                 if (matchThreshold >= clickMatchThreshold) {
                     // 匹配成功后直接执行下一个操作步骤
-                    if (clickMatched_break().equals(matchedType)) {
+                    if (MatchedTypeEnum.BREAK.ordinal() == matchedType) {
                         clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                         return clickResultBean;
                         // 匹配成功后执行指定步骤
-                    } else if (clickMatched_step().equals(matchedType)) {
+                    } else if (MatchedTypeEnum.STEP.ordinal() == matchedType) {
                         clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()))
                                 .setClickLogs(dynamicQueue.getSnapshot());
                         return clickResultBean;
                         // 匹配成功后点击匹配图像并执行指定步骤
-                    } else if (clickMatched_clickStep().equals(matchedType)) {
+                    } else if (MatchedTypeEnum.CLICK_STEP.ordinal() == matchedType) {
                         clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()));
                         // 匹配图像存在则重复点击
-                    } else if (clickMatched_clickWhile().equals(matchedType)) {
+                    } else if (MatchedTypeEnum.CLICK_WHILE.ordinal() == matchedType) {
                         clickResultBean.setStepIndex(-1);
                     }
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
-                } else if (retryType_break().equals(retryType) || clickMatched_clickWhile().equals(matchedType)) {
+                } else if (RetryTypeEnum.BREAK.ordinal() == retryType ||
+                        MatchedTypeEnum.CLICK_WHILE.ordinal() == matchedType) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     return clickResultBean;
                     // 匹配失败后终止操作
-                } else if (retryType_stop().equals(retryType)) {
+                } else if (RetryTypeEnum.STOP.ordinal() == retryType) {
                     clickResultBean.setClickLogs(dynamicQueue.getSnapshot());
                     try {
                         throw new RuntimeException(text_index() + clickPositionVO.getIndex() + text_taskErr() +
@@ -773,7 +775,7 @@ public class AutoClickService {
                         throw new RuntimeException(e);
                     }
                     // 匹配失败后执行指定步骤
-                } else if (retryType_Step().equals(retryType)) {
+                } else if (RetryTypeEnum.STEP.ordinal() == retryType) {
                     clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getRetryStep()))
                             .setClickLogs(dynamicQueue.getSnapshot());
                     return clickResultBean;
@@ -805,7 +807,7 @@ public class AutoClickService {
                     dynamicQueue.add(clickLogBean);
                 }
             }
-            MouseButton mouseButton = runClickTypeMap.get(clickPositionVO.getClickKey());
+            MouseButton mouseButton = NativeMouseToMouseButton.get(clickPositionVO.getClickKeyEnum());
             String clickKey = clickPositionVO.getClickKey();
             // 处理随机坐标偏移量
             if (activation.equals(clickPositionVO.getRandomClick())) {
@@ -850,7 +852,7 @@ public class AutoClickService {
                         dynamicQueue.add(releaseLog);
                     }
                 }
-                if (clickType_click().equals(clickType)) {
+                if (ClickTypeEnum.CLICK.ordinal() == clickType) {
                     robot.mousePress(mouseButton);
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
@@ -873,7 +875,8 @@ public class AutoClickService {
                 break;
             }
             // 执行长按操作
-            if (!clickType_drag().equals(clickType) && !clickType_moveTrajectory().equals(clickType)) {
+            if (ClickTypeEnum.DRAG.ordinal() != clickType &&
+                    ClickTypeEnum.MOVE_TRAJECTORY.ordinal() != clickType) {
                 // 处理随机点击时长偏移
                 if (activation.equals(clickPositionVO.getRandomClickTime())) {
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
@@ -898,7 +901,7 @@ public class AutoClickService {
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
-                    if (clickType_click().equals(clickType)) {
+                    if (ClickTypeEnum.CLICK.ordinal() == clickType) {
                         robot.mouseRelease(mouseButton);
                         if (taskBean.isClickLog()) {
                             ClickLogBean releaseLog = new ClickLogBean();
