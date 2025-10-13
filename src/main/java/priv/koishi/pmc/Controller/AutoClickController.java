@@ -676,7 +676,9 @@ public class AutoClickController extends RootController implements MousePosition
             runClicking = true;
             // 检查跳转逻辑参数与操作类型设置是否合理
             checkSetting(clickPositionVOS);
-            clickLogs.clear();
+            if (clickLogs != null) {
+                clickLogs.clear();
+            }
             CheckBox firstClick = settingController.firstClick_Set;
             TextField retrySecond = settingController.retrySecond_Set;
             TextField overTime = settingController.overtime_Set;

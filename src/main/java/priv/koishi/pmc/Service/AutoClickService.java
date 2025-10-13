@@ -347,33 +347,43 @@ public class AutoClickService {
                 updateMassage(text_checkingWindowInfo());
                 List<String> errs = new ArrayList<>();
                 updateProgress(0, tableSize);
+                // 错误的窗口设置集合
+                List<Integer> clickErrIndex = new ArrayList<>();
+                List<Integer> stopErrIndex = new ArrayList<>();
+                // 校验窗口信息设置是否有误
                 for (int i = 0; i < tableSize; i++) {
                     updateProgress(i + 1, tableSize);
                     ClickPositionVO clickPositionVO = tableViewItems.get(i);
-                    String err = text_checkIndex() + clickPositionVO.getIndex() + text_taskErr();
+                    int index = clickPositionVO.getIndex();
+                    String err = text_checkIndex() + index + text_taskErr();
+                    // 校验目标窗口设置是否有误
                     if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
                         FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
                         if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
                             WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
                             if (clickInfo == null || StringUtils.isBlank(clickInfo.getProcessPath())) {
                                 errs.add(err + text_noClickWindowInfo());
+                                clickErrIndex.add(index);
                             } else {
                                 processPaths.add(clickInfo.getProcessPath());
                             }
                         }
                     }
+                    // 校验终止操作窗口设置是否有误
                     if (CollectionUtils.isNotEmpty(clickPositionVO.getStopImgFiles())) {
                         FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
                         if (stopWindowConfig != null && stopWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
                             WindowInfo stopInfo = stopWindowConfig.getWindowInfo();
                             if (stopInfo == null || StringUtils.isBlank(stopInfo.getProcessPath())) {
                                 errs.add(err + text_noStopWindowInfo());
+                                stopErrIndex.add(index);
                             } else {
                                 processPaths.add(stopInfo.getProcessPath());
                             }
                         }
                     }
                 }
+                // 更新窗口信息
                 Map<String, WindowInfo> windowInfoMap = new HashMap<>();
                 int pathSize = processPaths.size();
                 updateMassage(text_gettingWindowInfo());
@@ -390,35 +400,47 @@ public class AutoClickService {
                         throw new RuntimeException(e);
                     }
                 }
-                updateMassage(text_updatingWindowInfo());
-                updateProgress(0, tableSize);
-                for (int i = 0; i < tableSize; i++) {
-                    updateProgress(i + 1, tableSize);
-                    ClickPositionVO clickPositionVO = tableViewItems.get(i);
-                    String err = text_checkIndex() + clickPositionVO.getIndex() + text_taskErr();
-                    if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
-                        FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
-                        if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
-                            WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
-                            WindowInfo windowInfo = windowInfoMap.get(clickInfo.getProcessPath());
-                            if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
-                                errs.add(err + text_noClickWindowInfo());
-                            } else {
-                                clickWindowConfig.setWindowInfo(windowInfo);
-                                clickPositionVO.setClickWindowConfig(clickWindowConfig);
+                // 校验窗口是否存在
+                if (!windowInfoMap.isEmpty()) {
+                    updateMassage(text_updatingWindowInfo());
+                    updateProgress(0, tableSize);
+                    for (int i = 0; i < tableSize; i++) {
+                        updateProgress(i + 1, tableSize);
+                        ClickPositionVO clickPositionVO = tableViewItems.get(i);
+                        int index = clickPositionVO.getIndex();
+                        String err = text_checkIndex() + index + text_taskErr();
+                        // 校验目标窗口是否存在
+                        if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
+                            if (clickErrIndex.contains(index)) {
+                                continue;
+                            }
+                            FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                            if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                                WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
+                                WindowInfo windowInfo = windowInfoMap.get(clickInfo.getProcessPath());
+                                if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
+                                    errs.add(err + text_noClickWindowInfo());
+                                } else {
+                                    clickWindowConfig.setWindowInfo(windowInfo);
+                                    clickPositionVO.setClickWindowConfig(clickWindowConfig);
+                                }
                             }
                         }
-                    }
-                    if (CollectionUtils.isNotEmpty(clickPositionVO.getStopImgFiles())) {
-                        FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
-                        if (stopWindowConfig != null && stopWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
-                            WindowInfo stopInfo = stopWindowConfig.getWindowInfo();
-                            WindowInfo windowInfo = windowInfoMap.get(stopInfo.getProcessPath());
-                            if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
-                                errs.add(err + text_noStopWindowInfo());
-                            } else {
-                                stopWindowConfig.setWindowInfo(windowInfo);
-                                clickPositionVO.setStopWindowConfig(stopWindowConfig);
+                        // 校验终止操作窗口是否存在
+                        if (CollectionUtils.isNotEmpty(clickPositionVO.getStopImgFiles())) {
+                            if (stopErrIndex.contains(index)) {
+                                continue;
+                            }
+                            FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
+                            if (stopWindowConfig != null && stopWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                                WindowInfo stopInfo = stopWindowConfig.getWindowInfo();
+                                WindowInfo windowInfo = windowInfoMap.get(stopInfo.getProcessPath());
+                                if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
+                                    errs.add(err + text_noStopWindowInfo());
+                                } else {
+                                    stopWindowConfig.setWindowInfo(windowInfo);
+                                    clickPositionVO.setStopWindowConfig(stopWindowConfig);
+                                }
                             }
                         }
                     }
