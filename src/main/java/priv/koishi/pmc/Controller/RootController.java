@@ -34,10 +34,13 @@ public class RootController extends CommonProperties {
      * @param <T>  控制器类型
      */
     public static <T extends RootController> T getController(Class<T> type) {
-        WeakReference<RootController> ref = controllers.get(type);
-        RootController instance = (ref != null) ? ref.get() : null;
-        // 类型安全校验
-        return (instance != null) ? type.cast(instance) : null;
+        synchronized (controllers) {
+            WeakReference<RootController> ref = controllers.get(type);
+            RootController instance = (ref != null) ? ref.get() : null;
+            if (instance == null) {
+                return null;
+            }
+            return type.cast(instance);
+        }
     }
-
 }
