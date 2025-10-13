@@ -674,8 +674,6 @@ public class AutoClickController extends RootController implements MousePosition
         if (isFree()) {
             // 标记为正在运行自动操作
             runClicking = true;
-            // 检查跳转逻辑参数与操作类型设置是否合理
-            checkSetting(clickPositionVOS);
             if (clickLogs != null) {
                 clickLogs.clear();
             }
@@ -794,49 +792,6 @@ public class AutoClickController extends RootController implements MousePosition
                 runTimeline = executeRunTimeLine(preparation);
             }
         }
-    }
-
-    /**
-     * 检查跳转逻辑参数与操作类型设置是否合理
-     *
-     * @param clickPositionVOS 操作步骤
-     * @throws RuntimeException 参数设置相关错误
-     */
-    private static void checkSetting(List<? extends ClickPositionVO> clickPositionVOS) {
-        int maxIndex = clickPositionVOS.size();
-        clickPositionVOS.forEach(clickPositionVO -> {
-            int index = clickPositionVO.getIndex();
-            String err = getString(clickPositionVO, index, maxIndex);
-            if (retryType_Step().equals(clickPositionVO.getRetryStep())) {
-                int retryStep = Integer.parseInt(clickPositionVO.getMatchedStep());
-                if (retryStep > maxIndex) {
-                    throw new RuntimeException(err + text_retryStepGreaterMax());
-                }
-                if (retryStep == index) {
-                    throw new RuntimeException(err + text_retryStepEqualIndex());
-                }
-            }
-        });
-    }
-
-    /**
-     * 获取错误信息
-     *
-     * @param clickPositionVO 操作步骤
-     * @param index           操作步骤序号
-     * @param maxIndex        最大序号
-     * @return 错误信息
-     * @throws RuntimeException 参数设置相关错误
-     */
-    private static String getString(ClickPositionVO clickPositionVO, int index, int maxIndex) {
-        String err = autoClick_index() + index + autoClick_name() + clickPositionVO.getName() + autoClick_settingErr();
-        if (clickMatched_clickStep().equals(clickPositionVO.getMatchedType())) {
-            int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
-            if (matchStep > maxIndex) {
-                throw new RuntimeException(err + text_matchedStepGreaterMax());
-            }
-        }
-        return err;
     }
 
     /**

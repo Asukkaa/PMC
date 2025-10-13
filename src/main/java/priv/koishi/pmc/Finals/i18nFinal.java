@@ -1326,6 +1326,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 正在检查跳转逻辑参数设置
+     */
+    public static String text_checkJumpSetting() {
+        return bundle.getString("checkJumpSetting");
+    }
+
+    /**
      * @return 正在获取最新的目标窗口信息
      */
     public static String text_gettingWindowInfo() {
@@ -1344,6 +1351,13 @@ public class i18nFinal {
      */
     public static String text_windowInfoErr() {
         return bundle.getString("windowInfoErr");
+    }
+
+    /**
+     * @return 跳转逻辑设置异常
+     */
+    public static String text_jumpSettingErr() {
+        return bundle.getString("jumpSettingErr");
     }
 
     /**

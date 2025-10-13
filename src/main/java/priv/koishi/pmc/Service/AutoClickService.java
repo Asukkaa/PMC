@@ -293,6 +293,18 @@ public class AutoClickService {
         return new Task<>() {
             @Override
             protected List<ClickLogBean> call() throws Exception {
+                List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
+                List<String> errs;
+                // 检查跳转逻辑参数与操作类型设置是否合理
+                errs = checkJumpSetting(tableViewItems);
+                if (showErrAlert(errs, text_jumpSettingErr())) {
+                    return null;
+                }
+                // 校验并更新识别范围设置
+                errs = updateWindowInfos(tableViewItems);
+                if (showErrAlert(errs, text_windowInfoErr())) {
+                    return null;
+                }
                 List<ClickLogBean> clickLogBeans = new CopyOnWriteArrayList<>();
                 Timeline timeline = taskBean.getRunTimeline();
                 if (timeline != null) {
@@ -302,13 +314,6 @@ public class AutoClickService {
                 int maxLogNum = taskBean.getMaxLogNum();
                 if (maxLogNum > 0) {
                     dynamicQueue.setMaxSize(maxLogNum);
-                }
-                List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
-                // 校验并更新识别范围设置
-                List<String> errs = updateWindowInfos(tableViewItems);
-                if (CollectionUtils.isNotEmpty(errs)) {
-                    Platform.runLater(() -> showStageAlert(errs, text_windowInfoErr(), mainStage));
-                    return null;
                 }
                 int loopTime = taskBean.getLoopTimes();
                 if (loopTime == 0) {
@@ -333,6 +338,48 @@ public class AutoClickService {
                     }
                 }
                 return clickLogBeans;
+            }
+
+            /**
+             * 检查跳转逻辑参数与操作类型设置是否合理
+             *
+             * @param clickPositionVOS 操作步骤
+             * @throws RuntimeException 参数设置相关错误
+             */
+            private List<String> checkJumpSetting(List<? extends ClickPositionVO> clickPositionVOS) {
+                List<String> errs = new ArrayList<>();
+                int maxIndex = clickPositionVOS.size();
+                updateProgress(0, maxIndex);
+                updateMassage(text_checkJumpSetting());
+                for (int i = 0; i < maxIndex; i++) {
+                    updateProgress(i + 1, maxIndex);
+                    ClickPositionVO clickPositionVO = clickPositionVOS.get(i);
+                    int index = clickPositionVO.getIndex();
+                    String err = autoClick_index() + index + autoClick_name() + clickPositionVO.getName() + autoClick_settingErr();
+                    boolean isErr = false;
+                    String matchedType = clickPositionVO.getMatchedType();
+                    if (clickMatched_clickStep().equals(matchedType) || clickMatched_step().equals(matchedType)) {
+                        int matchStep = Integer.parseInt(clickPositionVO.getMatchedStep());
+                        if (matchStep > maxIndex) {
+                            err += text_matchedStepGreaterMax();
+                            isErr = true;
+                        }
+                    }
+                    if (retryType_Step().equals(clickPositionVO.getRetryType())) {
+                        int retryStep = Integer.parseInt(clickPositionVO.getRetryStep());
+                        if (retryStep > maxIndex) {
+                            err += text_retryStepGreaterMax();
+                            isErr = true;
+                        } else if (retryStep == index) {
+                            err += text_retryStepEqualIndex();
+                            isErr = true;
+                        }
+                    }
+                    if (isErr) {
+                        errs.add(err);
+                    }
+                }
+                return errs;
             }
 
             /**
@@ -554,6 +601,21 @@ public class AutoClickService {
                 return dynamicQueue.getSnapshot();
             }
         };
+    }
+
+    /**
+     * 显示错误弹窗
+     *
+     * @param errs    错误信息
+     * @param errType 错误类型
+     * @return true-显示弹窗 false-不显示弹窗
+     */
+    private static boolean showErrAlert(List<String> errs, String errType) {
+        if (CollectionUtils.isNotEmpty(errs)) {
+            Platform.runLater(() -> showStageAlert(errs, errType, mainStage));
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1018,6 +1080,9 @@ public class AutoClickService {
      * @return 当前产生的日志
      **/
     public static List<ClickLogBean> getNowLogs() {
+        if (dynamicQueue == null) {
+            return null;
+        }
         return dynamicQueue.getSnapshot();
     }
 
