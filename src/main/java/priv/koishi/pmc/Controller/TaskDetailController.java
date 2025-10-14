@@ -200,10 +200,10 @@ public class TaskDetailController extends RootController {
      */
     private void textFieldChangeListener() {
         // 限制小时文本输入框内容
-        ChangeListener<String> hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
+        ChangeListener<Boolean> hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
         changeListeners.put(hourField_TD, hourFieldListener);
         // 限制分钟文本输入框内容
-        ChangeListener<String> minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
+        ChangeListener<Boolean> minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
         changeListeners.put(minuteField_TD, minuteFieldListener);
         // 限制任务名称文本输入框内容
         ChangeListener<String> taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());

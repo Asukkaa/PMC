@@ -807,15 +807,46 @@ public class UiUtils {
      * @param tip       鼠标悬停提示文案
      * @return 监听器
      */
-    public static ChangeListener<String> integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
-        ChangeListener<String> listener = (_, oldValue, newValue) -> {
-            // 这里处理文本变化的逻辑
-            if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                textField.setText(oldValue);
+    public static ChangeListener<Boolean> integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
+        ChangeListener<Boolean> listener = (_, oldFocused, newFocused) -> {
+            if (oldFocused && !newFocused) {
+                String newValue = textField.getText();
+                if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                    textField.setText("");
+                    new MessageBubble(text_errRange(), 1);
+                }
+                addValueToolTip(textField, tip);
             }
-            addValueToolTip(textField, tip);
         };
-        textField.textProperty().addListener(listener);
+        textField.focusedProperty().addListener(listener);
+        return listener;
+    }
+
+    /**
+     * 限制输入框只能输入指定范围内的小数
+     *
+     * @param textField     要处理的文本输入框
+     * @param min           可输入的最小值，为空则不限制
+     * @param max           可输入的最大值，为空则不限制
+     * @param decimalDigits 小数位数，0表示整数
+     * @param tip           鼠标悬停提示文案
+     * @return 监听器
+     */
+    public static ChangeListener<Boolean> DoubleRangeTextField(TextField textField, Double min, Double max,
+                                                               int decimalDigits, String tip) {
+        ChangeListener<Boolean> listener = (_, oldFocused, newFocused) -> {
+            if (oldFocused && !newFocused) {
+                String newValue = textField.getText();
+                if (!isInDecimalRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                    textField.setText("");
+                    new MessageBubble(text_errRange(), 1);
+                } else if (newValue.contains(".")) {
+                    textField.setText(newValue.substring(0, newValue.lastIndexOf(".") + decimalDigits + 1));
+                }
+                addValueToolTip(textField, tip);
+            }
+        };
+        textField.focusedProperty().addListener(listener);
         return listener;
     }
 

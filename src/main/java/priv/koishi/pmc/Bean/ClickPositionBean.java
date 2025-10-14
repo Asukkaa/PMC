@@ -46,6 +46,16 @@ public class ClickPositionBean {
     String startY;
 
     /**
+     * 相对横（X）坐标
+     */
+    String relativeX;
+
+    /**
+     * 相对纵（Y）坐标
+     */
+    String relativeY;
+
+    /**
      * 点击时长（单位：毫秒）
      */
     String clickTime;

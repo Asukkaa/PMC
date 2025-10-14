@@ -714,6 +714,14 @@ public class i18nFinal {
     }
 
     /**
+     * @return <p>设置目标窗口后才可填写，用来计算相对坐标</p>
+     * 有效范围 0 - 100，最多保留两位小数
+     */
+    public static String tip_relatively() {
+        return bundle.getString("tip.relatively");
+    }
+
+    /**
      * @return <p>需要在 macOS 系统设置中启用辅助功能权限：</p>
      * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 辅助功能]</p>
      * <p>2. 点击🔒解锁设置</p>
@@ -1715,6 +1723,13 @@ public class i18nFinal {
      */
     public static String text_noWindowInfo() {
         return bundle.getString("noWindowInfo");
+    }
+
+    /**
+     * @return 不符合输入范围
+     */
+    public static String text_errRange() {
+        return bundle.getString("errRange");
     }
 
     /**
@@ -3307,6 +3322,50 @@ public class i18nFinal {
     }
 
     /**
+     * @return 绝对坐标
+     */
+    public static String absoluteCoordinates() {
+        return bundle.getString("absoluteCoordinates");
+    }
+
+    /**
+     * @return 相对坐标
+     */
+    public static String relativeCoordinates() {
+        return bundle.getString("relativeCoordinates");
+    }
+
+    /**
+     * 坐标类型选项
+     */
+    public static final List<String> coordinateTypeList = new ArrayList<>();
+
+    /**
+     * 更新坐标类型选项
+     */
+    public static void updateCoordinateTypeList() {
+        List<String> newList = Arrays.asList(
+                absoluteCoordinates(),
+                relativeCoordinates());
+        coordinateTypeList.clear();
+        coordinateTypeList.addAll(newList);
+    }
+
+    /**
+     * 坐标类型映射
+     */
+    public static final BidiMap<Integer, String> coordinateTypeMap = new DualHashBidiMap<>();
+
+    /**
+     * 更新坐标类型映射
+     */
+    public static void updateCoordinateTypeMap() {
+        coordinateTypeMap.clear();
+        coordinateTypeMap.put(CoordinateTypeEnum.ABSOLUTE_COORDINATES.ordinal(), absoluteCoordinates());
+        coordinateTypeMap.put(CoordinateTypeEnum.RELATIVE_COORDINATES.ordinal(), relativeCoordinates());
+    }
+
+    /**
      * 切换语言下拉框选项
      */
     public static final BidiMap<Locale, String> languageMap = new DualHashBidiMap<>();
@@ -3359,6 +3418,10 @@ public class i18nFinal {
         updateFindImgTypeList();
         // 更新图像识别区域类型选项映射
         updateFindImgTypeMap();
+        // 更新坐标类型选项
+        updateCoordinateTypeList();
+        // 更新坐标类型映射
+        updateCoordinateTypeMap();
     }
 
 }

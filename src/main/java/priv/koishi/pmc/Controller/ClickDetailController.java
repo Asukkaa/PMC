@@ -175,11 +175,11 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det, clickFindImgType_Det,
-            stopFindImgType_Det;
+            stopFindImgType_Det, coordinateType_Det;
 
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
-            updateClickName_Det, clickWindow_Det, stopWindow_Det;
+            updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
@@ -187,12 +187,12 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
-            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det;
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -557,13 +557,13 @@ public class ClickDetailController extends RootController {
         ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName());
         changeListeners.put(clickName_Det, clickNameListener);
         // 限制每步操作执行前等待时间文本输入框内容
-        ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait());
+        ChangeListener<Boolean> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait());
         changeListeners.put(wait_Det, waitListener);
         // 匹配图像坐标横(X)轴偏移量文本输入框内容
-        ChangeListener<String> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
+        ChangeListener<Boolean> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
         changeListeners.put(imgX_Det, imgXListener);
         // 匹配图像坐标纵(Y)轴偏移量文本输入框内容
-        ChangeListener<String> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
+        ChangeListener<Boolean> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
         changeListeners.put(imgY_Det, imgYListener);
         // 停止操作图像识别准确度设置监听
         ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
@@ -572,40 +572,46 @@ public class ClickDetailController extends RootController {
         ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
         changeListeners.put(clickOpacity_Det, clickOpacityListener);
         // 限制操作时长文本输入内容
-        ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
+        ChangeListener<Boolean> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
         changeListeners.put(timeClick_Det, timeClickListener);
         // 限制操作间隔文本输入框内容
-        ChangeListener<String> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
+        ChangeListener<Boolean> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
         changeListeners.put(interval_Det, intervalListener);
         // 限制鼠标起始位置横(X)坐标文本输入框内容
-        ChangeListener<String> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
+        ChangeListener<Boolean> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
         changeListeners.put(mouseStartX_Det, mouseStartXListener);
         // 限制鼠标起始位置纵(Y)坐标文本输入框内容
-        ChangeListener<String> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
+        ChangeListener<Boolean> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
         changeListeners.put(mouseStartY_Det, mouseStartYListener);
         // 限制点击次数文本输入框内容
-        ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
+        ChangeListener<Boolean> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
         changeListeners.put(clickNumBer_Det, clickNumBerListener);
         // 限制重试后要跳转的步骤序号文本输入框内容
         ChangeListener<String> retryStepListener = warnIntegerRangeTextField(retryStep_Det, 1, maxIndex, tip_step(), retryStepWarning_Det);
         changeListeners.put(retryStep_Det, retryStepListener);
+        // 限制点击起始相对横(X)坐标文本输入框内容
+        ChangeListener<Boolean> relativelyXListener = DoubleRangeTextField(relativelyX_Det, 0.0, 100.0, 2, tip_relatively());
+        changeListeners.put(relativelyX_Det, relativelyXListener);
+        // 限制点击起始相对纵(Y)坐标文本输入框内容
+        ChangeListener<Boolean> relativelyYListener = DoubleRangeTextField(relativelyY_Det, 0.0, 100.0, 2, tip_relatively());
+        changeListeners.put(relativelyY_Det, relativelyYListener);
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
         ChangeListener<String> matchedStepListener = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
         changeListeners.put(matchedStep_Det, matchedStepListener);
         // 随机点击时间偏移量文本输入框内容
-        ChangeListener<String> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
+        ChangeListener<Boolean> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
         changeListeners.put(randomTimeOffset_Det, randomTimeListener);
         // 随机横坐标偏移量文本输入框内容
-        ChangeListener<String> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
+        ChangeListener<Boolean> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
         changeListeners.put(randomClickX_Det, randomClickXListener);
         // 随机纵坐标偏移量文本输入框内容
-        ChangeListener<String> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
+        ChangeListener<Boolean> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
         changeListeners.put(randomClickY_Det, randomClickYListener);
         // 限制终止操作识别失败重试次数文本输入框内容
-        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
+        ChangeListener<Boolean> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
         changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
+        ChangeListener<Boolean> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
         changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
     }
 
@@ -653,6 +659,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_findWindow(), clickWindow_Det, stopWindow_Det);
         addToolTip(tip_showRegion(), clickRegion_Det, stopRegion_Det);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
+        addToolTip(tip_relatively(), relativelyX_Det, relativelyY_Det);
         addToolTip(tip_allRegion(), clickAllRegion_Det, stopAllRegion_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
@@ -738,6 +745,8 @@ public class ClickDetailController extends RootController {
         initializeChoiceBoxItems(stopFindImgType_Det, findImgType_all(), findImgTypeList);
         // 要点击的图像识别区域设置
         initializeChoiceBoxItems(clickFindImgType_Det, findImgType_all(), findImgTypeList);
+        // 要点击的图像识别区域设置
+        initializeChoiceBoxItems(coordinateType_Det, absoluteCoordinates(), coordinateTypeList);
     }
 
     /**
@@ -1214,7 +1223,7 @@ public class ClickDetailController extends RootController {
      * 获取要点击的窗口信息
      */
     @FXML
-    public void findClickWindowAction() {
+    private void findClickWindowAction() {
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, true);
         // 隐藏窗口
@@ -1232,7 +1241,7 @@ public class ClickDetailController extends RootController {
      * 获取终止操作窗口信息
      */
     @FXML
-    public void findStopWindowAction() {
+    private void findStopWindowAction() {
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, true);
         // 隐藏窗口
@@ -1244,6 +1253,22 @@ public class ClickDetailController extends RootController {
         if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
             stopWindowMonitor.startClickWindowMouseListener(preparation);
         }
+    }
+
+    /**
+     * 坐标类型下拉框
+     */
+    @FXML
+    private void coordinateTypeChange() {
+
+    }
+
+    /**
+     * 更新坐标信息按钮
+     */
+    @FXML
+    private void updateCoordinate() {
+
     }
 
 }
