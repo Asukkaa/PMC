@@ -64,6 +64,53 @@ public class CommonUtils {
     }
 
     /**
+     * 正则表达式用于匹配指定范围的小数
+     *
+     * @param str 要校验的字符串
+     * @param min 最小值，为空则不限制
+     * @param max 最大值，为空则不限制
+     * @return 在设置范围内为 true，不在范围内为 false
+     */
+    public static boolean isInDecimalRange(String str, Double min, Double max) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        // 处理负号情况
+        boolean isNegative = str.startsWith("-");
+        String absStr = isNegative ? str.substring(1) : str;
+        // 禁止出现0开头的非0数字（整数部分）
+        if (absStr.indexOf("0") == 0 && absStr.length() > 1 && absStr.charAt(1) != '.') {
+            return false;
+        }
+        // 构建数字正则表达式（允许任意小数位数）
+        String decimalPattern = "^-?\\d{1,10}(\\.\\d+)?$";
+        Pattern pattern = Pattern.compile(decimalPattern);
+        if (!pattern.matcher(str).matches()) {
+            return false;
+        }
+        // 将字符串转换为小数并判断是否在指定范围内
+        double value;
+        try {
+            value = Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        // 只判断是否为有效数字，不限定范围
+        if (max == null && min == null) {
+            return !Double.isNaN(value) && Double.isFinite(value);
+        }
+        // 限定最小值
+        if (max == null) {
+            return value >= min && Double.isFinite(value);
+        }
+        // 限定最大值
+        if (min == null) {
+            return value <= max && Double.isFinite(value);
+        }
+        return value >= min && value <= max && Double.isFinite(value);
+    }
+
+    /**
      * 获取详细的异常信息
      *
      * @param e 要获取的异常
