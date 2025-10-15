@@ -56,6 +56,11 @@ public class ClickPositionBean {
     String relativeY;
 
     /**
+     * 是否启用相对坐标 0-不启用，1-启用
+     */
+    String useRelative;
+
+    /**
      * 点击时长（单位：毫秒）
      */
     String clickTime;

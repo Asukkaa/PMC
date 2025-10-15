@@ -48,6 +48,7 @@ import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomationPermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
@@ -780,11 +781,13 @@ public class SettingController extends RootController implements MousePositionUp
      * 初始化窗口信息获取器
      */
     private void initWindowMonitor() {
-        stopWindowMonitor = new WindowMonitor(stopWindowInfo_Set, disableNodes, mainStage);
+        stopWindowMonitor = new WindowMonitor(disableNodes, mainStage);
+        stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Set));
         if (StringUtils.isNotBlank(stopWindowPath)) {
             stopWindowMonitor.updateWindowInfo(stopWindowPath);
         }
-        clickWindowMonitor = new WindowMonitor(clickWindowInfo_Set, disableNodes, mainStage);
+        clickWindowMonitor = new WindowMonitor(disableNodes, mainStage);
+        clickWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(clickWindowInfo_Set));
         if (StringUtils.isNotBlank(clickWindowPath)) {
             clickWindowMonitor.updateWindowInfo(clickWindowPath);
         }

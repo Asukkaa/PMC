@@ -25,7 +25,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -74,9 +76,10 @@ public class WindowMonitor {
     private Timeline findingWindowTimeline;
 
     /**
-     * 关联的标签，用于显示窗口信息
+     * 窗口信息处理器
      */
-    private final Label infoLabel;
+    @Setter
+    private WindowInfoHandler windowInfoHandler;
 
     /**
      * 要防重复点击的组件
@@ -98,38 +101,99 @@ public class WindowMonitor {
     /**
      * 构造函数
      *
-     * @param infoLabel    用于显示窗口信息的标签
      * @param disableNodes 要防重复点击的组件
      * @param stage        需要弹出的窗口
      */
-    public WindowMonitor(Label infoLabel, List<? extends Node> disableNodes, Stage stage) {
-        this.infoLabel = infoLabel;
+    public WindowMonitor(List<? extends Node> disableNodes, Stage stage) {
         this.disableNodes = disableNodes;
         this.stage = stage;
+    }
+
+    /**
+     * 创建默认窗口信息处理器
+     *
+     * @param infoLabel 窗口信息展示栏
+     * @return 窗口信息处理器
+     */
+    public static WindowInfoHandler creatDefaultWindowInfoHandler(Label infoLabel) {
+        return new WindowInfoHandler() {
+
+            /**
+             * 显示窗口信息接口
+             *
+             * @param windowInfo 窗口信息
+             */
+            @Override
+            public void showInfo(WindowInfo windowInfo) {
+                Platform.runLater(() -> windowInfoShow(windowInfo, infoLabel));
+            }
+
+            /**
+             * 删除窗口信息接口
+             */
+            @Override
+            public void removeInfo() {
+                infoLabel.setText("");
+            }
+        };
+    }
+
+    /**
+     * 计算绝对坐标
+     *
+     * @param windowInfo 窗口信息
+     * @param relativeX  相对横坐标（未乘 100 的百分比）
+     * @param relativeY  相对纵坐标（未乘 100 的百分比）
+     * @return 计算后的绝对坐标
+     */
+    public static Map<String, Integer> calculateAbsolutePosition(WindowInfo windowInfo, double relativeX, double relativeY) {
+        Map<String, Integer> absolutePosition = new HashMap<>();
+        relativeX = relativeX / 100;
+        relativeY = relativeY / 100;
+        int wX = windowInfo.getX();
+        int wY = windowInfo.getY();
+        int wW = windowInfo.getWidth();
+        int wH = windowInfo.getHeight();
+        int x = (int) Math.round(wX + wW * relativeX);
+        int y = (int) Math.round(wY + wH * relativeY);
+        absolutePosition.put(absoluteX, x);
+        absolutePosition.put(absoluteY, y);
+        return absolutePosition;
+    }
+
+
+    /**
+     * 显示窗口信息
+     *
+     * @param windowInfo 窗口信息
+     * @param infoLabel  窗口信息展示栏
+     */
+    public static void windowInfoShow(WindowInfo windowInfo, Label infoLabel) {
+        if (windowInfo != null) {
+            infoLabel.setTextFill(Color.CORNFLOWERBLUE);
+            infoLabel.setText(windowInfo.getProcessName());
+            String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                    findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
+                    findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                    findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                    findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+            addToolTip(info, infoLabel);
+        } else {
+            String text = infoLabel.getText();
+            if (StringUtils.isNotEmpty(text)) {
+                infoLabel.setTextFill(Color.RED);
+                addToolTip(text_noWindowInfo(), infoLabel);
+            }
+        }
     }
 
     /**
      * 显示窗口信息
      */
     public void showWindowInfo() {
-        Platform.runLater(() -> {
-            if (windowInfo != null) {
-                infoLabel.setTextFill(Color.CORNFLOWERBLUE);
-                infoLabel.setText(windowInfo.getProcessName());
-                String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
-                        findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
-                        findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
-                        findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
-                        findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
-                addToolTip(info, infoLabel);
-            } else {
-                String text = infoLabel.getText();
-                if (StringUtils.isNotEmpty(text)) {
-                    infoLabel.setTextFill(Color.RED);
-                    addToolTip(text_noWindowInfo(), infoLabel);
-                }
-            }
-        });
+        if (windowInfoHandler != null) {
+            windowInfoHandler.showInfo(windowInfo);
+        }
     }
 
     /**
@@ -158,7 +222,7 @@ public class WindowMonitor {
      */
     public void removeWindowInfo() {
         windowInfo = null;
-        infoLabel.setText("");
+        windowInfoHandler.removeInfo();
     }
 
     /**

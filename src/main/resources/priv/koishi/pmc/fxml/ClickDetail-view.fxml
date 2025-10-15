@@ -54,7 +54,7 @@
                         </HBox>
                     </HBox>
 
-                    <HBox spacing="10">
+                    <HBox fx:id="relativelyHBox_Det" disable="true" spacing="10">
                         <HBox styleClass="hBox-veryShort">
                             <Label prefHeight="25" text="%clickDetail.relativelyX"/>
                             <TextField fx:id="relativelyX_Det" promptText="0.00 - 100.00" prefWidth="100"/>
@@ -68,10 +68,8 @@
                         </HBox>
 
                         <HBox styleClass="hBox-veryShort">
-                            <Label fx:id="coordinateTypeText_Det" prefHeight="25"
-                                   text="%clickDetail.coordinateType_Det"/>
-                            <ChoiceBox fx:id="coordinateType_Det" prefHeight="25" prefWidth="120"
-                                       style="-fx-cursor: hand" onAction="#coordinateTypeChange"/>
+                            <CheckBox fx:id="useRelatively_Det" styleClass="checkBox-short"
+                                      text="%clickDetail.useRelatively"/>
                         </HBox>
 
                         <HBox styleClass="hBox-veryShort">

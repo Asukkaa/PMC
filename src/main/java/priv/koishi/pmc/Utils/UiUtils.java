@@ -299,7 +299,7 @@ public class UiUtils {
     }
 
     /**
-     * 设置默认数值
+     * 设置默认整数值
      *
      * @param textField    要设置默认值的文本输入框
      * @param defaultValue 默认值
@@ -312,6 +312,24 @@ public class UiUtils {
         int value = defaultValue;
         if (isInIntegerRange(valueStr, min, max)) {
             value = Integer.parseInt(valueStr);
+        }
+        return value;
+    }
+
+    /**
+     * 设置默认小数值
+     *
+     * @param textField    要设置默认值的文本输入框
+     * @param defaultValue 默认值
+     * @param min          文本输入框可填写的最小值，为空则不限制最小值
+     * @param max          文本输入框可填写的最大值，为空则不限制最大值
+     * @return 文本输入框所填值如果在规定范围内则返回所填值，否则返回默认值
+     */
+    public static double setDefaultDoubleValue(TextField textField, double defaultValue, Double min, Double max) {
+        String valueStr = textField.getText();
+        double value = defaultValue;
+        if (isInDecimalRange(valueStr, min, max)) {
+            value = Double.parseDouble(valueStr);
         }
         return value;
     }

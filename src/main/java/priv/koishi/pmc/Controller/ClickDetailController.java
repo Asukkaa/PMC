@@ -30,6 +30,7 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
@@ -45,8 +46,12 @@ import static priv.koishi.pmc.Controller.SettingController.noAutomationPermissio
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.windowInfoShow;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -162,7 +167,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
             stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det,
-            stopWindowInfoHBox_Det, noPermissionHBox_Det;
+            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -175,7 +180,7 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det, clickFindImgType_Det,
-            stopFindImgType_Det, coordinateType_Det;
+            stopFindImgType_Det;
 
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
@@ -183,7 +188,7 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
-            stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det;
+            stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
@@ -335,18 +340,100 @@ public class ClickDetailController extends RootController {
      * 初始化窗口信息获取器
      */
     private void initWindowMonitor() {
-        stopWindowMonitor = new WindowMonitor(stopWindowInfo_Det, disableNodes, stage);
+        stopWindowMonitor = new WindowMonitor(disableNodes, stage);
+        stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Det));
         FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
         WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
         updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
         stopWindowMonitor.setWindowInfo(stopWindowInfo);
         stopWindowMonitor.updateWindowInfo();
-        windowMonitorClick = new WindowMonitor(clickWindowInfo_Det, disableNodes, stage);
+        windowMonitorClick = new WindowMonitor(disableNodes, stage);
+        windowMonitorClick.setWindowInfoHandler(creatWindowInfoHandler());
         FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
         WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
         updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
         windowMonitorClick.setWindowInfo(clickWindowInfo);
         windowMonitorClick.updateWindowInfo();
+        relativelyHBox_Det.setDisable(StringUtils.isBlank(windowMonitorClick.getWindowInfo().getProcessPath()));
+    }
+
+    /**
+     * 创建窗口信息处理器
+     *
+     * @return 窗口信息处理器
+     */
+    private WindowInfoHandler creatWindowInfoHandler() {
+        return new WindowInfoHandler() {
+
+            /**
+             * 显示窗口信息接口
+             *
+             * @param windowInfo 窗口信息
+             */
+            @Override
+            public void showInfo(WindowInfo windowInfo) {
+                Platform.runLater(() -> {
+                    windowInfoShow(windowInfo, clickWindowInfo_Det);
+                    if (windowInfo != null) {
+                        relativelyHBox_Det.setDisable(false);
+                        calculateRelativePosition(windowInfo);
+                    } else {
+                        relativelyHBox_Det.setDisable(true);
+                    }
+                });
+            }
+
+            /**
+             * 删除窗口信息接口
+             */
+            @Override
+            public void removeInfo() {
+                clickWindowInfo_Det.setText("");
+                relativelyHBox_Det.setDisable(true);
+                relativelyX_Det.setText("");
+                relativelyY_Det.setText("");
+            }
+        };
+    }
+
+    /**
+     * 计算相对坐标
+     *
+     * @param windowInfo 窗口信息
+     */
+    private void calculateRelativePosition(WindowInfo windowInfo) {
+        int x = setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth);
+        int y = setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight);
+        int wX = windowInfo.getX();
+        int wY = windowInfo.getY();
+        int wW = windowInfo.getWidth();
+        int wH = windowInfo.getHeight();
+        if (x < wX || x > wX + wW || y < wY || y > wY + wH || wH == 0 || wW == 0) {
+            relativelyX_Det.setText("");
+            relativelyY_Det.setText("");
+        } else {
+            double relativeX = ((double) (x - wX) / wW) * 100;
+            double relativeY = ((double) (y - wY) / wH) * 100;
+            String formattedX = String.format("%.2f", relativeX);
+            String formattedY = String.format("%.2f", relativeY);
+            relativelyX_Det.setText(formattedX);
+            relativelyY_Det.setText(formattedY);
+        }
+    }
+
+    /**
+     * 计算绝对坐标
+     *
+     * @param windowInfo 窗口信息
+     */
+    private void calculateAbsolutePosition(WindowInfo windowInfo) {
+        double relativeX = setDefaultDoubleValue(relativelyX_Det, 0, 0.0, 100.0);
+        double relativeY = setDefaultDoubleValue(relativelyY_Det, 0, 0.0, 100.0);
+        Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, relativeX, relativeY);
+        int x = absolutePosition.get(absoluteX);
+        int y = absolutePosition.get(absoluteY);
+        mouseStartX_Det.setText(String.valueOf(x));
+        mouseStartY_Det.setText(String.valueOf(y));
     }
 
     /**
@@ -745,8 +832,6 @@ public class ClickDetailController extends RootController {
         initializeChoiceBoxItems(stopFindImgType_Det, findImgType_all(), findImgTypeList);
         // 要点击的图像识别区域设置
         initializeChoiceBoxItems(clickFindImgType_Det, findImgType_all(), findImgTypeList);
-        // 要点击的图像识别区域设置
-        initializeChoiceBoxItems(coordinateType_Det, absoluteCoordinates(), coordinateTypeList);
     }
 
     /**
@@ -993,16 +1078,16 @@ public class ClickDetailController extends RootController {
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
                 .setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()))
                 .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
-                .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, null, null)))
-                .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, null, null)))
                 .setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)))
-                .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, null)))
-                .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, null)))
+                .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, -screenWidth, screenWidth)))
+                .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, -screenHeight, screenHeight)))
                 .setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)))
+                .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth)))
+                .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight)))
                 .setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)))
-                .setRandomX(String.valueOf(setDefaultIntValue(randomClickX_Det, Integer.parseInt(defaultRandomClickX), 0, null)))
-                .setRandomY(String.valueOf(setDefaultIntValue(randomClickY_Det, Integer.parseInt(defaultRandomClickY), 0, null)))
                 .setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, Integer.parseInt(defaultClickTimeOffset), 0, null)))
+                .setRandomX(String.valueOf(setDefaultIntValue(randomClickX_Det, Integer.parseInt(defaultRandomClickX), 0, screenWidth)))
+                .setRandomY(String.valueOf(setDefaultIntValue(randomClickY_Det, Integer.parseInt(defaultRandomClickY), 0, screenHeight)))
                 .setRandomTime(String.valueOf(setDefaultIntValue(randomTimeOffset_Det, Integer.parseInt(defaultRandomTime), 0, null)))
                 .setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(stopRetryNumDefault), 0, null)))
                 .setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(clickRetryNumDefault), 0, null)));
@@ -1024,6 +1109,13 @@ public class ClickDetailController extends RootController {
                 throw new RuntimeException(text_retryStepEqualIndex());
             }
             selectedItem.setRetryStep(retryStep);
+        }
+        if (windowMonitorClick.getWindowInfo() != null) {
+            if (FindImgTypeEnum.WINDOW.ordinal() == clickFloatingConfig.getFindImgTypeEnum()) {
+                updateCoordinate();
+                selectedItem.setRelativeX(relativelyX_Det.getText())
+                        .setRelativeY(relativelyY_Det.getText());
+            }
         }
         closeStage();
         // 触发列表刷新（通过回调）
@@ -1256,19 +1348,18 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 坐标类型下拉框
-     */
-    @FXML
-    private void coordinateTypeChange() {
-
-    }
-
-    /**
      * 更新坐标信息按钮
      */
     @FXML
     private void updateCoordinate() {
-
+        WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
+        if (windowInfo != null) {
+            if (useRelatively_Det.isSelected()) {
+                calculateAbsolutePosition(windowInfo);
+            } else {
+                calculateRelativePosition(windowInfo);
+            }
+        }
     }
 
 }

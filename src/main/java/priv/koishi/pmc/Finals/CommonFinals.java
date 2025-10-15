@@ -482,6 +482,16 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 绝对横坐标标识
+     */
+    public static String absoluteX = "absoluteX";
+
+    /**
+     * 绝对纵坐标标识
+     */
+    public static String absoluteY = "absoluteY";
+
+    /**
      * 默认循环次数
      */
     public static final String defaultLoopTime = "1";
