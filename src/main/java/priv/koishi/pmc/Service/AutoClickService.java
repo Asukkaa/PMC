@@ -45,6 +45,7 @@ import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMai
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
+import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -231,14 +232,17 @@ public class AutoClickService {
      * @param outFilePath 导出文件夹路径
      * @return 导出文件路径
      */
-    public static Task<String> exportPMC(TaskBean<ClickPositionVO> taskBean, String fileName, String outFilePath) {
+    public static Task<String> exportPMC(TaskBean<ClickPositionVO> taskBean, String fileName, String outFilePath, boolean notOverwrite) {
         return new Task<>() {
             @Override
             protected String call() throws IOException {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_exportData());
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
-                String path = notOverwritePath(outFilePath + File.separator + fileName + PMC);
+                String path = outFilePath + File.separator + fileName + PMC;
+                if (notOverwrite) {
+                    path = notOverwritePath(path);
+                }
                 ObjectMapper objectMapper = new ObjectMapper();
                 // 构建基类类型信息
                 JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
@@ -1123,6 +1127,33 @@ public class AutoClickService {
                         .setRemove(false)
                         .setUuid(UUID.randomUUID().toString());
                 vo.setIndex(index++);
+                if (!retryTypeMap.containsKey(vo.getRetryTypeEnum())
+                        || !clickTypeMap.containsKey(vo.getClickTypeEnum())
+                        || !matchedTypeMap.containsKey(vo.getMatchedTypeEnum())
+                        || !recordClickTypeMap.containsKey(vo.getClickKeyEnum())
+                        || !activationList.contains(vo.getRandomClick())
+                        || !activationList.contains(vo.getRandomWaitTime())
+                        || !activationList.contains(vo.getRandomClickTime())
+                        || !activationList.contains(vo.getRandomTrajectory())
+                        || !activationList.contains(vo.getRandomClickInterval())
+                        || !isInIntegerRange(vo.getStartX(), 0, null)
+                        || !isInIntegerRange(vo.getStartY(), 0, null)
+                        || !isInIntegerRange(vo.getRandomX(), 0, null)
+                        || !isInIntegerRange(vo.getRandomY(), 0, null)
+                        || !isInIntegerRange(vo.getImgX(), null, null)
+                        || !isInIntegerRange(vo.getImgY(), null, null)
+                        || !isInIntegerRange(vo.getWaitTime(), 0, null)
+                        || !isInIntegerRange(vo.getClickNum(), 0, null)
+                        || !isInIntegerRange(vo.getClickTime(), 0, null)
+                        || !isInIntegerRange(vo.getClickInterval(), 0, null)
+                        || !isInIntegerRange(vo.getStopRetryTimes(), 0, null)
+                        || !isInIntegerRange(vo.getClickRetryTimes(), 0, null)
+                        || !isInIntegerRange(vo.getRandomClickTime(), 0, null)
+                        || !isInIntegerRange(vo.getStopMatchThreshold(), 0, 100)
+                        || !isInIntegerRange(vo.getClickMatchThreshold(), 0, 100)) {
+                    throw new RuntimeException(text_missingKeyData());
+                }
+                vo.setUuid(UUID.randomUUID().toString());
                 clickPositionVOS.add(vo);
             }
         }

@@ -484,12 +484,22 @@ public class CommonFinals {
     /**
      * 绝对横坐标标识
      */
-    public static String absoluteX = "absoluteX";
+    public static String AbsoluteX = "absoluteX";
 
     /**
      * 绝对纵坐标标识
      */
-    public static String absoluteY = "absoluteY";
+    public static String AbsoluteY = "absoluteY";
+
+    /**
+     * 相对横坐标标识
+     */
+    public static String RelativeX = "relativeX";
+
+    /**
+     * 相对纵坐标标识
+     */
+    public static String RelativeY = "relativeY";
 
     /**
      * 默认循环次数

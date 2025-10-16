@@ -156,11 +156,38 @@ public class WindowMonitor {
         int wH = windowInfo.getHeight();
         int x = (int) Math.round(wX + wW * relativeX);
         int y = (int) Math.round(wY + wH * relativeY);
-        absolutePosition.put(absoluteX, x);
-        absolutePosition.put(absoluteY, y);
+        absolutePosition.put(AbsoluteX, x);
+        absolutePosition.put(AbsoluteY, y);
         return absolutePosition;
     }
 
+    /**
+     * 计算相对对坐标
+     *
+     * @param windowInfo 窗口信息
+     * @param absoluteX  绝对横坐标
+     * @param absoluteY  绝对纵坐标
+     * @return 计算后的相对坐标
+     */
+    public static Map<String, String> calculateRelativePosition(WindowInfo windowInfo, int absoluteX, int absoluteY) {
+        Map<String, String> relativePosition = new HashMap<>();
+        int wX = windowInfo.getX();
+        int wY = windowInfo.getY();
+        int wW = windowInfo.getWidth();
+        int wH = windowInfo.getHeight();
+        if (absoluteX < wX || absoluteX > wX + wW || absoluteY < wY || absoluteY > wY + wH || wH == 0 || wW == 0) {
+            relativePosition.put(RelativeX, "");
+            relativePosition.put(RelativeY, "");
+        } else {
+            double rX = ((double) (absoluteX - wX) / wW) * 100;
+            double rY = ((double) (absoluteY - wY) / wH) * 100;
+            String formattedX = String.format("%.2f", rX);
+            String formattedY = String.format("%.2f", rY);
+            relativePosition.put(RelativeX, formattedX);
+            relativePosition.put(RelativeY, formattedY);
+        }
+        return relativePosition;
+    }
 
     /**
      * 显示窗口信息

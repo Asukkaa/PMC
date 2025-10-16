@@ -4,14 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
+import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static priv.koishi.pmc.Finals.CommonFinals.RelativeX;
+import static priv.koishi.pmc.Finals.CommonFinals.RelativeY;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
 
 /**
  * 自动操作步骤类
@@ -263,12 +270,37 @@ public class ClickPositionBean {
                 || (timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval)
                 // 拖拽时如果轨迹点为空则认为是结束拖拽，直接添加结束轨迹点
                 || (isDragging && pressButtons == null)) {
-            TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean();
-            trajectoryPointBean.setPressButtons(pressButtons)
+            TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean()
+                    .setPressButtons(pressButtons)
                     .setTimestamp(timestamp)
                     .setX(x)
                     .setY(y);
+            if (clickWindowConfig != null &&
+                    FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
+                WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+                if (windowInfo != null) {
+                    trajectoryPointBean.updatePosition(windowInfo);
+                }
+            }
             moveTrajectory.add(trajectoryPointBean);
+        }
+    }
+
+    /**
+     * 换算绝对和相对坐标
+     */
+    public void updatePosition() {
+        if (clickWindowConfig != null &&
+                FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
+            WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+            if (windowInfo != null) {
+                if (StringUtils.isNotBlank(startX) && StringUtils.isNotBlank(startY)) {
+                    Map<String, String> relativePosition = calculateRelativePosition(windowInfo,
+                            Integer.parseInt(startX), Integer.parseInt(startY));
+                    relativeX = relativePosition.get(RelativeX);
+                    relativeY = relativePosition.get(RelativeY);
+                }
+            }
         }
     }
 

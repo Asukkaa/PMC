@@ -404,21 +404,9 @@ public class ClickDetailController extends RootController {
     private void calculateRelativePosition(WindowInfo windowInfo) {
         int x = setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth);
         int y = setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight);
-        int wX = windowInfo.getX();
-        int wY = windowInfo.getY();
-        int wW = windowInfo.getWidth();
-        int wH = windowInfo.getHeight();
-        if (x < wX || x > wX + wW || y < wY || y > wY + wH || wH == 0 || wW == 0) {
-            relativelyX_Det.setText("");
-            relativelyY_Det.setText("");
-        } else {
-            double relativeX = ((double) (x - wX) / wW) * 100;
-            double relativeY = ((double) (y - wY) / wH) * 100;
-            String formattedX = String.format("%.2f", relativeX);
-            String formattedY = String.format("%.2f", relativeY);
-            relativelyX_Det.setText(formattedX);
-            relativelyY_Det.setText(formattedY);
-        }
+        Map<String, String> relativePosition = WindowMonitor.calculateRelativePosition(windowInfo, x, y);
+        relativelyX_Det.setText(relativePosition.get(RelativeX));
+        relativelyY_Det.setText(relativePosition.get(RelativeY));
     }
 
     /**
@@ -430,8 +418,8 @@ public class ClickDetailController extends RootController {
         double relativeX = setDefaultDoubleValue(relativelyX_Det, 0, 0.0, 100.0);
         double relativeY = setDefaultDoubleValue(relativelyY_Det, 0, 0.0, 100.0);
         Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, relativeX, relativeY);
-        int x = absolutePosition.get(absoluteX);
-        int y = absolutePosition.get(absoluteY);
+        int x = absolutePosition.get(AbsoluteX);
+        int y = absolutePosition.get(AbsoluteY);
         mouseStartX_Det.setText(String.valueOf(x));
         mouseStartY_Det.setText(String.valueOf(y));
     }
@@ -1045,6 +1033,7 @@ public class ClickDetailController extends RootController {
                 stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
         saveFloatingWindow(clickFloating, stopFloating);
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
+        String useRelatively = useRelatively_Det.isSelected() ? activation : unActivation;
         String stopAllRegion = stopAllRegion_Det.isSelected() ? activation : unActivation;
         String clickAllRegion = clickAllRegion_Det.isSelected() ? activation : unActivation;
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
@@ -1064,6 +1053,7 @@ public class ClickDetailController extends RootController {
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
                 .setRandomClick(randomClick)
+                .setUseRelative(useRelatively)
                 .setName(clickName_Det.getText())
                 .setRandomWaitTime(randomWaitTime)
                 .setRandomClickTime(randomClickTime)

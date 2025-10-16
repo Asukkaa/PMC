@@ -5,10 +5,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
@@ -35,13 +33,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Annotate.UsedByReflection;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
-import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Bean.VO.Indexable;
-import priv.koishi.pmc.Controller.FileChooserController;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.MainApplication;
@@ -50,10 +46,8 @@ import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -64,7 +58,6 @@ import java.util.stream.Collectors;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -2257,66 +2250,6 @@ public class UiUtils {
             stage.close();
         }
         System.gc();
-    }
-
-    /**
-     * 使用自定义文件选择器选择文件
-     *
-     * @param fileChooserConfig 文件查询配置
-     * @return 文件选择器控制器
-     * @throws IOException 页面加载失败、配置文件读取异常
-     */
-    public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
-        URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loader.load();
-        FileChooserController controller = loader.getController();
-        controller.initData(fileChooserConfig);
-        Stage detailStage = new Stage();
-        Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
-        prop.load(input);
-        double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1000"));
-        double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "450"));
-        input.close();
-        Scene scene = new Scene(root, with, height);
-        detailStage.setScene(scene);
-        detailStage.setTitle(fileChooserConfig.getTitle());
-        detailStage.initModality(Modality.APPLICATION_MODAL);
-        setWindowLogo(detailStage, logoPath);
-        detailStage.show();
-        // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((_, _, _) ->
-                Platform.runLater(controller::adaption));
-        // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((_, _, _) ->
-                Platform.runLater(controller::adaption));
-        return controller;
-    }
-
-    /**
-     * 处理要过滤的文件类型
-     *
-     * @param filterFileType 填有空格区分的要过滤的文件类型字符串的文本输入框
-     * @return 要过滤的文件类型list
-     */
-    public static List<String> getFilterExtensionList(TextField filterFileType) {
-        String filterFileTypeValue = filterFileType.getText();
-        return getFilterExtensionList(filterFileTypeValue);
-    }
-
-    /**
-     * 处理要过滤的文件类型
-     *
-     * @param filterFileTypeValue 空格区分的要过滤的文件类型字符串
-     * @return 要过滤的文件类型list
-     */
-    public static List<String> getFilterExtensionList(String filterFileTypeValue) {
-        List<String> filterExtensionList = new ArrayList<>();
-        if (StringUtils.isNotBlank(filterFileTypeValue)) {
-            filterExtensionList = Arrays.asList(filterFileTypeValue.toLowerCase().split(" "));
-        }
-        return filterExtensionList;
     }
 
 }

@@ -66,12 +66,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -83,7 +86,6 @@ import static priv.koishi.pmc.Service.AutoClickService.loadPMC;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
-import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
@@ -1102,35 +1104,6 @@ public class AutoClickController extends RootController implements MousePosition
      * @param filePath         要导入的文件路径
      */
     public void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) {
-        for (ClickPositionVO clickPositionVO : clickPositionVOS) {
-            if (!isInIntegerRange(clickPositionVO.getStartX(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getStartY(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickTime(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickNum(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickInterval(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getWaitTime(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickRetryTimes(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getStopRetryTimes(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getClickMatchThreshold(), 0, 100)
-                    || !isInIntegerRange(clickPositionVO.getStopMatchThreshold(), 0, 100)
-                    || !isInIntegerRange(clickPositionVO.getRandomX(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getRandomY(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getRandomClickTime(), 0, null)
-                    || !isInIntegerRange(clickPositionVO.getImgX(), null, null)
-                    || !isInIntegerRange(clickPositionVO.getImgY(), null, null)
-                    || !matchedTypeMap.containsKey(clickPositionVO.getMatchedTypeEnum())
-                    || !recordClickTypeMap.containsKey(clickPositionVO.getClickTypeEnum())
-                    || !retryTypeMap.containsKey(clickPositionVO.getRetryTypeEnum())
-                    || !clickTypeMap.containsKey(clickPositionVO.getClickTypeEnum())
-                    || !activationList.contains(clickPositionVO.getRandomClick())
-                    || !activationList.contains(clickPositionVO.getRandomTrajectory())
-                    || !activationList.contains(clickPositionVO.getRandomClickInterval())
-                    || !activationList.contains(clickPositionVO.getRandomWaitTime())
-                    || !activationList.contains(clickPositionVO.getRandomClickTime())) {
-                throw new RuntimeException(text_missingKeyData());
-            }
-            clickPositionVO.setUuid(UUID.randomUUID().toString());
-        }
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, unit_process());
         updateLabel(log_Click, text_loadSuccess() + filePath);
@@ -1302,9 +1275,8 @@ public class AutoClickController extends RootController implements MousePosition
                 Point mousePoint = MousePositionListener.getMousePoint();
                 int startX = (int) mousePoint.getX();
                 int startY = (int) mousePoint.getY();
-                int dataSize = tableView_Click.getItems().size() + 1;
                 // 添加移动轨迹到表格
-                addMoveTrajectory(dataSize, startX, startY);
+                addMoveTrajectory(startX, startY);
             }
             removeNativeListener(moveMotionListener);
             pressButtonList.clear();
@@ -1350,11 +1322,10 @@ public class AutoClickController extends RootController implements MousePosition
         /**
          * 添加移动轨迹到表格
          *
-         * @param index  数据编号
          * @param startX 起始横坐标
          * @param startY 起始纵坐标
          */
-        private void addMoveTrajectory(int index, int startX, int startY) {
+        private void addMoveTrajectory(int startX, int startY) {
             // 所有按键都松开时才能记录
             if (recordMove && pressButtonList.isEmpty()) {
                 Platform.runLater(() -> {
@@ -1364,13 +1335,15 @@ public class AutoClickController extends RootController implements MousePosition
                     long moveTime = isFirstClick ?
                             endMoveTime - recordingStartTime :
                             endMoveTime - startMoveTime;
+                    int index = tableView_Click.getItems().size() + 1;
                     // 添加至表格
                     List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
                     movePoint.setName(text_step() + index + text_isRecord())
                             .setClickTypeEnum(ClickTypeEnum.MOVE_TRAJECTORY.ordinal())
                             .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY));
+                            .setStartY(String.valueOf(startY))
+                            .updatePosition();
                     clickPositionVOS.add(movePoint);
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
@@ -1409,13 +1382,13 @@ public class AutoClickController extends RootController implements MousePosition
                 Point mousePoint = MousePositionListener.getMousePoint();
                 int startX = (int) mousePoint.getX();
                 int startY = (int) mousePoint.getY();
-                int dataSize = tableView_Click.getItems().size() + 1;
                 // 添加移动轨迹到表格
-                addMoveTrajectory(dataSize, startX, startY);
+                addMoveTrajectory(startX, startY);
                 // 创建点击位置对象
                 if (pressButtonList.isEmpty()) {
+                    int index = tableView_Click.getItems().size() + 1;
                     clickBean = createClickPositionVO();
-                    clickBean.setName(text_step() + dataSize + text_isRecord())
+                    clickBean.setName(text_step() + index + text_isRecord())
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
@@ -1465,7 +1438,8 @@ public class AutoClickController extends RootController implements MousePosition
                     // 计算点击持续时间（毫秒）
                     long duration = releasedTime - pressTime;
                     // 设置点击持续时间
-                    clickBean.setClickTime(String.valueOf(duration));
+                    clickBean.setClickTime(String.valueOf(duration))
+                            .updatePosition();
                     Platform.runLater(() -> {
                         // 添加至表格
                         List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
@@ -1628,14 +1602,14 @@ public class AutoClickController extends RootController implements MousePosition
         disableNodes.add(clearButton_Click);
         disableNodes.add(loadAutoClick_Click);
         disableNodes.add(exportAutoClick_Click);
-        Node timedStartTab = mainScene.lookup("#timedStartTab");
-        disableNodes.add(timedStartTab);
-        Node autoClickTab = mainScene.lookup("#autoClickTab");
-        disableNodes.add(autoClickTab);
-        Node settingTab = mainScene.lookup("#settingTab");
-        disableNodes.add(settingTab);
         Node aboutTab = mainScene.lookup("#aboutTab");
         disableNodes.add(aboutTab);
+        Node settingTab = mainScene.lookup("#settingTab");
+        disableNodes.add(settingTab);
+        Node autoClickTab = mainScene.lookup("#autoClickTab");
+        disableNodes.add(autoClickTab);
+        Node timedStartTab = mainScene.lookup("#timedStartTab");
+        disableNodes.add(timedStartTab);
     }
 
     /**
@@ -1863,7 +1837,7 @@ public class AutoClickController extends RootController implements MousePosition
             taskBean.setMassageLabel(log_Click)
                     .setBeanList(tableViewItems);
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
-            exportPMCTask = exportPMC(taskBean, fileName, outFilePath);
+            exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_Click.isSelected());
             bindingTaskNode(exportPMCTask, taskBean);
             exportPMCTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
