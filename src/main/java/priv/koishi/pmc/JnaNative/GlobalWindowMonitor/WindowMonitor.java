@@ -142,8 +142,8 @@ public class WindowMonitor {
      * 计算绝对坐标
      *
      * @param windowInfo 窗口信息
-     * @param relativeX  相对横坐标（未乘 100 的百分比）
-     * @param relativeY  相对纵坐标（未乘 100 的百分比）
+     * @param relativeX  相对横坐标（保留两位小数的百分比）
+     * @param relativeY  相对纵坐标（保留两位小数的百分比）
      * @return 计算后的绝对坐标
      */
     public static Map<String, Integer> calculateAbsolutePosition(WindowInfo windowInfo, double relativeX, double relativeY) {

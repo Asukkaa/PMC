@@ -68,8 +68,8 @@
                         </HBox>
 
                         <HBox styleClass="hBox-veryShort">
-                            <CheckBox fx:id="useRelatively_Det" styleClass="checkBox-short"
-                                      text="%clickDetail.useRelatively"/>
+                            <CheckBox fx:id="useRelatively_Det" onAction="#useRelatively" styleClass="checkBox-short"
+                                      text="%useRelatively"/>
                         </HBox>
 
                         <HBox styleClass="hBox-veryShort">

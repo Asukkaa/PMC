@@ -1004,6 +1004,7 @@ public class AutoClickController extends RootController implements MousePosition
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+        String useRelatively = settingController.useRelatively_Set.isSelected() ? activation : unActivation;
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setSampleInterval(Integer.parseInt(sampleInterval))
@@ -1023,6 +1024,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setStopWindowConfig(stopConfig)
                 .setStopRetryTimes(stopRetryNum)
                 .setClickTime(clickTimeOffset)
+                .setUseRelative(useRelatively)
                 .setRandomClick(randomClick)
                 .setRandomTime(randomTime)
                 .setRandomX(randomClickX)

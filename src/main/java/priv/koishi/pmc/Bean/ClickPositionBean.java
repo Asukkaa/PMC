@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static priv.koishi.pmc.Finals.CommonFinals.RelativeX;
-import static priv.koishi.pmc.Finals.CommonFinals.RelativeY;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
 
@@ -65,7 +64,7 @@ public class ClickPositionBean {
     /**
      * 是否启用相对坐标 0-不启用，1-启用
      */
-    String useRelative;
+    String useRelative = unActivation;
 
     /**
      * 点击时长（单位：毫秒）
@@ -199,12 +198,12 @@ public class ClickPositionBean {
     /**
      * 是否启用随机点击坐标 0-不启用，1-启用
      */
-    String randomClick;
+    String randomClick = unActivation;
 
     /**
      * 是否启用随机轨迹 0-不启用，1-启用
      */
-    String randomTrajectory;
+    String randomTrajectory = unActivation;
 
     /**
      * 随机偏移时长（单位：毫秒）
@@ -214,17 +213,17 @@ public class ClickPositionBean {
     /**
      * 是否启用随机点击时长 0-不启用，1-启用
      */
-    String randomClickTime;
+    String randomClickTime = unActivation;
 
     /**
      * 是否启用随机等待时长 0-不启用，1-启用
      */
-    String randomWaitTime;
+    String randomWaitTime = unActivation;
 
     /**
      * 是否启用随机点击间隔 0-不启用，1-启用
      */
-    String randomClickInterval;
+    String randomClickInterval = unActivation;
 
     /**
      * 匹配图像坐标横轴偏移量

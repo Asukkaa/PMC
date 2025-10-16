@@ -890,4 +890,6 @@ public class CommonFinals {
 
     public static final String key_stopWindowPath = "stopWindowPath";
 
+    public static final String key_useRelatively = "useRelatively";
+
 }

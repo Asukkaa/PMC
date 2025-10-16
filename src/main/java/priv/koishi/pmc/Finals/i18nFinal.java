@@ -315,6 +315,22 @@ public class i18nFinal {
     }
 
     /**
+     * @return <p>勾选后将根据相对坐标与目标窗口宽高进行换算</p>
+     * 只有设置图像识别目标窗口后才可使用
+     */
+    public static String tip_useRelatively() {
+        return bundle.getString("tip.useRelatively");
+    }
+
+    /**
+     * @return <p>使用相对坐标时将更新绝对坐标</p>
+     * 使用绝对坐标时将更新相对坐标
+     */
+    public static String tip_updateCoordinate() {
+        return bundle.getString("tip.updateCoordinate");
+    }
+
+    /**
      * @return 浮窗将会根据填写值向左右偏移，只能填整数，正数向右偏移，负数向左偏移，不填默认为
      */
     public static String tip_offsetX() {

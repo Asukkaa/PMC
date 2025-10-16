@@ -354,7 +354,14 @@ public class ClickDetailController extends RootController {
         updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
         windowMonitorClick.setWindowInfo(clickWindowInfo);
         windowMonitorClick.updateWindowInfo();
-        relativelyHBox_Det.setDisable(StringUtils.isBlank(windowMonitorClick.getWindowInfo().getProcessPath()));
+        if (StringUtils.isBlank(windowMonitorClick.getWindowInfo().getProcessPath())) {
+            relativelyHBox_Det.setDisable(true);
+            useRelatively_Det.setSelected(false);
+        } else {
+            relativelyHBox_Det.setDisable(false);
+            useRelatively_Det.setSelected(activation.equals(selectedItem.getUseRelative()));
+        }
+        useRelatively();
     }
 
     /**
@@ -723,11 +730,13 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_mouseStartY(), mouseStartY_Det);
         addToolTip(tip_randomClick(), randomClick_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
+        addToolTip(tip_useRelatively(), useRelatively_Det);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Det);
         addToolTip(tip_randomClickTime(), randomClickTime_Det);
         addToolTip(tip_step(), matchedStep_Det, retryStep_Det);
         addToolTip(tip_removeClickImgBtn(), removeClickImg_Det);
         addToolTip(tip_randomTrajectory(), randomTrajectory_Det);
+        addToolTip(tip_updateCoordinate(), updateCoordinate_Det);
         addToolTip(tip_updateClickNameBtn(), updateClickName_Det);
         addValueToolTip(imgX_Det, tip_imgX(), imgX_Det.getText());
         addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
@@ -1349,6 +1358,24 @@ public class ClickDetailController extends RootController {
             } else {
                 calculateRelativePosition(windowInfo);
             }
+        }
+    }
+
+    /**
+     * 使用相对坐标开关
+     */
+    @FXML
+    private void useRelatively() {
+        if (useRelatively_Det.isSelected()) {
+            mouseStartX_Det.setDisable(true);
+            mouseStartY_Det.setDisable(true);
+            relativelyX_Det.setDisable(false);
+            relativelyY_Det.setDisable(false);
+        } else {
+            mouseStartX_Det.setDisable(false);
+            mouseStartY_Det.setDisable(false);
+            relativelyX_Det.setDisable(true);
+            relativelyY_Det.setDisable(true);
         }
     }
 

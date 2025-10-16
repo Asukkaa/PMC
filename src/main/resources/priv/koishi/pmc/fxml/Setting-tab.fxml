@@ -183,6 +183,11 @@
                 <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
                 <Label prefHeight="25" text="%unit.ms"/>
             </HBox>
+
+            <HBox styleClass="hBox-short">
+                <CheckBox fx:id="useRelatively_Set" onAction="#useRelatively" styleClass="checkBox-medium"
+                          text="%useRelatively"/>
+            </HBox>
         </HBox>
 
         <Separator/>

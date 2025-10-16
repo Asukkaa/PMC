@@ -153,7 +153,7 @@ public class SettingController extends RootController implements MousePositionUp
             autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
-            updateStopWindow_Set, updateClickWindow_Set;
+            updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -379,6 +379,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, unActivation);
+        setControlLastConfig(useRelatively_Set, prop, key_useRelatively, unActivation);
         setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, unActivation);
         setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
@@ -490,6 +491,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_showWindowRun(), showWindowRun_Set);
         addToolTip(maxWindow_Set.getText(), maxWindow_Set);
         addToolTip(tip_massageRegion(), massageRegion_Set);
+        addToolTip(tip_useRelatively(), useRelatively_Set);
         addToolTip(tip_defaultStopImgBtn(), stopImgBtn_Set);
         addToolTip(tip_remindTaskSave(), remindTaskSave_Set);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Set);
@@ -1241,6 +1243,16 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void updateStopWindowAction() throws IOException {
         setLoadLastConfigCheckBox(updateStopWindow_Set, configFile_Click, key_updateStopWindow);
+    }
+
+    /**
+     * 使用相对坐标开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void useRelatively() throws IOException {
+        setLoadLastConfigCheckBox(useRelatively_Set, configFile_Click, key_useRelatively);
     }
 
     /**
