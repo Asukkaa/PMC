@@ -624,6 +624,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setAddCloseKey(false)
                 .setTransparent(true)
                 .setEnableDrag(false)
+                .setCloseSave(false)
                 .setShowName(false)
                 .setFontSize(14);
         // 创建浮窗
@@ -689,7 +690,6 @@ public class AutoClickController extends RootController implements MousePosition
             CheckBox clickImgLog = settingController.clickImgLog_Set;
             CheckBox stopImgLog = settingController.stopImgLog_Set;
             CheckBox waitLog = settingController.waitLog_Set;
-            Label floatingLabel = massageFloating.getMassageLabel();
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
@@ -697,11 +697,11 @@ public class AutoClickController extends RootController implements MousePosition
                     .setClickImgLog(clickImgLog.isSelected())
                     .setStopImgLog(stopImgLog.isSelected())
                     .setFirstClick(firstClick.isSelected())
+                    .setMassageFloating(massageFloating)
                     .setClickLog(clickLog.isSelected())
                     .setMoveLog(moveLog.isSelected())
                     .setDragLog(dragLog.isSelected())
                     .setWaitLog(waitLog.isSelected())
-                    .setFloatingLabel(floatingLabel)
                     .setRunTimeline(runTimeline)
                     .setLoopTimes(loopTimes)
                     .setProgressBar(progressBar_Click)
@@ -1123,7 +1123,9 @@ public class AutoClickController extends RootController implements MousePosition
                 int x = (int) mousePoint.getX();
                 int y = (int) mousePoint.getY();
                 String text = autoClick_nowMousePos() + "X: " + x + " Y: " + y;
+                // 运行自动流程时信息浮窗跟随鼠标
                 CheckBox mouseFloatingRun = settingController.mouseFloatingRun_Set;
+                // 录制自动流程时信息浮窗跟随鼠标
                 CheckBox mouseFloatingRecord = settingController.mouseFloatingRecord_Set;
                 TextField offsetXTextField = settingController.offsetX_Set;
                 int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
@@ -1137,10 +1139,10 @@ public class AutoClickController extends RootController implements MousePosition
                     mainStage.setTitle(appName);
                 }
                 if (floatingStage != null && floatingStage.isShowing()) {
-                    floatingMove(floatingStage, mousePoint, offsetX, offsetY);
+                    setPositionText(massageFloating, autoClick_nowMousePos() + "\nX: " + x + " Y: " + y);
                     if ((mouseFloatingRun.isSelected() && runClicking) || findingWindow
                             || (mouseFloatingRecord.isSelected() && recordClicking)) {
-                        setPositionText(massageFloating, autoClick_nowMousePos() + "\nX: " + x + " Y: " + y);
+                        floatingMove(floatingStage, mousePoint, offsetX, offsetY);
                     }
                 }
             }

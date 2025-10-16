@@ -231,7 +231,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后在运行自动操作时运行信息浮窗会跟随鼠标移动
+     * @return 勾选后在运行自动操作时信息浮窗会跟随鼠标移动
      */
     public static String tip_mouseFloatingRun() {
         return bundle.getString("tip.mouseFloatingRun");

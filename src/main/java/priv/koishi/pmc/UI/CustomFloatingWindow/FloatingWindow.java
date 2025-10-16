@@ -512,7 +512,7 @@ public class FloatingWindow {
                             .setX(floatingX)
                             .setY(floatingY);
                     floatingConfig.setConfig(windowConfig);
-                    if (StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
+                    if (floatingConfig.isCloseSave() && StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
                         try {
                             saveFloatingCoordinate(floatingConfig);
                         } catch (IOException e) {

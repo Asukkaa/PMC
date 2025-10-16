@@ -28,6 +28,7 @@ import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Queue.DynamicQueue;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -66,7 +68,7 @@ public class AutoClickService {
     /**
      * 浮窗信息栏
      */
-    private static Label floatingLabel;
+    private static FloatingWindowDescriptor massageFloating;
 
     /**
      * 程序界面信息栏
@@ -521,7 +523,7 @@ public class AutoClickService {
                     backup.add(vo);
                 }
                 int dataSize = backup.size();
-                floatingLabel = taskBean.getFloatingLabel();
+                massageFloating = taskBean.getMassageFloating();
                 massageLabel = taskBean.getMassageLabel();
                 firstClick.set(taskBean.isFirstClick());
                 updateProgress(0, dataSize);
@@ -547,23 +549,21 @@ public class AutoClickService {
                     } else {
                         clickText = text_taskInfo() + clickPositionVO.getClickKey() + clickPositionVO.getClickType();
                     }
-                    Platform.runLater(() -> {
-                        String text = loopTimeText +
+                    String text = loopTimeText +
+                            text_progress() + progress + "/" + dataSize +
+                            text_willBe() + waitTime + text_msWillBe() + name +
+                            text_point() + " X：" + startX + " Y：" + startY + clickText +
+                            text_clickTime() + clickTime + " " + unit_ms() +
+                            text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
+                    if (StringUtils.isNotBlank(clickImgPath)) {
+                        text = loopTimeText +
                                 text_progress() + progress + "/" + dataSize +
                                 text_willBe() + waitTime + text_msWillBe() + name +
-                                text_point() + " X：" + startX + " Y：" + startY + clickText +
-                                text_clickTime() + clickTime + " " + unit_ms() +
-                                text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
-                        if (StringUtils.isNotBlank(clickImgPath)) {
-                            text = loopTimeText +
-                                    text_progress() + progress + "/" + dataSize +
-                                    text_willBe() + waitTime + text_msWillBe() + name +
-                                    text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
-                                    text_afterMatch() + clickPositionVO.getMatchedType();
-                        }
-                        // 更新操作信息
-                        updateMassage(text);
-                    });
+                                text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
+                                text_afterMatch() + clickPositionVO.getMatchedType();
+                    }
+                    // 更新操作信息
+                    updateMassage(text);
                     long wait = Long.parseLong(waitTime);
                     // 处理随机等待时间偏移
                     if (activation.equals(clickPositionVO.getRandomWaitTime())) {
@@ -648,11 +648,9 @@ public class AutoClickService {
                 String stopPath = stopImgFileBean.getPath();
                 AtomicReference<String> fileName = new AtomicReference<>();
                 fileName.set(getExistsFileName(new File(stopPath)));
-                Platform.runLater(() -> {
-                    String text = loopTimeText + text_searchingStop() + fileName.get();
-                    // 更新操作信息
-                    updateMassage(text);
-                });
+                String text = loopTimeText + text_searchingStop() + fileName.get();
+                // 更新操作信息
+                updateMassage(text);
                 long start = System.currentTimeMillis();
                 double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
                 FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
@@ -706,11 +704,9 @@ public class AutoClickService {
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             fileName.set(getExistsFileName(new File(clickPath)));
-            Platform.runLater(() -> {
-                String text = loopTimeText + text_searchingClick() + fileName.get();
-                // 更新操作信息
-                updateMassage(text);
-            });
+            String text = loopTimeText + text_searchingClick() + fileName.get();
+            // 更新操作信息
+            updateMassage(text);
             long start = System.currentTimeMillis();
             int retryType = clickPositionVO.getRetryTypeEnum();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
@@ -1064,19 +1060,21 @@ public class AutoClickService {
      * @param message 要更新的信息
      */
     private static void updateMassage(String message) {
-        if (massageLabel != null) {
-            massageLabel.setText(message);
-        }
-        if (floatingLabel != null) {
-            floatingLabel.setText(message);
-        }
+        Platform.runLater(() -> {
+            if (massageLabel != null) {
+                massageLabel.setText(message);
+            }
+            if (massageFloating != null) {
+                updateMassageLabel(massageFloating, message);
+            }
+        });
     }
 
     /**
      * 解除组件引用
      */
     public static void clearReferences() {
-        floatingLabel = null;
+        massageFloating = null;
         massageLabel = null;
         dynamicQueue = null;
     }

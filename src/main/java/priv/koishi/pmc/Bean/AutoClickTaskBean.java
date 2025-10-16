@@ -1,11 +1,11 @@
 package priv.koishi.pmc.Bean;
 
 import javafx.animation.Timeline;
-import javafx.scene.control.Label;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 /**
  * 自动操作工具多线程任务所需设置类
@@ -32,7 +32,7 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     /**
      * 执行自动操作时的信息输出栏
      */
-    Label floatingLabel;
+    FloatingWindowDescriptor massageFloating;
 
     /**
      * 运行时间线

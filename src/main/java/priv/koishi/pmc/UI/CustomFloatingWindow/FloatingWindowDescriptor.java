@@ -168,6 +168,11 @@ public class FloatingWindowDescriptor {
     String configFile;
 
     /**
+     * 关闭时保存浮窗位置（true 保存）
+     */
+    boolean closeSave = true;
+
+    /**
      * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidth}）
      */
     int minWidth = defaultFloatingWidthInt;

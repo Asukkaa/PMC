@@ -614,7 +614,7 @@ public class CommonFinals {
     /**
      * 默认信息浮窗高度
      */
-    public static final String defaultFloatingHeight = "160";
+    public static final String defaultFloatingHeight = "220";
 
     /**
      * 默认信息浮窗高度
