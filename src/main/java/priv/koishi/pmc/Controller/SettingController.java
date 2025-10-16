@@ -1255,10 +1255,12 @@ public class SettingController extends RootController implements MousePositionUp
             Stage floatingStage = massageFloating.getStage();
             if (floatingStage != null && floatingStage.isShowing()) {
                 if (mouseFloating_Set.isSelected()) {
+                    massageFloating.setCloseSave(false);
                     updateMassageLabel(massageFloating, text_escCloseFloating());
                     massageRegion_Set.setText(text_closeFloating());
                     addToolTip(tip_closeFloating(), massageRegion_Set);
                 } else {
+                    massageFloating.setCloseSave(true);
                     updateMassageLabel(massageFloating, text_saveFloatingCoordinate());
                     massageRegion_Set.setText(text_saveCloseFloating());
                     addToolTip(tip_saveFloating(), massageRegion_Set);
@@ -1283,10 +1285,12 @@ public class SettingController extends RootController implements MousePositionUp
                     floatingStage.setX(lastX);
                     floatingStage.setY(lastY);
                     massageFloating.setHideButtonText(text_closeFloating())
-                            .setHideButtonToolTip(tip_closeFloating());
+                            .setHideButtonToolTip(tip_closeFloating())
+                            .setCloseSave(false);
                 } else {
                     massageFloating.setHideButtonText(text_saveCloseFloating())
-                            .setHideButtonToolTip(tip_saveFloating());
+                            .setHideButtonToolTip(tip_saveFloating())
+                            .setCloseSave(true);
                 }
                 // 隐藏浮窗
                 hideFloatingWindow(massageFloating);
@@ -1374,7 +1378,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * gc类型变更下拉框监听
+     * gc 类型变更下拉框监听
      */
     @FXML
     private void nextGcTypeAction() {
