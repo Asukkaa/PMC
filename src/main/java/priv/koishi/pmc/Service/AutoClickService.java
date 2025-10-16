@@ -27,6 +27,7 @@ import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Queue.DynamicQueue;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
@@ -534,6 +535,24 @@ public class AutoClickService {
                     ClickPositionVO clickPositionVO = backup.get(currentStep);
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
+                    // 处理相对路径
+                    String useRelative = clickPositionVO.getUseRelative();
+                    FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                    if (clickWindowConfig != null &&
+                            FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
+                        WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+                        if (windowInfo != null && activation.equals(useRelative)) {
+                            String relativeX = clickPositionVO.getRelativeX();
+                            String relativeY = clickPositionVO.getRelativeY();
+                            if (StringUtils.isNotBlank(relativeX) && StringUtils.isNotBlank(relativeY)) {
+                                double rX = Double.parseDouble(relativeX);
+                                double rY = Double.parseDouble(relativeY);
+                                Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, rX, rY);
+                                startX = absolutePosition.get(AbsoluteX);
+                                startY = absolutePosition.get(AbsoluteY);
+                            }
+                        }
+                    }
                     String waitTime = clickPositionVO.getWaitTime();
                     String clickTime = clickPositionVO.getClickTime();
                     String name = clickPositionVO.getName();
@@ -975,6 +994,24 @@ public class AutoClickService {
                 lastPoint = point;
                 double x = point.getX();
                 double y = point.getY();
+                // 处理相对路径
+                String useRelative = clickPositionVO.getUseRelative();
+                FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                if (clickWindowConfig != null &&
+                        FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
+                    WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+                    if (windowInfo != null && activation.equals(useRelative)) {
+                        String relativeX = point.getRelativeX();
+                        String relativeY = point.getRelativeY();
+                        if (StringUtils.isNotBlank(relativeX) && StringUtils.isNotBlank(relativeY)) {
+                            double rX = Double.parseDouble(relativeX);
+                            double rY = Double.parseDouble(relativeY);
+                            Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, rX, rY);
+                            x = absolutePosition.get(AbsoluteX);
+                            y = absolutePosition.get(AbsoluteY);
+                        }
+                    }
+                }
                 if (activation.equals(clickPositionVO.getRandomTrajectory())) {
                     int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                     int randomY = Integer.parseInt(clickPositionVO.getRandomY());
