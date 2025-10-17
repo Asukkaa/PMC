@@ -274,6 +274,8 @@ public class ClickDetailController extends RootController {
         retryType_Det.setValue(item.getRetryType());
         randomClickX_Det.setText(item.getRandomX());
         randomClickY_Det.setText(item.getRandomY());
+        relativelyX_Det.setText(item.getRelativeX());
+        relativelyY_Det.setText(item.getRelativeY());
         interval_Det.setText(item.getClickInterval());
         matchedType_Det.setValue(item.getMatchedType());
         stopImgSelectPath = item.getStopImgSelectPath();
@@ -383,7 +385,11 @@ public class ClickDetailController extends RootController {
                     windowInfoShow(windowInfo, clickWindowInfo_Det);
                     if (windowInfo != null) {
                         relativelyHBox_Det.setDisable(false);
-                        calculateRelativePosition(windowInfo);
+                        if (useRelatively_Det.isSelected()) {
+                            calculateAbsolutePosition(windowInfo);
+                        } else {
+                            calculateRelativePosition(windowInfo);
+                        }
                     } else {
                         relativelyHBox_Det.setDisable(true);
                     }
@@ -395,8 +401,8 @@ public class ClickDetailController extends RootController {
              */
             @Override
             public void removeInfo() {
-                clickWindowInfo_Det.setText("");
                 relativelyHBox_Det.setDisable(true);
+                clickWindowInfo_Det.setText("");
                 relativelyX_Det.setText("");
                 relativelyY_Det.setText("");
             }
@@ -1265,6 +1271,14 @@ public class ClickDetailController extends RootController {
     private void clickFindImgTypeAction() {
         updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                 clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, false);
+        if (findImgType_window().equals(clickFindImgType_Det.getValue())) {
+            relativelyHBox_Det.setDisable(false);
+            useRelatively();
+        } else {
+            relativelyHBox_Det.setDisable(true);
+            mouseStartX_Det.setDisable(false);
+            mouseStartY_Det.setDisable(false);
+        }
     }
 
     /**
@@ -1351,6 +1365,7 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void updateCoordinate() {
+        windowMonitorClick.updateWindowInfo();
         WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
         if (windowInfo != null) {
             if (useRelatively_Det.isSelected()) {

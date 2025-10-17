@@ -31,7 +31,6 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.activation;
 import static priv.koishi.pmc.Finals.CommonFinals.percentage;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
@@ -218,13 +217,6 @@ public class ImageRecognitionService {
             WindowInfo windowInfo = config.getWindowInfo();
             if (windowInfo == null) {
                 throw new RuntimeException(findImgSet_noWindow());
-            }
-            // 实时刷新
-            if (activation.equals(config.getAlwaysRefresh())) {
-                windowInfo = getMainWindowInfo(windowInfo.getProcessPath());
-                if (windowInfo == null) {
-                    throw new RuntimeException(findImgSet_noWindow());
-                }
             }
             x = windowInfo.getX();
             y = windowInfo.getY();

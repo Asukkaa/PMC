@@ -286,9 +286,9 @@ public class ClickPositionBean {
     }
 
     /**
-     * 换算绝对和相对坐标
+     * 换算相对坐标
      */
-    public void updatePosition() {
+    public void updateRelativePosition() {
         if (clickWindowConfig != null &&
                 FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
             WindowInfo windowInfo = clickWindowConfig.getWindowInfo();

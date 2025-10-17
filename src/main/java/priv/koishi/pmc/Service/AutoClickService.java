@@ -414,16 +414,14 @@ public class AutoClickService {
                     int index = clickPositionVO.getIndex();
                     String err = text_checkIndex() + index + text_taskErr();
                     // 校验目标窗口设置是否有误
-                    if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
-                        FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
-                        if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
-                            WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
-                            if (clickInfo == null || StringUtils.isBlank(clickInfo.getProcessPath())) {
-                                errs.add(err + text_noClickWindowInfo());
-                                clickErrIndex.add(index);
-                            } else {
-                                processPaths.add(clickInfo.getProcessPath());
-                            }
+                    FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                    if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                        WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
+                        if (clickInfo == null || StringUtils.isBlank(clickInfo.getProcessPath())) {
+                            errs.add(err + text_noClickWindowInfo());
+                            clickErrIndex.add(index);
+                        } else {
+                            processPaths.add(clickInfo.getProcessPath());
                         }
                     }
                     // 校验终止操作窗口设置是否有误
@@ -467,20 +465,18 @@ public class AutoClickService {
                         int index = clickPositionVO.getIndex();
                         String err = text_checkIndex() + index + text_taskErr();
                         // 校验目标窗口是否存在
-                        if (StringUtils.isNotBlank(clickPositionVO.getClickImgPath())) {
-                            if (clickErrIndex.contains(index)) {
-                                continue;
-                            }
-                            FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
-                            if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
-                                WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
-                                WindowInfo windowInfo = windowInfoMap.get(clickInfo.getProcessPath());
-                                if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
-                                    errs.add(err + text_noClickWindowInfo());
-                                } else {
-                                    clickWindowConfig.setWindowInfo(windowInfo);
-                                    clickPositionVO.setClickWindowConfig(clickWindowConfig);
-                                }
+                        if (clickErrIndex.contains(index)) {
+                            continue;
+                        }
+                        FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                        if (clickWindowConfig != null && clickWindowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                            WindowInfo clickInfo = clickWindowConfig.getWindowInfo();
+                            WindowInfo windowInfo = windowInfoMap.get(clickInfo.getProcessPath());
+                            if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
+                                errs.add(err + text_noClickWindowInfo());
+                            } else {
+                                clickWindowConfig.setWindowInfo(windowInfo);
+                                clickPositionVO.setClickWindowConfig(clickWindowConfig);
                             }
                         }
                         // 校验终止操作窗口是否存在
@@ -550,6 +546,8 @@ public class AutoClickService {
                                 Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, rX, rY);
                                 startX = absolutePosition.get(AbsoluteX);
                                 startY = absolutePosition.get(AbsoluteY);
+                                clickPositionVO.setStartX(String.valueOf(startX));
+                                clickPositionVO.setStartY(String.valueOf(startY));
                             }
                         }
                     }
@@ -673,6 +671,13 @@ public class AutoClickService {
                 long start = System.currentTimeMillis();
                 double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
                 FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
+                // 实时刷新
+                if (stopWindowConfig != null) {
+                    WindowInfo windowInfo = stopWindowConfig.getWindowInfo();
+                    if (windowInfo != null && activation.equals(stopWindowConfig.getAlwaysRefresh())) {
+                        stopWindowConfig.setWindowInfo(getMainWindowInfo(windowInfo.getProcessPath()));
+                    }
+                }
                 FindPositionConfig findPositionConfig = new FindPositionConfig()
                         .setMaxRetry(Integer.parseInt(clickPositionVO.getStopRetryTimes()))
                         .setFloatingWindowConfig(stopWindowConfig)
@@ -730,6 +735,13 @@ public class AutoClickService {
             int retryType = clickPositionVO.getRetryTypeEnum();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
             FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+            // 实时刷新
+            if (clickWindowConfig != null) {
+                WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+                if (windowInfo != null && activation.equals(clickWindowConfig.getAlwaysRefresh())) {
+                    clickWindowConfig.setWindowInfo(getMainWindowInfo(windowInfo.getProcessPath()));
+                }
+            }
             FindPositionConfig findPositionConfig = new FindPositionConfig()
                     .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(RetryTypeEnum.CONTINUOUSLY.ordinal() == retryType)

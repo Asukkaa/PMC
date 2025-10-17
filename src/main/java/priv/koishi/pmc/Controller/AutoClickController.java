@@ -1347,7 +1347,7 @@ public class AutoClickController extends RootController implements MousePosition
                             .setClickTime(String.valueOf(moveTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
-                            .updatePosition();
+                            .updateRelativePosition();
                     clickPositionVOS.add(movePoint);
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
@@ -1443,7 +1443,7 @@ public class AutoClickController extends RootController implements MousePosition
                     long duration = releasedTime - pressTime;
                     // 设置点击持续时间
                     clickBean.setClickTime(String.valueOf(duration))
-                            .updatePosition();
+                            .updateRelativePosition();
                     Platform.runLater(() -> {
                         // 添加至表格
                         List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
@@ -1486,6 +1486,9 @@ public class AutoClickController extends RootController implements MousePosition
             recordClicking = true;
             // 改变要防重复点击的组件状态
             changeDisableNodes(disableNodes, true);
+            if (clickFloating.getConfig().getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+                clickWindowMonitor.updateWindowInfo();
+            }
             // 获取准备时间值
             int preparationTimeValue = setDefaultIntValue(preparationRecordTime_Click,
                     Integer.parseInt(defaultPreparationRecord), 0, null);
