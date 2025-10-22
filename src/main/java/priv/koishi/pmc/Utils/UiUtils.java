@@ -120,6 +120,7 @@ public class UiUtils {
         tooltip.setHideDelay(Duration.ZERO);
         tooltip.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT);
         tooltip.getStyleClass().add("tooltip-font-size");
+        tooltip.setMaxWidth(500);
         return tooltip;
     }
 
