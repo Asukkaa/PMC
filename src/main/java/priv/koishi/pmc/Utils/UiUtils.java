@@ -79,9 +79,9 @@ public class UiUtils {
     private static final Logger logger = LogManager.getLogger(UiUtils.class);
 
     /**
-     * 图片单元格字体颜色绑定
+     * 字体颜色绑定
      */
-    private static final ObjectProperty<Color> thumbnailTextColor = new SimpleObjectProperty<>(Color.BLACK);
+    private static final ObjectProperty<Color> textColorProperty = new SimpleObjectProperty<>(Color.BLACK);
 
     /**
      * 鼠标停留提示框
@@ -642,7 +642,7 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
-                textFillProperty().bind(thumbnailTextColorProperty());
+                textFillProperty().bind(textColorProperty());
                 if (empty) {
                     setText(null);
                     setGraphic(null);
@@ -683,12 +683,22 @@ public class UiUtils {
         });
     }
 
-    public static ObjectProperty<Color> thumbnailTextColorProperty() {
-        return thumbnailTextColor;
+    /**
+     * 获取字体颜色绑定
+     *
+     * @return 字体颜色绑定
+     */
+    public static ObjectProperty<Color> textColorProperty() {
+        return textColorProperty;
     }
 
-    public static void setThumbnailTextColor(Color color) {
-        thumbnailTextColor.set(color);
+    /**
+     * 设置要绑定的字体颜色
+     *
+     * @param color 要绑定的字体颜色
+     */
+    public static void setTextColorProperty(Color color) {
+        textColorProperty.set(color);
     }
 
     /**
@@ -803,7 +813,8 @@ public class UiUtils {
     public static void updateLabel(Label label, String text) {
         label.textProperty().unbind();
         label.setText(text);
-        label.setTextFill(Color.BLACK);
+        label.textFillProperty().bind(textColorProperty());
+        label.textFillProperty().unbind();
     }
 
     /**

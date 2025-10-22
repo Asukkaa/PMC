@@ -245,7 +245,7 @@ public class MainApplication extends Application {
             setUserAgentStylesheet(null);
             isDarkTheme = false;
         }
-        setThumbnailTextColor(isDarkTheme ? Color.WHITE : Color.BLACK);
+        setTextColorProperty(isDarkTheme ? Color.WHITE : Color.BLACK);
     }
 
     /**

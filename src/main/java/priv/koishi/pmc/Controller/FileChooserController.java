@@ -584,7 +584,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
     public void manuallyChangeTheme() {
         manuallyChangeThemePane(anchorPane_FC, getClass());
         setRowDoubleClick();
-        setThumbnailTextColor(isDarkTheme ? Color.WHITE : Color.BLACK);
+        setTextColorProperty(isDarkTheme ? Color.WHITE : Color.BLACK);
     }
 
     /**
