@@ -537,7 +537,7 @@ public class ClickDetailController extends RootController {
         removeWeakReferenceChangeListener(weakChangeListeners);
         weakChangeListeners.clear();
         // 移除带鼠标悬停提示的内容变化监听器
-        removeChangeListener(listenerRemovers);
+        listenerRemovers.forEach(Runnable::run);
         listenerRemovers.clear();
         // 处理表格监听器引用
         tableListener = null;

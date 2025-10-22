@@ -39,7 +39,8 @@ import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
-import static priv.koishi.pmc.Utils.ListenerUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
+import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -79,9 +80,9 @@ public class TaskDetailController extends RootController {
     private Stage stage;
 
     /**
-     * 带鼠标悬停提示的内容变化监听器
+     * 带鼠标悬停提示的内容变化删除器
      */
-    private final List<Runnable> changeListeners = new ArrayList<>();
+    private final List<Runnable> listenerRemovers = new ArrayList<>();
 
     /**
      * 星期复选框集合
@@ -193,8 +194,8 @@ public class TaskDetailController extends RootController {
      */
     private void removeAllListeners() {
         // 移除带鼠标悬停提示的内容变化监听器
-        removeChangeListener(changeListeners);
-        changeListeners.clear();
+        listenerRemovers.forEach(Runnable::run);
+        listenerRemovers.clear();
     }
 
     /**
@@ -203,13 +204,13 @@ public class TaskDetailController extends RootController {
     private void textFieldChangeListener() {
         // 限制小时文本输入框内容
         Runnable hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
-        changeListeners.add(hourFieldListener);
+        listenerRemovers.add(hourFieldListener);
         // 限制分钟文本输入框内容
         Runnable minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
-        changeListeners.add(minuteFieldListener);
+        listenerRemovers.add(minuteFieldListener);
         // 限制任务名称文本输入框内容
         Runnable taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
-        changeListeners.add(taskNameFieldListener);
+        listenerRemovers.add(taskNameFieldListener);
     }
 
     /**

@@ -1,8 +1,6 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -36,7 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -68,9 +69,9 @@ public class FileChooserController extends RootController {
     private FileChooserConfig fileChooserConfig;
 
     /**
-     * 带鼠标悬停提示的内容变化监听器
+     * 带鼠标悬停提示的内容变化删除器
      */
-    private final Map<Object, Runnable> changeListeners = new WeakHashMap<>();
+    private final List<Runnable> listenerRemovers = new ArrayList<>();
 
     /**
      * 文件查询任务
@@ -546,30 +547,18 @@ public class FileChooserController extends RootController {
     private void textFieldChangeListener() {
         // 鼠标悬停提示输入的文件名过滤
         Runnable fileNameFilterChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
-        changeListeners.put(fileNameFilter_FC, fileNameFilterChangeListener);
+        listenerRemovers.add(fileNameFilterChangeListener);
         // 鼠标悬停提示输入的需要识别的文件后缀名
         Runnable filterFileTypeChangeListener = textFieldValueListener(filterFileType_FC, tip_filterFileType());
-        changeListeners.put(filterFileType_FC, filterFileTypeChangeListener);
+        listenerRemovers.add(filterFileTypeChangeListener);
     }
 
     /**
      * 移除所有监听器
      */
-    @SuppressWarnings("unchecked")
     private void removeAllListeners() {
-        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
-        changeListeners.forEach((key, listener) -> {
-            if (key instanceof ChoiceBox<?> choiceBox) {
-                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
-            } else if (key instanceof Slider slider) {
-                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
-            } else if (key instanceof TextInputControl textInput) {
-                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
-            } else if (key instanceof CheckBox checkBox) {
-                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
-            }
-        });
-        changeListeners.clear();
+        listenerRemovers.forEach(Runnable::run);
+        listenerRemovers.clear();
     }
 
     /**

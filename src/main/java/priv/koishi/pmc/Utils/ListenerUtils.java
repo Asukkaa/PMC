@@ -21,7 +21,6 @@ import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.lang.ref.WeakReference;
 import java.util.EventListener;
-import java.util.List;
 import java.util.Map;
 
 import static priv.koishi.pmc.Finals.i18nFinal.text_errRange;
@@ -239,15 +238,6 @@ public class ListenerUtils {
                 slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
             }
         });
-    }
-
-    /**
-     * 移除带鼠标悬停提示的内容变化监听器
-     *
-     * @param changeListeners 监听器集合
-     */
-    public static void removeChangeListener(List<? extends Runnable> changeListeners) {
-        changeListeners.forEach(Runnable::run);
     }
 
     /**
