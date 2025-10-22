@@ -104,22 +104,24 @@
 
 .text-field {
     -fx-font-size: 12;
+    -fx-pref-height: 35;
 }
 
 .button {
     -fx-cursor: hand;
     -fx-font-size: 12;
+    -fx-pref-height: 35;
 }
 
 .check-box {
     -fx-cursor: hand;
-    -fx-pref-height: 35;
     -fx-font-size: 12;
+    -fx-pref-height: 35;
 }
 
 .label {
-    -fx-pref-height: 35;
     -fx-font-size: 12;
+    -fx-pref-height: 35;
 }
 
 .label-low {

@@ -52,7 +52,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-05-20
  * Time:14:53
  */
-public class TaskDetailController extends RootController {
+public class TaskDetailController extends ManuallyChangeThemeController {
 
     /**
      * 页面数据对象
@@ -319,12 +319,26 @@ public class TaskDetailController extends RootController {
     }
 
     /**
+     * 页面关闭事件处理逻辑
+     */
+    private void closeRequest() {
+        removeController();
+    }
+
+    /**
+     * 手动处理主题切换
+     */
+    public void manuallyChangeTheme() {
+        manuallyChangeThemePane(anchorPane_TD, getClass());
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
-        // 手动处理深色主题
-        setDarkThemePane(anchorPane_TD);
+        // 手动处主题切换
+        manuallyChangeTheme();
         // 初始化下拉框
         setChoiceBoxItems();
         // 设置要防重复点击的组件
@@ -335,6 +349,8 @@ public class TaskDetailController extends RootController {
         setDatePickerFormatter(datePicker_TD, DateTimeFormatter.ofPattern("yyyy-MM-dd EEEE"));
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_TD.getScene().getWindow();
+            // 设置页面关闭事件处理逻辑
+            stage.setOnCloseRequest(_ -> closeRequest());
             // 设置鼠标悬停提示
             setToolTip();
             // 给输入框添加内容变化监听
@@ -402,7 +418,7 @@ public class TaskDetailController extends RootController {
             // 复制成功消息气泡
             new MessageBubble(text_successSave(), 2);
             removeAllListeners();
-            stage.close();
+            closeStage(stage, this::closeRequest);
             // 触发列表刷新（通过回调）
             if (refreshCallback != null) {
                 refreshCallback.run();
@@ -425,7 +441,7 @@ public class TaskDetailController extends RootController {
             deleteTask(taskName);
         }
         removeAllListeners();
-        stage.close();
+        closeStage(stage, this::closeRequest);
         // 触发列表刷新（通过回调）
         if (isEdit && refreshCallback != null) {
             refreshCallback.run();

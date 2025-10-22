@@ -31,13 +31,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import priv.koishi.pmc.Annotate.LoadImgFunction;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.Bean.VO.ClickPositionVO;
-import priv.koishi.pmc.Bean.VO.FileVO;
-import priv.koishi.pmc.Bean.VO.ImgFileVO;
-import priv.koishi.pmc.Bean.VO.Indexable;
+import priv.koishi.pmc.Bean.VO.*;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.MainApplication;
@@ -47,7 +43,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -59,6 +54,7 @@ import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
+import static priv.koishi.pmc.MainApplication.manuallyChangeThemeList;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -549,23 +545,15 @@ public class UiUtils {
                 // 添加列名Tooltip
                 addTableColumnToolTip(m);
                 if (f.getType() == Image.class) {
-                    try {
-                        Method getter = beanClass.getMethod("loadThumb");
-                        // 显式标记方法调用（解决IDE误报）
-                        if (getter.isAnnotationPresent(LoadImgFunction.class)) {
-                            Function<T, Image> supplier = bean -> {
-                                try {
-                                    return (Image) getter.invoke(bean);
-                                } catch (Exception e) {
-                                    return null;
-                                }
-                            };
-                            // 创建图片表格
-                            buildThumbnailCell((TableColumn<T, Image>) m, supplier);
+                    // 直接使用类型安全的函数式调用
+                    Function<T, Image> supplier = bean -> {
+                        if (bean instanceof ImgBean imgBean) {
+                            return imgBean.loadThumb();
                         }
-                    } catch (NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
+                        return null;
+                    };
+                    // 创建图片表格
+                    buildThumbnailCell((TableColumn<T, Image>) m, supplier);
                 } else {
                     if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
                         // 设置列为序号列
@@ -2156,21 +2144,24 @@ public class UiUtils {
     }
 
     /**
-     * 处理无法切换深色布局的页面
+     * 处理无法自动切换主题的页面
      *
      * @param pane 页面布局
      */
-    public static void setDarkThemePane(Pane pane) {
+    public static <T> void manuallyChangeThemePane(Pane pane, Class<T> clazz) {
         if (isDarkTheme) {
             pane.setStyle("""
                     -fx-background-color: -color-border-subtle, -color-base-9;
-                     -fx-background-radius: 6px, 0;
-                     -fx-background-insets: 0, 0 1 0 0;
-                     -fx-border-radius: 6px;
-                     -fx-border-width: 1px, 0 3px 0 0;
-                     -fx-border-color: transparent, transparent;
+                    -fx-background-radius: 6px, 0;
+                    -fx-background-insets: 0, 0 1 0 0;
+                    -fx-border-radius: 6px;
+                    -fx-border-width: 1px, 0 3px 0 0;
+                    -fx-border-color: transparent, transparent;
                     """);
+        } else {
+            pane.setStyle(null);
         }
+        manuallyChangeThemeList.add(clazz);
     }
 
 }

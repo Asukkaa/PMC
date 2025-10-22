@@ -834,6 +834,15 @@ public class SettingController extends RootController implements MousePositionUp
                     setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
                     isDarkTheme = false;
                 }
+                // 处理无法自动切换主题的页面
+                manuallyChangeThemeList.forEach(controllerClass -> {
+                    @SuppressWarnings("unchecked")
+                    Class<ManuallyChangeThemeController> typedClass = (Class<ManuallyChangeThemeController>) controllerClass;
+                    ManuallyChangeThemeController controller = getController(typedClass);
+                    if (controller != null) {
+                        controller.manuallyChangeTheme();
+                    }
+                });
             }
         });
     }

@@ -16,6 +16,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -42,6 +43,7 @@ import java.util.Properties;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.MainApplication.isDarkTheme;
 import static priv.koishi.pmc.Service.ReadDataService.readAllFilesTask;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
@@ -56,7 +58,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-08-04
  * Time:22:12
  */
-public class FileChooserController extends RootController {
+public class FileChooserController extends ManuallyChangeThemeController {
 
     /**
      * 页面标识符
@@ -441,6 +443,7 @@ public class FileChooserController extends RootController {
             contextMenu.getItems().stream().parallel().forEach(item -> item.setOnAction(null));
             tableView_FC.setContextMenu(null);
         }
+        removeController();
     }
 
     /**
@@ -482,14 +485,26 @@ public class FileChooserController extends RootController {
         } else {
             // 根据文件类型设置样式
             String fileType = item.getFileType();
-            if (extension_folder().equals(fileType)) {
-                row.setStyle("-fx-background-color: #e6f7ff;");
-            } else if (PMC.equals(fileType)) {
-                row.setStyle("-fx-background-color: #bdf8b3;");
-            } else if (imageType.contains(fileType)) {
-                row.setStyle("-fx-background-color: #b3cff8;");
+            if (isDarkTheme) {
+                if (extension_folder().equals(fileType)) {
+                    row.setStyle("-fx-background-color: #190800;");
+                } else if (PMC.equals(fileType)) {
+                    row.setStyle("-fx-background-color: #42074c;");
+                } else if (imageType.contains(fileType)) {
+                    row.setStyle("-fx-background-color: #4c3007;");
+                } else {
+                    row.setStyle("");
+                }
             } else {
-                row.setStyle("");
+                if (extension_folder().equals(fileType)) {
+                    row.setStyle("-fx-background-color: #e6f7ff;");
+                } else if (PMC.equals(fileType)) {
+                    row.setStyle("-fx-background-color: #bdf8b3;");
+                } else if (imageType.contains(fileType)) {
+                    row.setStyle("-fx-background-color: #b3cff8;");
+                } else {
+                    row.setStyle("");
+                }
             }
         }
     }
@@ -564,12 +579,21 @@ public class FileChooserController extends RootController {
     }
 
     /**
+     * 手动处理深色主题
+     */
+    public void manuallyChangeTheme() {
+        manuallyChangeThemePane(anchorPane_FC, getClass());
+        setRowDoubleClick();
+        setThumbnailTextColor(isDarkTheme ? Color.WHITE : Color.BLACK);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
         // 手动处理深色主题
-        setDarkThemePane(anchorPane_FC);
+        manuallyChangeTheme();
         // 初始化下拉框
         setChoiceBoxItems();
         Platform.runLater(() -> {

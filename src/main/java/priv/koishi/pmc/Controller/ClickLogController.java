@@ -122,6 +122,8 @@ public class ClickLogController extends RootController {
     private void initialize() {
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Log.getScene().getWindow();
+            // 设置页面关闭事件处理逻辑
+            stage.setOnCloseRequest(_ -> removeController());
             // 组件宽高自适应
             adaption();
             // 添加鼠标悬停提示

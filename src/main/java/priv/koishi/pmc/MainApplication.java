@@ -22,14 +22,17 @@ import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Controller.MainController;
+import priv.koishi.pmc.Controller.RootController;
 import priv.koishi.pmc.Finals.Enum.ThemeEnum;
 
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -105,6 +108,16 @@ public class MainApplication extends Application {
      * 当前是否为夜晚模式（true-当前为夜晚模式）
      */
     public static boolean isDarkTheme;
+
+    /**
+     * 全局控制器容器
+     */
+    public static final Map<Class<?>, WeakReference<RootController>> controllers = new ConcurrentHashMap<>();
+
+    /**
+     * 无法切换深色布局的页面控制器类集合
+     */
+    public static Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
 
     /**
      * 加载 fxml 页面
