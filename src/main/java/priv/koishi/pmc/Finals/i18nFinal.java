@@ -1756,6 +1756,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 更新成功，受影响的操作共有：
+     */
+    public static String text_updateNum() {
+        return bundle.getString("updateNum");
+    }
+
+    /**
+     * @return 操作列表为空
+     */
+    public static String text_noUpdateNum() {
+        return bundle.getString("noUpdateNum");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
@@ -1781,6 +1795,13 @@ public class i18nFinal {
      */
     public static String findImgSet_updateWindow() {
         return bundle.getString("findImgSet.updateWindow");
+    }
+
+    /**
+     * @return 更新到操作列表
+     */
+    public static String findImgSet_updateList() {
+        return bundle.getString("findImgSet.updateList");
     }
 
     /**

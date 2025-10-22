@@ -1878,9 +1878,10 @@ public class UiUtils {
      * @param windowMonitor 窗口监视器
      * @param disableNodes  要防重复点击的组件
      * @param stages        需要隐藏的窗口
+     * @return 右键菜单
      */
-    public static void buildWindowInfoMenu(Label label, WindowMonitor windowMonitor,
-                                           List<? extends Node> disableNodes, List<? extends Stage> stages) {
+    public static ContextMenu buildWindowInfoMenu(Label label, WindowMonitor windowMonitor,
+                                                  List<? extends Node> disableNodes, List<? extends Stage> stages) {
         // 添加窗口信息右键菜单
         ContextMenu windowInfoMenu = new ContextMenu();
         // 更新窗口信息选项
@@ -1895,6 +1896,7 @@ public class UiUtils {
                 windowInfoMenu.show(label, event.getScreenX(), event.getScreenY());
             }
         });
+        return windowInfoMenu;
     }
 
     /**

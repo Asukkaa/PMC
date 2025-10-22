@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -26,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
@@ -37,6 +39,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
+import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.awt.*;
 import java.io.File;
@@ -49,6 +52,7 @@ import java.util.*;
 import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -788,8 +792,72 @@ public class SettingController extends RootController implements MousePositionUp
         buildTableViewContextMenu(tableView_Set, dataNumber_Set);
         List<Stage> stages = List.of(mainStage);
         // 构建窗口信息栏右键菜单
-        buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, disableNodes, stages);
-        buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, disableNodes, stages);
+        ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, disableNodes, stages);
+        buildStopUpdateListMenu(stopContextMenu, stopWindowMonitor);
+        ContextMenu clickContextMenu = buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, disableNodes, stages);
+        buildClickUpdateListMenu(clickContextMenu, clickWindowMonitor);
+    }
+
+    /**
+     * 更新操作列表所有终止操作窗口信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildStopUpdateListMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_updateList());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            ObservableList<ClickPositionVO> items = autoClickController.tableView_Click.getItems();
+            if (CollectionUtils.isNotEmpty(items)) {
+                int update = 0;
+                for (ClickPositionVO item : items) {
+                    FloatingWindowConfig windowConfig = item.getStopWindowConfig();
+                    if (windowConfig != null) {
+                        if (FindImgTypeEnum.WINDOW.ordinal() == windowConfig.getFindImgTypeEnum()) {
+                            windowConfig.setWindowInfo(windowMonitor.getWindowInfo());
+                            item.setStopWindowConfig(windowConfig);
+                            update++;
+                        }
+                    }
+                }
+                new MessageBubble(text_updateNum() + update, updateListMassageTime);
+            } else {
+                new MessageBubble(text_noUpdateNum(), updateListMassageTime);
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 更新操作列表所有要识别的窗口信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildClickUpdateListMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_updateList());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            ObservableList<ClickPositionVO> items = autoClickController.tableView_Click.getItems();
+            if (CollectionUtils.isNotEmpty(items)) {
+                int update = 0;
+                for (ClickPositionVO item : items) {
+                    FloatingWindowConfig windowConfig = item.getClickWindowConfig();
+                    if (windowConfig != null) {
+                        if (FindImgTypeEnum.WINDOW.ordinal() == windowConfig.getFindImgTypeEnum()) {
+                            windowConfig.setWindowInfo(windowMonitor.getWindowInfo());
+                            item.setClickWindowConfig(windowConfig);
+                            update++;
+                        }
+                    }
+                }
+                new MessageBubble(text_updateNum() + update, updateListMassageTime);
+            } else {
+                new MessageBubble(text_noUpdateNum(), updateListMassageTime);
+            }
+        });
+        contextMenu.getItems().add(menuItem);
     }
 
     /**

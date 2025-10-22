@@ -482,6 +482,11 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 更新窗口信息消息气泡显示事件（单位：秒）
+     */
+    public static final int updateListMassageTime = 2;
+
+    /**
      * 绝对横坐标标识
      */
     public static String AbsoluteX = "absoluteX";
