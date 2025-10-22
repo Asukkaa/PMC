@@ -28,6 +28,7 @@ import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
+import priv.koishi.pmc.Finals.Enum.ThemeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
@@ -131,15 +132,15 @@ public class SettingController extends RootController implements MousePositionUp
     public Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
 
     @FXML
-    public ChoiceBox<String> nextGcType_Set, language_Set, clickFindImgType_Set, stopFindImgType_Set;
+    public ChoiceBox<String> nextGcType_Set, language_Set, clickFindImgType_Set, stopFindImgType_Set, theme_Set;
 
     @FXML
-    public Button massageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set,
-            stopRegion_Set, clickWindow_Set, stopWindow_Set;
+    public Button massageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
+            clickWindow_Set, stopWindow_Set;
 
     @FXML
-    public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, gcType_Set, thisPath_Set,
-            clickWindowInfo_Set, stopWindowInfo_Set, noPermission_Set;
+    public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
+            gcType_Set, thisPath_Set, noPermission_Set;
 
     @FXML
     public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
@@ -147,11 +148,11 @@ public class SettingController extends RootController implements MousePositionUp
             randomTimeOffset_Set, nextRunMemory_Set, findWindowWait_Set;
 
     @FXML
-    public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, firstClick_Set,
+    public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, dragLog_Set,
+            autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
+            randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, firstClick_Set, clickImgLog_Set,
             hideWindowRecord_Set, showWindowRecord_Set, floatingRun_Set, floatingRecord_Set, randomClickTime_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
-            autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
-            randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, dragLog_Set, clickImgLog_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set;
 
@@ -187,9 +188,9 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置 javaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
-        index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.05));
+        index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
         thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
-        name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.25));
+        name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
         path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.4));
         type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
     }
@@ -257,6 +258,9 @@ public class SettingController extends RootController implements MousePositionUp
             saveJVMConfig();
             // 保存语言设置
             updateProperties(configFile, key_language, language_Set.getValue());
+            // 更新外观设置
+            int them = themeMap.getKey(theme_Set.getValue());
+            updateProperties(configFile, key_theme, String.valueOf(them));
         }
     }
 
@@ -355,6 +359,8 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, activation);
         setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, unActivation);
         setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, unActivation);
+        int them = Integer.parseInt(prop.getProperty(key_theme, String.valueOf(ThemeEnum.Auto.ordinal())));
+        theme_Set.setValue(themeMap.get(them));
         configFileInput.close();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
@@ -765,6 +771,8 @@ public class SettingController extends RootController implements MousePositionUp
         initializeChoiceBoxItems(stopFindImgType_Set, findImgType_all(), findImgTypeList);
         // 要点击的图像识别区域设置
         initializeChoiceBoxItems(clickFindImgType_Set, findImgType_all(), findImgTypeList);
+        // 外观下拉框
+        initializeChoiceBoxItems(theme_Set, theme_light(), themeList);
     }
 
     /**
@@ -1509,7 +1517,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 获取要点击的窗口信息
      */
     @FXML
-    public void findClickWindowAction() {
+    private void findClickWindowAction() {
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, true);
         // 隐藏主窗口
@@ -1526,7 +1534,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 获取终止操作窗口信息
      */
     @FXML
-    public void findStopWindowAction() {
+    private void findStopWindowAction() {
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, true);
         // 隐藏主窗口
@@ -1536,6 +1544,20 @@ public class SettingController extends RootController implements MousePositionUp
                 Integer.parseInt(defaultFindWindowWait), 0, null);
         if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
             stopWindowMonitor.startClickWindowMouseListener(preparation);
+        }
+    }
+
+    /**
+     * 切换主题下拉框
+     */
+    @FXML
+    private void themeAction() {
+        String value = theme_Set.getValue();
+        addValueToolTip(theme_Set, tip_them(), value);
+        int them = themeMap.getKey(value);
+        changeTheme(them);
+        if (mainController != null) {
+            Platform.runLater(mainController::mainAdaption);
         }
     }
 

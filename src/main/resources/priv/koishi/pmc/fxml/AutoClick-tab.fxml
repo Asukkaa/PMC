@@ -6,63 +6,53 @@
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AutoClickController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <HBox fx:id="cancelTipHBox_Click" spacing="10">
-            <Label prefHeight="25" prefWidth="250" fx:id="mousePosition_Click"/>
+            <Label prefWidth="300" fx:id="mousePosition_Click"/>
 
-            <Label prefHeight="25" textFill="coral" text="%autoClick.tip"/>
+            <Label textFill="coral" text="%autoClick.tip"/>
 
-            <Label fx:id="cancelTip_Click" prefHeight="25" textFill="red" alignment="CENTER_RIGHT"
-                   text="%autoClick.cancelTip_Click"/>
+            <Label fx:id="cancelTip_Click" textFill="red" alignment="CENTER_RIGHT" text="%autoClick.cancelTip_Click"/>
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addOutPath_Click" onAction="#addOutPath" style="-fx-cursor: hand"
-                    text="%autoClick.addOutPath_Click"/>
-            <Label fx:id="outPath_Click" prefHeight="25" prefWidth="300" style="-fx-font-size: 15px;"/>
+            <Button fx:id="addOutPath_Click" onAction="#addOutPath" text="%autoClick.addOutPath_Click"/>
+            <Label fx:id="outPath_Click" prefWidth="300" style="-fx-font-size: 15px;"/>
 
-            <Label prefHeight="25" text="%autoClick.outFileName"/>
+            <Label text="%autoClick.outFileName"/>
             <TextField fx:id="outFileName_Click" prefWidth="140"/>
 
-            <CheckBox fx:id="openDirectory_Click" prefHeight="25" selected="true" style="-fx-cursor: hand"
-                      text="%autoClick.openDirectory_Click"/>
+            <CheckBox fx:id="openDirectory_Click" selected="true" text="%autoClick.openDirectory_Click"/>
 
-            <CheckBox fx:id="notOverwrite_Click" prefHeight="25" selected="true" style="-fx-cursor: hand"
-                      text="%autoClick.notOverwrite_Click"/>
+            <CheckBox fx:id="notOverwrite_Click" selected="true" text="%autoClick.notOverwrite_Click"/>
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addPosition_Click" onAction="#addPosition" style="-fx-cursor: hand"
-                    text="%autoClick.addPosition_Click"/>
-            <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" style="-fx-cursor: hand"
-                    text="%autoClick.loadAutoClick_Click"/>
-            <CheckBox fx:id="loadFolder_Click" prefHeight="25" style="-fx-cursor: hand"
-                      text="%autoClick.loadFolder_Click"/>
-            <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" style="-fx-cursor: hand"
-                    text="%autoClick.exportAutoClick_Click"/>
-            <Button fx:id="clearButton_Click" onAction="#removeAll" style="-fx-cursor: hand"
-                    text="%listText.removeAll"/>
+            <Button fx:id="addPosition_Click" onAction="#addPosition" text="%autoClick.addPosition_Click"/>
+            <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" text="%autoClick.loadAutoClick_Click"/>
+            <CheckBox fx:id="loadFolder_Click" text="%autoClick.loadFolder_Click"/>
+            <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" text="%autoClick.exportAutoClick_Click"/>
+            <Button fx:id="clearButton_Click" onAction="#removeAll" text="%listText.removeAll"/>
         </HBox>
 
         <HBox fx:id="fileNumberHBox_Click" spacing="10">
-            <Label prefHeight="25" text="%autoClick.preparationRecordTime"/>
+            <Label text="%autoClick.preparationRecordTime"/>
             <TextField fx:id="preparationRecordTime_Click" prefWidth="50"/>
-            <Label prefHeight="25" text="%unit.s"/>
+            <Label text="%unit.s"/>
             <Button fx:id="recordClick_Click" onAction="#recordClick" text="%autoClick.recordClick_Click"
                     styleClass="cadetblue-button"/>
 
-            <Label prefHeight="25" text="%autoClick.preparationRunTime"/>
+            <Label text="%autoClick.preparationRunTime"/>
             <TextField fx:id="preparationRunTime_Click" prefWidth="50"/>
-            <Label prefHeight="25" text="%unit.s"/>
+            <Label text="%unit.s"/>
             <Button fx:id="runClick_Click" onAction="#runClick" text="%autoClick.runClick_Click"
                     styleClass="cornflowerblue-button"/>
 
-            <Label prefHeight="25" text="%autoClick.loopTime"/>
+            <Label text="%autoClick.loopTime"/>
             <TextField fx:id="loopTime_Click" prefWidth="80"/>
-            <Label prefHeight="25" text="%unit.times"/>
+            <Label text="%unit.times"/>
 
-            <Button fx:id="clickLog_Click" onAction="#clickLog" style="-fx-cursor: hand"
-                    text="%autoClick.clickLog_Click"/>
+            <Button fx:id="clickLog_Click" onAction="#clickLog" text="%autoClick.clickLog_Click"/>
 
-            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
+            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Click" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

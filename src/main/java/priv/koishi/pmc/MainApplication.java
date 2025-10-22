@@ -1,8 +1,11 @@
 package priv.koishi.pmc;
 
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import de.jangassen.MenuToolkit;
 import javafx.application.Application;
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +21,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Controller.MainController;
+import priv.koishi.pmc.Finals.Enum.ThemeEnum;
 
 import java.io.*;
 import java.net.BindException;
@@ -105,11 +109,14 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         mainStage = stage;
-        // 读取fxml页面
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
+        // 设置外观
+        int theme = Integer.parseInt(prop.getProperty(key_theme));
+        changeTheme(theme);
+        // 读取fxml页面
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         double appWidth = Double.parseDouble(prop.getProperty(key_appWidth, defaultAppWidth));
         double appHeight = Double.parseDouble(prop.getProperty(key_appHeight, defaultAppHeight));
         if (activation.equals(prop.getProperty(key_lastMaxWindow, unActivation))
@@ -192,6 +199,28 @@ public class MainApplication extends Application {
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);
+    }
+
+    /**
+     * 切换主题
+     *
+     * @param theme 主题枚举
+     */
+    public static void changeTheme(int theme) {
+        if (theme == ThemeEnum.Light.ordinal()) {
+            setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+        } else if (theme == ThemeEnum.Dark.ordinal()) {
+            setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        } else if (theme == ThemeEnum.Auto.ordinal()) {
+            ColorScheme scheme = Platform.getPreferences().getColorScheme();
+            if (ColorScheme.DARK == scheme) {
+                setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+            } else {
+                setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+            }
+        } else if (theme == ThemeEnum.JavaFx.ordinal()) {
+            setUserAgentStylesheet(null);
+        }
     }
 
     /**

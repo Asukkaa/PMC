@@ -954,6 +954,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 用来设置应用的外观
+     */
+    public static String tip_them() {
+        return bundle.getString("tip.them");
+    }
+
+    /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Oracle Corporation 25+36-3489
@@ -3338,6 +3345,66 @@ public class i18nFinal {
     }
 
     /**
+     * javaFX 原生外观
+     */
+    public static String theme_javafx() {
+        return bundle.getString("theme.javafx");
+    }
+
+    /**
+     * 白天模式
+     */
+    public static String theme_light() {
+        return bundle.getString("theme.light");
+    }
+
+    /**
+     * 夜晚模式
+     */
+    public static String theme_dark() {
+        return bundle.getString("theme.dark");
+    }
+
+    /**
+     * 跟随系统
+     */
+    public static String theme_auto() {
+        return bundle.getString("theme.auto");
+    }
+
+    /**
+     * 外观选项
+     */
+    public static final List<String> themeList = new ArrayList<>();
+
+    /**
+     * 更新外观选项
+     */
+    public static void updateThemeList() {
+        themeList.clear();
+        themeList.add(theme_javafx());
+        themeList.add(theme_light());
+        themeList.add(theme_dark());
+        themeList.add(theme_auto());
+    }
+
+    /**
+     * 外观选项映射
+     */
+    public static final BidiMap<Integer, String> themeMap = new DualHashBidiMap<>();
+
+    /**
+     * 更新外观选项映射
+     */
+    public static void updateThemeMap() {
+        themeMap.clear();
+        themeMap.put(ThemeEnum.JavaFx.ordinal(), theme_javafx());
+        themeMap.put(ThemeEnum.Light.ordinal(), theme_light());
+        themeMap.put(ThemeEnum.Dark.ordinal(), theme_dark());
+        themeMap.put(ThemeEnum.Auto.ordinal(), theme_auto());
+    }
+
+    /**
      * 切换语言下拉框选项
      */
     public static final BidiMap<Locale, String> languageMap = new DualHashBidiMap<>();
@@ -3390,6 +3457,10 @@ public class i18nFinal {
         updateFindImgTypeList();
         // 更新图像识别区域类型选项映射
         updateFindImgTypeMap();
+        // 更新外观选项
+        updateThemeList();
+        // 更新外观选项映射
+        updateThemeMap();
     }
 
 }

@@ -20,6 +20,7 @@ module priv.koishi.pmc {
     requires java.net.http;
     requires com.sun.jna.platform;
     requires jdk.naming.dns;
+    requires atlantafx.base;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;

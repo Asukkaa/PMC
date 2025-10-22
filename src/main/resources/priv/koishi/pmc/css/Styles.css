@@ -36,7 +36,7 @@
 
 .hBox-medium {
     -fx-spacing: 5;
-    -fx-pref-width: 350;
+    -fx-pref-width: 400;
 }
 
 .hBox-long {
@@ -57,6 +57,7 @@
     -fx-padding: 0;
     -fx-border-radius: 0;
     -fx-background-insets: 0;
+    -fx-pref-height: 20;
 }
 
 .cadetblue-button {
@@ -93,4 +94,34 @@
     -fx-border-insets: -2px;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
+}
+
+.choice-box {
+    -fx-cursor: hand;
+    -fx-font-size: 12;
+    -fx-pref-height: 35;
+}
+
+.text-field {
+    -fx-font-size: 12;
+}
+
+.button {
+    -fx-cursor: hand;
+    -fx-font-size: 12;
+}
+
+.check-box {
+    -fx-cursor: hand;
+    -fx-pref-height: 35;
+    -fx-font-size: 12;
+}
+
+.label {
+    -fx-pref-height: 35;
+    -fx-font-size: 12;
+}
+
+.label-low {
+    -fx-pref-height: 20;
 }

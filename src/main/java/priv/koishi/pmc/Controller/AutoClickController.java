@@ -319,7 +319,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 列表高度占用主界面的百分比
      */
-    public static double tableViewHeight = 0.6;
+    public static double tableViewHeight = 0.55;
 
     @FXML
     public AnchorPane anchorPane_Click;
@@ -1775,7 +1775,7 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 清空 javaFX 列表按钮
+     * 清空操作列表按钮
      */
     @FXML
     public void removeAll() {
