@@ -12,7 +12,9 @@ import java.util.Objects;
 
 import static priv.koishi.pmc.Finals.i18nFinal.text_editingCellTip;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
-import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
+import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
+import static priv.koishi.pmc.Utils.UiUtils.creatTooltip;
 
 /**
  * 可编辑的 javaFX 列表单元格
@@ -61,7 +63,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     /**
      * 输入框文本改变监听器（更新鼠标悬浮提示）
      */
-    private ChangeListener<String> stringChangeListener;
+    private Runnable stringChangeListener;
 
     /**
      * 输入框失去焦点时,提交编辑监听器
@@ -254,7 +256,7 @@ public class EditingCell<T> extends TableCell<T, String> {
             textChangeListener = null;
         }
         if (textField != null && stringChangeListener != null) {
-            textField.textProperty().removeListener(stringChangeListener);
+            stringChangeListener.run();
             stringChangeListener = null;
         }
     }

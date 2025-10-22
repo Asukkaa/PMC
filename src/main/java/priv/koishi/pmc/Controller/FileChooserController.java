@@ -43,6 +43,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Service.ReadDataService.readAllFilesTask;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -69,7 +70,7 @@ public class FileChooserController extends RootController {
     /**
      * 带鼠标悬停提示的内容变化监听器
      */
-    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+    private final Map<Object, Runnable> changeListeners = new WeakHashMap<>();
 
     /**
      * 文件查询任务
@@ -544,10 +545,10 @@ public class FileChooserController extends RootController {
      */
     private void textFieldChangeListener() {
         // 鼠标悬停提示输入的文件名过滤
-        ChangeListener<String> fileNameFilterChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
+        Runnable fileNameFilterChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
         changeListeners.put(fileNameFilter_FC, fileNameFilterChangeListener);
         // 鼠标悬停提示输入的需要识别的文件后缀名
-        ChangeListener<String> filterFileTypeChangeListener = textFieldValueListener(filterFileType_FC, tip_filterFileType());
+        Runnable filterFileTypeChangeListener = textFieldValueListener(filterFileType_FC, tip_filterFileType());
         changeListeners.put(filterFileType_FC, filterFileTypeChangeListener);
     }
 

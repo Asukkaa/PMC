@@ -113,19 +113,19 @@ public class ClickDetailController extends RootController {
     private Task<Void> loadImgTask;
 
     /**
-     * 修改内容变化标志监听器
+     * 修改内容变化标志监听器（滑块组件专用）
      */
     private final Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners = new WeakHashMap<>();
 
     /**
-     * 修改内容变化标志监听器（滑块组件专用）
+     * 修改内容变化标志监听器
      */
     private final Map<Object, WeakReference<InvalidationListener>> weakInvalidationListeners = new WeakHashMap<>();
 
     /**
-     * 带鼠标悬停提示的内容变化监听器
+     * 带鼠标悬停提示的内容变化监听器删除器
      */
-    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+    private final List<Runnable> listenerRemovers = new ArrayList<>();
 
     /**
      * 表格结构变化监听器
@@ -530,15 +530,15 @@ public class ClickDetailController extends RootController {
         if (tableListener != null) {
             tableView_Det.getItems().removeListener(tableListener);
         }
-        // 移除修改内容变化标志监听器（滑块组件专用）
+        // 移除修改内容变化标志监听器
         removeInvalidationListeners(weakInvalidationListeners);
         weakInvalidationListeners.clear();
-        // 移除修改内容变化标志监听器
+        // 移除修改内容变化标志监听器（滑块组件专用）
         removeWeakReferenceChangeListener(weakChangeListeners);
         weakChangeListeners.clear();
         // 移除带鼠标悬停提示的内容变化监听器
-        removeChangeListener(changeListeners);
-        changeListeners.clear();
+        removeChangeListener(listenerRemovers);
+        listenerRemovers.clear();
         // 处理表格监听器引用
         tableListener = null;
     }
@@ -642,65 +642,65 @@ public class ClickDetailController extends RootController {
      */
     private void nodeValueChangeListener() {
         // 操作名称文本输入框鼠标悬停提示
-        ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName());
-        changeListeners.put(clickName_Det, clickNameListener);
+        Runnable clickNameRemover = textFieldValueListener(clickName_Det, tip_clickName());
+        listenerRemovers.add(clickNameRemover);
         // 限制每步操作执行前等待时间文本输入框内容
-        ChangeListener<Boolean> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait());
-        changeListeners.put(wait_Det, waitListener);
+        Runnable waitRemover = integerRangeTextField(wait_Det, 0, null, tip_wait());
+        listenerRemovers.add(waitRemover);
         // 匹配图像坐标横(X)轴偏移量文本输入框内容
-        ChangeListener<Boolean> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
-        changeListeners.put(imgX_Det, imgXListener);
+        Runnable imgXRemover = integerRangeTextField(imgX_Det, null, null, tip_imgX());
+        listenerRemovers.add(imgXRemover);
         // 匹配图像坐标纵(Y)轴偏移量文本输入框内容
-        ChangeListener<Boolean> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
-        changeListeners.put(imgY_Det, imgYListener);
+        Runnable imgYRemover = integerRangeTextField(imgY_Det, null, null, tip_imgY());
+        listenerRemovers.add(imgYRemover);
         // 停止操作图像识别准确度设置监听
-        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
-        changeListeners.put(stopOpacity_Det, stopOpacityListener);
+        Runnable stopOpacityRemover = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
+        listenerRemovers.add(stopOpacityRemover);
         // 要点击的图像识别准确度设置监听
-        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
-        changeListeners.put(clickOpacity_Det, clickOpacityListener);
+        Runnable clickOpacityRemover = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
+        listenerRemovers.add(clickOpacityRemover);
         // 限制操作时长文本输入内容
-        ChangeListener<Boolean> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
-        changeListeners.put(timeClick_Det, timeClickListener);
+        Runnable timeClickRemover = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
+        listenerRemovers.add(timeClickRemover);
         // 限制操作间隔文本输入框内容
-        ChangeListener<Boolean> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
-        changeListeners.put(interval_Det, intervalListener);
+        Runnable intervalRemover = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
+        listenerRemovers.add(intervalRemover);
         // 限制鼠标起始位置横(X)坐标文本输入框内容
-        ChangeListener<Boolean> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
-        changeListeners.put(mouseStartX_Det, mouseStartXListener);
+        Runnable mouseStartXRemover = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
+        listenerRemovers.add(mouseStartXRemover);
         // 限制鼠标起始位置纵(Y)坐标文本输入框内容
-        ChangeListener<Boolean> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
-        changeListeners.put(mouseStartY_Det, mouseStartYListener);
+        Runnable mouseStartYRemover = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
+        listenerRemovers.add(mouseStartYRemover);
         // 限制点击次数文本输入框内容
-        ChangeListener<Boolean> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
-        changeListeners.put(clickNumBer_Det, clickNumBerListener);
+        Runnable clickNumBerRemover = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
+        listenerRemovers.add(clickNumBerRemover);
         // 限制重试后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> retryStepListener = warnIntegerRangeTextField(retryStep_Det, 1, maxIndex, tip_step(), retryStepWarning_Det);
-        changeListeners.put(retryStep_Det, retryStepListener);
+        Runnable retryStepRemover = warnIntegerRangeTextField(retryStep_Det, 1, maxIndex, tip_step(), retryStepWarning_Det);
+        listenerRemovers.add(retryStepRemover);
         // 限制点击起始相对横(X)坐标文本输入框内容
-        ChangeListener<Boolean> relativelyXListener = DoubleRangeTextField(relativelyX_Det, 0.0, 100.0, 2, tip_relatively());
-        changeListeners.put(relativelyX_Det, relativelyXListener);
+        Runnable relativelyXRemover = DoubleRangeTextField(relativelyX_Det, 0.0, 100.0, 2, tip_relatively());
+        listenerRemovers.add(relativelyXRemover);
         // 限制点击起始相对纵(Y)坐标文本输入框内容
-        ChangeListener<Boolean> relativelyYListener = DoubleRangeTextField(relativelyY_Det, 0.0, 100.0, 2, tip_relatively());
-        changeListeners.put(relativelyY_Det, relativelyYListener);
+        Runnable relativelyYRemover = DoubleRangeTextField(relativelyY_Det, 0.0, 100.0, 2, tip_relatively());
+        listenerRemovers.add(relativelyYRemover);
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> matchedStepListener = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
-        changeListeners.put(matchedStep_Det, matchedStepListener);
+        Runnable matchedStepRemover = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
+        listenerRemovers.add(matchedStepRemover);
         // 随机点击时间偏移量文本输入框内容
-        ChangeListener<Boolean> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
-        changeListeners.put(randomTimeOffset_Det, randomTimeListener);
+        Runnable randomTimeRemover = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
+        listenerRemovers.add(randomTimeRemover);
         // 随机横坐标偏移量文本输入框内容
-        ChangeListener<Boolean> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
-        changeListeners.put(randomClickX_Det, randomClickXListener);
+        Runnable randomClickXRemover = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
+        listenerRemovers.add(randomClickXRemover);
         // 随机纵坐标偏移量文本输入框内容
-        ChangeListener<Boolean> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
-        changeListeners.put(randomClickY_Det, randomClickYListener);
+        Runnable randomClickYRemover = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
+        listenerRemovers.add(randomClickYRemover);
         // 限制终止操作识别失败重试次数文本输入框内容
-        ChangeListener<Boolean> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
-        changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
+        Runnable stopRetryNumRemover = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
+        listenerRemovers.add(stopRetryNumRemover);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        ChangeListener<Boolean> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
-        changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
+        Runnable clickRetryNumRemover = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
+        listenerRemovers.add(clickRetryNumRemover);
     }
 
     /**

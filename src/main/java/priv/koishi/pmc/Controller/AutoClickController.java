@@ -87,8 +87,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParam
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
-import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
+import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 

@@ -44,6 +44,7 @@ import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.runPMCFile;
 import static priv.koishi.pmc.Service.CheckUpdateService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 

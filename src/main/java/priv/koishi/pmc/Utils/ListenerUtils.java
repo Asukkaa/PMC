@@ -10,17 +10,25 @@ import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WeakChangeListener;
-import javafx.scene.control.CheckBox;
+import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.lang.ref.WeakReference;
 import java.util.EventListener;
+import java.util.List;
 import java.util.Map;
 
+import static priv.koishi.pmc.Finals.i18nFinal.text_errRange;
 import static priv.koishi.pmc.Finals.i18nFinal.text_unknownListener;
+import static priv.koishi.pmc.Utils.CommonUtils.isInDecimalRange;
+import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
+import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
 
 /**
  * 监听器工具类
@@ -30,6 +38,126 @@ import static priv.koishi.pmc.Finals.i18nFinal.text_unknownListener;
  * Time:16:24
  */
 public class ListenerUtils {
+
+    /**
+     * 限制滑动条只能输入整数
+     *
+     * @param slider 要处理的滑动条
+     * @param tip    鼠标悬停提示文案
+     * @return 监听器删除函数
+     */
+    public static Runnable integerSliderValueListener(Slider slider, String tip) {
+        ChangeListener<Number> listener = (_, _, newValue) -> {
+            int rounded = newValue.intValue();
+            slider.setValue(rounded);
+            addValueToolTip(slider, tip, String.valueOf(rounded));
+        };
+        slider.valueProperty().addListener(listener);
+        return () -> slider.valueProperty().removeListener(listener);
+    }
+
+    /**
+     * 限制输入框只能输入指定范围内的整数
+     *
+     * @param textField 要处理的文本输入框
+     * @param min       可输入的最小值，为空则不限制
+     * @param max       可输入的最大值，为空则不限制
+     * @param tip       鼠标悬停提示文案
+     * @return 监听器删除函数
+     */
+    public static Runnable integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
+        ChangeListener<Boolean> focusedListener = (_, oldFocused, newFocused) -> {
+            if (oldFocused && !newFocused) {
+                String newValue = textField.getText();
+                if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                    textField.setText("");
+                    new MessageBubble(text_errRange(), 1);
+                }
+                addValueToolTip(textField, tip);
+            }
+        };
+        textField.focusedProperty().addListener(focusedListener);
+        Runnable runnable = textFieldValueListener(textField, tip);
+        return () -> {
+            textField.focusedProperty().removeListener(focusedListener);
+            runnable.run();
+        };
+    }
+
+
+    /**
+     * 限制输入框只能输入指定范围内的小数
+     *
+     * @param textField     要处理的文本输入框
+     * @param min           可输入的最小值，为空则不限制
+     * @param max           可输入的最大值，为空则不限制
+     * @param decimalDigits 小数位数，0表示整数
+     * @param tip           鼠标悬停提示文案
+     * @return 监听器删除函数
+     */
+    public static Runnable DoubleRangeTextField(TextField textField, Double min, Double max,
+                                                int decimalDigits, String tip) {
+        ChangeListener<Boolean> focusedListener = (_, oldFocused, newFocused) -> {
+            if (oldFocused && !newFocused) {
+                String newValue = textField.getText();
+                if (!isInDecimalRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                    textField.setText("");
+                    new MessageBubble(text_errRange(), 1);
+                } else if (newValue.contains(".")) {
+                    textField.setText(newValue.substring(0, newValue.lastIndexOf(".") + decimalDigits + 1));
+                }
+                addValueToolTip(textField, tip);
+            }
+        };
+        textField.focusedProperty().addListener(focusedListener);
+        Runnable runnable = textFieldValueListener(textField, tip);
+        return () -> {
+            textField.focusedProperty().removeListener(focusedListener);
+            runnable.run();
+        };
+    }
+
+    /**
+     * 限制输入框只能输入指定范围内的正整数（范围外显示警告信息）
+     *
+     * @param textField   要处理的文本输入框
+     * @param min         可输入的最小值
+     * @param max         可输入的最大值，为空则不限制
+     * @param tip         鼠标悬停提示文案
+     * @param warningNode 警告节点
+     * @return 监听器删除函数
+     */
+    public static Runnable warnIntegerRangeTextField(TextField textField, Integer min, Integer max, String tip, Node warningNode) {
+        ChangeListener<String> listener = (_, oldValue, newValue) -> {
+            // 这里处理文本变化的逻辑
+            if (!isInIntegerRange(newValue, 1, null) && StringUtils.isNotBlank(newValue)) {
+                textField.setText(oldValue);
+            } else if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                textField.setStyle("-fx-text-fill: red;");
+                warningNode.setVisible(true);
+            } else {
+                textField.setStyle("-fx-text-fill: black;");
+                warningNode.setVisible(false);
+            }
+            addValueToolTip(textField, tip);
+        };
+        textField.textProperty().addListener(listener);
+        return () -> textField.textProperty().removeListener(listener);
+    }
+
+    /**
+     * 监听输入框内容变化
+     *
+     * @param textField 要监听的文本输入框
+     * @param tip       鼠标悬停提示文案
+     * @return 监听器删除函数
+     */
+    public static Runnable textFieldValueListener(TextField textField, String tip) {
+        ChangeListener<String> listener = (_, _, _) ->
+                addValueToolTip(textField, tip);
+        textField.textProperty().addListener(listener);
+        return () -> textField.textProperty().removeListener(listener);
+    }
 
     /**
      * 注册一个弱引用的属性变更监听器，避免因监听器未被释放而导致的内存泄漏。
@@ -67,7 +195,7 @@ public class ListenerUtils {
     }
 
     /**
-     * 移除修改内容变化标志监听器（滑块组件专用）
+     * 移除修改内容变化标志监听器
      *
      * @param weakInvalidationListeners 监听器集合
      */
@@ -93,7 +221,7 @@ public class ListenerUtils {
     }
 
     /**
-     * 移除修改内容变化标志监听器
+     * 移除修改内容变化标志监听器（滑块组件专用）
      *
      * @param weakChangeListeners 监听器集合
      */
@@ -118,20 +246,8 @@ public class ListenerUtils {
      *
      * @param changeListeners 监听器集合
      */
-    @SuppressWarnings("unchecked")
-    public static void removeChangeListener(Map<Object, ChangeListener<?>> changeListeners) {
-        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
-        changeListeners.forEach((key, listener) -> {
-            if (key instanceof ChoiceBox<?> choiceBox) {
-                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
-            } else if (key instanceof Slider slider) {
-                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
-            } else if (key instanceof TextInputControl textInput) {
-                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
-            } else if (key instanceof CheckBox checkBox) {
-                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
-            }
-        });
+    public static void removeChangeListener(List<? extends Runnable> changeListeners) {
+        changeListeners.forEach(Runnable::run);
     }
 
     /**

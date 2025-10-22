@@ -2,7 +2,6 @@ package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
@@ -790,117 +789,6 @@ public class UiUtils {
         // 同步表格数据量
         updateTableViewSizeText(tableView, dataNumber, dataNumberUnit);
         tableView.refresh();
-    }
-
-    /**
-     * 限制滑动条只能输入整数
-     *
-     * @param slider 要处理的滑动条
-     * @param tip    鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<Number> integerSliderValueListener(Slider slider, String tip) {
-        ChangeListener<Number> listener = (_, _, newValue) -> {
-            int rounded = newValue.intValue();
-            slider.setValue(rounded);
-            addValueToolTip(slider, tip, String.valueOf(rounded));
-        };
-        slider.valueProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 限制输入框只能输入指定范围内的整数
-     *
-     * @param textField 要处理的文本输入框
-     * @param min       可输入的最小值，为空则不限制
-     * @param max       可输入的最大值，为空则不限制
-     * @param tip       鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<Boolean> integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
-        ChangeListener<Boolean> listener = (_, oldFocused, newFocused) -> {
-            if (oldFocused && !newFocused) {
-                String newValue = textField.getText();
-                if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                    textField.setText("");
-                    new MessageBubble(text_errRange(), 1);
-                }
-                addValueToolTip(textField, tip);
-            }
-        };
-        textField.focusedProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 限制输入框只能输入指定范围内的小数
-     *
-     * @param textField     要处理的文本输入框
-     * @param min           可输入的最小值，为空则不限制
-     * @param max           可输入的最大值，为空则不限制
-     * @param decimalDigits 小数位数，0表示整数
-     * @param tip           鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<Boolean> DoubleRangeTextField(TextField textField, Double min, Double max,
-                                                               int decimalDigits, String tip) {
-        ChangeListener<Boolean> listener = (_, oldFocused, newFocused) -> {
-            if (oldFocused && !newFocused) {
-                String newValue = textField.getText();
-                if (!isInDecimalRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                    textField.setText("");
-                    new MessageBubble(text_errRange(), 1);
-                } else if (newValue.contains(".")) {
-                    textField.setText(newValue.substring(0, newValue.lastIndexOf(".") + decimalDigits + 1));
-                }
-                addValueToolTip(textField, tip);
-            }
-        };
-        textField.focusedProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 限制输入框只能输入指定范围内的正整数（范围外显示警告信息）
-     *
-     * @param textField   要处理的文本输入框
-     * @param min         可输入的最小值
-     * @param max         可输入的最大值，为空则不限制
-     * @param tip         鼠标悬停提示文案
-     * @param warningNode 警告节点
-     * @return 监听器
-     */
-    public static ChangeListener<String> warnIntegerRangeTextField(TextField textField, Integer min, Integer max, String tip, Node warningNode) {
-        ChangeListener<String> listener = (_, oldValue, newValue) -> {
-            // 这里处理文本变化的逻辑
-            if (!isInIntegerRange(newValue, 1, null) && StringUtils.isNotBlank(newValue)) {
-                textField.setText(oldValue);
-            } else if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                textField.setStyle("-fx-text-fill: red;");
-                warningNode.setVisible(true);
-            } else {
-                textField.setStyle("-fx-text-fill: black;");
-                warningNode.setVisible(false);
-            }
-            addValueToolTip(textField, tip);
-        };
-        textField.textProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 监听输入框内容变化
-     *
-     * @param textField 要监听的文本输入框
-     * @param tip       鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<String> textFieldValueListener(TextField textField, String tip) {
-        ChangeListener<String> listener = (_, _, _) ->
-                addValueToolTip(textField, tip);
-        textField.textProperty().addListener(listener);
-        return listener;
     }
 
     /**

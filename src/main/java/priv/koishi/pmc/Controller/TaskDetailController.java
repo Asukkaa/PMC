@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,7 +27,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -37,7 +39,7 @@ import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
-import static priv.koishi.pmc.Utils.ListenerUtils.removeChangeListener;
+import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -79,7 +81,7 @@ public class TaskDetailController extends RootController {
     /**
      * 带鼠标悬停提示的内容变化监听器
      */
-    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+    private final List<Runnable> changeListeners = new ArrayList<>();
 
     /**
      * 星期复选框集合
@@ -200,14 +202,14 @@ public class TaskDetailController extends RootController {
      */
     private void textFieldChangeListener() {
         // 限制小时文本输入框内容
-        ChangeListener<Boolean> hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
-        changeListeners.put(hourField_TD, hourFieldListener);
+        Runnable hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
+        changeListeners.add(hourFieldListener);
         // 限制分钟文本输入框内容
-        ChangeListener<Boolean> minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
-        changeListeners.put(minuteField_TD, minuteFieldListener);
+        Runnable minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
+        changeListeners.add(minuteFieldListener);
         // 限制任务名称文本输入框内容
-        ChangeListener<String> taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
-        changeListeners.put(taskNameField_TD, taskNameFieldListener);
+        Runnable taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
+        changeListeners.add(taskNameFieldListener);
     }
 
     /**
