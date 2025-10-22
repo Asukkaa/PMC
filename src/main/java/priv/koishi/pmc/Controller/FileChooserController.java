@@ -220,7 +220,7 @@ public class FileChooserController extends RootController {
     public void adaption() {
         // 设置组件高度
         double stageHeight = stage.getHeight();
-        tableView_FC.setPrefHeight(stageHeight * 0.6);
+        tableView_FC.setPrefHeight(stageHeight * 0.53);
         // 设置组件宽度
         double stageWidth = stage.getWidth();
         double tableWidth = stageWidth * 0.94;
