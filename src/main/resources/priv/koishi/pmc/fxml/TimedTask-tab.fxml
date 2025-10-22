@@ -8,9 +8,9 @@
         <HBox fx:id="fileNumberHBox_Task" spacing="10">
             <Button fx:id="addTimedTask_Task" text="%timedTask.addTimedTask_Task" onAction="#addTimedTask"/>
             <Button fx:id="getScheduleTask_Task" text="%timedTask.getScheduleTask_Task" onAction="#getScheduleTask"/>
-            <Label text="%timedTask.tip" textFill="red" prefHeight="25"/>
+            <Label text="%timedTask.tip" textFill="red"/>
 
-            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
+            <Label fx:id="dataNumber_Task" alignment="CENTER_RIGHT" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Task">

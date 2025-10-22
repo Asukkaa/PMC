@@ -579,7 +579,7 @@ public class CommonFinals {
     /**
      * 默认日志窗口宽度
      */
-    public static final String defaultLogWidth = "1000";
+    public static final String defaultLogWidth = "1300";
 
     /**
      * 默认日志窗口高度

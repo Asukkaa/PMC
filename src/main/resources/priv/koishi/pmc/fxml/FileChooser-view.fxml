@@ -7,51 +7,45 @@
     <AnchorPane fx:id="anchorPane_FC" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
             <HBox spacing="10">
-                <Button fx:id="selectPathButton_FC" onAction="#selectFilePath" style="-fx-cursor: hand"
-                        text="%fileChooser.selectPathButton_FC"/>
-                <Label fx:id="filePath_FC" prefHeight="25" style="-fx-font-size: 15px;"/>
+                <Button fx:id="selectPathButton_FC" onAction="#selectFilePath" text="%fileChooser.selectPathButton_FC"/>
+                <Label fx:id="filePath_FC" style="-fx-font-size: 15px;"/>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%fileChooser.fileFilter"/>
-                    <ChoiceBox fx:id="fileFilter_FC" prefHeight="25" prefWidth="200" onAction="#fileFilterAction"
-                               style="-fx-cursor: hand"/>
+                    <Label text="%fileChooser.fileFilter"/>
+                    <ChoiceBox fx:id="fileFilter_FC" prefWidth="200" onAction="#fileFilterAction"/>
                 </HBox>
 
                 <HBox spacing="10">
-                    <Label prefHeight="25" text="%fileChooser.hideFileType"/>
-                    <ChoiceBox fx:id="hideFileType_FC" prefHeight="25" prefWidth="200" onAction="#hideFileTypeAction"
-                               style="-fx-cursor: hand"/>
+                    <Label text="%fileChooser.hideFileType"/>
+                    <ChoiceBox fx:id="hideFileType_FC" prefWidth="200" onAction="#hideFileTypeAction"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%fileChooser.fileNameType"/>
-                    <ChoiceBox fx:id="fileNameType_FC" prefHeight="25" prefWidth="200" onAction="#fileNameTypeAction"
-                               style="-fx-cursor: hand"/>
+                    <Label text="%fileChooser.fileNameType"/>
+                    <ChoiceBox fx:id="fileNameType_FC" prefWidth="180" onAction="#fileNameTypeAction"/>
 
-                    <TextField fx:id="fileNameFilter_FC" prefHeight="25" prefWidth="165"/>
+                    <TextField fx:id="fileNameFilter_FC" prefWidth="130"/>
                 </HBox>
 
                 <HBox spacing="30">
-                    <CheckBox fx:id="reverse_FC" style="-fx-cursor: hand" text="%fileChooser.reverse_FC"
-                              onAction="#reverseAction" prefHeight="25"/>
+                    <CheckBox fx:id="reverse_FC" text="%fileChooser.reverse_FC" onAction="#reverseAction"/>
 
-                    <CheckBox fx:id="filterNameCase_FC" style="-fx-cursor: hand" text="%fileChooser.filterNameCase_FC"
-                              onAction="#filterNameCaseAction" prefHeight="25"/>
+                    <CheckBox fx:id="filterNameCase_FC" text="%fileChooser.filterNameCase_FC"
+                              onAction="#filterNameCaseAction"/>
                 </HBox>
             </HBox>
 
             <HBox fx:id="fileTypeHBox_FC" visible="false" spacing="10">
                 <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%fileChooser.filterFileType"/>
-                    <TextField fx:id="filterFileType_FC" prefHeight="20" prefWidth="350"/>
+                    <Label text="%fileChooser.filterFileType"/>
+                    <TextField fx:id="filterFileType_FC" prefWidth="300"/>
                 </HBox>
 
-                <CheckBox fx:id="reverseFileType_FC" prefHeight="25" style="-fx-cursor: hand"
-                          text="%fileChooser.reverseFileType_FC"/>
+                <CheckBox fx:id="reverseFileType_FC" text="%fileChooser.reverseFileType_FC"/>
             </HBox>
 
             <HBox fx:id="fileNumberHBox_FC" spacing="10">
@@ -59,9 +53,9 @@
                         text="%fileChooser.gotoParentButton_FC"/>
                 <Button fx:id="refreshButton_FC" onAction="#refreshTable" styleClass="cadetblue-button"
                         text="%listText.refresh"/>
-                <Label fx:id="tip_FC" prefHeight="25" textFill="red" text="%fileChooser.tip_FC"/>
+                <Label fx:id="tip_FC" textFill="red" text="%fileChooser.tip_FC"/>
 
-                <Label fx:id="fileNumber_FC" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
+                <Label fx:id="fileNumber_FC" alignment="CENTER_RIGHT" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_FC" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
@@ -89,7 +83,7 @@
                 </VBox>
 
                 <Button fx:id="confirm_FC" text="%confirm.select" onAction="#confirmSelect"/>
-                <Button fx:id="close_FC" text="%confirm.cancel" style="-fx-cursor: hand" onAction="#closeWindow"/>
+                <Button fx:id="close_FC" text="%confirm.cancel" onAction="#closeWindow"/>
             </HBox>
         </VBox>
     </AnchorPane>

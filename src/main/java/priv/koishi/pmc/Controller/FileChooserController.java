@@ -236,9 +236,9 @@ public class FileChooserController extends RootController {
      * 设置列表各列宽度
      */
     private void bindPrefWidthProperty() {
-        index_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.04));
+        index_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.05));
         thumb_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.1));
-        name_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.14));
+        name_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.13));
         fileType_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.08));
         path_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.2));
         size_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.08));
@@ -509,7 +509,7 @@ public class FileChooserController extends RootController {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
-        double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1000"));
+        double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1300"));
         double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "450"));
         input.close();
         Scene scene = new Scene(root, with, height);
