@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Controller;
 
+import com.jthemedetecor.OsThemeDetector;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -116,6 +117,8 @@ public class SettingController extends RootController implements MousePositionUp
      * 窗口信息获取器
      */
     public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
+
+    private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
     @FXML
     public AnchorPane anchorPane_Set;
@@ -817,6 +820,22 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 添加系统主题变化监听器
+     */
+    private void setRegisterListener() {
+        detector.registerListener(isDark -> {
+            String value = theme_Set.getValue();
+            if (theme_auto().equals(value)) {
+                if (isDark) {
+                    changeTheme(ThemeEnum.Dark.ordinal());
+                } else {
+                    changeTheme(ThemeEnum.Light.ordinal());
+                }
+            }
+        });
+    }
+
+    /**
      * 根据鼠标位置调整 ui
      *
      * @param mousePoint 鼠标位置
@@ -865,6 +884,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
+            setRegisterListener();
             // 建议自动化权限
             if (!hasAutomationPermission()) {
                 // 禁用需要自动化权限的组件
