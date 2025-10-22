@@ -21,7 +21,6 @@ module priv.koishi.pmc {
     requires com.sun.jna.platform;
     requires jdk.naming.dns;
     requires atlantafx.base;
-    requires com.jthemedetector;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;

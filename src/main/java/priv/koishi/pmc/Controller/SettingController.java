@@ -1,6 +1,8 @@
 package priv.koishi.pmc.Controller;
 
-import com.jthemedetecor.OsThemeDetector;
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -117,8 +119,6 @@ public class SettingController extends RootController implements MousePositionUp
      * 窗口信息获取器
      */
     public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
-
-    private final OsThemeDetector detector = OsThemeDetector.getDetector();
 
     @FXML
     public AnchorPane anchorPane_Set;
@@ -823,13 +823,16 @@ public class SettingController extends RootController implements MousePositionUp
      * 添加系统主题变化监听器
      */
     private void setRegisterListener() {
-        detector.registerListener(isDark -> {
+        Platform.getPreferences().colorSchemeProperty().addListener((_, _, _) -> {
             String value = theme_Set.getValue();
             if (theme_auto().equals(value)) {
-                if (isDark) {
-                    changeTheme(ThemeEnum.Dark.ordinal());
+                ColorScheme scheme = Platform.getPreferences().getColorScheme();
+                if (ColorScheme.DARK == scheme) {
+                    setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+                    isDarkTheme = true;
                 } else {
-                    changeTheme(ThemeEnum.Light.ordinal());
+                    setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+                    isDarkTheme = false;
                 }
             }
         });
