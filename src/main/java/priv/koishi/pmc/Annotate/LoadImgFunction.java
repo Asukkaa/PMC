@@ -4,7 +4,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 在 Bean 类中添加注解表明该方法被反射调用
+ * 在 Bean 类中添加注解表明该方法为列表图片加载方法
  *
  * @author KOISHI
  * Date:2025-03-24
@@ -12,5 +12,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UsedByReflection {
+public @interface LoadImgFunction {
 }

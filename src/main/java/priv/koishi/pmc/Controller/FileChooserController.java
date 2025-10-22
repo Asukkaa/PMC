@@ -512,20 +512,22 @@ public class FileChooserController extends RootController {
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
         double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1300"));
-        double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "450"));
+        double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "700"));
         input.close();
         Scene scene = new Scene(root, with, height);
         detailStage.setScene(scene);
         detailStage.setTitle(fileChooserConfig.getTitle());
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
-        detailStage.show();
         // 监听窗口面板宽度变化
         detailStage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
+        detailStage.show();
         return controller;
     }
 
@@ -566,6 +568,8 @@ public class FileChooserController extends RootController {
      */
     @FXML
     private void initialize() {
+        // 手动处理深色主题
+        setDarkThemePane(anchorPane_FC);
         // 初始化下拉框
         setChoiceBoxItems();
         Platform.runLater(() -> {

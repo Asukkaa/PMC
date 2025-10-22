@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Annotate.UsedByReflection;
+import priv.koishi.pmc.Annotate.LoadImgFunction;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 
 import java.io.File;
@@ -66,7 +66,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable {
      *
      * @return 当前图片表格的缩略图
      */
-    @UsedByReflection
+    @LoadImgFunction
     public Image loadThumb() {
         if (StringUtils.isBlank(getClickImgPath())) {
             return null;

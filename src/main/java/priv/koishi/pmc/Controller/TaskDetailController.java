@@ -323,6 +323,8 @@ public class TaskDetailController extends RootController {
      */
     @FXML
     private void initialize() {
+        // 手动处理深色主题
+        setDarkThemePane(anchorPane_TD);
         // 初始化下拉框
         setChoiceBoxItems();
         // 设置要防重复点击的组件

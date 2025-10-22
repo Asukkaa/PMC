@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,7 +31,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import priv.koishi.pmc.Annotate.UsedByReflection;
+import priv.koishi.pmc.Annotate.LoadImgFunction;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.isDarkTheme;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -79,6 +81,11 @@ public class UiUtils {
      * 日志记录器
      */
     private static final Logger logger = LogManager.getLogger(UiUtils.class);
+
+    /**
+     * 图片单元格字体颜色绑定
+     */
+    private static final ObjectProperty<Color> thumbnailTextColor = new SimpleObjectProperty<>(Color.BLACK);
 
     /**
      * 鼠标停留提示框
@@ -545,7 +552,7 @@ public class UiUtils {
                     try {
                         Method getter = beanClass.getMethod("loadThumb");
                         // 显式标记方法调用（解决IDE误报）
-                        if (getter.isAnnotationPresent(UsedByReflection.class)) {
+                        if (getter.isAnnotationPresent(LoadImgFunction.class)) {
                             Function<T, Image> supplier = bean -> {
                                 try {
                                     return (Image) getter.invoke(bean);
@@ -647,7 +654,7 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
-                setTextFill(Color.BLACK);
+                textFillProperty().bind(thumbnailTextColorProperty());
                 if (empty) {
                     setText(null);
                     setGraphic(null);
@@ -686,6 +693,14 @@ public class UiUtils {
                 return !new File(imgPath).exists();
             }
         });
+    }
+
+    public static ObjectProperty<Color> thumbnailTextColorProperty() {
+        return thumbnailTextColor;
+    }
+
+    public static void setThumbnailTextColor(Color color) {
+        thumbnailTextColor.set(color);
     }
 
     /**
@@ -2138,6 +2153,24 @@ public class UiUtils {
             stage.close();
         }
         System.gc();
+    }
+
+    /**
+     * 处理无法切换深色布局的页面
+     *
+     * @param pane 页面布局
+     */
+    public static void setDarkThemePane(Pane pane) {
+        if (isDarkTheme) {
+            pane.setStyle("""
+                    -fx-background-color: -color-border-subtle, -color-base-9;
+                     -fx-background-radius: 6px, 0;
+                     -fx-background-insets: 0, 0 1 0 0;
+                     -fx-border-radius: 6px;
+                     -fx-border-width: 1px, 0 3px 0 0;
+                     -fx-border-color: transparent, transparent;
+                    """);
+        }
     }
 
 }

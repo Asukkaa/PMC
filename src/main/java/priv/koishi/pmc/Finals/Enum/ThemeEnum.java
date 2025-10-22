@@ -15,12 +15,12 @@ public enum ThemeEnum {
     JavaFx,
 
     /**
-     * 白天模式
+     * 浅色模式
      */
     Light,
 
     /**
-     * 夜晚模式
+     * 深色模式
      */
     Dark,
 

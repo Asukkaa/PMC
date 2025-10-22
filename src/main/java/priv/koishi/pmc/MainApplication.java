@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -99,6 +100,11 @@ public class MainApplication extends Application {
      * 语言包
      */
     public static ResourceBundle bundle;
+
+    /**
+     * 当前是否为夜晚模式（true-当前为夜晚模式）
+     */
+    public static boolean isDarkTheme;
 
     /**
      * 加载 fxml 页面
@@ -209,18 +215,24 @@ public class MainApplication extends Application {
     public static void changeTheme(int theme) {
         if (theme == ThemeEnum.Light.ordinal()) {
             setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+            isDarkTheme = false;
         } else if (theme == ThemeEnum.Dark.ordinal()) {
             setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+            isDarkTheme = true;
         } else if (theme == ThemeEnum.Auto.ordinal()) {
             ColorScheme scheme = Platform.getPreferences().getColorScheme();
             if (ColorScheme.DARK == scheme) {
                 setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+                isDarkTheme = true;
             } else {
                 setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+                isDarkTheme = false;
             }
         } else if (theme == ThemeEnum.JavaFx.ordinal()) {
             setUserAgentStylesheet(null);
+            isDarkTheme = false;
         }
+        setThumbnailTextColor(isDarkTheme ? Color.WHITE : Color.BLACK);
     }
 
     /**
