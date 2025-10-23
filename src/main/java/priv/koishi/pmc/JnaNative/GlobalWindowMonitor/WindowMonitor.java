@@ -197,14 +197,25 @@ public class WindowMonitor {
      */
     public static void windowInfoShow(WindowInfo windowInfo, Label infoLabel) {
         if (windowInfo != null) {
-            infoLabel.setTextFill(Color.CORNFLOWERBLUE);
-            infoLabel.setText(windowInfo.getProcessName());
-            String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
-                    findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
-                    findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
-                    findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
-                    findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
-            addToolTip(info, infoLabel);
+            String processPath = windowInfo.getProcessPath();
+            if (windowInfo.getPid() != -1) {
+                infoLabel.setTextFill(Color.CORNFLOWERBLUE);
+                infoLabel.setText(windowInfo.getProcessName());
+                String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                        findImgSet_windowPath() + processPath + "\n" +
+                        findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                        findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
+                        findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
+                addToolTip(info, infoLabel);
+            } else if (StringUtils.isNotBlank(processPath)) {
+                infoLabel.setTextFill(Color.RED);
+                String name = new File(processPath).getName();
+                infoLabel.setText(name);
+                String info = text_noWindowInfo() + "\n" +
+                        findImgSet_PName() + name + "\n" +
+                        findImgSet_windowPath() + processPath + "\n";
+                addToolTip(info, infoLabel);
+            }
         } else {
             String text = infoLabel.getText();
             if (StringUtils.isNotEmpty(text)) {
@@ -394,6 +405,10 @@ public class WindowMonitor {
             windowInfo = getMainWinWindowInfo(processPath);
         } else if (isMac) {
             windowInfo = getMainMacWindowInfo(processPath);
+        }
+        if (windowInfo == null) {
+            windowInfo = new WindowInfo()
+                    .setProcessPath(processPath);
         }
         return windowInfo;
     }

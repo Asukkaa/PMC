@@ -1908,7 +1908,10 @@ public class UiUtils {
      */
     private static void buildUpdateDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
         MenuItem menuItem = new MenuItem(findImgSet_updateWindow());
-        menuItem.setOnAction(_ -> windowMonitor.updateWindowInfo());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            new MessageBubble(text_updateSuccess(), 2);
+        });
         contextMenu.getItems().add(menuItem);
     }
 
@@ -1926,25 +1929,35 @@ public class UiUtils {
         menuItem.setOnAction(_ -> {
             windowMonitor.updateWindowInfo();
             WindowInfo windowInfo = windowMonitor.getWindowInfo();
-            if (windowInfo != null) {
-                stages.forEach(stage -> stage.setIconified(true));
-                String info = text_escCloseFloating() + "\n" +
-                        findImgSet_PName() + windowInfo.getProcessName() + "\n" +
-                        findImgSet_PID() + windowInfo.getPid() + "\n" +
-                        findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
-                        findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
-                        findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
-                        findImgSet_windowSize() + " W: " + windowInfo.getWidth() + " H: " + windowInfo.getHeight();
-                windowInfoFloating.setMassage(info)
-                        .getConfig()
-                        .setHeight(windowInfo.getHeight())
-                        .setWidth(windowInfo.getWidth())
-                        .setX(windowInfo.getX())
-                        .setY(windowInfo.getY());
-                // 改变要防重复点击的组件状态
-                changeDisableNodes(disableNodes, true);
-                showFloatingWindow(windowInfoFloating);
-                windowMonitor.startNativeKeyListener();
+            if (windowInfo != null && windowInfo.getPid() != -1) {
+                int x = windowInfo.getX();
+                int y = windowInfo.getY();
+                int w = windowInfo.getWidth();
+                int h = windowInfo.getHeight();
+                if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
+                    new MessageBubble(text_windowHidden(), 2);
+                } else {
+                    stages.forEach(stage -> stage.setIconified(true));
+                    String info = text_escCloseFloating() + "\n" +
+                            findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                            findImgSet_PID() + windowInfo.getPid() + "\n" +
+                            findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
+                            findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                            findImgSet_windowLocation() + " X: " + x + " Y: " + y + "\n" +
+                            findImgSet_windowSize() + " W: " + w + " H: " + h;
+                    windowInfoFloating.setMassage(info)
+                            .getConfig()
+                            .setHeight(windowInfo.getHeight())
+                            .setWidth(windowInfo.getWidth())
+                            .setX(windowInfo.getX())
+                            .setY(windowInfo.getY());
+                    // 改变要防重复点击的组件状态
+                    changeDisableNodes(disableNodes, true);
+                    showFloatingWindow(windowInfoFloating);
+                    windowMonitor.startNativeKeyListener();
+                }
+            } else {
+                new MessageBubble(text_noWindowInfo(), 2);
             }
         });
         contextMenu.getItems().add(menuItem);

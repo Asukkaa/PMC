@@ -40,9 +40,9 @@ public class WindowInfo {
     int height;
 
     /**
-     * 窗口进程ID
+     * 窗口进程 ID（-1 表示应用未启动）
      */
-    int pid;
+    int pid = -1;
 
     /**
      * 窗口层级

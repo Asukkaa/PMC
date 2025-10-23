@@ -1770,6 +1770,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 窗口信息已更新
+     */
+    public static String text_updateSuccess() {
+        return bundle.getString("updateSuccess");
+    }
+
+    /**
+     * @return 无法展示窗口位置，窗口可能已隐藏
+     */
+    public static String text_windowHidden() {
+        return bundle.getString("windowHidden");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
