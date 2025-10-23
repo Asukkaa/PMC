@@ -68,7 +68,8 @@ public class WindowMonitor {
     /**
      * 正在寻找窗口（true 寻找中）
      */
-    public boolean findingWindow;
+    @Getter
+    private boolean findingWindow;
 
     /**
      * 寻找窗口计时器

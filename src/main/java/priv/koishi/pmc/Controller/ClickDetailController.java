@@ -1356,7 +1356,7 @@ public class ClickDetailController extends RootController {
         // 获取准备时间值
         int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
                 Integer.parseInt(defaultPreparationRecord), 0, null);
-        if (stopWindowMonitor != null && !stopWindowMonitor.findingWindow) {
+        if (stopWindowMonitor != null && !stopWindowMonitor.isFindingWindow()) {
             stopWindowMonitor.startClickWindowMouseListener(preparation);
         }
     }
