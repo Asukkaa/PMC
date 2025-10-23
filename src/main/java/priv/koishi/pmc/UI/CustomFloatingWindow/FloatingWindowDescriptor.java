@@ -43,7 +43,7 @@ public class FloatingWindowDescriptor {
     Rectangle rectangle;
 
     /**
-     * 浮窗Stage
+     * 浮窗 Stage
      */
     Stage stage;
 
@@ -56,6 +56,11 @@ public class FloatingWindowDescriptor {
      * 浮窗坐标展示栏
      */
     Label floatingPosition;
+
+    /**
+     * 浮窗名称展示栏
+     */
+    Label nameeLabel;
 
     /**
      * 修改设置的按钮
@@ -163,14 +168,24 @@ public class FloatingWindowDescriptor {
     String configFile;
 
     /**
-     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidthInt}）
+     * 关闭时保存浮窗位置（true 保存）
+     */
+    boolean closeSave = true;
+
+    /**
+     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidth}）
      */
     int minWidth = defaultFloatingWidthInt;
 
     /**
-     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingHeightInt}）
+     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingHeight}）
      */
     int minHeight = defaultFloatingHeightInt;
+
+    /**
+     * 浮窗是否添加关闭快捷键键（true 添加）
+     */
+    boolean addCloseKey = true;
 
     /**
      * 销毁浮窗

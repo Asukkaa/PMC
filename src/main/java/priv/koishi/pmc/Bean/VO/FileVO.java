@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Annotate.UsedByReflection;
 import priv.koishi.pmc.Bean.FileBean;
 
 import java.io.File;
@@ -15,7 +14,7 @@ import java.io.File;
 import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 
 /**
- * javafx列表展示文件信息类
+ * javaFX列表展示文件信息类
  *
  * @author KOISHI
  * Date 2024-10-01
@@ -24,7 +23,7 @@ import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class FileVO extends FileBean implements Indexable {
+public class FileVO extends FileBean implements Indexable, ImgBean {
 
     /**
      * 序号
@@ -51,7 +50,7 @@ public class FileVO extends FileBean implements Indexable {
      *
      * @return 当前图片表格的缩略图
      */
-    @UsedByReflection
+    @Override
     public Image loadThumb() {
         if (StringUtils.isBlank(getPath())) {
             return null;

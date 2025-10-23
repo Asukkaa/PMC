@@ -105,7 +105,7 @@ public class TimedTaskController extends RootController {
     }
 
     /**
-     * 设置javafx单元格宽度
+     * 设置 javaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Task.prefWidthProperty().bind(tableView_Task.widthProperty().multiply(0.1));
@@ -133,7 +133,7 @@ public class TimedTaskController extends RootController {
     }
 
     /**
-     * 清空javafx列表按钮
+     * 清空 javaFX 列表按钮
      */
     public void removeAll() {
         removeTableViewData(tableView_Task, dataNumber_Task);
@@ -287,7 +287,7 @@ public class TimedTaskController extends RootController {
         // 设置要防重复点击的组件
         setDisableNodes();
         Platform.runLater(() -> {
-            // 自动填充javafx表格
+            // 自动填充 javaFX 表格
             autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId, index_Task);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Task);

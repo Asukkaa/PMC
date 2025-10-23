@@ -3,8 +3,8 @@ package priv.koishi.pmc.Controller;
 import priv.koishi.pmc.Properties.CommonProperties;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static priv.koishi.pmc.MainApplication.controllers;
 
 /**
  * 根控制器
@@ -16,11 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RootController extends CommonProperties {
 
     /**
-     * 全局控制器容器
-     */
-    private static final Map<Class<?>, WeakReference<RootController>> controllers = new ConcurrentHashMap<>();
-
-    /**
      * 构造方法
      */
     public RootController() {
@@ -28,13 +23,27 @@ public class RootController extends CommonProperties {
     }
 
     /**
+     * 删除当前容器
+     */
+    public void removeController() {
+        controllers.remove(getClass());
+    }
+
+    /**
      * 获取控制器实例
+     *
+     * @param type 要获取的控制器的类
+     * @param <T>  控制器类型
      */
     public static <T extends RootController> T getController(Class<T> type) {
-        WeakReference<RootController> ref = controllers.get(type);
-        RootController instance = (ref != null) ? ref.get() : null;
-        // 类型安全校验
-        return (instance != null) ? type.cast(instance) : null;
+        synchronized (controllers) {
+            WeakReference<RootController> ref = controllers.get(type);
+            RootController instance = (ref != null) ? ref.get() : null;
+            if (instance == null) {
+                return null;
+            }
+            return type.cast(instance);
+        }
     }
 
 }

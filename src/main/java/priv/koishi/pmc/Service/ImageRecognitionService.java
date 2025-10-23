@@ -14,6 +14,7 @@ import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.MatchPointBean;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.awt.*;
@@ -76,7 +77,7 @@ public class ImageRecognitionService {
      * 根据本地图片寻找屏幕坐标
      *
      * @param config 匹配配置
-     * @return Javacv Point对象
+     * @return Javacv Point 对象
      * @throws Exception 匹配失败时抛出异常
      */
     public static MatchPointBean findPosition(FindPositionConfig config, DynamicQueue<? super ClickLogBean> dynamicQueue) throws Exception {
@@ -195,7 +196,7 @@ public class ImageRecognitionService {
      * 根据本地图片寻找屏幕坐标
      *
      * @param findPositionConfig 匹配配置
-     * @return Javacv Point对象
+     * @return Javacv Point 对象
      * @throws Exception 匹配失败时抛出异常
      */
     private static MatchPointBean getPoint(FindPositionConfig findPositionConfig) throws Exception {
@@ -205,33 +206,42 @@ public class ImageRecognitionService {
         FloatingWindowConfig config = findPositionConfig.getFloatingWindowConfig();
         int x;
         int y;
-        int width;
-        int height;
+        int w;
+        int h;
         if (FindImgTypeEnum.ALL.ordinal() == config.getFindImgTypeEnum()) {
             x = 0;
             y = 0;
-            width = screenWidth;
-            height = screenHeight;
+            w = screenWidth;
+            h = screenHeight;
+        } else if (FindImgTypeEnum.WINDOW.ordinal() == config.getFindImgTypeEnum()) {
+            WindowInfo windowInfo = config.getWindowInfo();
+            if (windowInfo == null) {
+                throw new RuntimeException(findImgSet_noWindow());
+            }
+            x = windowInfo.getX();
+            y = windowInfo.getY();
+            w = windowInfo.getWidth();
+            h = windowInfo.getHeight();
         } else {
             // 识别次数大于1且开启全屏重试
             if (findPositionConfig.getFindTime() > 1 && activation.equals(config.getAllRegion())) {
                 x = 0;
                 y = 0;
-                width = screenWidth;
-                height = screenHeight;
+                w = screenWidth;
+                h = screenHeight;
             } else {
                 x = config.getX();
                 y = config.getY();
-                height = config.getHeight();
-                width = config.getWidth();
+                h = config.getHeight();
+                w = config.getWidth();
             }
         }
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle(
-                    x,
-                    y,
-                    width,
-                    height));
+                    Math.max(0, Math.min(x, screenWidth)),
+                    Math.max(0, Math.min(y, screenHeight)),
+                    Math.max(1, Math.min(w, screenWidth - x)),
+                    Math.max(1, Math.min(h, screenHeight - y))));
         } catch (AWTException e) {
             throw new RuntimeException(text_screenErr() + e.getMessage(), e);
         }
@@ -300,10 +310,10 @@ public class ImageRecognitionService {
     }
 
     /**
-     * BufferedImage转Mat
+     * BufferedImage 转 Mat
      *
      * @param image 需要转换的图片
-     * @return Mat对象
+     * @return Mat 对象
      */
     private static Mat bufferedImageToMat(BufferedImage image) {
         // 转换为标准的3通道BGR格式
@@ -340,7 +350,7 @@ public class ImageRecognitionService {
     /**
      * 检查是否能正常截图
      *
-     * @return true: 可以截图，false: 无法截图
+     * @return true-可以截图，false-无法截图
      */
     public static boolean checkScreenCapturePermission() {
         refreshScreenParameters();

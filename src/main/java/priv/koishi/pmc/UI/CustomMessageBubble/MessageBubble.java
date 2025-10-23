@@ -26,6 +26,11 @@ import java.awt.*;
 public class MessageBubble extends Label implements MousePositionUpdater {
 
     /**
+     * 当前显示的消息气泡实例
+     */
+    private static MessageBubble currentBubble;
+
+    /**
      * 消息气泡所在舞台
      */
     private final Stage bubbleStage;
@@ -47,6 +52,12 @@ public class MessageBubble extends Label implements MousePositionUpdater {
      * @param time 消息气泡显示时间
      */
     public MessageBubble(String text, double time) {
+        // 如果已有显示的气泡，先关闭它
+        if (currentBubble != null) {
+            currentBubble.closeBubble();
+        }
+        // 设置当前实例为新的气泡
+        currentBubble = this;
         setText(text);
         setTextFill(Color.WHITE);
         setPadding(new Insets(10));
@@ -67,15 +78,25 @@ public class MessageBubble extends Label implements MousePositionUpdater {
         bubbleStage.setX(mousePoint.getX() + offsetX);
         bubbleStage.setY(mousePoint.getY() + offsetY);
         // 自动关闭
-        new Timeline(new KeyFrame(Duration.seconds(time), _ -> {
-            bubbleStage.close();
-            MousePositionListener.getInstance().removeListener(this);
-        })).play();
+        new Timeline(new KeyFrame(Duration.seconds(time), _ -> closeBubble())).play();
         bubbleStage.show();
     }
 
     /**
-     * 根据鼠标位置调整ui
+     * 关闭消息气泡
+     */
+    private void closeBubble() {
+        if (bubbleStage != null) {
+            bubbleStage.close();
+        }
+        MousePositionListener.getInstance().removeListener(this);
+        if (currentBubble == this) {
+            currentBubble = null;
+        }
+    }
+
+    /**
+     * 根据鼠标位置调整 ui
      *
      * @param mousePoint 鼠标位置
      */

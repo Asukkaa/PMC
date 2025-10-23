@@ -17,6 +17,7 @@ InfoPlist="$appContents/Info.plist"
 appMainClass="priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 runtimeImage="app"
 language="zh_CN"
+entitlements_file="$script_dir/entitlements.plist"
 
 # 关闭正在运行的程序
 echo "强制关闭正在运行的 $appName..."
@@ -65,7 +66,9 @@ if [ -d "$target/$appFile" ]; then
 fi
 
 # 执行打包
-(cd "$target" && jpackage --name "$appName" --type app-image -m "$appMainClass" --runtime-image "$runtimeImage" --icon "$appIcon" --app-version "$appVersion" --java-options "-XX:+UseZGC")
+(cd "$target" && jpackage --name "$appName" --type app-image -m "$appMainClass" --runtime-image "$runtimeImage" \
+--icon "$appIcon" --app-version "$appVersion" --java-options "-XX:+UseZGC" \
+--java-options "--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv")
 echo "已完成 jpackage 打包"
 
 # 移动动态库文件
@@ -84,6 +87,28 @@ if [ -f "$InfoPlist" ]; then
 else
     echo "错误：找不到 Info.plist 文件" >&2
     exit 1
+fi
+
+# 代码签名部分
+echo "正在对应用进行代码签名..."
+if codesign --deep --force --verbose --sign "PMC" --entitlements "$entitlements_file" "$appFullPath"; then
+    echo "应用签名成功"
+
+    # 验证签名
+    echo "正在验证签名..."
+    if codesign --verify --verbose "$appFullPath"; then
+        echo "签名验证通过"
+    else
+        echo "签名验证警告，但应用仍可运行"
+    fi
+else
+    echo "应用签名失败，尝试使用临时签名..."
+    # 备用方案：使用临时签名
+    if codesign --deep --force --verbose --sign - "$appFullPath"; then
+        echo "临时签名成功"
+    else
+        echo "签名完全失败，继续打包流程..."
+    fi
 fi
 
 appZipFile="$target/${appName}-${appVersion}-mac.zip"

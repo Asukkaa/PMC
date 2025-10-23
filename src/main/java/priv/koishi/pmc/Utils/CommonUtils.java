@@ -27,7 +27,7 @@ public class CommonUtils {
      * @param str 要校验的字符串
      * @param min 最小值，为空则不限制
      * @param max 最大值，为空则不限制
-     * @return 在设置范围内为true，不在范围内为false
+     * @return 在设置范围内为 true，不在范围内为 false
      */
     public static boolean isInIntegerRange(String str, Integer min, Integer max) {
         if (StringUtils.isEmpty(str)) {
@@ -61,6 +61,53 @@ public class CommonUtils {
             return value <= max;
         }
         return value >= min && value <= max;
+    }
+
+    /**
+     * 正则表达式用于匹配指定范围的小数
+     *
+     * @param str 要校验的字符串
+     * @param min 最小值，为空则不限制
+     * @param max 最大值，为空则不限制
+     * @return 在设置范围内为 true，不在范围内为 false
+     */
+    public static boolean isInDecimalRange(String str, Double min, Double max) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        // 处理负号情况
+        boolean isNegative = str.startsWith("-");
+        String absStr = isNegative ? str.substring(1) : str;
+        // 禁止出现0开头的非0数字（整数部分）
+        if (absStr.indexOf("0") == 0 && absStr.length() > 1 && absStr.charAt(1) != '.') {
+            return false;
+        }
+        // 构建数字正则表达式（允许任意小数位数）
+        String decimalPattern = "^-?\\d{1,10}(\\.\\d+)?$";
+        Pattern pattern = Pattern.compile(decimalPattern);
+        if (!pattern.matcher(str).matches()) {
+            return false;
+        }
+        // 将字符串转换为小数并判断是否在指定范围内
+        double value;
+        try {
+            value = Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        // 只判断是否为有效数字，不限定范围
+        if (max == null && min == null) {
+            return !Double.isNaN(value) && Double.isFinite(value);
+        }
+        // 限定最小值
+        if (max == null) {
+            return value >= min && Double.isFinite(value);
+        }
+        // 限定最大值
+        if (min == null) {
+            return value <= max && Double.isFinite(value);
+        }
+        return value >= min && value <= max && Double.isFinite(value);
     }
 
     /**
@@ -145,9 +192,9 @@ public class CommonUtils {
     }
 
     /**
-     * 获取当前GC类型
+     * 获取当前 GC 类型
      *
-     * @return 当前GC类型
+     * @return 当前 GC 类型
      */
     public static String getCurrentGCType() {
         List<String> gcNames = ManagementFactory.getGarbageCollectorMXBeans().stream()
@@ -168,10 +215,10 @@ public class CommonUtils {
     }
 
     /**
-     * 获取当前进程PID
+     * 获取当前进程 PID
      *
-     * @return 当前进程PID字符串
-     * @throws Exception 获取PID时抛出的异常
+     * @return 当前进程 PID 字符串
+     * @throws Exception 获取 PID 时抛出的异常
      */
     public static String getProcessId() throws Exception {
         Class<?> processHandleClass = Class.forName("java.lang.ProcessHandle");

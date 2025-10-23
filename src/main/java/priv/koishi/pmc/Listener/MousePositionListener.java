@@ -40,13 +40,13 @@ public class MousePositionListener {
 
     /**
      * 私有构造函数，初始化鼠标位置监听定时器
-     * 创建AnimationTimer定时在JavaFX应用线程中更新鼠标位置
-     * 通过MouseInfo获取系统级鼠标坐标，通知所有注册的监听器
+     * 创建 AnimationTimer 定时在 JavaFX 应用线程中更新鼠标位置
+     * 通过 MouseInfo 获取系统级鼠标坐标，通知所有注册的监听器
      */
     private MousePositionListener() {
         AnimationTimer timer = new AnimationTimer() {
             /**
-             * 定时器处理逻辑，将通知操作调度到JavaFX应用线程
+             * 定时器处理逻辑，将通知操作调度到 JavaFX 应用线程
              *
              * @param now 当前时间戳（纳秒）
              */
@@ -72,7 +72,7 @@ public class MousePositionListener {
     /**
      * 获取单例实例（线程安全）
      *
-     * @return 返回MousePositionListener的唯一实例
+     * @return 返回 MousePositionListener 的唯一实例
      */
     public static synchronized MousePositionListener getInstance() {
         if (instance == null) {

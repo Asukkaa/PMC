@@ -1,4 +1,6 @@
-package priv.koishi.pmc.MacScreenPermissionChecker;
+package priv.koishi.pmc.JnaNative.PermissionChecker;
+
+import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
 
 import java.awt.*;
 
@@ -6,16 +8,16 @@ import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapturePermission;
 
 /**
- * macOS屏幕录制权限检查工具
+ * macOS 屏幕录制权限检查工具
  *
  * @author koishi
  * Date 2025/04/21
  * Time 14:30
  */
-public class MacScreenPermissionChecker {
+public class MacChecker {
 
     /**
-     * 检查macOS屏幕录制权限方法
+     * 检查 macOS 屏幕录制权限方法
      */
     public static boolean hasScreenCapturePermission() {
         // 非macOS系统直接返回true
@@ -36,6 +38,28 @@ public class MacScreenPermissionChecker {
             return checkScreenCapturePermission();
             // 截图失败认为没有权限
         } catch (AWTException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 校验 macOS 自动化权限
+     *
+     * @return true 拥有权限
+     */
+    public static boolean hasAutomationPermission() {
+        // 非macOS系统直接返回true
+        if (!isMac) {
+            return true;
+        }
+        try {
+            String script = "tell application \"System Events\" to get name of every process";
+            Process process = Runtime.getRuntime().exec(new String[]{
+                    "osascript", "-e", script
+            });
+            process.waitFor();
+            return process.exitValue() == 0;
+        } catch (Exception e) {
             return false;
         }
     }

@@ -1,8 +1,11 @@
 package priv.koishi.pmc;
 
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import de.jangassen.MenuToolkit;
 import javafx.application.Application;
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,13 +22,17 @@ import org.apache.logging.log4j.core.config.Configurator;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Controller.MainController;
+import priv.koishi.pmc.Controller.RootController;
+import priv.koishi.pmc.Finals.Enum.ThemeEnum;
 
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -62,22 +70,22 @@ public class MainApplication extends Application {
     public static Scene mainScene;
 
     /**
-     * 用来激活已运行的窗口的Socket服务
+     * 用来激活已运行的窗口的 Socket 服务
      */
     private static ServerSocket serverSocket;
 
     /**
-     * 程序启动后要自动加载的pmc文件路径
+     * 程序启动后要自动加载的 pmc 文件路径
      */
     public static String loadPMCPath;
 
     /**
-     * 程序启动后运行pmc流程标志（true-运行 false-不运行）
+     * 程序启动后运行 pmc 流程标志（true-运行 false-不运行）
      */
     public static boolean runPMCFile;
 
     /**
-     * 重新启动后自动加载过pmc文件标志（true-加载过 false-没有加载过）
+     * 重新启动后自动加载过 pmc 文件标志（true-加载过 false-没有加载过）
      */
     public static boolean loadPMC;
 
@@ -97,7 +105,22 @@ public class MainApplication extends Application {
     public static ResourceBundle bundle;
 
     /**
-     * 加载fxml页面
+     * 当前是否为夜晚模式（true-当前为夜晚模式）
+     */
+    public static boolean isDarkTheme;
+
+    /**
+     * 全局控制器容器
+     */
+    public static final Map<Class<?>, WeakReference<RootController>> controllers = new ConcurrentHashMap<>();
+
+    /**
+     * 无法切换深色布局的页面控制器类集合
+     */
+    public static Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
+
+    /**
+     * 加载 fxml 页面
      *
      * @param stage 程序主舞台
      * @throws IOException 配置文件读取异常、设置全局异常处理器异常
@@ -105,11 +128,14 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         mainStage = stage;
-        // 读取fxml页面
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
+        // 设置外观
+        int theme = Integer.parseInt(prop.getProperty(key_theme));
+        changeTheme(theme);
+        // 读取fxml页面
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         double appWidth = Double.parseDouble(prop.getProperty(key_appWidth, defaultAppWidth));
         double appHeight = Double.parseDouble(prop.getProperty(key_appHeight, defaultAppHeight));
         if (activation.equals(prop.getProperty(key_lastMaxWindow, unActivation))
@@ -174,7 +200,7 @@ public class MainApplication extends Application {
     /**
      * 程序停止时保存设置并关闭资源
      *
-     * @throws IOException 配置文件保存异常、钩子异常、线程池关闭异常
+     * @throws Exception 配置文件保存异常、钩子异常、线程池关闭异常
      */
     @Override
     public void stop() throws Exception {
@@ -188,14 +214,42 @@ public class MainApplication extends Application {
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
         }
-        // 停止 javafx ui 线程
+        // 停止 javaFX ui 线程
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);
     }
 
     /**
-     * 初始化macOS系统应用菜单
+     * 切换主题
+     *
+     * @param theme 主题枚举
+     */
+    public static void changeTheme(int theme) {
+        if (theme == ThemeEnum.Light.ordinal()) {
+            setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+            isDarkTheme = false;
+        } else if (theme == ThemeEnum.Dark.ordinal()) {
+            setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+            isDarkTheme = true;
+        } else if (theme == ThemeEnum.Auto.ordinal()) {
+            ColorScheme scheme = Platform.getPreferences().getColorScheme();
+            if (ColorScheme.DARK == scheme) {
+                setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+                isDarkTheme = true;
+            } else {
+                setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+                isDarkTheme = false;
+            }
+        } else if (theme == ThemeEnum.JavaFx.ordinal()) {
+            setUserAgentStylesheet(null);
+            isDarkTheme = false;
+        }
+        setTextColorProperty(isDarkTheme ? Color.WHITE : Color.BLACK);
+    }
+
+    /**
+     * 初始化 macOS 系统应用菜单
      *
      * @param tabPane 程序页面基础布局
      */
@@ -345,7 +399,7 @@ public class MainApplication extends Application {
     }
 
     /**
-     * 创建加载pmc文件任务
+     * 创建加载 pmc 文件任务
      *
      * @param file         要加载的文件
      * @param tabPane      主页面布局
@@ -387,7 +441,7 @@ public class MainApplication extends Application {
      * 启动程序
      *
      * @param args 启动参数
-     * @throws IOException log4j日志配置文件读取异常、应用配置文件读取异常
+     * @throws IOException log4j 日志配置文件读取异常、应用配置文件读取异常
      */
     public static void main(String[] args) throws IOException {
         MainApplication.args = args;

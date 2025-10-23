@@ -18,30 +18,35 @@
     -fx-pref-width: 290;
 }
 
-.hBox-medium {
-    -fx-spacing: 5;
-    -fx-pref-width: 290;
-}
-
 .checkBox-short {
     -fx-cursor: hand;
     -fx-pref-height: 25;
     -fx-pref-width: 270;
 }
 
-.hBox-short {
+.hBox-veryShort {
     -fx-spacing: 5;
     -fx-pref-width: 270;
 }
 
+.hBox-short {
+    -fx-spacing: 5;
+    -fx-pref-width: 290;
+}
+
+.hBox-medium {
+    -fx-spacing: 5;
+    -fx-pref-width: 400;
+}
+
 .hBox-long {
     -fx-spacing: 5;
-    -fx-pref-width: 350;
+    -fx-pref-width: 500;
 }
 
 .hBox-veryLong {
     -fx-spacing: 5;
-    -fx-pref-width: 550;
+    -fx-pref-width: 600;
 }
 
 .img-button-style {
@@ -52,6 +57,7 @@
     -fx-padding: 0;
     -fx-border-radius: 0;
     -fx-background-insets: 0;
+    -fx-pref-height: 35;
 }
 
 .cadetblue-button {
@@ -88,4 +94,36 @@
     -fx-border-insets: -2px;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
+}
+
+.choice-box {
+    -fx-cursor: hand;
+    -fx-font-size: 12;
+    -fx-pref-height: 35;
+}
+
+.text-field {
+    -fx-font-size: 12;
+    -fx-pref-height: 35;
+}
+
+.button {
+    -fx-cursor: hand;
+    -fx-font-size: 12;
+    -fx-pref-height: 35;
+}
+
+.check-box {
+    -fx-cursor: hand;
+    -fx-font-size: 12;
+    -fx-pref-height: 35;
+}
+
+.label {
+    -fx-font-size: 12;
+    -fx-pref-height: 35;
+}
+
+.label-low {
+    -fx-pref-height: 20;
 }

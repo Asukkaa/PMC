@@ -10,39 +10,39 @@
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="%taskDetail.taskNameField"/>
+                    <Label text="%taskDetail.taskNameField"/>
                     <TextField fx:id="taskNameField_TD" prefWidth="200"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="%taskDetail.hourField"/>
+                    <Label text="%taskDetail.hourField"/>
                     <TextField fx:id="hourField_TD" prefWidth="70" promptText="0"/>
 
-                    <Label prefHeight="25" text="%taskDetail.minuteField"/>
+                    <Label text="%taskDetail.minuteField"/>
                     <TextField fx:id="minuteField_TD" prefWidth="70" promptText="0"/>
                 </HBox>
 
                 <HBox spacing="5">
-                    <Label prefHeight="25" text="%taskDetail.repeatType"/>
-                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" style="-fx-cursor: hand"
-                               prefHeight="25" prefWidth="100"/>
+                    <Label text="%taskDetail.repeatType"/>
+                    <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefWidth="100"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="%taskDetail.startDate"/>
+                <Label text="%taskDetail.startDate"/>
                 <HBox spacing="10">
                     <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false"
                                 promptText="%taskDetail.datePicker_TD"/>
-                    <Label prefHeight="25" text="%taskDetail.dateTip" textFill="red"/>
+                    <Label text="%taskDetail.dateTip" textFill="red"/>
                 </HBox>
             </HBox>
 
             <VBox spacing="10">
                 <HBox spacing="10">
-                    <Label prefHeight="25" text="%taskDetail.weekField"/>
-                    <Label prefHeight="25" text="%taskDetail.weekTip" textFill="red"/>
+                    <Label text="%taskDetail.weekField"/>
+                    <Label text="%taskDetail.weekTip" textFill="red"/>
                 </HBox>
+
                 <HBox spacing="20">
                     <CheckBox fx:id="monday_TD" text="%monday"/>
                     <CheckBox fx:id="tuesday_TD" text="%tuesday"/>
@@ -56,16 +56,15 @@
 
             <VBox spacing="10">
                 <HBox spacing="10">
-                    <Button fx:id="loadAutoClick_TD" onAction="#loadAutoClick" style="-fx-cursor: hand"
+                    <Button fx:id="loadAutoClick_TD" onAction="#loadAutoClick"
                             text="%taskDetail.loadAutoClick_TD"/>
-                    <Label prefHeight="25" text="%taskDetail.loadAutoClickTip" textFill="red"/>
+                    <Label text="%taskDetail.loadAutoClickTip" textFill="red"/>
                 </HBox>
 
                 <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
-                    <Label prefHeight="25" text="%taskDetail.fileName"/>
-                    <Label prefHeight="25" fx:id="fileName_DT"/>
-                    <Button onAction="#removePath" prefHeight="20" fx:id="delete_TD"
-                            styleClass="img-button-style">
+                    <Label text="%taskDetail.fileName"/>
+                    <Label fx:id="fileName_DT"/>
+                    <Button onAction="#removePath" fx:id="delete_TD" styleClass="img-button-style">
                         <graphic>
                             <ImageView>
                                 <Image url="@../icon/Trash.png"/>
@@ -75,8 +74,8 @@
                 </HBox>
 
                 <HBox fx:id="filePathHBox_DT" visible="false">
-                    <Label prefHeight="25" text="%taskDetail.filePath"/>
-                    <Label fx:id="pmcFilePath_TD" prefHeight="25" style="-fx-font-size: 15px;"/>
+                    <Label text="%taskDetail.filePath"/>
+                    <Label fx:id="pmcFilePath_TD" style="-fx-font-size: 15px;"/>
                 </HBox>
             </VBox>
 
@@ -86,9 +85,8 @@
                     <Label fx:id="log_TD"/>
                 </VBox>
 
-                <Button fx:id="saveDetail_TD" text="%detail.save" style="-fx-cursor: hand" onAction="#saveDetail"/>
-                <Button fx:id="removeDetail_TD" text="%taskDetail.removeDetail_TD" style="-fx-cursor: hand"
-                        onAction="#removeDetail"/>
+                <Button fx:id="saveDetail_TD" text="%detail.save" onAction="#saveDetail"/>
+                <Button fx:id="removeDetail_TD" text="%taskDetail.removeDetail_TD" onAction="#removeDetail"/>
             </HBox>
         </VBox>
     </AnchorPane>

@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,7 +27,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -37,7 +39,8 @@ import static priv.koishi.pmc.Service.ScheduledService.createTask;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
-import static priv.koishi.pmc.Utils.ListenerUtils.removeChangeListener;
+import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
+import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -49,7 +52,7 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Date:2025-05-20
  * Time:14:53
  */
-public class TaskDetailController extends RootController {
+public class TaskDetailController extends ManuallyChangeThemeController {
 
     /**
      * 页面数据对象
@@ -77,9 +80,9 @@ public class TaskDetailController extends RootController {
     private Stage stage;
 
     /**
-     * 带鼠标悬停提示的内容变化监听器
+     * 带鼠标悬停提示的内容变化删除器
      */
-    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+    private final List<Runnable> listenerRemovers = new ArrayList<>();
 
     /**
      * 星期复选框集合
@@ -191,8 +194,8 @@ public class TaskDetailController extends RootController {
      */
     private void removeAllListeners() {
         // 移除带鼠标悬停提示的内容变化监听器
-        removeChangeListener(changeListeners);
-        changeListeners.clear();
+        listenerRemovers.forEach(Runnable::run);
+        listenerRemovers.clear();
     }
 
     /**
@@ -200,14 +203,14 @@ public class TaskDetailController extends RootController {
      */
     private void textFieldChangeListener() {
         // 限制小时文本输入框内容
-        ChangeListener<String> hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
-        changeListeners.put(hourField_TD, hourFieldListener);
+        Runnable hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
+        listenerRemovers.add(hourFieldListener);
         // 限制分钟文本输入框内容
-        ChangeListener<String> minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
-        changeListeners.put(minuteField_TD, minuteFieldListener);
+        Runnable minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
+        listenerRemovers.add(minuteFieldListener);
         // 限制任务名称文本输入框内容
-        ChangeListener<String> taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
-        changeListeners.put(taskNameField_TD, taskNameFieldListener);
+        Runnable taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
+        listenerRemovers.add(taskNameFieldListener);
     }
 
     /**
@@ -316,10 +319,26 @@ public class TaskDetailController extends RootController {
     }
 
     /**
+     * 页面关闭事件处理逻辑
+     */
+    private void closeRequest() {
+        removeController();
+    }
+
+    /**
+     * 手动处理主题切换
+     */
+    public void manuallyChangeTheme() {
+        manuallyChangeThemePane(anchorPane_TD, getClass());
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
+        // 手动处主题切换
+        manuallyChangeTheme();
         // 初始化下拉框
         setChoiceBoxItems();
         // 设置要防重复点击的组件
@@ -330,6 +349,8 @@ public class TaskDetailController extends RootController {
         setDatePickerFormatter(datePicker_TD, DateTimeFormatter.ofPattern("yyyy-MM-dd EEEE"));
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_TD.getScene().getWindow();
+            // 设置页面关闭事件处理逻辑
+            stage.setOnCloseRequest(_ -> closeRequest());
             // 设置鼠标悬停提示
             setToolTip();
             // 给输入框添加内容变化监听
@@ -344,7 +365,7 @@ public class TaskDetailController extends RootController {
     /**
      * 设置定时任务要执行的流程
      *
-     * @throws IOException io异
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadAutoClick(ActionEvent actionEvent) throws IOException {
@@ -364,7 +385,7 @@ public class TaskDetailController extends RootController {
     }
 
     /**
-     * 删除要执行的PMC文件路径
+     * 删除要执行的 PMC 文件路径
      */
     @FXML
     private void removePath() {
@@ -397,7 +418,7 @@ public class TaskDetailController extends RootController {
             // 复制成功消息气泡
             new MessageBubble(text_successSave(), 2);
             removeAllListeners();
-            stage.close();
+            closeStage(stage, this::closeRequest);
             // 触发列表刷新（通过回调）
             if (refreshCallback != null) {
                 refreshCallback.run();
@@ -420,7 +441,7 @@ public class TaskDetailController extends RootController {
             deleteTask(taskName);
         }
         removeAllListeners();
-        stage.close();
+        closeStage(stage, this::closeRequest);
         // 触发列表刷新（通过回调）
         if (isEdit && refreshCallback != null) {
             refreshCallback.run();

@@ -1,14 +1,12 @@
 package priv.koishi.pmc.Utils;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
@@ -33,25 +31,18 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import priv.koishi.pmc.Annotate.UsedByReflection;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
-import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.Bean.VO.ClickPositionVO;
-import priv.koishi.pmc.Bean.VO.FileVO;
-import priv.koishi.pmc.Bean.VO.ImgFileVO;
-import priv.koishi.pmc.Bean.VO.Indexable;
-import priv.koishi.pmc.Controller.FileChooserController;
+import priv.koishi.pmc.Bean.VO.*;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -59,9 +50,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.MainApplication.isDarkTheme;
+import static priv.koishi.pmc.MainApplication.manuallyChangeThemeList;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -85,6 +79,11 @@ public class UiUtils {
     private static final Logger logger = LogManager.getLogger(UiUtils.class);
 
     /**
+     * 字体颜色绑定
+     */
+    private static final ObjectProperty<Color> textColorProperty = new SimpleObjectProperty<>(Color.BLACK);
+
+    /**
      * 鼠标停留提示框
      *
      * @param nodes 需要显示提示框的组件
@@ -100,7 +99,7 @@ public class UiUtils {
      * 设置永久显示的鼠标停留提示框参数
      *
      * @param tip 提示文案
-     * @return 设置参数后的Tooltip对象
+     * @return 设置参数后的 Tooltip 对象
      */
     public static Tooltip creatTooltip(String tip) {
         return creatTooltip(tip, Duration.INDEFINITE);
@@ -111,7 +110,7 @@ public class UiUtils {
      *
      * @param tip      提示文案
      * @param duration 显示时长
-     * @return 设置参数后的Tooltip对象
+     * @return 设置参数后的 Tooltip 对象
      */
     public static Tooltip creatTooltip(String tip, Duration duration) {
         Tooltip tooltip = new Tooltip(tip);
@@ -121,6 +120,7 @@ public class UiUtils {
         tooltip.setHideDelay(Duration.ZERO);
         tooltip.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT);
         tooltip.getStyleClass().add("tooltip-font-size");
+        tooltip.setMaxWidth(500);
         return tooltip;
     }
 
@@ -257,7 +257,7 @@ public class UiUtils {
     }
 
     /**
-     * 创建一个多图片选择器（只支持png、jpg、jpeg格式）
+     * 创建一个多图片选择器（只支持 png、jpg、jpeg 格式）
      *
      * @param window        文件选择器窗口
      * @param imgSelectPath 默认路径
@@ -269,7 +269,7 @@ public class UiUtils {
     }
 
     /**
-     * 创建一个单图片选择器（只支持png、jpg、jpeg格式）
+     * 创建一个单图片选择器（只支持 png、jpg、jpeg 格式）
      *
      * @param window        文件选择器窗口
      * @param imgSelectPath 默认路径
@@ -295,7 +295,7 @@ public class UiUtils {
     }
 
     /**
-     * 设置默认数值
+     * 设置默认整数值
      *
      * @param textField    要设置默认值的文本输入框
      * @param defaultValue 默认值
@@ -308,6 +308,24 @@ public class UiUtils {
         int value = defaultValue;
         if (isInIntegerRange(valueStr, min, max)) {
             value = Integer.parseInt(valueStr);
+        }
+        return value;
+    }
+
+    /**
+     * 设置默认小数值
+     *
+     * @param textField    要设置默认值的文本输入框
+     * @param defaultValue 默认值
+     * @param min          文本输入框可填写的最小值，为空则不限制最小值
+     * @param max          文本输入框可填写的最大值，为空则不限制最大值
+     * @return 文本输入框所填值如果在规定范围内则返回所填值，否则返回默认值
+     */
+    public static double setDefaultDoubleValue(TextField textField, double defaultValue, Double min, Double max) {
+        String valueStr = textField.getText();
+        double value = defaultValue;
+        if (isInDecimalRange(valueStr, min, max)) {
+            value = Double.parseDouble(valueStr);
         }
         return value;
     }
@@ -411,41 +429,41 @@ public class UiUtils {
     }
 
     /**
-     * 给窗口设置logo
+     * 给窗口设置 logo
      *
-     * @param stage 要设置logo的窗口
-     * @param path  logo路径
+     * @param stage 要设置 logo 的窗口
+     * @param path  logo 路径
      */
     public static void setWindowLogo(Stage stage, String path) {
         stage.getIcons().add(new Image(Objects.requireNonNull(MainApplication.class.getResource(path)).toString()));
     }
 
     /**
-     * 设置窗口css样式
+     * 设置窗口 css 样式
      *
      * @param scene     要设置样式的场景
-     * @param stylesCss css文件路径
+     * @param stylesCss css 文件路径
      */
     public static void setWindowCss(Scene scene, String stylesCss) {
         scene.getStylesheets().add(Objects.requireNonNull(MainApplication.class.getResource(stylesCss)).toExternalForm());
     }
 
     /**
-     * 为javafx单元格赋值并添加鼠标悬停提示
+     * 为 javaFX 单元格赋值并添加鼠标悬停提示
      *
-     * @param tableColumn 要处理的javafx列表列
-     * @param param       javafx列表列对应的数据属性名
+     * @param tableColumn 要处理的 javaFX 列表列
+     * @param param       javaFX 列表列对应的数据属性名
      */
     public static void buildCellValue(TableColumn<?, ?> tableColumn, String param) {
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(param));
-        // 为javafx单元格和表头添加鼠标悬停提示
+        // 为 javaFX 单元格和表头添加鼠标悬停提示
         addTableCellToolTip(tableColumn);
     }
 
     /**
-     * 自定义单元格工厂，为单元格添加Tooltip
+     * 自定义单元格工厂，为单元格添加 Tooltip
      *
-     * @param column 要处理的javafx表格单元格
+     * @param column 要处理的 javaFX 表格单元格
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
@@ -473,7 +491,7 @@ public class UiUtils {
     /**
      * 为表头添加鼠标悬停提示
      *
-     * @param column 要处理的javafx表格列
+     * @param column 要处理的 javaFX 表格列
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
@@ -484,7 +502,7 @@ public class UiUtils {
     /**
      * 为表头添加鼠标悬停提示
      *
-     * @param column  要处理的javafx表格列
+     * @param column  要处理的 javaFX 表格列
      * @param tooltip 要展示的提示文案
      * @param <S>     表格单元格数据类型
      * @param <T>     表格单元格类型
@@ -501,13 +519,13 @@ public class UiUtils {
     }
 
     /**
-     * 根据bean属性名自动填充javafx表格
+     * 根据 bean 属性名自动填充 javaFX 表格
      *
-     * @param tableView   要处理的javafx表格
-     * @param beanClass   要处理的javafx表格的数据bean类
-     * @param tabId       用于区分不同列表的id，要展示的数据bean属性名加上tabId即为javafx列表的列对应的id
+     * @param tableView   要处理的 javaFX 表格
+     * @param beanClass   要处理的 javaFX 表格的数据 bean 类
+     * @param tabId       用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 javaFX 列表的列对应的 id
      * @param indexColumn 序号列
-     * @param <T>         要处理的javafx表格的数据bean类
+     * @param <T>         要处理的 javaFX 表格的数据 bean 类
      */
     @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
@@ -528,23 +546,15 @@ public class UiUtils {
                 // 添加列名Tooltip
                 addTableColumnToolTip(m);
                 if (f.getType() == Image.class) {
-                    try {
-                        Method getter = beanClass.getMethod("loadThumb");
-                        // 显式标记方法调用（解决IDE误报）
-                        if (getter.isAnnotationPresent(UsedByReflection.class)) {
-                            Function<T, Image> supplier = bean -> {
-                                try {
-                                    return (Image) getter.invoke(bean);
-                                } catch (Exception e) {
-                                    return null;
-                                }
-                            };
-                            // 创建图片表格
-                            buildThumbnailCell((TableColumn<T, Image>) m, supplier);
+                    // 直接使用类型安全的函数式调用
+                    Function<T, Image> supplier = bean -> {
+                        if (bean instanceof ImgBean imgBean) {
+                            return imgBean.loadThumb();
                         }
-                    } catch (NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
+                        return null;
+                    };
+                    // 创建图片表格
+                    buildThumbnailCell((TableColumn<T, Image>) m, supplier);
                 } else {
                     if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
                         // 设置列为序号列
@@ -553,10 +563,10 @@ public class UiUtils {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());
-                        // 为javafx单元格和表头添加鼠标悬停提示
+                        // 为 javaFX 单元格和表头添加鼠标悬停提示
                         addTableCellToolTip(pathColumn);
                     } else {
-                        // 为javafx单元格赋值并添加鼠标悬停提示
+                        // 为 javaFX 单元格赋值并添加鼠标悬停提示
                         buildCellValue(m, fieldName);
                     }
                 }
@@ -633,7 +643,7 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
-                setTextFill(Color.BLACK);
+                textFillProperty().bind(textColorProperty());
                 if (empty) {
                     setText(null);
                     setGraphic(null);
@@ -675,9 +685,27 @@ public class UiUtils {
     }
 
     /**
-     * 清空javafx列表数据
+     * 获取字体颜色绑定
      *
-     * @param tableView  要清空的javafx列表
+     * @return 字体颜色绑定
+     */
+    public static ObjectProperty<Color> textColorProperty() {
+        return textColorProperty;
+    }
+
+    /**
+     * 设置要绑定的字体颜色
+     *
+     * @param color 要绑定的字体颜色
+     */
+    public static void setTextColorProperty(Color color) {
+        textColorProperty.set(color);
+    }
+
+    /**
+     * 清空 javaFX 列表数据
+     *
+     * @param tableView  要清空的 javaFX 列表
      * @param fileNumber 用于展示列表数据数量的文本框
      * @param <T>        数据类型
      */
@@ -712,7 +740,8 @@ public class UiUtils {
      * @param selected       true 表示选中添加的数据，false 表示不选中添加的数据
      * @param <T>            数据类型
      */
-    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit, boolean selected) {
+    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber,
+                                   String dataNumberUnit, boolean selected) {
         ObservableList<T> tableViewItems = tableView.getItems();
         TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
         List<T> selectedItem = selectionModel.getSelectedItems();
@@ -777,87 +806,7 @@ public class UiUtils {
     }
 
     /**
-     * 限制滑动条只能输入整数
-     *
-     * @param slider 要处理的滑动条
-     * @param tip    鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<Number> integerSliderValueListener(Slider slider, String tip) {
-        ChangeListener<Number> listener = (_, _, newValue) -> {
-            int rounded = newValue.intValue();
-            slider.setValue(rounded);
-            addValueToolTip(slider, tip, String.valueOf(rounded));
-        };
-        slider.valueProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 限制输入框只能输入指定范围内的整数
-     *
-     * @param textField 要处理的文本输入框
-     * @param min       可输入的最小值，为空则不限制
-     * @param max       可输入的最大值，为空则不限制
-     * @param tip       鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<String> integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
-        ChangeListener<String> listener = (_, oldValue, newValue) -> {
-            // 这里处理文本变化的逻辑
-            if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                textField.setText(oldValue);
-            }
-            addValueToolTip(textField, tip);
-        };
-        textField.textProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 限制输入框只能输入指定范围内的正整数（范围外显示警告信息）
-     *
-     * @param textField   要处理的文本输入框
-     * @param min         可输入的最小值
-     * @param max         可输入的最大值，为空则不限制
-     * @param tip         鼠标悬停提示文案
-     * @param warningNode 警告节点
-     * @return 监听器
-     */
-    public static ChangeListener<String> warnIntegerRangeTextField(TextField textField, Integer min, Integer max, String tip, Node warningNode) {
-        ChangeListener<String> listener = (_, oldValue, newValue) -> {
-            // 这里处理文本变化的逻辑
-            if (!isInIntegerRange(newValue, 1, null) && StringUtils.isNotBlank(newValue)) {
-                textField.setText(oldValue);
-            } else if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                textField.setStyle("-fx-text-fill: red;");
-                warningNode.setVisible(true);
-            } else {
-                textField.setStyle("-fx-text-fill: black;");
-                warningNode.setVisible(false);
-            }
-            addValueToolTip(textField, tip);
-        };
-        textField.textProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 监听输入框内容变化
-     *
-     * @param textField 要监听的文本输入框
-     * @param tip       鼠标悬停提示文案
-     * @return 监听器
-     */
-    public static ChangeListener<String> textFieldValueListener(TextField textField, String tip) {
-        ChangeListener<String> listener = (_, _, _) ->
-                addValueToolTip(textField, tip);
-        textField.textProperty().addListener(listener);
-        return listener;
-    }
-
-    /**
-     * 修改label信息
+     * 修改 label 信息
      *
      * @param label 要修改的文本栏
      * @param text  要修改的文本
@@ -865,7 +814,8 @@ public class UiUtils {
     public static void updateLabel(Label label, String text) {
         label.textProperty().unbind();
         label.setText(text);
-        label.setTextFill(Color.BLACK);
+        label.textFillProperty().bind(textColorProperty());
+        label.textFillProperty().unbind();
     }
 
     /**
@@ -873,7 +823,7 @@ public class UiUtils {
      *
      * @param selectedFilePath 本次所选的文件路径
      * @param filePath         上次选的文件路径
-     * @param pathKey          配置文件中路径的key
+     * @param pathKey          配置文件中路径的 key
      * @param pathLabel        要展示路径的文本框
      * @param configFile       要更新的配置文件
      * @return 所选文件路径
@@ -1487,8 +1437,8 @@ public class UiUtils {
     /**
      * 改变要防重复点击的组件状态
      *
-     * @param taskBean 包含防重复点击组件列表的taskBean
-     * @param disable  可点击状态，true设置为不可点击，false设置为可点击
+     * @param taskBean 包含防重复点击组件列表的 taskBean
+     * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
      */
     public static void changeDisableNodes(TaskBean<?> taskBean, boolean disable) {
         List<Node> disableNodes = taskBean.getDisableNodes();
@@ -1499,7 +1449,7 @@ public class UiUtils {
      * 改变要防重复点击的组件状态
      *
      * @param disableNodes 防重复点击组件列表
-     * @param disable      可点击状态，true设置为不可点击，false设置为可点击
+     * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
      */
     public static void changeDisableNodes(List<? extends Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
@@ -1516,7 +1466,7 @@ public class UiUtils {
      *
      * @param control 需要处理的组件
      * @param prop    配置文件
-     * @param key     要读取的key
+     * @param key     要读取的 key
      */
     public static void setControlLastConfig(Control control, Properties prop, String key) {
         setControlLastConfig(control, prop, key, "");
@@ -1527,7 +1477,7 @@ public class UiUtils {
      *
      * @param control      需要处理的组件
      * @param prop         配置文件
-     * @param key          要读取的key
+     * @param key          要读取的 key
      * @param defaultValue 默认值
      */
     @SuppressWarnings("unchecked")
@@ -1554,7 +1504,7 @@ public class UiUtils {
      *
      * @param tableView  需要处理的列表
      * @param prop       配置文件
-     * @param key        要读取的key
+     * @param key        要读取的 key
      * @param dataNumber 列表数据数量
      */
     public static void setControlLastConfig(TableView<ImgFileVO> tableView, Properties prop, String key, Label dataNumber) {
@@ -1581,7 +1531,7 @@ public class UiUtils {
      *
      * @param label 需要处理的文本框
      * @param prop  配置文件
-     * @param key   要读取的key
+     * @param key   要读取的 key
      */
     public static void setControlLastConfig(Label label, Properties prop, String key) {
         String lastValue = prop.getProperty(key);
@@ -1595,8 +1545,8 @@ public class UiUtils {
      *
      * @param colorPicker    颜色选择器
      * @param prop           配置文件
-     * @param colorKey       选中的颜色key
-     * @param colorCustomKey 保存的自定义颜色key
+     * @param colorKey       选中的颜色 key
+     * @param colorCustomKey 保存的自定义颜色 key
      */
     public static void setColorPickerConfig(ColorPicker colorPicker, Properties prop, String colorKey, String colorCustomKey) {
         String selectColor = prop.getProperty(colorKey, defaultColor);
@@ -1665,6 +1615,10 @@ public class UiUtils {
                 }
             }
         });
+        if (StringUtils.isBlank(openPath)) {
+            openPath = "";
+            openText = text_mouseClickNull();
+        }
         addToolTip(path + openText + openPath, pathLabel);
         // 设置右键菜单
         setPathLabelContextMenu(pathLabel);
@@ -1672,7 +1626,7 @@ public class UiUtils {
     }
 
     /**
-     * 给路径Label设置右键菜单
+     * 给路径 Label 设置右键菜单
      *
      * @param valueLabel 要处理的文本栏
      */
@@ -1705,7 +1659,7 @@ public class UiUtils {
     }
 
     /**
-     * 添加复制Label值右键菜单
+     * 添加复制 Label 值右键菜单
      *
      * @param valueLabel 要处理的文本栏
      * @param text       右键菜单文本
@@ -1745,7 +1699,7 @@ public class UiUtils {
     /**
      * 指定组件设置右对齐
      *
-     * @param hBox           组件所在hBox
+     * @param hBox           组件所在 hBox
      * @param alignmentWidth 右对齐参考组件宽度
      * @param region         要设置右对齐的组件
      */
@@ -1799,8 +1753,8 @@ public class UiUtils {
      *
      * @param floatingStage 浮窗
      * @param mousePoint    鼠标位置
-     * @param offsetX       x轴偏移量
-     * @param offsetY       y轴偏移量
+     * @param offsetX       x 轴偏移量
+     * @param offsetY       y 轴偏移量
      */
     public static void floatingMove(Stage floatingStage, Point mousePoint, int offsetX, int offsetY) {
         // 获取当前所在屏幕
@@ -1847,12 +1801,36 @@ public class UiUtils {
      * @param stage 程序主舞台
      */
     public static void showStage(Stage stage) {
-        stage.setAlwaysOnTop(true);
-        stage.setIconified(false);
-        stage.show();
-        stage.toFront();
-        stage.requestFocus();
-        stage.setAlwaysOnTop(false);
+        Platform.runLater(() -> {
+            stage.setAlwaysOnTop(true);
+            stage.setIconified(false);
+            stage.show();
+            stage.toFront();
+            stage.requestFocus();
+            stage.setAlwaysOnTop(false);
+        });
+    }
+
+    /**
+     * 弹出界面和错误弹窗
+     *
+     * @param errs  错误详情
+     * @param title 错误标题
+     * @param stage 错误弹窗的父窗口
+     */
+    public static void showStageAlert(List<String> errs, String title, Stage stage) {
+        if (stage.isIconified()) {
+            stage.setIconified(false);
+            stage.show();
+            stage.toFront();
+            stage.requestFocus();
+        }
+        Alert alert = creatErrorAlert(String.join("\n", errs));
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.initOwner(stage);
+        alertStage.setAlwaysOnTop(true);
+        alert.setHeaderText(title);
+        alert.showAndWait();
     }
 
     /**
@@ -1872,12 +1850,12 @@ public class UiUtils {
     }
 
     /**
-     * 构建右键菜单
+     * 构建表格右键菜单
      *
      * @param tableView  要添加右键菜单的列表
      * @param dataNumber 数据数量信息栏
      */
-    public static void buildContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
+    public static void buildTableViewContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 修改图片路径选项
@@ -1892,6 +1870,109 @@ public class UiUtils {
         buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, unit_img());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView);
+    }
+
+    /**
+     * 构建窗口信息栏右键菜单
+     *
+     * @param label         窗口信息栏
+     * @param windowMonitor 窗口监视器
+     * @param disableNodes  要防重复点击的组件
+     * @param stages        需要隐藏的窗口
+     * @return 右键菜单
+     */
+    public static ContextMenu buildWindowInfoMenu(Label label, WindowMonitor windowMonitor,
+                                                  List<? extends Node> disableNodes, List<? extends Stage> stages) {
+        // 添加窗口信息右键菜单
+        ContextMenu windowInfoMenu = new ContextMenu();
+        // 更新窗口信息选项
+        buildUpdateDataMenu(windowInfoMenu, windowMonitor);
+        // 显示窗口位置信息
+        buildShowDataMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
+        // 删除窗信息据选项
+        buildDeleteDataMenu(windowInfoMenu, windowMonitor);
+        // 为窗口信息栏添加右键菜单
+        label.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                windowInfoMenu.show(label, event.getScreenX(), event.getScreenY());
+            }
+        });
+        return windowInfoMenu;
+    }
+
+    /**
+     * 更新窗口数据选项
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildUpdateDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_updateWindow());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            new MessageBubble(text_updateSuccess(), 2);
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 显示窗口位置信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     * @param disableNodes  要防重复点击的组件
+     * @param stages        需要隐藏的窗口
+     */
+    private static void buildShowDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor,
+                                          List<? extends Node> disableNodes, List<? extends Stage> stages) {
+        MenuItem menuItem = new MenuItem(findImgSet_showWindow());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            WindowInfo windowInfo = windowMonitor.getWindowInfo();
+            if (windowInfo != null && windowInfo.getPid() != -1) {
+                int x = windowInfo.getX();
+                int y = windowInfo.getY();
+                int w = windowInfo.getWidth();
+                int h = windowInfo.getHeight();
+                if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
+                    new MessageBubble(text_windowHidden(), 2);
+                } else {
+                    stages.forEach(stage -> stage.setIconified(true));
+                    String info = text_escCloseFloating() + "\n" +
+                            findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                            findImgSet_PID() + windowInfo.getPid() + "\n" +
+                            findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
+                            findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                            findImgSet_windowLocation() + " X: " + x + " Y: " + y + "\n" +
+                            findImgSet_windowSize() + " W: " + w + " H: " + h;
+                    windowInfoFloating.setMassage(info)
+                            .getConfig()
+                            .setHeight(windowInfo.getHeight())
+                            .setWidth(windowInfo.getWidth())
+                            .setX(windowInfo.getX())
+                            .setY(windowInfo.getY());
+                    // 改变要防重复点击的组件状态
+                    changeDisableNodes(disableNodes, true);
+                    showFloatingWindow(windowInfoFloating);
+                    windowMonitor.startNativeKeyListener();
+                }
+            } else {
+                new MessageBubble(text_noWindowInfo(), 2);
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 删除窗口信息
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildDeleteDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_deleteWindow());
+        menuItem.setOnAction(_ -> Platform.runLater(windowMonitor::removeWindowInfo));
+        contextMenu.getItems().add(menuItem);
     }
 
     /**
@@ -2090,63 +2171,24 @@ public class UiUtils {
     }
 
     /**
-     * 使用自定义文件选择器选择文件
+     * 处理无法自动切换主题的页面
      *
-     * @param fileChooserConfig 文件查询配置
-     * @return 文件选择器控制器
-     * @throws IOException 页面加载失败、配置文件读取异常
+     * @param pane 页面布局
      */
-    public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
-        URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
-        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loader.load();
-        FileChooserController controller = loader.getController();
-        controller.initData(fileChooserConfig);
-        Stage detailStage = new Stage();
-        Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
-        prop.load(input);
-        double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1000"));
-        double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "450"));
-        input.close();
-        Scene scene = new Scene(root, with, height);
-        detailStage.setScene(scene);
-        detailStage.setTitle(fileChooserConfig.getTitle());
-        detailStage.initModality(Modality.APPLICATION_MODAL);
-        setWindowLogo(detailStage, logoPath);
-        detailStage.show();
-        // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((_, _, _) ->
-                Platform.runLater(controller::adaption));
-        // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((_, _, _) ->
-                Platform.runLater(controller::adaption));
-        return controller;
-    }
-
-    /**
-     * 处理要过滤的文件类型
-     *
-     * @param filterFileType 填有空格区分的要过滤的文件类型字符串的文本输入框
-     * @return 要过滤的文件类型list
-     */
-    public static List<String> getFilterExtensionList(TextField filterFileType) {
-        String filterFileTypeValue = filterFileType.getText();
-        return getFilterExtensionList(filterFileTypeValue);
-    }
-
-    /**
-     * 处理要过滤的文件类型
-     *
-     * @param filterFileTypeValue 空格区分的要过滤的文件类型字符串
-     * @return 要过滤的文件类型list
-     */
-    public static List<String> getFilterExtensionList(String filterFileTypeValue) {
-        List<String> filterExtensionList = new ArrayList<>();
-        if (StringUtils.isNotBlank(filterFileTypeValue)) {
-            filterExtensionList = Arrays.asList(filterFileTypeValue.toLowerCase().split(" "));
+    public static <T> void manuallyChangeThemePane(Pane pane, Class<T> clazz) {
+        if (isDarkTheme) {
+            pane.setStyle("""
+                    -fx-background-color: -color-border-subtle, -color-base-9;
+                    -fx-background-radius: 6px, 0;
+                    -fx-background-insets: 0, 0 1 0 0;
+                    -fx-border-radius: 6px;
+                    -fx-border-width: 1px, 0 3px 0 0;
+                    -fx-border-color: transparent, transparent;
+                    """);
+        } else {
+            pane.setStyle(null);
         }
-        return filterExtensionList;
+        manuallyChangeThemeList.add(clazz);
     }
 
 }

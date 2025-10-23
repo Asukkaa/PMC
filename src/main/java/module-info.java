@@ -19,6 +19,8 @@ module priv.koishi.pmc {
     requires jdk.httpserver;
     requires java.net.http;
     requires com.sun.jna.platform;
+    requires jdk.naming.dns;
+    requires atlantafx.base;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;
@@ -43,4 +45,5 @@ module priv.koishi.pmc {
     opens priv.koishi.pmc.Bean.Config to javafx.fxml;
     opens priv.koishi.pmc.UI.CustomFloatingWindow to javafx.fxml;
     exports priv.koishi.pmc.UI.CustomFloatingWindow;
+    exports priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 }

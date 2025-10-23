@@ -29,6 +29,9 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import java.io.File;
@@ -39,9 +42,16 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
+import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
+import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.windowInfoShow;
+import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -103,19 +113,19 @@ public class ClickDetailController extends RootController {
     private Task<Void> loadImgTask;
 
     /**
-     * 修改内容变化标志监听器
+     * 修改内容变化标志监听器（滑块组件专用）
      */
     private final Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners = new WeakHashMap<>();
 
     /**
-     * 修改内容变化标志监听器（滑块组件专用）
+     * 修改内容变化标志监听器
      */
     private final Map<Object, WeakReference<InvalidationListener>> weakInvalidationListeners = new WeakHashMap<>();
 
     /**
-     * 带鼠标悬停提示的内容变化监听器
+     * 带鼠标悬停提示的内容变化监听器删除器
      */
-    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+    private final List<Runnable> listenerRemovers = new ArrayList<>();
 
     /**
      * 表格结构变化监听器
@@ -138,6 +148,11 @@ public class ClickDetailController extends RootController {
     private FloatingWindowDescriptor clickFloating, stopFloating;
 
     /**
+     * 窗口信息获取器
+     */
+    public static WindowMonitor windowMonitorClick, stopWindowMonitor;
+
+    /**
      * 更新数据用的回调函数
      */
     @Setter
@@ -150,8 +165,9 @@ public class ClickDetailController extends RootController {
     public VBox clickImgVBox_Det, progressBarVBox_Det;
 
     @FXML
-    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det,
-            clickRegionHBox_Det, stopRegionHBox_Det;
+    public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
+            stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det,
+            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -167,21 +183,21 @@ public class ClickDetailController extends RootController {
             stopFindImgType_Det;
 
     @FXML
-    public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, updateClickName_Det,
-            clickRegion_Det, stopRegion_Det;
+    public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
+            updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det;
 
     @FXML
-    public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomClickInterval_Det,
-            randomWaitTime_Det, clickAllRegion_Det, stopAllRegion_Det;
+    public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
+            stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det;
 
     @FXML
-    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det,
-            tableViewSize_Det, clickTypeText_Det;
+    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -209,7 +225,7 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 设置javafx单元格宽度
+     * 设置 javaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.1));
@@ -238,9 +254,13 @@ public class ClickDetailController extends RootController {
         setPromptText();
         // 给输入框添加内容变化监听
         nodeValueChangeListener();
+        // 初始化操作类型相关组件
         initClickType(item);
+        // 初始识别区域设置相关组件
         initFloatingWindowConfig(item);
+        // 初始终止操作图片列表
         initStopImg(item.getStopImgFiles());
+        // 展示要点击的图片
         showClickImg(item.getClickImgPath());
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
@@ -254,6 +274,8 @@ public class ClickDetailController extends RootController {
         retryType_Det.setValue(item.getRetryType());
         randomClickX_Det.setText(item.getRandomX());
         randomClickY_Det.setText(item.getRandomY());
+        relativelyX_Det.setText(item.getRelativeX());
+        relativelyY_Det.setText(item.getRelativeY());
         interval_Det.setText(item.getClickInterval());
         matchedType_Det.setValue(item.getMatchedType());
         stopImgSelectPath = item.getStopImgSelectPath();
@@ -317,6 +339,105 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 初始化窗口信息获取器
+     */
+    private void initWindowMonitor() {
+        stopWindowMonitor = new WindowMonitor(disableNodes, stage);
+        stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Det));
+        FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
+        WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
+        updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
+        stopWindowMonitor.setWindowInfo(stopWindowInfo);
+        stopWindowMonitor.updateWindowInfo();
+        windowMonitorClick = new WindowMonitor(disableNodes, stage);
+        windowMonitorClick.setWindowInfoHandler(creatWindowInfoHandler());
+        FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
+        WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
+        updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
+        windowMonitorClick.setWindowInfo(clickWindowInfo);
+        windowMonitorClick.updateWindowInfo();
+        if (StringUtils.isBlank(windowMonitorClick.getWindowInfo().getProcessPath())) {
+            relativelyHBox_Det.setDisable(true);
+            useRelatively_Det.setSelected(false);
+        } else {
+            relativelyHBox_Det.setDisable(false);
+            useRelatively_Det.setSelected(activation.equals(selectedItem.getUseRelative()));
+        }
+        useRelatively();
+    }
+
+    /**
+     * 创建窗口信息处理器
+     *
+     * @return 窗口信息处理器
+     */
+    private WindowInfoHandler creatWindowInfoHandler() {
+        return new WindowInfoHandler() {
+
+            /**
+             * 显示窗口信息接口
+             *
+             * @param windowInfo 窗口信息
+             */
+            @Override
+            public void showInfo(WindowInfo windowInfo) {
+                Platform.runLater(() -> {
+                    windowInfoShow(windowInfo, clickWindowInfo_Det);
+                    if (windowInfo != null) {
+                        relativelyHBox_Det.setDisable(false);
+                        if (useRelatively_Det.isSelected()) {
+                            calculateAbsolutePosition(windowInfo);
+                        } else {
+                            calculateRelativePosition(windowInfo);
+                        }
+                    } else {
+                        relativelyHBox_Det.setDisable(true);
+                    }
+                });
+            }
+
+            /**
+             * 删除窗口信息接口
+             */
+            @Override
+            public void removeInfo() {
+                relativelyHBox_Det.setDisable(true);
+                clickWindowInfo_Det.setText("");
+                relativelyX_Det.setText("");
+                relativelyY_Det.setText("");
+            }
+        };
+    }
+
+    /**
+     * 计算相对坐标
+     *
+     * @param windowInfo 窗口信息
+     */
+    private void calculateRelativePosition(WindowInfo windowInfo) {
+        int x = setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth);
+        int y = setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight);
+        Map<String, String> relativePosition = WindowMonitor.calculateRelativePosition(windowInfo, x, y);
+        relativelyX_Det.setText(relativePosition.get(RelativeX));
+        relativelyY_Det.setText(relativePosition.get(RelativeY));
+    }
+
+    /**
+     * 计算绝对坐标
+     *
+     * @param windowInfo 窗口信息
+     */
+    private void calculateAbsolutePosition(WindowInfo windowInfo) {
+        double relativeX = setDefaultDoubleValue(relativelyX_Det, 0, 0.0, 100.0);
+        double relativeY = setDefaultDoubleValue(relativelyY_Det, 0, 0.0, 100.0);
+        Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, relativeX, relativeY);
+        int x = absolutePosition.get(AbsoluteX);
+        int y = absolutePosition.get(AbsoluteY);
+        mouseStartX_Det.setText(String.valueOf(x));
+        mouseStartY_Det.setText(String.valueOf(y));
+    }
+
+    /**
      * 初始识别区域设置相关组件
      *
      * @param item 列表选中的数据
@@ -347,7 +468,7 @@ public class ClickDetailController extends RootController {
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
-        createFloatingWindows(clickFloating, stopFloating);
+        createFloatingWindows(clickFloating, stopFloating, windowInfoFloating);
     }
 
     /**
@@ -359,8 +480,8 @@ public class ClickDetailController extends RootController {
         Color textFill = settingController.colorPicker_Set.getValue();
         return new FloatingWindowDescriptor()
                 .setHideButtonToolTip(text_saveCloseFloating())
-                .setShowButtonText(clickDetail_showRegion())
-                .setHideButtonText(clickDetail_saveRegion())
+                .setShowButtonText(findImgSet_showRegion())
+                .setHideButtonText(findImgSet_saveRegion())
                 .setShowButtonToolTip(tip_showRegion())
                 .setMassage(text_saveFindImgConfig())
                 .setTextFill(textFill);
@@ -409,15 +530,15 @@ public class ClickDetailController extends RootController {
         if (tableListener != null) {
             tableView_Det.getItems().removeListener(tableListener);
         }
-        // 移除修改内容变化标志监听器（滑块组件专用）
+        // 移除修改内容变化标志监听器
         removeInvalidationListeners(weakInvalidationListeners);
         weakInvalidationListeners.clear();
-        // 移除修改内容变化标志监听器
+        // 移除修改内容变化标志监听器（滑块组件专用）
         removeWeakReferenceChangeListener(weakChangeListeners);
         weakChangeListeners.clear();
         // 移除带鼠标悬停提示的内容变化监听器
-        removeChangeListener(changeListeners);
-        changeListeners.clear();
+        listenerRemovers.forEach(Runnable::run);
+        listenerRemovers.clear();
         // 处理表格监听器引用
         tableListener = null;
     }
@@ -438,14 +559,17 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(mouseStartY_Det, mouseStartY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickNumBer_Det, clickNumBer_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedStep_Det, matchedStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(relativelyX_Det, relativelyX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(relativelyY_Det, relativelyY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickX_Det, randomClickX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickY_Det, randomClickY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(clickAllRegion_Det, clickAllRegion_Det.textProperty(), invalidationListener, weakInvalidationListeners);
-        registerWeakInvalidationListener(randomClickTime_Det, randomClickTime_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(useRelatively_Det, useRelatively_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickAllRegion_Det, clickAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(randomClickTime_Det, randomClickTime_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
@@ -521,59 +645,65 @@ public class ClickDetailController extends RootController {
      */
     private void nodeValueChangeListener() {
         // 操作名称文本输入框鼠标悬停提示
-        ChangeListener<String> clickNameListener = textFieldValueListener(clickName_Det, tip_clickName());
-        changeListeners.put(clickName_Det, clickNameListener);
+        Runnable clickNameRemover = textFieldValueListener(clickName_Det, tip_clickName());
+        listenerRemovers.add(clickNameRemover);
         // 限制每步操作执行前等待时间文本输入框内容
-        ChangeListener<String> waitListener = integerRangeTextField(wait_Det, 0, null, tip_wait());
-        changeListeners.put(wait_Det, waitListener);
+        Runnable waitRemover = integerRangeTextField(wait_Det, 0, null, tip_wait());
+        listenerRemovers.add(waitRemover);
         // 匹配图像坐标横(X)轴偏移量文本输入框内容
-        ChangeListener<String> imgXListener = integerRangeTextField(imgX_Det, null, null, tip_imgX());
-        changeListeners.put(imgX_Det, imgXListener);
+        Runnable imgXRemover = integerRangeTextField(imgX_Det, null, null, tip_imgX());
+        listenerRemovers.add(imgXRemover);
         // 匹配图像坐标纵(Y)轴偏移量文本输入框内容
-        ChangeListener<String> imgYListener = integerRangeTextField(imgY_Det, null, null, tip_imgY());
-        changeListeners.put(imgY_Det, imgYListener);
+        Runnable imgYRemover = integerRangeTextField(imgY_Det, null, null, tip_imgY());
+        listenerRemovers.add(imgYRemover);
         // 停止操作图像识别准确度设置监听
-        ChangeListener<Number> stopOpacityListener = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
-        changeListeners.put(stopOpacity_Det, stopOpacityListener);
+        Runnable stopOpacityRemover = integerSliderValueListener(stopOpacity_Det, tip_stopOpacity());
+        listenerRemovers.add(stopOpacityRemover);
         // 要点击的图像识别准确度设置监听
-        ChangeListener<Number> clickOpacityListener = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
-        changeListeners.put(clickOpacity_Det, clickOpacityListener);
+        Runnable clickOpacityRemover = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
+        listenerRemovers.add(clickOpacityRemover);
         // 限制操作时长文本输入内容
-        ChangeListener<String> timeClickListener = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
-        changeListeners.put(timeClick_Det, timeClickListener);
+        Runnable timeClickRemover = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
+        listenerRemovers.add(timeClickRemover);
         // 限制操作间隔文本输入框内容
-        ChangeListener<String> intervalListener = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
-        changeListeners.put(interval_Det, intervalListener);
+        Runnable intervalRemover = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
+        listenerRemovers.add(intervalRemover);
         // 限制鼠标起始位置横(X)坐标文本输入框内容
-        ChangeListener<String> mouseStartXListener = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
-        changeListeners.put(mouseStartX_Det, mouseStartXListener);
+        Runnable mouseStartXRemover = integerRangeTextField(mouseStartX_Det, 0, null, tip_mouseStartX());
+        listenerRemovers.add(mouseStartXRemover);
         // 限制鼠标起始位置纵(Y)坐标文本输入框内容
-        ChangeListener<String> mouseStartYListener = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
-        changeListeners.put(mouseStartY_Det, mouseStartYListener);
+        Runnable mouseStartYRemover = integerRangeTextField(mouseStartY_Det, 0, null, tip_mouseStartY());
+        listenerRemovers.add(mouseStartYRemover);
         // 限制点击次数文本输入框内容
-        ChangeListener<String> clickNumBerListener = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
-        changeListeners.put(clickNumBer_Det, clickNumBerListener);
+        Runnable clickNumBerRemover = integerRangeTextField(clickNumBer_Det, 0, null, tip_clickNumBer());
+        listenerRemovers.add(clickNumBerRemover);
         // 限制重试后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> retryStepListener = warnIntegerRangeTextField(retryStep_Det, 1, maxIndex, tip_step(), retryStepWarning_Det);
-        changeListeners.put(retryStep_Det, retryStepListener);
+        Runnable retryStepRemover = warnIntegerRangeTextField(retryStep_Det, 1, maxIndex, tip_step(), retryStepWarning_Det);
+        listenerRemovers.add(retryStepRemover);
+        // 限制点击起始相对横(X)坐标文本输入框内容
+        Runnable relativelyXRemover = DoubleRangeTextField(relativelyX_Det, 0.0, 100.0, 2, tip_relatively());
+        listenerRemovers.add(relativelyXRemover);
+        // 限制点击起始相对纵(Y)坐标文本输入框内容
+        Runnable relativelyYRemover = DoubleRangeTextField(relativelyY_Det, 0.0, 100.0, 2, tip_relatively());
+        listenerRemovers.add(relativelyYRemover);
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
-        ChangeListener<String> matchedStepListener = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
-        changeListeners.put(matchedStep_Det, matchedStepListener);
+        Runnable matchedStepRemover = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
+        listenerRemovers.add(matchedStepRemover);
         // 随机点击时间偏移量文本输入框内容
-        ChangeListener<String> randomTimeListener = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
-        changeListeners.put(randomTimeOffset_Det, randomTimeListener);
+        Runnable randomTimeRemover = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
+        listenerRemovers.add(randomTimeRemover);
         // 随机横坐标偏移量文本输入框内容
-        ChangeListener<String> randomClickXListener = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
-        changeListeners.put(randomClickX_Det, randomClickXListener);
+        Runnable randomClickXRemover = integerRangeTextField(randomClickX_Det, 0, null, tip_randomClickX() + defaultRandomClickX);
+        listenerRemovers.add(randomClickXRemover);
         // 随机纵坐标偏移量文本输入框内容
-        ChangeListener<String> randomClickYListener = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
-        changeListeners.put(randomClickY_Det, randomClickYListener);
+        Runnable randomClickYRemover = integerRangeTextField(randomClickY_Det, 0, null, tip_randomClickY() + defaultRandomClickY);
+        listenerRemovers.add(randomClickYRemover);
         // 限制终止操作识别失败重试次数文本输入框内容
-        ChangeListener<String> stopRetryNumListener = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
-        changeListeners.put(stopRetryNum_Det, stopRetryNumListener);
+        Runnable stopRetryNumRemover = integerRangeTextField(stopRetryNum_Det, 0, null, tip_stopRetryNum() + stopRetryNumDefault);
+        listenerRemovers.add(stopRetryNumRemover);
         // 限制要点击的图片识别失败重试次数文本输入框内容
-        ChangeListener<String> clickRetryNumListener = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
-        changeListeners.put(clickRetryNum_Det, clickRetryNumListener);
+        Runnable clickRetryNumRemover = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
+        listenerRemovers.add(clickRetryNumRemover);
     }
 
     /**
@@ -609,22 +739,27 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_mouseStartY(), mouseStartY_Det);
         addToolTip(tip_randomClick(), randomClick_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
+        addToolTip(tip_useRelatively(), useRelatively_Det);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Det);
         addToolTip(tip_randomClickTime(), randomClickTime_Det);
         addToolTip(tip_step(), matchedStep_Det, retryStep_Det);
         addToolTip(tip_removeClickImgBtn(), removeClickImg_Det);
         addToolTip(tip_randomTrajectory(), randomTrajectory_Det);
+        addToolTip(tip_updateCoordinate(), updateCoordinate_Det);
         addToolTip(tip_updateClickNameBtn(), updateClickName_Det);
         addValueToolTip(imgX_Det, tip_imgX(), imgX_Det.getText());
         addValueToolTip(imgY_Det, tip_imgY(), imgY_Det.getText());
+        addToolTip(tip_findWindow(), clickWindow_Det, stopWindow_Det);
         addToolTip(tip_showRegion(), clickRegion_Det, stopRegion_Det);
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
+        addToolTip(tip_relatively(), relativelyX_Det, relativelyY_Det);
         addToolTip(tip_allRegion(), clickAllRegion_Det, stopAllRegion_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
         addToolTip(tip_stopRetryNum() + stopRetryNumDefault, stopRetryNum_Det);
         addToolTip(tip_clickIndex() + clickIndex_Det.getText(), clickIndex_Det);
+        addToolTip(tip_alwaysRefresh(), updateStopWindow_Det, updateClickWindow_Det);
         addValueToolTip(clickTypeText_Det, tip_clickType(), clickType_Det.getValue());
         addToolTip(tip_clickRetryNum() + clickRetryNumDefault, clickRetryNum_Det);
         addToolTip(tip_notExistsIndex(), matchedStepWarning_Det, retryStepWarning_Det);
@@ -712,10 +847,16 @@ public class ClickDetailController extends RootController {
         hideFloatingWindow(clickFloating, stopFloating);
         removeAll();
         removeAllListeners();
+        windowMonitorClick = null;
+        stopWindowMonitor = null;
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
         stage.close();
+        removeController();
+        if (mainStage.isIconified()) {
+            showStage(mainStage);
+        }
     }
 
     /**
@@ -770,6 +911,99 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 构建右键菜单
+     */
+    private void buildContextMenu() {
+        // 构建表格右键菜单
+        buildTableViewContextMenu(tableView_Det, dataNumber_Det);
+        List<Stage> stages = List.of(stage, mainStage);
+        // 构建窗口信息栏右键菜单
+        buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, disableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, disableNodes, stages);
+    }
+
+    /**
+     * 保存浮窗设置
+     *
+     * @param floatingVOs 浮窗设置
+     */
+    private void saveFloatingWindow(FloatingWindowDescriptor... floatingVOs) {
+        for (FloatingWindowDescriptor floatingVO : floatingVOs) {
+            Stage stage = floatingVO.getStage();
+            if (stage != null && stage.isShowing()) {
+                FloatingWindowConfig config = floatingVO.getConfig()
+                        .setHeight((int) stage.getHeight())
+                        .setWidth((int) stage.getWidth())
+                        .setX((int) stage.getX())
+                        .setY((int) stage.getY());
+                floatingVO.setConfig(config);
+            }
+        }
+    }
+
+    /**
+     * 更新浮窗配置
+     *
+     * @param findImgTypeDet    识别区域设置下拉框
+     * @param regionInfoHBoxDet 设置指定识别区域的组件所在容器
+     * @param regionHBoxDet     选项识别指定范围相关设置的组件所在容器
+     * @param windowInfoHBoxDet 选项识别指定窗口相关设置的组件所在容器
+     * @param floating          识别范围展示浮窗
+     * @param windowMonitor     窗口监控
+     * @param checkWindowInfo   是否检查窗口信息为空（true 校验空值）
+     */
+    private void updateFloatingWindowConfig(ChoiceBox<String> findImgTypeDet, HBox regionInfoHBoxDet, HBox regionHBoxDet,
+                                            HBox windowInfoHBoxDet, FloatingWindowDescriptor floating,
+                                            WindowMonitor windowMonitor, boolean checkWindowInfo) {
+        String value = findImgTypeDet.getValue();
+        addValueToolTip(findImgTypeDet, tip_findImgType(), value);
+        if (findImgType_region().equals(value)) {
+            regionInfoHBoxDet.setVisible(true);
+            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            regionInfoHBoxDet.getChildren().add(regionHBoxDet);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                floating.setConfig(config);
+            }
+        } else if (findImgType_window().equals(value)) {
+            regionInfoHBoxDet.setVisible(true);
+            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            regionInfoHBoxDet.getChildren().add(windowInfoHBoxDet);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                floating.setConfig(config);
+                if (windowMonitor != null) {
+                    WindowInfo windowInfo = windowMonitor.getWindowInfo();
+                    if (checkWindowInfo && windowInfo == null) {
+                        throw new RuntimeException(text_windowInfoNull());
+                    }
+                    config.setWindowInfo(windowInfo);
+                }
+            }
+        } else if (findImgType_all().equals(value)) {
+            regionInfoHBoxDet.setVisible(false);
+            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                floating.setConfig(config);
+            }
+        }
+    }
+
+    /**
+     * 禁用需要自动化权限的组件
+     */
+    private void setNoPermissionLog() {
+        stopWindow_Det.setDisable(true);
+        clickWindow_Det.setDisable(true);
+        noPermissionHBox_Det.setVisible(true);
+        addToolTip(tip_noAutomationPermission(), noPermission_Det);
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -782,20 +1016,26 @@ public class ClickDetailController extends RootController {
         getConfig();
         Platform.runLater(() -> {
             stage = (Stage) anchorPane_Det.getScene().getWindow();
+            // 初始化窗口监控器
+            initWindowMonitor();
             // 组件宽高自适应
             adaption();
+            // 禁用需要自动化权限的组件
+            if (noAutomationPermission) {
+                setNoPermissionLog();
+            }
             // 设置要防重复点击的组件
             setDisableNodes();
             // 添加确认关闭确认框
             addCloseConfirm();
             // 添加控件监听
             addModificationListeners();
-            // 自动填充javafx表格
+            // 自动填充 javaFX 表格
             autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId, index_Det);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             // 构建右键菜单
-            buildContextMenu(tableView_Det, dataNumber_Det);
+            buildContextMenu();
         });
     }
 
@@ -806,47 +1046,57 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void saveDetail() throws IllegalAccessException {
-        clickFindImgTypeAction();
-        stopFindImgTypeAction();
+        updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
+                clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
+        updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
+                stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
         saveFloatingWindow(clickFloating, stopFloating);
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
+        String useRelatively = useRelatively_Det.isSelected() ? activation : unActivation;
         String stopAllRegion = stopAllRegion_Det.isSelected() ? activation : unActivation;
         String clickAllRegion = clickAllRegion_Det.isSelected() ? activation : unActivation;
         String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
         String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
         String randomTrajectory = randomTrajectory_Det.isSelected() ? activation : unActivation;
+        String stopWindowUpdate = updateStopWindow_Det.isSelected() ? activation : unActivation;
+        String clickWindowUpdate = updateClickWindow_Det.isSelected() ? activation : unActivation;
         String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
-        stopFloating.getConfig().setAllRegion(stopAllRegion);
-        clickFloating.getConfig().setAllRegion(clickAllRegion);
+        FloatingWindowConfig stopFloatingConfig = stopFloating.getConfig();
+        FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
+        stopFloatingConfig.setAllRegion(stopAllRegion)
+                .setAlwaysRefresh(stopWindowUpdate);
+        clickFloatingConfig.setAllRegion(clickAllRegion)
+                .setAlwaysRefresh(clickWindowUpdate);
         int selectIndex = selectedItem.getIndex();
         String matchedType = matchedType_Det.getValue();
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
                 .setRandomClick(randomClick)
+                .setUseRelative(useRelatively)
                 .setName(clickName_Det.getText())
                 .setRandomWaitTime(randomWaitTime)
                 .setRandomClickTime(randomClickTime)
                 .setRandomTrajectory(randomTrajectory)
+                .setStopWindowConfig(stopFloatingConfig)
+                .setClickWindowConfig(clickFloatingConfig)
                 .setClickImgPath(clickImgPath_Det.getText())
                 .setRandomClickInterval(randomClickInterval)
-                .setStopWindowConfig(stopFloating.getConfig())
-                .setClickWindowConfig(clickFloating.getConfig())
                 .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
                 .setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()))
                 .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
-                .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, null, null)))
-                .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, null, null)))
                 .setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)))
-                .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, null)))
-                .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, null)))
+                .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, -screenWidth, screenWidth)))
+                .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, -screenHeight, screenHeight)))
                 .setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)))
+                .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth)))
+                .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight)))
                 .setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)))
-                .setRandomX(String.valueOf(setDefaultIntValue(randomClickX_Det, Integer.parseInt(defaultRandomClickX), 0, null)))
-                .setRandomY(String.valueOf(setDefaultIntValue(randomClickY_Det, Integer.parseInt(defaultRandomClickY), 0, null)))
                 .setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, Integer.parseInt(defaultClickTimeOffset), 0, null)))
+                .setRandomX(String.valueOf(setDefaultIntValue(randomClickX_Det, Integer.parseInt(defaultRandomClickX), 0, screenWidth)))
+                .setRandomY(String.valueOf(setDefaultIntValue(randomClickY_Det, Integer.parseInt(defaultRandomClickY), 0, screenHeight)))
                 .setRandomTime(String.valueOf(setDefaultIntValue(randomTimeOffset_Det, Integer.parseInt(defaultRandomTime), 0, null)))
                 .setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(stopRetryNumDefault), 0, null)))
                 .setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(clickRetryNumDefault), 0, null)));
@@ -869,29 +1119,17 @@ public class ClickDetailController extends RootController {
             }
             selectedItem.setRetryStep(retryStep);
         }
+        if (windowMonitorClick.getWindowInfo() != null) {
+            if (FindImgTypeEnum.WINDOW.ordinal() == clickFloatingConfig.getFindImgTypeEnum()) {
+                updateCoordinate();
+                selectedItem.setRelativeX(relativelyX_Det.getText())
+                        .setRelativeY(relativelyY_Det.getText());
+            }
+        }
         closeStage();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();
-        }
-    }
-
-    /**
-     * 保存浮窗设置
-     *
-     * @param floatingVOs 浮窗设置
-     */
-    private void saveFloatingWindow(FloatingWindowDescriptor... floatingVOs) {
-        for (FloatingWindowDescriptor floatingVO : floatingVOs) {
-            Stage clickStage = floatingVO.getStage();
-            if (clickStage != null && clickStage.isShowing()) {
-                FloatingWindowConfig config = floatingVO.getConfig()
-                        .setHeight((int) clickStage.getHeight())
-                        .setWidth((int) clickStage.getWidth())
-                        .setX((int) clickStage.getX())
-                        .setY((int) clickStage.getY());
-                floatingVO.setConfig(config);
-            }
         }
     }
 
@@ -1035,22 +1273,15 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickFindImgTypeAction() {
-        String value = clickFindImgType_Det.getValue();
-        addValueToolTip(clickFindImgType_Det, tip_findImgType(), value);
-        if (findImgType_region().equals(value)) {
-            clickRegionHBox_Det.setVisible(true);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
-                clickFloating.setConfig(config);
-            }
-        } else if (findImgType_all().equals(value)) {
-            clickRegionHBox_Det.setVisible(false);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
-                clickFloating.setConfig(config);
-            }
+        updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
+                clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, false);
+        if (findImgType_window().equals(clickFindImgType_Det.getValue())) {
+            relativelyHBox_Det.setDisable(false);
+            useRelatively();
+        } else {
+            relativelyHBox_Det.setDisable(true);
+            mouseStartX_Det.setDisable(false);
+            mouseStartY_Det.setDisable(false);
         }
     }
 
@@ -1059,23 +1290,8 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void stopFindImgTypeAction() {
-        String value = stopFindImgType_Det.getValue();
-        addValueToolTip(stopFindImgType_Det, tip_findImgType(), value);
-        if (findImgType_region().equals(value)) {
-            stopRegionHBox_Det.setVisible(true);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
-                stopFloating.setConfig(config);
-            }
-        } else if (findImgType_all().equals(value)) {
-            stopRegionHBox_Det.setVisible(false);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
-                stopFloating.setConfig(config);
-            }
-        }
+        updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
+                stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, false);
     }
 
     /**
@@ -1109,6 +1325,76 @@ public class ClickDetailController extends RootController {
                 // 隐藏浮窗
                 hideFloatingWindow(stopFloating);
             }
+        }
+    }
+
+    /**
+     * 获取要点击的窗口信息
+     */
+    @FXML
+    private void findClickWindowAction() {
+        // 改变要防重复点击的组件状态
+        changeDisableNodes(disableNodes, true);
+        // 隐藏窗口
+        mainStage.setIconified(true);
+        stage.setIconified(true);
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecord), 0, null);
+        if (windowMonitorClick != null) {
+            windowMonitorClick.startClickWindowMouseListener(preparation);
+        }
+    }
+
+    /**
+     * 获取终止操作窗口信息
+     */
+    @FXML
+    private void findStopWindowAction() {
+        // 改变要防重复点击的组件状态
+        changeDisableNodes(disableNodes, true);
+        // 隐藏窗口
+        mainStage.setIconified(true);
+        stage.setIconified(true);
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecord), 0, null);
+        if (stopWindowMonitor != null && !stopWindowMonitor.isFindingWindow()) {
+            stopWindowMonitor.startClickWindowMouseListener(preparation);
+        }
+    }
+
+    /**
+     * 更新坐标信息按钮
+     */
+    @FXML
+    private void updateCoordinate() {
+        windowMonitorClick.updateWindowInfo();
+        WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
+        if (windowInfo != null) {
+            if (useRelatively_Det.isSelected()) {
+                calculateAbsolutePosition(windowInfo);
+            } else {
+                calculateRelativePosition(windowInfo);
+            }
+        }
+    }
+
+    /**
+     * 使用相对坐标开关
+     */
+    @FXML
+    private void useRelatively() {
+        if (useRelatively_Det.isSelected()) {
+            mouseStartX_Det.setDisable(true);
+            mouseStartY_Det.setDisable(true);
+            relativelyX_Det.setDisable(false);
+            relativelyY_Det.setDisable(false);
+        } else {
+            mouseStartX_Det.setDisable(false);
+            mouseStartY_Det.setDisable(false);
+            relativelyX_Det.setDisable(true);
+            relativelyY_Det.setDisable(true);
         }
     }
 

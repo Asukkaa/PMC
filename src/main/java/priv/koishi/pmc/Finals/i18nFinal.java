@@ -231,7 +231,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后在运行自动操作时运行信息浮窗会跟随鼠标移动
+     * @return 勾选后在运行自动操作时信息浮窗会跟随鼠标移动
      */
     public static String tip_mouseFloatingRun() {
         return bundle.getString("tip.mouseFloatingRun");
@@ -312,6 +312,22 @@ public class i18nFinal {
      */
     public static String tip_saveFloating() {
         return bundle.getString("tip.saveFloating");
+    }
+
+    /**
+     * @return <p>勾选后将根据相对坐标与目标窗口宽高进行换算</p>
+     * 只有设置图像识别目标窗口后才可使用
+     */
+    public static String tip_useRelatively() {
+        return bundle.getString("tip.useRelatively");
+    }
+
+    /**
+     * @return <p>使用相对坐标时将更新绝对坐标</p>
+     * 使用绝对坐标时将更新相对坐标
+     */
+    public static String tip_updateCoordinate() {
+        return bundle.getString("tip.updateCoordinate");
     }
 
     /**
@@ -609,11 +625,11 @@ public class i18nFinal {
     }
 
     /**
-     * @return 次启动应用将会按照此设置项设置垃圾回收（GC）方式
-     * G1GC：分区回收，低延迟与吞吐量平衡
-     * ZGC：亚毫秒级停顿
-     * ParallelGC：多线程并行回收，吞吐量优先
-     * ShenandoahGC：全并发回收，停顿时间与堆大小无关
+     * @return <p>下次启动应用将会按照此设置项设置垃圾回收（GC）方式</p>
+     * <p>G1GC：分区回收，低延迟与吞吐量平衡</p>
+     * <p>ZGC：亚毫秒级停顿</p>
+     * <p>ParallelGC：多线程并行回收，吞吐量优先</p>
+     * <p>ShenandoahGC：全并发回收，停顿时间与堆大小无关</p>
      * SerialGC：单线程回收，简单高效
      */
     public static String tip_nextGcType() {
@@ -628,7 +644,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹
+     * @return <p>在开启相应设置后，录制自动操作时会按照设置值的时间间隔记录拖拽和移动时的鼠标轨迹</p>
      * 只能填自然数，单位为毫秒，数字越小越接近录制轨迹，不填默认为
      */
     public static String tip_sampleInterval() {
@@ -636,7 +652,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 要点击的图片识别没有匹配项后将会按照设置次数再次识别
+     * @return <p>要点击的图片识别没有匹配项后将会按照设置次数再次识别</p>
      * 只能填自然数，不填默认为
      */
     public static String tip_clickRetryNum() {
@@ -644,7 +660,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 终止操作图片识别没有匹配项后将会按照设置次数再次识别
+     * @return <p>终止操作图片识别没有匹配项后将会按照设置次数再次识别</p>
      * 只能填自然数，不填默认为
      */
     public static String tip_stopRetryNum() {
@@ -652,8 +668,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 滑动将会改变录制或运行自动操作时浮窗透明度
-     * 透明的为 0 时 Windows 下鼠标将会点击透过浮窗
+     * @return <p>滑动将会改变录制或运行自动操作时浮窗透明度</p>
+     * <p>透明的为 0 时 Windows 下鼠标将会点击透过浮窗</p>
      * macOS 暂时无法实现鼠标点击透过
      */
     public static String tip_opacity() {
@@ -661,7 +677,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作
+     * @return <p>点击录制自动操作按钮将会等待设置的准备时间后开始录制自动操作</p>
      * 每次鼠标点击并松开为一个步骤，每次点击间隔为操作前等待时间
      */
     public static String tip_recordClick() {
@@ -669,8 +685,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 不用填写文件拓展名，导出文件为 .pmc 格式，如果导出文件夹已经存在同名文件不会覆盖
-     * 文件名不能包含  <>:"/\|?*
+     * @return <p>不用填写文件拓展名，导出文件为 .pmc 格式，如果导出文件夹已经存在同名文件不会覆盖</p>
+     * <p>文件名不能包含  <>:"/\|?*</p>
      * 设置为空或者不合法将会以默认名称命名，默认名称为：
      */
     public static String tip_autoClickFileName() {
@@ -678,10 +694,10 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后：
-     * 如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作
-     * 如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作
-     * Windows 一般会直接点击对应窗口的对应坐标，macOS 可能需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标
+     * @return <p>勾选后：</p>
+     * <p>如果是运行 测试操作流程 则会 鼠标左键 点击一次设置栏设置的起始坐标后再执行测试操作</p>
+     * <p>如果是运行 自动化操作 则会 鼠标左键 点击一次第一步操作的起始坐标后再执行自动化操作</p>
+     * <p>Windows 一般会直接点击对应窗口的对应坐标，macOS 可能需要先点击对应窗口将焦点切换过去才能点中对应窗口的对应坐标</p>
      * 建议 Windows 用户不要勾选， macOS 用户视情况勾选
      */
     public static String tip_firstClick() {
@@ -689,7 +705,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后在应用关闭时如果列表不为空将会保存列表的所有操作步骤
+     * @return <p>勾选后在应用关闭时如果列表不为空将会保存列表的所有操作步骤</p>
      * 自动保存路径为导出文件夹路径，文件名为：
      */
     public static String tip_autoSave() {
@@ -697,7 +713,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后运行或测试自动操作开始前将会隐藏本应用的窗口
+     * @return <p>勾选后运行或测试自动操作开始前将会隐藏本应用的窗口</p>
      * 如果有图像识别设置最好勾选，操作列表缩略图可能会干扰识别准确度
      */
     public static String tip_hideWindowRun() {
@@ -705,13 +721,29 @@ public class i18nFinal {
     }
 
     /**
-     * @return 需要在macOS系统设置中启用辅助设备权限：
-     * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
-     * 2. 在左侧列表选择「辅助功能」
-     * 3. 点击🔒解锁设置
-     * 4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)
-     * 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中
-     * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
+     * @return <p>勾选后将会在图像识别前自动更新窗口信息</p>
+     * <p>建议在窗口位置和大小不会改变的情况下不要勾选</p>
+     * 启动自动操作时将会自动更新一次窗口信息
+     */
+    public static String tip_alwaysRefresh() {
+        return bundle.getString("tip.alwaysRefresh");
+    }
+
+    /**
+     * @return <p>设置目标窗口后才可填写，用来计算相对坐标</p>
+     * 有效范围 0 - 100，最多保留两位小数
+     */
+    public static String tip_relatively() {
+        return bundle.getString("tip.relatively");
+    }
+
+    /**
+     * @return <p>需要在 macOS 系统设置中启用辅助功能权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 辅助功能]</p>
+     * <p>2. 点击🔒解锁设置</p>
+     * <p>3. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>4. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
+     * 5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_NativeHookException() {
         return bundle.getString("tip.NativeHookException") + appName + app +
@@ -720,13 +752,12 @@ public class i18nFinal {
     }
 
     /**
-     * @return =需要在macOS系统设置中启用录屏与系统录音权限：
-     * 1. 打开 [系统偏好设置 → 安全性与隐私 → 隐私]
-     * 2. 在左侧列表选择「录屏与系统录音」
-     * 3. 点击🔒解锁设置
-     * 4. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)
-     * 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中
-     * 6. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
+     * @return <p>需要在 macOS 系统设置中启用录屏与系统录音权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 录屏与系统录音]</p>
+     * <p>2. 点击🔒解锁设置</p>
+     * <p>3. 删除列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>4. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 添加到允许列表中</p>
+     * 5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_noScreenCapturePermission() {
         return bundle.getString("tip.noScreenCapturePermission") + appName + app +
@@ -735,7 +766,23 @@ public class i18nFinal {
     }
 
     /**
-     * @return 运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标
+     * @return <p>需要在 macOS 系统设置中启用自动化权限：</p>
+     * <p>1. 打开 [系统偏好设置 → 安全性与隐私 → 自动化]</p>
+     * <p>2. 点击🔒解锁设置</p>
+     * <p>3. 选择列表中的 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} (如果有的话)</p>
+     * <p>4. 将 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 的 System Events 选项开启</p>
+     * <p>5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}</p>
+     * 如果列表中没有 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app} 尝试重新安装应用后开启权限
+     */
+    public static String tip_noAutomationPermission() {
+        return bundle.getString("tip.noAutomationPermission") + appName + app +
+                bundle.getString("tip.ifHave") + appName + app +
+                bundle.getString("tip.activeSystemEvents") + appName + app +
+                bundle.getString("tip.ifNotHave") + appName + app + bundle.getString("tip.reinstall");
+    }
+
+    /**
+     * @return <p>运行自动操作时横坐标将随机在设置值范围内随机发生左右偏移，可用来模仿手动移动和点击鼠标</p>
      * 单位为像素，只能填自然数，不填默认为
      */
     public static String tip_randomClickX() {
@@ -743,7 +790,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标\n\
+     * @return <p>运行自动操作时纵坐标将随机在设置值范围内随机发生上下偏移，可用来模仿手动移动和点击鼠标</p>
      * 单位为像素，只能填自然数，不填默认为
      */
     public static String tip_randomClickY() {
@@ -751,7 +798,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移
+     * @return <p>运行自动操作时执行前等待时间、每个步骤内的操作间隔、点击时长都会以此项设置进行随机偏移</p>
      * 偏移后时间最小为0，单位为毫秒，只能填自然数，不填默认为
      */
     public static String tip_randomTime() {
@@ -759,7 +806,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 手动创建新的操作步骤时将会按照此设置先设置默认点击时长
+     * @return <p>手动创建新的操作步骤时将会按照此设置先设置默认点击时长</p>
      * 单位为毫秒，只能填自然数，不填默认为
      */
     public static String tip_clickTimeOffset() {
@@ -767,8 +814,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 目标图像识别成功后横坐标将按此设置发生偏移
-     * 单位为像素，只能填整数，不填默认为 0
+     * @return <p>目标图像识别成功后横坐标将按此设置发生偏移</p>
+     * <p>单位为像素，只能填整数，不填默认为 0</p>
      * 向左为负数，向右为正数
      */
     public static String tip_imgX() {
@@ -776,8 +823,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 目标图像识别成功后横纵标将按此设置发生偏移
-     * 单位为像素，只能填整数，不填默认为 0
+     * @return <p>目标图像识别成功后横纵标将按此设置发生偏移</p>
+     * <p>单位为像素，只能填整数，不填默认为 0</p>
      * 向下为正数，向上为负数
      */
     public static String tip_imgY() {
@@ -862,8 +909,8 @@ public class i18nFinal {
     }
 
     /**
-     * @return 勾选后只能选择PMC文件所在文件夹
-     * 选中文件夹后将会导入文件夹下所有的PMC文件，如果文件夹中有图片，
+     * @return <p>勾选后只能选择 PMC 文件所在文件夹</p>
+     * <p>选中文件夹后将会导入文件夹下所有的 PMC 文件，如果文件夹中有图片，</p>
      * 将会按照图片名称自动匹配未匹配到图片的要点击的图像设置
      */
     public static String tip_loadFolder_Click() {
@@ -893,8 +940,29 @@ public class i18nFinal {
     }
 
     /**
-     * @return 版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}
-     * 构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}
+     * @return 用来设置窗口识别的准备时间，只能填自然数，单位秒，不填默认为
+     */
+    public static String tip_findWindowWait() {
+        return bundle.getString("tip.findWindowWait");
+    }
+
+    /**
+     * @return 点击后可开始记录需要识别的窗口
+     */
+    public static String tip_findWindow() {
+        return bundle.getString("tip.findWindow");
+    }
+
+    /**
+     * @return 用来设置应用的外观
+     */
+    public static String tip_them() {
+        return bundle.getString("tip.them");
+    }
+
+    /**
+     * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
+     * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Oracle Corporation 25+36-3489
      */
     public static String tip_version() {
@@ -1020,7 +1088,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 鼠标拖拽浮窗即可移动浮窗
+     * @return <p>鼠标拖拽浮窗即可移动浮窗</p>
      * 按下esc 即可保存浮窗位置
      */
     public static String text_saveFloatingCoordinate() {
@@ -1028,9 +1096,9 @@ public class i18nFinal {
     }
 
     /**
-     * @return 拖拽浮窗边缘即可调整浮窗大小
-     * 鼠标拖拽浮窗即可移动浮窗
-     * 按下esc 即可保存浮窗位置
+     * @return <p>拖拽浮窗边缘即可调整浮窗大小</p>
+     * <p>鼠标拖拽浮窗即可移动浮窗</p>
+     * 按下 esc 即可保存浮窗位置
      */
     public static String text_saveFindImgConfig() {
         return bundle.getString("saveFindImgConfig") + bundle.getString("saveFloatingCoordinate");
@@ -1261,6 +1329,76 @@ public class i18nFinal {
     }
 
     /**
+     * @return 检查到序号为：
+     */
+    public static String text_checkIndex() {
+        return bundle.getString("checkIndex");
+    }
+
+    /**
+     * @return 无法获取到要点击的窗口信息
+     */
+    public static String text_noClickWindowInfo() {
+        return bundle.getString("noClickWindowInfo");
+    }
+
+    /**
+     * @return 无法获取到终止操作窗口信息
+     */
+    public static String text_noStopWindowInfo() {
+        return bundle.getString("noStopWindowInfo");
+    }
+
+    /**
+     * @return 正在检查图像识别范围设置
+     */
+    public static String text_checkingWindowInfo() {
+        return bundle.getString("checkingWindowInfo");
+    }
+
+    /**
+     * @return 正在检查跳转逻辑参数设置
+     */
+    public static String text_checkJumpSetting() {
+        return bundle.getString("checkJumpSetting");
+    }
+
+    /**
+     * @return 正在获取最新的目标窗口信息
+     */
+    public static String text_gettingWindowInfo() {
+        return bundle.getString("gettingWindowInfo");
+    }
+
+    /**
+     * @return 正在更新目标窗口信息
+     */
+    public static String text_updatingWindowInfo() {
+        return bundle.getString("updatingWindowInfo");
+    }
+
+    /**
+     * @return 图像识别范围设置异常
+     */
+    public static String text_windowInfoErr() {
+        return bundle.getString("windowInfoErr");
+    }
+
+    /**
+     * @return 跳转逻辑设置异常
+     */
+    public static String text_jumpSettingErr() {
+        return bundle.getString("jumpSettingErr");
+    }
+
+    /**
+     * @return 未记录窗口信息
+     */
+    public static String text_windowInfoNull() {
+        return bundle.getString("windowInfoNull");
+    }
+
+    /**
      * @return 坐标：
      */
     public static String text_point() {
@@ -1314,6 +1452,13 @@ public class i18nFinal {
      */
     public static String text_mouseClickOpenNull() {
         return bundle.getString("mouseClickOpenNull");
+    }
+
+    /**
+     * @return 文件不存在
+     */
+    public static String text_mouseClickNull() {
+        return bundle.getString("mouseClickNull");
     }
 
     /**
@@ -1555,7 +1700,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 容量不能小于0
+     * @return 容量不能小于 0
      */
     public static String text_minSize() {
         return bundle.getString("minSize");
@@ -1576,6 +1721,69 @@ public class i18nFinal {
     }
 
     /**
+     * @return 无法获取当前焦点应用 PID:
+     */
+    public static String text_getPidErr() {
+        return bundle.getString("getPidErr");
+    }
+
+    /**
+     * @return 获取 Mac 焦点窗口信息失败
+     */
+    public static String text_getMacFocusErr() {
+        return bundle.getString("getMacFocusErr");
+    }
+
+    /**
+     * @return 无法获取焦点应用路径
+     */
+    public static String text_geFocusPathErr() {
+        return bundle.getString("geFocusPathErr");
+    }
+
+    /**
+     * @return 无法获取窗口信息，窗口可能已经关闭
+     */
+    public static String text_noWindowInfo() {
+        return bundle.getString("noWindowInfo");
+    }
+
+    /**
+     * @return 不符合输入范围
+     */
+    public static String text_errRange() {
+        return bundle.getString("errRange");
+    }
+
+    /**
+     * @return 更新成功，受影响的操作共有：
+     */
+    public static String text_updateNum() {
+        return bundle.getString("updateNum");
+    }
+
+    /**
+     * @return 操作列表为空
+     */
+    public static String text_noUpdateNum() {
+        return bundle.getString("noUpdateNum");
+    }
+
+    /**
+     * @return 窗口信息已更新
+     */
+    public static String text_updateSuccess() {
+        return bundle.getString("updateSuccess");
+    }
+
+    /**
+     * @return 无法展示窗口位置，窗口可能已隐藏
+     */
+    public static String text_windowHidden() {
+        return bundle.getString("windowHidden");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
@@ -1585,15 +1793,141 @@ public class i18nFinal {
     /**
      * @return 保存识别区域
      */
-    public static String clickDetail_saveRegion() {
-        return bundle.getString("clickDetail.saveRegion");
+    public static String findImgSet_saveRegion() {
+        return bundle.getString("findImgSet.saveRegion");
+    }
+
+    /**
+     * @return 自动操作目标窗口
+     */
+    public static String findImgSet_tagetWindow() {
+        return bundle.getString("findImgSet.tagetWindow");
+    }
+
+    /**
+     * @return 更新窗口数据
+     */
+    public static String findImgSet_updateWindow() {
+        return bundle.getString("findImgSet.updateWindow");
+    }
+
+    /**
+     * @return 更新到操作列表
+     */
+    public static String findImgSet_updateList() {
+        return bundle.getString("findImgSet.updateList");
+    }
+
+    /**
+     * @return 展示窗口位置
+     */
+    public static String findImgSet_showWindow() {
+        return bundle.getString("findImgSet.showWindow");
+    }
+
+    /**
+     * @return 删除窗口信息
+     */
+    public static String findImgSet_deleteWindow() {
+        return bundle.getString("findImgSet.deleteWindow");
+    }
+
+    /**
+     * @return 进程名称：
+     */
+    public static String findImgSet_PName() {
+        return bundle.getString("findImgSet.PName");
+    }
+
+    /**
+     * @return 窗口标题：
+     */
+    public static String findImgSet_windowTitle() {
+        return bundle.getString("findImgSet.windowTitle");
+    }
+
+    /**
+     * @return 窗口位置：
+     */
+    public static String findImgSet_windowLocation() {
+        return bundle.getString("findImgSet.windowLocation");
+    }
+
+    /**
+     * @return 窗口大小：
+     */
+    public static String findImgSet_windowSize() {
+        return bundle.getString("findImgSet.windowSize");
+    }
+
+    /**
+     * @return 进程 ID：
+     */
+    public static String findImgSet_PID() {
+        return bundle.getString("findImgSet.PID");
+    }
+
+    /**
+     * @return 进程路径：
+     */
+    public static String findImgSet_windowPath() {
+        return bundle.getString("findImgSet.windowPath");
+    }
+
+    /**
+     * @return 正在记录窗口信息
+     */
+    public static String findImgSet_finding() {
+        return bundle.getString("findImgSet.finding");
+    }
+
+    /**
+     * @return 已记录窗口信息
+     */
+    public static String findImgSet_getInfo() {
+        return bundle.getString("findImgSet.getInfo");
+    }
+
+    /**
+     * @return 未找到窗口信息请重试
+     */
+    public static String findImgSet_notFind() {
+        return bundle.getString("findImgSet.notFind");
+    }
+
+    /**
+     * @return 松开鼠标即可记录窗口信息
+     */
+    public static String findImgSet_released() {
+        return bundle.getString("findImgSet.released");
+    }
+
+    /**
+     * @return 正在记录窗口信息
+     */
+    public static String findImgSet_recording() {
+        return bundle.getString("findImgSet.recording");
+    }
+
+    /**
+     * @return 秒后开始记录窗口信息
+     */
+    public static String findImgSet_wait() {
+        return bundle.getString("findImgSet.wait");
+    }
+
+    /**
+     * @return 未设置目标窗口
+     */
+    public static String findImgSet_noWindow() {
+        return bundle.getString("findImgSet.noWindow");
     }
 
     /**
      * @return 显示识别区域
      */
-    public static String clickDetail_showRegion() {
-        return bundle.getString("clickDetail.showRegion");
+    public static String findImgSet_showRegion() {
+        return bundle.getString("findImgSet.showRegion");
     }
 
     /**
@@ -2531,6 +2865,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 识别指定窗口
+     */
+    public static String findImgType_window() {
+        return bundle.getString("findImgType.window");
+    }
+
+    /**
      * @return 识别指定区域
      */
     public static String findImgType_region() {
@@ -2548,7 +2889,8 @@ public class i18nFinal {
     public static void updateFindImgTypeList() {
         List<String> newList = Arrays.asList(
                 findImgType_all(),
-                findImgType_region());
+                findImgType_region(),
+                findImgType_window());
         findImgTypeList.clear();
         findImgTypeList.addAll(newList);
     }
@@ -2565,6 +2907,7 @@ public class i18nFinal {
         findImgTypeMap.clear();
         findImgTypeMap.put(FindImgTypeEnum.ALL.ordinal(), findImgType_all());
         findImgTypeMap.put(FindImgTypeEnum.REGION.ordinal(), findImgType_region());
+        findImgTypeMap.put(FindImgTypeEnum.WINDOW.ordinal(), findImgType_window());
     }
 
     /**
@@ -3037,6 +3380,66 @@ public class i18nFinal {
     }
 
     /**
+     * javaFX 原生外观
+     */
+    public static String theme_javafx() {
+        return bundle.getString("theme.javafx");
+    }
+
+    /**
+     * 白天模式
+     */
+    public static String theme_light() {
+        return bundle.getString("theme.light");
+    }
+
+    /**
+     * 夜晚模式
+     */
+    public static String theme_dark() {
+        return bundle.getString("theme.dark");
+    }
+
+    /**
+     * 跟随系统
+     */
+    public static String theme_auto() {
+        return bundle.getString("theme.auto");
+    }
+
+    /**
+     * 外观选项
+     */
+    public static final List<String> themeList = new ArrayList<>();
+
+    /**
+     * 更新外观选项
+     */
+    public static void updateThemeList() {
+        themeList.clear();
+        themeList.add(theme_javafx());
+        themeList.add(theme_light());
+        themeList.add(theme_dark());
+        themeList.add(theme_auto());
+    }
+
+    /**
+     * 外观选项映射
+     */
+    public static final BidiMap<Integer, String> themeMap = new DualHashBidiMap<>();
+
+    /**
+     * 更新外观选项映射
+     */
+    public static void updateThemeMap() {
+        themeMap.clear();
+        themeMap.put(ThemeEnum.JavaFx.ordinal(), theme_javafx());
+        themeMap.put(ThemeEnum.Light.ordinal(), theme_light());
+        themeMap.put(ThemeEnum.Dark.ordinal(), theme_dark());
+        themeMap.put(ThemeEnum.Auto.ordinal(), theme_auto());
+    }
+
+    /**
      * 切换语言下拉框选项
      */
     public static final BidiMap<Locale, String> languageMap = new DualHashBidiMap<>();
@@ -3089,6 +3492,10 @@ public class i18nFinal {
         updateFindImgTypeList();
         // 更新图像识别区域类型选项映射
         updateFindImgTypeMap();
+        // 更新外观选项
+        updateThemeList();
+        // 更新外观选项映射
+        updateThemeMap();
     }
 
 }

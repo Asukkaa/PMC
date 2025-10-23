@@ -7,7 +7,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AboutController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-        <Label prefHeight="25" text="%about.aboutLabel0"/>
+        <Label styleClass="label-low" text="%about.aboutLabel0"/>
 
         <HBox spacing="10">
             <ImageView fx:id="logo_Abt" fitWidth="140" fitHeight="140" preserveRatio="true">
@@ -16,37 +16,33 @@
 
             <VBox spacing="10">
                 <HBox>
-                    <Label prefHeight="20" fx:id="title_Abt" textFill="hotpink"/>
-                    <Label prefHeight="20" text="%about.aboutLabel1"/>
+                    <Label styleClass="label-low" fx:id="title_Abt" textFill="hotpink"/>
+                    <Label styleClass="label-low" text="%about.aboutLabel1"/>
                 </HBox>
-
-                <Label prefHeight="20" text="%about.aboutLabel2"/>
-
-                <Label prefHeight="20" text="%about.aboutLabel3"/>
-
-                <Label prefHeight="20" text="%about.aboutLabel4"/>
-
-                <Label prefHeight="20" text="%about.aboutLabel5"/>
+                <Label styleClass="label-low" text="%about.aboutLabel2"/>
+                <Label styleClass="label-low" text="%about.aboutLabel3"/>
+                <Label styleClass="label-low" text="%about.aboutLabel4"/>
+                <Label styleClass="label-low" text="%about.aboutLabel5"/>
             </VBox>
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="25" text="%about.logsPath"/>
-            <Label prefHeight="25" prefWidth="400" fx:id="logsPath_Abt"/>
+            <Label text="%about.logsPath"/>
+            <Label prefWidth="400" fx:id="logsPath_Abt"/>
 
-            <Label prefHeight="25" text="%about.logsNum"/>
-            <TextField fx:id="logsNum_Abt" prefHeight="20" prefWidth="50"/>
-            <Label prefHeight="25" text="个"/>
+            <Label text="%about.logsNum"/>
+            <TextField fx:id="logsNum_Abt" styleClass="label-low" prefWidth="50"/>
+            <Label text="%unit.piece"/>
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="25" text="%about.email"/>
-            <Label fx:id="mail_Abt" prefHeight="25" textFill="blue" text="csolxqt@foxmail.com"/>
+            <Label styleClass="label-low" text="%about.email"/>
+            <Label fx:id="mail_Abt" styleClass="label-low" textFill="blue" text="csolxqt@foxmail.com"/>
         </HBox>
 
         <HBox spacing="5">
-            <Label prefHeight="45" text="%about.appreciate"/>
-            <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style" prefHeight="20">
+            <Label style="-fx-pref-height: 45" text="%about.appreciate"/>
+            <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style">
                 <graphic>
                     <ImageView>
                         <Image url="@../icon/Gift.png"/>
@@ -57,67 +53,61 @@
 
         <Separator/>
 
-        <Label prefHeight="25" text="%about.git"/>
+        <Label styleClass="label-low" text="%about.git"/>
 
         <HBox spacing="10">
-            <Label prefHeight="25" text="%about.gitHub"/>
-            <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" style="-fx-cursor: hand"
-                    text="%about.openGitHubLinkBtn_Abt"/>
+            <Label text="%about.gitHub"/>
+            <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" text="%about.openGitHubLinkBtn_Abt"/>
 
             <Label prefWidth="100"/>
 
-            <Label prefHeight="25" text="%about.gitee"/>
-            <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" style="-fx-cursor: hand"
-                    text="%about.openGiteeLinkBtn_Abt"/>
+            <Label text="%about.gitee"/>
+            <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" text="%about.openGiteeLinkBtn_Abt"/>
         </HBox>
 
         <Separator/>
 
-        <VBox spacing="15">
-            <Label prefHeight="25" text="%about.versionUpdate"/>
-            <Label prefHeight="25" text="%about.download"/>
+        <VBox spacing="5">
+            <Label styleClass="label-low" text="%about.versionUpdate"/>
+            <Label styleClass="label-low" text="%about.download"/>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%about.openBaiduLinkBtn"/>
-                    <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" style="-fx-cursor: hand"
-                            text="%about.latestVersion"/>
+                <HBox styleClass="hBox-medium">
+                    <Label text="%about.openBaiduLinkBtn"/>
+                    <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%about.openQuarkLinkBtn"/>
-                    <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" style="-fx-cursor: hand"
-                            text="%about.latestVersion"/>
+                <HBox styleClass="hBox-medium">
+                    <Label text="%about.openQuarkLinkBtn"/>
+                    <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%about.openXunleiLinkBtn"/>
-                    <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" style="-fx-cursor: hand"
-                            text="%about.latestVersion"/>
+                <HBox styleClass="hBox-medium">
+                    <Label text="%about.openXunleiLinkBtn"/>
+                    <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" text="%about.latestVersion"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-long">
-                    <Label prefHeight="25" text="%update.checkUpdate"/>
-                    <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" style="-fx-cursor: hand"
-                            text="%update.checkUpdate_Abt"/>
+                <HBox styleClass="hBox-medium">
+                    <Label text="%update.checkUpdate"/>
+                    <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" text="%update.checkUpdate_Abt"/>
                 </HBox>
 
-                <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" style="-fx-cursor: hand"
-                          prefHeight="25" prefWidth="350" text="%update.autoCheck_Abt"/>
+                <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" prefWidth="400"
+                          text="%update.autoCheck_Abt"/>
 
-                <Label prefHeight="25" textFill="red" text="%about.autoUpdate"/>
+                <Label textFill="red" text="%about.autoUpdate"/>
             </HBox>
 
             <VBox>
-                <Label fx:id="checkMassage_Abt"/>
-                <Label fx:id="checkDate_Abt"/>
+                <Label styleClass="label-low" fx:id="checkMassage_Abt"/>
+                <Label styleClass="label-low" fx:id="checkDate_Abt"/>
             </VBox>
 
             <HBox spacing="5">
-                <Label prefHeight="25" text="%about.version"/>
-                <Label fx:id="version_Abt" prefHeight="25" textFill="limegreen"/>
+                <Label styleClass="label-low" text="%about.version"/>
+                <Label styleClass="label-low" fx:id="version_Abt" textFill="limegreen"/>
             </HBox>
         </VBox>
     </VBox>

@@ -4,14 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
+import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
 
 /**
  * 自动操作步骤类
@@ -44,6 +50,21 @@ public class ClickPositionBean {
      * 起始纵（Y）坐标
      */
     String startY;
+
+    /**
+     * 相对横（X）坐标
+     */
+    String relativeX;
+
+    /**
+     * 相对纵（Y）坐标
+     */
+    String relativeY;
+
+    /**
+     * 是否启用相对坐标 0-不启用，1-启用
+     */
+    String useRelative = unActivation;
 
     /**
      * 点击时长（单位：毫秒）
@@ -177,12 +198,12 @@ public class ClickPositionBean {
     /**
      * 是否启用随机点击坐标 0-不启用，1-启用
      */
-    String randomClick;
+    String randomClick = unActivation;
 
     /**
      * 是否启用随机轨迹 0-不启用，1-启用
      */
-    String randomTrajectory;
+    String randomTrajectory = unActivation;
 
     /**
      * 随机偏移时长（单位：毫秒）
@@ -192,17 +213,17 @@ public class ClickPositionBean {
     /**
      * 是否启用随机点击时长 0-不启用，1-启用
      */
-    String randomClickTime;
+    String randomClickTime = unActivation;
 
     /**
      * 是否启用随机等待时长 0-不启用，1-启用
      */
-    String randomWaitTime;
+    String randomWaitTime = unActivation;
 
     /**
      * 是否启用随机点击间隔 0-不启用，1-启用
      */
-    String randomClickInterval;
+    String randomClickInterval = unActivation;
 
     /**
      * 匹配图像坐标横轴偏移量
@@ -248,12 +269,37 @@ public class ClickPositionBean {
                 || (timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval)
                 // 拖拽时如果轨迹点为空则认为是结束拖拽，直接添加结束轨迹点
                 || (isDragging && pressButtons == null)) {
-            TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean();
-            trajectoryPointBean.setPressButtons(pressButtons)
+            TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean()
+                    .setPressButtons(pressButtons)
                     .setTimestamp(timestamp)
                     .setX(x)
                     .setY(y);
+            if (clickWindowConfig != null &&
+                    FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
+                WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+                if (windowInfo != null) {
+                    trajectoryPointBean.updatePosition(windowInfo);
+                }
+            }
             moveTrajectory.add(trajectoryPointBean);
+        }
+    }
+
+    /**
+     * 换算相对坐标
+     */
+    public void updateRelativePosition() {
+        if (clickWindowConfig != null &&
+                FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
+            WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+            if (windowInfo != null) {
+                if (StringUtils.isNotBlank(startX) && StringUtils.isNotBlank(startY)) {
+                    Map<String, String> relativePosition = calculateRelativePosition(windowInfo,
+                            Integer.parseInt(startX), Integer.parseInt(startY));
+                    relativeX = relativePosition.get(RelativeX);
+                    relativeY = relativePosition.get(RelativeY);
+                }
+            }
         }
     }
 

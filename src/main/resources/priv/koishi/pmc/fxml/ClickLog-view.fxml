@@ -4,11 +4,11 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane_Log" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="priv.koishi.pmc.Controller.ClickLogController">
-    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
         <HBox fx:id="fileNumberHBox_Log" spacing="10">
             <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand" text="%listText.removeAll"/>
 
-            <Label fx:id="dataNumber_Log" alignment="CENTER_RIGHT" prefHeight="25" text="%listText.null"/>
+            <Label fx:id="dataNumber_Log" alignment="CENTER_RIGHT" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Log">

@@ -1,4 +1,4 @@
-package priv.koishi.pmc.EventBus;
+package priv.koishi.pmc.Event;
 
 /**
  * 设置页加载完成事件

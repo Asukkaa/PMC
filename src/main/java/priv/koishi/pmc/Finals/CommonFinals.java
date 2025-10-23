@@ -26,7 +26,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "3.2.0";
+    public static final String version = "4.0.0";
 
     /**
      * jdk 版本
@@ -36,7 +36,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.09.18";
+    public static final String buildDate = "2025.10.23";
 
     /**
      * 文件后缀名：bat
@@ -164,12 +164,12 @@ public class CommonFinals {
     public static final String percentage = " %";
 
     /**
-     * 程序logo
+     * 程序 logo
      */
     public static String logoPath = "icon/PMC.png";
 
     /**
-     * css样式文件路径
+     * css 样式文件路径
      */
     public static String stylesCss = "css/Styles.css";
 
@@ -184,27 +184,27 @@ public class CommonFinals {
     public static String resourcesPath = "src/main/resources" + resourcePath;
 
     /**
-     * jpackage打包后的资源文件路径
+     * jpackage 打包后的资源文件路径
      */
     public static String packagePath = "/bin/";
 
     /**
-     * log文件夹名称
+     * log 文件夹名称
      */
     public static final String logs = "logs";
 
     /**
-     * log文件夹目录
+     * log 文件夹目录
      */
     public static final String logsDir = packagePath + logs;
 
     /**
-     * log4j配置文件名称
+     * log4j 配置文件名称
      */
     public static String log4j2 = "log4j2.xml";
 
     /**
-     * app配置文件路径
+     * app 配置文件路径
      */
     public static final String configFile = "config/config.properties";
 
@@ -224,22 +224,22 @@ public class CommonFinals {
     public static final String systemName = System.getProperty("os.name").toLowerCase();
 
     /**
-     * win操作系统简称
+     * win 操作系统简称
      */
     public static final String win = "win";
 
     /**
-     * mac操作系统简称
+     * mac 操作系统简称
      */
     public static final String mac = "mac";
 
     /**
-     * 是否为win操作系统（true-win系统，false-非win系统）
+     * 是否为 win 操作系统（true-win 系统，false-非 win 系统）
      */
     public static final boolean isWin = systemName.contains(win);
 
     /**
-     * 是否为mac操作系统（true-mac系统，false-非mac系统）
+     * 是否为 mac 操作系统（true-mac 系统，false-非 mac 系统）
      */
     public static final boolean isMac = systemName.contains(mac);
 
@@ -249,17 +249,17 @@ public class CommonFinals {
     public static final String userHome = System.getProperty("user.home");
 
     /**
-     * idea中程序运行目录
+     * idea 中程序运行目录
      */
     public static final String userDir = System.getProperty("user.dir");
 
     /**
-     * java home目录（win为runtime目录，mac为../runtime/Contents/Home）
+     * java home 目录（win 为 runtime 目录，mac 为 ../runtime/Contents/Home）
      */
     public static final String javaHome = System.getProperty("java.home");
 
     /**
-     * 程序核心目录（win为根目录，mac为../runtime/Contents）
+     * 程序核心目录（win 为根目录，mac 为 ../runtime/Contents）
      */
     public static final String rootDir = new File(javaHome).getParent();
 
@@ -269,52 +269,52 @@ public class CommonFinals {
     public static final String appLaunchPath = getAppLaunchPath();
 
     /**
-     * 获取应用根目录(win为应用名目录，mac为应用程序目录)
+     * 获取应用根目录(win 为应用名目录，mac 为应用程序目录)
      */
     public static final String appRootPath = new File(appLaunchPath).getParent();
 
     /**
-     * 判断程序是否在 idea 中运行(在 idea 环境运为 true，其他环境为 false)
+     * 判断程序是否在 IDEA 中运行(在 IDEA 环境运为 true，其他环境为 false)
      */
     public static final boolean isRunningFromIDEA = isRunningFromIDEA();
 
     /**
-     * app目录
+     * app 目录
      */
     public static final String appDirectory = "/app";
 
     /**
-     * Contents目录
+     * Contents 目录
      */
     public static final String contentsDirectory = "/Contents";
 
     /**
-     * cfg文件路径
+     * cfg 文件路径
      */
     public static final String cfgFilePath = getCFGPath();
 
     /**
-     * 当前GC类型
+     * 当前 GC类 型
      */
     public static final String currentGCType = getCurrentGCType();
 
     /**
-     * jvm最大内存设置参数
+     * jvm 最大内存设置参数
      */
     public static final String Xmx = "-Xmx";
 
     /**
-     * gc类型设置参数
+     * gc 类型设置参数
      */
     public static final String XX = "-XX:+Use";
 
     /**
-     * jvm参数
+     * jvm 参数
      */
     public static final List<String> jvmArgs = Arrays.asList(Xmx, XX);
 
     /**
-     * cfg文件jvm参数头
+     * cfg 文件 jvm 参数头
      */
     public static final String javaOptions = "java-options=";
 
@@ -359,6 +359,16 @@ public class CommonFinals {
     public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
 
     /**
+     * macOS 要排除窗口识别的进程地址
+     */
+    public static final List<String> macSysNoWindowPath = Arrays.asList(
+            "/System/Library/CoreServices/Spotlight.app",
+            "/System/Library/CoreServices/ControlCenter.app",
+            "/System/Library/CoreServices/SystemUIServer.app",
+            "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+    );
+
+    /**
      * 更新服务阿里云 uniCloud 地址
      */
     public static final String uniCloudCheckUpdateURL_aliyun = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/PMCUpdate";
@@ -369,7 +379,7 @@ public class CommonFinals {
     public static final String uniCloudCheckUpdateURL_alipay = "https://env-00jxtp3qdq80.dev-hz.cloudbasefunction.cn/PMCUpdate";
 
     /**
-     * 检测更新URL数组
+     * 检测更新 URL 数组
      */
     public static final String[] urls = {
             uniCloudCheckUpdateURL_aliyun,
@@ -392,12 +402,12 @@ public class CommonFinals {
     public static final String xunleiLink = "https://pan.xunlei.com/s/VOKjQlqFxTDbJNN7yRA_DLVgA1?pwd=gx3q#";
 
     /**
-     * github地址
+     * github 地址
      */
     public static final String githubLink = "https://github.com/Asukkaa/PMC";
 
     /**
-     * gitee地址
+     * gitee 地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
@@ -472,6 +482,31 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 更新窗口信息消息气泡显示事件（单位：秒）
+     */
+    public static final int updateListMassageTime = 2;
+
+    /**
+     * 绝对横坐标标识
+     */
+    public static String AbsoluteX = "absoluteX";
+
+    /**
+     * 绝对纵坐标标识
+     */
+    public static String AbsoluteY = "absoluteY";
+
+    /**
+     * 相对横坐标标识
+     */
+    public static String RelativeX = "relativeX";
+
+    /**
+     * 相对纵坐标标识
+     */
+    public static String RelativeY = "relativeY";
+
+    /**
      * 默认循环次数
      */
     public static final String defaultLoopTime = "1";
@@ -512,14 +547,19 @@ public class CommonFinals {
     public static final String defaultStopRetryNum = "0";
 
     /**
+     * 默认设置目标窗口准备时间
+     */
+    public static final String defaultFindWindowWait = "3";
+
+    /**
      * 默认录制准备时间
      */
-    public static final String defaultPreparationRecordTime = "3";
+    public static final String defaultPreparationRecord = "3";
 
     /**
      * 默认运行准备时间
      */
-    public static final String defaultPreparationRunTime = "3";
+    public static final String defaultPreparationRun = "3";
 
     /**
      * 默认悬信息浮窗位置横坐标
@@ -544,7 +584,7 @@ public class CommonFinals {
     /**
      * 默认日志窗口宽度
      */
-    public static final String defaultLogWidth = "1000";
+    public static final String defaultLogWidth = "1300";
 
     /**
      * 默认日志窗口高度
@@ -554,7 +594,7 @@ public class CommonFinals {
     /**
      * 默认操作步骤详情窗口宽度
      */
-    public static final String defaultClickDetailWidth = "1200";
+    public static final String defaultClickDetailWidth = "1300";
 
     /**
      * 默认操作步骤详情窗口高度
@@ -572,16 +612,6 @@ public class CommonFinals {
     public static final String defaultTaskDetailHeight = "400";
 
     /**
-     * 默认信息浮窗高度
-     */
-    public static final int defaultFloatingHeightInt = 160;
-
-    /**
-     * 默认信息浮窗宽度
-     */
-    public static final int defaultFloatingWidthInt = 250;
-
-    /**
      * 默认信息浮窗宽度
      */
     public static final String defaultFloatingWidth = "250";
@@ -589,7 +619,17 @@ public class CommonFinals {
     /**
      * 默认信息浮窗高度
      */
-    public static final String defaultFloatingHeight = "160";
+    public static final String defaultFloatingHeight = "220";
+
+    /**
+     * 默认信息浮窗高度
+     */
+    public static final int defaultFloatingHeightInt = Integer.parseInt(defaultFloatingHeight);
+
+    /**
+     * 默认信息浮窗宽度
+     */
+    public static final int defaultFloatingWidthInt = Integer.parseInt(defaultFloatingWidth);
 
     /**
      * 默认应用窗口宽度
@@ -842,5 +882,21 @@ public class CommonFinals {
     public static final String key_clickAllRegion = "clickAllRegion";
 
     public static final String key_stopAllRegion = "stopAllRegion";
+
+    public static final String key_findWindowWait = "findWindowWait";
+
+    public static final String key_titleCoordinate = "titleCoordinate";
+
+    public static final String key_updateClickWindow = "updateClickWindow";
+
+    public static final String key_updateStopWindow = "updateStopWindow";
+
+    public static final String key_clickWindowPath = "clickWindowPath";
+
+    public static final String key_stopWindowPath = "stopWindowPath";
+
+    public static final String key_useRelatively = "useRelatively";
+
+    public static final String key_theme = "theme";
 
 }

@@ -94,11 +94,10 @@ public class FloatingWindow {
         String name = config.getName();
         config.setMassageLabel(massageLabel);
         Label nameLabel = new Label();
-        if (config.isShowName()) {
-            nameLabel.setText(name);
-        }
+        nameLabel.setText(name);
         nameLabel.setStyle(fontSize);
         nameLabel.setTextFill(color);
+        config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.getChildren().addAll(floatingPosition, massageLabel, nameLabel);
         root.getChildren().addAll(rectangle, vBox);
@@ -427,16 +426,24 @@ public class FloatingWindow {
             rectangle.setY(y);
             rectangle.setWidth(w);
             rectangle.setHeight(h);
+            floatingStage.setX(x);
+            floatingStage.setY(y);
+            floatingStage.setWidth(w);
+            floatingStage.setHeight(h);
+            config.getMassageLabel().setText(config.getMassage());
             setPositionText(config, "");
             Button button = config.getButton();
             if (button != null) {
                 button.setText(config.getHideButtonText());
                 addToolTip(config.getHideButtonToolTip(), button);
             }
+            config.getNameeLabel().setVisible(config.isShowName());
             floatingStage.show();
             // 监听键盘事件
-            startNativeKeyListener();
-            floatingWindows.add(config);
+            if (config.isAddCloseKey()) {
+                startNativeKeyListener();
+                floatingWindows.add(config);
+            }
         });
     }
 
@@ -468,8 +475,8 @@ public class FloatingWindow {
      *
      * @param config 浮窗配置
      * @param text   要更新的文本
-     * @param x      浮窗X坐标
-     * @param y      浮窗Y坐标
+     * @param x      浮窗 X 坐标
+     * @param y      浮窗 Y 坐标
      * @param w      浮窗宽度
      * @param h      浮窗高度
      */
@@ -505,7 +512,7 @@ public class FloatingWindow {
                             .setX(floatingX)
                             .setY(floatingY);
                     floatingConfig.setConfig(windowConfig);
-                    if (StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
+                    if (floatingConfig.isCloseSave() && StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
                         try {
                             saveFloatingCoordinate(floatingConfig);
                         } catch (IOException e) {

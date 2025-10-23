@@ -50,7 +50,7 @@ public class TaskUtils {
     }
 
     /**
-     * 抛出task异常
+     * 抛出 task 异常
      *
      * @param task     有异常的线程任务
      * @param taskBean 线程任务所需参数

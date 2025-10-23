@@ -1,13 +1,14 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -15,6 +16,8 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
@@ -26,28 +29,36 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Callback.FileChooserCallback;
 import priv.koishi.pmc.Utils.FileUtils;
+import priv.koishi.pmc.Utils.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.MainApplication.isDarkTheme;
 import static priv.koishi.pmc.Service.ReadDataService.readAllFilesTask;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
+ * 自定义文件选择器控制器
+ *
  * @author KOISHI
  * Date:2025-08-04
  * Time:22:12
  */
-public class FileChooserController extends RootController {
+public class FileChooserController extends ManuallyChangeThemeController {
 
     /**
      * 页面标识符
@@ -60,9 +71,9 @@ public class FileChooserController extends RootController {
     private FileChooserConfig fileChooserConfig;
 
     /**
-     * 带鼠标悬停提示的内容变化监听器
+     * 带鼠标悬停提示的内容变化删除器
      */
-    private final Map<Object, ChangeListener<?>> changeListeners = new WeakHashMap<>();
+    private final List<Runnable> listenerRemovers = new ArrayList<>();
 
     /**
      * 文件查询任务
@@ -213,7 +224,7 @@ public class FileChooserController extends RootController {
     public void adaption() {
         // 设置组件高度
         double stageHeight = stage.getHeight();
-        tableView_FC.setPrefHeight(stageHeight * 0.6);
+        tableView_FC.setPrefHeight(stageHeight * 0.53);
         // 设置组件宽度
         double stageWidth = stage.getWidth();
         double tableWidth = stageWidth * 0.94;
@@ -229,9 +240,9 @@ public class FileChooserController extends RootController {
      * 设置列表各列宽度
      */
     private void bindPrefWidthProperty() {
-        index_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.04));
+        index_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.05));
         thumb_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.1));
-        name_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.14));
+        name_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.13));
         fileType_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.08));
         path_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.2));
         size_FC.prefWidthProperty().bind(tableView_FC.widthProperty().multiply(0.08));
@@ -270,6 +281,31 @@ public class FileChooserController extends RootController {
         addValueToolTip(fileNameType_FC, tip_fileNameType(), fileNameType_FC.getValue());
         addValueToolTip(hideFileType_FC, tip_hideFileType(), hideFileType_FC.getValue());
         addValueToolTip(fileFilter_FC, tip_directoryNameType(), fileFilter_FC.getValue());
+    }
+
+    /**
+     * 处理要过滤的文件类型
+     *
+     * @param filterFileType 填有空格区分的要过滤的文件类型字符串的文本输入框
+     * @return 要过滤的文件类型list
+     */
+    public static List<String> getFilterExtensionList(TextField filterFileType) {
+        String filterFileTypeValue = filterFileType.getText();
+        return getFilterExtensionList(filterFileTypeValue);
+    }
+
+    /**
+     * 处理要过滤的文件类型
+     *
+     * @param filterFileTypeValue 空格区分的要过滤的文件类型字符串
+     * @return 要过滤的文件类型list
+     */
+    public static List<String> getFilterExtensionList(String filterFileTypeValue) {
+        List<String> filterExtensionList = new ArrayList<>();
+        if (StringUtils.isNotBlank(filterFileTypeValue)) {
+            filterExtensionList = Arrays.asList(filterFileTypeValue.toLowerCase().split(" "));
+        }
+        return filterExtensionList;
     }
 
     /**
@@ -407,6 +443,7 @@ public class FileChooserController extends RootController {
             contextMenu.getItems().stream().parallel().forEach(item -> item.setOnAction(null));
             tableView_FC.setContextMenu(null);
         }
+        removeController();
     }
 
     /**
@@ -423,8 +460,10 @@ public class FileChooserController extends RootController {
                 }
             });
             // 更新行样式方法
-            row.itemProperty().addListener((_, _, _) -> updateRowStyle(row));
-            row.selectedProperty().addListener((_, _, _) -> updateRowStyle(row));
+            row.itemProperty().addListener((_, _, _) ->
+                    updateRowStyle(row));
+            row.selectedProperty().addListener((_, _, _) ->
+                    updateRowStyle(row));
             return row;
         });
     }
@@ -446,16 +485,65 @@ public class FileChooserController extends RootController {
         } else {
             // 根据文件类型设置样式
             String fileType = item.getFileType();
-            if (extension_folder().equals(fileType)) {
-                row.setStyle("-fx-background-color: #e6f7ff;");
-            } else if (PMC.equals(fileType)) {
-                row.setStyle("-fx-background-color: #bdf8b3;");
-            } else if (imageType.contains(fileType)) {
-                row.setStyle("-fx-background-color: #b3cff8;");
+            if (isDarkTheme) {
+                if (extension_folder().equals(fileType)) {
+                    row.setStyle("-fx-background-color: #190800;");
+                } else if (PMC.equals(fileType)) {
+                    row.setStyle("-fx-background-color: #42074c;");
+                } else if (imageType.contains(fileType)) {
+                    row.setStyle("-fx-background-color: #4c3007;");
+                } else {
+                    row.setStyle("");
+                }
             } else {
-                row.setStyle("");
+                if (extension_folder().equals(fileType)) {
+                    row.setStyle("-fx-background-color: #e6f7ff;");
+                } else if (PMC.equals(fileType)) {
+                    row.setStyle("-fx-background-color: #bdf8b3;");
+                } else if (imageType.contains(fileType)) {
+                    row.setStyle("-fx-background-color: #b3cff8;");
+                } else {
+                    row.setStyle("");
+                }
             }
         }
+    }
+
+    /**
+     * 使用自定义文件选择器选择文件
+     *
+     * @param fileChooserConfig 文件查询配置
+     * @return 文件选择器控制器
+     * @throws IOException 页面加载失败、配置文件读取异常
+     */
+    public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
+        URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
+        Parent root = loader.load();
+        FileChooserController controller = loader.getController();
+        controller.initData(fileChooserConfig);
+        Stage detailStage = new Stage();
+        Properties prop = new Properties();
+        InputStream input = checkRunningInputStream(configFile);
+        prop.load(input);
+        double with = Double.parseDouble(prop.getProperty(key_fileChooserWidth, "1300"));
+        double height = Double.parseDouble(prop.getProperty(key_fileChooserHeight, "700"));
+        input.close();
+        Scene scene = new Scene(root, with, height);
+        detailStage.setScene(scene);
+        detailStage.setTitle(fileChooserConfig.getTitle());
+        detailStage.initModality(Modality.APPLICATION_MODAL);
+        setWindowLogo(detailStage, logoPath);
+        // 监听窗口面板宽度变化
+        detailStage.widthProperty().addListener((_, _, _) ->
+                Platform.runLater(controller::adaption));
+        // 监听窗口面板高度变化
+        detailStage.heightProperty().addListener((_, _, _) ->
+                Platform.runLater(controller::adaption));
+        // 设置css样式
+        setWindowCss(scene, stylesCss);
+        detailStage.show();
+        return controller;
     }
 
     /**
@@ -475,31 +563,28 @@ public class FileChooserController extends RootController {
      */
     private void textFieldChangeListener() {
         // 鼠标悬停提示输入的文件名过滤
-        ChangeListener<String> fileNameFilterChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
-        changeListeners.put(fileNameFilter_FC, fileNameFilterChangeListener);
+        Runnable fileNameFilterChangeListener = textFieldValueListener(fileNameFilter_FC, tip_fileNameFilter());
+        listenerRemovers.add(fileNameFilterChangeListener);
         // 鼠标悬停提示输入的需要识别的文件后缀名
-        ChangeListener<String> filterFileTypeChangeListener = textFieldValueListener(filterFileType_FC, tip_filterFileType());
-        changeListeners.put(filterFileType_FC, filterFileTypeChangeListener);
+        Runnable filterFileTypeChangeListener = textFieldValueListener(filterFileType_FC, tip_filterFileType());
+        listenerRemovers.add(filterFileTypeChangeListener);
     }
 
     /**
      * 移除所有监听器
      */
-    @SuppressWarnings("unchecked")
     private void removeAllListeners() {
-        // 处理带鼠标悬停提示的变更监听器集合，遍历所有entry，根据不同类型移除对应的选择/数值监听器
-        changeListeners.forEach((key, listener) -> {
-            if (key instanceof ChoiceBox<?> choiceBox) {
-                choiceBox.getSelectionModel().selectedItemProperty().removeListener((InvalidationListener) listener);
-            } else if (key instanceof Slider slider) {
-                slider.valueProperty().removeListener((ChangeListener<? super Number>) listener);
-            } else if (key instanceof TextInputControl textInput) {
-                textInput.textProperty().removeListener((ChangeListener<? super String>) listener);
-            } else if (key instanceof CheckBox checkBox) {
-                checkBox.selectedProperty().removeListener((ChangeListener<? super Boolean>) listener);
-            }
-        });
-        changeListeners.clear();
+        listenerRemovers.forEach(Runnable::run);
+        listenerRemovers.clear();
+    }
+
+    /**
+     * 手动处理深色主题
+     */
+    public void manuallyChangeTheme() {
+        manuallyChangeThemePane(anchorPane_FC, getClass());
+        setRowDoubleClick();
+        setTextColorProperty(isDarkTheme ? Color.WHITE : Color.BLACK);
     }
 
     /**
@@ -507,6 +592,8 @@ public class FileChooserController extends RootController {
      */
     @FXML
     private void initialize() {
+        // 手动处理深色主题
+        manuallyChangeTheme();
         // 初始化下拉框
         setChoiceBoxItems();
         Platform.runLater(() -> {
