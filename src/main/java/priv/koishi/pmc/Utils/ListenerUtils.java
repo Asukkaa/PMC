@@ -99,13 +99,15 @@ public class ListenerUtils {
         ChangeListener<Boolean> focusedListener = (_, oldFocused, newFocused) -> {
             if (oldFocused && !newFocused) {
                 String newValue = textField.getText();
-                if (!isInDecimalRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
-                    textField.setText("");
-                    new MessageBubble(text_errRange(), 1);
-                } else if (newValue.contains(".")) {
-                    textField.setText(newValue.substring(0, newValue.lastIndexOf(".") + decimalDigits + 1));
+                if (StringUtils.isNotBlank(newValue)) {
+                    if (!isInDecimalRange(newValue, min, max)) {
+                        textField.setText("");
+                        new MessageBubble(text_errRange(), 1);
+                    } else if (newValue.contains(".")) {
+                        textField.setText(newValue.substring(0, newValue.lastIndexOf(".") + decimalDigits + 1));
+                    }
+                    addValueToolTip(textField, tip);
                 }
-                addValueToolTip(textField, tip);
             }
         };
         textField.focusedProperty().addListener(focusedListener);
