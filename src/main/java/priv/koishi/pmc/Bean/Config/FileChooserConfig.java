@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * 文件选择器配置类
  *
@@ -30,5 +32,10 @@ public class FileChooserConfig extends FileConfig {
      * 文件选择器窗口标题
      */
     String title;
+
+    /**
+     * 可选文件类型列表
+     */
+    List<String> extensionFilter;
 
 }

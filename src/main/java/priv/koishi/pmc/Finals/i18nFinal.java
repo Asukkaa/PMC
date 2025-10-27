@@ -983,6 +983,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 选择文件夹或文件
+     */
+    public static String text_selectFileFolder() {
+        return bundle.getString("selectFileFolder");
+    }
+
+    /**
      * @return 选择要识别的图片
      */
     public static String text_selectTemplateImg() {
@@ -1008,6 +1015,20 @@ public class i18nFinal {
      */
     public static String text_fileNotExists() {
         return bundle.getString("fileNotExists");
+    }
+
+    /**
+     * @return 测试完成
+     */
+    public static String text_testSuccess() {
+        return bundle.getString("testSuccess");
+    }
+
+    /**
+     * @return 脚本文件不可执行
+     */
+    public static String text_scriptNotExecutable() {
+        return bundle.getString("scriptNotExecutable");
     }
 
     /**
@@ -1781,6 +1802,13 @@ public class i18nFinal {
      */
     public static String text_windowHidden() {
         return bundle.getString("windowHidden");
+    }
+
+    /**
+     * @return 脚本文件
+     */
+    public static String text_script() {
+        return bundle.getString("script");
     }
 
     /**
@@ -3159,6 +3187,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return 打开文件
+     */
+    public static String clickType_openFile() {
+        return bundle.getString("clickType.openFile");
+    }
+
+    /**
+     * @return 打开网址
+     */
+    public static String clickType_openUrl() {
+        return bundle.getString("clickType.openUrl");
+    }
+
+    /**
+     * @return 运行脚本
+     */
+    public static String clickType_runScript() {
+        return bundle.getString("clickType.runScript");
+    }
+
+    /**
      * @return 带轨迹的移动
      */
     public static String clickType_moveTrajectory() {
@@ -3194,6 +3243,23 @@ public class i18nFinal {
     }
 
     /**
+     * 打开链接相关选项
+     */
+    public static final List<String> linkList = new ArrayList<>();
+
+    /**
+     * 更新打开链接相关选项
+     */
+    public static void updateLinkList() {
+        List<String> newList = Arrays.asList(
+                clickType_openFile(),
+                clickType_openUrl(),
+                clickType_runScript());
+        linkList.clear();
+        linkList.addAll(newList);
+    }
+
+    /**
      * 自动操作的操作类型选项
      */
     public static final List<String> clickTypeList = new ArrayList<>();
@@ -3202,6 +3268,8 @@ public class i18nFinal {
      * 更新自动操作的操作类型选项
      */
     public static void updateClickTypeList() {
+        // 更新打开链接相关选项
+        updateLinkList();
         List<String> newList = Arrays.asList(
                 clickType_moveTrajectory(),
                 clickType_move(),
@@ -3209,6 +3277,7 @@ public class i18nFinal {
                 clickType_drag(),
                 clickType_moveTo());
         clickTypeList.clear();
+        clickTypeList.addAll(linkList);
         clickTypeList.addAll(newList);
     }
 
@@ -3222,6 +3291,9 @@ public class i18nFinal {
      */
     public static void updateClickTypeMap() {
         clickTypeMap.clear();
+        clickTypeMap.put(ClickTypeEnum.OPEN_FILE.ordinal(), clickType_openFile());
+        clickTypeMap.put(ClickTypeEnum.OPEN_URL.ordinal(), clickType_openUrl());
+        clickTypeMap.put(ClickTypeEnum.RUN_SCRIPT.ordinal(), clickType_runScript());
         clickTypeMap.put(ClickTypeEnum.MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
         clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
         clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());

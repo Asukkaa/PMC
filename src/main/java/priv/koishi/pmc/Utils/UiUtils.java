@@ -651,6 +651,7 @@ public class UiUtils {
                     TableRow<T> tableRow = getTableRow();
                     if (isRedText(tableRow)) {
                         setText(text_badImg());
+                        textFillProperty().unbind();
                         setTextFill(Color.RED);
                         setTooltip(creatTooltip(text_badImg()));
                     } else {

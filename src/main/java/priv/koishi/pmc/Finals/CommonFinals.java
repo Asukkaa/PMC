@@ -36,12 +36,22 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.10.23";
+    public static final String buildDate = "2025.10.27";
 
     /**
      * 文件后缀名：bat
      */
     public static final String bat = ".bat";
+
+    /**
+     * 文件后缀名：cmd
+     */
+    public static final String cmd = ".cmd";
+
+    /**
+     * 文件后缀名：bash
+     */
+    public static final String bash = ".bash";
 
     /**
      * 文件后缀名：sh
@@ -127,6 +137,11 @@ public class CommonFinals {
      * 图片格式后缀名匹配符列表
      */
     public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+
+    /**
+     * 文件后缀名匹配符：bat
+     */
+    public static final String allBat = "*.bat";
 
     /**
      * 文件大小单位：Byte

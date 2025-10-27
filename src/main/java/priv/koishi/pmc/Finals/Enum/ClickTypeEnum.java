@@ -10,6 +10,21 @@ package priv.koishi.pmc.Finals.Enum;
 public enum ClickTypeEnum {
 
     /**
+     * 打开文件
+     */
+    OPEN_FILE,
+
+    /**
+     * 打开网址
+     */
+    OPEN_URL,
+
+    /**
+     * 运行脚本
+     */
+    RUN_SCRIPT,
+
+    /**
      * 带轨迹的移动
      */
     MOVE_TRAJECTORY,

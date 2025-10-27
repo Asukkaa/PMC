@@ -21,7 +21,6 @@
 .checkBox-short {
     -fx-cursor: hand;
     -fx-pref-height: 25;
-    -fx-pref-width: 270;
 }
 
 .hBox-veryShort {

@@ -11,6 +11,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -18,11 +21,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
@@ -33,14 +38,19 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
+import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.URI;
 import java.util.*;
+import java.util.List;
 import java.util.stream.IntStream;
 
+import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
@@ -55,6 +65,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
+import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -91,6 +102,11 @@ public class ClickDetailController extends RootController {
      * 默认终止操作图片识别重试次数
      */
     private String stopRetryNumDefault;
+
+    /**
+     * 导入文件路径
+     */
+    private String inFilePath;
 
     /**
      * 操作列表步骤数量（操作步骤最大跳转序号）
@@ -162,12 +178,13 @@ public class ClickDetailController extends RootController {
     public AnchorPane anchorPane_Det;
 
     @FXML
-    public VBox clickImgVBox_Det, progressBarVBox_Det;
+    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det;
 
     @FXML
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
-            stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det,
-            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det;
+            stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det,
+            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, linkHBox_Det, pathLinkHBox_Det,
+            parameterHBox_Det, pointHBox_Det, commonHBox_Det, workDirHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -184,20 +201,23 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
-            updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det;
+            updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
+            workDir_Det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
             stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det;
 
     @FXML
-    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, clickTypeText_Det,
-            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det;
+    public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
+            clickTypeText_Det, openLink_Det, workPath_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det,
+            parameterValue_Det, openLinkValue_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -241,8 +261,9 @@ public class ClickDetailController extends RootController {
      * @param item 列表选中的数据
      * @throws IllegalAccessException 访问属性异常
      */
-    public void initData(ClickPositionVO item) throws IllegalAccessException {
+    public void initData(ClickPositionVO item, String inFilePath) throws IllegalAccessException {
         selectedItem = item;
+        this.inFilePath = inFilePath;
         isModified = false;
         maxIndex = selectedItem.getTableView().getItems().size();
         clickIndex_Det.setText(String.valueOf(item.getIndex()));
@@ -1004,6 +1025,19 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 获取选择的文件
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    private void getSelectFile(List<? extends File> selectedFile) throws IOException {
+        if (CollectionUtils.isNotEmpty(selectedFile)) {
+            inFilePath = selectedFile.getFirst().getPath();
+            updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
+            setPathLabel(link_Det, inFilePath);
+        }
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -1234,9 +1268,10 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void retryTypeChange() {
+        String value = retryType_Det.getValue();
         retryStep_Det.setText("");
-        retryStepHBox_Det.setVisible(retryType_Step().equals(retryType_Det.getValue()));
-        addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
+        retryStepHBox_Det.setVisible(retryType_Step().equals(value));
+        addValueToolTip(retryType_Det, tip_retryType(), value);
     }
 
     /**
@@ -1244,10 +1279,11 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void matchedTypeChange() {
+        String value = matchedType_Det.getValue();
         matchedStep_Det.setText("");
-        matchedStepHBox_Det.setVisible(clickMatched_step().equals(matchedType_Det.getValue()) ||
-                clickMatched_clickStep().equals(matchedType_Det.getValue()));
-        addValueToolTip(matchedType_Det, tip_matchedType(), matchedType_Det.getValue());
+        matchedStepHBox_Det.setVisible(clickMatched_step().equals(value) ||
+                clickMatched_clickStep().equals(value));
+        addValueToolTip(matchedType_Det, tip_matchedType(), value);
     }
 
     /**
@@ -1255,9 +1291,32 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickTypeChange() {
-        clickTypeHBox_Det.setVisible(clickType_click().equals(clickType_Det.getValue()));
-        addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
-        addValueToolTip(clickTypeText_Det, tip_clickType(), clickType_Det.getValue());
+        String value = clickType_Det.getValue();
+        clickTypeHBox_Det.setVisible(clickType_click().equals(value));
+        addValueToolTip(clickType_Det, tip_clickType(), value);
+        addValueToolTip(clickTypeText_Det, tip_clickType(), value);
+        setPathLabel(link_Det, null);
+        vBox_Det.getChildren().clear();
+        vBox_Det.getChildren().add(commonHBox_Det);
+        if (linkList.contains(value)) {
+            vBox_Det.getChildren().add(pathLinkVBox_Det);
+            testLink_Det.setVisible(true);
+            pathLinkVBox_Det.getChildren().remove(parameterHBox_Det);
+            pathLinkHBox_Det.getChildren().clear();
+            if (clickType_openFile().equals(value)) {
+                pathLinkHBox_Det.getChildren().add(pathHBox_Det);
+                workDirHBox_Det.setVisible(false);
+            } else if (clickType_runScript().equals(value)) {
+                pathLinkVBox_Det.getChildren().add(parameterHBox_Det);
+                pathLinkHBox_Det.getChildren().add(pathHBox_Det);
+                workDirHBox_Det.setVisible(true);
+            } else if (clickType_openUrl().equals(value)) {
+                pathLinkHBox_Det.getChildren().add(linkHBox_Det);
+            }
+        } else {
+            vBox_Det.getChildren().add(clickVBox_Det);
+            testLink_Det.setVisible(false);
+        }
     }
 
     /**
@@ -1395,6 +1454,99 @@ public class ClickDetailController extends RootController {
             mouseStartY_Det.setDisable(false);
             relativelyX_Det.setDisable(true);
             relativelyY_Det.setDisable(true);
+        }
+    }
+
+    /**
+     * 选择目标路径按钮
+     *
+     * @param actionEvent 点击事件
+     * @throws IOException 配置文件读取异常、配置文件保存异常、页面加载失败
+     */
+    @FXML
+    private void pathLinkAction(ActionEvent actionEvent) throws IOException {
+        String value = clickType_Det.getValue();
+        if (clickType_openFile().equals(value)) {
+            FileChooserConfig fileConfig = new FileChooserConfig();
+            fileConfig.setTitle(text_selectFileFolder())
+                    .setConfigPath(configFile_Click)
+                    .setPathKey(key_inFilePath)
+                    .setShowDirectory(search_fileDirectory())
+                    .setShowHideFile(hide_noHideFile())
+                    .setPath(inFilePath);
+            FileChooserController controller = chooserFiles(fileConfig);
+            // 设置回调
+            controller.setFileChooserCallback(this::getSelectFile);
+        } else if (clickType_runScript().equals(value)) {
+            Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(text_script(), allBat);
+            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
+            List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
+            getSelectFile(selectedFile);
+        }
+    }
+
+    /**
+     * 测试目标路径按钮
+     */
+    @FXML
+    private void testLinkAction() throws Exception {
+        String value = clickType_Det.getValue();
+        int time = 2;
+        if (clickType_openFile().equals(value)) {
+            String path = link_Det.getText();
+            if (StringUtils.isNotBlank(path)) {
+                File file = new File(path);
+                if (!file.exists()) {
+                    new MessageBubble(text_fileNotExists(), time);
+                } else {
+                    openFile(path);
+                    new MessageBubble(text_testSuccess(), time);
+                }
+            } else {
+                new MessageBubble(text_pathNull(), time);
+            }
+        } else if (clickType_runScript().equals(value)) {
+            String path = link_Det.getText();
+            if (StringUtils.isNotBlank(path)) {
+                File file = new File(path);
+                if (!file.exists()) {
+                    new MessageBubble(text_fileNotExists(), time);
+                } else {
+                    String workDir = workPath_Det.getText();
+                    String parameter = parameterValue_Det.getText();
+                    runScript(file, workDir, parameter);
+                    new MessageBubble(text_testSuccess(), time);
+                }
+            } else {
+                new MessageBubble(text_pathNull(), time);
+            }
+        } else if (clickType_openUrl().equals(value)) {
+            String url = openLinkValue_Det.getText();
+            if (StringUtils.isNotBlank(url)) {
+                Desktop.getDesktop().browse(new URI(url));
+                new MessageBubble(text_testSuccess(), time);
+            } else {
+                new MessageBubble(text_pathNull(), time);
+            }
+        }
+    }
+
+    /**
+     * 选择工作路径按钮
+     *
+     * @param actionEvent 点击事件
+     * @throws IOException 配置文件读取异常、配置文件保存异常、页面加载失败
+     */
+    @FXML
+    public void workPathAction(ActionEvent actionEvent) throws IOException {
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        String outFilePath = workPath_Det.getText();
+        File selectedFile = creatDirectoryChooser(window, outFilePath, text_selectDirectory());
+        if (selectedFile != null) {
+            inFilePath = selectedFile.getAbsolutePath();
+            updateProperties(configFile_Click, key_inFilePath, inFilePath);
+            setPathLabel(workPath_Det, inFilePath);
         }
     }
 

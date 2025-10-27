@@ -570,7 +570,7 @@ public class AutoClickController extends RootController implements MousePosition
         item.setClickImgSelectPath(clickImgSelectPath);
         item.setStopImgSelectPath(stopImgSelectPath);
         try {
-            controller.initData(item);
+            controller.initData(item, inFilePath);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -1804,11 +1804,13 @@ public class AutoClickController extends RootController implements MousePosition
         if (isFree()) {
             // 读取配置文件
             getProperties();
-            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
-            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
             if (loadFolder_Click.isSelected()) {
+                List<String> extensionFilter = new ArrayList<>();
+                extensionFilter.add(PMC);
+                extensionFilter.add(extension_folder());
                 FileChooserConfig fileConfig = new FileChooserConfig();
-                fileConfig.setTitle(text_selectDirectory())
+                fileConfig.setExtensionFilter(extensionFilter)
+                        .setTitle(text_selectDirectory())
                         .setConfigPath(configFile_Click)
                         .setPathKey(key_inFilePath)
                         .setShowDirectory(search_onlyDirectory())
@@ -1819,6 +1821,8 @@ public class AutoClickController extends RootController implements MousePosition
                 controller.setFileChooserCallback(this::getSelectFile);
             } else {
                 Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+                FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
+                List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
                 List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
                 getSelectFile(selectedFile);
             }

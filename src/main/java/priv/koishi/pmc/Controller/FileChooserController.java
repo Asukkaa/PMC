@@ -180,41 +180,50 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * @param file 列表选中的数据
      */
     private void selectFile(File file) {
-        removeAll();
-        FileConfig fileConfig = new FileConfig();
-        fileConfig.setFilterExtensionList(getFilterExtensionList(filterFileType_FC))
-                .setReverseFileType(reverseFileType_FC.isSelected())
-                .setFilterNameCase(filterNameCase_FC.isSelected())
-                .setFileNameFilter(fileNameFilter_FC.getText())
-                .setShowHideFile(hideFileType_FC.getValue())
-                .setFileNameType(fileNameType_FC.getValue())
-                .setReverseFileName(reverse_FC.isSelected())
-                .setShowDirectory(fileFilter_FC.getValue())
-                .setSortType(sort_type())
-                .setPath(file.getPath())
-                .setReverseSort(true);
-        TaskBean<FileVO> taskBean = new TaskBean<>();
-        taskBean.setProgressBar(progressBar_FC)
-                .setMassageLabel(fileNumber_FC)
-                .setDisableNodes(disableNodes)
-                .setTableView(tableView_FC);
-        readAllFilesTask = readAllFilesTask(taskBean, fileConfig);
-        bindingTaskNode(readAllFilesTask, taskBean);
-        readAllFilesTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            try {
-                addRemoveSameFile(readAllFilesTask.getValue(), false, tableView_FC);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        String path = file.getPath();
+        if (StringUtils.isNotBlank(path)) {
+            String selectedPath;
+            if (file.isFile()) {
+                selectedPath = file.getParent();
+            } else {
+                selectedPath = path;
             }
-            // 获取所选文件路径
-            setPathLabel(filePath_FC, file.getPath());
-            updateTableViewSizeText(tableView_FC, fileNumber_FC, text_file());
-        });
-        if (!readAllFilesTask.isRunning()) {
-            Thread.ofVirtual()
-                    .name("readAllFilesTask-vThread" + tabId)
-                    .start(readAllFilesTask);
+            removeAll();
+            FileConfig fileConfig = new FileConfig();
+            fileConfig.setFilterExtensionList(getFilterExtensionList(filterFileType_FC))
+                    .setReverseFileType(reverseFileType_FC.isSelected())
+                    .setFilterNameCase(filterNameCase_FC.isSelected())
+                    .setFileNameFilter(fileNameFilter_FC.getText())
+                    .setShowHideFile(hideFileType_FC.getValue())
+                    .setFileNameType(fileNameType_FC.getValue())
+                    .setReverseFileName(reverse_FC.isSelected())
+                    .setShowDirectory(fileFilter_FC.getValue())
+                    .setSortType(sort_type())
+                    .setPath(selectedPath)
+                    .setReverseSort(true);
+            TaskBean<FileVO> taskBean = new TaskBean<>();
+            taskBean.setProgressBar(progressBar_FC)
+                    .setMassageLabel(fileNumber_FC)
+                    .setDisableNodes(disableNodes)
+                    .setTableView(tableView_FC);
+            readAllFilesTask = readAllFilesTask(taskBean, fileConfig);
+            bindingTaskNode(readAllFilesTask, taskBean);
+            readAllFilesTask.setOnSucceeded(_ -> {
+                taskUnbind(taskBean);
+                try {
+                    addRemoveSameFile(readAllFilesTask.getValue(), false, tableView_FC);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                // 获取所选文件路径
+                setPathLabel(filePath_FC, selectedPath);
+                updateTableViewSizeText(tableView_FC, fileNumber_FC, text_file());
+            });
+            if (!readAllFilesTask.isRunning()) {
+                Thread.ofVirtual()
+                        .name("readAllFilesTask-vThread" + tabId)
+                        .start(readAllFilesTask);
+            }
         }
     }
 
@@ -682,28 +691,26 @@ public class FileChooserController extends ManuallyChangeThemeController {
     private void confirmSelect() throws IOException {
         ObservableList<FileVO> selectedItems = tableView_FC.getSelectionModel().getSelectedItems();
         List<File> fileVOList = new ArrayList<>();
-        String showDirectory = fileChooserConfig.getShowDirectory();
         if (CollectionUtils.isNotEmpty(selectedItems)) {
             for (FileVO fileVO : selectedItems) {
                 File file = new File(fileVO.getPath());
                 String fileType = fileVO.getFileType();
-                if (search_onlyDirectory().equals(showDirectory)) {
-                    if (extension_folder().equals(fileType)) {
+                List<String> extensionFilter = fileChooserConfig.getExtensionFilter();
+                if (CollectionUtils.isNotEmpty(extensionFilter)) {
+                    if (extensionFilter.contains(fileType)) {
                         fileVOList.add(file);
                     }
-                } else if (search_onlyFile().equals(showDirectory)) {
-                    if (!extension_folder().equals(fileType)) {
-                        List<String> filterExtensionList = fileChooserConfig.getFilterExtensionList();
-                        if (CollectionUtils.isEmpty(filterExtensionList) || filterExtensionList.contains(fileType)) {
-                            fileVOList.add(file);
-                        }
-                    }
+                } else {
+                    fileVOList.add(file);
                 }
             }
         } else {
             // 列表为空时，选择当前目录
-            File file = new File(filePath_FC.getText());
-            fileVOList.add(file);
+            String path = filePath_FC.getText();
+            if (StringUtils.isNotBlank(path)) {
+                File file = new File(path);
+                fileVOList.add(file);
+            }
         }
         closeStage(stage, this::closeRequest);
         // 触发列表刷新
