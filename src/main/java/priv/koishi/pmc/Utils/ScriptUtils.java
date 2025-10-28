@@ -3,7 +3,6 @@ package priv.koishi.pmc.Utils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,17 +22,19 @@ public class ScriptUtils {
     /**
      * 运行脚本
      *
-     * @param script    要运行的脚本文件
-     * @param workDir   运行脚本的目录
-     * @param parameter 运行脚本的参数
-     * @throws IOException 运行脚本时发生错误
+     * @param script          要运行的脚本文件
+     * @param workDir         运行脚本的目录
+     * @param parameter       运行脚本的参数
+     * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
+     * @throws Exception 运行脚本时发生错误
      */
-    public static void runScript(File script, String workDir, String parameter) throws IOException {
+    public static void runScript(File script, String workDir, String parameter,
+                                 boolean minScriptWindow) throws Exception {
         String path = script.getAbsolutePath();
         // 验证脚本文件是否可执行
-        if (!script.canExecute()) {
+        if (isMac && !script.canExecute()) {
             // 尝试设置可执行权限
-            if (script.setExecutable(true)) {
+            if (!script.setExecutable(true)) {
                 throw new RuntimeException(text_scriptNotExecutable() + path);
             }
         }
@@ -44,26 +45,44 @@ public class ScriptUtils {
                 pb.directory(workDirFile);
             }
         }
-        List<String> command = buildCommand(path, getFileType(path), parameter);
+        List<String> command = buildCommand(path, getFileType(path), parameter, minScriptWindow);
         pb.command(command);
-        pb.start();
+        Process process = pb.start();
+        process.waitFor();
     }
 
     /**
      * 构建执行命令 - 使用系统默认终端
      *
-     * @param scriptPath 要执行的脚本路径
-     * @param fileType   脚本文件类型
-     * @param parameter  运行脚本的参数
+     * @param scriptPath      要执行的脚本路径
+     * @param fileType        脚本文件类型
+     * @param parameter       运行脚本的参数
+     * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
      */
-    private static List<String> buildCommand(String scriptPath, String fileType, String parameter) {
+    private static List<String> buildCommand(String scriptPath, String fileType,
+                                             String parameter, boolean minScriptWindow) {
         List<String> command = new ArrayList<>();
         if (bat.equals(fileType) || cmd.equals(fileType)) {
             command.add("cmd");
             command.add("/c");
             command.add("start");
+            if (minScriptWindow) {
+                command.add("/min");
+            }
+            command.add("/wait");
         } else if (sh.equals(fileType) || bash.equals(fileType)) {
             command.add("/bin/bash");
+        } else if (py.equals(fileType)) {
+            if (isWin) {
+                command.add("cmd");
+                command.add("/c");
+                command.add("start");
+                if (minScriptWindow) {
+                    command.add("/min");
+                }
+                command.add("/wait");
+            }
+            command.add("python3");
         }
         command.add(scriptPath);
         // 添加参数
@@ -77,7 +96,7 @@ public class ScriptUtils {
                     List<String> params = parseParameters(parameter);
                     command.addAll(scriptIndex + 1, params);
                 }
-            } else {
+            } else if (py.equals(fileType)) {
                 // 其他系统直接添加参数
                 List<String> params = parseParameters(parameter);
                 command.addAll(params);

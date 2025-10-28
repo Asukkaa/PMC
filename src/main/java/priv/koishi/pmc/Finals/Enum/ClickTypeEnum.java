@@ -25,16 +25,6 @@ public enum ClickTypeEnum {
     RUN_SCRIPT,
 
     /**
-     * 带轨迹的移动
-     */
-    MOVE_TRAJECTORY,
-
-    /**
-     * 仅移动
-     */
-    MOVE,
-
-    /**
      * 点击后松开
      */
     CLICK,
@@ -43,6 +33,16 @@ public enum ClickTypeEnum {
      * 拖拽
      */
     DRAG,
+
+    /**
+     * 带轨迹的移动
+     */
+    MOVE_TRAJECTORY,
+
+    /**
+     * 仅移动
+     */
+    MOVE,
 
     /**
      * 移动到设置坐标

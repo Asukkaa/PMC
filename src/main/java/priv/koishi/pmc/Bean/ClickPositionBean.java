@@ -246,6 +246,26 @@ public class ClickPositionBean {
     FloatingWindowConfig stopWindowConfig;
 
     /**
+     * 要打开的路径
+     */
+    String targetPath;
+
+    /**
+     * 脚本工作路径
+     */
+    String workPath;
+
+    /**
+     * 脚本参数
+     */
+    String parameter;
+
+    /**
+     * 是否启用脚本窗口最小化执行 0-不启用，1-启用
+     */
+    String minScriptWindow = activation;
+
+    /**
      * 添加移动轨迹
      *
      * @param x            横坐标

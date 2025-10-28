@@ -36,7 +36,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.10.27";
+    public static final String buildDate = "2025.10.28";
 
     /**
      * 文件后缀名：bat
@@ -57,6 +57,11 @@ public class CommonFinals {
      * 文件后缀名：sh
      */
     public static final String sh = ".sh";
+
+    /**
+     * 文件后缀名：py
+     */
+    public static final String py = ".py";
 
     /**
      * 文件后缀名：zip
@@ -142,6 +147,26 @@ public class CommonFinals {
      * 文件后缀名匹配符：bat
      */
     public static final String allBat = "*.bat";
+
+    /**
+     * 文件后缀名匹配符：cmd
+     */
+    public static final String allCmd = "*.cmd";
+
+    /**
+     * 文件后缀名匹配符：py
+     */
+    public static final String allPy = "*.py";
+
+    /**
+     * 文件后缀名匹配符：sh
+     */
+    public static final String allSh = "*.sh";
+
+    /**
+     * 文件后缀名匹配符：bash
+     */
+    public static final String allBash = "*.bash";
 
     /**
      * 文件大小单位：Byte

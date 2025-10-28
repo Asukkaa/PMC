@@ -31,9 +31,12 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Queue.DynamicQueue;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +53,7 @@ import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassa
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -411,6 +415,10 @@ public class AutoClickService {
                 for (int i = 0; i < tableSize; i++) {
                     updateProgress(i + 1, tableSize);
                     ClickPositionVO clickPositionVO = tableViewItems.get(i);
+                    int clickType = clickPositionVO.getClickTypeEnum();
+                    if (clickType <= ClickTypeEnum.RUN_SCRIPT.ordinal()) {
+                        continue;
+                    }
                     int index = clickPositionVO.getIndex();
                     String err = text_checkIndex() + index + text_taskErr();
                     // 校验目标窗口设置是否有误
@@ -529,6 +537,19 @@ public class AutoClickService {
                     int progress = currentStep + 1;
                     updateProgress(progress, dataSize);
                     ClickPositionVO clickPositionVO = backup.get(currentStep);
+                    int clickType = clickPositionVO.getClickTypeEnum();
+                    String waitTime = clickPositionVO.getWaitTime();
+                    String name = clickPositionVO.getName();
+                    String text = loopTimeText +
+                            text_progress() + progress + "/" + dataSize +
+                            text_willBe() + waitTime + text_msWillBe() + name;
+                    if (clickType <= ClickTypeEnum.RUN_SCRIPT.ordinal()) {
+                        if (openLinkPath(text, clickPositionVO)) {
+                            break;
+                        }
+                        currentStep++;
+                        continue;
+                    }
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
                     // 处理相对路径
@@ -551,33 +572,23 @@ public class AutoClickService {
                             }
                         }
                     }
-                    String waitTime = clickPositionVO.getWaitTime();
                     String clickTime = clickPositionVO.getClickTime();
-                    String name = clickPositionVO.getName();
-                    int clickType = clickPositionVO.getClickTypeEnum();
                     String interval = clickPositionVO.getClickInterval();
                     String clickImgPath = clickPositionVO.getClickImgPath();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     String clickText;
-                    if (ClickTypeEnum.MOVE_TRAJECTORY.ordinal() == clickType ||
-                            ClickTypeEnum.MOVE.ordinal() == clickType ||
-                            ClickTypeEnum.MOVETO.ordinal() == clickType) {
+                    if (clickType >= ClickTypeEnum.MOVE_TRAJECTORY.ordinal()) {
                         clickText = "";
                     } else {
                         clickText = text_taskInfo() + clickPositionVO.getClickKey() + clickPositionVO.getClickType();
                     }
-                    String text = loopTimeText +
-                            text_progress() + progress + "/" + dataSize +
-                            text_willBe() + waitTime + text_msWillBe() + name +
-                            text_point() + " X：" + startX + " Y：" + startY + clickText +
-                            text_clickTime() + clickTime + " " + unit_ms() +
-                            text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
                     if (StringUtils.isNotBlank(clickImgPath)) {
-                        text = loopTimeText +
-                                text_progress() + progress + "/" + dataSize +
-                                text_willBe() + waitTime + text_msWillBe() + name +
-                                text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
+                        text += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
                                 text_afterMatch() + clickPositionVO.getMatchedType();
+                    } else {
+                        text += text_point() + " X：" + startX + " Y：" + startY + clickText +
+                                text_clickTime() + clickTime + " " + unit_ms() +
+                                text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
                     }
                     // 更新操作信息
                     updateMassage(text);
@@ -622,7 +633,75 @@ public class AutoClickService {
                 }
                 return dynamicQueue.getSnapshot();
             }
+
+            /**
+             * 处理要链接相关操作
+             *
+             * @param text 提示信息
+             * @param clickPositionVO 自动操作设置信息
+             *
+             * @throws Exception 链接操作异常
+             */
+            private boolean openLinkPath(String text, ClickPositionVO clickPositionVO) throws Exception {
+                String waitTime = clickPositionVO.getWaitTime();
+                String name = clickPositionVO.getName();
+                int clickType = clickPositionVO.getClickTypeEnum();
+                text += text_taskInfo() + clickPositionVO.getClickType();
+                updateMassage(text);
+                long wait = Long.parseLong(waitTime);
+                if (activation.equals(clickPositionVO.getRandomWaitTime())) {
+                    int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
+                    wait = (long) Math.max(0, wait + (random.nextDouble() * 2 - 1) * randomTime);
+                }
+                try {
+                    Thread.sleep(wait);
+                } catch (InterruptedException e) {
+                    if (isCancelled()) {
+                        return true;
+                    }
+                }
+                if (taskBean.isWaitLog()) {
+                    ClickLogBean waitLog = new ClickLogBean();
+                    waitLog.setClickTime(String.valueOf(wait))
+                            .setType(log_wait())
+                            .setName(name);
+                    dynamicQueue.add(waitLog);
+                }
+                boolean minScriptWindow = clickPositionVO.getMinScriptWindow().equals(activation);
+                openLink(clickPositionVO.getTargetPath(), clickPositionVO.getWorkPath(), clickPositionVO.getParameter(), clickType, minScriptWindow);
+                return false;
+            }
         };
+    }
+
+    /**
+     * 处理要链接相关操作
+     *
+     * @param link      链接地址
+     * @param workDir   工作目录
+     * @param param     脚本参数
+     * @param clickType 操作类型
+     * @throws Exception 运行脚本时发生错误、链接操作异常
+     */
+    private static void openLink(String link, String workDir, String param, int clickType, boolean minScriptWindow) throws Exception {
+        if (StringUtils.isBlank(link)) {
+            throw new RuntimeException(text_pathNull());
+        }
+        if (clickType == ClickTypeEnum.OPEN_FILE.ordinal()) {
+            File file = new File(link);
+            if (!file.exists()) {
+                throw new RuntimeException(text_fileNotExists());
+            }
+            openFile(link);
+        } else if (clickType == ClickTypeEnum.OPEN_URL.ordinal()) {
+            Desktop.getDesktop().browse(new URI(link));
+        } else if (clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
+            File file = new File(link);
+            if (!file.exists()) {
+                throw new RuntimeException(text_fileNotExists());
+            }
+            runScript(file, workDir, param, minScriptWindow);
+        }
     }
 
     /**
@@ -1205,6 +1284,30 @@ public class AutoClickService {
             }
         }
         return clickPositionVOS;
+    }
+
+    /**
+     * 运行脚本任务
+     *
+     * @param taskBean        任务参数
+     * @param script          要运行的脚本文件
+     * @param workDir         运行脚本的目录
+     * @param parameter       运行脚本的参数
+     * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
+     * @return 运行脚本任务对象
+     */
+    public static Task<Void> scriptRun(TaskBean<?> taskBean, File script, String workDir,
+                                       String parameter, boolean minScriptWindow) {
+        return new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                changeDisableNodes(taskBean, true);
+                updateMessage("测试中");
+                runScript(script, workDir, parameter, minScriptWindow);
+                updateMessage("");
+                return null;
+            }
+        };
     }
 
 }

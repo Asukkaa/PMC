@@ -60,12 +60,12 @@ import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatD
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.windowInfoShow;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.AutoClickService.loadImg;
+import static priv.koishi.pmc.Service.AutoClickService.scriptRun;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
-import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -178,13 +178,13 @@ public class ClickDetailController extends RootController {
     public AnchorPane anchorPane_Det;
 
     @FXML
-    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det;
+    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det, commonVBox_Det;
 
     @FXML
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
             stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det,
-            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, linkHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, pointHBox_Det, commonHBox_Det, workDirHBox_Det;
+            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
+            parameterHBox_Det, pointHBox_Det, workDirHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -206,18 +206,19 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
-            stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det;
+            stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det,
+            minWindow_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
             tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
-            clickTypeText_Det, openLink_Det, workPath_Det;
+            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
             randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det,
-            parameterValue_Det, openLinkValue_Det;
+            parameter_Det, url_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -326,6 +327,7 @@ public class ClickDetailController extends RootController {
         ObservableList<String> clickTypeItems = clickType_Det.getItems();
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
+        String targetPath = item.getTargetPath();
         if (CollectionUtils.isEmpty(item.getMoveTrajectory())) {
             clickTypeItems.remove(clickType_moveTrajectory());
             clickTypeItems.remove(clickType_drag());
@@ -334,6 +336,15 @@ public class ClickDetailController extends RootController {
             clickType_Det.setDisable(true);
             mouseStartX_Det.setDisable(true);
             mouseStartY_Det.setDisable(true);
+        }
+        if (clickType_openFile().equals(clickType)) {
+            setPathLabel(link_Det, targetPath);
+        } else if (clickType_runScript().equals(clickType)) {
+            setPathLabel(link_Det, targetPath);
+            setPathLabel(workPath_Det, item.getWorkPath());
+            parameter_Det.setText(item.getParameter());
+        } else if (clickType_openUrl().equals(clickType)) {
+            url_Det.setText(targetPath);
         }
     }
 
@@ -377,7 +388,8 @@ public class ClickDetailController extends RootController {
         updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
         windowMonitorClick.setWindowInfo(clickWindowInfo);
         windowMonitorClick.updateWindowInfo();
-        if (StringUtils.isBlank(windowMonitorClick.getWindowInfo().getProcessPath())) {
+        WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
+        if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
             relativelyHBox_Det.setDisable(true);
             useRelatively_Det.setSelected(false);
         } else {
@@ -889,8 +901,8 @@ public class ClickDetailController extends RootController {
         TaskBean<ImgFileVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Det)
                 .setMassageLabel(dataNumber_Det)
-                .setTableView(tableView_Det)
-                .setDisableNodes(disableNodes);
+                .setDisableNodes(disableNodes)
+                .setTableView(tableView_Det);
         return taskBean;
     }
 
@@ -927,6 +939,7 @@ public class ClickDetailController extends RootController {
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
+        disableNodes.add(testLink_Det);
         disableNodes.add(removeAll_Det);
         disableNodes.add(stopImgBtn_Det);
     }
@@ -1109,7 +1122,10 @@ public class ClickDetailController extends RootController {
                 .setUseRelative(useRelatively)
                 .setName(clickName_Det.getText())
                 .setRandomWaitTime(randomWaitTime)
+                .setTargetPath(link_Det.getText())
+                .setWorkPath(workPath_Det.getText())
                 .setRandomClickTime(randomClickTime)
+                .setParameter(parameter_Det.getText())
                 .setRandomTrajectory(randomTrajectory)
                 .setStopWindowConfig(stopFloatingConfig)
                 .setClickWindowConfig(clickFloatingConfig)
@@ -1297,10 +1313,11 @@ public class ClickDetailController extends RootController {
         addValueToolTip(clickTypeText_Det, tip_clickType(), value);
         setPathLabel(link_Det, null);
         vBox_Det.getChildren().clear();
-        vBox_Det.getChildren().add(commonHBox_Det);
+        vBox_Det.getChildren().add(commonVBox_Det);
         if (linkList.contains(value)) {
             vBox_Det.getChildren().add(pathLinkVBox_Det);
             testLink_Det.setVisible(true);
+            randomClickInterval_Det.setVisible(false);
             pathLinkVBox_Det.getChildren().remove(parameterHBox_Det);
             pathLinkHBox_Det.getChildren().clear();
             if (clickType_openFile().equals(value)) {
@@ -1311,11 +1328,12 @@ public class ClickDetailController extends RootController {
                 pathLinkHBox_Det.getChildren().add(pathHBox_Det);
                 workDirHBox_Det.setVisible(true);
             } else if (clickType_openUrl().equals(value)) {
-                pathLinkHBox_Det.getChildren().add(linkHBox_Det);
+                pathLinkHBox_Det.getChildren().add(urlHBox_Det);
             }
         } else {
             vBox_Det.getChildren().add(clickVBox_Det);
             testLink_Det.setVisible(false);
+            randomClickInterval_Det.setVisible(true);
         }
     }
 
@@ -1479,8 +1497,18 @@ public class ClickDetailController extends RootController {
             controller.setFileChooserCallback(this::getSelectFile);
         } else if (clickType_runScript().equals(value)) {
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(text_script(), allBat);
-            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
+            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+            if (isWin) {
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allPy));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allCmd));
+            } else {
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allPy));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBash));
+            }
             List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
             getSelectFile(selectedFile);
         }
@@ -1488,6 +1516,8 @@ public class ClickDetailController extends RootController {
 
     /**
      * 测试目标路径按钮
+     *
+     * @throws Exception 网址打开失败
      */
     @FXML
     private void testLinkAction() throws Exception {
@@ -1514,15 +1544,24 @@ public class ClickDetailController extends RootController {
                     new MessageBubble(text_fileNotExists(), time);
                 } else {
                     String workDir = workPath_Det.getText();
-                    String parameter = parameterValue_Det.getText();
-                    runScript(file, workDir, parameter);
-                    new MessageBubble(text_testSuccess(), time);
+                    String parameter = parameter_Det.getText();
+                    TaskBean<?> taskBean = creatTaskBean()
+                            .setMassageLabel(log_Det);
+                    Task<Void> scriptTask = scriptRun(taskBean, file, workDir, parameter, minWindow_Det.isSelected());
+                    bindingTaskNode(scriptTask, taskBean);
+                    scriptTask.setOnSucceeded(_ -> {
+                        taskUnbind(taskBean);
+                        new MessageBubble(text_testSuccess(), time);
+                    });
+                    Thread.ofVirtual()
+                            .name("scriptTask-vThread" + tabId)
+                            .start(scriptTask);
                 }
             } else {
                 new MessageBubble(text_pathNull(), time);
             }
         } else if (clickType_openUrl().equals(value)) {
-            String url = openLinkValue_Det.getText();
+            String url = url_Det.getText();
             if (StringUtils.isNotBlank(url)) {
                 Desktop.getDesktop().browse(new URI(url));
                 new MessageBubble(text_testSuccess(), time);

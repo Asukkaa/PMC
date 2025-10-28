@@ -9,29 +9,55 @@
         <ScrollPane fitToWidth="true" fitToHeight="true">
             <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
                 <VBox fx:id="vBox_Det" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
-                    <HBox fx:id="commonHBox_Det" spacing="10">
-                        <HBox styleClass="hBox-veryShort">
-                            <Label text="%clickDetail.clickIndex"/>
-                            <Label fx:id="clickIndex_Det"/>
+                    <VBox fx:id="commonVBox_Det" spacing="10">
+                        <HBox spacing="10">
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.clickIndex"/>
+                                <Label fx:id="clickIndex_Det"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.tableViewSize"/>
+                                <Label fx:id="tableViewSize_Det"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.clickName"/>
+                                <TextField fx:id="clickName_Det"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-veryShort">
+                                <Label fx:id="clickTypeText_Det" text="%clickDetail.clickTypeText_Det"/>
+                                <ChoiceBox fx:id="clickType_Det" prefWidth="120" onAction="#clickTypeChange"/>
+                            </HBox>
+
+                            <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testLinkAction"/>
                         </HBox>
 
-                        <HBox styleClass="hBox-veryShort">
-                            <Label text="%clickDetail.tableViewSize"/>
-                            <Label fx:id="tableViewSize_Det"/>
-                        </HBox>
+                        <HBox spacing="10">
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.wait"/>
+                                <TextField fx:id="wait_Det" prefWidth="80"/>
+                                <Label text="%unit.ms"/>
+                            </HBox>
 
-                        <HBox styleClass="hBox-veryShort">
-                            <Label text="%clickDetail.clickName"/>
-                            <TextField fx:id="clickName_Det"/>
-                        </HBox>
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.randomTimeOffset"/>
+                                <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
+                                <Label text="%unit.ms"/>
+                            </HBox>
 
-                        <HBox styleClass="hBox-veryShort">
-                            <Label fx:id="clickTypeText_Det" text="%clickDetail.clickTypeText_Det"/>
-                            <ChoiceBox fx:id="clickType_Det" prefWidth="120" onAction="#clickTypeChange"/>
-                        </HBox>
+                            <HBox styleClass="hBox-veryShort">
+                                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short"
+                                          text="%randomWaitTime"/>
+                            </HBox>
 
-                        <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testLinkAction"/>
-                    </HBox>
+                            <HBox styleClass="hBox-veryShort">
+                                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short"
+                                          text="%randomClickInterval"/>
+                            </HBox>
+                        </HBox>
+                    </VBox>
 
                     <VBox fx:id="pathLinkVBox_Det" spacing="10">
                         <HBox fx:id="pathLinkHBox_Det" spacing="10">
@@ -51,15 +77,22 @@
                                 </HBox>
                             </HBox>
 
-                            <HBox fx:id="linkHBox_Det" spacing="10">
-                                <Label fx:id="openLink_Det" text="%clickDetail.openLink_Det"/>
-                                <TextField fx:id="openLinkValue_Det" prefWidth="1000"/>
+                            <HBox fx:id="urlHBox_Det" spacing="10">
+                                <Label fx:id="openUrl_Det" text="%clickDetail.openUrl_Det"/>
+                                <TextField fx:id="url_Det" prefWidth="1000"/>
                             </HBox>
                         </HBox>
 
                         <HBox fx:id="parameterHBox_Det" spacing="10">
-                            <Label text="%clickDetail.parameter_Det"/>
-                            <TextField fx:id="parameterValue_Det" prefWidth="400"/>
+                            <HBox spacing="10" prefWidth="550">
+                                <Label text="%clickDetail.parameter_Det"/>
+                                <TextField fx:id="parameter_Det" prefWidth="450"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-veryShort">
+                                <CheckBox fx:id="minWindow_Det" styleClass="checkBox-short"
+                                          text="%clickDetail.minWindow_Det"/>
+                            </HBox>
                         </HBox>
                     </VBox>
 
@@ -111,34 +144,6 @@
 
                         <HBox spacing="10">
                             <HBox styleClass="hBox-veryShort">
-                                <Label text="%clickDetail.wait"/>
-                                <TextField fx:id="wait_Det" prefWidth="80"/>
-                                <Label text="%unit.ms"/>
-                            </HBox>
-
-                            <HBox fx:id="clickTypeHBox_Det" spacing="10">
-                                <HBox styleClass="hBox-veryShort">
-                                    <Label text="%clickDetail.clickNumBer"/>
-                                    <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
-                                    <Label text="%unit.times"/>
-                                </HBox>
-
-                                <HBox styleClass="hBox-veryShort">
-                                    <Label text="%clickDetail.timeClick"/>
-                                    <TextField fx:id="timeClick_Det" prefWidth="80"/>
-                                    <Label text="%unit.ms"/>
-                                </HBox>
-
-                                <HBox styleClass="hBox-veryShort">
-                                    <Label text="%clickDetail.interval"/>
-                                    <TextField fx:id="interval_Det" prefWidth="80"/>
-                                    <Label text="%unit.ms"/>
-                                </HBox>
-                            </HBox>
-                        </HBox>
-
-                        <HBox spacing="10">
-                            <HBox styleClass="hBox-veryShort">
                                 <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
                             </HBox>
 
@@ -160,26 +165,28 @@
                             </HBox>
                         </HBox>
 
-                        <HBox spacing="10">
+                        <HBox fx:id="clickTypeHBox_Det" spacing="10">
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.clickNumBer"/>
+                                <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
+                                <Label text="%unit.times"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.timeClick"/>
+                                <TextField fx:id="timeClick_Det" prefWidth="80"/>
+                                <Label text="%unit.ms"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-veryShort">
+                                <Label text="%clickDetail.interval"/>
+                                <TextField fx:id="interval_Det" prefWidth="80"/>
+                                <Label text="%unit.ms"/>
+                            </HBox>
+
                             <HBox styleClass="hBox-veryShort">
                                 <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short"
                                           text="%randomClickTime"/>
-                            </HBox>
-
-                            <HBox styleClass="hBox-veryShort">
-                                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short"
-                                          text="%randomClickInterval"/>
-                            </HBox>
-
-                            <HBox styleClass="hBox-veryShort">
-                                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short"
-                                          text="%randomWaitTime"/>
-                            </HBox>
-
-                            <HBox styleClass="hBox-short">
-                                <Label text="%clickDetail.randomTimeOffset"/>
-                                <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
-                                <Label text="%unit.ms"/>
                             </HBox>
                         </HBox>
 
@@ -402,6 +409,7 @@
         <HBox spacing="10" style="-fx-padding: 10">
             <VBox fx:id="progressBarVBox_Det">
                 <ProgressBar fx:id="progressBar_Det" visible="false" prefWidth="200.0" progress="0.0"/>
+                <Label fx:id="log_Det"/>
             </VBox>
 
             <Button text="%detail.save" onAction="#saveDetail"/>
