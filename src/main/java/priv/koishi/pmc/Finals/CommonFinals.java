@@ -54,6 +54,26 @@ public class CommonFinals {
     public static final String py = ".py";
 
     /**
+     * 文件后缀名：ps1
+     */
+    public static final String ps1 = ".ps1";
+
+    /**
+     * 文件后缀名：java
+     */
+    public static final String java = ".java";
+
+    /**
+     * 文件后缀名：jar
+     */
+    public static final String jar = ".jar";
+
+    /**
+     * 文件后缀名：class
+     */
+    public static final String clazz = ".class";
+
+    /**
      * 文件后缀名：zip
      */
     public static final String zip = ".zip";
@@ -157,6 +177,26 @@ public class CommonFinals {
      * 文件后缀名匹配符：bash
      */
     public static final String allBash = "*.bash";
+
+    /**
+     * 文件后缀名匹配符：ps1
+     */
+    public static final String allPs1 = "*.ps1";
+
+    /**
+     * 文件后缀名匹配符：java
+     */
+    public static final String allJava = "*.java";
+
+    /**
+     * 文件后缀名匹配符：jar
+     */
+    public static final String allJar = "*.jar";
+
+    /**
+     * 文件后缀名匹配符：class
+     */
+    public static final String allClass = "*.class";
 
     /**
      * 文件大小单位：Byte

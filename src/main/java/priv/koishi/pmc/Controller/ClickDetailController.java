@@ -1499,16 +1499,19 @@ public class ClickDetailController extends RootController {
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
             if (isWin) {
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy));
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allPy));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy, allPs1, allJava, allJar, allClass));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allCmd));
             } else {
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy));
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allPy));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy, allPs1, allJava, allJar, allClass));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBash));
             }
+            extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allPy));
+            extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allPs1));
+            extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allJava));
+            extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allJar));
+            extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allClass));
             List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
             getSelectFile(selectedFile);
         }

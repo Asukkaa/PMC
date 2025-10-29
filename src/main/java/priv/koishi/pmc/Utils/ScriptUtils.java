@@ -8,6 +8,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_scriptNotExecutable;
+import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 import static priv.koishi.pmc.Utils.FileUtils.getFileType;
 
 /**
@@ -47,10 +48,10 @@ public class ScriptUtils {
         }
         String fileType = getFileType(path);
         List<String> command = new ArrayList<>();
-        if (isMac) {
-            runWithMacTerminal(minScriptWindow, command, fileType, path, parameter, pb);
-        } else if (isWin) {
+        if (isWin) {
             runWithWinTerminal(minScriptWindow, command, fileType, path, parameter, pb);
+        } else {
+            runWithMacTerminal(minScriptWindow, command, fileType, path, parameter, pb);
         }
         Process process = pb.start();
         process.waitFor();
@@ -74,8 +75,23 @@ public class ScriptUtils {
             command.add("/min");
         }
         command.add("/wait");
-        if (py.equals(fileType)) {
-            command.add("python3");
+        switch (fileType) {
+            case py -> command.add("python3");
+            case ps1 -> {
+                command.add("powershell");
+                command.add("-ExecutionPolicy");
+                command.add("Bypass");
+                command.add("-File");
+            }
+            case java -> command.add("java");
+            case jar -> {
+                command.add("java");
+                command.add("-jar");
+            }
+            case clazz -> {
+                command.add("java");
+                command.add(getFileName(scriptPath));
+            }
         }
         command.add(scriptPath);
         // 添加参数
@@ -113,8 +129,16 @@ public class ScriptUtils {
                     .append(directory.getPath())
                     .append(" && ");
         }
-        if (py.equals(fileType)) {
-            appleScript.append("python3 ");
+        switch (fileType) {
+            case py -> appleScript.append("python3 ");
+            case ps1 -> appleScript.append("pwsh ");
+            case java -> appleScript.append("java ");
+            case jar -> appleScript.append("java -jar ");
+            case clazz -> {
+                appleScript.append("java ");
+                appleScript.append(getFileName(scriptPath));
+                appleScript.append(" ");
+            }
         }
         appleScript.append(scriptPath);
         if (StringUtils.isNotBlank(parameter)) {
