@@ -1302,7 +1302,7 @@ public class AutoClickService {
             @Override
             protected Void call() throws Exception {
                 changeDisableNodes(taskBean, true);
-                updateMessage("测试中");
+                updateMessage(text_testing());
                 runScript(script, workDir, parameter, minScriptWindow);
                 updateMessage("");
                 return null;

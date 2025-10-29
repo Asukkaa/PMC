@@ -56,6 +56,15 @@ public class ScriptUtils {
         process.waitFor();
     }
 
+    /**
+     * 拼接 Windows 终端启动脚本命令
+     *
+     * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
+     * @param command         命令列表
+     * @param fileType        脚本文件类型
+     * @param scriptPath      脚本文件路径
+     * @param pb              进程构建器
+     */
     private static void runWithWinTerminal(boolean minScriptWindow, List<String> command, String fileType,
                                            String scriptPath, String parameter, ProcessBuilder pb) {
         command.add("cmd");
@@ -83,10 +92,13 @@ public class ScriptUtils {
     }
 
     /**
-     * 拼接终端启动脚本命令
+     * 拼接 macOS 终端启动脚本命令
      *
      * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
      * @param command         命令列表
+     * @param fileType        脚本文件类型
+     * @param scriptPath      脚本文件路径
+     * @param pb              进程构建器
      */
     private static void runWithMacTerminal(boolean minScriptWindow, List<String> command, String fileType,
                                            String scriptPath, String parameter, ProcessBuilder pb) {

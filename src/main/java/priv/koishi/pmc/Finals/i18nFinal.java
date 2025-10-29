@@ -1812,6 +1812,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 测试中
+     */
+    public static String text_testing() {
+        return bundle.getString("testing");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

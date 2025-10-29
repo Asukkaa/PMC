@@ -44,16 +44,6 @@ public class CommonFinals {
     public static final String bat = ".bat";
 
     /**
-     * 文件后缀名：cmd
-     */
-    public static final String cmd = ".cmd";
-
-    /**
-     * 文件后缀名：bash
-     */
-    public static final String bash = ".bash";
-
-    /**
      * 文件后缀名：sh
      */
     public static final String sh = ".sh";
