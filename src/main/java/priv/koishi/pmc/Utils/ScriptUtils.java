@@ -23,6 +23,9 @@ public class ScriptUtils {
     /**
      * 运行脚本
      *
+     * <p>
+     * 测试文件所在目录： ScriptTest
+     *
      * @param script          要运行的脚本文件
      * @param workDir         运行脚本的目录
      * @param parameter       运行脚本的参数
