@@ -45,68 +45,85 @@ public class ScriptUtils {
                 pb.directory(workDirFile);
             }
         }
-        List<String> command = buildCommand(path, getFileType(path), parameter, minScriptWindow);
-        pb.command(command);
+        String fileType = getFileType(path);
+        List<String> command = new ArrayList<>();
+        if (isMac) {
+            runWithMacTerminal(minScriptWindow, command, fileType, path, parameter, pb);
+        } else if (isWin) {
+            runWithWinTerminal(minScriptWindow, command, fileType, path, parameter, pb);
+        }
         Process process = pb.start();
         process.waitFor();
     }
 
-    /**
-     * 构建执行命令 - 使用系统默认终端
-     *
-     * @param scriptPath      要执行的脚本路径
-     * @param fileType        脚本文件类型
-     * @param parameter       运行脚本的参数
-     * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
-     */
-    private static List<String> buildCommand(String scriptPath, String fileType,
-                                             String parameter, boolean minScriptWindow) {
-        List<String> command = new ArrayList<>();
-        if (bat.equals(fileType) || cmd.equals(fileType)) {
-            runWithCmd(minScriptWindow, command);
-        } else if (sh.equals(fileType) || bash.equals(fileType)) {
-            command.add("/bin/bash");
-        } else if (py.equals(fileType)) {
-            runWithCmd(minScriptWindow, command);
+    private static void runWithWinTerminal(boolean minScriptWindow, List<String> command, String fileType,
+                                           String scriptPath, String parameter, ProcessBuilder pb) {
+        command.add("cmd");
+        command.add("/c");
+        command.add("start");
+        if (minScriptWindow) {
+            command.add("/min");
+        }
+        command.add("/wait");
+        if (py.equals(fileType)) {
             command.add("python3");
         }
         command.add(scriptPath);
         // 添加参数
         if (StringUtils.isNotBlank(parameter)) {
-            // 对于Windows批处理，参数需要放在start命令之后
-            if (bat.equals(fileType) || cmd.equals(fileType)) {
-                // 将参数添加到脚本路径后面
-                int scriptIndex = command.indexOf(scriptPath);
-                if (scriptIndex >= 0) {
-                    // 解析参数并添加到命令中
-                    List<String> params = parseParameters(parameter);
-                    command.addAll(scriptIndex + 1, params);
-                }
-            } else if (py.equals(fileType)) {
-                // 其他系统直接添加参数
+            // 将参数添加到脚本路径后面
+            int scriptIndex = command.indexOf(scriptPath);
+            if (scriptIndex >= 0) {
+                // 解析参数并添加到命令中
                 List<String> params = parseParameters(parameter);
-                command.addAll(params);
+                command.addAll(scriptIndex + 1, params);
             }
         }
-        return command;
+        pb.command(command);
     }
 
     /**
-     * 拼接 cmd 启动脚本命令
+     * 拼接终端启动脚本命令
      *
      * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
      * @param command         命令列表
      */
-    private static void runWithCmd(boolean minScriptWindow, List<? super String> command) {
-        if (isWin) {
-            command.add("cmd");
-            command.add("/c");
-            command.add("start");
-            if (minScriptWindow) {
-                command.add("/min");
-            }
-            command.add("/wait");
+    private static void runWithMacTerminal(boolean minScriptWindow, List<String> command, String fileType,
+                                           String scriptPath, String parameter, ProcessBuilder pb) {
+        command.add("osascript");
+        command.add("-e");
+        StringBuilder appleScript = new StringBuilder();
+        appleScript.append("tell application \"Terminal\"\n");
+        appleScript.append("  do script \"");
+        File directory = pb.directory();
+        if (directory != null) {
+            appleScript.append("cd ")
+                    .append(directory.getPath())
+                    .append(" && ");
         }
+        if (py.equals(fileType)) {
+            appleScript.append("python3 ");
+        }
+        appleScript.append(scriptPath);
+        if (StringUtils.isNotBlank(parameter)) {
+            // 将参数添加到脚本路径后面
+            appleScript.append(" ").append(parameter);
+        }
+        appleScript.append(" && exit\"\n");
+        if (minScriptWindow) {
+            appleScript.append("  set miniaturized of window 1 to true\n");
+        } else {
+            appleScript.append("  activate\n");
+        }
+        appleScript.append("  repeat until not busy of window 1\n");
+        // 额外延迟确保脚本开始执行
+        appleScript.append("    delay 0.5\n");
+        appleScript.append("  end repeat\n");
+        appleScript.append("  delay 0.5\n");
+        appleScript.append("  close window 1\n");
+        appleScript.append("end tell");
+        command.add(appleScript.toString());
+        pb.command(command);
     }
 
     /**
