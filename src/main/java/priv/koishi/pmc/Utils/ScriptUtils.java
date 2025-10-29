@@ -63,25 +63,11 @@ public class ScriptUtils {
                                              String parameter, boolean minScriptWindow) {
         List<String> command = new ArrayList<>();
         if (bat.equals(fileType) || cmd.equals(fileType)) {
-            command.add("cmd");
-            command.add("/c");
-            command.add("start");
-            if (minScriptWindow) {
-                command.add("/min");
-            }
-            command.add("/wait");
+            runWithCmd(minScriptWindow, command);
         } else if (sh.equals(fileType) || bash.equals(fileType)) {
             command.add("/bin/bash");
         } else if (py.equals(fileType)) {
-            if (isWin) {
-                command.add("cmd");
-                command.add("/c");
-                command.add("start");
-                if (minScriptWindow) {
-                    command.add("/min");
-                }
-                command.add("/wait");
-            }
+            runWithCmd(minScriptWindow, command);
             command.add("python3");
         }
         command.add(scriptPath);
@@ -103,6 +89,24 @@ public class ScriptUtils {
             }
         }
         return command;
+    }
+
+    /**
+     * 拼接 cmd 启动脚本命令
+     *
+     * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
+     * @param command         命令列表
+     */
+    private static void runWithCmd(boolean minScriptWindow, List<? super String> command) {
+        if (isWin) {
+            command.add("cmd");
+            command.add("/c");
+            command.add("start");
+            if (minScriptWindow) {
+                command.add("/min");
+            }
+            command.add("/wait");
+        }
     }
 
     /**
