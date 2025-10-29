@@ -8,7 +8,7 @@ import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_scriptNotExecutable;
-import static priv.koishi.pmc.Utils.FileUtils.getFileName;
+import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 import static priv.koishi.pmc.Utils.FileUtils.getFileType;
 
 /**
@@ -75,6 +75,7 @@ public class ScriptUtils {
             command.add("/min");
         }
         command.add("/wait");
+        boolean addScriptPath = true;
         switch (fileType) {
             case py -> command.add("python3");
             case ps1 -> {
@@ -90,10 +91,18 @@ public class ScriptUtils {
             }
             case clazz -> {
                 command.add("java");
-                command.add(getFileName(scriptPath));
+                command.add("-cp");
+                // 设置类路径为 class 文件所在目录
+                File classFile = new File(scriptPath);
+                String classDir = classFile.getParent();
+                command.add(classDir != null ? classDir : ".");
+                command.add(getExistsFileName(classFile));
+                addScriptPath = false;
             }
         }
-        command.add(scriptPath);
+        if (addScriptPath) {
+            command.add(scriptPath);
+        }
         // 添加参数
         if (StringUtils.isNotBlank(parameter)) {
             // 将参数添加到脚本路径后面
@@ -129,18 +138,26 @@ public class ScriptUtils {
                     .append(directory.getPath())
                     .append(" && ");
         }
+        boolean addScriptPath = true;
         switch (fileType) {
             case py -> appleScript.append("python3 ");
             case ps1 -> appleScript.append("pwsh ");
             case java -> appleScript.append("java ");
             case jar -> appleScript.append("java -jar ");
             case clazz -> {
-                appleScript.append("java ");
-                appleScript.append(getFileName(scriptPath));
-                appleScript.append(" ");
+                appleScript.append("java");
+                appleScript.append("-cp");
+                // 设置类路径为 class 文件所在目录
+                File classFile = new File(scriptPath);
+                String classDir = classFile.getParent();
+                appleScript.append(classDir != null ? classDir : ".");
+                appleScript.append(getExistsFileName(classFile));
+                addScriptPath = false;
             }
         }
-        appleScript.append(scriptPath);
+        if (addScriptPath) {
+            appleScript.append(scriptPath);
+        }
         if (StringUtils.isNotBlank(parameter)) {
             // 将参数添加到脚本路径后面
             appleScript.append(" ").append(parameter);
