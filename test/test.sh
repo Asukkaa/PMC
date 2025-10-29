@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# 测试脚本：输出3秒倒计时和启动参数
-# 用于验证 Java 程序在 macOS 上启动 shell 脚本的功能
-
 echo "=== Shell 脚本测试开始 ==="
 echo "脚本路径: $0"
 echo "工作目录: $(pwd)"
@@ -17,6 +14,16 @@ else
     for i in $(seq 1 $#); do
         echo "参数 $i: ${!i}"
     done
+fi
+
+echo ""
+echo "=== 工作目录下的文件 ==="
+# 列出当前工作目录下的所有文件和文件夹
+if command -v ls >/dev/null 2>&1; then
+    ls -la
+else
+    # 如果 ls 命令不可用，使用 find 命令
+    find . -maxdepth 1 -type f -o -type d
 fi
 
 echo ""

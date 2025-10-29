@@ -1,4 +1,3 @@
-# test_script_no_pause.ps1 - No pause version
 param(
     [string]$Param1,
     [string]$Param2,

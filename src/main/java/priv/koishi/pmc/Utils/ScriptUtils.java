@@ -71,48 +71,42 @@ public class ScriptUtils {
         command.add("cmd");
         command.add("/c");
         command.add("start");
+        // 设置窗口标题
+        String title = new File(scriptPath).getName();
+        command.add("\"" + title + "\"");
         if (minScriptWindow) {
             command.add("/min");
         }
-        command.add("/wait");
+        // 构建实际的执行命令
+        StringBuilder executeCommand = new StringBuilder();
         boolean addScriptPath = true;
         switch (fileType) {
-            case py -> command.add("python3");
-            case ps1 -> {
-                command.add("powershell");
-                command.add("-ExecutionPolicy");
-                command.add("Bypass");
-                command.add("-File");
-            }
-            case java -> command.add("java");
-            case jar -> {
-                command.add("java");
-                command.add("-jar");
-            }
+            case py -> executeCommand.append("python3 ");
+            case ps1 -> executeCommand.append("powershell -ExecutionPolicy Bypass -File ");
+            case java -> executeCommand.append("java ");
+            case jar -> executeCommand.append("java -jar ");
             case clazz -> {
-                command.add("java");
-                command.add("-cp");
-                // 设置类路径为 class 文件所在目录
                 File classFile = new File(scriptPath);
                 String classDir = classFile.getParent();
-                command.add(classDir != null ? classDir : ".");
-                command.add(getExistsFileName(classFile));
+                executeCommand.append("java -cp ");
+                executeCommand.append("\"").append(classDir != null ? classDir : ".").append("\" ");
+                executeCommand.append(getExistsFileName(classFile));
                 addScriptPath = false;
             }
         }
         if (addScriptPath) {
-            command.add(scriptPath);
+            executeCommand.append("\"").append(scriptPath).append("\"");
         }
         // 添加参数
         if (StringUtils.isNotBlank(parameter)) {
-            // 将参数添加到脚本路径后面
-            int scriptIndex = command.indexOf(scriptPath);
-            if (scriptIndex >= 0) {
-                // 解析参数并添加到命令中
-                List<String> params = parseParameters(parameter);
-                command.addAll(scriptIndex + 1, params);
-            }
+            executeCommand.append(" ").append(parameter);
         }
+        // 添加自动退出命令 - 关键修改
+        executeCommand.append(" && exit");
+        command.add("/wait");
+        command.add("cmd");
+        command.add("/c");
+        command.add(executeCommand.toString());
         pb.command(command);
     }
 
@@ -178,47 +172,6 @@ public class ScriptUtils {
         appleScript.append("end tell");
         command.add(appleScript.toString());
         pb.command(command);
-    }
-
-    /**
-     * 解析参数字符串，支持带引号的参数
-     *
-     * @param parameter 参数字符串
-     */
-    private static List<String> parseParameters(String parameter) {
-        List<String> params = new ArrayList<>();
-        StringBuilder currentParam = new StringBuilder();
-        boolean inQuotes = false;
-        char quoteChar = '"';
-        for (int i = 0; i < parameter.length(); i++) {
-            char c = parameter.charAt(i);
-            if ((c == '"' || c == '\'') && !inQuotes) {
-                // 开始引号
-                inQuotes = true;
-                quoteChar = c;
-            } else if (c == quoteChar) {
-                // 结束引号
-                inQuotes = false;
-                if (!currentParam.isEmpty()) {
-                    params.add(currentParam.toString());
-                    currentParam.setLength(0);
-                }
-            } else if (Character.isWhitespace(c) && !inQuotes) {
-                // 空格且不在引号内，结束当前参数
-                if (!currentParam.isEmpty()) {
-                    params.add(currentParam.toString());
-                    currentParam.setLength(0);
-                }
-            } else {
-                // 普通字符
-                currentParam.append(c);
-            }
-        }
-        // 处理最后一个参数
-        if (!currentParam.isEmpty()) {
-            params.add(currentParam.toString());
-        }
-        return params;
     }
 
 }
