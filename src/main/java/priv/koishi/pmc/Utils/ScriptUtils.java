@@ -145,12 +145,13 @@ public class ScriptUtils {
             case java -> appleScript.append("java ");
             case jar -> appleScript.append("java -jar ");
             case clazz -> {
-                appleScript.append("java");
-                appleScript.append("-cp");
+                appleScript.append("java ");
+                appleScript.append("-cp ");
                 // 设置类路径为 class 文件所在目录
                 File classFile = new File(scriptPath);
                 String classDir = classFile.getParent();
                 appleScript.append(classDir != null ? classDir : ".");
+                appleScript.append(" ");
                 appleScript.append(getExistsFileName(classFile));
                 addScriptPath = false;
             }
