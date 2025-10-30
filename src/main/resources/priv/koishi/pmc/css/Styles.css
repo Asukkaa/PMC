@@ -15,7 +15,6 @@
 .checkBox-medium {
     -fx-cursor: hand;
     -fx-pref-height: 25;
-    -fx-pref-width: 290;
 }
 
 .checkBox-short {

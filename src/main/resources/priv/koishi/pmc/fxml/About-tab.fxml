@@ -28,7 +28,9 @@
 
         <HBox spacing="5">
             <Label text="%about.logsPath"/>
-            <Label prefWidth="400" fx:id="logsPath_Abt"/>
+            <HBox prefWidth="400">
+                <Label fx:id="logsPath_Abt"/>
+            </HBox>
 
             <Label text="%about.logsNum"/>
             <TextField fx:id="logsNum_Abt" styleClass="label-low" prefWidth="50"/>
@@ -94,8 +96,9 @@
                     <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" text="%update.checkUpdate_Abt"/>
                 </HBox>
 
-                <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" prefWidth="400"
-                          text="%update.autoCheck_Abt"/>
+                <HBox styleClass="hBox-medium">
+                    <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" text="%update.autoCheck_Abt"/>
+                </HBox>
 
                 <Label textFill="red" text="%about.autoUpdate"/>
             </HBox>
