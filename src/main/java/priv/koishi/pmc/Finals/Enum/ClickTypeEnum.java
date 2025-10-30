@@ -15,14 +15,14 @@ public enum ClickTypeEnum {
     OPEN_FILE,
 
     /**
-     * 打开网址
-     */
-    OPEN_URL,
-
-    /**
      * 运行脚本
      */
     RUN_SCRIPT,
+
+    /**
+     * 打开网址
+     */
+    OPEN_URL,
 
     /**
      * 点击后松开

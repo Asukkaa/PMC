@@ -689,11 +689,17 @@ public class AutoClickController extends RootController implements MousePosition
             CheckBox clickImgLog = settingController.clickImgLog_Set;
             CheckBox stopImgLog = settingController.stopImgLog_Set;
             CheckBox waitLog = settingController.waitLog_Set;
+            CheckBox openFileLog = settingController.openFileLog_Set;
+            CheckBox openUrlLog = settingController.openUrlLog_Set;
+            CheckBox runScriptLog = settingController.runScriptLog_Set;
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
                     .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
+                    .setRunScriptLog(runScriptLog.isSelected())
+                    .setOpenFileLog(openFileLog.isSelected())
                     .setClickImgLog(clickImgLog.isSelected())
+                    .setOpenUrlLog(openUrlLog.isSelected())
                     .setStopImgLog(stopImgLog.isSelected())
                     .setFirstClick(firstClick.isSelected())
                     .setMassageFloating(massageFloating)

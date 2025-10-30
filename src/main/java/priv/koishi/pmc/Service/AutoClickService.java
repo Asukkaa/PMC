@@ -50,8 +50,7 @@ import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMai
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
-import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
-import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
+import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -416,7 +415,7 @@ public class AutoClickService {
                     updateProgress(i + 1, tableSize);
                     ClickPositionVO clickPositionVO = tableViewItems.get(i);
                     int clickType = clickPositionVO.getClickTypeEnum();
-                    if (clickType <= ClickTypeEnum.RUN_SCRIPT.ordinal()) {
+                    if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
                         continue;
                     }
                     int index = clickPositionVO.getIndex();
@@ -543,7 +542,7 @@ public class AutoClickService {
                     String text = loopTimeText +
                             text_progress() + progress + "/" + dataSize +
                             text_willBe() + waitTime + text_msWillBe() + name;
-                    if (clickType <= ClickTypeEnum.RUN_SCRIPT.ordinal()) {
+                    if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
                         if (openLinkPath(text, clickPositionVO)) {
                             break;
                         }
@@ -645,7 +644,6 @@ public class AutoClickService {
             private boolean openLinkPath(String text, ClickPositionVO clickPositionVO) throws Exception {
                 String waitTime = clickPositionVO.getWaitTime();
                 String name = clickPositionVO.getName();
-                int clickType = clickPositionVO.getClickTypeEnum();
                 text += text_taskInfo() + clickPositionVO.getClickType();
                 updateMassage(text);
                 long wait = Long.parseLong(waitTime);
@@ -667,8 +665,7 @@ public class AutoClickService {
                             .setName(name);
                     dynamicQueue.add(waitLog);
                 }
-                boolean minScriptWindow = clickPositionVO.getMinScriptWindow().equals(activation);
-                openLink(clickPositionVO.getTargetPath(), clickPositionVO.getWorkPath(), clickPositionVO.getParameter(), clickType, minScriptWindow);
+                openLink(clickPositionVO, taskBean);
                 return false;
             }
         };
@@ -677,13 +674,18 @@ public class AutoClickService {
     /**
      * 处理要链接相关操作
      *
-     * @param link      链接地址
-     * @param workDir   工作目录
-     * @param param     脚本参数
-     * @param clickType 操作类型
+     * @param clickPositionVO 自动操作设置信息
+     * @param taskBean        任务设置信息
      * @throws Exception 运行脚本时发生错误、链接操作异常
      */
-    private static void openLink(String link, String workDir, String param, int clickType, boolean minScriptWindow) throws Exception {
+    private static void openLink(ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) throws Exception {
+        long start = System.currentTimeMillis();
+        String link = clickPositionVO.getTargetPath();
+        String workDir = clickPositionVO.getWorkPath();
+        String param = clickPositionVO.getParameter();
+        int clickType = clickPositionVO.getClickTypeEnum();
+        boolean minScriptWindow = clickPositionVO.getMinScriptWindow().equals(activation);
+        String name = clickPositionVO.getName();
         if (StringUtils.isBlank(link)) {
             throw new RuntimeException(text_pathNull());
         }
@@ -693,15 +695,57 @@ public class AutoClickService {
                 throw new RuntimeException(text_fileNotExists());
             }
             openFile(link);
+            if (taskBean.isOpenFileLog()) {
+                long end = System.currentTimeMillis();
+                String key = file.getName();
+                long time = end - start;
+                addLinkLog(name, time, key, clickType_openFile());
+            }
         } else if (clickType == ClickTypeEnum.OPEN_URL.ordinal()) {
-            Desktop.getDesktop().browse(new URI(link));
+            if (isValidUrl(link)) {
+                try {
+                    Desktop.getDesktop().browse(new URI(link));
+                    if (taskBean.isOpenUrlLog()) {
+                        long end = System.currentTimeMillis();
+                        long time = end - start;
+                        addLinkLog(name, time, link, clickType_openUrl());
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(text_urlErr());
+                }
+            } else {
+                throw new RuntimeException(text_urlErr());
+            }
         } else if (clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
             File file = new File(link);
             if (!file.exists()) {
                 throw new RuntimeException(text_fileNotExists());
             }
             runScript(file, workDir, param, minScriptWindow);
+            if (taskBean.isRunScriptLog()) {
+                long end = System.currentTimeMillis();
+                String key = file.getName();
+                long time = end - start;
+                addLinkLog(name, time, key, clickType_runScript());
+            }
         }
+    }
+
+    /**
+     * 添加链接操作日志
+     *
+     * @param name      操作名称
+     * @param clickTime 操作时长
+     * @param key       链接对应的文件名称或链接网址
+     * @param type      操作类型
+     */
+    private static void addLinkLog(String name, long clickTime, String key, String type) {
+        ClickLogBean clickLogBean = new ClickLogBean()
+                .setClickTime(String.valueOf(clickTime))
+                .setClickKey(key)
+                .setType(type)
+                .setName(name);
+        dynamicQueue.add(clickLogBean);
     }
 
     /**

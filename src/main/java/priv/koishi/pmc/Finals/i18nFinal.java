@@ -961,6 +961,55 @@ public class i18nFinal {
     }
 
     /**
+     * @return 点击将会根据当前设置打开文件、网址或运行脚本
+     */
+    public static String tip_testLink() {
+        return bundle.getString("tip.testLink");
+    }
+
+    /**
+     * @return 点击将即可选择要打开的文件或要运行的脚本
+     */
+    public static String tip_pathLink() {
+        return bundle.getString("tip.pathLink");
+    }
+
+    /**
+     * @return 击将即可选择脚本执行时的工作目录
+     */
+    public static String tip_workDir() {
+        return bundle.getString("tip.workDir");
+    }
+
+    /**
+     * @return 需要填写完整的网址
+     */
+    public static String tip_url() {
+        return bundle.getString("tip.url");
+    }
+
+    /**
+     * @return 填写脚本需要的参数，多个参数用空格隔开
+     */
+    public static String tip_parameter() {
+        return bundle.getString("tip.parameter");
+    }
+
+    /**
+     * @return 勾选后将会最小化终端窗口运行脚本
+     */
+    public static String tip_minWindow() {
+        return bundle.getString("tip.minWindow");
+    }
+
+    /**
+     * @return 删除工作目录
+     */
+    public static String tip_removeWorkDir() {
+        return bundle.getString("tip.removeWorkDir");
+    }
+
+    /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Oracle Corporation 25+36-3489
@@ -3297,8 +3346,8 @@ public class i18nFinal {
     public static void updateLinkList() {
         List<String> newList = Arrays.asList(
                 clickType_openFile(),
-                clickType_openUrl(),
-                clickType_runScript());
+                clickType_runScript(),
+                clickType_openUrl());
         linkList.clear();
         linkList.addAll(newList);
     }
@@ -3336,8 +3385,8 @@ public class i18nFinal {
     public static void updateClickTypeMap() {
         clickTypeMap.clear();
         clickTypeMap.put(ClickTypeEnum.OPEN_FILE.ordinal(), clickType_openFile());
-        clickTypeMap.put(ClickTypeEnum.OPEN_URL.ordinal(), clickType_openUrl());
         clickTypeMap.put(ClickTypeEnum.RUN_SCRIPT.ordinal(), clickType_runScript());
+        clickTypeMap.put(ClickTypeEnum.OPEN_URL.ordinal(), clickType_openUrl());
         clickTypeMap.put(ClickTypeEnum.MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
         clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
         clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());

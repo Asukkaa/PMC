@@ -96,6 +96,18 @@ public class UiUtils {
     }
 
     /**
+     * 鼠标停留提示框（组件文字为提示内容）
+     *
+     * @param labels 需要显示提示框的组件
+     */
+    public static void addToolTip(Labeled... labels) {
+        for (Labeled labeled : labels) {
+            String tip = labeled.getText();
+            Tooltip.install(labeled, creatTooltip(tip));
+        }
+    }
+
+    /**
      * 设置永久显示的鼠标停留提示框参数
      *
      * @param tip 提示文案

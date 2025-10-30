@@ -71,8 +71,17 @@
                                 <HBox fx:id="workDirHBox_Det" spacing="10">
                                     <Button fx:id="workDir_Det" text="%clickDetail.workPath_Det"
                                             onAction="#workPathAction"/>
-                                    <HBox prefWidth="445">
+                                    <HBox prefWidth="445" spacing="5">
                                         <Label fx:id="workPath_Det"/>
+
+                                        <Button fx:id="removeWorkPath_Det" onAction="#removeWorkPath" prefHeight="20"
+                                                styleClass="img-button-style" visible="false">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@../icon/Trash.png"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </Button>
                                     </HBox>
                                 </HBox>
                             </HBox>
@@ -90,7 +99,7 @@
                             </HBox>
 
                             <HBox styleClass="hBox-veryShort">
-                                <CheckBox fx:id="minWindow_Det" styleClass="checkBox-short"
+                                <CheckBox fx:id="minWindow_Det" styleClass="checkBox-short" selected="true"
                                           text="%clickDetail.minWindow_Det"/>
                             </HBox>
                         </HBox>
@@ -359,16 +368,18 @@
                                 <HBox spacing="5">
                                     <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath"
                                             text="%clickDetail.clickImgBtn_Det"/>
-                                    <Label fx:id="clickImgPath_Det" prefWidth="300" style="-fx-font-size: 15px;"/>
+                                    <HBox prefWidth="300" spacing="5">
+                                        <Label fx:id="clickImgPath_Det" style="-fx-font-size: 15px;"/>
 
-                                    <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
-                                            styleClass="img-button-style" visible="false">
-                                        <graphic>
-                                            <ImageView>
-                                                <Image url="@../icon/Trash.png"/>
-                                            </ImageView>
-                                        </graphic>
-                                    </Button>
+                                        <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
+                                                styleClass="img-button-style" visible="false">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@../icon/Trash.png"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </Button>
+                                    </HBox>
                                 </HBox>
 
                                 <VBox fx:id="clickImgVBox_Det" visible="false" spacing="10">

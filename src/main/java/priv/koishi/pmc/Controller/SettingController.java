@@ -163,7 +163,8 @@ public class SettingController extends RootController implements MousePositionUp
             hideWindowRecord_Set, showWindowRecord_Set, floatingRun_Set, floatingRecord_Set, randomClickTime_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
-            updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set;
+            updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
+            openUrlLog_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -385,7 +386,10 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, activation);
         setControlLastConfig(recordDrag_Set, prop, key_recordDrag, activation);
         setControlLastConfig(recordMove_Set, prop, key_recordMove, activation);
+        setControlLastConfig(openUrlLog_Set, prop, key_openUrlLog, activation);
         setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
+        setControlLastConfig(openFileLog_Set, prop, key_openFileLog, activation);
+        setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, activation);
         setControlLastConfig(randomClick_Set, prop, key_randomClick, unActivation);
         setControlLastConfig(floatingDistance_Set, prop, key_margin, defaultMargin);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, unActivation);
@@ -543,6 +547,8 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(colorPicker_Set.getValue()));
         addValueToolTip(stopOpacity_Set, tip_stopOpacity(), String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
+        addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set,
+                imgLog_Set, openFileLog_Set, runScriptLog_Set, openUrlLog_Set);
     }
 
     /**
@@ -1309,6 +1315,36 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void waitLog() throws IOException {
         setLoadLastConfigCheckBox(waitLog_Set, configFile_Click, key_waitLog);
+    }
+
+    /**
+     * 运行自动流程时记录打开文件事件
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void openFileLog() throws IOException {
+        setLoadLastConfigCheckBox(openFileLog_Set, configFile_Click, key_openFileLog);
+    }
+
+    /**
+     * 运行自动流程时记录运行脚本事件
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void runScriptLog() throws IOException {
+        setLoadLastConfigCheckBox(runScriptLog_Set, configFile_Click, key_runScriptLog);
+    }
+
+    /**
+     * 运行自动流程时记录打开网址事件
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void openUrlLog() throws IOException {
+        setLoadLastConfigCheckBox(openUrlLog_Set, configFile_Click, key_openUrlLog);
     }
 
     /**

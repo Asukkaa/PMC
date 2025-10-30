@@ -173,6 +173,8 @@ public class AboutController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        // 自动检查更新开关添加鼠标悬停提示
+        addToolTip(autoCheck_Abt);
         // 版本号鼠标悬停提示
         addToolTip(tip_version(), version_Abt);
         // 日志文件数量输入框添加鼠标悬停提示
@@ -181,8 +183,6 @@ public class AboutController extends RootController {
         addToolTip(tip_appreciate(), appreciate_Abt);
         // 给logo和应用名称添加鼠标悬停提示
         addToolTip(tip_thanks(), logo_Abt, title_Abt);
-        // 自动检查更新开关添加鼠标悬停提示
-        addToolTip(autoCheck_Abt.getText(), autoCheck_Abt);
         // 检查更新按钮添加鼠标悬停提示
         addToolTip(tip_checkUpdate_Abt(), checkUpdate_Abt);
         // 给github、gitee跳转按钮添加鼠标悬停提示

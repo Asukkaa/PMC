@@ -286,7 +286,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         addValueToolTip(datePicker_TD.getEditor(), tip_datePicker());
         addValueToolTip(repeatType_TD, tip_repeatType(), repeatType_TD.getValue());
         addValueToolTip(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
-        weekCheckBoxMap.forEach((_, checkBox) -> addToolTip(checkBox.getText(), checkBox));
+        weekCheckBoxMap.forEach((_, checkBox) -> addToolTip(checkBox));
     }
 
     /**

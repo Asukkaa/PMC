@@ -33,7 +33,10 @@ import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
@@ -203,7 +206,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
             updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
-            workDir_Det;
+            workDir_Det, removeWorkPath_Det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
@@ -344,6 +347,7 @@ public class ClickDetailController extends RootController {
             setPathLabel(link_Det, targetPath);
             setPathLabel(workPath_Det, item.getWorkPath());
             parameter_Det.setText(item.getParameter());
+            minWindow_Det.setSelected(item.getMinScriptWindow().equals(activation));
         } else if (clickType_openUrl().equals(clickType)) {
             url_Det.setText(targetPath);
         }
@@ -584,8 +588,12 @@ public class ClickDetailController extends RootController {
         // 通用内容变化监听
         InvalidationListener invalidationListener = _ -> isModified = true;
         // 绑定所有输入控件
+        registerWeakInvalidationListener(url_Det, url_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(link_Det, link_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(workPath_Det, workPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(parameter_Det, parameter_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(timeClick_Det, timeClick_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickName_Det, clickName_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryStep_Det, retryStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -595,11 +603,14 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(matchedStep_Det, matchedStep_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(relativelyX_Det, relativelyX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(relativelyY_Det, relativelyY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(minWindow_Det, minWindow_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickX_Det, randomClickX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickY_Det, randomClickY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(stopWindowInfo_Det, stopWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickWindowInfo_Det, clickWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(useRelatively_Det, useRelatively_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickAllRegion_Det, clickAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
@@ -678,6 +689,9 @@ public class ClickDetailController extends RootController {
      * 给组件添加内容变化监听
      */
     private void nodeValueChangeListener() {
+        // 目标网址文本输入框鼠标悬停提示
+        Runnable urlRemover = textFieldValueListener(url_Det, tip_url());
+        listenerRemovers.add(urlRemover);
         // 操作名称文本输入框鼠标悬停提示
         Runnable clickNameRemover = textFieldValueListener(clickName_Det, tip_clickName());
         listenerRemovers.add(clickNameRemover);
@@ -762,7 +776,13 @@ public class ClickDetailController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_url(), url_Det);
         addToolTip(tip_wait(), wait_Det);
+        addToolTip(tip_workDir(), workDir_Det);
+        addToolTip(tip_testLink(), testLink_Det);
+        addToolTip(tip_pathLink(), pathLink_Det);
+        addToolTip(tip_minWindow(), minWindow_Det);
+        addToolTip(tip_parameter(), parameter_Det);
         addToolTip(tip_clickTime(), timeClick_Det);
         addToolTip(tip_clickName(), clickName_Det);
         addToolTip(tip_stopImgBtn(), stopImgBtn_Det);
@@ -774,6 +794,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_randomClick(), randomClick_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
         addToolTip(tip_useRelatively(), useRelatively_Det);
+        addToolTip(tip_removeWorkDir(), removeWorkPath_Det);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Det);
         addToolTip(tip_randomClickTime(), randomClickTime_Det);
         addToolTip(tip_step(), matchedStep_Det, retryStep_Det);
@@ -1094,11 +1115,13 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void saveDetail() throws IllegalAccessException {
-        updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
-                clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
-        updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
-                stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
-        saveFloatingWindow(clickFloating, stopFloating);
+        String url = url_Det.getText();
+        String link = link_Det.getText();
+        int selectIndex = selectedItem.getIndex();
+        Integer clickType = clickTypeMap.getKey(clickType_Det.getValue());
+        Integer retryType = retryTypeMap.getKey(retryType_Det.getValue());
+        Integer matchedType = matchedTypeMap.getKey(matchedType_Det.getValue());
+        String minWindow = minWindow_Det.isSelected() ? activation : unActivation;
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
         String useRelatively = useRelatively_Det.isSelected() ? activation : unActivation;
         String stopAllRegion = stopAllRegion_Det.isSelected() ? activation : unActivation;
@@ -1109,32 +1132,62 @@ public class ClickDetailController extends RootController {
         String stopWindowUpdate = updateStopWindow_Det.isSelected() ? activation : unActivation;
         String clickWindowUpdate = updateClickWindow_Det.isSelected() ? activation : unActivation;
         String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
-        FloatingWindowConfig stopFloatingConfig = stopFloating.getConfig();
-        FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
-        stopFloatingConfig.setAllRegion(stopAllRegion)
-                .setAlwaysRefresh(stopWindowUpdate);
-        clickFloatingConfig.setAllRegion(clickAllRegion)
-                .setAlwaysRefresh(clickWindowUpdate);
-        int selectIndex = selectedItem.getIndex();
-        String matchedType = matchedType_Det.getValue();
+        if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
+            matchedType = MatchedTypeEnum.CLICK.ordinal();
+            retryType = RetryTypeEnum.STOP.ordinal();
+            useRelatively = unActivation;
+            if ((clickType == ClickTypeEnum.OPEN_FILE.ordinal() || clickType == ClickTypeEnum.RUN_SCRIPT.ordinal())
+                    && StringUtils.isBlank(link)) {
+                throw new RuntimeException(text_pathNull());
+            } else if (clickType == ClickTypeEnum.OPEN_URL.ordinal()) {
+                if (StringUtils.isBlank(url)) {
+                    throw new RuntimeException(text_pathNull());
+                } else if (isValidUrl(url)) {
+                    link = url;
+                } else {
+                    throw new RuntimeException(text_urlErr());
+                }
+            }
+        } else {
+            updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
+                    clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
+            updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
+                    stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
+            saveFloatingWindow(clickFloating, stopFloating);
+            FloatingWindowConfig stopFloatingConfig = stopFloating.getConfig();
+            FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
+            stopFloatingConfig.setAllRegion(stopAllRegion)
+                    .setAlwaysRefresh(stopWindowUpdate);
+            clickFloatingConfig.setAllRegion(clickAllRegion)
+                    .setAlwaysRefresh(clickWindowUpdate);
+            selectedItem.setStopWindowConfig(stopFloatingConfig)
+                    .setClickWindowConfig(clickFloatingConfig);
+            if (windowMonitorClick.getWindowInfo() != null) {
+                if (FindImgTypeEnum.WINDOW.ordinal() == clickFloatingConfig.getFindImgTypeEnum()) {
+                    updateCoordinate();
+                    selectedItem.setRelativeX(relativelyX_Det.getText())
+                            .setRelativeY(relativelyY_Det.getText());
+                }
+            }
+        }
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
+                .setTargetPath(link)
                 .setRandomClick(randomClick)
+                .setClickTypeEnum(clickType)
+                .setRetryTypeEnum(retryType)
+                .setMinScriptWindow(minWindow)
                 .setUseRelative(useRelatively)
+                .setMatchedTypeEnum(matchedType)
                 .setName(clickName_Det.getText())
                 .setRandomWaitTime(randomWaitTime)
-                .setTargetPath(link_Det.getText())
                 .setWorkPath(workPath_Det.getText())
                 .setRandomClickTime(randomClickTime)
                 .setParameter(parameter_Det.getText())
                 .setRandomTrajectory(randomTrajectory)
-                .setStopWindowConfig(stopFloatingConfig)
-                .setClickWindowConfig(clickFloatingConfig)
                 .setClickImgPath(clickImgPath_Det.getText())
                 .setRandomClickInterval(randomClickInterval)
-                .setMatchedTypeEnum(matchedTypeMap.getKey(matchedType))
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
-                .setClickTypeEnum(clickTypeMap.getKey(clickType_Det.getValue()))
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
                 .setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()))
                 .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
@@ -1151,16 +1204,14 @@ public class ClickDetailController extends RootController {
                 .setRandomTime(String.valueOf(setDefaultIntValue(randomTimeOffset_Det, Integer.parseInt(defaultRandomTime), 0, null)))
                 .setStopRetryTimes(String.valueOf(setDefaultIntValue(stopRetryNum_Det, Integer.parseInt(stopRetryNumDefault), 0, null)))
                 .setClickRetryTimes(String.valueOf(setDefaultIntValue(clickRetryNum_Det, Integer.parseInt(clickRetryNumDefault), 0, null)));
-        if (clickMatched_step().equals(matchedType) || clickMatched_clickStep().equals(matchedType)) {
+        if (MatchedTypeEnum.STEP.ordinal() == matchedType || MatchedTypeEnum.CLICK_STEP.ordinal() == matchedType) {
             String matchedStep = matchedStep_Det.getText();
             if (StringUtils.isBlank(matchedStep)) {
                 throw new RuntimeException(text_matchedStepIsNull());
             }
             selectedItem.setMatchedStep(matchedStep);
         }
-        String retryType = retryType_Det.getValue();
-        selectedItem.setRetryTypeEnum(retryTypeMap.getKey(retryType));
-        if (retryType_Step().equals(retryType)) {
+        if (RetryTypeEnum.STEP.ordinal() == retryType) {
             String retryStep = retryStep_Det.getText();
             if (StringUtils.isBlank(retryStep)) {
                 throw new RuntimeException(text_retryStepIsNull());
@@ -1169,13 +1220,6 @@ public class ClickDetailController extends RootController {
                 throw new RuntimeException(text_retryStepEqualIndex());
             }
             selectedItem.setRetryStep(retryStep);
-        }
-        if (windowMonitorClick.getWindowInfo() != null) {
-            if (FindImgTypeEnum.WINDOW.ordinal() == clickFloatingConfig.getFindImgTypeEnum()) {
-                updateCoordinate();
-                selectedItem.setRelativeX(relativelyX_Det.getText())
-                        .setRelativeY(relativelyY_Det.getText());
-            }
         }
         closeStage();
         // 触发列表刷新（通过回调）
@@ -1598,7 +1642,7 @@ public class ClickDetailController extends RootController {
      * @throws IOException 配置文件读取异常、配置文件保存异常、页面加载失败
      */
     @FXML
-    public void workPathAction(ActionEvent actionEvent) throws IOException {
+    private void workPathAction(ActionEvent actionEvent) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         String outFilePath = workPath_Det.getText();
         File selectedFile = creatDirectoryChooser(window, outFilePath, text_selectDirectory());
@@ -1606,7 +1650,17 @@ public class ClickDetailController extends RootController {
             inFilePath = selectedFile.getAbsolutePath();
             updateProperties(configFile_Click, key_inFilePath, inFilePath);
             setPathLabel(workPath_Det, inFilePath);
+            removeWorkPath_Det.setVisible(true);
         }
+    }
+
+    /**
+     * 删除工作路径
+     */
+    @FXML
+    private void removeWorkPath() {
+        setPathLabel(workPath_Det, "");
+        removeWorkPath_Det.setVisible(false);
     }
 
 }

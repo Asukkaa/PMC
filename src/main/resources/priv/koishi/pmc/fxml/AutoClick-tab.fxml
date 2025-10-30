@@ -15,7 +15,9 @@
 
         <HBox spacing="10">
             <Button fx:id="addOutPath_Click" onAction="#addOutPath" text="%autoClick.addOutPath_Click"/>
-            <Label fx:id="outPath_Click" prefWidth="300" style="-fx-font-size: 15px;"/>
+            <HBox prefWidth="300">
+                <Label fx:id="outPath_Click" style="-fx-font-size: 15px;"/>
+            </HBox>
 
             <Label text="%autoClick.outFileName"/>
             <TextField fx:id="outFileName_Click" prefWidth="140"/>

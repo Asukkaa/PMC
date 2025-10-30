@@ -36,7 +36,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.10.29";
+    public static final String buildDate = "2025.10.30";
 
     /**
      * 文件后缀名：bat
@@ -968,5 +968,11 @@ public class CommonFinals {
     public static final String key_useRelatively = "useRelatively";
 
     public static final String key_theme = "theme";
+
+    public static final String key_openFileLog = "openFileLog";
+
+    public static final String key_runScriptLog = "runScriptLog";
+
+    public static final String key_openUrlLog = "openUrlLog";
 
 }

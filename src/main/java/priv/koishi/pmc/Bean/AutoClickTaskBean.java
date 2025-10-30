@@ -80,6 +80,21 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     boolean waitLog;
 
     /**
+     * 运行自动流程时记录打开文件事件
+     */
+    boolean openFileLog;
+
+    /**
+     * 运行自动流程时记录运行脚本事件
+     */
+    boolean runScriptLog;
+
+    /**
+     * 运行自动流程时记录打开网址事件
+     */
+    boolean openUrlLog;
+
+    /**
      * 最大记录数量
      */
     int maxLogNum;

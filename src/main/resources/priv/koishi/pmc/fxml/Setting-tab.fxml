@@ -223,6 +223,17 @@
             <CheckBox fx:id="imgLog_Set" onAction="#imgLog" styleClass="checkBox-medium"
                       text="%setting.imgLog_Set" selected="true"/>
 
+            <CheckBox fx:id="openFileLog_Set" onAction="#openFileLog" styleClass="checkBox-medium"
+                      text="%setting.openFileLog_Set" selected="true"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <CheckBox fx:id="runScriptLog_Set" onAction="#runScriptLog" styleClass="checkBox-medium"
+                      text="%setting.runScriptLog_Set" selected="true"/>
+
+            <CheckBox fx:id="openUrlLog_Set" onAction="#openUrlLog" styleClass="checkBox-medium"
+                      text="%setting.openUrlLog_Set" selected="true"/>
+
             <HBox styleClass="hBox-short">
                 <Label text="%setting.maxLogNum"/>
                 <TextField fx:id="maxLogNum_Set" prefWidth="80"/>
