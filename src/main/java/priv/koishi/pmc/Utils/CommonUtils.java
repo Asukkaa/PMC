@@ -227,4 +227,33 @@ public class CommonUtils {
         return String.valueOf(pid);
     }
 
+    /**
+     * 验证 URL 是否有效
+     *
+     * @param url 要验证的 URL
+     * @return true 表示 URL 有效，false 表示无效
+     */
+    public static boolean isValidUrl(String url) {
+        if (StringUtils.isBlank(url)) {
+            return false;
+        }
+        //  协议
+        String urlRegex = "^(https?|ftp|file)://" +
+                // 域名或 IP
+                "([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}|localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})" +
+                // 端口
+                "(:[0-9]{1,5})?" +
+                // 路径
+                "(/[\\w.-]*)*" +
+                // 查询参数
+                "(\\?[\\w.-=&]*)?$";
+        Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+        String trimmedUrl = url.trim();
+        // 如果没有协议前缀，自动添加 https:// 进行测试
+        if (!trimmedUrl.matches("^[a-zA-Z]+://.*")) {
+            trimmedUrl = "https://" + trimmedUrl;
+        }
+        return urlPattern.matcher(trimmedUrl).matches();
+    }
+
 }

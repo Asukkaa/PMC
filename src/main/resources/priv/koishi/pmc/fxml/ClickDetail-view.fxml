@@ -94,6 +94,8 @@
                                           text="%clickDetail.minWindow_Det"/>
                             </HBox>
                         </HBox>
+
+                        <Label fx:id="pathTip_Det" style="-fx-pref-height: -1" textFill="red"/>
                     </VBox>
 
                     <VBox fx:id="clickVBox_Det" spacing="10">
@@ -416,7 +418,7 @@
             <Button text="%clickDetail.removeDetail" onAction="#removeDetail"/>
 
             <Region HBox.hgrow="ALWAYS"/>
-            <Label textFill="red" text="%clickDetail.tip"/>
+            <Label fx:id="resolution_Det" textFill="red" text="%clickDetail.tip"/>
         </HBox>
     </bottom>
 </BorderPane>

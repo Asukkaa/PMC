@@ -64,6 +64,7 @@ import static priv.koishi.pmc.Service.AutoClickService.scriptRun;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -212,7 +213,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
             tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
-            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det;
+            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -239,7 +240,7 @@ public class ClickDetailController extends RootController {
         double tableWidth = stage.getWidth() * 0.5;
         tableView_Det.setMaxWidth(tableWidth);
         tableView_Det.setPrefWidth(tableWidth);
-        tableView_Det.setPrefHeight(stage.getHeight() * 0.4);
+        tableView_Det.setPrefHeight(stage.getHeight() * 0.5);
         regionRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
         progressBarVBox_Det.setPrefWidth(stage.getWidth() * 0.4);
         bindPrefWidthProperty();
@@ -1317,23 +1318,31 @@ public class ClickDetailController extends RootController {
         if (linkList.contains(value)) {
             vBox_Det.getChildren().add(pathLinkVBox_Det);
             testLink_Det.setVisible(true);
+            resolution_Det.setVisible(false);
             randomClickInterval_Det.setVisible(false);
-            pathLinkVBox_Det.getChildren().remove(parameterHBox_Det);
+            pathLinkVBox_Det.getChildren().removeAll(parameterHBox_Det, pathTip_Det);
             pathLinkHBox_Det.getChildren().clear();
             if (clickType_openFile().equals(value)) {
+                pathLinkVBox_Det.getChildren().add(pathTip_Det);
                 pathLinkHBox_Det.getChildren().add(pathHBox_Det);
                 workDirHBox_Det.setVisible(false);
+                pathTip_Det.setText(pathTip_openFile());
             } else if (clickType_runScript().equals(value)) {
-                pathLinkVBox_Det.getChildren().add(parameterHBox_Det);
+                pathLinkVBox_Det.getChildren().addAll(parameterHBox_Det, pathTip_Det);
                 pathLinkHBox_Det.getChildren().add(pathHBox_Det);
                 workDirHBox_Det.setVisible(true);
+                pathTip_Det.setText(pathTip_runScript());
             } else if (clickType_openUrl().equals(value)) {
+                pathLinkVBox_Det.getChildren().add(pathTip_Det);
                 pathLinkHBox_Det.getChildren().add(urlHBox_Det);
+                pathTip_Det.setText(pathTip_openUrl());
             }
         } else {
             vBox_Det.getChildren().add(clickVBox_Det);
             testLink_Det.setVisible(false);
             randomClickInterval_Det.setVisible(true);
+            pathTip_Det.setText("");
+            resolution_Det.setVisible(true);
         }
     }
 
@@ -1566,8 +1575,16 @@ public class ClickDetailController extends RootController {
         } else if (clickType_openUrl().equals(value)) {
             String url = url_Det.getText();
             if (StringUtils.isNotBlank(url)) {
-                Desktop.getDesktop().browse(new URI(url));
-                new MessageBubble(text_testSuccess(), time);
+                if (isValidUrl(url)) {
+                    try {
+                        Desktop.getDesktop().browse(new URI(url));
+                        new MessageBubble(text_testSuccess(), time);
+                    } catch (IOException e) {
+                        new MessageBubble(text_urlErr(), time);
+                    }
+                } else {
+                    new MessageBubble(text_urlErr(), time);
+                }
             } else {
                 new MessageBubble(text_pathNull(), time);
             }

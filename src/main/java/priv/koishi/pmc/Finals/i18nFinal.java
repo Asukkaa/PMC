@@ -1819,6 +1819,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 网址格式不正确
+     */
+    public static String text_urlErr() {
+        return bundle.getString("urlErr");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
@@ -2768,6 +2775,36 @@ public class i18nFinal {
      */
     public static String macMenu_quit() {
         return bundle.getString("macMenu.quit");
+    }
+
+    /**
+     * @return <p>将会使用操作系统默认打开方式打开文件</p>
+     * <p>无法确定文件是否正常打开，后续操作需要自行计算文件打开的时间</p>
+     * 脚本文件如果默认打开方式为终端则会直接运行脚本
+     */
+    public static String pathTip_openFile() {
+        return bundle.getString("pathTip.openFile");
+    }
+
+    /**
+     * @return <p>将会使用操作系统默认浏览器打开网址</p>
+     * <p>无法确定网址是否正常打开，后续操作需要自行计算网址打开的时间</p>
+     * 需要输入完整网址，可不输入协议（http:// https://）前缀
+     */
+    public static String pathTip_openUrl() {
+        return bundle.getString("pathTip.openUrl");
+    }
+
+    /**
+     * @return <p>将会打开终端运行脚本，脚本执行结束后自动关闭终端窗口进行后续操作</p>
+     * <p>执行脚本需要安装对应的脚本运行环境</p>
+     * <p>运行 .py 文件需要 python 3.0 以上的环境</p>
+     * <p>运行 .ps1 文件需要 powershell 环境</p>
+     * <p>运行 .java 文件需要 java 11 以上的环境</p>
+     * 运行 .jar 和 .class 文件需要 java 环境
+     */
+    public static String pathTip_runScript() {
+        return bundle.getString("pathTip.runScript");
     }
 
     /**
