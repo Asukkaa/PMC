@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
+import static priv.koishi.pmc.Finals.i18nFinal.text_cantEdit;
 import static priv.koishi.pmc.Finals.i18nFinal.text_editingCellTip;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
@@ -76,6 +77,16 @@ public class EditingCell<T> extends TableCell<T, String> {
     private String tableColumnText;
 
     /**
+     * 单元格是否可编辑
+     */
+    private boolean editable = true;
+
+    /**
+     * 禁用时的显示值
+     */
+    private String disabledValue;
+
+    /**
      * 构造 EditingCell 对象,并且明确将该 cell 的值保存进相应的 JavaBean 的属性值的方法
      *
      * @param itemConsumer 用于引入 lambda 表达式的对象
@@ -104,7 +115,7 @@ public class EditingCell<T> extends TableCell<T, String> {
      */
     @Override
     public void startEdit() {
-        if (!isEmpty()) {
+        if (!isEmpty() && editable) {
             super.startEdit();
             if (Objects.isNull(textField)) {
                 createTextField();
@@ -124,7 +135,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setText(getItem());
+        updateDisplayText();
         setGraphic(null);
         // 移除监听器
         removeListeners();
@@ -157,7 +168,9 @@ public class EditingCell<T> extends TableCell<T, String> {
             if (tableColumnText == null) {
                 tableColumnText = "";
             }
-            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getString()));
+            // 检查单元格是否可编辑
+            updateEditableState();
+            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getDisplayText()));
             if (isEditing()) {
                 if (textField != null) {
                     textField.setText(getString());
@@ -165,7 +178,7 @@ public class EditingCell<T> extends TableCell<T, String> {
                 setText(null);
                 setGraphic(textField);
             } else {
-                setText(getString());
+                updateDisplayText();
                 setGraphic(null);
             }
         }
@@ -179,7 +192,7 @@ public class EditingCell<T> extends TableCell<T, String> {
     @Override
     public void commitEdit(String newValue) {
         super.commitEdit(newValue);
-        updateItem(newValue, false);
+        updateDisplayText();
         setTProperties(newValue);
         // 移除监听器
         removeListeners();
@@ -241,6 +254,46 @@ public class EditingCell<T> extends TableCell<T, String> {
      */
     private String getString() {
         return getItem() == null ? "" : getItem();
+    }
+
+    /**
+     * 获取显示文本（考虑禁用状态）
+     *
+     * @return 显示文本
+     */
+    private String getDisplayText() {
+        if (!editable && disabledValue != null) {
+            return disabledValue;
+        }
+        return getString();
+    }
+
+    /**
+     * 更新显示文本
+     */
+    private void updateDisplayText() {
+        setText(getDisplayText());
+        // 根据可编辑状态设置样式
+        if (!editable) {
+            setTooltip(creatTooltip(tableColumnText + text_cantEdit() + "\n" + getDisplayText()));
+        } else {
+            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getDisplayText()));
+        }
+    }
+
+    /**
+     * 更新可编辑状态
+     */
+    private void updateEditableState() {
+        TableView<T> tableView = getTableView();
+        if (tableView != null && getIndex() >= 0 && getIndex() < tableView.getItems().size()) {
+            T t = tableView.getItems().get(getIndex());
+            editable = itemConsumer.isEditable(t);
+            disabledValue = itemConsumer.getDisabledValue(t);
+        } else {
+            editable = true;
+            disabledValue = null;
+        }
     }
 
     /**

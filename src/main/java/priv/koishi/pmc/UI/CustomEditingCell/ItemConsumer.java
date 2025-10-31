@@ -14,9 +14,29 @@ public interface ItemConsumer<T> {
      * 如果不将属性保存到 cell 所在表格的 ObservableList 集合中对象的相应属性中,
      * 则只是改变了表格显示的值,一旦表格刷新,则仍会表示旧值.
      *
-     * @param t     表格数据类型
+     * @param t     当前行数据
      * @param value 新值
      */
     void setTProperties(T t, String value);
+
+    /**
+     * 检查单元格是否可编辑
+     *
+     * @param t 当前行数据
+     * @return true-可编辑，false-不可编辑
+     */
+    default boolean isEditable(T t) {
+        return true;
+    }
+
+    /**
+     * 获取单元格禁用时的显示值
+     *
+     * @param t 当前行数据
+     * @return 禁用时显示的值
+     */
+    default String getDisabledValue(T t) {
+        return null;
+    }
 
 }

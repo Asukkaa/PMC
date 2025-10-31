@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Controller;
 
+import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
@@ -188,7 +189,7 @@ public class ClickDetailController extends RootController {
     public HBox fileNumberHBox_Det, retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det,
             stopRegionHBox_Det, clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, pointHBox_Det, workDirHBox_Det;
+            parameterHBox_Det, pointHBox_Det, workDirHBox_Det, clickKeyHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -1118,8 +1119,10 @@ public class ClickDetailController extends RootController {
         String url = url_Det.getText();
         String link = link_Det.getText();
         int selectIndex = selectedItem.getIndex();
+        int clickNum = setDefaultIntValue(clickNumBer_Det, 1, 1, null);
         Integer clickType = clickTypeMap.getKey(clickType_Det.getValue());
         Integer retryType = retryTypeMap.getKey(retryType_Det.getValue());
+        Integer clickKey = recordClickTypeMap.getKey(clickKey_Det.getValue());
         Integer matchedType = matchedTypeMap.getKey(matchedType_Det.getValue());
         String minWindow = minWindow_Det.isSelected() ? activation : unActivation;
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
@@ -1135,6 +1138,8 @@ public class ClickDetailController extends RootController {
         if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
             matchedType = MatchedTypeEnum.CLICK.ordinal();
             retryType = RetryTypeEnum.STOP.ordinal();
+            clickKey = NativeMouseEvent.BUTTON1;
+            clickNum = 1;
             useRelatively = unActivation;
             if ((clickType == ClickTypeEnum.OPEN_FILE.ordinal() || clickType == ClickTypeEnum.RUN_SCRIPT.ordinal())
                     && StringUtils.isBlank(link)) {
@@ -1149,6 +1154,15 @@ public class ClickDetailController extends RootController {
                 }
             }
         } else {
+            if (clickType == ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
+                    || clickType == ClickTypeEnum.MOVE.ordinal()
+                    || clickType == ClickTypeEnum.MOVETO.ordinal()) {
+                clickKey = NativeMouseEvent.BUTTON1;
+                clickNum = 1;
+            } else if (clickType == ClickTypeEnum.WHEEL_UP.ordinal()
+                    || clickType == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
+                clickKey = NativeMouseEvent.BUTTON1;
+            }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                     clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
             updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
@@ -1173,6 +1187,7 @@ public class ClickDetailController extends RootController {
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
                 .setTargetPath(link)
+                .setClickKeyEnum(clickKey)
                 .setRandomClick(randomClick)
                 .setClickTypeEnum(clickType)
                 .setRetryTypeEnum(retryType)
@@ -1185,16 +1200,15 @@ public class ClickDetailController extends RootController {
                 .setRandomClickTime(randomClickTime)
                 .setParameter(parameter_Det.getText())
                 .setRandomTrajectory(randomTrajectory)
+                .setClickNum(String.valueOf(clickNum))
                 .setClickImgPath(clickImgPath_Det.getText())
                 .setRandomClickInterval(randomClickInterval)
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
                 .setClickMatchThreshold(String.valueOf(clickOpacity_Det.getValue()))
-                .setClickKeyEnum(recordClickTypeMap.getKey(clickKey_Det.getValue()))
                 .setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)))
                 .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, -screenWidth, screenWidth)))
                 .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, -screenHeight, screenHeight)))
-                .setClickNum(String.valueOf(setDefaultIntValue(clickNumBer_Det, 1, 1, null)))
                 .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth)))
                 .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight)))
                 .setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)))
@@ -1353,7 +1367,6 @@ public class ClickDetailController extends RootController {
     @FXML
     private void clickTypeChange() {
         String value = clickType_Det.getValue();
-        clickTypeHBox_Det.setVisible(clickType_click().equals(value));
         addValueToolTip(clickType_Det, tip_clickType(), value);
         addValueToolTip(clickTypeText_Det, tip_clickType(), value);
         setPathLabel(link_Det, null);
@@ -1382,6 +1395,12 @@ public class ClickDetailController extends RootController {
                 pathTip_Det.setText(pathTip_openUrl());
             }
         } else {
+            clickTypeHBox_Det.setVisible(!clickType_move().equals(value) && !clickType_moveTo().equals(value));
+            clickKeyHBox_Det.setVisible(!clickType_move().equals(value)
+                    && !clickType_moveTo().equals(value)
+                    && !clickType_moveTrajectory().equals(value)
+                    && !clickType_wheelUp().equals(value)
+                    && !clickType_wheelDown().equals(value));
             vBox_Det.getChildren().add(clickVBox_Det);
             testLink_Det.setVisible(false);
             randomClickInterval_Det.setVisible(true);

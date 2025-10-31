@@ -1017,6 +1017,10 @@ public class AutoClickService {
                                 .setName(name);
                         dynamicQueue.add(pressLog);
                     }
+                } else if (ClickTypeEnum.WHEEL_DOWN.ordinal() == clickType) {
+                    robot.mouseWheel(1);
+                } else if (ClickTypeEnum.WHEEL_UP.ordinal() == clickType) {
+                    robot.mouseWheel(-1);
                 }
                 actionFuture.complete(null);
             });

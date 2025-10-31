@@ -1216,86 +1216,6 @@ public class UiUtils {
     }
 
     /**
-     * 更改点击按键
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     */
-    public static void buildEditClickKeyMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu(menu_changeKey());
-        // 创建二级菜单项
-        MenuItem primary = new MenuItem(mouseButton_primary());
-        MenuItem secondary = new MenuItem(mouseButton_secondary());
-        MenuItem middle = new MenuItem(mouseButton_middle());
-        MenuItem forward = new MenuItem(mouseButton_forward());
-        MenuItem back = new MenuItem(mouseButton_back());
-        // 为每个菜单项添加事件处理
-        primary.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_primary()));
-        secondary.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_secondary()));
-        middle.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_middle()));
-        forward.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_forward()));
-        back.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_back()));
-        // 将菜单添加到菜单列表
-        menu.getItems().addAll(primary, secondary, middle, forward, back);
-        contextMenu.getItems().add(menu);
-    }
-
-    /**
-     * 修改点击按键二级菜单选项
-     *
-     * @param tableView 要添加右键菜单的列表
-     * @param clickKey  点击按键
-     */
-    private static void updateClickKeyMenuItem(TableView<ClickPositionVO> tableView, String clickKey) {
-        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
-        if (CollectionUtils.isNotEmpty(selectedItem)) {
-            selectedItem.forEach(bean -> {
-                bean.setClickKeyEnum(recordClickTypeMap.getKey(clickKey));
-                tableView.refresh();
-            });
-        }
-    }
-
-    /**
-     * 更改重试类型
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     */
-    public static void buildEditRetryTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu(menu_changeRetryType());
-        // 创建二级菜单项
-        MenuItem primary = new MenuItem(retryType_continuously());
-        MenuItem secondary = new MenuItem(retryType_click());
-        MenuItem middle = new MenuItem(retryType_stop());
-        MenuItem forward = new MenuItem(retryType_break());
-        // 为每个菜单项添加事件处理
-        primary.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_continuously()));
-        secondary.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_click()));
-        middle.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_stop()));
-        forward.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_break()));
-        // 将菜单添加到菜单列表
-        menu.getItems().addAll(primary, secondary, middle, forward);
-        contextMenu.getItems().add(menu);
-    }
-
-    /**
-     * 更改重试类型二级菜单选项
-     *
-     * @param tableView 要添加右键菜单的列表
-     * @param retryType 操作类型
-     */
-    private static void updateRetryTypeMenuItem(TableView<ClickPositionVO> tableView, String retryType) {
-        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
-        if (CollectionUtils.isNotEmpty(selectedItem)) {
-            selectedItem.forEach(bean -> {
-                bean.setRetryTypeEnum(retryTypeMap.getKey(retryType));
-                tableView.refresh();
-            });
-        }
-    }
-
-    /**
      * 修改所选项终止操作图片地址
      *
      * @param tableView   要添加右键菜单的列表
@@ -1303,7 +1223,8 @@ public class UiUtils {
      * @param dataNumber  列表数据数量文本框
      * @param unit        列表数据数量单位
      */
-    public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu, Label dataNumber, String unit) {
+    public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu,
+                                                Label dataNumber, String unit) {
         MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
         upMoveDataMenuItem.setOnAction(_ -> {
             ObservableList<ImgFileVO> selectedItems = tableView.getSelectionModel().getSelectedItems();

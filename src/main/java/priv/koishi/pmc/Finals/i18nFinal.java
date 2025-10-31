@@ -1882,6 +1882,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 当前单元格不可编辑
+     */
+    public static String text_cantEdit() {
+        return bundle.getString("cantEdit");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
@@ -3343,6 +3350,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 滚轮上滑
+     */
+    public static String clickType_wheelUp() {
+        return bundle.getString("clickType.wheelUp");
+    }
+
+    /**
+     * @return 滚轮下滑
+     */
+    public static String clickType_wheelDown() {
+        return bundle.getString("clickType.wheelDown");
+    }
+
+    /**
      * 打开链接相关选项
      */
     public static final List<String> linkList = new ArrayList<>();
@@ -3375,7 +3396,9 @@ public class i18nFinal {
                 clickType_move(),
                 clickType_click(),
                 clickType_drag(),
-                clickType_moveTo());
+                clickType_moveTo(),
+                clickType_wheelUp(),
+                clickType_wheelDown());
         clickTypeList.clear();
         clickTypeList.addAll(linkList);
         clickTypeList.addAll(newList);
@@ -3399,6 +3422,8 @@ public class i18nFinal {
         clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());
         clickTypeMap.put(ClickTypeEnum.DRAG.ordinal(), clickType_drag());
         clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
+        clickTypeMap.put(ClickTypeEnum.WHEEL_UP.ordinal(), clickType_wheelUp());
+        clickTypeMap.put(ClickTypeEnum.WHEEL_DOWN.ordinal(), clickType_wheelDown());
     }
 
     /**

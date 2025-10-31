@@ -57,6 +57,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
+import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
@@ -538,6 +539,31 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 判断单元格是否可编辑
+     *
+     * @param clickType 操作类型枚举
+     * @return true 可编辑 false 不可编辑
+     */
+    private static boolean canEdit(int clickType) {
+        return clickType != ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
+                && clickType != ClickTypeEnum.MOVE.ordinal()
+                && clickType != ClickTypeEnum.MOVETO.ordinal()
+                && clickType > ClickTypeEnum.OPEN_URL.ordinal();
+    }
+
+    /**
+     * 判断单元格所在操作步骤是否有按键
+     *
+     * @param clickType 操作类型枚举
+     * @return true 无按键 false 有按键
+     */
+    private static boolean noKeyCell(int clickType) {
+        return !canEdit(clickType)
+                || clickType == ClickTypeEnum.WHEEL_UP.ordinal()
+                || clickType == ClickTypeEnum.WHEEL_DOWN.ordinal();
+    }
+
+    /**
      * 设置单元格可编辑
      */
     private void makeCellCanEdit() {
@@ -548,8 +574,50 @@ public class AutoClickController extends RootController implements MousePosition
                 new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
         clickTime_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
-        clickNum_Click.setCellFactory((_) ->
-                new EditingCell<>(ClickPositionVO::setClickNum, true, 0, null));
+        clickNum_Click.setCellFactory(_ -> new EditingCell<>(
+                new ItemConsumer<>() {
+
+                    /**
+                     * 将编辑后的对象属性进行保存.
+                     * 如果不将属性保存到 cell 所在表格的 ObservableList 集合中对象的相应属性中,
+                     * 则只是改变了表格显示的值,一旦表格刷新,则仍会表示旧值.
+                     *
+                     * @param item     当前行数据
+                     * @param value 新值
+                     */
+                    @Override
+                    public void setTProperties(ClickPositionVO item, String value) {
+                        item.setClickNum(value);
+                    }
+
+                    /**
+                     * 检查单元格是否可编辑
+                     *
+                     * @param item 当前行数据
+                     * @return true-可编辑，false-不可编辑
+                     */
+                    @Override
+                    public boolean isEditable(ClickPositionVO item) {
+                        int clickType = item.getClickTypeEnum();
+                        return canEdit(clickType);
+                    }
+
+                    /**
+                     * 获取单元格禁用时的显示值
+                     *
+                     * @param item 当前行数据
+                     * @return 禁用时显示的值
+                     */
+                    @Override
+                    public String getDisabledValue(ClickPositionVO item) {
+                        int clickType = item.getClickTypeEnum();
+                        if (!canEdit(clickType)) {
+                            return "1";
+                        }
+                        return null;
+                    }
+
+                }, true, 1, null));
     }
 
     /**
@@ -958,6 +1026,86 @@ public class AutoClickController extends RootController implements MousePosition
             } else if (menuItem_recordTop().equals(insertType)) {
                 startRecord(topAdd);
             }
+        }
+    }
+
+    /**
+     * 更改点击按键
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    private static void buildEditClickKeyMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu(menu_changeKey());
+        // 创建二级菜单项
+        MenuItem primary = new MenuItem(mouseButton_primary());
+        MenuItem secondary = new MenuItem(mouseButton_secondary());
+        MenuItem middle = new MenuItem(mouseButton_middle());
+        MenuItem forward = new MenuItem(mouseButton_forward());
+        MenuItem back = new MenuItem(mouseButton_back());
+        // 为每个菜单项添加事件处理
+        primary.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_primary()));
+        secondary.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_secondary()));
+        middle.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_middle()));
+        forward.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_forward()));
+        back.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_back()));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(primary, secondary, middle, forward, back);
+        contextMenu.getItems().add(menu);
+    }
+
+    /**
+     * 修改点击按键二级菜单选项
+     *
+     * @param tableView 要添加右键菜单的列表
+     * @param clickKey  点击按键
+     */
+    private static void updateClickKeyMenuItem(TableView<ClickPositionVO> tableView, String clickKey) {
+        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        if (CollectionUtils.isNotEmpty(selectedItem)) {
+            selectedItem.forEach(bean -> {
+                if (!noKeyCell(bean.getClickTypeEnum())) {
+                    bean.setClickKeyEnum(recordClickTypeMap.getKey(clickKey));
+                }
+            });
+            tableView.refresh();
+        }
+    }
+
+    /**
+     * 更改重试类型
+     *
+     * @param tableView   要添加右键菜单的列表
+     * @param contextMenu 右键菜单集合
+     */
+    private static void buildEditRetryTypeMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
+        Menu menu = new Menu(menu_changeRetryType());
+        // 创建二级菜单项
+        MenuItem primary = new MenuItem(retryType_continuously());
+        MenuItem secondary = new MenuItem(retryType_click());
+        MenuItem middle = new MenuItem(retryType_stop());
+        MenuItem forward = new MenuItem(retryType_break());
+        // 为每个菜单项添加事件处理
+        primary.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_continuously()));
+        secondary.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_click()));
+        middle.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_stop()));
+        forward.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_break()));
+        // 将菜单添加到菜单列表
+        menu.getItems().addAll(primary, secondary, middle, forward);
+        contextMenu.getItems().add(menu);
+    }
+
+    /**
+     * 更改重试类型二级菜单选项
+     *
+     * @param tableView 要添加右键菜单的列表
+     * @param retryType 操作类型
+     */
+    private static void updateRetryTypeMenuItem(TableView<ClickPositionVO> tableView, String retryType) {
+        List<ClickPositionVO> selectedItem = tableView.getSelectionModel().getSelectedItems();
+        if (CollectionUtils.isNotEmpty(selectedItem)) {
+            selectedItem.forEach(bean -> bean.setRetryTypeEnum(retryTypeMap.getKey(retryType)));
+            tableView.refresh();
         }
     }
 
