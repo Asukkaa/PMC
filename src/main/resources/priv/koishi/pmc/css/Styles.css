@@ -102,13 +102,13 @@
 
 .text-field {
     -fx-font-size: 12;
-    -fx-pref-height: 35;
+    -fx-pref-height: 25;
 }
 
 .button {
     -fx-cursor: hand;
     -fx-font-size: 12;
-    -fx-pref-height: 35;
+    -fx-pref-height: 25;
 }
 
 .check-box {
