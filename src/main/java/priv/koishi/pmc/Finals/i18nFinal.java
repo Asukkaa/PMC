@@ -1875,6 +1875,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 发送邮件
+     */
+    public static String text_mailTo() {
+        return bundle.getString("mailTo");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

@@ -239,7 +239,7 @@ public class AboutController extends RootController {
      * @param valueLabel  要处理的文本栏
      */
     private void buildMailMenu(ContextMenu contextMenu, Label valueLabel) {
-        MenuItem mailMenuItem = new MenuItem("发送邮件");
+        MenuItem mailMenuItem = new MenuItem(text_mailTo());
         mailMenuItem.setOnAction(_ -> {
             try {
                 String email = valueLabel.getText();
