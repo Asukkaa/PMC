@@ -1660,10 +1660,7 @@ public class UiUtils {
             openFileMenuItem.setOnAction(_ -> openFile(path));
             contextMenu.getItems().add(openFileMenuItem);
         }
-        MenuItem copyValueMenuItem = new MenuItem(text_copyPath());
-        contextMenu.getItems().add(copyValueMenuItem);
-        valueLabel.setContextMenu(contextMenu);
-        copyValueMenuItem.setOnAction(_ -> copyText(valueLabel.getText()));
+        setCopyValueContextMenu(contextMenu, valueLabel, text_copyPath());
         valueLabel.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
                 contextMenu.show(valueLabel, event.getScreenX(), event.getScreenY());
@@ -1674,21 +1671,16 @@ public class UiUtils {
     /**
      * 添加复制 Label 值右键菜单
      *
-     * @param valueLabel 要处理的文本栏
-     * @param text       右键菜单文本
+     * @param contextMenu 右键菜单
+     * @param valueLabel  要处理的文本栏
+     * @param text        右键菜单文本
      */
-    public static void setCopyValueContextMenu(Label valueLabel, String text) {
-        ContextMenu contextMenu = new ContextMenu();
+    public static void setCopyValueContextMenu(ContextMenu contextMenu, Label valueLabel, String text) {
         MenuItem copyValueMenuItem = new MenuItem(text);
-        contextMenu.getItems().add(copyValueMenuItem);
         valueLabel.setContextMenu(contextMenu);
-        valueLabel.setOnMousePressed(event -> {
-            if (event.isSecondaryButtonDown()) {
-                contextMenu.show(valueLabel, event.getScreenX(), event.getScreenY());
-            }
-        });
         // 设置右键菜单行为
         copyValueMenuItem.setOnAction(_ -> copyText(valueLabel.getText()));
+        contextMenu.getItems().add(copyValueMenuItem);
     }
 
     /**

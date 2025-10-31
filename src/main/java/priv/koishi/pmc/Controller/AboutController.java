@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -218,6 +219,46 @@ public class AboutController extends RootController {
     }
 
     /**
+     * 构建邮件右键菜单
+     */
+    private void buildMailMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        setCopyValueContextMenu(contextMenu, mail_Abt, about_copyEmail());
+        buildMailMenu(contextMenu, mail_Abt);
+        mail_Abt.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                contextMenu.show(mail_Abt, event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    /**
+     * 添加复制 Label 值右键菜单
+     *
+     * @param contextMenu 右键菜单
+     * @param valueLabel  要处理的文本栏
+     */
+    private void buildMailMenu(ContextMenu contextMenu, Label valueLabel) {
+        MenuItem mailMenuItem = new MenuItem("发送邮件");
+        mailMenuItem.setOnAction(_ -> {
+            try {
+                String email = valueLabel.getText();
+                URI mailtoURI;
+                String mailto = "mailto:";
+                if (email.startsWith(mailto)) {
+                    mailtoURI = URI.create(email);
+                } else {
+                    mailtoURI = URI.create(mailto + email);
+                }
+                Desktop.getDesktop().mail(mailtoURI);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        contextMenu.getItems().add(mailMenuItem);
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException 日志文件配置读取异常
@@ -229,7 +270,7 @@ public class AboutController extends RootController {
         // 设置版本号
         version_Abt.setText(version);
         // 添加右键菜单
-        setCopyValueContextMenu(mail_Abt, about_copyEmail());
+        buildMailMenu();
         // 设置鼠标悬停提示
         setToolTip();
         // 设置要防重复点击的组件
