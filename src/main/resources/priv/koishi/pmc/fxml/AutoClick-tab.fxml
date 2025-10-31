@@ -14,8 +14,8 @@
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addOutPath_Click" onAction="#addOutPath" text="%autoClick.addOutPath_Click"/>
-            <HBox prefWidth="300">
+            <HBox prefWidth="500" spacing="10">
+                <Button fx:id="addOutPath_Click" onAction="#addOutPath" text="%autoClick.addOutPath_Click"/>
                 <Label fx:id="outPath_Click" style="-fx-font-size: 15px;"/>
             </HBox>
 
@@ -28,9 +28,12 @@
         </HBox>
 
         <HBox spacing="10">
-            <Button fx:id="addPosition_Click" onAction="#addPosition" text="%autoClick.addPosition_Click"/>
-            <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" text="%autoClick.loadAutoClick_Click"/>
-            <CheckBox fx:id="loadFolder_Click" text="%autoClick.loadFolder_Click"/>
+            <HBox prefWidth="500" spacing="10">
+                <Button fx:id="addPosition_Click" onAction="#addPosition" text="%autoClick.addPosition_Click"/>
+                <Button fx:id="loadAutoClick_Click" onAction="#loadAutoClick" text="%autoClick.loadAutoClick_Click"/>
+                <CheckBox fx:id="loadFolder_Click" text="%autoClick.loadFolder_Click"/>
+            </HBox>
+
             <Button fx:id="exportAutoClick_Click" onAction="#exportAutoClick" text="%autoClick.exportAutoClick_Click"/>
             <Button fx:id="clearButton_Click" onAction="#removeAll" text="%listText.removeAll"/>
         </HBox>
