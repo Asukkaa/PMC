@@ -579,11 +579,19 @@ public class FloatingWindow {
      */
     public static void updateFloatingWindow(FloatingWindowDescriptor config) {
         Platform.runLater(() -> {
-            Label massageLabel = config.getMassageLabel();
-            Label floatingPosition = config.getFloatingPosition();
             Color color = config.getTextFill();
-            massageLabel.setTextFill(color);
-            floatingPosition.setTextFill(color);
+            Label nameeLabel = config.getNameeLabel();
+            if (nameeLabel != null) {
+                nameeLabel.setTextFill(color);
+            }
+            Label massageLabel = config.getMassageLabel();
+            if (massageLabel != null) {
+                massageLabel.setTextFill(color);
+            }
+            Label floatingPosition = config.getFloatingPosition();
+            if (floatingPosition != null) {
+                floatingPosition.setTextFill(color);
+            }
             Rectangle rectangle = config.getRectangle();
             double opacity = config.getOpacity();
             if (!config.isTransparent() && opacity == 0) {

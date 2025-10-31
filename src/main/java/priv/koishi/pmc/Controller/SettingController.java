@@ -598,10 +598,8 @@ public class SettingController extends RootController implements MousePositionUp
     private void setColorsListener() {
         colorPicker_Set.valueProperty().addListener((_, _, newValue) -> {
             if (massageFloating != null) {
-                Label floatingLabel = massageFloating.getMassageLabel();
-                if (floatingLabel != null) {
-                    floatingLabel.setTextFill(newValue);
-                }
+                massageFloating.setTextFill(newValue);
+                updateFloatingWindow(massageFloating);
             }
             addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(newValue));
         });

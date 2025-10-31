@@ -125,3 +125,7 @@
 .label-low {
     -fx-pref-height: 20;
 }
+
+.menu-item {
+    -fx-pref-height: 35;
+}
