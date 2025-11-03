@@ -4,6 +4,7 @@ import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.Property;
@@ -256,6 +257,8 @@ public class ListenerUtils {
                 case NativeMouseMotionListener nativeMouseMotionListener ->
                         GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
                 case NativeKeyListener nativeKeyListener -> GlobalScreen.removeNativeKeyListener(nativeKeyListener);
+                case NativeMouseWheelListener nativeMouseWheelListener ->
+                        GlobalScreen.removeNativeMouseWheelListener(nativeMouseWheelListener);
                 default -> throw new IllegalArgumentException(text_unknownListener());
             }
         }
@@ -273,6 +276,8 @@ public class ListenerUtils {
             case NativeMouseMotionListener nativeMouseMotionListener ->
                     GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
             case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
+            case NativeMouseWheelListener nativeMouseWheelListener ->
+                    GlobalScreen.addNativeMouseWheelListener(nativeMouseWheelListener);
             default -> throw new IllegalArgumentException(text_unknownListener());
         }
     }

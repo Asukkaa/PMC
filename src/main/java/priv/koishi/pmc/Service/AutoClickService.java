@@ -1133,6 +1133,7 @@ public class AutoClickService {
                 lastPoint = point;
                 double x = point.getX();
                 double y = point.getY();
+                int wheelRotation = point.getWheelRotation();
                 // 处理相对路径
                 String useRelative = clickPositionVO.getUseRelative();
                 FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
@@ -1191,6 +1192,7 @@ public class AutoClickService {
                         });
                     }
                     robot.mouseMove(finalX, finalY);
+                    robot.mouseWheel(wheelRotation);
                     if (CollectionUtils.isEmpty(pressButtons) && taskBean.isMoveLog()) {
                         ClickLogBean moveLog = new ClickLogBean();
                         moveLog.setX(String.valueOf((int) finalX))

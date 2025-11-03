@@ -53,6 +53,11 @@ public class TrajectoryPointBean {
     List<Integer> pressButtons;
 
     /**
+     * 滑轮状态（正数上滑，负数下滑，0 为无滑动状态）
+     */
+    int wheelRotation;
+
+    /**
      * 换算绝对和相对坐标
      */
     public void updatePosition(WindowInfo windowInfo) {

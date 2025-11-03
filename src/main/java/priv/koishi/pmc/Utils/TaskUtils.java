@@ -1,15 +1,12 @@
 package priv.koishi.pmc.Utils;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.paint.Color;
 import priv.koishi.pmc.Bean.TaskBean;
 
 import static priv.koishi.pmc.Finals.i18nFinal.text_taskFailed;
-import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
-import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 多线程任务工具的方法
@@ -95,11 +92,7 @@ public class TaskUtils {
      */
     public static void taskNotSuccess(TaskBean<?> taskBean, String log) {
         taskUnbind(taskBean);
-        Label massageLabel = taskBean.getMassageLabel();
-        Platform.runLater(() -> {
-            massageLabel.setTextFill(Color.RED);
-            massageLabel.setText(log);
-        });
+        showErrLabelText(taskBean.getMassageLabel(), log);
     }
 
 }

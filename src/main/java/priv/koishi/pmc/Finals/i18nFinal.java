@@ -1889,6 +1889,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 滑轮事件监听异常
+     */
+    public static String text_mouseWheelErr() {
+        return bundle.getString("mouseWheelErr");
+    }
+
+    /**
+     * @return 无法正常监听滑轮事件，当前页面可能启用了平滑滚动
+     */
+    public static String text_mouseWheelError() {
+        return bundle.getString("mouseWheelError");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

@@ -360,6 +360,19 @@ public class UiUtils {
     }
 
     /**
+     * 展示错误信息栏
+     *
+     * @param massageLabel 错误信息栏
+     * @param log          要展示的错误信息
+     */
+    public static void showErrLabelText(Label massageLabel, String log) {
+        Platform.runLater(() -> {
+            massageLabel.setTextFill(Color.RED);
+            massageLabel.setText(log);
+        });
+    }
+
+    /**
      * 处理异常的统一弹窗
      *
      * @param ex 要处理的异常
