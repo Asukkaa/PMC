@@ -985,7 +985,7 @@ public class AutoClickService {
                 }
                 // 执行自动流程前点击第一个起始坐标
                 if (firstClick.compareAndSet(true, false)) {
-                    robot.mousePress(mouseButton);
+                    robot.mousePress(MouseButton.PRIMARY);
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
                         pressLog.setX(String.valueOf((int) finalStartX))
@@ -995,7 +995,7 @@ public class AutoClickService {
                                 .setName(name);
                         dynamicQueue.add(pressLog);
                     }
-                    robot.mouseRelease(mouseButton);
+                    robot.mouseRelease(MouseButton.PRIMARY);
                     if (taskBean.isClickLog()) {
                         ClickLogBean releaseLog = new ClickLogBean();
                         releaseLog.setX(String.valueOf((int) finalStartX))
@@ -1006,7 +1006,7 @@ public class AutoClickService {
                         dynamicQueue.add(releaseLog);
                     }
                 }
-                if (ClickTypeEnum.CLICK.ordinal() == clickType) {
+                if (ClickTypeEnum.CLICK.ordinal() == clickType && mouseButton != MouseButton.NONE) {
                     robot.mousePress(mouseButton);
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
@@ -1059,7 +1059,7 @@ public class AutoClickService {
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
-                    if (ClickTypeEnum.CLICK.ordinal() == clickType) {
+                    if (ClickTypeEnum.CLICK.ordinal() == clickType && mouseButton != MouseButton.NONE) {
                         robot.mouseRelease(mouseButton);
                         if (taskBean.isClickLog()) {
                             ClickLogBean releaseLog = new ClickLogBean();

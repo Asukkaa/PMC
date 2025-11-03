@@ -3223,6 +3223,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 无按键
+     */
+    public static String mouseButton_none() {
+        return bundle.getString("mouseButton.none");
+    }
+
+    /**
      * 点击按键下拉框选项
      */
     public static final List<String> mouseButtonList = new ArrayList<>();
@@ -3256,6 +3263,7 @@ public class i18nFinal {
         runClickTypeMap.put(mouseButton_middle(), MouseButton.MIDDLE);
         runClickTypeMap.put(mouseButton_forward(), MouseButton.FORWARD);
         runClickTypeMap.put(mouseButton_back(), MouseButton.BACK);
+        runClickTypeMap.put(mouseButton_none(), MouseButton.NONE);
     }
 
     /**
@@ -3273,6 +3281,7 @@ public class i18nFinal {
         recordClickTypeMap.put(NativeMouseEvent.BUTTON3, mouseButton_middle());
         recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back());
         recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward());
+        recordClickTypeMap.put(NativeMouseEvent.NOBUTTON, mouseButton_none());
     }
 
     /**

@@ -1138,7 +1138,7 @@ public class ClickDetailController extends RootController {
         if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
             matchedType = MatchedTypeEnum.CLICK.ordinal();
             retryType = RetryTypeEnum.STOP.ordinal();
-            clickKey = NativeMouseEvent.BUTTON1;
+            clickKey = NativeMouseEvent.NOBUTTON;
             clickNum = 1;
             useRelatively = unActivation;
             if ((clickType == ClickTypeEnum.OPEN_FILE.ordinal() || clickType == ClickTypeEnum.RUN_SCRIPT.ordinal())
@@ -1157,11 +1157,11 @@ public class ClickDetailController extends RootController {
             if (clickType == ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
                     || clickType == ClickTypeEnum.MOVE.ordinal()
                     || clickType == ClickTypeEnum.MOVETO.ordinal()) {
-                clickKey = NativeMouseEvent.BUTTON1;
+                clickKey = NativeMouseEvent.NOBUTTON;
                 clickNum = 1;
             } else if (clickType == ClickTypeEnum.WHEEL_UP.ordinal()
                     || clickType == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
-                clickKey = NativeMouseEvent.BUTTON1;
+                clickKey = NativeMouseEvent.NOBUTTON;
             }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                     clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
@@ -1406,6 +1406,10 @@ public class ClickDetailController extends RootController {
             randomClickInterval_Det.setVisible(true);
             pathTip_Det.setText("");
             resolution_Det.setVisible(true);
+        }
+        ObservableList<String> clickItems = clickKey_Det.getItems();
+        if (CollectionUtils.isNotEmpty(clickItems) && !clickItems.contains(clickKey_Det.getValue())) {
+            clickKey_Det.setValue(clickKey_Det.getItems().getFirst());
         }
     }
 
