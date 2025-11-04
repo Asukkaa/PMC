@@ -1440,59 +1440,61 @@ public class AutoClickController extends RootController implements MousePosition
             @Override
             public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
                 if (isRecordClicking) {
-                    Point mousePoint = MousePositionListener.getMousePoint();
-                    int x = (int) mousePoint.getX();
-                    int y = (int) mousePoint.getY();
-                    // 根据滑轮滚动方向设置操作类型
-                    int wheelRotation = e.getWheelRotation();
-                    if (wheelRotation == 0) {
-                        Platform.runLater(() -> {
-                            stopAllWork();
+                    if (e.getScrollType() == NativeMouseWheelEvent.WHEEL_UNIT_SCROLL) {
+                        Point mousePoint = MousePositionListener.getMousePoint();
+                        int x = (int) mousePoint.getX();
+                        int y = (int) mousePoint.getY();
+                        // 根据滑轮滚动方向设置操作类型
+                        int wheelRotation = e.getWheelRotation();
+                        if (wheelRotation == 0) {
                             Platform.runLater(() -> {
-                                Alert alert = creatErrorAlert(text_mouseWheelError());
-                                alert.setTitle(text_mouseWheelErr());
-                                alert.setHeaderText(text_mouseWheelError());
-                                showErrLabelText(log_Click, text_taskFailed());
-                                alert.show();
+                                stopAllWork();
+                                Platform.runLater(() -> {
+                                    Alert alert = creatErrorAlert(text_mouseWheelError());
+                                    alert.setTitle(text_mouseWheelErr());
+                                    alert.setHeaderText(text_mouseWheelError());
+                                    showErrLabelText(log_Click, text_taskFailed());
+                                    alert.show();
+                                });
                             });
-                        });
-                    } else {
-                        if (recordMove && isRecordingMoveTrajectory()) {
-                            // 有移动轨迹时在轨迹点中记录滑轮事件
-                            movePoint.addMovePoint(x, y, null, false, wheelRotation);
-                            Platform.runLater(() -> updateWheelLog(wheelRotation, Math.abs(wheelRotation)));
                         } else {
-                            // 没有移动轨迹时单独记录滑轮事件
-                            pressTime = System.currentTimeMillis();
-                            long waitTime = isFirstClick ?
-                                    pressTime - recordingStartTime :
-                                    pressTime - releasedTime;
-                            int clickType = wheelRotation > 0 ?
-                                    ClickTypeEnum.WHEEL_DOWN.ordinal() :
-                                    ClickTypeEnum.WHEEL_UP.ordinal();
-                            int wheelNum = Math.abs(wheelRotation);
-                            // 创建单独的滑轮步骤
-                            ClickPositionVO wheelBean = createClickPositionVO();
-                            int index = tableView_Click.getItems().size() + 1;
-                            wheelBean.setName(text_step() + index + text_isRecord())
-                                    .setClickKeyEnum(NativeMouseEvent.NOBUTTON)
-                                    .setWaitTime(String.valueOf(waitTime))
-                                    .setClickNum(String.valueOf(wheelNum))
-                                    .setStartX(String.valueOf(x))
-                                    .setStartY(String.valueOf(y))
-                                    .setClickTypeEnum(clickType)
-                                    .setClickTime("0")
-                                    .updateRelativePosition();
-                            // 添加至表格
-                            List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                            clickPositionVOS.add(wheelBean);
-                            Platform.runLater(() -> {
-                                addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
-                                updateWheelLog(wheelRotation, wheelNum);
-                            });
-                            releasedTime = System.currentTimeMillis();
-                            startMoveTime = System.currentTimeMillis();
-                            isFirstClick = false;
+                            if (recordMove && isRecordingMoveTrajectory()) {
+                                // 有移动轨迹时在轨迹点中记录滑轮事件
+                                movePoint.addMovePoint(x, y, null, false, wheelRotation);
+                                Platform.runLater(() -> updateWheelLog(wheelRotation, Math.abs(wheelRotation)));
+                            } else {
+                                // 没有移动轨迹时单独记录滑轮事件
+                                pressTime = System.currentTimeMillis();
+                                long waitTime = isFirstClick ?
+                                        pressTime - recordingStartTime :
+                                        pressTime - releasedTime;
+                                int clickType = wheelRotation > 0 ?
+                                        ClickTypeEnum.WHEEL_DOWN.ordinal() :
+                                        ClickTypeEnum.WHEEL_UP.ordinal();
+                                int wheelNum = Math.abs(wheelRotation);
+                                // 创建单独的滑轮步骤
+                                ClickPositionVO wheelBean = createClickPositionVO();
+                                int index = tableView_Click.getItems().size() + 1;
+                                wheelBean.setName(text_step() + index + text_isRecord())
+                                        .setClickKeyEnum(NativeMouseEvent.NOBUTTON)
+                                        .setWaitTime(String.valueOf(waitTime))
+                                        .setClickNum(String.valueOf(wheelNum))
+                                        .setStartX(String.valueOf(x))
+                                        .setStartY(String.valueOf(y))
+                                        .setClickTypeEnum(clickType)
+                                        .setClickTime("0")
+                                        .updateRelativePosition();
+                                // 添加至表格
+                                List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
+                                clickPositionVOS.add(wheelBean);
+                                Platform.runLater(() -> {
+                                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
+                                    updateWheelLog(wheelRotation, wheelNum);
+                                });
+                                releasedTime = System.currentTimeMillis();
+                                startMoveTime = System.currentTimeMillis();
+                                isFirstClick = false;
+                            }
                         }
                     }
                 }
