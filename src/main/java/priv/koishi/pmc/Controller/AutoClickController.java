@@ -1440,7 +1440,8 @@ public class AutoClickController extends RootController implements MousePosition
             @Override
             public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
                 if (isRecordClicking) {
-                    if (e.getScrollType() == NativeMouseWheelEvent.WHEEL_UNIT_SCROLL) {
+                    // 只记录垂直方向滑动
+                    if (e.getWheelDirection() == NativeMouseWheelEvent.WHEEL_VERTICAL_DIRECTION) {
                         Point mousePoint = MousePositionListener.getMousePoint();
                         int x = (int) mousePoint.getX();
                         int y = (int) mousePoint.getY();
