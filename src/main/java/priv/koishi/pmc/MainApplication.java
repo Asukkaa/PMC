@@ -107,11 +107,6 @@ public class MainApplication extends Application {
     public static boolean isDarkTheme;
 
     /**
-     * 无法切换深色布局的页面控制器类集合
-     */
-    public static Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
-
-    /**
      * 加载 fxml 页面
      *
      * @param stage 程序主舞台

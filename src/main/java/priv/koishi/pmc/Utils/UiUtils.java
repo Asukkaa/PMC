@@ -54,7 +54,6 @@ import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
-import static priv.koishi.pmc.MainApplication.manuallyChangeThemeList;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -82,6 +81,11 @@ public class UiUtils {
      * 字体颜色绑定
      */
     private static final ObjectProperty<Color> textColorProperty = new SimpleObjectProperty<>(Color.BLACK);
+
+    /**
+     * 无法切换深色布局的页面控制器类集合
+     */
+    public static Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
 
     /**
      * 鼠标停留提示框
