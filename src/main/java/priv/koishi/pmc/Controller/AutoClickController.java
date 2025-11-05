@@ -315,11 +315,6 @@ public class AutoClickController extends RootController implements MousePosition
      */
     public static FloatingWindowDescriptor massageFloating;
 
-    /**
-     * 列表高度占用主界面的百分比
-     */
-    public static double tableViewHeight = 0.54;
-
     @FXML
     public AnchorPane anchorPane_Click;
 
@@ -336,8 +331,8 @@ public class AutoClickController extends RootController implements MousePosition
     public CheckBox openDirectory_Click, notOverwrite_Click, loadFolder_Click;
 
     @FXML
-    public Button clearButton_Click, runClick_Click, addPosition_Click, loadAutoClick_Click,
-            exportAutoClick_Click, addOutPath_Click, recordClick_Click, clickLog_Click;
+    public Button clearButton_Click, runClick_Click, addPosition_Click, loadAutoClick_Click, exportAutoClick_Click,
+            addOutPath_Click, recordClick_Click, clickLog_Click;
 
     @FXML
     public TextField loopTime_Click, outFileName_Click, preparationRecordTime_Click, preparationRunTime_Click;
@@ -361,7 +356,7 @@ public class AutoClickController extends RootController implements MousePosition
     public void adaption() {
         // 设置组件高度
         double stageHeight = mainStage.getHeight();
-        tableView_Click.setPrefHeight(stageHeight * tableViewHeight);
+        tableView_Click.setPrefHeight(stageHeight * 0.5);
         // 设置组件宽度
         double tableWidth = mainStage.getWidth() * 0.95;
         tableView_Click.setMaxWidth(tableWidth);
@@ -746,43 +741,7 @@ public class AutoClickController extends RootController implements MousePosition
             if (clickLogs != null) {
                 clickLogs.clear();
             }
-            CheckBox firstClick = settingController.firstClick_Set;
-            TextField retrySecond = settingController.retrySecond_Set;
-            TextField overTime = settingController.overtime_Set;
-            TextField maxLogNum = settingController.maxLogNum_Set;
-            CheckBox clickLog = settingController.clickLog_Set;
-            CheckBox moveLog = settingController.moveLog_Set;
-            CheckBox dragLog = settingController.dragLog_Set;
-            CheckBox clickImgLog = settingController.clickImgLog_Set;
-            CheckBox stopImgLog = settingController.stopImgLog_Set;
-            CheckBox waitLog = settingController.waitLog_Set;
-            CheckBox openFileLog = settingController.openFileLog_Set;
-            CheckBox openUrlLog = settingController.openUrlLog_Set;
-            CheckBox runScriptLog = settingController.runScriptLog_Set;
-            CheckBox mouseWheelLog = settingController.mouseWheelLog_Set;
-            AutoClickTaskBean taskBean = new AutoClickTaskBean();
-            taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
-                    .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
-                    .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
-                    .setMouseWheelLog(mouseWheelLog.isSelected())
-                    .setRunScriptLog(runScriptLog.isSelected())
-                    .setOpenFileLog(openFileLog.isSelected())
-                    .setClickImgLog(clickImgLog.isSelected())
-                    .setOpenUrlLog(openUrlLog.isSelected())
-                    .setStopImgLog(stopImgLog.isSelected())
-                    .setFirstClick(firstClick.isSelected())
-                    .setMassageFloating(massageFloating)
-                    .setClickLog(clickLog.isSelected())
-                    .setMoveLog(moveLog.isSelected())
-                    .setDragLog(dragLog.isSelected())
-                    .setWaitLog(waitLog.isSelected())
-                    .setRunTimeline(runTimeline)
-                    .setLoopTimes(loopTimes)
-                    .setProgressBar(progressBar_Click)
-                    .setBindingMassageLabel(false)
-                    .setDisableNodes(disableNodes)
-                    .setBeanList(clickPositionVOS)
-                    .setMassageLabel(log_Click);
+            AutoClickTaskBean taskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
@@ -791,70 +750,10 @@ public class AutoClickController extends RootController implements MousePosition
             refreshScreenParameters();
             // 开启键盘监听
             startNativeKeyListener();
-            // 创建一个Robot实例
-            Robot robot = new Robot();
-            autoClickTask = autoClick(taskBean, robot);
+            autoClickTask = autoClick(taskBean, new Robot());
             // 绑定带进度条的线程
             bindingTaskNode(autoClickTask, taskBean);
-            autoClickTask.setOnSucceeded(_ -> {
-                clickLogs = autoClickTask.getValue();
-                if (clickLogs == null) {
-                    taskNotSuccess(taskBean, text_taskFailed());
-                } else {
-                    taskUnbind(taskBean);
-                    log_Click.setTextFill(Color.GREEN);
-                    log_Click.setText(text_taskFinished());
-                    CheckBox showWindowRun = settingController.showWindowRun_Set;
-                    if (showWindowRun.isSelected()) {
-                        if (mainStage.isIconified()) {
-                            showStage(mainStage);
-                        }
-                    }
-                }
-                clearReferences();
-                hideFloatingWindow(massageFloating);
-                // 移除键盘监听器
-                removeNativeListener(nativeKeyListener);
-                autoClickTask = null;
-                runTimeline = null;
-                runClicking = false;
-            });
-            autoClickTask.setOnFailed(_ -> {
-                clickLogs = getNowLogs();
-                taskNotSuccess(taskBean, text_taskFailed());
-                hideFloatingWindow(massageFloating);
-                CheckBox showWindowRun = settingController.showWindowRun_Set;
-                if (showWindowRun.isSelected()) {
-                    showStage(mainStage);
-                }
-                // 移除键盘监听器
-                removeNativeListener(nativeKeyListener);
-                // 移除开始前的倒计时
-                if (runTimeline != null) {
-                    runTimeline.stop();
-                    runTimeline = null;
-                }
-                Throwable ex = autoClickTask.getException();
-                autoClickTask = null;
-                runClicking = false;
-                clearReferences();
-                throw new RuntimeException(ex);
-            });
-            autoClickTask.setOnCancelled(_ -> {
-                clickLogs = getNowLogs();
-                taskNotSuccess(taskBean, text_taskCancelled());
-                hideFloatingWindow(massageFloating);
-                CheckBox showWindowRun = settingController.showWindowRun_Set;
-                if (showWindowRun.isSelected()) {
-                    showStage(mainStage);
-                }
-                // 移除键盘监听器
-                removeNativeListener(nativeKeyListener);
-                autoClickTask = null;
-                runTimeline = null;
-                runClicking = false;
-                clearReferences();
-            });
+            setTaskEvent(taskBean);
             if (runTimeline == null) {
                 // 获取准备时间值
                 int preparation = setDefaultIntValue(preparationRunTime_Click,
@@ -868,6 +767,120 @@ public class AutoClickController extends RootController implements MousePosition
                 runTimeline = executeRunTimeLine(preparation);
             }
         }
+    }
+
+    /**
+     * 设置任务事件
+     *
+     * @param taskBean 线程任务参数
+     */
+    private void setTaskEvent(AutoClickTaskBean taskBean) {
+        autoClickTask.setOnSucceeded(_ -> {
+            clickLogs = autoClickTask.getValue();
+            if (clickLogs == null) {
+                taskNotSuccess(taskBean, text_taskFailed());
+            } else {
+                taskUnbind(taskBean);
+                log_Click.setTextFill(Color.GREEN);
+                log_Click.setText(text_taskFinished());
+                CheckBox showWindowRun = settingController.showWindowRun_Set;
+                if (showWindowRun.isSelected()) {
+                    if (mainStage.isIconified()) {
+                        showStage(mainStage);
+                    }
+                }
+            }
+            clearReferences();
+            hideFloatingWindow(massageFloating);
+            // 移除键盘监听器
+            removeNativeListener(nativeKeyListener);
+            autoClickTask = null;
+            runTimeline = null;
+            runClicking = false;
+        });
+        autoClickTask.setOnFailed(_ -> {
+            clickLogs = getNowLogs();
+            taskNotSuccess(taskBean, text_taskFailed());
+            hideFloatingWindow(massageFloating);
+            CheckBox showWindowRun = settingController.showWindowRun_Set;
+            if (showWindowRun.isSelected()) {
+                showStage(mainStage);
+            }
+            // 移除键盘监听器
+            removeNativeListener(nativeKeyListener);
+            // 移除开始前的倒计时
+            if (runTimeline != null) {
+                runTimeline.stop();
+                runTimeline = null;
+            }
+            Throwable ex = autoClickTask.getException();
+            autoClickTask = null;
+            runClicking = false;
+            clearReferences();
+            throw new RuntimeException(ex);
+        });
+        autoClickTask.setOnCancelled(_ -> {
+            clickLogs = getNowLogs();
+            taskNotSuccess(taskBean, text_taskCancelled());
+            hideFloatingWindow(massageFloating);
+            CheckBox showWindowRun = settingController.showWindowRun_Set;
+            if (showWindowRun.isSelected()) {
+                showStage(mainStage);
+            }
+            // 移除键盘监听器
+            removeNativeListener(nativeKeyListener);
+            autoClickTask = null;
+            runTimeline = null;
+            runClicking = false;
+            clearReferences();
+        });
+    }
+
+    /**
+     * 构建自动操作线程任务设置参数
+     *
+     * @param clickPositionVOS 自动操作流程
+     * @param loopTimes        循环次数
+     */
+    private AutoClickTaskBean buildAutoClickTaskBean(List<ClickPositionVO> clickPositionVOS, int loopTimes) {
+        CheckBox firstClick = settingController.firstClick_Set;
+        TextField retrySecond = settingController.retrySecond_Set;
+        TextField overTime = settingController.overtime_Set;
+        TextField maxLogNum = settingController.maxLogNum_Set;
+        CheckBox clickLog = settingController.clickLog_Set;
+        CheckBox moveLog = settingController.moveLog_Set;
+        CheckBox dragLog = settingController.dragLog_Set;
+        CheckBox clickImgLog = settingController.clickImgLog_Set;
+        CheckBox stopImgLog = settingController.stopImgLog_Set;
+        CheckBox waitLog = settingController.waitLog_Set;
+        CheckBox openFileLog = settingController.openFileLog_Set;
+        CheckBox openUrlLog = settingController.openUrlLog_Set;
+        CheckBox runScriptLog = settingController.runScriptLog_Set;
+        CheckBox mouseWheelLog = settingController.mouseWheelLog_Set;
+        AutoClickTaskBean taskBean = new AutoClickTaskBean();
+        taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
+                .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
+                .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
+                .setMouseWheelLog(mouseWheelLog.isSelected())
+                .setRunScriptLog(runScriptLog.isSelected())
+                .setOpenFileLog(openFileLog.isSelected())
+                .setClickImgLog(clickImgLog.isSelected())
+                .setOpenUrlLog(openUrlLog.isSelected())
+                .setStopImgLog(stopImgLog.isSelected())
+                .setFirstClick(firstClick.isSelected())
+                .setMassageFloating(massageFloating)
+                .setClickLog(clickLog.isSelected())
+                .setMoveLog(moveLog.isSelected())
+                .setDragLog(dragLog.isSelected())
+                .setWaitLog(waitLog.isSelected())
+                .setRunTimeline(runTimeline)
+                .setLoopTimes(loopTimes)
+                .setProgressBar(progressBar_Click)
+                .setBindingMassageLabel(false)
+                .setDisableNodes(disableNodes)
+                .setBeanList(clickPositionVOS)
+                .setMassageLabel(log_Click);
+        return taskBean;
     }
 
     /**
@@ -1882,7 +1895,6 @@ public class AutoClickController extends RootController implements MousePosition
         isNativeHookException = true;
         runClick_Click.setDisable(true);
         recordClick_Click.setDisable(true);
-        tableViewHeight = 0.5;
         adaption();
         String errorMessage = appName + autoClick_noPermissions();
         if (isMac) {
@@ -1898,7 +1910,6 @@ public class AutoClickController extends RootController implements MousePosition
     private void setNoScreenCapturePermissionLog() {
         noScreenCapturePermission = true;
         runClick_Click.setDisable(true);
-        tableViewHeight = 0.5;
         adaption();
         err_Click.setText(tip_noScreenCapturePermission());
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));

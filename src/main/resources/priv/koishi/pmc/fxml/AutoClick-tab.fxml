@@ -86,7 +86,7 @@
         </HBox>
 
         <HBox fx:id="logHBox_Click" spacing="10">
-            <Label fx:id="log_Click"/>
+            <Label fx:id="log_Click" style="-fx-pref-height: -1"/>
             <Label fx:id="err_Click" textFill="red" alignment="CENTER_RIGHT"/>
         </HBox>
     </VBox>
