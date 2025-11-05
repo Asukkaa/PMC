@@ -6,7 +6,7 @@
       fx:controller="priv.koishi.pmc.Controller.MainController">
     <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
         <Tab style="-fx-cursor: hand" fx:id="autoClickTab" text="%main.autoClickTab">
-            <ScrollPane fitToWidth="true" fitToHeight="true">
+            <ScrollPane>
                 <AnchorPane>
                     <fx:include source="AutoClick-tab.fxml"/>
                 </AnchorPane>
@@ -14,7 +14,7 @@
         </Tab>
 
         <Tab style="-fx-cursor: hand" fx:id="timedStartTab" text="%main.timedStartTab">
-            <ScrollPane fitToWidth="true" fitToHeight="true">
+            <ScrollPane>
                 <AnchorPane>
                     <fx:include source="TimedTask-tab.fxml"/>
                 </AnchorPane>
@@ -22,7 +22,7 @@
         </Tab>
 
         <Tab style="-fx-cursor: hand" fx:id="settingTab" text="%main.settingTab">
-            <ScrollPane fitToWidth="true" fitToHeight="true">
+            <ScrollPane>
                 <AnchorPane>
                     <fx:include source="Setting-tab.fxml"/>
                 </AnchorPane>
@@ -30,7 +30,7 @@
         </Tab>
 
         <Tab style="-fx-cursor: hand" fx:id="aboutTab" text="%main.aboutTab">
-            <ScrollPane fitToWidth="true" fitToHeight="true">
+            <ScrollPane>
                 <AnchorPane>
                     <fx:include source="About-tab.fxml"/>
                 </AnchorPane>

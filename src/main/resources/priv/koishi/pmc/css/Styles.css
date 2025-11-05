@@ -129,3 +129,18 @@
 .menu-item {
     -fx-pref-height: 35;
 }
+
+.tab {
+    -fx-cursor: hand;
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+}
+
+.progress-bar {
+    -fx-pref-width: 200;
+}
+
+.scroll-pane {
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+}

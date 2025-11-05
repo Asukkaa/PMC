@@ -2,8 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fitToWidth="true"
-            fitToHeight="true" fx:controller="priv.koishi.pmc.Controller.FileChooserController">
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="priv.koishi.pmc.Controller.FileChooserController">
     <AnchorPane fx:id="anchorPane_FC" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
             <HBox spacing="10">
@@ -78,7 +78,7 @@
 
             <HBox spacing="10">
                 <VBox fx:id="progressBarVBox_FC" spacing="10">
-                    <ProgressBar fx:id="progressBar_FC" visible="false" prefWidth="200.0" progress="0.0"/>
+                    <ProgressBar fx:id="progressBar_FC" visible="false" progress="0.0"/>
                     <Label fx:id="log_FC" prefHeight="20"/>
                 </VBox>
 

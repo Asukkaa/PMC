@@ -6,7 +6,7 @@
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true">
+        <ScrollPane>
             <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
                 <VBox fx:id="vBox_Det" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
                     <VBox fx:id="commonVBox_Det" spacing="10">
@@ -421,7 +421,7 @@
     <bottom>
         <HBox spacing="10" style="-fx-padding: 10">
             <VBox fx:id="progressBarVBox_Det">
-                <ProgressBar fx:id="progressBar_Det" visible="false" prefWidth="200.0" progress="0.0"/>
+                <ProgressBar fx:id="progressBar_Det" visible="false" progress="0.0"/>
                 <Label fx:id="log_Det"/>
             </VBox>
 

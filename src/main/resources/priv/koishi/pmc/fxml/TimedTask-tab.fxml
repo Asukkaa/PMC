@@ -31,7 +31,7 @@
         </TableView>
 
         <HBox fx:id="tipHBox_Task" spacing="10">
-            <ProgressBar fx:id="progressBar_Task" visible="false" prefWidth="200.0" progress="0.0"/>
+            <ProgressBar fx:id="progressBar_Task" visible="false" progress="0.0"/>
             <Label fx:id="tip_Task" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
                    text="%timedTask.tip_Task"/>
         </HBox>
