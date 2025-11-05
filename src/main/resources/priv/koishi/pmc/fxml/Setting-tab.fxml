@@ -278,12 +278,17 @@
             </HBox>
 
             <HBox styleClass="hBox-short">
-                <CheckBox fx:id="openFileLog_Set" onAction="#openFileLog" styleClass="checkBox-medium"
-                          text="%setting.openFileLog_Set" selected="true"/>
+                <CheckBox fx:id="mouseWheelLog_Set" onAction="#mouseWheelLog" styleClass="checkBox-medium"
+                          text="%setting.mouseWheelLog_Set" selected="true"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
+            <HBox styleClass="hBox-short">
+                <CheckBox fx:id="openFileLog_Set" onAction="#openFileLog" styleClass="checkBox-medium"
+                          text="%setting.openFileLog_Set" selected="true"/>
+            </HBox>
+
             <HBox styleClass="hBox-short">
                 <CheckBox fx:id="runScriptLog_Set" onAction="#runScriptLog" styleClass="checkBox-medium"
                           text="%setting.runScriptLog_Set" selected="true"/>

@@ -758,10 +758,12 @@ public class AutoClickController extends RootController implements MousePosition
             CheckBox openFileLog = settingController.openFileLog_Set;
             CheckBox openUrlLog = settingController.openUrlLog_Set;
             CheckBox runScriptLog = settingController.runScriptLog_Set;
+            CheckBox mouseWheelLog = settingController.mouseWheelLog_Set;
             AutoClickTaskBean taskBean = new AutoClickTaskBean();
             taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                     .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
                     .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
+                    .setMouseWheelLog(mouseWheelLog.isSelected())
                     .setRunScriptLog(runScriptLog.isSelected())
                     .setOpenFileLog(openFileLog.isSelected())
                     .setClickImgLog(clickImgLog.isSelected())

@@ -164,7 +164,7 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
-            openUrlLog_Set;
+            openUrlLog_Set, mouseWheelLog_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -395,6 +395,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, unActivation);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, activation);
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
+        setControlLastConfig(mouseWheelLog_Set, prop, key_mouseWheelLog, activation);
         setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, unActivation);
@@ -548,7 +549,7 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(stopOpacity_Set, tip_stopOpacity(), String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
         addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set,
-                imgLog_Set, openFileLog_Set, runScriptLog_Set, openUrlLog_Set);
+                imgLog_Set, openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set);
     }
 
     /**
@@ -1344,6 +1345,17 @@ public class SettingController extends RootController implements MousePositionUp
     private void openUrlLog() throws IOException {
         setLoadLastConfigCheckBox(openUrlLog_Set, configFile_Click, key_openUrlLog);
     }
+
+    /**
+     * 运行自动流程时记录鼠标滚轮滚动
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void mouseWheelLog() throws IOException {
+        setLoadLastConfigCheckBox(mouseWheelLog_Set, configFile_Click, key_mouseWheelLog);
+    }
+
 
     /**
      * 终止操作图像第一次识别失败后改为识别整个屏幕

@@ -608,6 +608,7 @@ public class AutoClickService {
                     if (taskBean.isWaitLog()) {
                         ClickLogBean waitLog = new ClickLogBean();
                         waitLog.setClickTime(String.valueOf(wait))
+                                .setClickKey(mouseButton_none())
                                 .setType(log_wait())
                                 .setName(name);
                         dynamicQueue.add(waitLog);
@@ -661,6 +662,7 @@ public class AutoClickService {
                 if (taskBean.isWaitLog()) {
                     ClickLogBean waitLog = new ClickLogBean();
                     waitLog.setClickTime(String.valueOf(wait))
+                            .setClickKey(mouseButton_none())
                             .setType(log_wait())
                             .setName(name);
                     dynamicQueue.add(waitLog);
@@ -826,6 +828,7 @@ public class AutoClickService {
                         ClickLogBean clickLogBean = new ClickLogBean();
                         clickLogBean.setClickTime(String.valueOf(end - start))
                                 .setResult(matchThreshold + percentage)
+                                .setClickKey(mouseButton_none())
                                 .setX(String.valueOf(x))
                                 .setY(String.valueOf(y))
                                 .setType(log_stopImg())
@@ -889,6 +892,7 @@ public class AutoClickService {
                             .setResult(matchThreshold + percentage)
                             .setX(String.valueOf(position.x()))
                             .setY(String.valueOf(position.y()))
+                            .setClickKey(mouseButton_none())
                             .setType(log_clickImg())
                             .setName(name);
                     dynamicQueue.add(clickLogBean);
@@ -956,6 +960,7 @@ public class AutoClickService {
                 if (taskBean.isWaitLog()) {
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(clickInterval))
+                            .setClickKey(mouseButton_none())
                             .setType(log_wait())
                             .setName(name);
                     dynamicQueue.add(clickLogBean);
@@ -979,6 +984,7 @@ public class AutoClickService {
                     ClickLogBean moveLog = new ClickLogBean();
                     moveLog.setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
+                            .setClickKey(mouseButton_none())
                             .setType(log_move())
                             .setName(name);
                     dynamicQueue.add(moveLog);
@@ -1019,8 +1025,26 @@ public class AutoClickService {
                     }
                 } else if (ClickTypeEnum.WHEEL_DOWN.ordinal() == clickType) {
                     robot.mouseWheel(1);
+                    if (taskBean.isClickLog()) {
+                        ClickLogBean wheelLog = new ClickLogBean();
+                        wheelLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setType(clickType_wheelDown())
+                                .setClickKey(clickKey)
+                                .setName(name);
+                        dynamicQueue.add(wheelLog);
+                    }
                 } else if (ClickTypeEnum.WHEEL_UP.ordinal() == clickType) {
                     robot.mouseWheel(-1);
+                    if (taskBean.isClickLog()) {
+                        ClickLogBean wheelLog = new ClickLogBean();
+                        wheelLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setType(clickType_wheelUp())
+                                .setClickKey(clickKey)
+                                .setName(name);
+                        dynamicQueue.add(wheelLog);
+                    }
                 }
                 actionFuture.complete(null);
             });
@@ -1047,7 +1071,7 @@ public class AutoClickService {
                     Thread.currentThread().interrupt();
                     break;
                 }
-                if (taskBean.isClickLog()) {
+                if (taskBean.isClickLog() && !mouseButton_none().equals(clickKey)) {
                     ClickLogBean clickLog = new ClickLogBean();
                     clickLog.setClickTime(String.valueOf(clickTime))
                             .setX(String.valueOf((int) finalStartX))
@@ -1193,10 +1217,24 @@ public class AutoClickService {
                     }
                     robot.mouseMove(finalX, finalY);
                     robot.mouseWheel(wheelRotation);
+                    if (taskBean.isMouseWheelLog() && wheelRotation != 0) {
+                        ClickLogBean wheelLog = new ClickLogBean();
+                        wheelLog.setX(String.valueOf((int) finalX))
+                                .setY(String.valueOf((int) finalY))
+                                .setClickKey(mouseButton_none())
+                                .setName(name);
+                        if (wheelRotation > 0) {
+                            wheelLog.setType(clickType_wheelDown());
+                        } else {
+                            wheelLog.setType(clickType_wheelUp());
+                        }
+                        dynamicQueue.add(wheelLog);
+                    }
                     if (CollectionUtils.isEmpty(pressButtons) && taskBean.isMoveLog()) {
                         ClickLogBean moveLog = new ClickLogBean();
                         moveLog.setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
+                                .setClickKey(mouseButton_none())
                                 .setType(log_move())
                                 .setName(name);
                         dynamicQueue.add(moveLog);
@@ -1223,6 +1261,7 @@ public class AutoClickService {
                     if (taskBean.isWaitLog()) {
                         ClickLogBean sleepLog = new ClickLogBean();
                         sleepLog.setClickTime(String.valueOf(remaining))
+                                .setClickKey(mouseButton_none())
                                 .setType(log_wait())
                                 .setName(name);
                         dynamicQueue.add(sleepLog);

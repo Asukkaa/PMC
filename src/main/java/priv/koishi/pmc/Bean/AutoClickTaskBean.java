@@ -95,6 +95,11 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     boolean openUrlLog;
 
     /**
+     * 运行自动流程时记录鼠标滚轮滚动
+     */
+    boolean mouseWheelLog;
+
+    /**
      * 最大记录数量
      */
     int maxLogNum;
