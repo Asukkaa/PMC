@@ -5,6 +5,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -544,7 +545,14 @@ public class UiUtils {
         String columnText = column.getText();
         if (StringUtils.isNotBlank(columnText)) {
             Label label = new Label(columnText);
-            label.setMaxWidth(column.getMaxWidth());
+            // 完全绑定Label宽度到TableColumn宽度
+            label.prefWidthProperty().bind(column.widthProperty());
+            label.setMaxWidth(Control.USE_PREF_SIZE);
+            label.setMinWidth(Control.USE_PREF_SIZE);
+            // 确保文本居中显示
+            label.setAlignment(Pos.CENTER);
+            // 文本过长时自动调整
+            label.setTextOverrun(OverrunStyle.ELLIPSIS);
             addToolTip(tooltip, label);
             column.setGraphic(label);
             column.setText(null);
