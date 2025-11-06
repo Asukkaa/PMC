@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Bean.VO;
+package priv.koishi.pmc.Bean.Interface;
 
 import javafx.scene.image.Image;
 

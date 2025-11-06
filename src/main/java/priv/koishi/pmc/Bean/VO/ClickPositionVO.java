@@ -8,6 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Bean.Interface.ImgBean;
+import priv.koishi.pmc.Bean.Interface.Indexable;
 
 import java.io.File;
 

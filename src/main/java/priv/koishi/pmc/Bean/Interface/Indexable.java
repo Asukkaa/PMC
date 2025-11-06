@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Bean.VO;
+package priv.koishi.pmc.Bean.Interface;
 
 /**
  * 为列表数据设置序号

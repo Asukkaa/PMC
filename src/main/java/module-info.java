@@ -46,4 +46,6 @@ module priv.koishi.pmc {
     opens priv.koishi.pmc.UI.CustomFloatingWindow to javafx.fxml;
     exports priv.koishi.pmc.UI.CustomFloatingWindow;
     exports priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
+    exports priv.koishi.pmc.Bean.Interface;
+    opens priv.koishi.pmc.Bean.Interface to javafx.fxml;
 }

@@ -3,7 +3,7 @@ package priv.koishi.pmc.Bean;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import priv.koishi.pmc.Bean.VO.Indexable;
+import priv.koishi.pmc.Bean.Interface.Indexable;
 
 import java.time.LocalDateTime;
 import java.util.List;
