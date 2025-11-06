@@ -36,7 +36,7 @@ public class ClickLogController extends RootController {
     private final String tabId = "_Log";
 
     /**
-     * 详情页页面舞台
+     * 操作记录页面舞台
      */
     private Stage stage;
 

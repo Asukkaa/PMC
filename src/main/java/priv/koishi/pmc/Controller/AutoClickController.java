@@ -741,6 +741,7 @@ public class AutoClickController extends RootController implements MousePosition
             if (clickLogs != null) {
                 clickLogs.clear();
             }
+            updateLabel(log_Click, "");
             AutoClickTaskBean taskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
