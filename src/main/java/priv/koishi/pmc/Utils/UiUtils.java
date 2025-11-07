@@ -2162,13 +2162,14 @@ public class UiUtils {
      */
     public static void setNodeDisable(Node node, boolean disable, String tooltipText) {
         if (node != null) {
-            javafx.scene.Cursor ban = javafx.scene.Cursor.cursor(Objects.requireNonNull(MainApplication.class.getResource("icon/Ban.png")).toString());
+            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
+                    MainApplication.class.getResource("icon/Disable.png")).toString());
             if (disable) {
                 node.setOpacity(0.4);
                 // 不可编辑时使用默认光标
-                node.setCursor(ban);
+                node.setCursor(disableCursor);
                 // 为所有子节点也设置相同的光标
-                setCursorForChildren(node, ban);
+                setCursorForChildren(node, disableCursor);
             } else {
                 node.setOpacity(1.0);
                 // 恢复可编辑时的默认光标
