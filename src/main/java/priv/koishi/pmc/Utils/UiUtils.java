@@ -2360,16 +2360,16 @@ public class UiUtils {
      * @param node 需要修改样式的组件
      * @return CSS 后缀
      */
-    private static javafx.scene.Cursor getDefaultCursor(Node node) {
+    private static Cursor getDefaultCursor(Node node) {
         switch (node) {
-            case ButtonBase _ -> {
-                return javafx.scene.Cursor.HAND;
+            case CheckBox _, ButtonBase _, ChoiceBox<?> _ -> {
+                return Cursor.HAND;
             }
             case TextInputControl _ -> {
-                return javafx.scene.Cursor.TEXT;
+                return Cursor.TEXT;
             }
             default -> {
-                return javafx.scene.Cursor.DEFAULT;
+                return Cursor.DEFAULT;
             }
         }
     }
