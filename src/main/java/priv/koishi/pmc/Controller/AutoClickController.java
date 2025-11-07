@@ -1894,8 +1894,8 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setNativeHookExceptionLog() {
         isNativeHookException = true;
-        runClick_Click.setDisable(true);
-        recordClick_Click.setDisable(true);
+        setNodeDisable(runClick_Click, true);
+        setNodeDisable(recordClick_Click, true);
         adaption();
         String errorMessage = appName + autoClick_noPermissions();
         if (isMac) {
@@ -1910,7 +1910,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setNoScreenCapturePermissionLog() {
         noScreenCapturePermission = true;
-        runClick_Click.setDisable(true);
+        setNodeDisable(runClick_Click, true);
         adaption();
         err_Click.setText(tip_noScreenCapturePermission());
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
@@ -1954,7 +1954,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 禁用需要辅助控制权限的组件
         if (isNativeHookException) {
             Button saveButton = settingController.massageRegion_Set;
-            saveButton.setDisable(true);
+            setNodeDisable(saveButton, true);
         }
     }
 

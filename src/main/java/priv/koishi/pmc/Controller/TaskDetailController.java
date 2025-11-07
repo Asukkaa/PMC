@@ -181,11 +181,11 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         } else if (repeatType_daily().equals(repeat)) {
             weekCheckBoxMap.forEach((_, checkBox) -> {
                 checkBox.setSelected(true);
-                checkBox.setDisable(true);
+                setNodeDisable(checkBox, true);
             });
         }
         taskNameField_TD.setText(item.getTaskName());
-        taskNameField_TD.setDisable(isEdit);
+        setNodeDisable(taskNameField_TD, isEdit);
         taskNameField_TD.setPromptText(item.getTaskName());
     }
 
@@ -456,20 +456,20 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         String repeatType = repeatType_TD.getValue();
         addValueToolTip(repeatType_TD, tip_repeatType(), repeatType);
         if (repeatType_once().equals(repeatType)) {
-            datePicker_TD.setDisable(false);
+            setNodeDisable(datePicker_TD, false);
             datePickerAction();
-            weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setDisable(true));
+            weekCheckBoxMap.forEach((_, checkBox) -> setNodeDisable(checkBox, true));
         } else if (repeatType_weekly().equals(repeatType)) {
             datePicker_TD.setValue(LocalDate.now());
-            datePicker_TD.setDisable(true);
+            setNodeDisable(datePicker_TD, true);
             datePickerAction();
-            weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setDisable(false));
+            weekCheckBoxMap.forEach((_, checkBox) -> setNodeDisable(checkBox, false));
         } else if (repeatType_daily().equals(repeatType)) {
             datePicker_TD.setValue(LocalDate.now());
-            datePicker_TD.setDisable(true);
+            setNodeDisable(datePicker_TD, true);
             weekCheckBoxMap.forEach((_, checkBox) -> {
                 checkBox.setSelected(true);
-                checkBox.setDisable(true);
+                setNodeDisable(checkBox, true);
             });
         }
     }

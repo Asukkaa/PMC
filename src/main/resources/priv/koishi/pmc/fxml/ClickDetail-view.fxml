@@ -129,7 +129,7 @@
                             </HBox>
                         </HBox>
 
-                        <HBox fx:id="relativelyHBox_Det" disable="true" spacing="10">
+                        <HBox fx:id="relativelyHBox_Det" spacing="10">
                             <HBox styleClass="hBox-veryShort">
                                 <Label text="%clickDetail.relativelyX"/>
                                 <TextField fx:id="relativelyX_Det" promptText="0.00 - 100.00" prefWidth="100"/>

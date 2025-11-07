@@ -338,9 +338,9 @@ public class ClickDetailController extends RootController {
             clickTypeItems.remove(clickType_drag());
         } else if (clickType_drag().equals(clickType) || clickType_moveTrajectory().equals(clickType)) {
             clickTypeItems.add(clickType);
-            clickType_Det.setDisable(true);
-            mouseStartX_Det.setDisable(true);
-            mouseStartY_Det.setDisable(true);
+            setNodeDisable(clickType_Det, true);
+            setNodeDisable(mouseStartX_Det, true);
+            setNodeDisable(mouseStartY_Det, true);
         }
         if (clickType_openFile().equals(clickType)) {
             setPathLabel(link_Det, targetPath);
@@ -396,10 +396,10 @@ public class ClickDetailController extends RootController {
         windowMonitorClick.updateWindowInfo();
         WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
         if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
-            relativelyHBox_Det.setDisable(true);
+            setNodeDisable(relativelyHBox_Det, true);
             useRelatively_Det.setSelected(false);
         } else {
-            relativelyHBox_Det.setDisable(false);
+            setNodeDisable(relativelyHBox_Det, false);
             useRelatively_Det.setSelected(activation.equals(selectedItem.getUseRelative()));
         }
         useRelatively();
@@ -423,14 +423,14 @@ public class ClickDetailController extends RootController {
                 Platform.runLater(() -> {
                     windowInfoShow(windowInfo, clickWindowInfo_Det);
                     if (windowInfo != null) {
-                        relativelyHBox_Det.setDisable(false);
+                        setNodeDisable(relativelyHBox_Det, false);
                         if (useRelatively_Det.isSelected()) {
                             calculateAbsolutePosition(windowInfo);
                         } else {
                             calculateRelativePosition(windowInfo);
                         }
                     } else {
-                        relativelyHBox_Det.setDisable(true);
+                        setNodeDisable(relativelyHBox_Det, true);
                     }
                 });
             }
@@ -440,7 +440,7 @@ public class ClickDetailController extends RootController {
              */
             @Override
             public void removeInfo() {
-                relativelyHBox_Det.setDisable(true);
+                setNodeDisable(relativelyHBox_Det, true);
                 clickWindowInfo_Det.setText("");
                 relativelyX_Det.setText("");
                 relativelyY_Det.setText("");
@@ -1054,8 +1054,8 @@ public class ClickDetailController extends RootController {
      * 禁用需要自动化权限的组件
      */
     private void setNoPermissionLog() {
-        stopWindow_Det.setDisable(true);
-        clickWindow_Det.setDisable(true);
+        setNodeDisable(stopWindow_Det, true);
+        setNodeDisable(clickWindow_Det, true);
         noPermissionHBox_Det.setVisible(true);
         addToolTip(tip_noAutomationPermission(), noPermission_Det);
     }
@@ -1297,7 +1297,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public void removeClickImg() {
         showClickImg(null);
-        clickType_Det.setDisable(false);
+        setNodeDisable(clickType_Det, false);
     }
 
     /**
@@ -1429,12 +1429,12 @@ public class ClickDetailController extends RootController {
         updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                 clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, false);
         if (findImgType_window().equals(clickFindImgType_Det.getValue())) {
-            relativelyHBox_Det.setDisable(false);
+            setNodeDisable(relativelyHBox_Det, false);
             useRelatively();
         } else {
-            relativelyHBox_Det.setDisable(true);
-            mouseStartX_Det.setDisable(false);
-            mouseStartY_Det.setDisable(false);
+            setNodeDisable(relativelyHBox_Det, true);
+            setNodeDisable(mouseStartX_Det, false);
+            setNodeDisable(mouseStartY_Det, false);
         }
     }
 
@@ -1539,15 +1539,15 @@ public class ClickDetailController extends RootController {
     @FXML
     private void useRelatively() {
         if (useRelatively_Det.isSelected()) {
-            mouseStartX_Det.setDisable(true);
-            mouseStartY_Det.setDisable(true);
-            relativelyX_Det.setDisable(false);
-            relativelyY_Det.setDisable(false);
+            setNodeDisable(mouseStartX_Det, true);
+            setNodeDisable(mouseStartY_Det, true);
+            setNodeDisable(relativelyX_Det, false);
+            setNodeDisable(relativelyY_Det, false);
         } else {
-            mouseStartX_Det.setDisable(false);
-            mouseStartY_Det.setDisable(false);
-            relativelyX_Det.setDisable(true);
-            relativelyY_Det.setDisable(true);
+            setNodeDisable(mouseStartX_Det, false);
+            setNodeDisable(mouseStartY_Det, false);
+            setNodeDisable(relativelyX_Det, true);
+            setNodeDisable(relativelyY_Det, true);
         }
     }
 

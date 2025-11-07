@@ -886,9 +886,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setNoPermissionLog() {
         noAutomationPermission = true;
-        stopWindow_Set.setDisable(true);
-        clickWindow_Set.setDisable(true);
-        noPermissionHBox_Set.setVisible(true);
+        setNodeDisable(stopWindow_Set, true);
+        setNodeDisable(clickWindow_Set, true);
+        setNodeDisable(noPermissionHBox_Set, true);
         addToolTip(tip_noAutomationPermission(), noPermission_Set);
     }
 
