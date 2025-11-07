@@ -31,6 +31,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
+import static priv.koishi.pmc.Controller.AutoClickController.recordTextColorProperty;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
@@ -232,7 +233,8 @@ public class MainApplication extends Application {
             setUserAgentStylesheet(null);
             isDarkTheme = false;
         }
-        setTextColorProperty(isDarkTheme ? Color.WHITE : Color.BLACK);
+        setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
+        setTextColorProperty(recordTextColorProperty, isDarkTheme ? Color.AQUA : Color.BLUE);
     }
 
     /**

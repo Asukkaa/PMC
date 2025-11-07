@@ -709,7 +709,7 @@ public class CommonFinals {
     /**
      * 默认应用窗口高度
      */
-    public static final String defaultAppHeight = "720";
+    public static final String defaultAppHeight = "760";
 
     /**
      * 默认打开的页面

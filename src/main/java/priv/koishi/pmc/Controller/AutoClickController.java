@@ -10,6 +10,8 @@ import com.github.kwhat.jnativehook.mouse.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -314,6 +316,11 @@ public class AutoClickController extends RootController implements MousePosition
      * 信息浮窗设置
      */
     public static FloatingWindowDescriptor massageFloating;
+
+    /**
+     * 录制信息字体颜色绑定
+     */
+    public static final ObjectProperty<Color> recordTextColorProperty = new SimpleObjectProperty<>(Color.BLUE);
 
     @FXML
     public AnchorPane anchorPane_Click;
@@ -1361,10 +1368,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (recordTimeline != null) {
             recordTimeline.stop();
             recordTimeline = null;
-            Platform.runLater(() -> {
-                log_Click.setTextFill(Color.BLUE);
-                log_Click.setText(autoClick_recordEnd());
-            });
+            Platform.runLater(() -> log_Click.setText(autoClick_recordEnd()));
         }
         // 停止运行计时
         if (runTimeline != null) {
@@ -1553,7 +1557,6 @@ public class AutoClickController extends RootController implements MousePosition
             removeNativeListener(wheelListener);
             pressButtonList.clear();
             Platform.runLater(() -> {
-                log_Click.setTextFill(Color.BLUE);
                 log_Click.setText(autoClick_recordEnd());
                 tableView_Click.refresh();
             });
@@ -1601,7 +1604,6 @@ public class AutoClickController extends RootController implements MousePosition
             // 所有按键都松开时才能记录
             if (recordMove && pressButtonList.isEmpty()) {
                 Platform.runLater(() -> {
-                    log_Click.setTextFill(Color.BLUE);
                     // 计算移动时长
                     long endMoveTime = System.currentTimeMillis();
                     long moveTime = isFirstClick ?
@@ -1621,6 +1623,8 @@ public class AutoClickController extends RootController implements MousePosition
                     addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                     String log = text_cancelTask() + text_recordClicking() + "\n" +
                             text_recorded() + autoClick_mouseTrajectory();
+                    log_Click.textFillProperty().unbind();
+                    log_Click.textFillProperty().bind(recordTextColorProperty);
                     log_Click.setText(log);
                     updateMassageLabel(massageFloating, log);
                 });
@@ -1720,6 +1724,8 @@ public class AutoClickController extends RootController implements MousePosition
                         addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
                         String log = text_cancelTask() + text_recordClicking() + "\n" +
                                 text_recorded() + clickBean.getClickKey() + text_click() + " X：" + endX + " Y：" + endY;
+                        log_Click.textFillProperty().unbind();
+                        log_Click.textFillProperty().bind(recordTextColorProperty);
                         log_Click.setText(log);
                         updateMassageLabel(massageFloating, log);
                     });
@@ -1773,7 +1779,9 @@ public class AutoClickController extends RootController implements MousePosition
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparationTimeValue + text_preparation());
             updateMassageLabel(massageFloating, text.get());
-            updateLabel(log_Click, text.get());
+            log_Click.textFillProperty().unbind();
+            log_Click.textFillProperty().bind(recordTextColorProperty);
+            log_Click.setText(text.get());
             // 显示浮窗
             showFloatingWindow(false);
             recordTimeline = new Timeline();

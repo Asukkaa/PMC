@@ -89,7 +89,7 @@ public class UiUtils {
     /**
      * 字体颜色绑定
      */
-    private static final ObjectProperty<Color> textColorProperty = new SimpleObjectProperty<>(Color.BLACK);
+    public static final ObjectProperty<Color> textColorProperty = new SimpleObjectProperty<>(Color.BLACK);
 
     /**
      * 无法切换深色布局的页面控制器类集合
@@ -688,7 +688,7 @@ public class UiUtils {
             @Override
             protected void updateItem(Image image, boolean empty) {
                 super.updateItem(image, empty);
-                textFillProperty().bind(textColorProperty());
+                textFillProperty().bind(textColorProperty);
                 if (empty) {
                     setText(null);
                     setGraphic(null);
@@ -731,20 +731,12 @@ public class UiUtils {
     }
 
     /**
-     * 获取字体颜色绑定
-     *
-     * @return 字体颜色绑定
-     */
-    public static ObjectProperty<Color> textColorProperty() {
-        return textColorProperty;
-    }
-
-    /**
      * 设置要绑定的字体颜色
      *
-     * @param color 要绑定的字体颜色
+     * @param textColorProperty 字体颜色绑定器
+     * @param color             要绑定的字体颜色
      */
-    public static void setTextColorProperty(Color color) {
+    public static void setTextColorProperty(ObjectProperty<? super Color> textColorProperty, Color color) {
         textColorProperty.set(color);
     }
 
@@ -859,8 +851,9 @@ public class UiUtils {
      */
     public static void updateLabel(Label label, String text) {
         label.textProperty().unbind();
+        label.textFillProperty().unbind();
         label.setText(text);
-        label.textFillProperty().bind(textColorProperty());
+        label.textFillProperty().bind(textColorProperty);
         label.textFillProperty().unbind();
     }
 
