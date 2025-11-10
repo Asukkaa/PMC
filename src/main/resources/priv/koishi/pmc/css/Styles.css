@@ -97,7 +97,7 @@
 .choice-box {
     -fx-cursor: hand;
     -fx-font-size: 12;
-    -fx-pref-height: 35;
+    -fx-pref-height: 25;
 }
 
 .text-field {
