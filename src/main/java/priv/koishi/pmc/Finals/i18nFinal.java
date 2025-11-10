@@ -3607,14 +3607,14 @@ public class i18nFinal {
     }
 
     /**
-     * 白天模式
+     * 浅色模式
      */
     public static String theme_light() {
         return bundle.getString("theme.light");
     }
 
     /**
-     * 夜晚模式
+     * 深色模式
      */
     public static String theme_dark() {
         return bundle.getString("theme.dark");
