@@ -2,32 +2,35 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane_Log" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="priv.koishi.pmc.Controller.ClickLogController">
-    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
-        <HBox fx:id="fileNumberHBox_Log" spacing="10">
-            <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand" text="%listText.removeAll"/>
+    <AnchorPane fx:id="anchorPane_Log" stylesheets="@../css/Styles.css">
+        <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
+            <HBox fx:id="fileNumberHBox_Log" spacing="10">
+                <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand"
+                        text="%listText.removeAll"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="dataNumber_Log" text="%listText.null"/>
-        </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="dataNumber_Log" text="%listText.null"/>
+            </HBox>
 
-        <TableView fx:id="tableView_Log">
-            <placeholder>
-                <Label text="%clickLog.tableView_Log"/>
-            </placeholder>
+            <TableView fx:id="tableView_Log">
+                <placeholder>
+                    <Label text="%clickLog.tableView_Log"/>
+                </placeholder>
 
-            <columns>
-                <TableColumn fx:id="index_Log" text="%listText.index" sortable="false"/>
-                <TableColumn fx:id="date_Log" text="%clickLog.date_Log" sortable="false"/>
-                <TableColumn fx:id="name_Log" text="%clickLog.name_Log" sortable="false"/>
-                <TableColumn fx:id="type_Log" text="%clickLog.type_Log" sortable="false"/>
-                <TableColumn fx:id="X_Log" text="%clickLog.X_Log" sortable="false"/>
-                <TableColumn fx:id="Y_Log" text="%clickLog.Y_Log" sortable="false"/>
-                <TableColumn fx:id="clickTime_Log" text="%clickLog.clickTime_Log" sortable="false"/>
-                <TableColumn fx:id="clickKey_Log" text="%clickLog.clickKey_Log" sortable="false"/>
-                <TableColumn fx:id="result_Log" text="%clickLog.result_Log" sortable="false"/>
-            </columns>
-        </TableView>
-    </VBox>
-</AnchorPane>
+                <columns>
+                    <TableColumn fx:id="index_Log" text="%listText.index" sortable="false"/>
+                    <TableColumn fx:id="date_Log" text="%clickLog.date_Log" sortable="false"/>
+                    <TableColumn fx:id="name_Log" text="%clickLog.name_Log" sortable="false"/>
+                    <TableColumn fx:id="type_Log" text="%clickLog.type_Log" sortable="false"/>
+                    <TableColumn fx:id="X_Log" text="%clickLog.X_Log" sortable="false"/>
+                    <TableColumn fx:id="Y_Log" text="%clickLog.Y_Log" sortable="false"/>
+                    <TableColumn fx:id="clickTime_Log" text="%clickLog.clickTime_Log" sortable="false"/>
+                    <TableColumn fx:id="clickKey_Log" text="%clickLog.clickKey_Log" sortable="false"/>
+                    <TableColumn fx:id="result_Log" text="%clickLog.result_Log" sortable="false"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </AnchorPane>
+</ScrollPane>

@@ -390,8 +390,8 @@ public class AboutController extends RootController {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
-        double with = Double.parseDouble(prop.getProperty(key_appreciateWidth, "450"));
-        double height = Double.parseDouble(prop.getProperty(key_appreciateHeight, "450"));
+        double with = Double.parseDouble(prop.getProperty(key_appreciateWidth, "500"));
+        double height = Double.parseDouble(prop.getProperty(key_appreciateHeight, "500"));
         input.close();
         Scene scene = new Scene(root, with, height);
         detailStage.setScene(scene);

@@ -144,3 +144,13 @@
     -fx-fit-to-width: true;
     -fx-fit-to-height: true;
 }
+
+.table-view .column-header {
+    -fx-pref-height: 35;
+    -fx-min-height: 35;
+}
+
+.table-view .column-header .label {
+    -fx-alignment: CENTER;
+    -fx-content-display: CENTER;
+}

@@ -10,7 +10,7 @@
         <Label styleClass="label-low" text="%about.aboutLabel0"/>
 
         <HBox spacing="10">
-            <ImageView fx:id="logo_Abt" fitWidth="140" fitHeight="140" preserveRatio="true">
+            <ImageView fx:id="logo_Abt" fitWidth="150" fitHeight="150" preserveRatio="true">
                 <Image url="@../icon/PMC.png"/>
             </ImageView>
 
