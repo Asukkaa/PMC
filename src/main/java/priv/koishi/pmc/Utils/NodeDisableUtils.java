@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Utils;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -184,7 +185,7 @@ public class NodeDisableUtils {
                 if (event.getTarget() instanceof TextInputControl &&
                         event.getEventType() == MouseEvent.MOUSE_PRESSED) {
                     // 阻止文本输入框获得焦点
-                    ((TextInputControl) event.getTarget()).deselect();
+                    Platform.runLater(() -> ((TextInputControl) event.getTarget()).deselect());
                 }
                 // 对于下拉框，确保它不会展开
                 if (event.getTarget() instanceof ComboBoxBase<?> comboBox) {
@@ -226,7 +227,7 @@ public class NodeDisableUtils {
         if (node instanceof TextInputControl textInput) {
             textInput.setEditable(!disable);
             if (disable) {
-                textInput.deselect();
+                Platform.runLater(textInput::deselect);
             }
         }
         if (node instanceof ComboBoxBase<?> combo) {
