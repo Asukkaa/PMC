@@ -7,7 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,9 +54,6 @@ public class ClickLogController extends RootController {
 
     @FXML
     public AnchorPane anchorPane_Log;
-
-    @FXML
-    public HBox fileNumberHBox_Log;
 
     @FXML
     public Button removeAll_Log;

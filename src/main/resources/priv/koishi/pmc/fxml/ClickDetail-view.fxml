@@ -109,7 +109,7 @@
 
                     <VBox fx:id="clickVBox_Det" spacing="10">
                         <HBox spacing="10">
-                            <HBox fx:id="pointHBox_Det" spacing="10">
+                            <HBox spacing="10">
                                 <HBox styleClass="hBox-veryShort">
                                     <Label text="%clickDetail.mouseStartX"/>
                                     <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
@@ -341,7 +341,7 @@
 
                         <HBox spacing="20">
                             <VBox spacing="10">
-                                <HBox fx:id="fileNumberHBox_Det" spacing="10">
+                                <HBox spacing="10">
                                     <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath"
                                             text="%clickDetail.stopImgBtn_Det"/>
                                     <Button fx:id="removeAll_Det" onAction="#removeAll" text="%listText.removeAll"/>

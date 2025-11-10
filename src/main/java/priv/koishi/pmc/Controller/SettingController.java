@@ -134,8 +134,8 @@ public class SettingController extends RootController implements MousePositionUp
     public AnchorPane anchorPane_Set;
 
     @FXML
-    public HBox fileNumberHBox_Set, findImgSetting_Set, clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set,
-            clickWindowInfoHBox_Set, stopRegionInfoHBox_Set, clickRegionInfoHBox_Set, noPermissionHBox_Set;
+    public HBox clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set, clickWindowInfoHBox_Set,
+            stopRegionInfoHBox_Set, clickRegionInfoHBox_Set, noPermissionHBox_Set;
 
     @FXML
     public ProgressBar progressBar_Set;

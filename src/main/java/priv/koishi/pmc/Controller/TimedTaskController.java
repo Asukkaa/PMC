@@ -8,8 +8,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import priv.koishi.pmc.Bean.TaskBean;
@@ -67,12 +65,6 @@ public class TimedTaskController extends RootController {
      * 要防重复点击的组件
      */
     private final List<Node> disableNodes = new ArrayList<>();
-
-    @FXML
-    public AnchorPane anchorPane_Task;
-
-    @FXML
-    public HBox fileNumberHBox_Task, tipHBox_Task, logHBox_Task;
 
     @FXML
     public ProgressBar progressBar_Task;

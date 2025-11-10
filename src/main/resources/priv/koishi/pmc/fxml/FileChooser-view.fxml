@@ -48,7 +48,7 @@
                 <CheckBox fx:id="reverseFileType_FC" text="%fileChooser.reverseFileType_FC"/>
             </HBox>
 
-            <HBox fx:id="fileNumberHBox_FC" spacing="10">
+            <HBox spacing="10">
                 <Button fx:id="gotoParentButton_FC" onAction="#gotoParent" styleClass="cornflowerblue-button"
                         text="%fileChooser.gotoParentButton_FC"/>
                 <Button fx:id="refreshButton_FC" onAction="#refreshTable" styleClass="cadetblue-button"

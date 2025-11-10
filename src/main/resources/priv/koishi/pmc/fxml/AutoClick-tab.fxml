@@ -5,7 +5,7 @@
 <AnchorPane fx:id="anchorPane_Click" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AutoClickController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-        <HBox fx:id="cancelTipHBox_Click" spacing="10">
+        <HBox spacing="10">
             <Label prefWidth="300" fx:id="mousePosition_Click"/>
 
             <Label textFill="coral" text="%autoClick.tip"/>
@@ -39,7 +39,7 @@
             <Button fx:id="clearButton_Click" onAction="#removeAll" text="%listText.removeAll"/>
         </HBox>
 
-        <HBox fx:id="fileNumberHBox_Click" spacing="10">
+        <HBox spacing="10">
             <Label text="%autoClick.preparationRecordTime"/>
             <TextField fx:id="preparationRecordTime_Click" prefWidth="50"/>
             <Label text="%unit.s"/>
@@ -81,7 +81,7 @@
             </columns>
         </TableView>
 
-        <HBox fx:id="tipHBox_Click" spacing="10">
+        <HBox spacing="10">
             <ProgressBar fx:id="progressBar_Click" visible="false" progress="0.0"/>
 
             <Region HBox.hgrow="ALWAYS"/>

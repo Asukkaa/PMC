@@ -2,10 +2,10 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane_Task" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.TimedTaskController">
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/Styles.css"
+            fx:controller="priv.koishi.pmc.Controller.TimedTaskController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
-        <HBox fx:id="fileNumberHBox_Task" spacing="10">
+        <HBox spacing="10">
             <Button fx:id="addTimedTask_Task" text="%timedTask.addTimedTask_Task" onAction="#addTimedTask"/>
             <Button fx:id="getScheduleTask_Task" text="%timedTask.getScheduleTask_Task" onAction="#getScheduleTask"/>
             <Label text="%timedTask.tip" textFill="red"/>
@@ -31,14 +31,14 @@
             </columns>
         </TableView>
 
-        <HBox fx:id="tipHBox_Task" spacing="10">
+        <HBox spacing="10">
             <ProgressBar fx:id="progressBar_Task" visible="false" progress="0.0"/>
 
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="tip_Task" prefHeight="20" textFill="red" text="%timedTask.tip_Task"/>
         </HBox>
 
-        <HBox fx:id="logHBox_Task" spacing="10">
+        <HBox spacing="10">
             <Label fx:id="log_Task"/>
         </HBox>
     </VBox>

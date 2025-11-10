@@ -376,7 +376,7 @@
 
         <Separator/>
 
-        <HBox fx:id="findImgSetting_Set">
+        <HBox>
             <Label text="%setting.findImgSet"/>
 
             <Region HBox.hgrow="ALWAYS"/>
@@ -504,7 +504,7 @@
         </HBox>
 
         <VBox spacing="10">
-            <HBox fx:id="fileNumberHBox_Set" spacing="10">
+            <HBox spacing="10">
                 <Button fx:id="stopImgBtn_Set" onAction="#addStopImgPath" text="%setting.stopImgBtn_Set"/>
                 <Button fx:id="removeAll_Set" onAction="#removeAll" text="%listText.removeAll"/>
                 <ProgressBar fx:id="progressBar_Set" visible="false" progress="0.0"/>

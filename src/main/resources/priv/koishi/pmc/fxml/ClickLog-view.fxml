@@ -6,7 +6,7 @@
             fx:controller="priv.koishi.pmc.Controller.ClickLogController">
     <AnchorPane fx:id="anchorPane_Log" stylesheets="@../css/Styles.css">
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
-            <HBox fx:id="fileNumberHBox_Log" spacing="10">
+            <HBox spacing="10">
                 <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand"
                         text="%listText.removeAll"/>
 

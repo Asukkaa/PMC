@@ -332,7 +332,7 @@ public class AutoClickController extends RootController implements MousePosition
     public AnchorPane anchorPane_Click;
 
     @FXML
-    public HBox fileNumberHBox_Click, tipHBox_Click, cancelTipHBox_Click, logHBox_Click;
+    public HBox logHBox_Click;
 
     @FXML
     public ProgressBar progressBar_Click;
