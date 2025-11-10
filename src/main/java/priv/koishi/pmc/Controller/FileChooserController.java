@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -102,7 +101,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
     private Stage stage;
 
     @FXML
-    public AnchorPane anchorPane_FC;
+    public ScrollPane scrollPane_FC;
 
     @FXML
     public VBox progressBarVBox_FC;
@@ -595,7 +594,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * 手动处理深色主题
      */
     public void manuallyChangeTheme() {
-        manuallyChangeThemePane(anchorPane_FC, getClass());
+        manuallyChangeThemePane(scrollPane_FC, getClass());
         setRowDoubleClick();
         setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
     }
@@ -610,7 +609,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         // 初始化下拉框
         setChoiceBoxItems();
         Platform.runLater(() -> {
-            stage = (Stage) anchorPane_FC.getScene().getWindow();
+            stage = (Stage) scrollPane_FC.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
             stage.setOnCloseRequest(_ -> closeRequest());
             // 组件自适应宽高

@@ -2,9 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="priv.koishi.pmc.Controller.FileChooserController">
-    <AnchorPane fx:id="anchorPane_FC" stylesheets="@../css/Styles.css">
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="scrollPane_FC"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.FileChooserController">
+    <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
             <HBox spacing="10">
                 <Button fx:id="selectPathButton_FC" onAction="#selectFilePath" text="%fileChooser.selectPathButton_FC"/>

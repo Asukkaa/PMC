@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -105,7 +104,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     private Runnable refreshCallback;
 
     @FXML
-    public AnchorPane anchorPane_TD;
+    public ScrollPane scrollPane_TD;
 
     @FXML
     public VBox progressBarVBox_TD;
@@ -333,7 +332,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
      * 手动处理主题切换
      */
     public void manuallyChangeTheme() {
-        manuallyChangeThemePane(anchorPane_TD, getClass());
+        manuallyChangeThemePane(scrollPane_TD, getClass());
     }
 
     /**
@@ -352,7 +351,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         // 设置日期选择器显示格式
         setDatePickerFormatter(datePicker_TD, DateTimeFormatter.ofPattern("yyyy-MM-dd EEEE"));
         Platform.runLater(() -> {
-            stage = (Stage) anchorPane_TD.getScene().getWindow();
+            stage = (Stage) scrollPane_TD.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
             stage.setOnCloseRequest(_ -> closeRequest());
             // 设置鼠标悬停提示

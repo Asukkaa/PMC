@@ -4,9 +4,9 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="priv.koishi.pmc.Controller.TaskDetailController">
-    <AnchorPane fx:id="anchorPane_TD" stylesheets="@../css/Styles.css">
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="scrollPane_TD"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.TaskDetailController">
+    <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
                 <HBox spacing="5">

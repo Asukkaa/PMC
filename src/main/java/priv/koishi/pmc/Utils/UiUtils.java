@@ -16,8 +16,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -994,7 +994,7 @@ public class UiUtils {
      *
      * @param pane 页面布局
      */
-    public static <T> void manuallyChangeThemePane(Pane pane, Class<T> clazz) {
+    public static <T> void manuallyChangeThemePane(Region pane, Class<T> clazz) {
         if (isDarkTheme) {
             pane.setStyle("""
                     -fx-background-color: -color-border-subtle, -color-base-9;
