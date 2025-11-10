@@ -346,7 +346,8 @@
                                             text="%clickDetail.stopImgBtn_Det"/>
                                     <Button fx:id="removeAll_Det" onAction="#removeAll" text="%listText.removeAll"/>
 
-                                    <Label fx:id="dataNumber_Det" alignment="CENTER_RIGHT" text="%listText.null"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="dataNumber_Det" text="%listText.null"/>
                                 </HBox>
 
                                 <TableView fx:id="tableView_Det" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

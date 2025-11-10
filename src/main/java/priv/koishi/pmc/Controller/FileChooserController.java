@@ -246,7 +246,6 @@ public class FileChooserController extends ManuallyChangeThemeController {
         tableView_FC.setPrefWidth(tableWidth);
         progressBarVBox_FC.setMaxWidth(tableWidth * 0.4);
         progressBarVBox_FC.setPrefWidth(tableWidth * 0.4);
-        regionRightAlignment(fileNumberHBox_FC, tableWidth, fileNumber_FC);
         bindPrefWidthProperty();
     }
 

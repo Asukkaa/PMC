@@ -10,7 +10,7 @@
 
             <Label textFill="coral" text="%autoClick.tip"/>
 
-            <Label fx:id="cancelTip_Click" textFill="red" alignment="CENTER_RIGHT" text="%autoClick.cancelTip_Click"/>
+            <Label fx:id="cancelTip_Click" textFill="red" text="%autoClick.cancelTip_Click"/>
         </HBox>
 
         <HBox spacing="10">
@@ -57,7 +57,8 @@
 
             <Button fx:id="clickLog_Click" onAction="#clickLog" text="%autoClick.clickLog_Click"/>
 
-            <Label fx:id="dataNumber_Click" alignment="CENTER_RIGHT" text="%listText.null"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="dataNumber_Click" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Click" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
@@ -81,13 +82,16 @@
 
         <HBox fx:id="tipHBox_Click" spacing="10">
             <ProgressBar fx:id="progressBar_Click" visible="false" progress="0.0"/>
-            <Label fx:id="tip_Click" prefHeight="20" textFill="red" alignment="CENTER_RIGHT"
-                   text="%autoClick.tip_Click"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="tip_Click" prefHeight="20" textFill="red" text="%autoClick.tip_Click"/>
         </HBox>
 
         <HBox fx:id="logHBox_Click" spacing="10">
             <Label fx:id="log_Click" style="-fx-pref-height: -1"/>
-            <Label fx:id="err_Click" textFill="red" alignment="CENTER_RIGHT"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="err_Click" textFill="red"/>
         </HBox>
     </VBox>
 </AnchorPane>

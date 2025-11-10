@@ -55,7 +55,8 @@
                         text="%listText.refresh"/>
                 <Label fx:id="tip_FC" textFill="red" text="%fileChooser.tip_FC"/>
 
-                <Label fx:id="fileNumber_FC" alignment="CENTER_RIGHT" text="%listText.null"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="fileNumber_FC" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_FC" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

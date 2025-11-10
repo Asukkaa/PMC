@@ -378,7 +378,9 @@
 
         <HBox fx:id="findImgSetting_Set">
             <Label text="%setting.findImgSet"/>
-            <Label fx:id="tip_Set" textFill="red" alignment="CENTER_RIGHT" text="%setting.tip_Set"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="tip_Set" textFill="red" text="%setting.tip_Set"/>
         </HBox>
 
         <HBox spacing="10">
@@ -507,7 +509,8 @@
                 <Button fx:id="removeAll_Set" onAction="#removeAll" text="%listText.removeAll"/>
                 <ProgressBar fx:id="progressBar_Set" visible="false" progress="0.0"/>
 
-                <Label fx:id="dataNumber_Set" alignment="CENTER_RIGHT" text="%listText.null"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="dataNumber_Set" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_Set" onDragDropped="#handleDrop" onDragOver="#acceptDrop">

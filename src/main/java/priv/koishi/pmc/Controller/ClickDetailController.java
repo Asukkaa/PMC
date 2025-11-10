@@ -251,7 +251,6 @@ public class ClickDetailController extends RootController {
         tableView_Det.setMaxWidth(tableWidth);
         tableView_Det.setPrefWidth(tableWidth);
         tableView_Det.setPrefHeight(stage.getHeight() * 0.5);
-        regionRightAlignment(fileNumberHBox_Det, tableWidth, dataNumber_Det);
         progressBarVBox_Det.setPrefWidth(stage.getWidth() * 0.4);
         bindPrefWidthProperty();
     }

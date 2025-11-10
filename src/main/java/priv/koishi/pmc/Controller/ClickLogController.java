@@ -21,7 +21,6 @@ import static priv.koishi.pmc.Finals.i18nFinal.tip_removeAll_Log;
 import static priv.koishi.pmc.Finals.i18nFinal.unit_log;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.regionRightAlignment;
 
 /**
  * 操作记录页面控制器
@@ -84,7 +83,6 @@ public class ClickLogController extends RootController {
         tableView_Log.setMaxWidth(tableWidth);
         tableView_Log.setPrefWidth(tableWidth);
         tableView_Log.setPrefHeight(stage.getHeight() * 0.8);
-        regionRightAlignment(fileNumberHBox_Log, tableWidth, dataNumber_Log);
         bindPrefWidthProperty();
     }
 

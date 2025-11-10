@@ -8,7 +8,8 @@
         <HBox fx:id="fileNumberHBox_Log" spacing="10">
             <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand" text="%listText.removeAll"/>
 
-            <Label fx:id="dataNumber_Log" alignment="CENTER_RIGHT" text="%listText.null"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="dataNumber_Log" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Log">

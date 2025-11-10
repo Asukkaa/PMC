@@ -3,7 +3,6 @@ package priv.koishi.pmc.Utils;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -17,7 +16,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.stage.Window;
@@ -701,25 +702,6 @@ public class UiUtils {
         clipboard.setContent(content);
         // 复制成功消息气泡
         new MessageBubble(text_copySuccess(), 2);
-    }
-
-    /**
-     * 指定组件设置右对齐
-     *
-     * @param hBox           组件所在 hBox
-     * @param alignmentWidth 右对齐参考组件宽度
-     * @param region         要设置右对齐的组件
-     */
-    public static void regionRightAlignment(HBox hBox, double alignmentWidth, Region region) {
-        ObservableList<Node> nodes = hBox.getChildren();
-        double spacing = hBox.getSpacing();
-        double prefWidth = alignmentWidth - spacing;
-        for (Node node : nodes) {
-            if (!region.getId().equals(node.getId())) {
-                prefWidth = prefWidth - node.getLayoutBounds().getWidth() - spacing;
-            }
-        }
-        region.setPrefWidth(prefWidth);
     }
 
     /**

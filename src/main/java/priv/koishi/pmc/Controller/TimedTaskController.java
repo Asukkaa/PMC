@@ -36,7 +36,8 @@ import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.UiUtils.setWindowCss;
+import static priv.koishi.pmc.Utils.UiUtils.setWindowLogo;
 
 /**
  * 定时任务控制器
@@ -103,8 +104,6 @@ public class TimedTaskController extends RootController {
         double tableWidth = mainStage.getWidth() * 0.95;
         tableView_Task.setMaxWidth(tableWidth);
         tableView_Task.setPrefWidth(tableWidth);
-        regionRightAlignment(fileNumberHBox_Task, tableWidth, dataNumber_Task);
-        regionRightAlignment(tipHBox_Task, tableWidth, tip_Task);
         bindPrefWidthProperty();
     }
 
