@@ -1705,7 +1705,7 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void themeAction() {
         String value = theme_Set.getValue();
-        addValueToolTip(theme_Set, tip_them(), value);
+        addValueToolTip(theme_Set, tip_theme(), value);
         int them = themeMap.getKey(value);
         changeTheme(them);
         if (mainController != null) {

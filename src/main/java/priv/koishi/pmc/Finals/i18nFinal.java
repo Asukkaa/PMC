@@ -956,8 +956,8 @@ public class i18nFinal {
     /**
      * @return 用来设置应用的外观
      */
-    public static String tip_them() {
-        return bundle.getString("tip.them");
+    public static String tip_theme() {
+        return bundle.getString("tip.theme");
     }
 
     /**
