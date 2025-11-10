@@ -37,7 +37,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
+import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.loadPMC;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -126,7 +126,13 @@ public class MainApplication extends Application {
         // 读取fxml页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         double appWidth = Double.parseDouble(prop.getProperty(key_appWidth, defaultAppWidth));
+        if (appWidth >= screenWidth) {
+            appWidth = screenWidth * 0.9;
+        }
         double appHeight = Double.parseDouble(prop.getProperty(key_appHeight, defaultAppHeight));
+        if (appHeight >= screenHeight) {
+            appHeight = screenHeight * 0.9;
+        }
         if (activation.equals(prop.getProperty(key_lastMaxWindow, unActivation))
                 && activation.equals(prop.getProperty(key_loadLastMaxWindow, unActivation))) {
             stage.setMaximized(true);
