@@ -18,7 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -186,7 +186,7 @@ public class ClickDetailController extends RootController {
     private Runnable refreshCallback;
 
     @FXML
-    public AnchorPane anchorPane_Det;
+    public BorderPane borderPane_Det;
 
     @FXML
     public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det, commonVBox_Det;
@@ -1090,7 +1090,7 @@ public class ClickDetailController extends RootController {
         // 读取配置文件
         getConfig();
         Platform.runLater(() -> {
-            stage = (Stage) anchorPane_Det.getScene().getWindow();
+            stage = (Stage) borderPane_Det.getScene().getWindow();
             // 初始化窗口监控器
             initWindowMonitor();
             // 组件宽高自适应

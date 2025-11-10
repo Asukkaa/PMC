@@ -3,11 +3,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="priv.koishi.pmc.Controller.ClickDetailController">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/Styles.css"
+            fx:controller="priv.koishi.pmc.Controller.ClickDetailController" fx:id="borderPane_Det">
     <center>
         <ScrollPane>
-            <AnchorPane fx:id="anchorPane_Det" stylesheets="@../css/Styles.css">
+            <AnchorPane>
                 <VBox fx:id="vBox_Det" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
                     <VBox fx:id="commonVBox_Det" spacing="10">
                         <HBox spacing="10">

@@ -2,9 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="priv.koishi.pmc.Controller.ClickLogController">
-    <AnchorPane fx:id="anchorPane_Log" stylesheets="@../css/Styles.css">
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/Styles.css"
+            fx:controller="priv.koishi.pmc.Controller.ClickLogController" fx:id="scrollPane_Log">
+    <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
             <HBox spacing="10">
                 <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand"

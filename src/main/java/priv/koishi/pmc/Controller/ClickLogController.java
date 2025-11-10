@@ -2,11 +2,7 @@ package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,7 +49,7 @@ public class ClickLogController extends RootController {
     private Runnable refreshCallback;
 
     @FXML
-    public AnchorPane anchorPane_Log;
+    public ScrollPane scrollPane_Log;
 
     @FXML
     public Button removeAll_Log;
@@ -117,7 +113,7 @@ public class ClickLogController extends RootController {
     @FXML
     private void initialize() {
         Platform.runLater(() -> {
-            stage = (Stage) anchorPane_Log.getScene().getWindow();
+            stage = (Stage) scrollPane_Log.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
             stage.setOnCloseRequest(_ -> removeController());
             // 组件宽高自适应
