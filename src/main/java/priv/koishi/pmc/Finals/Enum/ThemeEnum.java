@@ -10,11 +10,6 @@ package priv.koishi.pmc.Finals.Enum;
 public enum ThemeEnum {
 
     /**
-     * javaFx 原生外观
-     */
-    JavaFx,
-
-    /**
      * 浅色模式
      */
     Light,
@@ -27,6 +22,11 @@ public enum ThemeEnum {
     /**
      * 跟随系统
      */
-    Auto
+    Auto,
+
+    /**
+     * 原生模式
+     */
+    JavaFx
 
 }

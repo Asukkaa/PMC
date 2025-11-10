@@ -3600,7 +3600,7 @@ public class i18nFinal {
     }
 
     /**
-     * javaFX 原生外观
+     * 原生模式
      */
     public static String theme_javafx() {
         return bundle.getString("theme.javafx");
@@ -3637,10 +3637,10 @@ public class i18nFinal {
      */
     public static void updateThemeList() {
         themeList.clear();
-        themeList.add(theme_javafx());
         themeList.add(theme_light());
         themeList.add(theme_dark());
         themeList.add(theme_auto());
+        themeList.add(theme_javafx());
     }
 
     /**
@@ -3653,10 +3653,10 @@ public class i18nFinal {
      */
     public static void updateThemeMap() {
         themeMap.clear();
-        themeMap.put(ThemeEnum.JavaFx.ordinal(), theme_javafx());
         themeMap.put(ThemeEnum.Light.ordinal(), theme_light());
         themeMap.put(ThemeEnum.Dark.ordinal(), theme_dark());
         themeMap.put(ThemeEnum.Auto.ordinal(), theme_auto());
+        themeMap.put(ThemeEnum.JavaFx.ordinal(), theme_javafx());
     }
 
     /**
