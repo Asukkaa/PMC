@@ -11,8 +11,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -40,6 +42,7 @@ import java.util.Properties;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.runPMCFile;
@@ -47,6 +50,8 @@ import static priv.koishi.pmc.Service.CheckUpdateService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -256,6 +261,36 @@ public class AboutController extends RootController {
             }
         });
         contextMenu.getItems().add(mailMenuItem);
+    }
+
+    /**
+     * 显示更新提示框
+     *
+     * @param updateInfo 更新信息
+     * @return 用户选择的按钮类型
+     */
+    private static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(update_checkUpdate_Abt());
+        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        " +
+                update_releaseDate() + updateInfo.getBuildDate());
+        // 创建包含更新信息的文本区域
+        TextArea textArea = new TextArea(updateInfo.getWhatsNew());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(textArea, 0, 0);
+        alert.getDialogPane().setContent(expContent);
+        ButtonType updateButton = new ButtonType(update_updateButton());
+        ButtonType laterButton = new ButtonType(update_laterButton(), ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(updateButton, laterButton);
+        // 设置窗口图标
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        setWindowLogo(stage, logoPath);
+        return alert.showAndWait();
     }
 
     /**

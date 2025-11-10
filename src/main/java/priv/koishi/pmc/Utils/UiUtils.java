@@ -3,44 +3,30 @@ package priv.koishi.pmc.Utils;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.stage.Window;
-import javafx.util.Callback;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import priv.koishi.pmc.Bean.CheckUpdateBean;
-import priv.koishi.pmc.Bean.Interface.ImgBean;
-import priv.koishi.pmc.Bean.Interface.Indexable;
-import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
@@ -51,13 +37,10 @@ import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -66,6 +49,9 @@ import static priv.koishi.pmc.MainApplication.isDarkTheme;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.TableViewUtils.updateTableViewSizeText;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 
 /**
  * ui相关工具类
@@ -75,11 +61,6 @@ import static priv.koishi.pmc.Utils.FileUtils.*;
  * Time:下午1:38
  */
 public class UiUtils {
-
-    /**
-     * 拖拽数据格式
-     */
-    private static final DataFormat dataFormat = new DataFormat("application/x-java-serialized-object");
 
     /**
      * 日志记录器
@@ -95,116 +76,6 @@ public class UiUtils {
      * 无法切换深色布局的页面控制器类集合
      */
     public static Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
-
-    /**
-     * 鼠标停留提示框
-     *
-     * @param nodes 需要显示提示框的组件
-     * @param tip   提示卡信息
-     */
-    public static void addToolTip(String tip, Node... nodes) {
-        for (Node node : nodes) {
-            Tooltip.install(node, creatTooltip(tip));
-        }
-    }
-
-    /**
-     * 鼠标停留提示框（组件文字为提示内容）
-     *
-     * @param labels 需要显示提示框的组件
-     */
-    public static void addToolTip(Labeled... labels) {
-        for (Labeled labeled : labels) {
-            String tip = labeled.getText();
-            Tooltip.install(labeled, creatTooltip(tip));
-        }
-    }
-
-    /**
-     * 设置永久显示的鼠标停留提示框参数
-     *
-     * @param tip 提示文案
-     * @return 设置参数后的 Tooltip 对象
-     */
-    public static Tooltip creatTooltip(String tip) {
-        return creatTooltip(tip, Duration.INDEFINITE);
-    }
-
-    /**
-     * 设置鼠标停留提示框参数
-     *
-     * @param tip      提示文案
-     * @param duration 显示时长
-     * @return 设置参数后的 Tooltip 对象
-     */
-    public static Tooltip creatTooltip(String tip, Duration duration) {
-        Tooltip tooltip = new Tooltip(tip);
-        tooltip.setWrapText(true);
-        tooltip.setShowDuration(duration);
-        tooltip.setShowDelay(Duration.ZERO);
-        tooltip.setHideDelay(Duration.ZERO);
-        tooltip.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT);
-        tooltip.getStyleClass().add("tooltip-font-size");
-        tooltip.setMaxWidth(500);
-        return tooltip;
-    }
-
-    /**
-     * 文本输入框鼠标停留提示输入值
-     *
-     * @param textField 要添加提示的文本输入框
-     * @param text      要展示的提示文案
-     */
-    public static void addValueToolTip(TextField textField, String text) {
-        addValueToolTip(textField, text, text_nowValue());
-    }
-
-    /**
-     * 文本输入框鼠标停留提示输入值
-     *
-     * @param textField 要添加提示的文本输入框
-     * @param text      要展示的提示文案
-     * @param valueText 当前所填值提示文案
-     */
-    public static void addValueToolTip(TextField textField, String text, String valueText) {
-        String value = textField.getText();
-        addValueToolTip(textField, text, valueText, value);
-    }
-
-    /**
-     * 为组件添加鼠标悬停提示框
-     *
-     * @param node  要添加提示的组件
-     * @param text  提示文案
-     * @param value 当前所填值
-     */
-    public static void addValueToolTip(Node node, String text, String value) {
-        addValueToolTip(node, text, text_nowValue(), value);
-    }
-
-    /**
-     * 为组件添加鼠标悬停提示框
-     *
-     * @param node      要添加提示的组件
-     * @param text      提示文案
-     * @param valueText 当前所填值提示文案
-     * @param value     当前所填值
-     */
-    public static void addValueToolTip(Node node, String text, String valueText, String value) {
-        if (StringUtils.isNotEmpty(text)) {
-            if (StringUtils.isNotEmpty(value)) {
-                addToolTip(text + "\n" + valueText + value, node);
-            } else {
-                addToolTip(text, node);
-            }
-        } else {
-            if (StringUtils.isNotEmpty(value)) {
-                addToolTip(value, node);
-            } else {
-                addToolTip(null, node);
-            }
-        }
-    }
 
     /**
      * 创建一个文件选择器
@@ -467,6 +338,62 @@ public class UiUtils {
     }
 
     /**
+     * 关闭窗口
+     *
+     * @param stage    要关闭的窗口
+     * @param runnable 关闭前的回调
+     */
+    public static void closeStage(Stage stage, Runnable runnable) {
+        if (runnable != null) {
+            runnable.run();
+        }
+        WindowEvent closeEvent = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
+        stage.fireEvent(closeEvent);
+        if (!closeEvent.isConsumed()) {
+            stage.close();
+        }
+        System.gc();
+    }
+
+    /**
+     * 将程序窗口弹出
+     *
+     * @param stage 程序主舞台
+     */
+    public static void showStage(Stage stage) {
+        Platform.runLater(() -> {
+            stage.setAlwaysOnTop(true);
+            stage.setIconified(false);
+            stage.show();
+            stage.toFront();
+            stage.requestFocus();
+            stage.setAlwaysOnTop(false);
+        });
+    }
+
+    /**
+     * 弹出界面和错误弹窗
+     *
+     * @param errs  错误详情
+     * @param title 错误标题
+     * @param stage 错误弹窗的父窗口
+     */
+    public static void showStageAlert(List<String> errs, String title, Stage stage) {
+        if (stage.isIconified()) {
+            stage.setIconified(false);
+            stage.show();
+            stage.toFront();
+            stage.requestFocus();
+        }
+        Alert alert = creatErrorAlert(String.join("\n", errs));
+        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+        alertStage.initOwner(stage);
+        alertStage.setAlwaysOnTop(true);
+        alert.setHeaderText(title);
+        alert.showAndWait();
+    }
+
+    /**
      * 给窗口设置 logo
      *
      * @param stage 要设置 logo 的窗口
@@ -487,250 +414,6 @@ public class UiUtils {
     }
 
     /**
-     * 为 javaFX 单元格赋值并添加鼠标悬停提示
-     *
-     * @param tableColumn 要处理的 javaFX 列表列
-     * @param param       javaFX 列表列对应的数据属性名
-     */
-    public static void buildCellValue(TableColumn<?, ?> tableColumn, String param) {
-        tableColumn.setCellValueFactory(new PropertyValueFactory<>(param));
-        // 为 javaFX 单元格和表头添加鼠标悬停提示
-        addTableCellToolTip(tableColumn);
-    }
-
-    /**
-     * 自定义单元格工厂，为单元格添加 Tooltip
-     *
-     * @param column 要处理的 javaFX 表格单元格
-     * @param <S>    表格单元格数据类型
-     * @param <T>    表格单元格类型
-     */
-    public static <S, T> void addTableCellToolTip(TableColumn<S, T> column) {
-        column.setCellFactory(new Callback<>() {
-            @Override
-            public TableCell<S, T> call(TableColumn<S, T> param) {
-                return new TableCell<>() {
-                    @Override
-                    protected void updateItem(T item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null || StringUtils.isEmpty(item.toString())) {
-                            setText(null);
-                            setTooltip(null);
-                        } else if (!item.toString().isEmpty()) {
-                            setText(item.toString());
-                            setTooltip(creatTooltip(item.toString()));
-                        }
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * 为表头添加鼠标悬停提示
-     *
-     * @param column 要处理的 javaFX 表格列
-     * @param <S>    表格单元格数据类型
-     * @param <T>    表格单元格类型
-     */
-    public static <S, T> void addTableColumnToolTip(TableColumn<S, T> column) {
-        addTableColumnToolTip(column, column.getText());
-    }
-
-    /**
-     * 为表头添加鼠标悬停提示
-     *
-     * @param column  要处理的 javaFX 表格列
-     * @param tooltip 要展示的提示文案
-     * @param <S>     表格单元格数据类型
-     * @param <T>     表格单元格类型
-     */
-    public static <S, T> void addTableColumnToolTip(TableColumn<S, T> column, String tooltip) {
-        String columnText = column.getText();
-        if (StringUtils.isNotBlank(columnText)) {
-            Label label = new Label(columnText);
-            // 完全绑定Label宽度到TableColumn宽度
-            label.prefWidthProperty().bind(column.widthProperty());
-            label.setMaxWidth(Control.USE_PREF_SIZE);
-            label.setMinWidth(Control.USE_PREF_SIZE);
-            // 确保文本居中显示
-            label.setAlignment(Pos.CENTER);
-            // 文本过长时自动调整
-            label.setTextOverrun(OverrunStyle.ELLIPSIS);
-            addToolTip(tooltip, label);
-            column.setGraphic(label);
-            column.setText(null);
-        }
-    }
-
-    /**
-     * 根据 bean 属性名自动填充 javaFX 表格
-     *
-     * @param tableView   要处理的 javaFX 表格
-     * @param beanClass   要处理的 javaFX 表格的数据 bean 类
-     * @param tabId       用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 javaFX 列表的列对应的 id
-     * @param indexColumn 序号列
-     * @param <T>         要处理的 javaFX 表格的数据 bean 类
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
-        // 递归获取类及其父类的所有字段
-        List<Field> fields = getAllFields(beanClass);
-        ObservableList<? extends TableColumn<?, ?>> columns = tableView.getColumns();
-        fields.forEach(f -> {
-            String fieldName = f.getName();
-            String finalFieldName;
-            if (StringUtils.isNotEmpty(tabId)) {
-                finalFieldName = fieldName + tabId;
-            } else {
-                finalFieldName = fieldName;
-            }
-            Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c ->
-                    finalFieldName.equals(c.getId())).findFirst();
-            matched.ifPresent(m -> {
-                // 添加列名Tooltip
-                addTableColumnToolTip(m);
-                if (f.getType() == Image.class) {
-                    // 直接使用类型安全的函数式调用
-                    Function<T, Image> supplier = bean -> {
-                        if (bean instanceof ImgBean imgBean) {
-                            return imgBean.loadThumb();
-                        }
-                        return null;
-                    };
-                    // 创建图片表格
-                    buildThumbnailCell((TableColumn<T, Image>) m, supplier);
-                } else {
-                    if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
-                        // 设置列为序号列
-                        buildIndexCellValue(indexColumn);
-                    } else if (beanClass == ImgFileVO.class && "path".equals(fieldName)) {
-                        TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
-                        pathColumn.setCellValueFactory(cellData ->
-                                cellData.getValue().pathProperty());
-                        // 为 javaFX 单元格和表头添加鼠标悬停提示
-                        addTableCellToolTip(pathColumn);
-                    } else {
-                        // 为 javaFX 单元格赋值并添加鼠标悬停提示
-                        buildCellValue(m, fieldName);
-                    }
-                }
-            });
-        });
-    }
-
-    /**
-     * 设置列为序号列
-     *
-     * @param column 要处理的列
-     * @param <T>    列对应的数据类型
-     */
-    public static <T> void buildIndexCellValue(TableColumn<T, Integer> column) {
-        column.setCellFactory(new Callback<>() {
-            @Override
-            public TableCell<T, Integer> call(TableColumn<T, Integer> param) {
-                return new TableCell<>() {
-                    @Override
-                    protected void updateItem(Integer item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setText(null);
-                        } else {
-                            // 获取当前行的索引并加1（行号从1开始）
-                            int rowIndex = getIndex() + 1;
-                            T itemData = getTableRow().getItem();
-                            if (itemData instanceof Indexable indexable) {
-                                indexable.setIndex(rowIndex);
-                            }
-                            setText(String.valueOf(rowIndex));
-                            setTooltip(creatTooltip(String.valueOf(rowIndex)));
-                        }
-                    }
-                };
-            }
-        });
-    }
-
-    /**
-     * 递归获取类及其父类的所有字段
-     *
-     * @param clazz 要获取字段的类
-     * @return 当前类和父类所有字段
-     */
-    private static List<Field> getAllFields(Class<?> clazz) {
-        List<Field> fields = new ArrayList<>();
-        while (clazz != null && clazz != Object.class) {
-            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            clazz = clazz.getSuperclass();
-        }
-        return fields;
-    }
-
-    /**
-     * 创建图片表格
-     *
-     * @param column        要创建图片表格的列
-     * @param thumbSupplier 获取图片的函数
-     * @param <T>           列对应的数据类型
-     */
-    public static <T> void buildThumbnailCell(TableColumn<T, Image> column, Function<? super T, ? extends Image> thumbSupplier) {
-        column.setCellValueFactory(cellData ->
-                new SimpleObjectProperty<>(thumbSupplier.apply(cellData.getValue())));
-        column.setCellFactory(_ -> new TableCell<>() {
-            private final ImageView imageView = new ImageView();
-
-            {
-                imageView.setFitWidth(100);
-                imageView.setFitHeight(100);
-                imageView.setPreserveRatio(true);
-            }
-
-            @Override
-            protected void updateItem(Image image, boolean empty) {
-                super.updateItem(image, empty);
-                textFillProperty().bind(textColorProperty);
-                if (empty) {
-                    setText(null);
-                    setGraphic(null);
-                } else if (image == null) {
-                    TableRow<T> tableRow = getTableRow();
-                    if (isRedText(tableRow)) {
-                        setText(text_badImg());
-                        textFillProperty().unbind();
-                        setTextFill(Color.RED);
-                        setTooltip(creatTooltip(text_badImg()));
-                    } else {
-                        setText(text_noImg());
-                        setTooltip(creatTooltip(text_noImg()));
-                    }
-                    setGraphic(null);
-                } else {
-                    setText(null);
-                    imageView.setImage(image);
-                    setGraphic(imageView);
-                    setTooltip(creatTooltip(image.getUrl().replace("file:", text_imgPath())));
-                }
-            }
-
-            // 判断字体是否变红，true 变红，false 不变红
-            private boolean isRedText(TableRow<? extends T> tableRow) {
-                T bean = tableRow.getItem();
-                String imgPath = null;
-                if (bean instanceof ImgFileVO imgFileVO) {
-                    imgPath = imgFileVO.getPath();
-                } else if (bean instanceof ClickPositionVO clickPositionVO) {
-                    imgPath = clickPositionVO.getClickImgPath();
-                }
-                // 只有在有图片路径但图片不存在时，才让缩略图提示文字变红
-                if (StringUtils.isBlank(imgPath)) {
-                    return false;
-                }
-                return !new File(imgPath).exists();
-            }
-        });
-    }
-
-    /**
      * 设置要绑定的字体颜色
      *
      * @param textColorProperty 字体颜色绑定器
@@ -738,109 +421,6 @@ public class UiUtils {
      */
     public static void setTextColorProperty(ObjectProperty<? super Color> textColorProperty, Color color) {
         textColorProperty.set(color);
-    }
-
-    /**
-     * 清空 javaFX 列表数据
-     *
-     * @param tableView  要清空的 javaFX 列表
-     * @param fileNumber 用于展示列表数据数量的文本框
-     * @param <T>        数据类型
-     */
-    public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber) {
-        tableView.getItems().clear();
-        updateLabel(fileNumber, listText_dataListNull());
-        System.gc();
-    }
-
-    /**
-     * 向列表指定位置添加数据
-     *
-     * @param data           要添加的数据
-     * @param addType        添加位置类型
-     * @param tableView      要添加数据的列表
-     * @param dataNumber     用于展示列表数据数量的文本框
-     * @param dataNumberUnit 数据数量单位
-     * @param <T>            数据类型
-     */
-    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
-        addData(data, addType, tableView, dataNumber, dataNumberUnit, true);
-    }
-
-    /**
-     * 向列表指定位置添加数据
-     *
-     * @param data           要添加的数据
-     * @param addType        添加位置类型
-     * @param tableView      要添加数据的列表
-     * @param dataNumber     用于展示列表数据数量的文本框
-     * @param dataNumberUnit 数据数量单位
-     * @param selected       true 表示选中添加的数据，false 表示不选中添加的数据
-     * @param <T>            数据类型
-     */
-    public static <T> void addData(List<? extends T> data, int addType, TableView<T> tableView, Label dataNumber,
-                                   String dataNumberUnit, boolean selected) {
-        ObservableList<T> tableViewItems = tableView.getItems();
-        TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
-        List<T> selectedItem = selectionModel.getSelectedItems();
-        switch (addType) {
-            // 在列表所选行第一行上方插入
-            case upAdd: {
-                // 获取首个选中行的索引
-                int selectedIndex = tableViewItems.indexOf(selectedItem.getFirst());
-                // 在选中行上方插入数据
-                tableView.getItems().addAll(selectedIndex, data);
-                // 滚动到插入位置
-                tableView.scrollTo(selectedIndex);
-                // 选中新插入的数据
-                if (selected) {
-                    selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
-                }
-                break;
-            }
-            // 在列表所选行最后一行下方插入
-            case downAdd: {
-                // 获取最后一个选中行的索引
-                int selectedIndex = tableViewItems.indexOf(selectedItem.getLast()) + 1;
-                // 在选中行下方插入数据
-                tableView.getItems().addAll(selectedIndex, data);
-                // 滚动到插入位置
-                tableView.scrollTo(selectedIndex);
-                // 选中新插入的数据
-                if (selected) {
-                    selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
-                }
-                break;
-            }
-            // 向列表第一行上方插入
-            case topAdd: {
-                // 向列表第一行追加数据
-                tableView.getItems().addAll(0, data);
-                // 滚动到插入位置
-                tableView.scrollTo(0);
-                // 选中新插入的数据
-                if (selected) {
-                    selectionModel.selectRange(0, data.size());
-                }
-                break;
-            }
-            // 向列表最后一行追加
-            case append: {
-                int lastIndex = tableViewItems.size();
-                // 向列表最后一行追加数据
-                tableViewItems.addAll(data);
-                // 滚动到插入位置
-                tableView.scrollTo(tableViewItems.size());
-                // 选中新插入的数据
-                if (selected) {
-                    selectionModel.selectRange(lastIndex, lastIndex + data.size());
-                }
-                break;
-            }
-        }
-        // 同步表格数据量
-        updateTableViewSizeText(tableView, dataNumber, dataNumberUnit);
-        tableView.refresh();
     }
 
     /**
@@ -881,547 +461,6 @@ public class UiUtils {
     }
 
     /**
-     * 设置列表通过拖拽排序行
-     *
-     * @param tableView 要处理的列表
-     * @param <T>       列表数据类型
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> void tableViewDragRow(TableView<T> tableView) {
-        tableView.setRowFactory(_ -> {
-            TableRow<T> row = new TableRow<>();
-            ObservableList<Integer> draggedIndices = FXCollections.observableArrayList();
-            // 拖拽检测
-            row.setOnDragDetected(e -> {
-                if (!row.isEmpty()) {
-                    // 获取所有选中的行索引
-                    draggedIndices.setAll(tableView.getSelectionModel().getSelectedIndices().stream()
-                            .sorted().collect(Collectors.toList()));
-                    // 只允许非空且选中多行时拖拽
-                    if (!draggedIndices.isEmpty()) {
-                        Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
-                        db.setDragView(row.snapshot(null, null));
-                        // 使用自定义数据格式存储多个索引
-                        ClipboardContent cc = new ClipboardContent();
-                        cc.put(dataFormat, new ArrayList<>(draggedIndices));
-                        db.setContent(cc);
-                        e.consume();
-                    }
-                }
-            });
-            // 拖拽悬停验证
-            row.setOnDragOver(e -> {
-                Dragboard db = e.getDragboard();
-                if (db.hasContent(dataFormat)) {
-                    // 禁止拖拽到选中行内部
-                    List<?> indices = (List<?>) db.getContent(dataFormat);
-                    int dropIndex = row.isEmpty() ? tableView.getItems().size() : row.getIndex();
-                    if (!indices.contains(dropIndex)) {
-                        e.acceptTransferModes(TransferMode.MOVE);
-                        e.consume();
-                    }
-                }
-            });
-            // 拖拽释放处理
-            row.setOnDragDropped(e -> {
-                Dragboard db = e.getDragboard();
-                if (db.hasContent(dataFormat)) {
-                    List<Integer> indices = (List<Integer>) db.getContent(dataFormat);
-                    int maxIndex = tableView.getItems().size();
-                    int dropIndex = row.isEmpty() ? maxIndex : row.getIndex();
-                    // 计算有效插入位置
-                    int adjustedDropIndex = calculateAdjustedIndex(indices, dropIndex, maxIndex);
-                    if (adjustedDropIndex != -1) {
-                        // 批量移动数据
-                        moveRows(tableView, indices, adjustedDropIndex);
-                        // 更新选中状态
-                        selectMovedRows(tableView, indices, adjustedDropIndex);
-                        e.setDropCompleted(true);
-                        e.consume();
-                    } else {
-                        // 确保拖拽失败
-                        e.setDropCompleted(false);
-                        // 消费事件以避免进一步传播
-                        e.consume();
-                    }
-                }
-            });
-            return row;
-        });
-    }
-
-    /**
-     * 计算调整后的插入位置
-     *
-     * @param draggedIndices 被拖拽行的原始索引列表（需保证有序）
-     * @param dropIndex      拖拽操作的目标放置位置原始索引
-     * @param maxIndex       表格数据项总数
-     * @return 调整后的有效插入位置，返回-1表示无效拖拽位置
-     */
-    private static int calculateAdjustedIndex(List<Integer> draggedIndices, int dropIndex, int maxIndex) {
-        int firstDragged = draggedIndices.getFirst();
-        int lastDragged = draggedIndices.getLast();
-        if (dropIndex + 1 >= maxIndex) {
-            return maxIndex - draggedIndices.size();
-        }
-        if (dropIndex >= firstDragged && dropIndex <= lastDragged) {
-            return -1;
-        }
-        return dropIndex;
-    }
-
-    /**
-     * 批量移动行数据
-     *
-     * @param tableView   目标表格视图对象
-     * @param indices     需要移动的行索引列表（需保证有序）
-     * @param targetIndex 移动的目标插入位置（经过调整后的有效位置）
-     * @param <T>         表格数据项类型
-     */
-    private static <T> void moveRows(TableView<T> tableView, List<Integer> indices, int targetIndex) {
-        ObservableList<T> items = tableView.getItems();
-        List<T> movedItems = indices.stream().map(items::get).toList();
-        // 批量操作减少刷新次数
-        items.removeAll(movedItems);
-        items.addAll(targetIndex, movedItems);
-    }
-
-    /**
-     * 重新选中移动后的行
-     *
-     * @param tableView       目标表格视图对象
-     * @param originalIndices 移动前的原始行索引列表
-     * @param targetIndex     移动后的起始插入位置
-     * @param <T>             表格数据项类型
-     */
-    private static <T> void selectMovedRows(TableView<T> tableView, List<Integer> originalIndices, int targetIndex) {
-        tableView.getSelectionModel().clearSelection();
-        for (int i = 0; i < originalIndices.size(); i++) {
-            tableView.getSelectionModel().select(targetIndex + i);
-        }
-    }
-
-    /**
-     * 移动所选行选项
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     * @param <T>         表格数据项类型
-     */
-    public static <T> void buildMoveDataMenu(TableView<T> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu(menu_moveSelected());
-        // 创建二级菜单项
-        MenuItem up = new MenuItem(menuItem_moveUp());
-        MenuItem down = new MenuItem(menuItem_moveDown());
-        MenuItem top = new MenuItem(menuItem_moveTop());
-        MenuItem bottom = new MenuItem(menuItem_moveBottom());
-        // 为每个菜单项添加事件处理
-        up.setOnAction(_ -> upMoveDataMenuItem(tableView));
-        down.setOnAction(_ -> downMoveDataMenuItem(tableView));
-        top.setOnAction(_ -> topMoveDataMenuItem(tableView));
-        bottom.setOnAction(_ -> bottomMoveDataMenuItem(tableView));
-        // 将菜单添加到菜单列表
-        menu.getItems().addAll(up, down, top, bottom);
-        contextMenu.getItems().add(menu);
-    }
-
-    /**
-     * 所选行上移一行选项
-     *
-     * @param tableView 要处理的数据列表
-     * @param <T>       表格数据项类型
-     */
-    private static <T> void upMoveDataMenuItem(TableView<T> tableView) {
-        // getSelectedCells处理上移操作有bug，通过getSelectedItems拿到的数据是实时变化的，需要一个新的list来存
-        List<T> selectionList = tableView.getSelectionModel().getSelectedItems();
-        List<T> selections = new ArrayList<>(selectionList);
-        List<T> fileList = tableView.getItems();
-        List<T> tempList = new ArrayList<>(fileList);
-        // 上移所选数据位置
-        for (int i = 0; i < selectionList.size(); i++) {
-            T t = selectionList.get(i);
-            int index = fileList.indexOf(t);
-            if (index - i > 0) {
-                tempList.set(index, tempList.get(index - 1));
-                tempList.set(index - 1, t);
-            }
-        }
-        fileList.clear();
-        fileList.addAll(tempList);
-        // 重新选中移动后的数据
-        for (T t : selections) {
-            int index = fileList.indexOf(t);
-            if (index != -1) {
-                tableView.getSelectionModel().select(index);
-            }
-        }
-    }
-
-    /**
-     * 所选行下移一行选项
-     *
-     * @param tableView 要处理的数据列表
-     * @param <T>       表格数据项类型
-     */
-    private static <T> void downMoveDataMenuItem(TableView<T> tableView) {
-        var selectedCells = tableView.getSelectionModel().getSelectedCells();
-        int loopTime = 0;
-        for (int i = selectedCells.size(); i > 0; i--) {
-            int row = selectedCells.get(i - 1).getRow();
-            List<T> fileList = tableView.getItems();
-            loopTime++;
-            if (row + loopTime < fileList.size()) {
-                fileList.add(row, fileList.remove(row + 1));
-            }
-        }
-    }
-
-    /**
-     * 所选行置顶
-     *
-     * @param tableView 要处理的数据列表
-     * @param <T>       表格数据项类型
-     */
-    private static <T> void topMoveDataMenuItem(TableView<T> tableView) {
-        ObservableList<T> items = tableView.getItems();
-        List<T> selectedItems = new ArrayList<>(tableView.getSelectionModel().getSelectedItems());
-        if (!selectedItems.isEmpty()) {
-            // 移除所有选中项
-            items.removeAll(selectedItems);
-            // 插入到列表顶部（保持原有顺序）
-            items.addAll(0, selectedItems);
-            // 刷新表格显示
-            tableView.refresh();
-            // 重新选中被移动的项
-            tableView.getSelectionModel().clearSelection();
-            tableView.getSelectionModel().selectRange(0, selectedItems.size());
-        }
-    }
-
-    /**
-     * 所选行置底
-     *
-     * @param tableView 要处理的数据列表
-     * @param <T>       表格数据项类型
-     */
-    private static <T> void bottomMoveDataMenuItem(TableView<T> tableView) {
-        ObservableList<T> items = tableView.getItems();
-        List<T> selectedItems = new ArrayList<>(tableView.getSelectionModel().getSelectedItems());
-        if (!selectedItems.isEmpty()) {
-            // 移除所有选中项
-            items.removeAll(selectedItems);
-            // 插入到列表末尾（保持原有顺序）
-            items.addAll(selectedItems);
-            // 刷新表格显示
-            tableView.refresh();
-            // 重新选中被移动的项
-            tableView.getSelectionModel().clearSelection();
-            int lastIndex = items.size() - 1;
-            int startIndex = lastIndex - selectedItems.size() + 1;
-            if (startIndex >= 0 && lastIndex >= startIndex) {
-                tableView.getSelectionModel().selectRange(startIndex, lastIndex + 1);
-            }
-        }
-    }
-
-    /**
-     * 查看文件选项
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     */
-    public static void buildFilePathItem(TableView<ImgFileVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu(menu_viewFile());
-        // 创建二级菜单项
-        MenuItem openFile = new MenuItem(menuItem_openSelected());
-        MenuItem openDirector = new MenuItem(menuItem_openDirectory());
-        MenuItem copyFilePath = new MenuItem(menuItem_copyFilePath());
-        // 为每个菜单项添加事件处理
-        openFile.setOnAction(_ -> openFileMenuItem(tableView));
-        openDirector.setOnAction(_ -> openDirectorMenuItem(tableView));
-        copyFilePath.setOnAction(_ -> copyFilePathItem(tableView));
-        // 将菜单添加到菜单列表
-        menu.getItems().addAll(openFile, openDirector, copyFilePath);
-        contextMenu.getItems().add(menu);
-    }
-
-    /**
-     * 打开所选文件选项
-     *
-     * @param tableView 文件列表
-     */
-    private static void openFileMenuItem(TableView<ImgFileVO> tableView) {
-        List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
-        fileBeans.forEach(fileBean -> openFile(fileBean.getPath()));
-    }
-
-    /**
-     * 打开所选文件所在文件夹选项
-     *
-     * @param tableView 要添加右键菜单的列表
-     */
-    private static void openDirectorMenuItem(TableView<ImgFileVO> tableView) {
-        List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
-        List<String> pathList = fileBeans.stream().map(ImgFileVO::getPath).distinct().toList();
-        pathList.forEach(FileUtils::openDirectory);
-    }
-
-    /**
-     * 复制文件路径选项
-     *
-     * @param tableView 要添加右键菜单的列表
-     */
-    private static void copyFilePathItem(TableView<? extends ImgFileVO> tableView) {
-        ImgFileVO fileBean = tableView.getSelectionModel().getSelectedItem();
-        copyText(fileBean.getPath());
-    }
-
-    /**
-     * 复制所选数据选项
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     * @param dataNumber  列表数据数量文本框
-     */
-    public static void buildCopyDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu, Label dataNumber) {
-        Menu menu = new Menu(menu_copy());
-        // 创建二级菜单项
-        MenuItem upCopy = new MenuItem(menuItem_upCopy());
-        MenuItem downCopy = new MenuItem(menuItem_downCopy());
-        MenuItem appendCopy = new MenuItem(menuItem_appendCopy());
-        MenuItem topCopy = new MenuItem(menuItem_topCopy());
-        // 为每个菜单项添加事件处理
-        upCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_upCopy(), dataNumber));
-        downCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_downCopy(), dataNumber));
-        appendCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber));
-        topCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber));
-        // 将菜单添加到菜单列表
-        menu.getItems().addAll(upCopy, downCopy, appendCopy, topCopy);
-        contextMenu.getItems().add(menu);
-    }
-
-    /**
-     * 复制所选数据二级菜单选项
-     *
-     * @param tableView  要处理的数据列表
-     * @param copyType   复制类型
-     * @param dataNumber 列表数据数量文本框
-     */
-    private static void copyDataMenuItem(TableView<ClickPositionVO> tableView, String copyType, Label dataNumber) {
-        List<ClickPositionVO> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
-        if (menuItem_upCopy().equals(copyType)) {
-            addData(copiedList, upAdd, tableView, dataNumber, unit_process());
-        } else if (menuItem_downCopy().equals(copyType)) {
-            addData(copiedList, downAdd, tableView, dataNumber, unit_process());
-        } else if (menuItem_appendCopy().equals(copyType)) {
-            addData(copiedList, append, tableView, dataNumber, unit_process());
-        } else if (menuItem_topCopy().equals(copyType)) {
-            addData(copiedList, topAdd, tableView, dataNumber, unit_process());
-        }
-    }
-
-    /**
-     * 获取复制的数据
-     *
-     * @param selectedItem 选中的数据
-     * @return 复制的数据
-     */
-    private static List<ClickPositionVO> getCopyList(List<ClickPositionVO> selectedItem) {
-        List<ClickPositionVO> copiedList = new ArrayList<>();
-        selectedItem.forEach(clickPositionBean -> {
-            ClickPositionVO copyClickPositionVO = new ClickPositionVO();
-            try {
-                copyAllProperties(clickPositionBean, copyClickPositionVO);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-            copyClickPositionVO.setUuid(UUID.randomUUID().toString());
-            copiedList.add(copyClickPositionVO);
-        });
-        return copiedList;
-    }
-
-    /**
-     * 修改所选项终止操作图片地址
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     * @param dataNumber  列表数据数量文本框
-     * @param unit        列表数据数量单位
-     */
-    public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu,
-                                                Label dataNumber, String unit) {
-        MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
-        upMoveDataMenuItem.setOnAction(_ -> {
-            ObservableList<ImgFileVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
-            if (CollectionUtils.isNotEmpty(selectedItems)) {
-                ImgFileVO selectedItem = selectedItems.getFirst();
-                Window window = tableView.getScene().getWindow();
-                File file = creatImgFileChooser(window, selectedItem.getPath());
-                if (file != null) {
-                    List<ImgFileVO> allImg = tableView.getItems();
-                    List<ImgFileVO> checkList = new ArrayList<>(allImg);
-                    checkList.remove(selectedItem);
-                    boolean isExist = checkList.stream().anyMatch(bean ->
-                            file.getPath().equals(bean.getPath()));
-                    if (isExist) {
-                        ButtonType buttonType = creatConfirmDialog(
-                                confirm_imageExist(),
-                                confirm_imageExistConfirm(),
-                                confirm_delete(),
-                                confirm_cancel());
-                        if (!buttonType.getButtonData().isCancelButton()) {
-                            tableView.getItems().remove(selectedItem);
-                        }
-                    } else {
-                        selectedItem.setPath(file.getPath());
-                        selectedItem.setType(getExistsFileType(file));
-                        selectedItem.setName(getExistsFileName(file));
-                    }
-                    selectedItem.updateThumb();
-                    updateTableViewSizeText(tableView, dataNumber, unit);
-                }
-            }
-        });
-        contextMenu.getItems().add(upMoveDataMenuItem);
-    }
-
-    /**
-     * 修改所选项要点击的图片地址
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     */
-    public static void buildEditClickImgPathMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu) {
-        MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
-        upMoveDataMenuItem.setOnAction(_ -> {
-            ObservableList<ClickPositionVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
-            if (CollectionUtils.isNotEmpty(selectedItems)) {
-                ClickPositionVO selectedItem = selectedItems.getFirst();
-                Window window = tableView.getScene().getWindow();
-                File file = creatImgFileChooser(window, selectedItem.getClickImgPath());
-                if (file != null) {
-                    selectedItem.setClickImgPath(file.getAbsolutePath());
-                    selectedItem.updateThumb();
-                }
-            }
-        });
-        contextMenu.getItems().add(upMoveDataMenuItem);
-    }
-
-    /**
-     * 取消选中选项
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     * @param <T>         列表数据类型
-     */
-    public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
-        MenuItem clearSelectedDataMenuItem = new MenuItem(menu_cancelSelected());
-        clearSelectedDataMenuItem.setOnAction(_ -> tableView.getSelectionModel().clearSelection());
-        contextMenu.getItems().add(clearSelectedDataMenuItem);
-    }
-
-    /**
-     * 删除所选数据选项
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param dataNumber  列表对应的统计信息展示栏
-     * @param contextMenu 右键菜单集合
-     * @param unit        统计信息展示栏数量单位
-     * @param <T>         列表数据类型
-     */
-    public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label dataNumber, ContextMenu contextMenu, String unit) {
-        MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
-        deleteDataMenuItem.setOnAction(_ -> {
-            TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
-            // 要删除的选中项
-            ObservableList<T> selectedItems = selectionModel.getSelectedItems();
-            ObservableList<T> items = tableView.getItems();
-            // 获取首个选中行的索引
-            int selectedIndex = items.indexOf(selectedItems.getFirst());
-            items.removeAll(selectedItems);
-            if (selectedIndex > 0) {
-                // 选中删除项的上一行
-                tableView.getSelectionModel().clearSelection();
-                tableView.getSelectionModel().select(selectedIndex - 1);
-                // 滚动到插入位置
-                tableView.scrollTo(selectedIndex - 1);
-            }
-            updateTableViewSizeText(tableView, dataNumber, unit);
-        });
-        contextMenu.getItems().add(deleteDataMenuItem);
-    }
-
-    /**
-     * 为列表添加右键菜单并设置可选择多行
-     *
-     * @param contextMenu 右键菜单
-     * @param tableView   要处理的列表
-     * @param <T>         列表数据类型
-     */
-    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView) {
-        setContextMenu(contextMenu, tableView, SelectionMode.MULTIPLE);
-    }
-
-    /**
-     * 为列表添加右键菜单
-     *
-     * @param contextMenu   右键菜单
-     * @param tableView     要处理的列表
-     * @param selectionMode 选中模式
-     * @param <T>           列表数据类型
-     */
-    public static <T> void setContextMenu(ContextMenu contextMenu, TableView<T> tableView, SelectionMode selectionMode) {
-        // 设置是否可以选中多行
-        tableView.getSelectionModel().setSelectionMode(selectionMode);
-        tableView.setOnMousePressed(event -> {
-            // 点击位置判断
-            Node source = event.getPickResult().getIntersectedNode();
-            while (source != null && !(source instanceof TableRow)) {
-                source = source.getParent();
-            }
-            if (source == null || ((TableRow<?>) source).isEmpty()) {
-                tableView.getSelectionModel().clearSelection();
-                tableView.setContextMenu(null);
-            } else if (event.isSecondaryButtonDown()) {
-                if (CollectionUtils.isNotEmpty(tableView.getSelectionModel().getSelectedItems())) {
-                    tableView.setContextMenu(contextMenu);
-                } else {
-                    tableView.setContextMenu(null);
-                }
-            }
-        });
-    }
-
-    /**
-     * 改变要防重复点击的组件状态
-     *
-     * @param taskBean 包含防重复点击组件列表的 taskBean
-     * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
-     */
-    public static void changeDisableNodes(TaskBean<?> taskBean, boolean disable) {
-        List<Node> disableNodes = taskBean.getDisableNodes();
-        changeDisableNodes(disableNodes, disable);
-    }
-
-    /**
-     * 改变要防重复点击的组件状态
-     *
-     * @param disableNodes 防重复点击组件列表
-     * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
-     */
-    public static void changeDisableNodes(List<? extends Node> disableNodes, boolean disable) {
-        if (CollectionUtils.isNotEmpty(disableNodes)) {
-            disableNodes.forEach(dc -> {
-                if (dc != null) {
-                    setNodeDisable(dc, disable);
-                }
-            });
-        }
-    }
-
-    /**
      * 为配置组件设置上次配置值
      *
      * @param control 需要处理的组件
@@ -1456,6 +495,22 @@ public class UiUtils {
             } else if (control instanceof Slider slider) {
                 slider.setValue(Double.parseDouble(lastValue));
             }
+        }
+    }
+
+    /**
+     * 保存多选框选择设置
+     *
+     * @param checkBox   更改配置的选项框
+     * @param configFile 要更新的配置文件相对路径
+     * @param key        要更新的配置
+     * @throws IOException 配置文件保存异常
+     */
+    public static void setLoadLastConfigCheckBox(CheckBox checkBox, String configFile, String key) throws IOException {
+        if (checkBox.isSelected()) {
+            updateProperties(configFile, key, activation);
+        } else {
+            updateProperties(configFile, key, unActivation);
         }
     }
 
@@ -1668,22 +723,6 @@ public class UiUtils {
     }
 
     /**
-     * 保存多选框选择设置
-     *
-     * @param checkBox   更改配置的选项框
-     * @param configFile 要更新的配置文件相对路径
-     * @param key        要更新的配置
-     * @throws IOException 配置文件保存异常
-     */
-    public static void setLoadLastConfigCheckBox(CheckBox checkBox, String configFile, String key) throws IOException {
-        if (checkBox.isSelected()) {
-            updateProperties(configFile, key, activation);
-        } else {
-            updateProperties(configFile, key, unActivation);
-        }
-    }
-
-    /**
      * 获取当前所在屏幕
      *
      * @param floatingStage 要获取屏幕位置的窗口
@@ -1745,83 +784,6 @@ public class UiUtils {
             floatingStage.setAlwaysOnTop(true);
             floatingStage.setIconified(false);
         }
-    }
-
-    /**
-     * 将程序窗口弹出
-     *
-     * @param stage 程序主舞台
-     */
-    public static void showStage(Stage stage) {
-        Platform.runLater(() -> {
-            stage.setAlwaysOnTop(true);
-            stage.setIconified(false);
-            stage.show();
-            stage.toFront();
-            stage.requestFocus();
-            stage.setAlwaysOnTop(false);
-        });
-    }
-
-    /**
-     * 弹出界面和错误弹窗
-     *
-     * @param errs  错误详情
-     * @param title 错误标题
-     * @param stage 错误弹窗的父窗口
-     */
-    public static void showStageAlert(List<String> errs, String title, Stage stage) {
-        if (stage.isIconified()) {
-            stage.setIconified(false);
-            stage.show();
-            stage.toFront();
-            stage.requestFocus();
-        }
-        Alert alert = creatErrorAlert(String.join("\n", errs));
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.initOwner(stage);
-        alertStage.setAlwaysOnTop(true);
-        alert.setHeaderText(title);
-        alert.showAndWait();
-    }
-
-    /**
-     * 图片列表拖拽中行为
-     *
-     * @param dragEvent 拖拽事件
-     */
-    public static void acceptDropImg(DragEvent dragEvent) {
-        List<File> files = dragEvent.getDragboard().getFiles();
-        files.forEach(file -> {
-            if (imageType.contains(getExistsFileType(file))) {
-                // 接受拖放
-                dragEvent.acceptTransferModes(TransferMode.COPY);
-                dragEvent.consume();
-            }
-        });
-    }
-
-    /**
-     * 构建表格右键菜单
-     *
-     * @param tableView  要添加右键菜单的列表
-     * @param dataNumber 数据数量信息栏
-     */
-    public static void buildTableViewContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
-        // 添加右键菜单
-        ContextMenu contextMenu = new ContextMenu();
-        // 修改图片路径选项
-        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, unit_img());
-        // 移动所选行选项
-        buildMoveDataMenu(tableView, contextMenu);
-        // 查看文件选项
-        buildFilePathItem(tableView, contextMenu);
-        // 取消选中选项
-        buildClearSelectedData(tableView, contextMenu);
-        // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, unit_img());
-        // 为列表添加右键菜单并设置可选择多行
-        setContextMenu(contextMenu, tableView);
     }
 
     /**
@@ -1928,23 +890,6 @@ public class UiUtils {
     }
 
     /**
-     * 更新列表数据数量提示框
-     *
-     * @param tableView      列表对象
-     * @param dataNumber     提示框对象
-     * @param dataNumberUnit 数据单位
-     * @param <T>            列表数据类型
-     */
-    public static <T> void updateTableViewSizeText(TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
-        int tableSize = tableView.getItems().size();
-        if (tableSize > 0) {
-            dataNumber.setText(text_allHave() + tableSize + dataNumberUnit);
-        } else {
-            dataNumber.setText(listText_dataListNull());
-        }
-    }
-
-    /**
      * 设置日期选择器显示格式
      *
      * @param datePicker    日期选择框
@@ -1997,36 +942,6 @@ public class UiUtils {
         choiceBox.getItems().clear();
         values.forEach((_, value) -> choiceBox.getItems().add(value));
         choiceBox.setValue(defaultValue);
-    }
-
-    /**
-     * 显示更新提示框
-     *
-     * @param updateInfo 更新信息
-     * @return 用户选择的按钮类型
-     */
-    public static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(update_checkUpdate_Abt());
-        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        " +
-                update_releaseDate() + updateInfo.getBuildDate());
-        // 创建包含更新信息的文本区域
-        TextArea textArea = new TextArea(updateInfo.getWhatsNew());
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(textArea, 0, 0);
-        alert.getDialogPane().setContent(expContent);
-        ButtonType updateButton = new ButtonType(update_updateButton());
-        ButtonType laterButton = new ButtonType(update_laterButton(), ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(updateButton, laterButton);
-        // 设置窗口图标
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        setWindowLogo(stage, logoPath);
-        return alert.showAndWait();
     }
 
     /**
@@ -2093,36 +1008,6 @@ public class UiUtils {
     }
 
     /**
-     * 文件大小排序
-     *
-     * @param sizeColumn 要进行文件大小排序的列
-     */
-    public static void fileSizeColum(TableColumn<?, String> sizeColumn) {
-        // 自定义比较器
-        Comparator<String> customComparator = Comparator.comparingDouble(FileUtils::fileSizeCompareValue);
-        // 应用自定义比较器
-        sizeColumn.setComparator(customComparator);
-    }
-
-    /**
-     * 关闭窗口
-     *
-     * @param stage    要关闭的窗口
-     * @param runnable 关闭前的回调
-     */
-    public static void closeStage(Stage stage, Runnable runnable) {
-        if (runnable != null) {
-            runnable.run();
-        }
-        WindowEvent closeEvent = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
-        stage.fireEvent(closeEvent);
-        if (!closeEvent.isConsumed()) {
-            stage.close();
-        }
-        System.gc();
-    }
-
-    /**
      * 处理无法自动切换主题的页面
      *
      * @param pane 页面布局
@@ -2141,238 +1026,6 @@ public class UiUtils {
             pane.setStyle(null);
         }
         manuallyChangeThemeList.add(clazz);
-    }
-
-    /**
-     * 设置节点的编辑状态
-     *
-     * @param node    要设置的节点
-     * @param disable 是否可编辑（true 不可编辑）
-     */
-    public static void setNodeDisable(Node node, boolean disable) {
-        setNodeDisable(node, disable, null);
-    }
-
-    /**
-     * 设置节点的编辑状态
-     *
-     * @param node        要设置的节点
-     * @param disable     是否可编辑（true 不可编辑）
-     * @param tooltipText 鼠标悬停提示文本
-     */
-    public static void setNodeDisable(Node node, boolean disable, String tooltipText) {
-        if (node != null) {
-            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
-                    MainApplication.class.getResource("icon/Disable.png")).toString());
-            if (disable) {
-                node.setOpacity(0.4);
-                // 不可编辑时使用默认光标
-                node.setCursor(disableCursor);
-                // 为所有子节点也设置相同的光标
-                setCursorForChildren(node, disableCursor);
-            } else {
-                node.setOpacity(1.0);
-                // 恢复可编辑时的默认光标
-                node.setCursor(getDefaultCursor(node));
-                setCursorForChildren(node, null);
-            }
-            if (tooltipText != null) {
-                addToolTip(tooltipText, node);
-            }
-            // 管理事件拦截
-            manageEventHandlers(node, disable);
-            // 针对特定组件的特殊处理
-            handleSpecificComponents(node, disable);
-        }
-    }
-
-    /**
-     * 为所有子节点设置光标
-     *
-     * @param node   需要修改样式的组件
-     * @param cursor 鼠标光标
-     */
-    private static void setCursorForChildren(Node node, Cursor cursor) {
-        if (node instanceof Parent) {
-            String originalCursor = "originalCursor";
-            for (Node child : ((Parent) node).getChildrenUnmodifiable()) {
-                if (!child.getProperties().containsKey(originalCursor)) {
-                    child.getProperties().put(originalCursor, child.getCursor());
-                }
-                child.setCursor(cursor);
-                setCursorForChildren(child, cursor);
-            }
-        }
-    }
-
-    /**
-     * 管理事件拦截器
-     *
-     * @param node    需要修改样式的组件
-     * @param disable 是否可编辑（true 不可编辑）
-     */
-    private static void manageEventHandlers(Node node, boolean disable) {
-        // 移除所有可能存在的自定义事件处理器
-        removeAllCustomEventHandlers(node);
-        if (disable) {
-            EventHandler<MouseEvent> mouseFilter = createMouseEventFilter();
-            // 注册多种鼠标事件过滤器
-            node.addEventFilter(MouseEvent.ANY, mouseFilter);
-            node.getProperties().put("nonEditableMouseFilter", mouseFilter);
-            // 阻止焦点获取
-            node.setFocusTraversable(false);
-            // 特殊处理：对于下拉框，添加额外的事件拦截
-            if (node instanceof ComboBoxBase) {
-                addComboBoxSpecialHandlers((ComboBoxBase<?>) node);
-            }
-        } else {
-            // 恢复焦点获取能力
-            node.setFocusTraversable(true);
-            // 移除下拉框的特殊处理器
-            if (node instanceof ComboBoxBase) {
-                removeComboBoxSpecialHandlers((ComboBoxBase<?>) node);
-            }
-        }
-    }
-
-    /**
-     * 为下拉框添加特殊的事件处理器
-     *
-     * @param comboBox 需要处理的下拉框
-     */
-    private static void addComboBoxSpecialHandlers(ComboBoxBase<?> comboBox) {
-        // 保存原始的事件处理器（如果有）
-        if (!comboBox.getProperties().containsKey("originalOnAction")) {
-            comboBox.getProperties().put("originalOnAction", comboBox.getOnAction());
-        }
-        // 设置一个空的事件处理器来阻止默认行为
-        comboBox.setOnAction(event -> {
-            event.consume();
-            // 如果下拉框已经展开，立即关闭它
-            if (comboBox.isShowing()) {
-                comboBox.hide();
-            }
-        });
-        // 添加额外的鼠标事件过滤器，专门处理下拉框
-        EventHandler<MouseEvent> comboBoxMouseFilter = event -> {
-            if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                event.consume();
-                // 如果下拉框已经展开，立即关闭它
-                if (comboBox.isShowing()) {
-                    comboBox.hide();
-                }
-            }
-        };
-        comboBox.addEventFilter(MouseEvent.MOUSE_PRESSED, comboBoxMouseFilter);
-        comboBox.getProperties().put("comboBoxMouseFilter", comboBoxMouseFilter);
-    }
-
-    /**
-     * 移除下拉框的特殊处理器
-     *
-     * @param comboBox 需要处理的下拉框
-     */
-    @SuppressWarnings("unchecked")
-    private static void removeComboBoxSpecialHandlers(ComboBoxBase<?> comboBox) {
-        // 恢复原始的事件处理器
-        EventHandler<?> originalOnAction = (EventHandler<?>) comboBox.getProperties().get("originalOnAction");
-        comboBox.setOnAction((EventHandler<ActionEvent>) originalOnAction);
-        comboBox.getProperties().remove("originalOnAction");
-        // 移除鼠标事件过滤器
-        EventHandler<MouseEvent> comboBoxMouseFilter =
-                (EventHandler<MouseEvent>) comboBox.getProperties().get("comboBoxMouseFilter");
-        if (comboBoxMouseFilter != null) {
-            comboBox.removeEventFilter(MouseEvent.MOUSE_PRESSED, comboBoxMouseFilter);
-            comboBox.getProperties().remove("comboBoxMouseFilter");
-        }
-    }
-
-    /**
-     * 创建鼠标事件过滤器
-     */
-    private static EventHandler<MouseEvent> createMouseEventFilter() {
-        return event -> {
-            // 阻止所有类型的鼠标交互
-            if (event.getEventType() == MouseEvent.MOUSE_PRESSED ||
-                    event.getEventType() == MouseEvent.MOUSE_CLICKED ||
-                    event.getEventType() == MouseEvent.MOUSE_RELEASED ||
-                    event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                event.consume();
-                // 对于某些组件，需要额外处理
-                if (event.getTarget() instanceof TextInputControl &&
-                        event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                    // 阻止文本输入框获得焦点
-                    ((TextInputControl) event.getTarget()).deselect();
-                }
-                // 对于下拉框，确保它不会展开
-                if (event.getTarget() instanceof ComboBoxBase<?> comboBox) {
-                    if (comboBox.isShowing()) {
-                        comboBox.hide();
-                    }
-                }
-            }
-        };
-    }
-
-    /**
-     * 移除所有自定义事件处理器
-     *
-     * @param node 需要修改样式的组件
-     */
-    private static void removeAllCustomEventHandlers(Node node) {
-        // 移除鼠标事件过滤器
-        @SuppressWarnings("unchecked")
-        EventHandler<MouseEvent> mouseFilter =
-                (EventHandler<MouseEvent>) node.getProperties().get("nonEditableMouseFilter");
-        if (mouseFilter != null) {
-            node.removeEventFilter(MouseEvent.ANY, mouseFilter);
-            node.getProperties().remove("nonEditableMouseFilter");
-        }
-        // 如果是下拉框，移除特殊处理器
-        if (node instanceof ComboBoxBase) {
-            removeComboBoxSpecialHandlers((ComboBoxBase<?>) node);
-        }
-    }
-
-    /**
-     * 针对特定组件的特殊处理
-     *
-     * @param node    需要修改样式的组件
-     * @param disable 是否可编辑（true 不可编辑）
-     */
-    private static void handleSpecificComponents(Node node, boolean disable) {
-        if (node instanceof TextInputControl textInput) {
-            textInput.setEditable(!disable);
-            if (disable) {
-                textInput.deselect();
-            }
-        }
-        if (node instanceof ComboBoxBase<?> combo) {
-            combo.setEditable(!disable);
-            if (disable && combo.isShowing()) {
-                combo.hide();
-            }
-        }
-    }
-
-    /**
-     * 获取组件的默认光标
-     *
-     * @param node 需要修改样式的组件
-     * @return CSS 后缀
-     */
-    private static Cursor getDefaultCursor(Node node) {
-        switch (node) {
-            case CheckBox _, ButtonBase _, ChoiceBox<?> _ -> {
-                return Cursor.HAND;
-            }
-            case TextInputControl _ -> {
-                return Cursor.TEXT;
-            }
-            default -> {
-                return Cursor.DEFAULT;
-            }
-        }
     }
 
 }

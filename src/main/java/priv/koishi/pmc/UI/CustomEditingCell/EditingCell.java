@@ -14,8 +14,8 @@ import static priv.koishi.pmc.Finals.i18nFinal.text_cantEdit;
 import static priv.koishi.pmc.Finals.i18nFinal.text_editingCellTip;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
-import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.creatTooltip;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
+import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 
 /**
  * 可编辑的 javaFX 列表单元格

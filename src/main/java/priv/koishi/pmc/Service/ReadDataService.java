@@ -14,7 +14,7 @@ import java.util.List;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileType;
 import static priv.koishi.pmc.Utils.FileUtils.readAllFiles;
-import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 
 /**
  * 读取文件服务类

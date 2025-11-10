@@ -28,7 +28,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.text_errRange;
 import static priv.koishi.pmc.Finals.i18nFinal.text_unknownListener;
 import static priv.koishi.pmc.Utils.CommonUtils.isInDecimalRange;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
-import static priv.koishi.pmc.Utils.UiUtils.addValueToolTip;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 
 /**
  * 监听器工具类

@@ -11,10 +11,11 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
-import static priv.koishi.pmc.Utils.UiUtils.creatTooltip;
+import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 
 /**
  * 全局页面控制器

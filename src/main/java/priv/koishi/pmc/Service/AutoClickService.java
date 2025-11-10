@@ -43,8 +43,8 @@ import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
 import static priv.koishi.pmc.Utils.FileUtils.openFile;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
-import static priv.koishi.pmc.Utils.UiUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.UiUtils.showStageAlert;
 
 /**

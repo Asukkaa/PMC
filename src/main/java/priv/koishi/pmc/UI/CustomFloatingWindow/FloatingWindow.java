@@ -31,7 +31,10 @@ import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
-import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.Utils.UiUtils.getCurrentScreen;
+import static priv.koishi.pmc.Utils.UiUtils.setWindowLogo;
 
 /**
  * 浮窗组件
