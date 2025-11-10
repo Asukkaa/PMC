@@ -3,7 +3,7 @@ package priv.koishi.pmc.Bean;
 import lombok.Data;
 
 /**
- * UniCloud返回结构类
+ * UniCloud 返回结构类
  *
  * @author KOISHI
  * Date:2025-06-23
