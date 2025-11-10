@@ -203,7 +203,7 @@ public class MainApplication extends Application {
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
         }
-        // 停止 javaFX ui 线程
+        // 停止 JavaFX ui 线程
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);

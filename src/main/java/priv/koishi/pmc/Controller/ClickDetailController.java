@@ -256,7 +256,7 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 设置 javaFX 单元格宽度
+     * 设置 JavaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.1));
@@ -1105,7 +1105,7 @@ public class ClickDetailController extends RootController {
             addCloseConfirm();
             // 添加控件监听
             addModificationListeners();
-            // 自动填充 javaFX 表格
+            // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId, index_Det);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);

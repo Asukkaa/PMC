@@ -1,7 +1,7 @@
 package priv.koishi.pmc.UI.CustomEditingCell;
 
 /**
- * 可编辑的 javaFX 列表单元格接口
+ * 可编辑的 JavaFX 列表单元格接口
  *
  * @author KOISHI
  * Date:2024-11-04

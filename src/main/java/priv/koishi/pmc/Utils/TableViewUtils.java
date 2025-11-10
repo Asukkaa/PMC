@@ -49,21 +49,21 @@ public class TableViewUtils {
     private static final DataFormat dataFormat = new DataFormat("application/x-java-serialized-object");
 
     /**
-     * 为 javaFX 单元格赋值并添加鼠标悬停提示
+     * 为 JavaFX 单元格赋值并添加鼠标悬停提示
      *
-     * @param tableColumn 要处理的 javaFX 列表列
-     * @param param       javaFX 列表列对应的数据属性名
+     * @param tableColumn 要处理的 JavaFX 列表列
+     * @param param       JavaFX 列表列对应的数据属性名
      */
     public static void buildCellValue(TableColumn<?, ?> tableColumn, String param) {
         tableColumn.setCellValueFactory(new PropertyValueFactory<>(param));
-        // 为 javaFX 单元格和表头添加鼠标悬停提示
+        // 为 JavaFX 单元格和表头添加鼠标悬停提示
         addTableCellToolTip(tableColumn);
     }
 
     /**
      * 自定义单元格工厂，为单元格添加 Tooltip
      *
-     * @param column 要处理的 javaFX 表格单元格
+     * @param column 要处理的 JavaFX 表格单元格
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
@@ -91,7 +91,7 @@ public class TableViewUtils {
     /**
      * 为表头添加鼠标悬停提示
      *
-     * @param column 要处理的 javaFX 表格列
+     * @param column 要处理的 JavaFX 表格列
      * @param <S>    表格单元格数据类型
      * @param <T>    表格单元格类型
      */
@@ -102,7 +102,7 @@ public class TableViewUtils {
     /**
      * 为表头添加鼠标悬停提示
      *
-     * @param column  要处理的 javaFX 表格列
+     * @param column  要处理的 JavaFX 表格列
      * @param tooltip 要展示的提示文案
      * @param <S>     表格单元格数据类型
      * @param <T>     表格单元格类型
@@ -126,13 +126,13 @@ public class TableViewUtils {
     }
 
     /**
-     * 根据 bean 属性名自动填充 javaFX 表格
+     * 根据 bean 属性名自动填充 JavaFX 表格
      *
-     * @param tableView   要处理的 javaFX 表格
-     * @param beanClass   要处理的 javaFX 表格的数据 bean 类
-     * @param tabId       用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 javaFX 列表的列对应的 id
+     * @param tableView   要处理的 JavaFX 表格
+     * @param beanClass   要处理的 JavaFX 表格的数据 bean 类
+     * @param tabId       用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 JavaFX 列表的列对应的 id
      * @param indexColumn 序号列
-     * @param <T>         要处理的 javaFX 表格的数据 bean 类
+     * @param <T>         要处理的 JavaFX 表格的数据 bean 类
      */
     @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
@@ -170,10 +170,10 @@ public class TableViewUtils {
                         TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
                         pathColumn.setCellValueFactory(cellData ->
                                 cellData.getValue().pathProperty());
-                        // 为 javaFX 单元格和表头添加鼠标悬停提示
+                        // 为 JavaFX 单元格和表头添加鼠标悬停提示
                         addTableCellToolTip(pathColumn);
                     } else {
-                        // 为 javaFX 单元格赋值并添加鼠标悬停提示
+                        // 为 JavaFX 单元格赋值并添加鼠标悬停提示
                         buildCellValue(m, fieldName);
                     }
                 }
@@ -198,7 +198,7 @@ public class TableViewUtils {
                         if (empty) {
                             setText(null);
                         } else {
-                            // 获取当前行的索引并加1（行号从1开始）
+                            // 获取当前行的索引并加 1 （行号从 1 开始）
                             int rowIndex = getIndex() + 1;
                             T itemData = getTableRow().getItem();
                             if (itemData instanceof Indexable indexable) {
@@ -293,9 +293,9 @@ public class TableViewUtils {
     }
 
     /**
-     * 清空 javaFX 列表数据
+     * 清空 JavaFX 列表数据
      *
-     * @param tableView  要清空的 javaFX 列表
+     * @param tableView  要清空的 JavaFX 列表
      * @param fileNumber 用于展示列表数据数量的文本框
      * @param <T>        数据类型
      */

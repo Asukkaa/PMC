@@ -378,7 +378,7 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 设置 javaFX 单元格宽度
+     * 设置 JavaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
         index_Click.prefWidthProperty().bind(tableView_Click.widthProperty().multiply(0.05));
@@ -2019,7 +2019,7 @@ public class AutoClickController extends RootController implements MousePosition
             MousePositionListener.getInstance().addListener(this);
             // 设置要防重复点击的组件
             setDisableNodes();
-            // 自动填充 javaFX 表格
+            // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
             // 监听列表数据变化
             tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) _ ->

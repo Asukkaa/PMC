@@ -18,7 +18,7 @@ import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 
 /**
- * 可编辑的 javaFX 列表单元格
+ * 可编辑的 JavaFX 列表单元格
  *
  * @author KOISHI
  * Date:2024-11-04
