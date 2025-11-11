@@ -1930,6 +1930,8 @@ public class AutoClickController extends RootController implements MousePosition
      * @param event 设置页加载完成事件
      */
     private void settingsLoaded(SettingsLoadedEvent event) {
+        // 设置要防重复点击的组件
+        setDisableNodes();
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
@@ -2017,8 +2019,6 @@ public class AutoClickController extends RootController implements MousePosition
             }
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
-            // 设置要防重复点击的组件
-            setDisableNodes();
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
             // 监听列表数据变化

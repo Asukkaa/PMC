@@ -985,8 +985,6 @@ public class SettingController extends RootController implements MousePositionUp
             initWindowMonitor();
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
-            // 设置要防重复点击的组件
-            setDisableNodes();
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId, index_Set);
             // 设置列表通过拖拽排序行
@@ -997,6 +995,8 @@ public class SettingController extends RootController implements MousePositionUp
             EventBus.publish(new SettingsLoadedEvent());
             // 标记页面加载完毕
             initializedFinished = true;
+            // 设置要防重复点击的组件
+            setDisableNodes();
         });
     }
 
@@ -1448,6 +1448,7 @@ public class SettingController extends RootController implements MousePositionUp
     private void massageRegionAction() {
         Stage floatingStage = massageFloating.getStage();
         if (floatingStage != null) {
+            massageFloating.setDisableNodes(disableNodes);
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
                 showFloatingWindow(massageFloating);
@@ -1638,6 +1639,7 @@ public class SettingController extends RootController implements MousePositionUp
     private void clickRegionAction() {
         Stage floatingStage = clickFloating.getStage();
         if (floatingStage != null) {
+            clickFloating.setDisableNodes(disableNodes);
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
@@ -1655,6 +1657,7 @@ public class SettingController extends RootController implements MousePositionUp
     private void stopRegionAction() {
         Stage floatingStage = stopFloating.getStage();
         if (floatingStage != null) {
+            stopFloating.setDisableNodes(disableNodes);
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
