@@ -1010,4 +1010,19 @@ public class UiUtils {
         manuallyChangeThemeList.add(clazz);
     }
 
+    /**
+     * 根据 Tab ID 查找 Tab
+     *
+     * @param tabId Tab ID
+     * @return Tab
+     */
+    public static Tab findTabById(String tabId, TabPane tabPane) {
+        for (Tab tab : tabPane.getTabs()) {
+            if (tabId.equals(tab.getId())) {
+                return tab;
+            }
+        }
+        return null;
+    }
+
 }

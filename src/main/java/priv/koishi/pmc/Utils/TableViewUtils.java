@@ -46,7 +46,7 @@ public class TableViewUtils {
     /**
      * 拖拽数据格式
      */
-    private static final DataFormat dataFormat = new DataFormat("application/x-java-serialized-object");
+    public static final DataFormat dragDataFormat = new DataFormat("application/x-java-serialized-object");
 
     /**
      * 为 JavaFX 单元格赋值并添加鼠标悬停提示
@@ -418,7 +418,7 @@ public class TableViewUtils {
                         db.setDragView(row.snapshot(null, null));
                         // 使用自定义数据格式存储多个索引
                         ClipboardContent cc = new ClipboardContent();
-                        cc.put(dataFormat, new ArrayList<>(draggedIndices));
+                        cc.put(dragDataFormat, new ArrayList<>(draggedIndices));
                         db.setContent(cc);
                         e.consume();
                     }
@@ -427,9 +427,9 @@ public class TableViewUtils {
             // 拖拽悬停验证
             row.setOnDragOver(e -> {
                 Dragboard db = e.getDragboard();
-                if (db.hasContent(dataFormat)) {
+                if (db.hasContent(dragDataFormat)) {
                     // 禁止拖拽到选中行内部
-                    List<?> indices = (List<?>) db.getContent(dataFormat);
+                    List<?> indices = (List<?>) db.getContent(dragDataFormat);
                     int dropIndex = row.isEmpty() ? tableView.getItems().size() : row.getIndex();
                     if (!indices.contains(dropIndex)) {
                         e.acceptTransferModes(TransferMode.MOVE);
@@ -440,8 +440,8 @@ public class TableViewUtils {
             // 拖拽释放处理
             row.setOnDragDropped(e -> {
                 Dragboard db = e.getDragboard();
-                if (db.hasContent(dataFormat)) {
-                    List<Integer> indices = (List<Integer>) db.getContent(dataFormat);
+                if (db.hasContent(dragDataFormat)) {
+                    List<Integer> indices = (List<Integer>) db.getContent(dragDataFormat);
                     int maxIndex = tableView.getItems().size();
                     int dropIndex = row.isEmpty() ? maxIndex : row.getIndex();
                     // 计算有效插入位置
