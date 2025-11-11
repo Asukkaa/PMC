@@ -116,7 +116,8 @@ public class MainController extends RootController {
                 // 边界检测：如果拖拽到最左或最右侧，提供视觉反馈
                 double x = event.getX();
                 double paneWidth = tabPane.getWidth();
-                double threshold = 50; // 边界阈值
+                // 边界阈值
+                double threshold = 50;
                 if (x < threshold) {
                     // 左侧边界反馈
                     tabPane.setStyle("-fx-border-color: #0078d4; -fx-border-width: 2 0 0 0;");
