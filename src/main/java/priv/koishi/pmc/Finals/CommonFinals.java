@@ -761,4 +761,9 @@ public class CommonFinals {
      */
     public static final String defaultColor = "0xffffffff";
 
+    /**
+     * macOS .DS_Store 文件名称
+     */
+    public static final String DS_Store = ".DS_Store";
+
 }

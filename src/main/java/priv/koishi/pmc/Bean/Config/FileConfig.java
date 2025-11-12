@@ -91,4 +91,9 @@ public class FileConfig {
      */
     boolean reverseSort;
 
+    /**
+     * 不显示 .DS_Store 文件（true-不显示）
+     */
+    boolean noDS_Store = true;
+
 }

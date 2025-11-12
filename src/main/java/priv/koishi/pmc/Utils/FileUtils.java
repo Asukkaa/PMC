@@ -728,9 +728,12 @@ public class FileUtils {
         List<String> filterExtensionList = fileConfig.getFilterExtensionList();
         if (files != null) {
             for (File file : files) {
-                if (file.isFile()) {
+                // 检测是否为符号链接（替身）
+                boolean isSymbolicLink = Files.isSymbolicLink(file.toPath());
+                if (file.isFile() || isSymbolicLink) {
                     if ((hide_noHideFile().equals(showHideFile) && file.isHidden()) ||
-                            (hide_onlyHideFile().equals(showHideFile) && !file.isHidden())) {
+                            (hide_onlyHideFile().equals(showHideFile) && !file.isHidden()) ||
+                            fileConfig.isNoDS_Store() && DS_Store.equals(file.getName())) {
                         continue;
                     }
                     if (StringUtils.isEmpty(showDirectory) ||
@@ -748,7 +751,7 @@ public class FileUtils {
                             filterFileName(fileConfig, fileList, file);
                         }
                     }
-                    if (recursion) {
+                    if (recursion && !isSymbolicLink) {
                         readFiles(fileConfig, fileList, file);
                     }
                 } else if (file.isDirectory()) {
