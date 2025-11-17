@@ -134,6 +134,7 @@
     -fx-cursor: hand;
     -fx-fit-to-width: true;
     -fx-fit-to-height: true;
+    -fx-pref-height: 35;
 }
 
 .progress-bar {
