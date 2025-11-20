@@ -441,6 +441,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
      */
     private void closeRequest() {
         try {
+            tableView_FC.getItems().stream().parallel().forEach(FileVO::unbindTableView);
             removeAll();
             updateProperties(fileChooserConfig.getConfigPath(), fileChooserConfig.getPathKey(), filePath_FC.getText());
         } catch (IOException ex) {

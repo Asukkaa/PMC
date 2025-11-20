@@ -905,6 +905,7 @@ public class ClickDetailController extends RootController {
      * 关闭页面
      */
     private void closeStage() {
+        tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
         hideFloatingWindow(clickFloating, stopFloating);
         removeAll();
         removeAllListeners();

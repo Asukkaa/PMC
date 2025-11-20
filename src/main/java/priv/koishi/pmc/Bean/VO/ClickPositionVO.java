@@ -125,12 +125,24 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable, Img
     /**
      * 清理资源
      */
+    @Override
     public void clearResources() {
-        if (currentThumbThread != null && currentThumbThread.isAlive()) {
+        if (currentThumbThread != null) {
             currentThumbThread.interrupt();
             currentThumbThread = null;
         }
+        if (thumb != null) {
+            thumb.cancel();
+        }
         thumb = null;
+    }
+
+    /**
+     * 解除表格引用
+     */
+    @Override
+    public void unbindTableView() {
+        tableView = null;
     }
 
     /**

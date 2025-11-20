@@ -18,4 +18,14 @@ public interface ImgBean {
      */
     Image loadThumb();
 
+    /**
+     * 清理资源
+     */
+    void clearResources();
+
+    /**
+     * 解除表格引用
+     */
+    void unbindTableView();
+
 }
