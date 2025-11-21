@@ -49,8 +49,7 @@ import static priv.koishi.pmc.Service.ReadDataService.readAllFilesTask;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -267,12 +266,12 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * 清空列表
      */
     private void removeAll() {
-        if (readAllFilesTask != null && readAllFilesTask.isRunning()) {
+        if (readAllFilesTask != null) {
             readAllFilesTask.cancel();
             readAllFilesTask = null;
         }
         tableView_FC.getItems().stream().parallel().forEach(FileVO::clearResources);
-        removeTableViewData(tableView_FC, fileNumber_FC);
+        Platform.runLater(() -> removeTableViewData(tableView_FC, fileNumber_FC));
     }
 
     /**
@@ -457,6 +456,17 @@ public class FileChooserController extends ManuallyChangeThemeController {
             tableView_FC.setContextMenu(null);
         }
         removeController();
+        disableNodes.clear();
+        stage = null;
+    }
+
+    /**
+     * 获取页面关闭清除资源函数
+     *
+     * @return 页面关闭清除资源函数
+     */
+    private Runnable getClearResources() {
+        return this::closeRequest;
     }
 
     /**
@@ -612,7 +622,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         Platform.runLater(() -> {
             stage = (Stage) scrollPane_FC.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
-            stage.setOnCloseRequest(_ -> closeRequest());
+            stage.setOnCloseRequest(_ -> startClearResourcesTask(getClearResources(), tabId));
             // 组件自适应宽高
             adaption();
             // 设置要防重复点击的组件

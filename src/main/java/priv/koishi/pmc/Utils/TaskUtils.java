@@ -97,4 +97,36 @@ public class TaskUtils {
         showErrLabelText(taskBean.getMassageLabel(), log);
     }
 
+    /**
+     * 页面关闭时清理资源任务
+     *
+     * @param runnable 清理资源函数
+     * @return 清理资源任务
+     */
+    public static Task<Void> clearResourcesTask(Runnable runnable) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                if (runnable != null) {
+                    runnable.run();
+                }
+                return null;
+            }
+        };
+    }
+
+    /**
+     * 启动清理资源任务
+     *
+     * @param runnable 清理资源函数
+     * @param tabId    功能 id
+     */
+    public static void startClearResourcesTask(Runnable runnable, String tabId) {
+        Task<Void> clearResources = clearResourcesTask(runnable);
+        clearResources.setOnSucceeded(_ -> System.gc());
+        Thread.ofVirtual()
+                .name("clearResourcesTask-vThread" + tabId)
+                .start(clearResources);
+    }
+
 }

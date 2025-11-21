@@ -129,6 +129,7 @@ public class ProgressDialog {
         Platform.runLater(() -> {
             if (dialogStage != null) {
                 dialogStage.close();
+                dialogStage = null;
             }
         });
     }

@@ -271,6 +271,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
                     } else {
                         // 直接关闭
                         stage.close();
+                        stage = null;
                     }
                 }
                 removeAllListeners();
@@ -326,6 +327,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
      */
     private void closeRequest() {
         removeController();
+        stage = null;
     }
 
     /**

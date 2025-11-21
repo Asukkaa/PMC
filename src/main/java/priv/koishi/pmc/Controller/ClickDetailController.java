@@ -915,6 +915,7 @@ public class ClickDetailController extends RootController {
             loadImgTask.cancel();
         }
         stage.close();
+        stage = null;
         removeController();
         if (mainStage.isIconified()) {
             showStage(mainStage);
