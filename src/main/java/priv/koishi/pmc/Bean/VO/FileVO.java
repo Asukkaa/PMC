@@ -123,7 +123,7 @@ public class FileVO extends FileBean implements Indexable, ImgBean {
     }
 
     /**
-     * 清理资源和引用
+     * 解除表格引用
      */
     @Override
     public void unbindTableView() {
