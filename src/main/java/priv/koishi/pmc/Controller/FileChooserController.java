@@ -271,7 +271,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
             readAllFilesTask = null;
         }
         tableView_FC.getItems().stream().parallel().forEach(FileVO::clearResources);
-        Platform.runLater(() -> removeTableViewData(tableView_FC, fileNumber_FC));
+        removeTableViewData(tableView_FC, fileNumber_FC);
     }
 
     /**

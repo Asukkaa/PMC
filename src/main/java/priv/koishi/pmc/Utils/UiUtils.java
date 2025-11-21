@@ -431,11 +431,13 @@ public class UiUtils {
      * @param text  要修改的文本
      */
     public static void updateLabel(Label label, String text) {
-        label.textProperty().unbind();
-        label.textFillProperty().unbind();
-        label.setText(text);
-        label.textFillProperty().bind(textColorProperty);
-        label.textFillProperty().unbind();
+        Platform.runLater(() -> {
+            label.textProperty().unbind();
+            label.textFillProperty().unbind();
+            label.setText(text);
+            label.textFillProperty().bind(textColorProperty);
+            label.textFillProperty().unbind();
+        });
     }
 
     /**
