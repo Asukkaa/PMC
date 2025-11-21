@@ -81,18 +81,20 @@
             </columns>
         </TableView>
 
-        <HBox spacing="10">
-            <ProgressBar fx:id="progressBar_Click" visible="false" progress="0.0"/>
+        <VBox>
+            <HBox spacing="10">
+                <ProgressBar fx:id="progressBar_Click" visible="false" progress="0.0"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="tip_Click" prefHeight="20" textFill="red" text="%autoClick.tip_Click"/>
-        </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="tip_Click" prefHeight="20" textFill="red" text="%autoClick.tip_Click"/>
+            </HBox>
 
-        <HBox fx:id="logHBox_Click" spacing="10">
-            <Label fx:id="log_Click" style="-fx-pref-height: -1"/>
+            <HBox fx:id="logHBox_Click" spacing="10">
+                <Label fx:id="log_Click" style="-fx-pref-height: -1"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="err_Click" textFill="red"/>
-        </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="err_Click" textFill="red"/>
+            </HBox>
+        </VBox>
     </VBox>
 </AnchorPane>

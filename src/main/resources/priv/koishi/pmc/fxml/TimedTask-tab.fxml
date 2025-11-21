@@ -31,15 +31,17 @@
             </columns>
         </TableView>
 
-        <HBox spacing="10">
-            <ProgressBar fx:id="progressBar_Task" visible="false" progress="0.0"/>
+        <VBox>
+            <HBox spacing="10">
+                <ProgressBar fx:id="progressBar_Task" visible="false" progress="0.0"/>
 
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="tip_Task" prefHeight="20" textFill="red" text="%timedTask.tip_Task"/>
-        </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="tip_Task" prefHeight="20" textFill="red" text="%timedTask.tip_Task"/>
+            </HBox>
 
-        <HBox spacing="10">
-            <Label fx:id="log_Task"/>
-        </HBox>
+            <HBox spacing="10">
+                <Label fx:id="log_Task"/>
+            </HBox>
+        </VBox>
     </VBox>
 </AnchorPane>
