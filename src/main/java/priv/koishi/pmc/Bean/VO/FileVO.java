@@ -89,7 +89,9 @@ public class FileVO extends FileBean implements Indexable, ImgBean {
                                             true);
                                     Platform.runLater(() -> {
                                         thumb = image;
-                                        tableView.refresh();
+                                        if (tableView != null) {
+                                            tableView.refresh();
+                                        }
                                     });
                                 }
                             } catch (Exception e) {
