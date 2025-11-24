@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Utils;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -42,7 +43,7 @@ public class TaskUtils {
             // 绑定TextField的值属性
             massageLabel.textProperty().unbind();
             updateLabel(massageLabel, "");
-            massageLabel.textProperty().bind(task.messageProperty());
+            Platform.runLater(() -> massageLabel.textProperty().bind(task.messageProperty()));
         }
         // 设置默认的异常处理
         throwTaskException(task, taskBean);
