@@ -25,7 +25,6 @@ import java.util.EventListener;
 import java.util.Map;
 
 import static priv.koishi.pmc.Finals.i18nFinal.text_errRange;
-import static priv.koishi.pmc.Finals.i18nFinal.text_unknownListener;
 import static priv.koishi.pmc.Utils.CommonUtils.isInDecimalRange;
 import static priv.koishi.pmc.Utils.CommonUtils.isInIntegerRange;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
@@ -246,19 +245,20 @@ public class ListenerUtils {
      * 移除全局输入监听
      *
      * @param listener 要移除的监听器
-     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
      */
     public static void removeNativeListener(EventListener listener) {
         if (listener != null) {
-            switch (listener) {
-                case NativeMouseListener nativeMouseListener ->
-                        GlobalScreen.removeNativeMouseListener(nativeMouseListener);
-                case NativeMouseMotionListener nativeMouseMotionListener ->
-                        GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
-                case NativeKeyListener nativeKeyListener -> GlobalScreen.removeNativeKeyListener(nativeKeyListener);
-                case NativeMouseWheelListener nativeMouseWheelListener ->
-                        GlobalScreen.removeNativeMouseWheelListener(nativeMouseWheelListener);
-                default -> throw new IllegalArgumentException(text_unknownListener());
+            if (listener instanceof NativeMouseListener nativeMouseListener) {
+                GlobalScreen.removeNativeMouseListener(nativeMouseListener);
+            }
+            if (listener instanceof NativeMouseMotionListener nativeMouseMotionListener) {
+                GlobalScreen.removeNativeMouseMotionListener(nativeMouseMotionListener);
+            }
+            if (listener instanceof NativeKeyListener nativeKeyListener) {
+                GlobalScreen.removeNativeKeyListener(nativeKeyListener);
+            }
+            if (listener instanceof NativeMouseWheelListener nativeMouseWheelListener) {
+                GlobalScreen.removeNativeMouseWheelListener(nativeMouseWheelListener);
             }
         }
     }
@@ -267,17 +267,21 @@ public class ListenerUtils {
      * 添加全局输入监听
      *
      * @param listener 要添加的监听器
-     * @throws IllegalArgumentException 如果监听器类型不匹配，则抛出此异常
      */
     public static void addNativeListener(EventListener listener) {
-        switch (listener) {
-            case NativeMouseListener nativeMouseListener -> GlobalScreen.addNativeMouseListener(nativeMouseListener);
-            case NativeMouseMotionListener nativeMouseMotionListener ->
-                    GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
-            case NativeKeyListener nativeKeyListener -> GlobalScreen.addNativeKeyListener(nativeKeyListener);
-            case NativeMouseWheelListener nativeMouseWheelListener ->
-                    GlobalScreen.addNativeMouseWheelListener(nativeMouseWheelListener);
-            default -> throw new IllegalArgumentException(text_unknownListener());
+        if (listener != null) {
+            if (listener instanceof NativeMouseListener nativeMouseListener) {
+                GlobalScreen.addNativeMouseListener(nativeMouseListener);
+            }
+            if (listener instanceof NativeMouseMotionListener nativeMouseMotionListener) {
+                GlobalScreen.addNativeMouseMotionListener(nativeMouseMotionListener);
+            }
+            if (listener instanceof NativeKeyListener nativeKeyListener) {
+                GlobalScreen.addNativeKeyListener(nativeKeyListener);
+            }
+            if (listener instanceof NativeMouseWheelListener nativeMouseWheelListener) {
+                GlobalScreen.addNativeMouseWheelListener(nativeMouseWheelListener);
+            }
         }
     }
 

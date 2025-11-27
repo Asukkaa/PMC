@@ -12,7 +12,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.RelativeY;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
 
 /**
- * 鼠标移动轨迹点
+ * 操作轨迹点
  *
  * @author KOISHI
  * Date:2025-04-28
@@ -48,9 +48,14 @@ public class TrajectoryPointBean {
     String relativeY;
 
     /**
-     * 按下的键
+     * 按下的鼠标按键
      */
-    List<Integer> pressButtons;
+    List<Integer> pressMouseKeys;
+
+    /**
+     * 按下的键盘按键
+     */
+    List<Integer> pressKeyboardKeys;
 
     /**
      * 滑轮状态（正数上滑，负数下滑，0 为无滑动状态）

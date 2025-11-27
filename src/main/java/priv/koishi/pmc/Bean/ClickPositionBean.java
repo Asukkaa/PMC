@@ -2,6 +2,7 @@ package priv.koishi.pmc.Bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
@@ -93,9 +94,14 @@ public class ClickPositionBean {
     String clickKey;
 
     /**
-     * 操作按键枚举值
+     * 鼠标按键枚举值
      */
-    int clickKeyEnum;
+    int mouseKeyEnum;
+
+    /**
+     * 键盘按键枚举值
+     */
+    int keyboardKeyEnum = -1;
 
     /**
      * 要识别的图片路径
@@ -268,19 +274,20 @@ public class ClickPositionBean {
     /**
      * 添加移动轨迹
      *
-     * @param x             横坐标
-     * @param y             纵坐标
-     * @param pressButtons  当前按下的按键
-     * @param isDragging    是否是拖拽（true-拖拽，false-普通移动）
-     * @param wheelRotation 滑轮滚动量
+     * @param x                 横坐标
+     * @param y                 纵坐标
+     * @param pressMouseKeys    当前按下的鼠标按键
+     * @param pressKeyboardKeys 当前按下的键盘按键
+     * @param isDragging        是否是拖拽（true-拖拽，false-普通移动）
+     * @param wheelRotation     滑轮滚动量
      */
-    public void addMovePoint(int x, int y, List<Integer> pressButtons, boolean isDragging, int wheelRotation) {
+    public void addMovePoint(int x, int y, List<Integer> pressMouseKeys, List<Integer> pressKeyboardKeys, boolean isDragging, int wheelRotation) {
         long timestamp = System.currentTimeMillis();
         if (!moveTrajectory.isEmpty()) {
             TrajectoryPointBean last = moveTrajectory.getLast();
             double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
             // 最小像素距离阈值，拖拽记录结束时不校验
-            if (distance < 1 && (!isDragging || pressButtons != null) && wheelRotation == 0) {
+            if (distance < 1 && (!isDragging || (pressMouseKeys != null && pressKeyboardKeys != null)) && wheelRotation == 0) {
                 return;
             }
         }
@@ -289,12 +296,13 @@ public class ClickPositionBean {
                 // 只有时间间隔超过采样间隔时才添加轨迹点
                 || (timestamp - moveTrajectory.getLast().getTimestamp() >= sampleInterval)
                 // 拖拽时如果轨迹点为空则认为是结束拖拽，直接添加结束轨迹点
-                || (isDragging && pressButtons == null)
+                || (isDragging && pressMouseKeys == null && pressKeyboardKeys == null)
                 // 有滑轮事件时总是记录
                 || wheelRotation != 0) {
             TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean()
                     .setWheelRotation(wheelRotation)
-                    .setPressButtons(pressButtons)
+                    .setPressMouseKeys(pressMouseKeys)
+                    .setPressKeyboardKeys(pressKeyboardKeys)
                     .setTimestamp(timestamp)
                     .setX(x)
                     .setY(y);
@@ -328,12 +336,33 @@ public class ClickPositionBean {
     }
 
     /**
-     * 获取操作按键
+     * 获取点击按键
      *
-     * @return 操作按键对应的文本
+     * @return 点击按键对应的文本
      */
     public String getClickKey() {
-        return recordClickTypeMap.get(clickKeyEnum);
+        if (keyboardKeyEnum == -1) {
+            return getMouseKey();
+        }
+        return getKeyboardKey();
+    }
+
+    /**
+     * 获取鼠标操作按键
+     *
+     * @return 鼠标操作按键对应的文本
+     */
+    public String getMouseKey() {
+        return recordClickTypeMap.get(mouseKeyEnum);
+    }
+
+    /**
+     * 获取键盘操作按键
+     *
+     * @return 键盘操作按键对应的文本
+     */
+    public String getKeyboardKey() {
+        return NativeKeyEvent.getKeyText(keyboardKeyEnum);
     }
 
     /**

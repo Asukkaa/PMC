@@ -280,7 +280,7 @@ public class PMCFileService {
                 if (!retryTypeMap.containsKey(vo.getRetryTypeEnum())
                         || !clickTypeMap.containsKey(vo.getClickTypeEnum())
                         || !matchedTypeMap.containsKey(vo.getMatchedTypeEnum())
-                        || !recordClickTypeMap.containsKey(vo.getClickKeyEnum())
+                        || !recordClickTypeMap.containsKey(vo.getMouseKeyEnum())
                         || !activationList.contains(vo.getRandomClick())
                         || !activationList.contains(vo.getRandomWaitTime())
                         || !activationList.contains(vo.getRandomClickTime())

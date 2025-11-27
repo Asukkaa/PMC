@@ -1476,13 +1476,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 未知监听类型
-     */
-    public static String text_unknownListener() {
-        return bundle.getString("unknownListener");
-    }
-
-    /**
      * @return 打开文件夹
      */
     public static String text_openDirectory() {
@@ -3387,6 +3380,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 键盘输入
+     */
+    public static String clickType_keyboard() {
+        return bundle.getString("clickType.keyboard");
+    }
+
+    /**
      * 打开链接相关选项
      */
     public static final List<String> linkList = new ArrayList<>();
@@ -3421,7 +3421,8 @@ public class i18nFinal {
                 clickType_drag(),
                 clickType_moveTo(),
                 clickType_wheelUp(),
-                clickType_wheelDown());
+                clickType_wheelDown(),
+                clickType_keyboard());
         clickTypeList.clear();
         clickTypeList.addAll(linkList);
         clickTypeList.addAll(newList);
@@ -3447,6 +3448,7 @@ public class i18nFinal {
         clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
         clickTypeMap.put(ClickTypeEnum.WHEEL_UP.ordinal(), clickType_wheelUp());
         clickTypeMap.put(ClickTypeEnum.WHEEL_DOWN.ordinal(), clickType_wheelDown());
+        clickTypeMap.put(ClickTypeEnum.KEYBOARD.ordinal(), clickType_keyboard());
     }
 
     /**

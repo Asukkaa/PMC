@@ -298,7 +298,7 @@ public class ClickDetailController extends RootController {
         imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
         clickName_Det.setText(item.getName());
-        clickKey_Det.setValue(item.getClickKey());
+        clickKey_Det.setValue(item.getMouseKey());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());
         timeClick_Det.setText(item.getClickTime());
@@ -1194,7 +1194,7 @@ public class ClickDetailController extends RootController {
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
                 .setTargetPath(link)
-                .setClickKeyEnum(clickKey)
+                .setMouseKeyEnum(clickKey)
                 .setRandomClick(randomClick)
                 .setClickTypeEnum(clickType)
                 .setRetryTypeEnum(retryType)

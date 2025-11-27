@@ -6,7 +6,7 @@ import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import com.github.kwhat.jnativehook.mouse.*;
+import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -54,8 +54,10 @@ import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
+import priv.koishi.pmc.Listener.InputRecordCallback;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
+import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
@@ -279,11 +281,6 @@ public class AutoClickController extends RootController implements MousePosition
     public boolean recordClicking;
 
     /**
-     * 正在录制标识（准备时间结束）
-     */
-    private boolean isRecordClicking;
-
-    /**
      * 正在运行自动操作标识
      */
     private boolean runClicking;
@@ -304,19 +301,14 @@ public class AutoClickController extends RootController implements MousePosition
     private Timeline runTimeline;
 
     /**
-     * 录制开始时间
-     */
-    private long recordingStartTime;
-
-    /**
-     * 全局鼠标监听器
-     */
-    private NativeMouseListener nativeMouseListener;
-
-    /**
      * 全局键盘监听器
      */
     private NativeKeyListener nativeKeyListener;
+
+    /**
+     * 全局输入监听器
+     */
+    private UnifiedInputRecordListener listener;
 
     /**
      * 信息浮窗设置
@@ -1087,7 +1079,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (CollectionUtils.isNotEmpty(selectedItem)) {
             selectedItem.forEach(bean -> {
                 if (!noKeyCell(bean.getClickTypeEnum())) {
-                    bean.setClickKeyEnum(recordClickTypeMap.getKey(clickKey));
+                    bean.setMouseKeyEnum(recordClickTypeMap.getKey(clickKey));
                 }
             });
             tableView.refresh();
@@ -1138,8 +1130,6 @@ public class AutoClickController extends RootController implements MousePosition
      * @return clickPositionBean 自动操作步骤类
      */
     private ClickPositionVO getClickSetting(int tableViewItemSize) {
-        // 读取设置页面设置的值
-        getSetting();
         ClickPositionVO clickPositionVO = createClickPositionVO();
         clickPositionVO.setName(text_step() + (tableViewItemSize + 1) + text_isAdd());
         return clickPositionVO;
@@ -1151,6 +1141,8 @@ public class AutoClickController extends RootController implements MousePosition
      * @return clickPositionVO 具有默认值的自动操作步骤类
      */
     private ClickPositionVO createClickPositionVO() {
+        // 读取设置页面设置的值
+        getSetting();
         FloatingWindowConfig clickConfig = new FloatingWindowConfig();
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
         try {
@@ -1188,7 +1180,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
-                .setClickKeyEnum(NativeMouseEvent.BUTTON1)
+                .setMouseKeyEnum(NativeMouseEvent.BUTTON1)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setRandomTrajectory(randomTrajectory)
                 .setStopImgFiles(defaultStopImgFiles)
@@ -1352,13 +1344,10 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 停止所有任务
      */
-    private void stopAllWork() {
-        if (nativeMouseListener instanceof RecordClickingMouseListener cmListener) {
-            // 停止轨迹记录
-            cmListener.stopRecording();
+    public void stopAllWork() {
+        if (listener != null) {
+            listener.stopRecording();
         }
-        // 移除鼠标监听器
-        removeNativeListener(nativeMouseListener);
         // 停止自动操作
         if (autoClickTask != null && autoClickTask.isRunning()) {
             autoClickTask.cancel();
@@ -1392,363 +1381,85 @@ public class AutoClickController extends RootController implements MousePosition
         removeNativeListener(nativeKeyListener);
         recordClicking = false;
         runClicking = false;
-        isRecordClicking = false;
     }
 
     /**
-     * 鼠标录制监听器
-     */
-    private class RecordClickingMouseListener implements NativeMouseListener {
-
-        /**
-         * 记录点击时刻
-         */
-        private long pressTime;
-
-        /**
-         * 记录松开时刻
-         */
-        private long releasedTime;
-
-        /**
-         * 首次点击标记
-         */
-        private boolean isFirstClick = true;
-
-        /**
-         * 添加类型
-         */
-        private final int addType;
-
-        /**
-         * 开始移动时刻
-         */
-        private long startMoveTime;
-
-        /**
-         * 鼠标移动记录器
-         */
-        private ClickPositionVO movePoint = createClickPositionVO();
-
-        /**
-         * 带点击的步骤
-         */
-        private ClickPositionVO clickBean;
-
-        /**
-         * 当前按下的按键
-         */
-        private final List<Integer> pressButtonList = new CopyOnWriteArrayList<>();
-
-        /**
-         * 构造器
-         */
-        private RecordClickingMouseListener(int addType) {
-            this.addType = addType;
-        }
-
-        /**
-         * 检查是否正在记录移动轨迹
-         */
-        private boolean isRecordingMoveTrajectory() {
-            return movePoint != null && !movePoint.getMoveTrajectory().isEmpty();
-        }
-
-        /**
-         * 滑轮滑动监听器
-         */
-        private final NativeMouseWheelListener wheelListener = new NativeMouseWheelListener() {
-            @Override
-            public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
-                if (isRecordClicking) {
-                    // 只记录垂直方向滑动
-                    if (e.getWheelDirection() == NativeMouseWheelEvent.WHEEL_VERTICAL_DIRECTION) {
-                        Point mousePoint = MousePositionListener.getMousePoint();
-                        int x = (int) mousePoint.getX();
-                        int y = (int) mousePoint.getY();
-                        // 根据滑轮滚动方向设置操作类型
-                        int wheelRotation = e.getWheelRotation();
-                        if (wheelRotation == 0) {
-                            Platform.runLater(() -> {
-                                stopAllWork();
-                                Platform.runLater(() -> {
-                                    Alert alert = creatErrorAlert(text_mouseWheelError());
-                                    alert.setTitle(text_mouseWheelErr());
-                                    alert.setHeaderText(text_mouseWheelError());
-                                    showErrLabelText(log_Click, text_taskFailed());
-                                    alert.show();
-                                });
-                            });
-                        } else {
-                            if (recordMove && isRecordingMoveTrajectory()) {
-                                // 有移动轨迹时在轨迹点中记录滑轮事件
-                                movePoint.addMovePoint(x, y, null, false, wheelRotation);
-                                Platform.runLater(() -> updateWheelLog(wheelRotation, Math.abs(wheelRotation)));
-                            } else {
-                                // 没有移动轨迹时单独记录滑轮事件
-                                pressTime = System.currentTimeMillis();
-                                long waitTime = isFirstClick ?
-                                        pressTime - recordingStartTime :
-                                        pressTime - releasedTime;
-                                int clickType = wheelRotation > 0 ?
-                                        ClickTypeEnum.WHEEL_DOWN.ordinal() :
-                                        ClickTypeEnum.WHEEL_UP.ordinal();
-                                int wheelNum = Math.abs(wheelRotation);
-                                // 创建单独的滑轮步骤
-                                ClickPositionVO wheelBean = createClickPositionVO();
-                                int index = tableView_Click.getItems().size() + 1;
-                                wheelBean.setName(text_step() + index + text_isRecord())
-                                        .setClickKeyEnum(NativeMouseEvent.NOBUTTON)
-                                        .setWaitTime(String.valueOf(waitTime))
-                                        .setClickNum(String.valueOf(wheelNum))
-                                        .setStartX(String.valueOf(x))
-                                        .setStartY(String.valueOf(y))
-                                        .setClickTypeEnum(clickType)
-                                        .setClickTime("0")
-                                        .updateRelativePosition();
-                                // 添加至表格
-                                List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                                clickPositionVOS.add(wheelBean);
-                                Platform.runLater(() -> {
-                                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
-                                    updateWheelLog(wheelRotation, wheelNum);
-                                });
-                                releasedTime = System.currentTimeMillis();
-                                startMoveTime = System.currentTimeMillis();
-                                isFirstClick = false;
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
-        /**
-         * 更新滑轮记录信息
-         *
-         * @param wheelRotation 滑轮滚动方向
-         * @param wheelNum      滑轮滚动次数
-         */
-        private void updateWheelLog(int wheelRotation, int wheelNum) {
-            String wheelDirection = wheelRotation > 0 ? clickType_wheelDown() : clickType_wheelUp();
-            String log = text_cancelTask() + text_recordClicking() + "\n" +
-                    text_recorded() + wheelDirection + " " + wheelNum + unit_times();
-            log_Click.setText(log);
-            updateMassageLabel(massageFloating, log);
-        }
-
-        /**
-         * 停止鼠标轨迹记录
-         */
-        private void stopRecording() {
-            // 停止拖拽轨迹记录
-            removeNativeListener(dragMotionListener);
-            // 停止移动轨迹记录
-            if (isRecordClicking) {
-                Point mousePoint = MousePositionListener.getMousePoint();
-                int startX = (int) mousePoint.getX();
-                int startY = (int) mousePoint.getY();
-                // 添加移动轨迹到表格
-                addMoveTrajectory(startX, startY);
-            }
-            // 停止鼠标移动监听器
-            removeNativeListener(moveMotionListener);
-            // 停止滑轮监听
-            removeNativeListener(wheelListener);
-            pressButtonList.clear();
-            Platform.runLater(() -> {
-                log_Click.setText(autoClick_recordEnd());
-                tableView_Click.refresh();
-            });
-        }
-
-        /**
-         * 鼠标拖拽监听器
-         */
-        private final NativeMouseMotionListener dragMotionListener = new NativeMouseMotionListener() {
-            @Override
-            public void nativeMouseDragged(NativeMouseEvent e) {
-                if (recordClicking && recordDrag) {
-                    Point mousePoint = MousePositionListener.getMousePoint();
-                    int x = (int) mousePoint.getX();
-                    int y = (int) mousePoint.getY();
-                    List<Integer> pressButtons = new CopyOnWriteArrayList<>(pressButtonList);
-                    clickBean.addMovePoint(x, y, pressButtons, true, 0);
-                    clickBean.setClickTypeEnum(ClickTypeEnum.DRAG.ordinal());
-                }
-            }
-        };
-
-        /**
-         * 鼠标移动监听器
-         */
-        private final NativeMouseMotionListener moveMotionListener = new NativeMouseMotionListener() {
-            @Override
-            public void nativeMouseMoved(NativeMouseEvent e) {
-                if (recordClicking && recordMove) {
-                    Point mousePoint = MousePositionListener.getMousePoint();
-                    int x = (int) mousePoint.getX();
-                    int y = (int) mousePoint.getY();
-                    movePoint.addMovePoint(x, y, null, false, 0);
-                }
-            }
-        };
-
-        /**
-         * 添加移动轨迹到表格
-         *
-         * @param startX 起始横坐标
-         * @param startY 起始纵坐标
-         */
-        private void addMoveTrajectory(int startX, int startY) {
-            // 所有按键都松开时才能记录
-            if (recordMove && pressButtonList.isEmpty()) {
-                Platform.runLater(() -> {
-                    // 计算移动时长
-                    long endMoveTime = System.currentTimeMillis();
-                    long moveTime = isFirstClick ?
-                            endMoveTime - recordingStartTime :
-                            endMoveTime - startMoveTime;
-                    int index = tableView_Click.getItems().size() + 1;
-                    // 添加至表格
-                    List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                    movePoint.setClickTypeEnum(ClickTypeEnum.MOVE_TRAJECTORY.ordinal())
-                            .setName(text_step() + index + text_isRecord())
-                            .setClickKeyEnum(NativeMouseEvent.NOBUTTON)
-                            .setClickTime(String.valueOf(moveTime))
-                            .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .updateRelativePosition();
-                    clickPositionVOS.add(movePoint);
-                    addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
-                    String log = text_cancelTask() + text_recordClicking() + "\n" +
-                            text_recorded() + autoClick_mouseTrajectory();
-                    log_Click.textFillProperty().unbind();
-                    log_Click.textFillProperty().bind(recordTextColorProperty);
-                    log_Click.setText(log);
-                    updateMassageLabel(massageFloating, log);
-                });
-            }
-        }
-
-        /**
-         * 监听鼠标按下
-         *
-         * @param e 鼠标按下事件
-         */
-        @Override
-        public void nativeMousePressed(NativeMouseEvent e) {
-            if (isRecordClicking) {
-                // 停止移动轨迹记录
-                if (recordMove) {
-                    removeNativeListener(moveMotionListener);
-                }
-                // 记录按下时刻的时间戳
-                pressTime = System.currentTimeMillis();
-                long waitTime;
-                // 记录移动轨迹时因为点击和移动是分开的两个步骤，所以点击不用再等待一次移动的时间
-                if (recordMove) {
-                    waitTime = 0;
-                } else {
-                    waitTime = isFirstClick ?
-                            pressTime - recordingStartTime :
-                            pressTime - releasedTime;
-                }
-                int pressButton = e.getButton();
-                // 记录按下的坐标
-                Point mousePoint = MousePositionListener.getMousePoint();
-                int startX = (int) mousePoint.getX();
-                int startY = (int) mousePoint.getY();
-                // 添加移动轨迹到表格
-                addMoveTrajectory(startX, startY);
-                // 创建点击位置对象
-                if (pressButtonList.isEmpty()) {
-                    int index = tableView_Click.getItems().size() + 1;
-                    clickBean = createClickPositionVO();
-                    clickBean.setName(text_step() + index + text_isRecord())
-                            .setWaitTime(String.valueOf(waitTime))
-                            .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .setClickKeyEnum(pressButton);
-                }
-                // 记录按下的按键
-                pressButtonList.add(pressButton);
-                // 开始拖拽轨迹记录
-                if (recordDrag) {
-                    addNativeListener(dragMotionListener);
-                }
-            }
-        }
-
-        /**
-         * 监听鼠标松开
-         *
-         * @param e 鼠标抬起事件
-         */
-        @Override
-        public void nativeMouseReleased(NativeMouseEvent e) {
-            if (isRecordClicking) {
-                // 记录抬起的按键
-                pressButtonList.remove(Integer.valueOf(e.getButton()));
-                Point mousePoint = MousePositionListener.getMousePoint();
-                int endX = (int) mousePoint.getX();
-                int endY = (int) mousePoint.getY();
-                // 所有按键都抬起后停止拖拽轨迹记录
-                if (recordDrag && pressButtonList.isEmpty()) {
-                    removeNativeListener(dragMotionListener);
-                    // 拖拽结束是添加释放鼠标的坐标
-                    clickBean.addMovePoint(endX, endY, null, true, 0);
-                }
-                isFirstClick = false;
-                // 记录移动轨迹
-                if (recordMove) {
-                    movePoint = createClickPositionVO();
-                }
-                // 所有按键都抬起后开始移动轨迹记录
-                if (recordMove && pressButtonList.isEmpty()) {
-                    startMoveTime = System.currentTimeMillis();
-                    addNativeListener(moveMotionListener);
-                }
-                // 只有在所有按键都抬起时才算一个完整的操作步骤
-                if (pressButtonList.isEmpty()) {
-                    releasedTime = System.currentTimeMillis();
-                    // 计算点击持续时间（毫秒）
-                    long duration = releasedTime - pressTime;
-                    // 设置点击持续时间
-                    clickBean.setClickTime(String.valueOf(duration))
-                            .updateRelativePosition();
-                    Platform.runLater(() -> {
-                        // 添加至表格
-                        List<ClickPositionVO> clickPositionVOS = new ArrayList<>();
-                        clickPositionVOS.add(clickBean);
-                        addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
-                        String log = text_cancelTask() + text_recordClicking() + "\n" +
-                                text_recorded() + clickBean.getClickKey() + text_click() + " X：" + endX + " Y：" + endY;
-                        log_Click.textFillProperty().unbind();
-                        log_Click.textFillProperty().bind(recordTextColorProperty);
-                        log_Click.setText(log);
-                        updateMassageLabel(massageFloating, log);
-                    });
-                }
-            }
-        }
-    }
-
-    /**
-     * 开启全局鼠标监听
+     * 初始化统一输入录制监听器
      *
-     * @param addType 添加类型
+     * @param addType 添加方式
+     * @return 统一输入录制监听器
      */
-    private void startNativeMouseListener(int addType) {
-        removeNativeListener(nativeMouseListener);
+    private UnifiedInputRecordListener initUnifiedInputRecordListener(int addType) {
+        // 初始化统一输入录制监听器
+        return new UnifiedInputRecordListener(addType, new InputRecordCallback() {
+
+            @Override
+            public void addEventsToTable(List<? extends ClickPositionVO> events, int addType) {
+                addData(events, addType, tableView_Click, dataNumber_Click, unit_process());
+            }
+
+            @Override
+            public void updateRecordLog(String log) {
+                log_Click.textFillProperty().unbind();
+                log_Click.textFillProperty().bind(recordTextColorProperty);
+                log_Click.setText(log);
+                updateMassageLabel(massageFloating, log);
+            }
+
+            /**
+             * 更新滑轮记录信息
+             *
+             * @param wheelRotation 滑轮滚动方向
+             * @param wheelNum      滑轮滚动次数
+             */
+            @Override
+            public void onWheelRecorded(int wheelRotation, int wheelNum) {
+                String wheelDirection = wheelRotation > 0 ? clickType_wheelDown() : clickType_wheelUp();
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + wheelDirection + " " + wheelNum + unit_times();
+                updateRecordLog(log);
+            }
+
+            /**
+             * 创建一个具有默认值的自动操作步骤类
+             *
+             * @return clickPositionVO 具有默认值的自动操作步骤类
+             */
+            @Override
+            public ClickPositionVO createDefaultClickPosition() {
+                return createClickPositionVO();
+            }
+
+            @Override
+            public int getCurrentStepCount() {
+                return tableView_Click.getItems().size();
+            }
+
+            @Override
+            public boolean isRecordMove() {
+                return recordMove;
+            }
+
+            @Override
+            public boolean isRecordDrag() {
+                return recordDrag;
+            }
+        });
+    }
+
+    /**
+     * 开始统一录制
+     *
+     * @param addType 添加方式
+     */
+    private void startUnifiedRecording(int addType) {
+        listener = initUnifiedInputRecordListener(addType);
         // 读取设置页面设置的值
         getSetting();
-        RecordClickingMouseListener listener = new RecordClickingMouseListener(addType);
-        nativeMouseListener = listener;
-        // 注册监听器
+        // 注册所有监听器
         addNativeListener(listener);
-        addNativeListener(listener.moveMotionListener);
-        addNativeListener(listener.wheelListener);
+        // 开始录制
+        listener.startRecording();
     }
 
     /**
@@ -1787,9 +1498,7 @@ public class AutoClickController extends RootController implements MousePosition
             recordTimeline = new Timeline();
             if (preparationTimeValue == 0) {
                 // 开启鼠标监听
-                startNativeMouseListener(addType);
-                // 录制开始时间
-                recordingStartTime = System.currentTimeMillis();
+                startUnifiedRecording(addType);
                 // 更新浮窗文本
                 text.set(text_cancelTask() + text_recordClicking());
                 updateMassageLabel(massageFloating, text.get());
@@ -1803,11 +1512,8 @@ public class AutoClickController extends RootController implements MousePosition
                     if (preparationTime.get() > 0) {
                         text.set(text_cancelTask() + preparationTime + text_preparation());
                     } else {
-                        isRecordClicking = true;
                         // 开启鼠标监听
-                        startNativeMouseListener(addType);
-                        // 录制开始时间
-                        recordingStartTime = System.currentTimeMillis();
+                        startUnifiedRecording(addType);
                         // 停止 Timeline
                         finalTimeline.stop();
                         // 更新浮窗文本

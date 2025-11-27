@@ -57,6 +57,11 @@ public enum ClickTypeEnum {
     /**
      * 滚轮下滑
      */
-    WHEEL_DOWN
+    WHEEL_DOWN,
+
+    /**
+     * 键盘输入
+     */
+    KEYBOARD
 
 }
