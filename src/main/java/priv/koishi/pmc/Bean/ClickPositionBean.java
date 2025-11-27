@@ -336,10 +336,11 @@ public class ClickPositionBean {
     }
 
     /**
-     * 获取点击按键
+     * 获取点击按键（通过反射调用）
      *
      * @return 点击按键对应的文本
      */
+    @SuppressWarnings("unused")
     public String getClickKey() {
         if (keyboardKeyEnum == -1) {
             return getMouseKey();
