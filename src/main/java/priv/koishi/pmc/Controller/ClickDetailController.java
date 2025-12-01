@@ -1,5 +1,7 @@
 package priv.koishi.pmc.Controller;
 
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -10,6 +12,7 @@ import javafx.collections.WeakListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -18,6 +21,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -41,6 +46,7 @@ import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
+import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -160,6 +166,21 @@ public class ClickDetailController extends RootController {
     private ListChangeListener<ImgFileVO> tableListener;
 
     /**
+     * 全局键盘监听器
+     */
+    private NativeKeyListener nativeKeyListener;
+
+    /**
+     * 正在录制标识
+     */
+    public boolean recordClicking;
+
+    /**
+     * 键盘按键设置
+     */
+    int keyCode = noKeyboard;
+
+    /**
      * 页面标识符
      */
     private final String tabId = "_Det";
@@ -195,7 +216,7 @@ public class ClickDetailController extends RootController {
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, clickKeyHBox_Det;
+            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -223,7 +244,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
             tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
-            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det;
+            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -334,10 +355,10 @@ public class ClickDetailController extends RootController {
      * @param item 列表选中的数据
      */
     private void initClickType(ClickPositionVO item) {
-        ObservableList<String> clickTypeItems = clickType_Det.getItems();
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
-        String targetPath = item.getTargetPath();
+        // 处理移动轨迹相关下拉框
+        ObservableList<String> clickTypeItems = clickType_Det.getItems();
         if (CollectionUtils.isEmpty(item.getMoveTrajectory())) {
             clickTypeItems.remove(clickType_moveTrajectory());
             clickTypeItems.remove(clickType_drag());
@@ -347,6 +368,15 @@ public class ClickDetailController extends RootController {
             setNodeDisable(mouseStartX_Det, true);
             setNodeDisable(mouseStartY_Det, true);
         }
+        // 处理按键相关组件
+        if (item.getKeyboardKeyEnum() != noKeyboard) {
+            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
+            clickKeyHBox_Det.setVisible(false);
+        } else {
+            clickKeyHBox_Det.setVisible(true);
+        }
+        // 处理打开链接相关组件
+        String targetPath = item.getTargetPath();
         if (clickType_openFile().equals(clickType)) {
             setPathLabel(link_Det, targetPath);
         } else if (clickType_runScript().equals(clickType)) {
@@ -798,6 +828,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_mouseStartX(), mouseStartX_Det);
         addToolTip(tip_mouseStartY(), mouseStartY_Det);
         addToolTip(tip_randomClick(), randomClick_Det);
+        addToolTip(tip_updateKeyboard(), setKeyHBox_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
         addToolTip(tip_useRelatively(), useRelatively_Det);
         addToolTip(tip_removeWorkDir(), removeWorkPath_Det);
@@ -909,12 +940,16 @@ public class ClickDetailController extends RootController {
         hideFloatingWindow(clickFloating, stopFloating);
         removeAll();
         removeAllListeners();
+        // 移除键盘监听器
+        removeNativeListener(nativeKeyListener);
         windowMonitorClick = null;
         stopWindowMonitor = null;
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
-        stage.close();
+        if (stage != null) {
+            stage.close();
+        }
         stage = null;
         removeController();
         if (mainStage.isIconified()) {
@@ -1081,6 +1116,42 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 开启全局键盘监听
+     */
+    private void startNativeKeyListener() {
+        removeNativeListener(nativeKeyListener);
+        // 键盘监听器
+        nativeKeyListener = new NativeKeyListener() {
+            @Override
+            public void nativeKeyPressed(NativeKeyEvent e) {
+                Platform.runLater(() -> {
+                    // 仅在录制情况下才监听键盘
+                    if (recordClicking) {
+                        keyCode = e.getKeyCode();
+                        String key = NativeKeyEvent.getKeyText(keyCode);
+                        int oldKey = selectedItem.getKeyboardKeyEnum();
+                        String oldKeyText = selectedItem.getClickKey();
+                        // 检测快捷键 esc
+                        if (keyCode == NativeKeyEvent.VC_ESCAPE) {
+                            removeNativeListener(nativeKeyListener);
+                            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, oldKeyText, oldKey != noKeyboard);
+                            setKeyHBox_Det.setCursor(Cursor.HAND);
+                            recordClicking = false;
+                            throw new RuntimeException(key + " 键与 PMC 快捷键配置冲突");
+                        } else {
+                            removeNativeListener(nativeKeyListener);
+                            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
+                            setKeyHBox_Det.setCursor(Cursor.HAND);
+                            recordClicking = false;
+                        }
+                    }
+                });
+            }
+        };
+        addNativeListener(nativeKeyListener);
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -1169,6 +1240,12 @@ public class ClickDetailController extends RootController {
             } else if (clickType == ClickTypeEnum.WHEEL_UP.ordinal()
                     || clickType == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
+            } else if (clickType == ClickTypeEnum.KEYBOARD.ordinal()) {
+                clickKey = NativeMouseEvent.NOBUTTON;
+                if (keyCode == noKeyboard) {
+                    throw new RuntimeException(text_unSetKeyboard());
+                }
+                selectedItem.setKeyboardKeyEnum(keyCode);
             }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                     clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
@@ -1413,6 +1490,13 @@ public class ClickDetailController extends RootController {
             randomClickInterval_Det.setVisible(true);
             pathTip_Det.setText("");
             resolution_Det.setVisible(true);
+            if (clickType_keyboard().equals(value)) {
+                keyboardHBox_Det.setVisible(true);
+                clickKeyHBox_Det.setVisible(false);
+            } else {
+                keyboardHBox_Det.setVisible(false);
+                clickKeyHBox_Det.setVisible(true);
+            }
         }
         ObservableList<String> clickItems = clickKey_Det.getItems();
         if (CollectionUtils.isNotEmpty(clickItems) && !clickItems.contains(clickKey_Det.getValue())) {
@@ -1691,6 +1775,24 @@ public class ClickDetailController extends RootController {
     private void removeWorkPath() {
         setPathLabel(workPath_Det, "");
         removeWorkPath_Det.setVisible(false);
+    }
+
+    /**
+     * 设置绑定键盘按键
+     *
+     * @param mouseEvent 鼠标点击事件
+     */
+    @FXML
+    private void handleMouseClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
+                    MainApplication.class.getResource("icon/Disable.png")).toString());
+            setKeyHBox_Det.setCursor(disableCursor);
+            recordClicking = true;
+            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_setKeyboard(), false);
+            addToolTip(null, setKeyHBox_Det);
+            startNativeKeyListener();
+        }
     }
 
 }

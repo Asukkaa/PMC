@@ -49,6 +49,7 @@ public class NodeDisableUtils {
                     MainApplication.class.getResource("icon/Disable.png")).toString());
             if (disable) {
                 node.setOpacity(0.4);
+                node.setCursor(null);
                 // 不可编辑时使用默认光标
                 node.setCursor(disableCursor);
                 // 为所有子节点也设置相同的光标
@@ -82,6 +83,7 @@ public class NodeDisableUtils {
                 if (!child.getProperties().containsKey(originalCursor)) {
                     child.getProperties().put(originalCursor, child.getCursor());
                 }
+                child.setCursor(null);
                 child.setCursor(cursor);
                 setCursorForChildren(child, cursor);
             }

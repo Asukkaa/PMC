@@ -557,6 +557,11 @@ public class CommonFinals {
     public static final int updateListMassageTime = 2;
 
     /**
+     * 无键盘按键
+     */
+    public static final int noKeyboard = -1;
+
+    /**
      * 绝对横坐标标识
      */
     public static String AbsoluteX = "absoluteX";

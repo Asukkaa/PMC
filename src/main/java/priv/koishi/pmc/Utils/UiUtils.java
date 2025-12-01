@@ -16,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -1025,6 +1026,24 @@ public class UiUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 设置绑定的按键
+     *
+     * @param label     设置按键文本栏
+     * @param key       要绑定的按键
+     * @param isBeenSet 是否已经设置过
+     */
+    public static void updateKeyboardLabel(Label label, HBox hBox, String key, boolean isBeenSet) {
+        label.setText(key);
+        if (isBeenSet) {
+            label.setTextFill(Color.CORNFLOWERBLUE);
+            addToolTip(tip_keyboard() + key + "\n" + tip_updateKeyboard(), hBox);
+        } else {
+            label.setTextFill(Color.RED);
+            addToolTip(tip_updateKeyboard(), hBox);
+        }
     }
 
 }

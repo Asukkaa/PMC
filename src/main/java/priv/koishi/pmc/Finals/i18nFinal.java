@@ -1010,6 +1010,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 当前按键为：
+     */
+    public static String tip_keyboard() {
+        return bundle.getString("tip.keyboard");
+    }
+
+    /**
+     * @return 鼠标左键点击即可替换按键
+     */
+    public static String tip_updateKeyboard() {
+        return bundle.getString("tip.updateKeyboard");
+    }
+
+    /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Oracle Corporation 25+36-3489
@@ -1893,6 +1907,20 @@ public class i18nFinal {
      */
     public static String text_mouseWheelError() {
         return bundle.getString("mouseWheelError");
+    }
+
+    /**
+     * @return 按下键盘按键即可完成设置
+     */
+    public static String text_setKeyboard() {
+        return bundle.getString("setKeyboard");
+    }
+
+    /**
+     * @return 未设置键盘按键
+     */
+    public static String text_unSetKeyboard() {
+        return bundle.getString("unSetKeyboard");
     }
 
     /**

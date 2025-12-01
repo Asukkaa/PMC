@@ -101,7 +101,7 @@ public class ClickPositionBean {
     /**
      * 键盘按键枚举值
      */
-    int keyboardKeyEnum = -1;
+    int keyboardKeyEnum = noKeyboard;
 
     /**
      * 要识别的图片路径
@@ -342,7 +342,7 @@ public class ClickPositionBean {
      */
     @SuppressWarnings("unused")
     public String getClickKey() {
-        if (keyboardKeyEnum == -1) {
+        if (keyboardKeyEnum == noKeyboard) {
             return getMouseKey();
         }
         return getKeyboardKey();

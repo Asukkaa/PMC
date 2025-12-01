@@ -27,7 +27,11 @@ public class ToolTipUtils {
      */
     public static void addToolTip(String tip, Node... nodes) {
         for (Node node : nodes) {
-            Tooltip.install(node, creatTooltip(tip));
+            if (tip == null) {
+                Tooltip.install(node, null);
+            } else {
+                Tooltip.install(node, creatTooltip(tip));
+            }
         }
     }
 

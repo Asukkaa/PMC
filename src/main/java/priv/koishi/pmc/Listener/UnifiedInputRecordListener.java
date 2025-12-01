@@ -304,7 +304,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                     clickBean = callback.createDefaultClickPosition();
                     int index = callback.getCurrentStepCount() + 1;
-                    clickBean.setName(text_step() + index + text_isRecord())
+                    clickBean.setClickTypeEnum(ClickTypeEnum.KEYBOARD.ordinal())
+                            .setName(text_step() + index + text_isRecord())
                             .setWaitTime(String.valueOf(waitTime))
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
