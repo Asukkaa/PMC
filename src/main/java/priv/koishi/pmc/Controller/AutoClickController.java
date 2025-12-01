@@ -47,6 +47,7 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Callback.InputRecordCallback;
 import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
@@ -54,7 +55,6 @@ import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
-import priv.koishi.pmc.Listener.InputRecordCallback;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
@@ -1344,7 +1344,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 停止所有任务
      */
-    public void stopAllWork() {
+    private void stopAllWork() {
         if (listener != null) {
             listener.stopRecording();
         }
@@ -1357,7 +1357,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (recordTimeline != null) {
             recordTimeline.stop();
             recordTimeline = null;
-            Platform.runLater(() -> log_Click.setText(autoClick_recordEnd()));
+            Platform.runLater(() -> updateLog(autoClick_recordEnd()));
         }
         // 停止运行计时
         if (runTimeline != null) {
@@ -1384,6 +1384,18 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 更新记录信息
+     *
+     * @param log 记录信息
+     */
+    private void updateLog(String log) {
+        log_Click.textFillProperty().unbind();
+        log_Click.textFillProperty().bind(recordTextColorProperty);
+        log_Click.setText(log);
+        updateMassageLabel(massageFloating, log);
+    }
+
+    /**
      * 初始化统一输入录制监听器
      *
      * @param addType 添加方式
@@ -1393,17 +1405,25 @@ public class AutoClickController extends RootController implements MousePosition
         // 初始化统一输入录制监听器
         return new UnifiedInputRecordListener(addType, new InputRecordCallback() {
 
+            /**
+             * 添加操作步骤到操作列表
+             *
+             * @param events  操作步骤
+             * @param addType 添加方式
+             */
             @Override
             public void addEventsToTable(List<? extends ClickPositionVO> events, int addType) {
                 addData(events, addType, tableView_Click, dataNumber_Click, unit_process());
             }
 
+            /**
+             * 更新记录信息
+             *
+             * @param log 记录信息
+             */
             @Override
             public void updateRecordLog(String log) {
-                log_Click.textFillProperty().unbind();
-                log_Click.textFillProperty().bind(recordTextColorProperty);
-                log_Click.setText(log);
-                updateMassageLabel(massageFloating, log);
+                updateLog(log);
             }
 
             /**
@@ -1421,6 +1441,17 @@ public class AutoClickController extends RootController implements MousePosition
             }
 
             /**
+             * 显示错误信息
+             */
+            public void showError() {
+                Alert alert = creatErrorAlert(text_mouseWheelError());
+                alert.setTitle(text_mouseWheelErr());
+                alert.setHeaderText(text_mouseWheelError());
+                showErrLabelText(log_Click, text_taskFailed());
+                alert.show();
+            }
+
+            /**
              * 创建一个具有默认值的自动操作步骤类
              *
              * @return clickPositionVO 具有默认值的自动操作步骤类
@@ -1430,20 +1461,44 @@ public class AutoClickController extends RootController implements MousePosition
                 return createClickPositionVO();
             }
 
+            /**
+             * 获取当前步骤数
+             *
+             * @return 当前步骤数
+             */
             @Override
             public int getCurrentStepCount() {
                 return tableView_Click.getItems().size();
             }
 
+            /**
+             * 获取是否录制鼠标移动事件
+             *
+             * @return true-记录
+             */
             @Override
             public boolean isRecordMove() {
                 return recordMove;
             }
 
+            /**
+             * 获取是否录制鼠标拖拽事件
+             *
+             * @return true-记录
+             */
             @Override
             public boolean isRecordDrag() {
                 return recordDrag;
             }
+
+            /**
+             * 停止所有任务
+             */
+            @Override
+            public void stopWorkAll() {
+                stopAllWork();
+            }
+
         });
     }
 

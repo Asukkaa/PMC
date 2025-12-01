@@ -4,8 +4,8 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.*;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Callback.InputRecordCallback;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 
 import java.awt.*;
@@ -13,12 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
-import static priv.koishi.pmc.Utils.UiUtils.creatErrorAlert;
-import static priv.koishi.pmc.Utils.UiUtils.showErrLabelText;
 
 /**
  * 统一输入事件录制监听器（同时录制鼠标和键盘）
@@ -108,6 +105,12 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      * 鼠标拖拽监听器
      */
     public final NativeMouseMotionListener dragMotionListener = new NativeMouseMotionListener() {
+
+        /**
+         * 鼠标按下时拖拽监听
+         *
+         * @param e 鼠标拖拽事件
+         */
         @Override
         public void nativeMouseDragged(NativeMouseEvent e) {
             if (isRecording && callback.isRecordDrag()) {
@@ -117,13 +120,17 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
                 List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
                 if (clickBean != null) {
-                    System.out.println("pressMouseButtons->" + pressMouseButtons);
                     clickBean.addMovePoint(x, y, currentMouseButtons, currentKeyboardKeys, true, 0);
                     clickBean.setClickTypeEnum(ClickTypeEnum.DRAG.ordinal());
                 }
             }
         }
 
+        /**
+         * 键盘按下时鼠标移动监听
+         *
+         * @param e 鼠标移动事件
+         */
         @Override
         public void nativeMouseMoved(NativeMouseEvent e) {
             // 键盘按下时移动鼠标也视为拖拽
@@ -134,7 +141,6 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
                 List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
                 if (clickBean != null) {
-                    System.out.println("pressKeyboardKeys->" + pressKeyboardKeys);
                     clickBean.addMovePoint(x, y, currentMouseButtons, currentKeyboardKeys, true, 0);
                     clickBean.setClickTypeEnum(ClickTypeEnum.DRAG.ordinal());
                 }
@@ -146,6 +152,12 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      * 鼠标移动监听器
      */
     public final NativeMouseMotionListener moveMotionListener = new NativeMouseMotionListener() {
+
+        /**
+         * 无按键按下时鼠标移动监听
+         *
+         * @param e 鼠标移动事件
+         */
         @Override
         public void nativeMouseMoved(NativeMouseEvent e) {
             if (isRecording && callback.isRecordMove()) {
@@ -354,6 +366,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
 
     /**
      * 滑轮滑动监听器
+     *
+     * @param e 滑轮滑动事件
      */
     @Override
     public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
@@ -366,14 +380,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 // 根据滑轮滚动方向设置操作类型
                 int wheelRotation = e.getWheelRotation();
                 if (wheelRotation == 0) {
-                    autoClickController.stopAllWork();
-                    Platform.runLater(() -> {
-                        Alert alert = creatErrorAlert(text_mouseWheelError());
-                        alert.setTitle(text_mouseWheelErr());
-                        alert.setHeaderText(text_mouseWheelError());
-                        showErrLabelText(autoClickController.log_Click, text_taskFailed());
-                        alert.show();
-                    });
+                    callback.stopWorkAll();
+                    Platform.runLater(callback::showError);
                 } else {
                     if (callback.isRecordMove() && isRecordingMoveTrajectory()) {
                         // 有移动轨迹时在轨迹点中记录滑轮事件
@@ -476,6 +484,10 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
 
     /**
      * 添加鼠标点击步骤到表格
+     *
+     * @param event 鼠标点击步骤
+     * @param endX  终点横坐标
+     * @param endY  终点纵坐标
      */
     private void addMouseEventToTable(ClickPositionVO event, int endX, int endY) {
         Platform.runLater(() -> {
@@ -490,6 +502,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
 
     /**
      * 添加键盘点击步骤到表格
+     *
+     * @param event 键盘点击步骤
      */
     private void addKeyEventToTable(ClickPositionVO event) {
         Platform.runLater(() -> {
@@ -497,13 +511,15 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             events.add(event);
             callback.addEventsToTable(events, addType);
             String log = text_cancelTask() + text_recordClicking() + "\n" +
-                    text_recorded() + "键盘" + log_press() + event.getKeyboardKey();
+                    text_recorded() + clickType_keyboard() + " " + event.getKeyboardKey();
             callback.updateRecordLog(log);
         });
     }
 
     /**
      * 添加滑轮滚动步骤到表格
+     *
+     * @param event 滑轮滚动步骤
      */
     private void addWheelEventToTable(ClickPositionVO event) {
         Platform.runLater(() -> {
@@ -515,6 +531,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
 
     /**
      * 添加轨迹步骤到表格
+     *
+     * @param event 轨迹步骤
      */
     private void addTrajectoryEventToTable(ClickPositionVO event) {
         Platform.runLater(() -> {
