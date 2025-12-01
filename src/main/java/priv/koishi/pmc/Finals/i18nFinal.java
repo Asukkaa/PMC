@@ -1017,7 +1017,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 鼠标左键点击即可替换按键
+     * @return 鼠标左键点击即可开始替换按键
      */
     public static String tip_updateKeyboard() {
         return bundle.getString("tip.updateKeyboard");
