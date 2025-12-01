@@ -1026,7 +1026,7 @@ public class i18nFinal {
     /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
-     * JDK版本：Oracle Corporation 25+36-3489
+     * JDK版本：Amazon.com Inc. 25.0.1+8-LTS
      */
     public static String tip_version() {
         return """
