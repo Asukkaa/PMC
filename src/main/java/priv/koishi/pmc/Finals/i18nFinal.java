@@ -1,7 +1,5 @@
 package priv.koishi.pmc.Finals;
 
-import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
-import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import priv.koishi.pmc.Finals.Enum.*;
@@ -11,6 +9,8 @@ import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRecordClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRunClickTypeMap;
 
 /**
  * 国际化相关文本常量
@@ -3284,60 +3284,6 @@ public class i18nFinal {
     }
 
     /**
-     * 自动操作的操作类型选项对应的鼠标行为（操作用）
-     */
-    public static final BidiMap<String, MouseButton> runClickTypeMap = new DualHashBidiMap<>();
-
-    /**
-     * 更新自动操作的操作类型选项对应的鼠标行为（操作用）
-     */
-    public static void updateRunClickTypeMap() {
-        runClickTypeMap.clear();
-        runClickTypeMap.put(mouseButton_primary(), MouseButton.PRIMARY);
-        runClickTypeMap.put(mouseButton_secondary(), MouseButton.SECONDARY);
-        runClickTypeMap.put(mouseButton_middle(), MouseButton.MIDDLE);
-        runClickTypeMap.put(mouseButton_forward(), MouseButton.FORWARD);
-        runClickTypeMap.put(mouseButton_back(), MouseButton.BACK);
-        runClickTypeMap.put(mouseButton_none(), MouseButton.NONE);
-    }
-
-    /**
-     * 自动操作的操作类型选项对应的鼠标行为（录制用）
-     */
-    public static final BidiMap<Integer, String> recordClickTypeMap = new DualHashBidiMap<>();
-
-    /**
-     * 更新自动操作的操作类型选项对应的鼠标行为（录制用）
-     */
-    public static void updateRecordClickTypeMap() {
-        recordClickTypeMap.clear();
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON1, mouseButton_primary());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON2, mouseButton_secondary());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON3, mouseButton_middle());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward());
-        recordClickTypeMap.put(NativeMouseEvent.NOBUTTON, mouseButton_none());
-    }
-
-    /**
-     * 录制与点击按键类映射
-     */
-    public static final BidiMap<Integer, MouseButton> NativeMouseToMouseButton = new DualHashBidiMap<>();
-
-    /**
-     * 更新录制与点击按键类映射
-     */
-    public static void updateMouseButton() {
-        NativeMouseToMouseButton.clear();
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON1, MouseButton.PRIMARY);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON2, MouseButton.SECONDARY);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON3, MouseButton.MIDDLE);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON4, MouseButton.BACK);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON5, MouseButton.FORWARD);
-        NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
-    }
-
-    /**
      * @return 打开文件
      */
     public static String clickType_openFile() {
@@ -3724,8 +3670,6 @@ public class i18nFinal {
         updateRunClickTypeMap();
         // 更新自动操作的操作类型选项对应的鼠标行为（录制用）
         updateRecordClickTypeMap();
-        // 更新录制与点击按键类映射
-        updateMouseButton();
         // 更新定时任务重复类型映射
         updateRepeatTypeMap();
         // 更新定时任务星期名称与数字映射

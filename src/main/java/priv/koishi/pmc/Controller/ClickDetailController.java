@@ -75,6 +75,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -368,8 +369,9 @@ public class ClickDetailController extends RootController {
             setNodeDisable(mouseStartX_Det, true);
             setNodeDisable(mouseStartY_Det, true);
         }
+        keyCode = item.getKeyboardKeyEnum();
         // 处理按键相关组件
-        if (item.getKeyboardKeyEnum() != noKeyboard) {
+        if (keyCode != noKeyboard) {
             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
             clickKeyHBox_Det.setVisible(false);
         } else {
@@ -1217,6 +1219,7 @@ public class ClickDetailController extends RootController {
             matchedType = MatchedTypeEnum.CLICK.ordinal();
             retryType = RetryTypeEnum.STOP.ordinal();
             clickKey = NativeMouseEvent.NOBUTTON;
+            keyCode = noKeyboard;
             clickNum = 1;
             useRelatively = unActivation;
             if ((clickType == ClickTypeEnum.OPEN_FILE.ordinal() || clickType == ClickTypeEnum.RUN_SCRIPT.ordinal())
@@ -1237,9 +1240,14 @@ public class ClickDetailController extends RootController {
                     || clickType == ClickTypeEnum.MOVETO.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
                 clickNum = 1;
+                keyCode = noKeyboard;
             } else if (clickType == ClickTypeEnum.WHEEL_UP.ordinal()
                     || clickType == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
+                keyCode = noKeyboard;
+            } else if (clickType == ClickTypeEnum.CLICK.ordinal()) {
+                keyCode = noKeyboard;
+                selectedItem.setKeyboardKeyEnum(keyCode);
             } else if (clickType == ClickTypeEnum.KEYBOARD.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
                 if (keyCode == noKeyboard) {

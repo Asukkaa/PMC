@@ -19,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 
 /**
  * 自动操作步骤类

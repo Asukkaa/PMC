@@ -39,6 +39,7 @@ import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMai
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
@@ -791,6 +792,7 @@ public class AutoClickService {
                 }
             }
             MouseButton mouseButton = NativeMouseToMouseButton.get(clickPositionVO.getMouseKeyEnum());
+            int keyCode = clickPositionVO.getKeyboardKeyEnum();
             String clickKey = clickPositionVO.getMouseKey();
             // 处理随机坐标偏移量
             if (activation.equals(clickPositionVO.getRandomClick())) {
@@ -869,6 +871,8 @@ public class AutoClickService {
                                 .setName(name);
                         dynamicQueue.add(wheelLog);
                     }
+                } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                    robot.keyPress(NativeKeyToKeyCode.get(keyCode));
                 }
                 actionFuture.complete(null);
             });
@@ -918,6 +922,8 @@ public class AutoClickService {
                                     .setName(name);
                             dynamicQueue.add(releaseLog);
                         }
+                    } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                        robot.keyRelease(NativeKeyToKeyCode.get(keyCode));
                     }
                     releaseFuture.complete(null);
                 });
@@ -1031,16 +1037,22 @@ public class AutoClickService {
         if (!points.isEmpty()) {
             TrajectoryPointBean lastPoint = null;
             for (TrajectoryPointBean point : points) {
-                // 当前轨迹点按下的按键
+                // 当前轨迹点按下的鼠标按键
                 List<Integer> pressMouseKeys = point.getPressMouseKeys();
-                // 当前轨迹点要抬起的按键
+                // 当前轨迹点要抬起的鼠标按键
                 List<Integer> releaseMouseKeys = new CopyOnWriteArrayList<>();
-                // 当前轨迹点新增的要按下的按键
+                // 当前轨迹点新增的要按下的鼠标按键
                 List<Integer> nowPressMouseKeys;
+                // 当前轨迹点按下的键盘按键
+                List<Integer> pressKeyboardKeys = point.getPressKeyboardKeys();
+                // 当前轨迹点要抬起的键盘按键
+                List<Integer> releaseKeyboardKeys = new CopyOnWriteArrayList<>();
+                // 当前轨迹点新增的要按下的键盘按键
+                List<Integer> nowPressKeyboardKeys;
                 long remaining = 0;
                 if (lastPoint != null) {
                     remaining = point.getTimestamp() - lastPoint.getTimestamp();
-                    // 上一个轨迹点按下的按键
+                    // 上一个轨迹点按下的鼠标按键
                     List<Integer> lastPressMouseKeys = lastPoint.getPressMouseKeys();
                     if (CollectionUtils.isEmpty(pressMouseKeys)) {
                         nowPressMouseKeys = null;
@@ -1053,8 +1065,22 @@ public class AutoClickService {
                             nowPressMouseKeys = pressMouseKeys;
                         }
                     }
+                    // 上一个轨迹点按下的键盘按键
+                    List<Integer> lastPressKeyboardKeys = lastPoint.getPressKeyboardKeys();
+                    if (CollectionUtils.isEmpty(pressKeyboardKeys)) {
+                        nowPressKeyboardKeys = null;
+                        releaseKeyboardKeys = lastPressKeyboardKeys;
+                    } else {
+                        if (CollectionUtils.isNotEmpty(lastPressKeyboardKeys)) {
+                            releaseKeyboardKeys = (List<Integer>) CollectionUtils.subtract(lastPressKeyboardKeys, pressKeyboardKeys);
+                            nowPressKeyboardKeys = (List<Integer>) CollectionUtils.subtract(pressKeyboardKeys, lastPressKeyboardKeys);
+                        } else {
+                            nowPressKeyboardKeys = pressKeyboardKeys;
+                        }
+                    }
                 } else {
                     nowPressMouseKeys = pressMouseKeys;
+                    nowPressKeyboardKeys = pressKeyboardKeys;
                 }
                 lastPoint = point;
                 double x = point.getX();
@@ -1086,6 +1112,7 @@ public class AutoClickService {
                 }
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
                 List<Integer> finalReleaseButtons = releaseMouseKeys;
+                List<Integer> finalReleaseKeyboardKeys = releaseKeyboardKeys;
                 double finalX = x;
                 double finalY = y;
                 Platform.runLater(() -> {
@@ -1115,6 +1142,16 @@ public class AutoClickService {
                                         .setName(name);
                                 dynamicQueue.add(releaseLog);
                             }
+                        });
+                    }
+                    if (CollectionUtils.isNotEmpty(nowPressKeyboardKeys)) {
+                        nowPressKeyboardKeys.forEach(button -> {
+                            robot.keyPress(NativeKeyToKeyCode.get(button));
+                        });
+                    }
+                    if (CollectionUtils.isNotEmpty(finalReleaseKeyboardKeys)) {
+                        finalReleaseKeyboardKeys.forEach(button -> {
+                            robot.keyRelease(NativeKeyToKeyCode.get(button));
                         });
                     }
                     robot.mouseMove(finalX, finalY);
