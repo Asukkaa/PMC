@@ -111,7 +111,7 @@ public class TableViewUtils {
         String columnText = column.getText();
         if (StringUtils.isNotBlank(columnText)) {
             Label label = new Label(columnText);
-            // 完全绑定Label宽度到TableColumn宽度
+            // 完全绑定 Labe l宽度到 TableColumn 宽度
             label.prefWidthProperty().bind(column.widthProperty());
             label.setMaxWidth(Control.USE_PREF_SIZE);
             label.setMinWidth(Control.USE_PREF_SIZE);
@@ -150,7 +150,7 @@ public class TableViewUtils {
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c ->
                     finalFieldName.equals(c.getId())).findFirst();
             matched.ifPresent(m -> {
-                // 添加列名Tooltip
+                // 添加列名 Tooltip
                 addTableColumnToolTip(m);
                 if (f.getType() == Image.class) {
                     // 直接使用类型安全的函数式调用

@@ -40,7 +40,7 @@ public class TaskUtils {
         }
         Label massageLabel = taskBean.getMassageLabel();
         if (massageLabel != null && taskBean.isBindingMassageLabel()) {
-            // 绑定TextField的值属性
+            // 绑定 TextField 的值属性
             massageLabel.textProperty().unbind();
             updateLabel(massageLabel, "");
             Platform.runLater(() -> massageLabel.textProperty().bind(task.messageProperty()));

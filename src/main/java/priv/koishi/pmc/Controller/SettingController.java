@@ -268,7 +268,7 @@ public class SettingController extends RootController implements MousePositionUp
             prop.store(output, null);
             input.close();
             output.close();
-            // 保存JVM参数设置
+            // 保存 JVM 参数设置
             saveJVMConfig();
             // 保存语言设置
             updateProperties(configFile, key_language, language_Set.getValue());
@@ -290,7 +290,7 @@ public class SettingController extends RootController implements MousePositionUp
         Map<String, String> options = new HashMap<>();
         options.put(Xmx, XmxValue);
         options.put(XX, nextGcTypeValue);
-        // 更新cfg文件中jvm参数设置
+        // 更新 cfg 文件中 jvm 参数设置
         setJavaOptionValue(options);
     }
 

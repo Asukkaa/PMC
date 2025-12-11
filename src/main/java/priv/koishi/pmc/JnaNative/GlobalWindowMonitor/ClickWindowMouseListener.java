@@ -22,7 +22,7 @@ public class ClickWindowMouseListener implements NativeMouseListener {
     private final FloatingWindowDescriptor massageFloating;
 
     /**
-     * 是否正在处理事件（ture 正在获取窗口信息）
+     * 是否正在处理事件（true 正在获取窗口信息）
      */
     private boolean processingEvent;
 

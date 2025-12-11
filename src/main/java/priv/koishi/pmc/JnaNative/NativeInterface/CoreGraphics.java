@@ -31,7 +31,7 @@ public interface CoreGraphics extends Library {
      *
      * @param option           窗口列表选项，可使用上述 kCGWindowListOption* 常量
      * @param relativeToWindow 相对窗口的 ID，如果为 0 则忽略
-     * @return 包含窗口信息的CFArrayRef指针
+     * @return 包含窗口信息的 CFArrayRef 指针
      */
     Pointer CGWindowListCopyWindowInfo(int option, int relativeToWindow);
 

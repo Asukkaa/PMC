@@ -155,7 +155,7 @@ public class CheckUpdateService {
                             aboutController.cancelUpdate();
                             progressDialog.close();
                         });
-                // 创建temp文件夹
+                // 创建 temp 文件夹
                 File tempDir = new File(PMCTempPath);
                 if (!tempDir.exists()) {
                     if (!tempDir.mkdirs()) {
@@ -172,7 +172,7 @@ public class CheckUpdateService {
                         updateInfo.getAlipayFileLink()
                 };
                 for (int attempt = 0; attempt < downloadLinks.length; attempt++) {
-                    // 在temp目录创建临时文件
+                    // 在 temp 目录创建临时文件
                     tempFile = File.createTempFile("pmc_update_", zip, tempDir);
                     // 创建使用TLSv1.2的SSLContext
                     SSLContext sslContext = SSLContext.getInstance("TLSv1.2");

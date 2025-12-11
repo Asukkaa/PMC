@@ -298,7 +298,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * 处理要过滤的文件类型
      *
      * @param filterFileType 填有空格区分的要过滤的文件类型字符串的文本输入框
-     * @return 要过滤的文件类型list
+     * @return 要过滤的文件类型 list
      */
     public static List<String> getFilterExtensionList(TextField filterFileType) {
         String filterFileTypeValue = filterFileType.getText();
@@ -309,7 +309,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * 处理要过滤的文件类型
      *
      * @param filterFileTypeValue 空格区分的要过滤的文件类型字符串
-     * @return 要过滤的文件类型list
+     * @return 要过滤的文件类型 list
      */
     public static List<String> getFilterExtensionList(String filterFileTypeValue) {
         List<String> filterExtensionList = new ArrayList<>();
@@ -563,7 +563,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
         return controller;

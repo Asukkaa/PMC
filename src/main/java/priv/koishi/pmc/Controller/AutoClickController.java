@@ -246,17 +246,17 @@ public class AutoClickController extends RootController implements MousePosition
     public Task<List<ClickLogBean>> autoClickTask;
 
     /**
-     * 批量导入PMC文件任务
+     * 批量导入 PMC 文件任务
      */
     public Task<PMCLoadResult> loadPMCFilsTask;
 
     /**
-     * 导入PMC文件任务
+     * 导入 PMC 文件任务
      */
     public Task<List<ClickPositionVO>> loadedPMCTask;
 
     /**
-     * 导出PMC文件任务
+     * 导出 PMC 文件任务
      */
     public Task<String> exportPMCTask;
 
@@ -668,7 +668,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
     }
@@ -1763,7 +1763,7 @@ public class AutoClickController extends RootController implements MousePosition
                 textFieldChangeListener();
                 // 设置初始配置值为上次配置值
                 setLastConfig();
-                // 检查macOS屏幕录制权限
+                // 检查 macOS 屏幕录制权限
                 if (!hasScreenCapturePermission()) {
                     // 禁用需要截屏相关权限的组件
                     setNoScreenCapturePermissionLog();
@@ -1989,7 +1989,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
     }

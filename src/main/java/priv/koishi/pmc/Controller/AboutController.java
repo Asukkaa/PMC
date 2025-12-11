@@ -314,9 +314,9 @@ public class AboutController extends RootController {
         integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum());
         // 读取配置文件
         getConfig();
-        // 获取logs文件夹路径并展示
+        // 获取 logs 文件夹路径并展示
         setLogsPath();
-        // 清理多余log文件
+        // 清理多余 log 文件
         deleteLogs();
         // 检查更新
         Platform.runLater(() -> {

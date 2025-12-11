@@ -123,7 +123,7 @@ public class MainApplication extends Application {
         // 设置外观
         int theme = Integer.parseInt(prop.getProperty(key_theme));
         changeTheme(theme);
-        // 读取fxml页面
+        // 读取 fxml 页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         double appWidth = Double.parseDouble(prop.getProperty(key_appWidth, defaultAppWidth));
         if (appWidth >= screenWidth) {
@@ -144,11 +144,11 @@ public class MainApplication extends Application {
         stage.setTitle(appName);
         stage.setScene(mainScene);
         setWindowLogo(stage, logoPath);
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(mainScene, stylesCss);
         mainController = fxmlLoader.getController();
         TabPane tabPane = mainController.tabPane;
-        // 设置默认选中的Tab
+        // 设置默认选中的 Tab
         if (loadPMC) {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
         } else if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
@@ -160,7 +160,7 @@ public class MainApplication extends Application {
             }
         }
         input.close();
-        // 初始化macOS系统应用菜单
+        // 初始化 macOS 系统应用菜单
         initMenu(tabPane);
         // 监听窗口面板宽度变化
         stage.widthProperty().addListener((_, _, _) ->
@@ -205,7 +205,7 @@ public class MainApplication extends Application {
         if (mainController != null) {
             mainController.saveAllLastConfig();
         }
-        // 关闭Socket服务
+        // 关闭 Socket 服务
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
         }

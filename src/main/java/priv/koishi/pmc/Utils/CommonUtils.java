@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import static priv.koishi.pmc.Finals.i18nFinal.text_unknowGC;
 
 /**
+ * 通用工具类
+ *
  * @author KOISHI
  * Date:2024-10-10
  * Time:下午1:14

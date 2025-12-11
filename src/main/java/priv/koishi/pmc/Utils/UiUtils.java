@@ -56,7 +56,7 @@ import static priv.koishi.pmc.Utils.TableViewUtils.updateTableViewSizeText;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 
 /**
- * ui相关工具类
+ * UI 相关工具类
  *
  * @author KOISHI
  * Date:2024-10-03
@@ -296,7 +296,7 @@ public class UiUtils {
      * 创建一个错误弹窗
      *
      * @param errString 要展示的异常信息
-     * @return Alert弹窗对象
+     * @return Alert 弹窗对象
      */
     public static Alert creatErrorAlert(String errString) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -304,12 +304,12 @@ public class UiUtils {
         DialogPane dialogPane = alert.getDialogPane();
         Stage stage = (Stage) dialogPane.getScene().getWindow();
         setWindowLogo(stage, logoPath);
-        // 创建展示异常信息的TextArea
+        // 创建展示异常信息的 TextArea
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
         textArea.setWrapText(true);
         textArea.setText(errString);
-        // 创建VBox并添加TextArea
+        // 创建 VBox 并添加 TextArea
         VBox details = new VBox();
         VBox.setVgrow(textArea, Priority.ALWAYS);
         textArea.setMaxHeight(Double.MAX_VALUE);

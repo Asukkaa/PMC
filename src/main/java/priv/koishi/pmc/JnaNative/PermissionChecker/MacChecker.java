@@ -20,12 +20,12 @@ public class MacChecker {
      * 检查 macOS 屏幕录制权限方法
      */
     public static boolean hasScreenCapturePermission() {
-        // 非macOS系统直接返回true
+        // 非 macOS 系统直接返回 true
         if (!isMac) {
             return true;
         }
         try {
-            // 尝试调用macOS原生API检查屏幕录制权限
+            // 尝试调用 macOS 原生 API 检查屏幕录制权限
             boolean hasAccess = CoreGraphics.INSTANCE.CGPreflightScreenCaptureAccess() == 1;
             // 没有权限时创建一个空的屏幕截图以便申请截屏权限
             if (!hasAccess) {
@@ -48,7 +48,7 @@ public class MacChecker {
      * @return true 拥有权限
      */
     public static boolean hasAutomationPermission() {
-        // 非macOS系统直接返回true
+        // 非 macOS 系统直接返回 true
         if (!isMac) {
             return true;
         }
