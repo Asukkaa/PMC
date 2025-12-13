@@ -187,7 +187,7 @@ public class AboutController extends RootController {
         addValueToolTip(logsNum_Abt, tip_logsNum());
         // 赞赏按钮添加鼠标悬停提示
         addToolTip(tip_appreciate(), appreciate_Abt);
-        // 给logo和应用名称添加鼠标悬停提示
+        // 给 logo 和应用名称添加鼠标悬停提示
         addToolTip(tip_thanks(), logo_Abt, title_Abt);
         // 检查更新按钮添加鼠标悬停提示
         addToolTip(tip_checkUpdate_Abt(), checkUpdate_Abt);
@@ -314,9 +314,9 @@ public class AboutController extends RootController {
         integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum());
         // 读取配置文件
         getConfig();
-        // 获取logs文件夹路径并展示
+        // 获取 logs 文件夹路径并展示
         setLogsPath();
-        // 清理多余log文件
+        // 清理多余 log 文件
         deleteLogs();
         // 检查更新
         Platform.runLater(() -> {
