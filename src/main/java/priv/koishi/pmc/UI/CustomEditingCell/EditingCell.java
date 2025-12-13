@@ -191,9 +191,20 @@ public class EditingCell<T> extends TableCell<T, String> {
      */
     @Override
     public void commitEdit(String newValue) {
-        super.commitEdit(newValue);
-        updateDisplayText();
+        // 如果新值为空，使用当前文本字段的值
+        if (newValue == null && textField != null) {
+            newValue = textField.getText();
+        }
+        // 保存到数据模型
         setTProperties(newValue);
+        // 设置单元格的 item
+        setItem(newValue);
+        // 调用父类的 commitEdit
+        super.commitEdit(newValue);
+        // 确保显示更新
+        updateDisplayText();
+        // 退出编辑状态
+        cancelEdit();
         // 移除监听器
         removeListeners();
     }
@@ -231,7 +242,7 @@ public class EditingCell<T> extends TableCell<T, String> {
             // 限制只能输入整数
             if (integerRange) {
                 textChangeListener = (_, oldValue, newValue) -> {
-                    if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                    if (!isInIntegerRange(newValue, min, max) || StringUtils.isBlank(newValue)) {
                         textField.setText(oldValue);
                     }
                 };

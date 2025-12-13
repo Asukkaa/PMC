@@ -30,7 +30,7 @@ public class CommonUtils {
      * @return 在设置范围内为 true，不在范围内为 false
      */
     public static boolean isInIntegerRange(String str, Integer min, Integer max) {
-        if (StringUtils.isEmpty(str)) {
+        if (StringUtils.isBlank(str)) {
             return false;
         }
         // 禁止出现0开头的非0数字
