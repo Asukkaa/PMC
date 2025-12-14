@@ -168,7 +168,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 每步操作中，单次操作的点击时长，单位为毫秒，只能填自然数，不填默认为 0
+     * @return 每步操作中，单次操作的点击时长，单位为毫秒，只能填自然数，不填默认为
      */
     public static String tip_clickTime() {
         return bundle.getString("tip.clickTime");
@@ -182,7 +182,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 每步操作的名称，不填将给一个默认名称
+     * @return 每步操作的名称
      */
     public static String tip_clickName() {
         return bundle.getString("tip.clickName");

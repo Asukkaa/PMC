@@ -716,9 +716,6 @@ public class ClickDetailController extends RootController {
         // 要点击的图像识别准确度设置监听
         Runnable clickOpacityRemover = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
         listenerRemovers.add(clickOpacityRemover);
-        // 限制操作时长文本输入内容
-        Runnable timeClickRemover = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
-        listenerRemovers.add(timeClickRemover);
         // 限制操作间隔文本输入框内容
         Runnable intervalRemover = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
         listenerRemovers.add(intervalRemover);
@@ -743,6 +740,9 @@ public class ClickDetailController extends RootController {
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
         Runnable matchedStepRemover = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
         listenerRemovers.add(matchedStepRemover);
+        // 限制操作时长文本输入内容
+        Runnable timeClickRemover = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime() + defaultClickTimeOffset);
+        listenerRemovers.add(timeClickRemover);
         // 随机点击时间偏移量文本输入框内容
         Runnable randomTimeRemover = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
         listenerRemovers.add(randomTimeRemover);
@@ -789,7 +789,6 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_pathLink(), pathLink_Det);
         addToolTip(tip_minWindow(), minWindow_Det);
         addToolTip(tip_parameter(), parameter_Det);
-        addToolTip(tip_clickTime(), timeClick_Det);
         addToolTip(tip_clickName(), clickName_Det);
         addToolTip(tip_stopImgBtn(), stopImgBtn_Det);
         addToolTip(tip_clickInterval(), interval_Det);
@@ -815,6 +814,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
         addToolTip(tip_relatively(), relativelyX_Det, relativelyY_Det);
         addToolTip(tip_allRegion(), clickAllRegion_Det, stopAllRegion_Det);
+        addToolTip(tip_clickTime() + defaultClickTimeOffset, timeClick_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
@@ -914,7 +914,9 @@ public class ClickDetailController extends RootController {
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
-        stage.close();
+        if (stage != null) {
+            stage.close();
+        }
         stage = null;
         removeController();
         if (mainStage.isIconified()) {
