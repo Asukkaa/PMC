@@ -189,7 +189,7 @@ public class MainApplication extends Application {
         super.init();
         // 在init()方法中设置全局异常处理器
         Platform.runLater(() -> Thread.setDefaultUncaughtExceptionHandler((_, exception) ->
-                showExceptionAlert(exception)));
+                Platform.runLater(() -> showExceptionAlert(exception))));
     }
 
     /**

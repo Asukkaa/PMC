@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.control.TableView;
@@ -224,20 +225,22 @@ public class PMCFileService {
                 TableView<ImgFileVO> tableView = taskBean.getTableView();
                 ObservableList<ImgFileVO> items = tableView.getItems();
                 int size = files.size();
-                updateProgress(0, size);
-                for (int i = 0; i < size; i++) {
-                    File file = files.get(i);
-                    boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
-                    if (!isExist) {
-                        ImgFileVO imgFileVO = new ImgFileVO();
-                        imgFileVO.setTableView(tableView)
-                                .setType(getExistsFileType(file))
-                                .setName(file.getName())
-                                .setPath(file.getPath());
-                        items.add(imgFileVO);
+                Platform.runLater(() -> {
+                    updateProgress(0, size);
+                    for (int i = 0; i < size; i++) {
+                        File file = files.get(i);
+                        boolean isExist = items.stream().anyMatch(bean -> file.getPath().equals(bean.getPath()));
+                        if (!isExist) {
+                            ImgFileVO imgFileVO = new ImgFileVO();
+                            imgFileVO.setTableView(tableView)
+                                    .setType(getExistsFileType(file))
+                                    .setName(file.getName())
+                                    .setPath(file.getPath());
+                            items.add(imgFileVO);
+                        }
+                        updateProgress(i + 1, size);
                     }
-                    updateProgress(i + 1, size);
-                }
+                });
                 return null;
             }
         };

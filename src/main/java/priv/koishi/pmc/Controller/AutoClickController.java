@@ -1284,7 +1284,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, unit_process());
         updateLabel(log_Click, text_loadSuccess() + filePath);
-        log_Click.setTextFill(Color.GREEN);
+        Platform.runLater(() -> log_Click.setTextFill(Color.GREEN));
     }
 
     /**
