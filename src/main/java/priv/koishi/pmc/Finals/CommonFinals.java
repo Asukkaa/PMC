@@ -26,7 +26,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "4.0.0";
+    public static final String version = "4.0.1";
 
     /**
      * jdk 版本
