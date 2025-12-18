@@ -244,17 +244,17 @@ public class AutoClickController extends RootController implements MousePosition
     public Task<List<ClickLogBean>> autoClickTask;
 
     /**
-     * 批量导入PMC文件任务
+     * 批量导入 PMC 文件任务
      */
     public Task<PMCLoadResult> loadPMCFilsTask;
 
     /**
-     * 导入PMC文件任务
+     * 导入 PMC 文件任务
      */
     public Task<List<ClickPositionVO>> loadedPMCTask;
 
     /**
-     * 导出PMC文件任务
+     * 导出 PMC 文件任务
      */
     public Task<String> exportPMCTask;
 
@@ -676,7 +676,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
     }
@@ -703,8 +703,9 @@ public class AutoClickController extends RootController implements MousePosition
      * 显示浮窗
      *
      * @param isRun 是否为运行自动操作
+     * @throws IOException 配置文件读取异常
      */
-    public static void showFloatingWindow(boolean isRun) {
+    public static void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
         Color color = settingController.colorPicker_Set.getValue();
         // 获取浮窗的显示设置
@@ -713,6 +714,7 @@ public class AutoClickController extends RootController implements MousePosition
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
         Slider slider = settingController.opacity_Set;
         if (isShow) {
+            getFloatingSetting(massageFloating, configFile_Click);
             Platform.runLater(() -> {
                 if (massageFloating != null) {
                     massageFloating.setConfig(SettingController.massageFloating.getConfig())
@@ -1783,7 +1785,11 @@ public class AutoClickController extends RootController implements MousePosition
             log_Click.textFillProperty().bind(recordTextColorProperty);
             log_Click.setText(text.get());
             // 显示浮窗
-            showFloatingWindow(false);
+            try {
+                showFloatingWindow(false);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             recordTimeline = new Timeline();
             if (preparationTimeValue == 0) {
                 // 开启鼠标监听
@@ -2002,7 +2008,7 @@ public class AutoClickController extends RootController implements MousePosition
                 textFieldChangeListener();
                 // 设置初始配置值为上次配置值
                 setLastConfig();
-                // 检查macOS屏幕录制权限
+                // 检查 macOS 屏幕录制权限
                 if (!hasScreenCapturePermission()) {
                     // 禁用需要截屏相关权限的组件
                     setNoScreenCapturePermissionLog();
@@ -2228,7 +2234,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
     }

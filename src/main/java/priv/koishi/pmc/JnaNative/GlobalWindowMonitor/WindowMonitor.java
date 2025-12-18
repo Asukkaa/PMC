@@ -304,7 +304,6 @@ public class WindowMonitor {
                     removeNativeListener(nativeKeyListener);
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(disableNodes, false);
-
                 }
             }
         };
@@ -313,11 +312,19 @@ public class WindowMonitor {
     }
 
     /**
+     * 停止全局键盘监听
+     */
+    public void stopNativeKeyListener() {
+        removeNativeListener(nativeKeyListener);
+    }
+
+    /**
      * 开启记录焦点窗口鼠标点击监听器
      *
      * @param preparation 准备时间
+     * @throws IOException 配置文件读取异常
      */
-    public void startClickWindowMouseListener(int preparation) {
+    public void startClickWindowMouseListener(int preparation) throws IOException {
         if (autoClickController.isFree()) {
             // 移除可能存在的旧监听器
             removeNativeListener(clickWindowMouseListener);
@@ -456,7 +463,7 @@ public class WindowMonitor {
                     pid);
             if (processHandle != null) {
                 try {
-                    // 使用char数组作为缓冲区
+                    // 使用 char 数组作为缓冲区
                     char[] pathChars = new char[1024];
                     int result = psapi.GetModuleFileNameExW(processHandle, null, pathChars, pathChars.length);
                     if (result > 0) {
@@ -575,7 +582,7 @@ public class WindowMonitor {
             );
             if (processHandle != null) {
                 try {
-                    // 使用char数组作为缓冲区
+                    // 使用 char 数组作为缓冲区
                     char[] pathChars = new char[1024];
                     int result = psapi.GetModuleFileNameExW(processHandle, null, pathChars, pathChars.length);
                     if (result > 0) {
@@ -599,7 +606,7 @@ public class WindowMonitor {
      */
     private static String getMacProcessPathByPid(int pid) {
         try {
-            // 使用ps命令通过PID获取进程名称
+            // 使用 ps 命令通过 PID 获取进程名称
             Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream()));
@@ -705,19 +712,19 @@ public class WindowMonitor {
             if (windowArray != null) {
                 try {
                     int count = cg.CFArrayGetCount(windowArray);
-                    // 创建必要的CFString键
+                    // 创建必要的 CFString 键
                     Pointer kCGWindowName = createCFString("kCGWindowName");
                     Pointer kCGWindowOwnerName = createCFString("kCGWindowOwnerName");
                     Pointer kCGWindowOwnerPID = createCFString("kCGWindowOwnerPID");
                     Pointer kCGWindowBounds = createCFString("kCGWindowBounds");
                     Pointer kCGWindowLayer = createCFString("kCGWindowLayer");
                     Pointer kCGWindowNumber = createCFString("kCGWindowNumber");
-                    // 定义Core Foundation类型常量
+                    // 定义 Core Foundation 类型常量
                     final int kCFNumberIntType = 9;
                     final int kCFNumberDoubleType = 13;
                     for (int i = 0; i < count; i++) {
                         Pointer windowInfo = cg.CFArrayGetValueAtIndex(windowArray, i);
-                        // 获取进程ID
+                        // 获取进程 ID
                         Pointer pidValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerPID);
                         int pid = 0;
                         if (pidValue != null) {
@@ -726,11 +733,11 @@ public class WindowMonitor {
                                 pid = pidArr[0];
                             }
                         }
-                        // 根据PID获取进程路径
+                        // 根据 PID 获取进程路径
                         String process = getMacProcessPathByPid(pid);
                         // 检查进程路径是否匹配
                         if (process != null && process.startsWith(appPath)) {
-                            // 获取窗口ID
+                            // 获取窗口 ID
                             Pointer windowIdValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowNumber);
                             long windowId = 0;
                             if (windowIdValue != null) {
@@ -820,7 +827,7 @@ public class WindowMonitor {
                             }
                         }
                     }
-                    // 释放CFString对象
+                    // 释放 CFString 对象
                     cg.CFRelease(kCGWindowName);
                     cg.CFRelease(kCGWindowOwnerName);
                     cg.CFRelease(kCGWindowOwnerPID);

@@ -62,7 +62,7 @@ public class MainController extends RootController {
      */
     @FXML
     private void initialize() {
-        // 设置tab页的鼠标悬停提示
+        // 设置 Tab 页的鼠标悬停提示
         tabPane.getTabs().forEach(tab -> tab.setTooltip(creatTooltip(tab.getText())));
         Platform.runLater(() -> {
             aboutController = getController(AboutController.class);
@@ -159,7 +159,7 @@ public class MainController extends RootController {
                     }
                     int draggedIndex = tabPane.getTabs().indexOf(draggedTab);
                     if (draggedIndex != targetIndex) {
-                        // 移动Tab到目标位置
+                        // 移动 Tab 到目标位置
                         tabPane.getTabs().remove(draggedTab);
                         tabPane.getTabs().add(targetIndex, draggedTab);
                         tabPane.getSelectionModel().select(draggedTab);
@@ -228,7 +228,7 @@ public class MainController extends RootController {
                             int draggedIndex = tabPane.getTabs().indexOf(draggedTab);
                             int targetIndex = tabPane.getTabs().indexOf(otherTab);
                             if (draggedIndex != targetIndex) {
-                                // 移动Tab到目标位置
+                                // 移动 Tab 到目标位置
                                 tabPane.getTabs().remove(draggedTab);
                                 tabPane.getTabs().add(targetIndex, draggedTab);
                                 tabPane.getSelectionModel().select(draggedTab);

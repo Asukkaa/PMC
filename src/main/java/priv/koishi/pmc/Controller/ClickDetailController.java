@@ -54,6 +54,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
@@ -133,6 +134,21 @@ public class ClickDetailController extends RootController {
      * 要防重复点击的组件
      */
     private final List<Node> disableNodes = new ArrayList<>();
+
+    /**
+     * 终止操作识别区域设置要防重复点击的组件
+     */
+    private final List<Node> stopDisableNodes = new ArrayList<>();
+
+    /**
+     * 目标图像识别区域设置要防重复点击的组件
+     */
+    private final List<Node> clickDisableNodes = new ArrayList<>();
+
+    /**
+     * 窗口信息设置防重复点击标志
+     */
+    private final List<Node> windowInfoDisableNodes = new ArrayList<>();
 
     /**
      * 加载图片任务
@@ -385,14 +401,14 @@ public class ClickDetailController extends RootController {
      * 初始化窗口信息获取器
      */
     private void initWindowMonitor() {
-        stopWindowMonitor = new WindowMonitor(disableNodes, stage);
+        stopWindowMonitor = new WindowMonitor(windowInfoDisableNodes, stage);
         stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Det));
         FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
         WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
         updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
         stopWindowMonitor.setWindowInfo(stopWindowInfo);
         stopWindowMonitor.updateWindowInfo();
-        windowMonitorClick = new WindowMonitor(disableNodes, stage);
+        windowMonitorClick = new WindowMonitor(windowInfoDisableNodes, stage);
         windowMonitorClick.setWindowInfoHandler(creatWindowInfoHandler());
         FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
         WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
@@ -496,7 +512,7 @@ public class ClickDetailController extends RootController {
         } else {
             clickFloating.setConfig(new FloatingWindowConfig());
         }
-        clickFloating.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
+        clickFloating.setDisableNodes(clickDisableNodes)
                 .setName(floatingName_click())
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
@@ -508,7 +524,7 @@ public class ClickDetailController extends RootController {
         } else {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
-        stopFloating.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+        stopFloating.setDisableNodes(stopDisableNodes)
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
@@ -906,18 +922,24 @@ public class ClickDetailController extends RootController {
      */
     private void closeStage() {
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
-        hideFloatingWindow(clickFloating, stopFloating);
+        hideFloatingWindow(clickFloating, stopFloating, massageFloating);
         removeAll();
         removeAllListeners();
-        windowMonitorClick = null;
-        stopWindowMonitor = null;
+        if (windowMonitorClick != null) {
+            windowMonitorClick.stopNativeKeyListener();
+            windowMonitorClick = null;
+        }
+        if (stopWindowMonitor != null) {
+            stopWindowMonitor.stopNativeKeyListener();
+            stopWindowMonitor = null;
+        }
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
         if (stage != null) {
             stage.close();
+            stage = null;
         }
-        stage = null;
         removeController();
         if (mainStage.isIconified()) {
             showStage(mainStage);
@@ -974,6 +996,15 @@ public class ClickDetailController extends RootController {
         disableNodes.add(testLink_Det);
         disableNodes.add(removeAll_Det);
         disableNodes.add(stopImgBtn_Det);
+        disableNodes.add(stopWindow_Det);
+        disableNodes.add(clickWindow_Det);
+        stopDisableNodes.add(stopWindow_Det);
+        stopDisableNodes.add(clickWindow_Det);
+        stopDisableNodes.add(stopFindImgType_Det);
+        clickDisableNodes.add(stopWindow_Det);
+        clickDisableNodes.add(clickWindow_Det);
+        clickDisableNodes.add(clickFindImgType_Det);
+        windowInfoDisableNodes.add(borderPane_Det);
     }
 
     /**
@@ -984,8 +1015,8 @@ public class ClickDetailController extends RootController {
         buildTableViewContextMenu(tableView_Det, dataNumber_Det);
         List<Stage> stages = List.of(stage, mainStage);
         // 构建窗口信息栏右键菜单
-        buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, disableNodes, stages);
-        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, disableNodes, stages);
+        buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, windowInfoDisableNodes, stages);
     }
 
     /**
@@ -1492,11 +1523,13 @@ public class ClickDetailController extends RootController {
 
     /**
      * 获取要点击的窗口信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void findClickWindowAction() {
+    private void findClickWindowAction() throws IOException {
         // 改变要防重复点击的组件状态
-        changeDisableNodes(disableNodes, true);
+        changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
         mainStage.setIconified(true);
         stage.setIconified(true);
@@ -1510,11 +1543,13 @@ public class ClickDetailController extends RootController {
 
     /**
      * 获取终止操作窗口信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void findStopWindowAction() {
+    private void findStopWindowAction() throws IOException {
         // 改变要防重复点击的组件状态
-        changeDisableNodes(disableNodes, true);
+        changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
         mainStage.setIconified(true);
         stage.setIconified(true);
