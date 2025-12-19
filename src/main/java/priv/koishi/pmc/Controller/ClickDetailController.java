@@ -70,6 +70,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -502,13 +503,15 @@ public class ClickDetailController extends RootController {
      *
      * @param item 列表选中的数据
      */
-    private void initFloatingWindowConfig(ClickPositionVO item) {
+    private void initFloatingWindowConfig(ClickPositionVO item) throws IllegalAccessException {
         FloatingWindowConfig clickWindowConfig = item.getClickWindowConfig();
+        FloatingWindowConfig copyClickWindowConfig = new FloatingWindowConfig();
         clickFloating = createFloatingWindowDescriptor();
         if (clickWindowConfig != null) {
-            clickFloating.setConfig(clickWindowConfig);
-            clickFindImgType_Det.setValue(findImgTypeMap.get(clickWindowConfig.getFindImgTypeEnum()));
-            clickAllRegion_Det.setSelected(activation.equals(clickWindowConfig.getAllRegion()));
+            copyAllProperties(clickWindowConfig, copyClickWindowConfig);
+            clickFloating.setConfig(copyClickWindowConfig);
+            clickFindImgType_Det.setValue(findImgTypeMap.get(copyClickWindowConfig.getFindImgTypeEnum()));
+            clickAllRegion_Det.setSelected(activation.equals(copyClickWindowConfig.getAllRegion()));
         } else {
             clickFloating.setConfig(new FloatingWindowConfig());
         }
@@ -516,11 +519,13 @@ public class ClickDetailController extends RootController {
                 .setName(floatingName_click())
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
+        FloatingWindowConfig copyStopWindowConfig = new FloatingWindowConfig();
         stopFloating = createFloatingWindowDescriptor();
         if (stopWindowConfig != null) {
-            stopFloating.setConfig(stopWindowConfig);
-            stopFindImgType_Det.setValue(findImgTypeMap.get(stopWindowConfig.getFindImgTypeEnum()));
-            stopAllRegion_Det.setSelected(activation.equals(stopWindowConfig.getAllRegion()));
+            copyAllProperties(stopWindowConfig, copyStopWindowConfig);
+            stopFloating.setConfig(copyStopWindowConfig);
+            stopFindImgType_Det.setValue(findImgTypeMap.get(copyStopWindowConfig.getFindImgTypeEnum()));
+            stopAllRegion_Det.setSelected(activation.equals(copyStopWindowConfig.getAllRegion()));
         } else {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
@@ -637,6 +642,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickAllRegion_Det, clickAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickTime_Det, randomClickTime_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickKey_Det, clickKey_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
@@ -1619,11 +1625,13 @@ public class ClickDetailController extends RootController {
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
             if (isWin) {
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy, allPs1, allJava, allJar, allClass));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy, allPs1,
+                        allJava, allJar, allClass));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allCmd));
             } else {
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy, allPs1, allJava, allJar, allClass));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy, allPs1,
+                        allJava, allJar, allClass));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBash));
             }
