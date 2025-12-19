@@ -961,14 +961,14 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击将会根据当前设置打开文件、网址或运行脚本
+     * @return 点击将会根据当前设置打开文件、应用、网址或运行脚本
      */
     public static String tip_testLink() {
         return bundle.getString("tip.testLink");
     }
 
     /**
-     * @return 点击将即可选择要打开的文件或要运行的脚本
+     * @return 点击将即可选择要打开的文件、应用或要运行的脚本
      */
     public static String tip_pathLink() {
         return bundle.getString("tip.pathLink");
@@ -1560,7 +1560,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 正在导出PMC自动操作流程
+     * @return 正在导出 PMC 自动操作流程
      */
     public static String text_exportData() {
         return bundle.getString("exportData");
@@ -2856,7 +2856,7 @@ public class i18nFinal {
 
     /**
      * @return <p>将会使用操作系统默认打开方式打开文件</p>
-     * <p>无法确定文件是否正常打开，后续操作需要自行计算文件打开的时间</p>
+     * <p>无法确定文件或应用是否正常打开，后续操作需要自行计算文件打开的时间</p>
      * 脚本文件如果默认打开方式为终端则会直接运行脚本
      */
     public static String pathTip_openFile() {
@@ -3317,7 +3317,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 打开文件
+     * @return 打开文件或应用
      */
     public static String clickType_openFile() {
         return bundle.getString("clickType.openFile");

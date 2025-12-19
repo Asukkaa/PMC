@@ -610,7 +610,8 @@ public class AutoClickService {
     private static void addLinkLog(String name, long clickTime, String key, String type) {
         ClickLogBean clickLogBean = new ClickLogBean()
                 .setClickTime(String.valueOf(clickTime))
-                .setClickKey(key)
+                .setClickKey(mouseButton_none())
+                .setResult(key)
                 .setType(type)
                 .setName(name);
         dynamicQueue.add(clickLogBean);
