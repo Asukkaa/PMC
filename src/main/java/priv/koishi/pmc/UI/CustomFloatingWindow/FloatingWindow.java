@@ -24,11 +24,15 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
+import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
@@ -501,38 +505,52 @@ public class FloatingWindow {
      * @param floatingConfigs 浮窗配置
      */
     public static void hideFloatingWindow(FloatingWindowDescriptor... floatingConfigs) {
+        hideFloatingWindow(true, floatingConfigs);
+    }
+
+    /**
+     * 隐藏浮窗
+     *
+     * @param isChangeDisableNodes 是否改变要防重复点击的组件为可交换状态(true-改变为可交互状态)
+     * @param floatingConfigs      浮窗配置
+     */
+    public static void hideFloatingWindow(boolean isChangeDisableNodes, FloatingWindowDescriptor... floatingConfigs) {
         Platform.runLater(() -> {
             for (FloatingWindowDescriptor floatingConfig : floatingConfigs) {
-                Stage floatingStage = floatingConfig.getStage();
-                if (floatingStage != null && floatingStage.isShowing()) {
-                    int floatingX = (int) floatingStage.getX();
-                    int floatingY = (int) floatingStage.getY();
-                    int floatingWidth = (int) floatingStage.getWidth();
-                    int floatingHeight = (int) floatingStage.getHeight();
-                    FloatingWindowConfig windowConfig = floatingConfig.getConfig();
-                    windowConfig.setWidth(floatingWidth)
-                            .setHeight(floatingHeight)
-                            .setX(floatingX)
-                            .setY(floatingY);
-                    floatingConfig.setConfig(windowConfig);
-                    if (floatingConfig.isCloseSave() && StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
-                        try {
-                            saveFloatingCoordinate(floatingConfig);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                if (floatingConfig != null) {
+                    Stage floatingStage = floatingConfig.getStage();
+                    if (floatingStage != null && floatingStage.isShowing()) {
+                        int floatingX = (int) floatingStage.getX();
+                        int floatingY = (int) floatingStage.getY();
+                        int floatingWidth = (int) floatingStage.getWidth();
+                        int floatingHeight = (int) floatingStage.getHeight();
+                        FloatingWindowConfig windowConfig = floatingConfig.getConfig();
+                        windowConfig.setWidth(floatingWidth)
+                                .setHeight(floatingHeight)
+                                .setX(floatingX)
+                                .setY(floatingY);
+                        floatingConfig.setConfig(windowConfig);
+                        if (floatingConfig.isCloseSave() && StringUtils.isNotBlank(floatingConfig.getConfigFile())) {
+                            try {
+                                saveFloatingCoordinate(floatingConfig);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
+                        floatingStage.hide();
+                        Button button = floatingConfig.getButton();
+                        if (button != null) {
+                            button.setText(floatingConfig.getShowButtonText());
+                            addToolTip(tip_massageRegion(), button);
+                        }
+                        // 改变要防重复点击的组件状态
+                        if (isChangeDisableNodes) {
+                            changeDisableNodes(floatingConfig.getDisableNodes(), false);
+                        }
+                        removeNativeListener(nativeKeyListener);
+                        floatingStage.close();
+                        floatingWindows.remove(floatingConfig);
                     }
-                    floatingStage.hide();
-                    Button button = floatingConfig.getButton();
-                    if (button != null) {
-                        button.setText(floatingConfig.getShowButtonText());
-                        addToolTip(tip_massageRegion(), button);
-                    }
-                    // 改变要防重复点击的组件状态
-                    changeDisableNodes(floatingConfig.getDisableNodes(), false);
-                    removeNativeListener(nativeKeyListener);
-                    floatingConfig.getStage().close();
-                    floatingWindows.remove(floatingConfig);
                 }
             }
         });
@@ -603,6 +621,30 @@ public class FloatingWindow {
                 rectangle.setFill(new Color(0, 0, 0, opacity));
             }
         });
+    }
+
+    /**
+     * 初始化浮窗坐标与宽高
+     *
+     * @param massageFloating 浮窗属性类
+     * @param configPath      配置文件路径
+     * @throws IOException 配置文件读取异常
+     */
+    public static void getFloatingSetting(FloatingWindowDescriptor massageFloating, String configPath) throws IOException {
+        if (massageFloating != null) {
+            FloatingWindowConfig config = massageFloating.getConfig();
+            if (config != null) {
+                Properties prop = new Properties();
+                InputStream input = checkRunningInputStream(configPath);
+                prop.load(input);
+                config.setHeight(Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight)))
+                        .setWidth(Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth)))
+                        .setX(Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX)))
+                        .setY(Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY)));
+                input.close();
+                massageFloating.setConfig(config);
+            }
+        }
     }
 
     /**

@@ -187,7 +187,7 @@ public class AboutController extends RootController {
         addValueToolTip(logsNum_Abt, tip_logsNum());
         // 赞赏按钮添加鼠标悬停提示
         addToolTip(tip_appreciate(), appreciate_Abt);
-        // 给logo和应用名称添加鼠标悬停提示
+        // 给 logo 和应用名称添加鼠标悬停提示
         addToolTip(tip_thanks(), logo_Abt, title_Abt);
         // 检查更新按钮添加鼠标悬停提示
         addToolTip(tip_checkUpdate_Abt(), checkUpdate_Abt);

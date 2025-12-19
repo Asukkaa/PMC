@@ -86,16 +86,6 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class SettingController extends RootController implements MousePositionUpdater {
 
     /**
-     * 信息浮窗跟随鼠标前 X 坐标
-     */
-    private int lastX;
-
-    /**
-     * 信息浮窗跟随鼠标前 Y 坐标
-     */
-    private int lastY;
-
-    /**
      * 页面标识符
      */
     private final String tabId = "_Set";
@@ -111,9 +101,24 @@ public class SettingController extends RootController implements MousePositionUp
     public static boolean noAutomationPermission;
 
     /**
-     * 要防重复点击的组件
+     * 基础要防重复点击的组件
      */
-    private final List<Node> disableNodes = new ArrayList<>();
+    private final List<Node> baseDisableNodes = new ArrayList<>();
+
+    /**
+     * 终止操作识别区域设置要防重复点击的组件
+     */
+    private final List<Node> stopDisableNodes = new ArrayList<>();
+
+    /**
+     * 目标图像识别区域设置要防重复点击的组件
+     */
+    private final List<Node> clickDisableNodes = new ArrayList<>();
+
+    /**
+     * 窗口信息设置要防重复点击的组件
+     */
+    private final List<Node> windowInfoDisableNodes = new ArrayList<>();
 
     /**
      * 窗口进程地址
@@ -301,7 +306,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private FloatingWindowDescriptor createFloatingWindowDescriptor() {
         return new FloatingWindowDescriptor()
-                .setDisableNodes(new ArrayList<>(disableNodes))
+                .setDisableNodes(new ArrayList<>(baseDisableNodes))
                 .setShowButtonText(findImgSet_showRegion())
                 .setHideButtonText(findImgSet_saveRegion())
                 .setHideButtonToolTip(tip_saveFloating())
@@ -681,16 +686,24 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
-        disableNodes.add(removeAll_Set);
-        disableNodes.add(stopImgBtn_Set);
+        baseDisableNodes.add(removeAll_Set);
+        baseDisableNodes.add(stopImgBtn_Set);
+        baseDisableNodes.add(stopWindow_Set);
+        baseDisableNodes.add(clickWindow_Set);
         Node aboutTab = mainScene.lookup("#aboutTab");
-        disableNodes.add(aboutTab);
+        baseDisableNodes.add(aboutTab);
         Node settingTab = mainScene.lookup("#settingTab");
-        disableNodes.add(settingTab);
+        baseDisableNodes.add(settingTab);
         Node autoClickTab = mainScene.lookup("#autoClickTab");
-        disableNodes.add(autoClickTab);
+        baseDisableNodes.add(autoClickTab);
         Node timedStartTab = mainScene.lookup("#timedStartTab");
-        disableNodes.add(timedStartTab);
+        baseDisableNodes.add(timedStartTab);
+        Node tabPane = mainScene.lookup("#tabPane");
+        windowInfoDisableNodes.add(tabPane);
+        stopDisableNodes.addAll(baseDisableNodes);
+        stopDisableNodes.add(stopFindImgType_Set);
+        clickDisableNodes.addAll(baseDisableNodes);
+        clickDisableNodes.add(clickFindImgType_Set);
     }
 
     /**
@@ -756,7 +769,7 @@ public class SettingController extends RootController implements MousePositionUp
         taskBean.setProgressBar(progressBar_Set)
                 .setMassageLabel(dataNumber_Set)
                 .setTableView(tableView_Set)
-                .setDisableNodes(disableNodes);
+                .setDisableNodes(windowInfoDisableNodes);
         return taskBean;
     }
 
@@ -801,9 +814,9 @@ public class SettingController extends RootController implements MousePositionUp
         buildTableViewContextMenu(tableView_Set, dataNumber_Set);
         List<Stage> stages = List.of(mainStage);
         // 构建窗口信息栏右键菜单
-        ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, disableNodes, stages);
+        ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildStopUpdateListMenu(stopContextMenu, stopWindowMonitor);
-        ContextMenu clickContextMenu = buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, disableNodes, stages);
+        ContextMenu clickContextMenu = buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, windowInfoDisableNodes, stages);
         buildClickUpdateListMenu(clickContextMenu, clickWindowMonitor);
     }
 
@@ -873,12 +886,12 @@ public class SettingController extends RootController implements MousePositionUp
      * 初始化窗口信息获取器
      */
     private void initWindowMonitor() {
-        stopWindowMonitor = new WindowMonitor(disableNodes, mainStage);
+        stopWindowMonitor = new WindowMonitor(windowInfoDisableNodes, mainStage);
         stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Set));
         if (StringUtils.isNotBlank(stopWindowPath)) {
             stopWindowMonitor.updateWindowInfo(stopWindowPath);
         }
-        clickWindowMonitor = new WindowMonitor(disableNodes, mainStage);
+        clickWindowMonitor = new WindowMonitor(windowInfoDisableNodes, mainStage);
         clickWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(clickWindowInfo_Set));
         if (StringUtils.isNotBlank(clickWindowPath)) {
             clickWindowMonitor.updateWindowInfo(clickWindowPath);
@@ -940,9 +953,6 @@ public class SettingController extends RootController implements MousePositionUp
                         int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, -screenHeight, screenHeight);
                         floatingMove(floatingStage, mousePoint, offsetX, offsetY);
                         setPositionText(massageFloating, "");
-                    } else {
-                        lastX = (int) floatingStage.getX();
-                        lastY = (int) floatingStage.getY();
                     }
                 }
             }
@@ -1443,20 +1453,21 @@ public class SettingController extends RootController implements MousePositionUp
 
     /**
      * 显示或隐藏浮窗位置
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void massageRegionAction() {
+    private void massageRegionAction() throws IOException {
         Stage floatingStage = massageFloating.getStage();
         if (floatingStage != null) {
-            massageFloating.setDisableNodes(disableNodes);
+            getFloatingSetting(massageFloating, configFile_Click);
+            massageFloating.setDisableNodes(baseDisableNodes);
             if (!floatingStage.isShowing()) {
                 // 显示浮窗
                 showFloatingWindow(massageFloating);
             } else if (floatingStage.isShowing()) {
                 // 还原鼠标跟随前的坐标
                 if (mouseFloating_Set.isSelected()) {
-                    floatingStage.setX(lastX);
-                    floatingStage.setY(lastY);
                     massageFloating.setHideButtonText(text_closeFloating())
                             .setHideButtonToolTip(tip_closeFloating())
                             .setCloseSave(false);
@@ -1466,7 +1477,14 @@ public class SettingController extends RootController implements MousePositionUp
                             .setCloseSave(true);
                 }
                 // 隐藏浮窗
-                hideFloatingWindow(massageFloating);
+                hideFloatingWindow(false, massageFloating);
+                // 只有所有浮窗都关闭时才恢复其他节点可交互状态
+                Stage clickStage = clickFloating.getStage();
+                Stage stopStage = stopFloating.getStage();
+                if ((clickStage == null || !clickStage.isShowing()) &&
+                        (stopStage == null || !stopStage.isShowing())) {
+                    changeDisableNodes(baseDisableNodes, false);
+                }
             }
         }
     }
@@ -1478,7 +1496,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void reLaunch() throws IOException {
-        // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新jvm配置参数
+        // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新 jvm 配置参数
         mainController.saveAllLastConfig();
         Platform.exit();
         if (!isRunningFromIDEA) {
@@ -1637,15 +1655,23 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void clickRegionAction() {
-        Stage floatingStage = clickFloating.getStage();
-        if (floatingStage != null) {
-            clickFloating.setDisableNodes(disableNodes);
-            if (!floatingStage.isShowing()) {
+        Stage clickStage = clickFloating.getStage();
+        if (clickStage != null) {
+            clickFloating.setDisableNodes(clickDisableNodes);
+            if (!clickStage.isShowing()) {
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
-            } else if (floatingStage.isShowing()) {
+            } else if (clickStage.isShowing()) {
                 // 隐藏浮窗
-                hideFloatingWindow(clickFloating);
+                hideFloatingWindow(false, clickFloating);
+                setNodeDisable(clickFindImgType_Set, false);
+                // 只有所有浮窗都关闭时才恢复其他节点可交互状态
+                Stage stopStage = stopFloating.getStage();
+                Stage massageStage = massageFloating.getStage();
+                if ((stopStage == null || !stopStage.isShowing()) &&
+                        (massageStage == null || !massageStage.isShowing())) {
+                    changeDisableNodes(clickDisableNodes, false);
+                }
             }
         }
     }
@@ -1655,26 +1681,36 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void stopRegionAction() {
-        Stage floatingStage = stopFloating.getStage();
-        if (floatingStage != null) {
-            stopFloating.setDisableNodes(disableNodes);
-            if (!floatingStage.isShowing()) {
+        Stage stopStage = stopFloating.getStage();
+        if (stopStage != null) {
+            stopFloating.setDisableNodes(stopDisableNodes);
+            if (!stopStage.isShowing()) {
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
-            } else if (floatingStage.isShowing()) {
+            } else if (stopStage.isShowing()) {
                 // 隐藏浮窗
-                hideFloatingWindow(stopFloating);
+                hideFloatingWindow(false, stopFloating);
+                setNodeDisable(stopFindImgType_Set, false);
+                // 只有所有浮窗都关闭时才恢复其他节点可交互状态
+                Stage clickStage = clickFloating.getStage();
+                Stage massageStage = massageFloating.getStage();
+                if ((clickStage == null || !clickStage.isShowing()) &&
+                        (massageStage == null || !massageStage.isShowing())) {
+                    changeDisableNodes(stopDisableNodes, false);
+                }
             }
         }
     }
 
     /**
      * 获取要点击的窗口信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void findClickWindowAction() {
+    private void findClickWindowAction() throws IOException {
         // 改变要防重复点击的组件状态
-        changeDisableNodes(disableNodes, true);
+        changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏主窗口
         mainStage.setIconified(true);
         // 获取准备时间值
@@ -1687,11 +1723,13 @@ public class SettingController extends RootController implements MousePositionUp
 
     /**
      * 获取终止操作窗口信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void findStopWindowAction() {
+    private void findStopWindowAction() throws IOException {
         // 改变要防重复点击的组件状态
-        changeDisableNodes(disableNodes, true);
+        changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏主窗口
         mainStage.setIconified(true);
         // 获取准备时间值

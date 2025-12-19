@@ -1,7 +1,5 @@
 package priv.koishi.pmc.Controller;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -62,6 +60,8 @@ import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 
 import java.awt.*;
 import java.io.File;
@@ -422,9 +422,8 @@ public class AutoClickController extends RootController implements MousePosition
      * 自动保存操作流程
      *
      * @param autoSave 自动保存开关
-     * @throws IOException pmc 文件保存异常
      */
-    private void autoSave(CheckBox autoSave, String outPath) throws IOException {
+    private void autoSave(CheckBox autoSave, String outPath) {
         if (autoSave.isSelected()) {
             List<?> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
@@ -696,8 +695,9 @@ public class AutoClickController extends RootController implements MousePosition
      * 显示浮窗
      *
      * @param isRun 是否为运行自动操作
+     * @throws IOException 配置文件读取异常
      */
-    public static void showFloatingWindow(boolean isRun) {
+    public static void showFloatingWindow(boolean isRun) throws IOException {
         // 获取浮窗的文本颜色设置
         Color color = settingController.colorPicker_Set.getValue();
         // 获取浮窗的显示设置
@@ -706,6 +706,7 @@ public class AutoClickController extends RootController implements MousePosition
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
         Slider slider = settingController.opacity_Set;
         if (isShow) {
+            getFloatingSetting(massageFloating, configFile_Click);
             Platform.runLater(() -> {
                 if (massageFloating != null) {
                     massageFloating.setConfig(SettingController.massageFloating.getConfig())
@@ -1277,7 +1278,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, unit_process());
         updateLabel(log_Click, text_loadSuccess() + filePath);
-        log_Click.setTextFill(Color.GREEN);
+        Platform.runLater(() -> log_Click.setTextFill(Color.GREEN));
     }
 
     /**
@@ -1550,7 +1551,11 @@ public class AutoClickController extends RootController implements MousePosition
             log_Click.textFillProperty().bind(recordTextColorProperty);
             log_Click.setText(text.get());
             // 显示浮窗
-            showFloatingWindow(false);
+            try {
+                showFloatingWindow(false);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             recordTimeline = new Timeline();
             if (preparationTimeValue == 0) {
                 // 开启鼠标监听

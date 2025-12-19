@@ -103,6 +103,7 @@
 .text-field {
     -fx-font-size: 12;
     -fx-pref-height: 25;
+    -fx-prompt-text-fill: rgba(128, 128, 128, 0.4);
 }
 
 .button {

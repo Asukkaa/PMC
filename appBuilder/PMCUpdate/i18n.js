@@ -2,9 +2,9 @@ module.exports = {
     "zh-CN": {
         versionPrefix: "版本",
         whatsNewItems: `
-        pmc 文件导入功能现在支持导入整个文件夹的文件，并且会根据文件夹下的图片名称自动匹配要点击的图片
-        优化了图片与 pmc 文件批量导入的逻辑，防止页面卡顿
-        修复了一些 bug
+        修复信息浮窗位置显示可能不正确的问题
+        优化图像识别范围设置功能
+        完善部分文本描述
         优化界面布局`,
         invalidJson: "无效的JSON请求体",
         invalidOS: "无效的操作系统参数"
@@ -12,9 +12,9 @@ module.exports = {
     "zh-TW": {
         versionPrefix: "版本",
         whatsNewItems: `
-        pmc 檔案導入功能現在支持導入整個資料夾的檔案，並且會根據資料夾下的圖片名稱自動匹配要點擊的圖片
-        優化了圖片與pmc檔案批量導入的邏輯，防止頁面卡頓
-        修復了一些 bug
+        修正資訊浮動視窗位置可能顯示不正確的問題
+        優化圖像識別範圍設定功能
+        完善部分文字描述
         優化介面佈局`,
         invalidJson: "無效的JSON請求體",
         invalidOS: "無效的作業系統參數"
@@ -22,9 +22,9 @@ module.exports = {
     "en": {
         versionPrefix: "Version",
         whatsNewItems: `
-        The PMC file import function now supports importing files from the entire folder and automatically matches the image to be clicked based on the name of the image in the folder
-        Optimized the logic for batch importing images and PMC files to prevent page lag
-        Fixed some bugs
+        Fix the issue where the position of the information floating window may display incorrectly
+        Optimize the image recognition scope setting function
+        Improve some text descriptions
         Optimize interface layout`,
         invalidJson: "Invalid JSON request body",
         invalidOS: "Invalid OS parameter"

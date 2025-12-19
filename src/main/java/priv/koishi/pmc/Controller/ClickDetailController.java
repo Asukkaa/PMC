@@ -60,6 +60,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
@@ -76,6 +77,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
+import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -140,6 +142,21 @@ public class ClickDetailController extends RootController {
      * 要防重复点击的组件
      */
     private final List<Node> disableNodes = new ArrayList<>();
+
+    /**
+     * 终止操作识别区域设置要防重复点击的组件
+     */
+    private final List<Node> stopDisableNodes = new ArrayList<>();
+
+    /**
+     * 目标图像识别区域设置要防重复点击的组件
+     */
+    private final List<Node> clickDisableNodes = new ArrayList<>();
+
+    /**
+     * 窗口信息设置防重复点击标志
+     */
+    private final List<Node> windowInfoDisableNodes = new ArrayList<>();
 
     /**
      * 加载图片任务
@@ -417,14 +434,14 @@ public class ClickDetailController extends RootController {
      * 初始化窗口信息获取器
      */
     private void initWindowMonitor() {
-        stopWindowMonitor = new WindowMonitor(disableNodes, stage);
+        stopWindowMonitor = new WindowMonitor(windowInfoDisableNodes, stage);
         stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Det));
         FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
         WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
         updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
         stopWindowMonitor.setWindowInfo(stopWindowInfo);
         stopWindowMonitor.updateWindowInfo();
-        windowMonitorClick = new WindowMonitor(disableNodes, stage);
+        windowMonitorClick = new WindowMonitor(windowInfoDisableNodes, stage);
         windowMonitorClick.setWindowInfoHandler(creatWindowInfoHandler());
         FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
         WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
@@ -518,29 +535,33 @@ public class ClickDetailController extends RootController {
      *
      * @param item 列表选中的数据
      */
-    private void initFloatingWindowConfig(ClickPositionVO item) {
+    private void initFloatingWindowConfig(ClickPositionVO item) throws IllegalAccessException {
         FloatingWindowConfig clickWindowConfig = item.getClickWindowConfig();
+        FloatingWindowConfig copyClickWindowConfig = new FloatingWindowConfig();
         clickFloating = createFloatingWindowDescriptor();
         if (clickWindowConfig != null) {
-            clickFloating.setConfig(clickWindowConfig);
-            clickFindImgType_Det.setValue(findImgTypeMap.get(clickWindowConfig.getFindImgTypeEnum()));
-            clickAllRegion_Det.setSelected(activation.equals(clickWindowConfig.getAllRegion()));
+            copyAllProperties(clickWindowConfig, copyClickWindowConfig);
+            clickFloating.setConfig(copyClickWindowConfig);
+            clickFindImgType_Det.setValue(findImgTypeMap.get(copyClickWindowConfig.getFindImgTypeEnum()));
+            clickAllRegion_Det.setSelected(activation.equals(copyClickWindowConfig.getAllRegion()));
         } else {
             clickFloating.setConfig(new FloatingWindowConfig());
         }
-        clickFloating.setDisableNodes(Collections.singletonList(clickFindImgType_Det))
+        clickFloating.setDisableNodes(clickDisableNodes)
                 .setName(floatingName_click())
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
+        FloatingWindowConfig copyStopWindowConfig = new FloatingWindowConfig();
         stopFloating = createFloatingWindowDescriptor();
         if (stopWindowConfig != null) {
-            stopFloating.setConfig(stopWindowConfig);
-            stopFindImgType_Det.setValue(findImgTypeMap.get(stopWindowConfig.getFindImgTypeEnum()));
-            stopAllRegion_Det.setSelected(activation.equals(stopWindowConfig.getAllRegion()));
+            copyAllProperties(stopWindowConfig, copyStopWindowConfig);
+            stopFloating.setConfig(copyStopWindowConfig);
+            stopFindImgType_Det.setValue(findImgTypeMap.get(copyStopWindowConfig.getFindImgTypeEnum()));
+            stopAllRegion_Det.setSelected(activation.equals(copyStopWindowConfig.getAllRegion()));
         } else {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
-        stopFloating.setDisableNodes(Collections.singletonList(stopFindImgType_Det))
+        stopFloating.setDisableNodes(stopDisableNodes)
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
@@ -653,6 +674,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickAllRegion_Det, clickAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickTime_Det, randomClickTime_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(clickKey_Det, clickKey_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickType_Det, clickType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
@@ -748,9 +770,6 @@ public class ClickDetailController extends RootController {
         // 要点击的图像识别准确度设置监听
         Runnable clickOpacityRemover = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
         listenerRemovers.add(clickOpacityRemover);
-        // 限制操作时长文本输入内容
-        Runnable timeClickRemover = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime());
-        listenerRemovers.add(timeClickRemover);
         // 限制操作间隔文本输入框内容
         Runnable intervalRemover = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
         listenerRemovers.add(intervalRemover);
@@ -775,6 +794,9 @@ public class ClickDetailController extends RootController {
         // 限制识别匹配后要跳转的步骤序号文本输入框内容
         Runnable matchedStepRemover = warnIntegerRangeTextField(matchedStep_Det, 1, maxIndex, tip_step(), matchedStepWarning_Det);
         listenerRemovers.add(matchedStepRemover);
+        // 限制操作时长文本输入内容
+        Runnable timeClickRemover = integerRangeTextField(timeClick_Det, 0, null, tip_clickTime() + defaultClickTimeOffset);
+        listenerRemovers.add(timeClickRemover);
         // 随机点击时间偏移量文本输入框内容
         Runnable randomTimeRemover = integerRangeTextField(randomTimeOffset_Det, 0, null, tip_randomTime() + defaultRandomTime);
         listenerRemovers.add(randomTimeRemover);
@@ -821,7 +843,6 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_pathLink(), pathLink_Det);
         addToolTip(tip_minWindow(), minWindow_Det);
         addToolTip(tip_parameter(), parameter_Det);
-        addToolTip(tip_clickTime(), timeClick_Det);
         addToolTip(tip_clickName(), clickName_Det);
         addToolTip(tip_stopImgBtn(), stopImgBtn_Det);
         addToolTip(tip_clickInterval(), interval_Det);
@@ -848,6 +869,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_randomClickInterval(), randomClickInterval_Det);
         addToolTip(tip_relatively(), relativelyX_Det, relativelyY_Det);
         addToolTip(tip_allRegion(), clickAllRegion_Det, stopAllRegion_Det);
+        addToolTip(tip_clickTime() + defaultClickTimeOffset, timeClick_Det);
         addValueToolTip(clickKey_Det, tip_clickKey(), clickKey_Det.getValue());
         addValueToolTip(clickType_Det, tip_clickType(), clickType_Det.getValue());
         addValueToolTip(retryType_Det, tip_retryType(), retryType_Det.getValue());
@@ -939,20 +961,26 @@ public class ClickDetailController extends RootController {
      */
     private void closeStage() {
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
-        hideFloatingWindow(clickFloating, stopFloating);
+        hideFloatingWindow(clickFloating, stopFloating, massageFloating);
         removeAll();
         removeAllListeners();
         // 移除键盘监听器
         removeNativeListener(nativeKeyListener);
-        windowMonitorClick = null;
-        stopWindowMonitor = null;
+        if (windowMonitorClick != null) {
+            windowMonitorClick.stopNativeKeyListener();
+            windowMonitorClick = null;
+        }
+        if (stopWindowMonitor != null) {
+            stopWindowMonitor.stopNativeKeyListener();
+            stopWindowMonitor = null;
+        }
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
         if (stage != null) {
             stage.close();
+            stage = null;
         }
-        stage = null;
         removeController();
         if (mainStage.isIconified()) {
             showStage(mainStage);
@@ -1009,6 +1037,15 @@ public class ClickDetailController extends RootController {
         disableNodes.add(testLink_Det);
         disableNodes.add(removeAll_Det);
         disableNodes.add(stopImgBtn_Det);
+        disableNodes.add(stopWindow_Det);
+        disableNodes.add(clickWindow_Det);
+        stopDisableNodes.add(stopWindow_Det);
+        stopDisableNodes.add(clickWindow_Det);
+        stopDisableNodes.add(stopFindImgType_Det);
+        clickDisableNodes.add(stopWindow_Det);
+        clickDisableNodes.add(clickWindow_Det);
+        clickDisableNodes.add(clickFindImgType_Det);
+        windowInfoDisableNodes.add(borderPane_Det);
     }
 
     /**
@@ -1019,8 +1056,8 @@ public class ClickDetailController extends RootController {
         buildTableViewContextMenu(tableView_Det, dataNumber_Det);
         List<Stage> stages = List.of(stage, mainStage);
         // 构建窗口信息栏右键菜单
-        buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, disableNodes, stages);
-        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, disableNodes, stages);
+        buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, windowInfoDisableNodes, stages);
     }
 
     /**
@@ -1582,11 +1619,13 @@ public class ClickDetailController extends RootController {
 
     /**
      * 获取要点击的窗口信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void findClickWindowAction() {
+    private void findClickWindowAction() throws IOException {
         // 改变要防重复点击的组件状态
-        changeDisableNodes(disableNodes, true);
+        changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
         mainStage.setIconified(true);
         stage.setIconified(true);
@@ -1600,11 +1639,13 @@ public class ClickDetailController extends RootController {
 
     /**
      * 获取终止操作窗口信息
+     *
+     * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void findStopWindowAction() {
+    private void findStopWindowAction() throws IOException {
         // 改变要防重复点击的组件状态
-        changeDisableNodes(disableNodes, true);
+        changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
         mainStage.setIconified(true);
         stage.setIconified(true);
@@ -1674,11 +1715,13 @@ public class ClickDetailController extends RootController {
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
             List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
             if (isWin) {
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy, allPs1, allJava, allJar, allClass));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat, allCmd, allPy, allPs1,
+                        allJava, allJar, allClass));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBat));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allCmd));
             } else {
-                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy, allPs1, allJava, allJar, allClass));
+                extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh, allBash, allPy, allPs1,
+                        allJava, allJar, allClass));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allSh));
                 extensionFilters.add(new FileChooser.ExtensionFilter(text_script(), allBash));
             }

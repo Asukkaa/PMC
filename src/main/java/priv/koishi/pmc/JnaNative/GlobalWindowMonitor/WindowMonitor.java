@@ -304,7 +304,6 @@ public class WindowMonitor {
                     removeNativeListener(nativeKeyListener);
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(disableNodes, false);
-
                 }
             }
         };
@@ -313,11 +312,19 @@ public class WindowMonitor {
     }
 
     /**
+     * 停止全局键盘监听
+     */
+    public void stopNativeKeyListener() {
+        removeNativeListener(nativeKeyListener);
+    }
+
+    /**
      * 开启记录焦点窗口鼠标点击监听器
      *
      * @param preparation 准备时间
+     * @throws IOException 配置文件读取异常
      */
-    public void startClickWindowMouseListener(int preparation) {
+    public void startClickWindowMouseListener(int preparation) throws IOException {
         if (autoClickController.isFree()) {
             // 移除可能存在的旧监听器
             removeNativeListener(clickWindowMouseListener);
@@ -712,7 +719,7 @@ public class WindowMonitor {
                     Pointer kCGWindowBounds = createCFString("kCGWindowBounds");
                     Pointer kCGWindowLayer = createCFString("kCGWindowLayer");
                     Pointer kCGWindowNumber = createCFString("kCGWindowNumber");
-                    // 定义Core Foundation类型常量
+                    // 定义 Core Foundation 类型常量
                     final int kCFNumberIntType = 9;
                     final int kCFNumberDoubleType = 13;
                     for (int i = 0; i < count; i++) {

@@ -28,7 +28,7 @@
 
                             <HBox styleClass="hBox-veryShort">
                                 <Label fx:id="clickTypeText_Det" text="%clickDetail.clickTypeText_Det"/>
-                                <ChoiceBox fx:id="clickType_Det" prefWidth="120" onAction="#clickTypeChange"/>
+                                <ChoiceBox fx:id="clickType_Det" prefWidth="150" onAction="#clickTypeChange"/>
                             </HBox>
 
                             <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testLinkAction"/>

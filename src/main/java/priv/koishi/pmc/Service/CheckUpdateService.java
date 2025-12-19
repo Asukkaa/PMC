@@ -1,7 +1,5 @@
 package priv.koishi.pmc.Service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.UniCloudResponse;
 import priv.koishi.pmc.UI.CustomProgressDialog.ProgressDialog;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.net.ssl.SSLContext;
 import java.io.*;
@@ -108,9 +109,10 @@ public class CheckUpdateService {
                         if (jsonData == null) {
                             throw new IOException(update_nullResponse());
                         }
-                        ObjectMapper objectMapper = new ObjectMapper();
                         // 配置忽略未知字段
-                        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                        ObjectMapper objectMapper = JsonMapper.builder()
+                                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                                .build();
                         // 先解析为 UniCloudResponse
                         UniCloudResponse uniResponse = objectMapper.readValue(jsonData, UniCloudResponse.class);
                         logger.info("查询版本更新，解析后的响应体: {}", uniResponse);

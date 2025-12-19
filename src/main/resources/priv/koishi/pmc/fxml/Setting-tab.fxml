@@ -425,15 +425,13 @@
         <HBox spacing="10">
             <HBox styleClass="hBox-short">
                 <Label text="%findImgSet.findImgType"/>
-                <ChoiceBox fx:id="clickFindImgType_Set" prefWidth="150"
-                           onAction="#clickFindImgTypeAction"/>
+                <ChoiceBox fx:id="clickFindImgType_Set" prefWidth="150" onAction="#clickFindImgTypeAction"/>
             </HBox>
 
             <HBox fx:id="clickRegionInfoHBox_Set">
                 <HBox fx:id="clickRegionHBox_Set" spacing="10">
                     <HBox styleClass="hBox-short">
-                        <Button fx:id="clickRegion_Set" text="%findImgSet.showRegion"
-                                onAction="#clickRegionAction"/>
+                        <Button fx:id="clickRegion_Set" text="%findImgSet.showRegion" onAction="#clickRegionAction"/>
                     </HBox>
 
                     <HBox styleClass="hBox-short">
