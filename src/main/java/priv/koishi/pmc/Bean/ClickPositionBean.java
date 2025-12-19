@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
@@ -9,6 +8,7 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.util.List;
 import java.util.Map;

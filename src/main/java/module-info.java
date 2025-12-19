@@ -6,7 +6,6 @@ module priv.koishi.pmc {
     requires org.apache.logging.log4j.core;
     requires jdk.management;
     requires com.github.kwhat.jnativehook;
-    requires com.fasterxml.jackson.databind;
     requires org.apache.commons.lang3;
     requires nsmenufx;
     requires javafx.controls;
@@ -21,6 +20,7 @@ module priv.koishi.pmc {
     requires com.sun.jna.platform;
     requires jdk.naming.dns;
     requires atlantafx.base;
+    requires tools.jackson.databind;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;
@@ -36,7 +36,6 @@ module priv.koishi.pmc {
     opens priv.koishi.pmc.Finals to javafx.fxml;
     exports priv.koishi.pmc.Bean.VO;
     opens priv.koishi.pmc.Bean.VO to javafx.fxml;
-    exports priv.koishi.pmc.Serializer to com.fasterxml.jackson.databind;
     exports priv.koishi.pmc.Queue;
     exports priv.koishi.pmc.UI.CustomProgressDialog;
     exports priv.koishi.pmc.Bean.Result;
@@ -48,4 +47,5 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
     exports priv.koishi.pmc.Bean.Interface;
     opens priv.koishi.pmc.Bean.Interface to javafx.fxml;
+    exports priv.koishi.pmc.Serializer to tools.jackson.databind;
 }

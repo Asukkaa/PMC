@@ -1,7 +1,5 @@
 package priv.koishi.pmc.Controller;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
@@ -60,6 +58,8 @@ import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 
 import java.awt.*;
 import java.io.File;
@@ -429,9 +429,8 @@ public class AutoClickController extends RootController implements MousePosition
      * 自动保存操作流程
      *
      * @param autoSave 自动保存开关
-     * @throws IOException pmc 文件保存异常
      */
-    private void autoSave(CheckBox autoSave, String outPath) throws IOException {
+    private void autoSave(CheckBox autoSave, String outPath) {
         if (autoSave.isSelected()) {
             List<?> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {

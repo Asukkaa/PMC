@@ -1,9 +1,5 @@
 package priv.koishi.pmc.Service;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -17,6 +13,9 @@ import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.MismatchedInputException;
 
 import java.io.File;
 import java.io.IOException;
@@ -191,7 +190,7 @@ public class PMCFileService {
     public static Task<String> exportPMC(TaskBean<ClickPositionVO> taskBean, String fileName, String outFilePath, boolean notOverwrite) {
         return new Task<>() {
             @Override
-            protected String call() throws IOException {
+            protected String call() {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_exportData());
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
@@ -260,7 +259,7 @@ public class PMCFileService {
         try {
             clickPositionBeans = objectMapper.readValue(jsonFile,
                     objectMapper.getTypeFactory().constructCollectionType(List.class, ClickPositionBean.class));
-        } catch (MismatchedInputException | JsonParseException e) {
+        } catch (MismatchedInputException e) {
             throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
         }
         // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号

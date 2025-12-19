@@ -1,10 +1,9 @@
 package priv.koishi.pmc.Serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 /**
  * 自定义 jackson 序列化器
@@ -13,7 +12,15 @@ import java.io.IOException;
  * Date:2025-04-01
  * Time:13:21
  */
-public class DoubleStringToIntSerializer extends JsonSerializer<String> {
+public class DoubleStringToIntSerializer extends StdSerializer<String> {
+
+    public DoubleStringToIntSerializer() {
+        super(String.class);
+    }
+
+    public DoubleStringToIntSerializer(Class<String> t) {
+        super(t);
+    }
 
     /**
      * json 序列化时将非整数字符串转为整数
@@ -23,7 +30,7 @@ public class DoubleStringToIntSerializer extends JsonSerializer<String> {
      * @param provider 序列化提供者
      */
     @Override
-    public void serialize(String value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(String value, JsonGenerator gen, SerializationContext provider) throws JacksonException {
         if (value != null) {
             try {
                 // 将字符串转为 double 后再转为 int

@@ -166,7 +166,7 @@ public class TimedTaskController extends RootController {
         // 监听窗口面板高度变化
         detailStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
-        // 设置css样式
+        // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
     }
