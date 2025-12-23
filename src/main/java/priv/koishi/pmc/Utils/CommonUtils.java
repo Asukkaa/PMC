@@ -8,6 +8,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,6 +23,58 @@ import static priv.koishi.pmc.Finals.i18nFinal.text_unknowGC;
  * Time:下午1:14
  */
 public class CommonUtils {
+
+    /**
+     * 自然排序比较器（数字按数值大小排序）
+     */
+    public static final Comparator<String> NATURAL_SORT = Comparator
+            .comparing((String str) -> {
+                if (str == null) return "";
+                return str;
+            }, CommonUtils::naturalCompare);
+
+    /**
+     * 自然排序的核心比较方法
+     *
+     * @param s1 要排序的字符串1
+     * @param s2 要排序的字符串2
+     */
+    private static int naturalCompare(String s1, String s2) {
+        if (s1 == null && s2 == null) {
+            return 0;
+        }
+        if (s1 == null) {
+            return -1;
+        }
+        if (s2 == null) {
+            return 1;
+        }
+        int i1 = 0, i2 = 0;
+        int len1 = s1.length(), len2 = s2.length();
+        while (i1 < len1 && i2 < len2) {
+            char c1 = s1.charAt(i1);
+            char c2 = s2.charAt(i2);
+            if (Character.isDigit(c1) && Character.isDigit(c2)) {
+                int num1 = 0, num2 = 0;
+                while (i1 < len1 && Character.isDigit(s1.charAt(i1))) {
+                    num1 = num1 * 10 + (s1.charAt(i1++) - '0');
+                }
+                while (i2 < len2 && Character.isDigit(s2.charAt(i2))) {
+                    num2 = num2 * 10 + (s2.charAt(i2++) - '0');
+                }
+                if (num1 != num2) {
+                    return Integer.compare(num1, num2);
+                }
+            } else {
+                // 不区分大小写比较
+                int cmp = Character.compare(Character.toLowerCase(c1), Character.toLowerCase(c2));
+                if (cmp != 0) return cmp;
+                i1++;
+                i2++;
+            }
+        }
+        return Integer.compare(len1 - i1, len2 - i2);
+    }
 
     /**
      * 正则表达式用于匹配指定范围的整数

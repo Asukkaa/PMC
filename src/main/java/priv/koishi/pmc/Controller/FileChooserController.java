@@ -611,6 +611,18 @@ public class FileChooserController extends ManuallyChangeThemeController {
     }
 
     /**
+     * 设置列排序
+     */
+    private void columnComparator() {
+        // 设置文件大小排序
+        fileSizeComparator(size_FC);
+        // 设置文件名称排序
+        fileNameComparator(name_FC);
+        // 设置文件路径排序
+        fileNameComparator(path_FC);
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
@@ -629,8 +641,8 @@ public class FileChooserController extends ManuallyChangeThemeController {
             setDisableNodes();
             // 绑定表格数据
             autoBuildTableViewData(tableView_FC, FileVO.class, tabId, index_FC);
-            // 设置文件大小排序
-            fileSizeColum(size_FC);
+            // 设置列排序
+            columnComparator();
             // 构建右键菜单
             tableViewContextMenu(tableView_FC);
             // 给输入框添加内容变化监听

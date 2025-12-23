@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
@@ -970,11 +971,21 @@ public class TableViewUtils {
      *
      * @param sizeColumn 要进行文件大小排序的列
      */
-    public static void fileSizeColum(TableColumn<?, String> sizeColumn) {
+    public static void fileSizeComparator(TableColumn<?, String> sizeColumn) {
         // 自定义比较器
         Comparator<String> customComparator = Comparator.comparingDouble(FileUtils::fileSizeCompareValue);
         // 应用自定义比较器
         sizeColumn.setComparator(customComparator);
+    }
+
+    /**
+     * 文件名称排序
+     *
+     * @param nameColumn 要进行文件名称排序的列
+     */
+    public static void fileNameComparator(TableColumn<?, String> nameColumn) {
+        // 应用自定义比较器
+        nameColumn.setComparator(NATURAL_SORT);
     }
 
 }
