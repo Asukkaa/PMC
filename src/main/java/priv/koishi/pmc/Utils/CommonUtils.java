@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,8 @@ public class CommonUtils {
     /**
      * 自然排序比较器（数字按数值大小排序）
      */
-    public static final Comparator<String> NATURAL_SORT = Comparator
-            .comparing((String str) -> {
-                if (str == null) return "";
-                return str;
-            }, CommonUtils::naturalCompare);
+    public static final Comparator<String> NATURAL_SORT = Comparator.comparing((String str) ->
+            Objects.requireNonNullElse(str, ""), CommonUtils::naturalCompare);
 
     /**
      * 自然排序的核心比较方法
