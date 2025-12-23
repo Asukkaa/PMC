@@ -887,7 +887,8 @@ public class AutoClickService {
             }
             // 执行长按操作
             if (ClickTypeEnum.DRAG.ordinal() != clickType &&
-                    ClickTypeEnum.MOVE_TRAJECTORY.ordinal() != clickType) {
+                    ClickTypeEnum.MOVE_TRAJECTORY.ordinal() != clickType &&
+                    ClickTypeEnum.COMBINATIONS.ordinal() != clickType) {
                 // 处理随机点击时长偏移
                 if (activation.equals(clickPositionVO.getRandomClickTime())) {
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);

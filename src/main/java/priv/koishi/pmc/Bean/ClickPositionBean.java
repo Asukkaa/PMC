@@ -282,13 +282,14 @@ public class ClickPositionBean {
      * @param isDragging        是否是拖拽（true-拖拽，false-普通移动）
      * @param wheelRotation     滑轮滚动量
      */
-    public void addMovePoint(int x, int y, List<Integer> pressMouseKeys, List<Integer> pressKeyboardKeys, boolean isDragging, int wheelRotation) {
+    public void addMovePoint(int x, int y, List<Integer> pressMouseKeys, List<Integer> pressKeyboardKeys,
+                             boolean isDragging, int wheelRotation) {
         long timestamp = System.currentTimeMillis();
         if (!moveTrajectory.isEmpty()) {
             TrajectoryPointBean last = moveTrajectory.getLast();
             double distance = Math.sqrt(Math.pow(x - last.getX(), 2) + Math.pow(y - last.getY(), 2));
             // 最小像素距离阈值，拖拽记录结束时不校验
-            if (distance < 1 && (!isDragging || (pressMouseKeys != null && pressKeyboardKeys != null)) && wheelRotation == 0) {
+            if ((distance < 1 && isDragging) && (pressMouseKeys != null && pressKeyboardKeys != null) && wheelRotation == 0) {
                 return;
             }
         }
@@ -301,9 +302,9 @@ public class ClickPositionBean {
                 // 有滑轮事件时总是记录
                 || wheelRotation != 0) {
             TrajectoryPointBean trajectoryPointBean = new TrajectoryPointBean()
-                    .setWheelRotation(wheelRotation)
-                    .setPressMouseKeys(pressMouseKeys)
                     .setPressKeyboardKeys(pressKeyboardKeys)
+                    .setPressMouseKeys(pressMouseKeys)
+                    .setWheelRotation(wheelRotation)
                     .setTimestamp(timestamp)
                     .setX(x)
                     .setY(y);

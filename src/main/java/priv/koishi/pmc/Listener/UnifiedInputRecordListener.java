@@ -77,6 +77,9 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     private ClickPositionVO clickBean;
 
+    /**
+     * 正在记录鼠标移动轨迹
+     */
     private boolean hasPendingMoveTrajectory;
 
     /**
@@ -212,9 +215,18 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
                             .setMouseKeyEnum(pressButton);
+                } else {
+                    clickBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
                 }
                 // 记录按下的鼠标按键
                 pressMouseButtons.add(pressButton);
+                // 如果是组合按键的开始，记录轨迹点
+                if (clickBean != null) {
+                    // 创建轨迹点记录组合按键
+                    List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                    List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                    clickBean.addMovePoint(startX, startY, currentMouseButtons, currentKeyboardKeys, false, 0);
+                }
                 // 开始拖拽轨迹记录
                 if (callback.isRecordDrag()) {
                     addNativeListener(dragMotionListener);
@@ -230,19 +242,22 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeMouseReleased(NativeMouseEvent e) {
-        if (isRecording) {
+        if (isRecording && clickBean != null) {
             // 记录抬起的鼠标按键
             pressMouseButtons.remove(Integer.valueOf(e.getButton()));
             Point mousePoint = MousePositionListener.getMousePoint();
             int endX = (int) mousePoint.getX();
             int endY = (int) mousePoint.getY();
-            // 所有鼠标按键都抬起后停止拖拽轨迹记录
-            if (callback.isRecordMove() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
+            // 所有按键都抬起后停止拖拽轨迹记录
+            if (callback.isRecordDrag() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                 removeNativeListener(dragMotionListener);
                 // 拖拽结束时添加释放鼠标的坐标
-                if (clickBean != null) {
-                    clickBean.addMovePoint(endX, endY, null, null, true, 0);
-                }
+                clickBean.addMovePoint(endX, endY, null, null, true, 0);
+            } else {
+                // 创建轨迹点记录组合按键
+                List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                clickBean.addMovePoint(endX, endY, currentMouseButtons, currentKeyboardKeys, false, 0);
             }
             isFirstClick = false;
             // 记录移动轨迹
@@ -310,9 +325,18 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                             .setStartX(String.valueOf(startX))
                             .setStartY(String.valueOf(startY))
                             .setKeyboardKeyEnum(keyCode);
+                } else {
+                    clickBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
                 }
                 // 记录按下的按键
                 pressKeyboardKeys.add(keyCode);
+                // 如果是组合按键的开始，记录轨迹点
+                if (clickBean != null) {
+                    // 创建轨迹点记录组合按键
+                    List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                    List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                    clickBean.addMovePoint(startX, startY, currentMouseButtons, currentKeyboardKeys, false, 0);
+                }
                 // 开始拖拽轨迹记录
                 if (callback.isRecordDrag()) {
                     addNativeListener(dragMotionListener);
@@ -328,19 +352,22 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
-        if (isRecording) {
+        if (isRecording && clickBean != null) {
             // 记录抬起的键盘按键
             pressKeyboardKeys.remove(Integer.valueOf(e.getKeyCode()));
             Point mousePoint = MousePositionListener.getMousePoint();
             int endX = (int) mousePoint.getX();
             int endY = (int) mousePoint.getY();
-            // 记录移动轨迹
-            if (callback.isRecordMove() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
+            // 所有按键都抬起后停止记录
+            if (callback.isRecordDrag() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                 removeNativeListener(dragMotionListener);
                 // 拖拽结束时添加释放鼠标的坐标
-                if (clickBean != null && callback.isRecordDrag()) {
-                    clickBean.addMovePoint(endX, endY, null, null, true, 0);
-                }
+                clickBean.addMovePoint(endX, endY, null, null, true, 0);
+            } else {
+                // 创建轨迹点记录组合按键
+                List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                clickBean.addMovePoint(endX, endY, currentMouseButtons, currentKeyboardKeys, false, 0);
             }
             isFirstClick = false;
             // 记录移动轨迹
@@ -384,7 +411,11 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                     callback.stopWorkAll();
                     Platform.runLater(callback::showError);
                 } else {
-                    if (callback.isRecordMove() && isRecordingMoveTrajectory()) {
+                    if (clickBean != null) {
+                        List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                        List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                        clickBean.addMovePoint(x, y, currentMouseButtons, currentKeyboardKeys, false, wheelRotation);
+                    } else if (callback.isRecordMove() && isRecordingMoveTrajectory()) {
                         // 有移动轨迹时在轨迹点中记录滑轮事件
                         List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
                         movePoint.addMovePoint(x, y, null, currentKeyboardKeys, false, wheelRotation);

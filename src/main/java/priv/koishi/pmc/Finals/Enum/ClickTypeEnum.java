@@ -62,6 +62,11 @@ public enum ClickTypeEnum {
     /**
      * 键盘输入
      */
-    KEYBOARD
+    KEYBOARD,
+
+    /**
+     * 组合键输入
+     */
+    COMBINATIONS
 
 }

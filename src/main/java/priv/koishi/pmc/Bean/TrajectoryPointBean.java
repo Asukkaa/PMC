@@ -30,12 +30,12 @@ public class TrajectoryPointBean {
     /**
      * 轨迹点横坐标
      */
-    double x;
+    int x;
 
     /**
      * 轨迹点纵坐标
      */
-    double y;
+    int y;
 
     /**
      * 轨迹点相对横（X）坐标
@@ -67,7 +67,7 @@ public class TrajectoryPointBean {
      */
     public void updatePosition(WindowInfo windowInfo) {
         if (windowInfo != null) {
-            Map<String, String> relativePosition = calculateRelativePosition(windowInfo, (int) x, (int) y);
+            Map<String, String> relativePosition = calculateRelativePosition(windowInfo, x, y);
             relativeX = relativePosition.get(RelativeX);
             relativeY = relativePosition.get(RelativeY);
         }

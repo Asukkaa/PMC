@@ -3361,6 +3361,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 组合键输入
+     */
+    public static String clickType_combinations() {
+        return bundle.getString("clickType.combinations");
+    }
+
+    /**
      * 打开链接相关选项
      */
     public static final List<String> linkList = new ArrayList<>();
@@ -3396,7 +3403,8 @@ public class i18nFinal {
                 clickType_moveTo(),
                 clickType_wheelUp(),
                 clickType_wheelDown(),
-                clickType_keyboard());
+                clickType_keyboard(),
+                clickType_combinations());
         clickTypeList.clear();
         clickTypeList.addAll(linkList);
         clickTypeList.addAll(newList);
@@ -3423,6 +3431,7 @@ public class i18nFinal {
         clickTypeMap.put(ClickTypeEnum.WHEEL_UP.ordinal(), clickType_wheelUp());
         clickTypeMap.put(ClickTypeEnum.WHEEL_DOWN.ordinal(), clickType_wheelDown());
         clickTypeMap.put(ClickTypeEnum.KEYBOARD.ordinal(), clickType_keyboard());
+        clickTypeMap.put(ClickTypeEnum.COMBINATIONS.ordinal(), clickType_combinations());
     }
 
     /**
