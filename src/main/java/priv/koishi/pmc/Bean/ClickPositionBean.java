@@ -354,6 +354,7 @@ public class ClickPositionBean {
      *
      * @return 鼠标操作按键对应的文本
      */
+    @JsonIgnore
     public String getMouseKey() {
         return recordClickTypeMap.get(mouseKeyEnum);
     }
@@ -363,6 +364,7 @@ public class ClickPositionBean {
      *
      * @return 键盘操作按键对应的文本
      */
+    @JsonIgnore
     public String getKeyboardKey() {
         return NativeKeyEvent.getKeyText(keyboardKeyEnum);
     }

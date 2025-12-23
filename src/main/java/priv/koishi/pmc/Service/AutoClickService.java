@@ -1146,14 +1146,12 @@ public class AutoClickService {
                         });
                     }
                     if (CollectionUtils.isNotEmpty(nowPressKeyboardKeys)) {
-                        nowPressKeyboardKeys.forEach(button -> {
-                            robot.keyPress(NativeKeyToKeyCode.get(button));
-                        });
+                        nowPressKeyboardKeys.forEach(button ->
+                                robot.keyPress(NativeKeyToKeyCode.get(button)));
                     }
                     if (CollectionUtils.isNotEmpty(finalReleaseKeyboardKeys)) {
-                        finalReleaseKeyboardKeys.forEach(button -> {
-                            robot.keyRelease(NativeKeyToKeyCode.get(button));
-                        });
+                        finalReleaseKeyboardKeys.forEach(button ->
+                                robot.keyRelease(NativeKeyToKeyCode.get(button)));
                     }
                     robot.mouseMove(finalX, finalY);
                     robot.mouseWheel(wheelRotation);
