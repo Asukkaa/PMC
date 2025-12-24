@@ -262,7 +262,8 @@ public class ClickDetailController extends RootController {
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
             tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
-            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det;
+            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det,
+            inputKey_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -377,10 +378,12 @@ public class ClickDetailController extends RootController {
         clickType_Det.setValue(clickType);
         // 处理移动轨迹相关下拉框
         ObservableList<String> clickTypeItems = clickType_Det.getItems();
-        if (CollectionUtils.isEmpty(item.getMoveTrajectory())) {
+        if (!clickType_moveTrajectory().equals(clickType) &&
+                !clickType_drag().equals(clickType)) {
             clickTypeItems.remove(clickType_moveTrajectory());
             clickTypeItems.remove(clickType_drag());
-        } else if (clickType_drag().equals(clickType) || clickType_moveTrajectory().equals(clickType)) {
+        } else if (clickType_drag().equals(clickType) ||
+                clickType_moveTrajectory().equals(clickType)) {
             clickTypeItems.add(clickType);
             setNodeDisable(clickType_Det, true);
             setNodeDisable(mouseStartX_Det, true);
@@ -388,7 +391,10 @@ public class ClickDetailController extends RootController {
         }
         keyCode = item.getKeyboardKeyEnum();
         // 处理按键相关组件
-        if (keyCode != noKeyboard) {
+        if (clickType_combinations().equals(clickType)) {
+            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
+            clickKeyHBox_Det.setVisible(false);
+        } else if (keyCode != noKeyboard) {
             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
             clickKeyHBox_Det.setVisible(false);
         } else {
@@ -1176,7 +1182,7 @@ public class ClickDetailController extends RootController {
                             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, oldKeyText, oldKey != noKeyboard);
                             setKeyHBox_Det.setCursor(Cursor.HAND);
                             recordClicking = false;
-                            throw new RuntimeException(key + " 键与 PMC 快捷键配置冲突");
+                            throw new RuntimeException(key + text_keyConflict());
                         } else {
                             removeNativeListener(nativeKeyListener);
                             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
@@ -1535,7 +1541,12 @@ public class ClickDetailController extends RootController {
             randomClickInterval_Det.setVisible(true);
             pathTip_Det.setText("");
             resolution_Det.setVisible(true);
-            if (clickType_keyboard().equals(value)) {
+            if (clickType_combinations().equals(value)) {
+                inputKey_Det.setText(clickDetail_combinations());
+                keyboardHBox_Det.setVisible(true);
+                clickKeyHBox_Det.setVisible(false);
+            } else if (clickType_keyboard().equals(value)) {
+                inputKey_Det.setText(clickDetail_keyboard());
                 keyboardHBox_Det.setVisible(true);
                 clickKeyHBox_Det.setVisible(false);
             } else {

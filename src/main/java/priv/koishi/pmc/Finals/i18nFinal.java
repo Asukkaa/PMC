@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.Enum.ClickTypeEnum.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRecordClickTypeMap;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRunClickTypeMap;
@@ -1924,10 +1925,31 @@ public class i18nFinal {
     }
 
     /**
+     * @return 键与 PMC 快捷键配置冲突
+     */
+    public static String text_keyConflict() {
+        return bundle.getString("keyConflict");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
         return bundle.getString("clickDetail.title");
+    }
+
+    /**
+     * @return 键盘按键:
+     */
+    public static String clickDetail_keyboard() {
+        return bundle.getString("clickDetail.keyboard");
+    }
+
+    /**
+     * @return 组合按键:
+     */
+    public static String clickDetail_combinations() {
+        return bundle.getString("clickDetail.combinations");
     }
 
     /**
@@ -3420,18 +3442,18 @@ public class i18nFinal {
      */
     public static void updateClickTypeMap() {
         clickTypeMap.clear();
-        clickTypeMap.put(ClickTypeEnum.OPEN_FILE.ordinal(), clickType_openFile());
-        clickTypeMap.put(ClickTypeEnum.RUN_SCRIPT.ordinal(), clickType_runScript());
-        clickTypeMap.put(ClickTypeEnum.OPEN_URL.ordinal(), clickType_openUrl());
-        clickTypeMap.put(ClickTypeEnum.MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
-        clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
-        clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());
-        clickTypeMap.put(ClickTypeEnum.DRAG.ordinal(), clickType_drag());
-        clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
-        clickTypeMap.put(ClickTypeEnum.WHEEL_UP.ordinal(), clickType_wheelUp());
-        clickTypeMap.put(ClickTypeEnum.WHEEL_DOWN.ordinal(), clickType_wheelDown());
-        clickTypeMap.put(ClickTypeEnum.KEYBOARD.ordinal(), clickType_keyboard());
-        clickTypeMap.put(ClickTypeEnum.COMBINATIONS.ordinal(), clickType_combinations());
+        clickTypeMap.put(OPEN_FILE.ordinal(), clickType_openFile());
+        clickTypeMap.put(RUN_SCRIPT.ordinal(), clickType_runScript());
+        clickTypeMap.put(OPEN_URL.ordinal(), clickType_openUrl());
+        clickTypeMap.put(MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
+        clickTypeMap.put(MOVE.ordinal(), clickType_move());
+        clickTypeMap.put(CLICK.ordinal(), clickType_click());
+        clickTypeMap.put(DRAG.ordinal(), clickType_drag());
+        clickTypeMap.put(MOVETO.ordinal(), clickType_moveTo());
+        clickTypeMap.put(WHEEL_UP.ordinal(), clickType_wheelUp());
+        clickTypeMap.put(WHEEL_DOWN.ordinal(), clickType_wheelDown());
+        clickTypeMap.put(KEYBOARD.ordinal(), clickType_keyboard());
+        clickTypeMap.put(COMBINATIONS.ordinal(), clickType_combinations());
     }
 
     /**

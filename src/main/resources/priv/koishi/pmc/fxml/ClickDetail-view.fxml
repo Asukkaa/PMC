@@ -128,7 +128,7 @@
                                 </HBox>
 
                                 <HBox fx:id="keyboardHBox_Det" styleClass="hBox-veryShort" visible="false">
-                                    <Label text="%clickDetail.keyboard_Det"/>
+                                    <Label fx:id="inputKey_Det" text="%clickDetail.keyboard"/>
                                     <HBox fx:id="setKeyHBox_Det" prefWidth="200" style="-fx-cursor: hand"
                                           onMouseClicked="#handleMouseClick">
                                         <Label fx:id="keyboard_Det" textFill="red" text="%unSetKeyboard"/>

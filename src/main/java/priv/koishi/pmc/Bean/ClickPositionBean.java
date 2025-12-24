@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 import tools.jackson.databind.annotation.JsonSerialize;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -342,11 +342,40 @@ public class ClickPositionBean {
      *
      * @return 点击按键对应的文本
      */
-    @SuppressWarnings("unused")
     public String getClickKey() {
-        if (keyboardKeyEnum == noKeyboard) {
+        // 处理组合键的显示
+        if (clickTypeEnum == ClickTypeEnum.COMBINATIONS.ordinal()) {
+            String combinationsKeys;
+            if (CollectionUtils.isNotEmpty(moveTrajectory)) {
+                Set<String> keySet = new LinkedHashSet<>();
+                for (TrajectoryPointBean t : moveTrajectory) {
+                    List<Integer> pressMouseKeys = t.getPressMouseKeys();
+                    if (CollectionUtils.isNotEmpty(pressMouseKeys)) {
+                        for (Integer m : pressMouseKeys) {
+                            String s = recordClickTypeMap.get(m);
+                            if (StringUtils.isNoneBlank(s)) {
+                                keySet.add(s);
+                            }
+                        }
+                    }
+                    List<Integer> pressKeyboardKeys = t.getPressKeyboardKeys();
+                    if (CollectionUtils.isNotEmpty(pressKeyboardKeys)) {
+                        for (Integer k : pressKeyboardKeys) {
+                            String s = NativeKeyEvent.getKeyText(k);
+                            if (StringUtils.isNoneBlank(s)) {
+                                keySet.add(s);
+                            }
+                        }
+                    }
+                }
+                combinationsKeys = String.join(" ", keySet);
+                return combinationsKeys;
+            }
+            // 如果没有键盘按键则获取鼠标按键
+        } else if (keyboardKeyEnum == noKeyboard) {
             return getMouseKey();
         }
+        // 获取键盘按键
         return getKeyboardKey();
     }
 
