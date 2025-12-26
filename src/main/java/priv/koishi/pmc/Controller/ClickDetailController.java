@@ -37,8 +37,10 @@ import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Callback.InputRecordCallback;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
@@ -46,6 +48,7 @@ import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
+import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
 import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
@@ -58,6 +61,7 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
@@ -189,9 +193,19 @@ public class ClickDetailController extends RootController {
     private NativeKeyListener nativeKeyListener;
 
     /**
+     * 全局组合键监听器
+     */
+    private UnifiedInputRecordListener listener;
+
+    /**
      * 正在录制标识
      */
     public boolean recordClicking;
+
+    /**
+     * 组合键轨迹
+     */
+    private final List<TrajectoryPointBean> trajectory = new CopyOnWriteArrayList<>();
 
     /**
      * 键盘按键设置
@@ -392,6 +406,7 @@ public class ClickDetailController extends RootController {
         keyCode = item.getKeyboardKeyEnum();
         // 处理按键相关组件
         if (clickType_combinations().equals(clickType)) {
+            trajectory.addAll(item.getMoveTrajectory());
             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
             clickKeyHBox_Det.setVisible(false);
         } else if (keyCode != noKeyboard) {
@@ -1197,6 +1212,164 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 初始化统一输入录制监听器
+     *
+     * @return 统一输入录制监听器
+     */
+    private UnifiedInputRecordListener initUnifiedInputRecordListener() {
+        // 创建组合键监听器
+        return listener = new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
+
+            /**
+             * 用来临时保存组合键的临时操作步骤
+             */
+            private ClickPositionVO combinationBean;
+
+
+            @Override
+            public ClickPositionVO createDefaultClickPosition() {
+                combinationBean = new ClickPositionVO();
+                return combinationBean;
+            }
+
+            /**
+             * 添加操作步骤到操作列表
+             *
+             * @param events  操作步骤
+             * @param addType 添加方式
+             */
+            @Override
+            public void addEventsToTable(List<? extends ClickPositionVO> events, int addType) {
+                // 这里不添加到表格，只用于组合键监听
+                if (combinationBean != null) {
+                    // 所有按键松开，组合键录制完成
+                    handleCombinationComplete();
+                }
+                stopRecording();
+            }
+
+            /**
+             * 获取当前步骤数
+             *
+             * @return 临时步骤数
+             */
+            @Override
+            public int getCurrentStepCount() {
+                return -1;
+            }
+
+            /**
+             * 获取是否录制鼠标移动事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMove() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制鼠标拖拽事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordDrag() {
+                return false;
+            }
+
+            /**
+             * 更新滑轮记录信息
+             *
+             * @param wheelRotation 滑轮滚动方向
+             * @param wheelNum      滑轮滚动次数
+             */
+            @Override
+            public void onWheelRecorded(int wheelRotation, int wheelNum) {
+            }
+
+            /**
+             * 更新记录信息
+             *
+             * @param log 记录信息
+             */
+            @Override
+            public void updateRecordLog(String log) {
+            }
+
+            /**
+             * 停止所有任务
+             */
+            @Override
+            public void stopWorkAll() {
+                removeNativeListener(listener);
+                recordClicking = false;
+            }
+
+            /**
+             * 显示错误信息
+             */
+            @Override
+            public void showError() {
+            }
+
+            /**
+             * 处理组合键录制完成
+             */
+            private void handleCombinationComplete() {
+                if (combinationBean.getClickTypeEnum() == ClickTypeEnum.WHEEL_UP.ordinal()) {
+                    int wheelNum = Integer.parseInt(combinationBean.getClickNum());
+                    TrajectoryPointBean wheelBean = new TrajectoryPointBean()
+                            .setWheelRotation(-wheelNum);
+                    combinationBean.setMoveTrajectory(Collections.singletonList(wheelBean));
+                } else if (combinationBean.getClickTypeEnum() == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
+                    int wheelNum = Integer.parseInt(combinationBean.getClickNum());
+                    TrajectoryPointBean wheelBean = new TrajectoryPointBean()
+                            .setWheelRotation(wheelNum);
+                    combinationBean.setMoveTrajectory(Collections.singletonList(wheelBean));
+                }
+                combinationBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
+                trajectory.clear();
+                trajectory.addAll(combinationBean.getMoveTrajectory());
+                // 计算持续时间
+                if (CollectionUtils.isNotEmpty(trajectory)) {
+                    long firstTime = trajectory.getFirst().getTimestamp();
+                    long lastTime = trajectory.getLast().getTimestamp();
+                    long duration = lastTime - firstTime;
+                    timeClick_Det.setText(String.valueOf(duration));
+                }
+            }
+
+            /**
+             * 停止录制
+             */
+            private void stopRecording() {
+                removeNativeListener(listener);
+                recordClicking = false;
+                Platform.runLater(() -> {
+                    if (combinationBean != null) {
+                        updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, combinationBean.getClickKey(), true);
+                    }
+                });
+            }
+
+        });
+    }
+
+    /**
+     * 开启全局组合键监听
+     */
+    private void startNativeCombinationsListener() {
+        // 移除之前的监听器
+        removeNativeListener(listener);
+        listener = initUnifiedInputRecordListener();
+        // 注册监听器
+        addNativeListener(listener);
+        // 启动录制
+        listener.startRecording();
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -1297,6 +1470,14 @@ public class ClickDetailController extends RootController {
                     throw new RuntimeException(text_unSetKeyboard());
                 }
                 selectedItem.setKeyboardKeyEnum(keyCode);
+            } else if (clickType == ClickTypeEnum.COMBINATIONS.ordinal()) {
+                if (text_unSetKeyboard().equals(keyboard_Det.getText())) {
+                    throw new RuntimeException(text_unSetKeyboard());
+                }
+                int x = setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth);
+                int y = setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight);
+                trajectory.forEach(t -> t.setX(x).setY(y));
+                selectedItem.setMoveTrajectory(trajectory);
             }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                     clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
@@ -1545,13 +1726,18 @@ public class ClickDetailController extends RootController {
                 inputKey_Det.setText(clickDetail_combinations());
                 keyboardHBox_Det.setVisible(true);
                 clickKeyHBox_Det.setVisible(false);
+                setNodeDisable(timeClick_Det, true);
+                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
             } else if (clickType_keyboard().equals(value)) {
                 inputKey_Det.setText(clickDetail_keyboard());
                 keyboardHBox_Det.setVisible(true);
                 clickKeyHBox_Det.setVisible(false);
+                setNodeDisable(timeClick_Det, false);
+                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
             } else {
                 keyboardHBox_Det.setVisible(false);
                 clickKeyHBox_Det.setVisible(true);
+                setNodeDisable(timeClick_Det, false);
             }
         }
         ObservableList<String> clickItems = clickKey_Det.getItems();
@@ -1853,7 +2039,12 @@ public class ClickDetailController extends RootController {
             recordClicking = true;
             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_setKeyboard(), false);
             addToolTip(null, setKeyHBox_Det);
-            startNativeKeyListener();
+            String value = clickType_Det.getValue();
+            if (clickType_keyboard().equals(value)) {
+                startNativeKeyListener();
+            } else if (clickType_combinations().equals(value)) {
+                startNativeCombinationsListener();
+            }
         }
     }
 

@@ -94,8 +94,7 @@ import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
@@ -754,7 +753,7 @@ public class AutoClickController extends RootController implements MousePosition
             startNativeKeyListener();
             autoClickTask = autoClick(taskBean, new Robot());
             // 绑定带进度条的线程
-            bindingTaskNode(autoClickTask, taskBean);
+            bindingTaskNode(autoClickTask, taskBean, true);
             setTaskEvent(taskBean);
             if (runTimeline == null) {
                 // 获取准备时间值
@@ -1445,6 +1444,7 @@ public class AutoClickController extends RootController implements MousePosition
             /**
              * 显示错误信息
              */
+            @Override
             public void showError() {
                 Alert alert = creatErrorAlert(text_mouseWheelError());
                 alert.setTitle(text_mouseWheelErr());
@@ -1510,6 +1510,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param addType 添加方式
      */
     private void startUnifiedRecording(int addType) {
+        removeNativeListener(listener);
         listener = initUnifiedInputRecordListener(addType);
         // 读取设置页面设置的值
         getSetting();
@@ -1529,7 +1530,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 标记为正在录制
             recordClicking = true;
             // 改变要防重复点击的组件状态
-            changeDisableNodes(disableNodes, true);
+            changeNodesDisable(disableNodes, true);
             if (clickFloating.getConfig().getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
                 clickWindowMonitor.updateWindowInfo();
             }

@@ -69,7 +69,7 @@ public class ClickPositionBean {
     String useRelative = unActivation;
 
     /**
-     * 点击时长（单位：毫秒）
+     * 操作时长（单位：毫秒）
      */
     String clickTime;
 
@@ -366,6 +366,10 @@ public class ClickPositionBean {
                                 keySet.add(s);
                             }
                         }
+                    }
+                    int wheelRotation = t.getWheelRotation();
+                    if (wheelRotation != 0) {
+                        keySet.add(wheelRotation < 0 ? clickType_wheelUp() : clickType_wheelDown());
                     }
                 }
                 combinationsKeys = String.join(" ", keySet);

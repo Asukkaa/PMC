@@ -238,17 +238,17 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     /**
      * 监听鼠标松开
      *
-     * @param e 鼠标抬起事件
+     * @param e 鼠标松开事件
      */
     @Override
     public void nativeMouseReleased(NativeMouseEvent e) {
         if (isRecording && clickBean != null) {
-            // 记录抬起的鼠标按键
+            // 记录松开的鼠标按键
             pressMouseButtons.remove(Integer.valueOf(e.getButton()));
             Point mousePoint = MousePositionListener.getMousePoint();
             int endX = (int) mousePoint.getX();
             int endY = (int) mousePoint.getY();
-            // 所有按键都抬起后停止拖拽轨迹记录
+            // 所有按键都松开后停止拖拽轨迹记录
             if (callback.isRecordDrag() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                 removeNativeListener(dragMotionListener);
                 // 拖拽结束时添加释放鼠标的坐标
@@ -263,13 +263,13 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             // 记录移动轨迹
             if (callback.isRecordMove()) {
                 movePoint = callback.createDefaultClickPosition();
-                // 所有按键都抬起后开始移动轨迹记录
+                // 所有按键都松开后开始移动轨迹记录
                 if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                     startMoveTime = System.currentTimeMillis();
                     addNativeListener(moveMotionListener);
                 }
             }
-            // 只有在所有鼠标按键都抬起时才算一个完整的操作步骤
+            // 只有在所有鼠标按键都松开时才算一个完整的操作步骤
             if (pressMouseButtons.isEmpty() && pressKeyboardKeys.isEmpty()) {
                 releasedTime = System.currentTimeMillis();
                 // 计算点击持续时间（毫秒）
@@ -346,19 +346,19 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     }
 
     /**
-     * 键盘抬起监听器
+     * 键盘松开监听器
      *
-     * @param e 键盘抬起事件
+     * @param e 键盘松开事件
      */
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
         if (isRecording && clickBean != null) {
-            // 记录抬起的键盘按键
+            // 记录松开的键盘按键
             pressKeyboardKeys.remove(Integer.valueOf(e.getKeyCode()));
             Point mousePoint = MousePositionListener.getMousePoint();
             int endX = (int) mousePoint.getX();
             int endY = (int) mousePoint.getY();
-            // 所有按键都抬起后停止记录
+            // 所有按键都松开后停止记录
             if (callback.isRecordDrag() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                 removeNativeListener(dragMotionListener);
                 // 拖拽结束时添加释放鼠标的坐标
@@ -373,13 +373,13 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             // 记录移动轨迹
             if (callback.isRecordMove()) {
                 movePoint = callback.createDefaultClickPosition();
-                // 所有按键都抬起后开始移动轨迹记录
+                // 所有按键都松开后开始移动轨迹记录
                 if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                     startMoveTime = System.currentTimeMillis();
                     addNativeListener(moveMotionListener);
                 }
             }
-            // 只有在所有按键都抬起时才算一个完整的操作步骤
+            // 只有在所有按键都松开时才算一个完整的操作步骤
             if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
                 releasedTime = System.currentTimeMillis();
                 // 计算点击持续时间（毫秒）

@@ -1918,7 +1918,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 未设置键盘按键
+     * @return 未设置按键
      */
     public static String text_unSetKeyboard() {
         return bundle.getString("unSetKeyboard");

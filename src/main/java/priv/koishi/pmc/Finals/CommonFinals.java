@@ -36,7 +36,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.12.24";
+    public static final String buildDate = "2025.12.26";
 
     /**
      * 文件后缀名：bat
@@ -550,6 +550,11 @@ public class CommonFinals {
      * 向列表第一行上方插入
      */
     public static final int topAdd = 0;
+
+    /**
+     * 不添加新数据，用于组合键监听器获取组合键
+     */
+    public static final int noAdd = -99;
 
     /**
      * 更新窗口信息消息气泡显示事件（单位：秒）

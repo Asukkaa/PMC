@@ -58,7 +58,7 @@ public class TrajectoryPointBean {
     List<Integer> pressKeyboardKeys;
 
     /**
-     * 滑轮状态（正数上滑，负数下滑，0 为无滑动状态）
+     * 滑轮状态（负数上滑，正数下滑，0 为无滑动状态）
      */
     int wheelRotation;
 
