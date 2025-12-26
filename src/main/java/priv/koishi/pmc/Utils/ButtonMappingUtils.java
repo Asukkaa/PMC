@@ -20,6 +20,11 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 public class ButtonMappingUtils {
 
     /**
+     * 取消按键
+     */
+    public static int cancelKey = NativeKeyEvent.VC_ESCAPE;
+
+    /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）
      */
     public static final BidiMap<String, MouseButton> runClickTypeMap = new DualHashBidiMap<>();

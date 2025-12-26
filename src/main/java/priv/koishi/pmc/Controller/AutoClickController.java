@@ -90,6 +90,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParam
 import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.Service.PMCFileService.loadPMC;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -1332,7 +1333,7 @@ public class AutoClickController extends RootController implements MousePosition
                     // 仅在自动操作与录制情况下才监听键盘
                     if (recordClicking || runClicking) {
                         // 检测快捷键 esc
-                        if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                        if (e.getKeyCode() == cancelKey) {
                             stopAllWork();
                         }
                     }

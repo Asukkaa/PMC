@@ -42,6 +42,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.dpiScale;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.hideFloatingWindow;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
@@ -277,7 +278,7 @@ public class WindowMonitor {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
                 // 检测快捷键 esc
-                if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                if (e.getKeyCode() == cancelKey) {
                     // 检测是否正在查找窗口
                     if (findingWindow) {
                         // 停止记录鼠标点击监听器

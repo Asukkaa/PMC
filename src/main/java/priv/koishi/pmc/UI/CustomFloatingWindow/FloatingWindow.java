@@ -32,6 +32,7 @@ import java.util.Properties;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
@@ -658,7 +659,7 @@ public class FloatingWindow {
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
                     // 检测快捷键 esc
-                    if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+                    if (e.getKeyCode() == cancelKey) {
                         floatingWindows.forEach(floatingConfig -> {
                             Stage stage = floatingConfig.getStage();
                             if (stage != null && stage.isShowing()) {
