@@ -80,6 +80,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
@@ -985,7 +986,8 @@ public class ClickDetailController extends RootController {
         hideFloatingWindow(clickFloating, stopFloating, massageFloating);
         removeAll();
         removeAllListeners();
-        // 移除键盘监听器
+        // 移除全局输入监听器
+        removeNativeListener(listener);
         removeNativeListener(nativeKeyListener);
         if (windowMonitorClick != null) {
             windowMonitorClick.stopNativeKeyListener();
@@ -1179,9 +1181,34 @@ public class ClickDetailController extends RootController {
      * 开启全局键盘监听
      */
     private void startNativeKeyListener() {
+        removeNativeListener(listener);
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
-        nativeKeyListener = new NativeKeyListener() {
+        nativeKeyListener = intitNativeKeyListener();
+        addNativeListener(nativeKeyListener);
+    }
+
+    /**
+     * 开启全局组合键监听
+     */
+    private void startNativeCombinationsListener() {
+        // 移除之前的监听器
+        removeNativeListener(listener);
+        removeNativeListener(nativeKeyListener);
+        startNativeKeyListener();
+        listener = initUnifiedInputRecordListener();
+        // 注册监听器
+        addNativeListener(listener);
+        // 启动录制
+        listener.startRecording();
+    }
+
+    /**
+     * 初始化键盘输入监听器
+     */
+    private NativeKeyListener intitNativeKeyListener() {
+        // 创建键盘监听器
+        return new NativeKeyListener() {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
@@ -1189,16 +1216,15 @@ public class ClickDetailController extends RootController {
                     if (recordClicking) {
                         keyCode = e.getKeyCode();
                         String key = NativeKeyEvent.getKeyText(keyCode);
-                        int oldKey = selectedItem.getKeyboardKeyEnum();
-                        String oldKeyText = selectedItem.getClickKey();
                         // 检测快捷键 esc
-                        if (keyCode == NativeKeyEvent.VC_ESCAPE) {
+                        if (keyCode == cancelKey) {
+                            removeNativeListener(listener);
                             removeNativeListener(nativeKeyListener);
-                            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, oldKeyText, oldKey != noKeyboard);
+                            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
                             setKeyHBox_Det.setCursor(Cursor.HAND);
                             recordClicking = false;
                             throw new RuntimeException(key + text_keyConflict());
-                        } else {
+                        } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
                             removeNativeListener(nativeKeyListener);
                             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
                             setKeyHBox_Det.setCursor(Cursor.HAND);
@@ -1208,7 +1234,6 @@ public class ClickDetailController extends RootController {
                 });
             }
         };
-        addNativeListener(nativeKeyListener);
     }
 
     /**
@@ -1218,7 +1243,7 @@ public class ClickDetailController extends RootController {
      */
     private UnifiedInputRecordListener initUnifiedInputRecordListener() {
         // 创建组合键监听器
-        return listener = new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
+        return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
 
             /**
              * 用来临时保存组合键的临时操作步骤
@@ -1355,19 +1380,6 @@ public class ClickDetailController extends RootController {
             }
 
         });
-    }
-
-    /**
-     * 开启全局组合键监听
-     */
-    private void startNativeCombinationsListener() {
-        // 移除之前的监听器
-        removeNativeListener(listener);
-        listener = initUnifiedInputRecordListener();
-        // 注册监听器
-        addNativeListener(listener);
-        // 启动录制
-        listener.startRecording();
     }
 
     /**
