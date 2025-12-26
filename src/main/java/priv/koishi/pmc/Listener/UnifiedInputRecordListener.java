@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static priv.koishi.pmc.Finals.CommonFinals.noAdd;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 
@@ -220,6 +222,9 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 }
                 // 记录按下的鼠标按键
                 pressMouseButtons.add(pressButton);
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + recordClickTypeMap.get(pressButton) + " " + log_press();
+                Platform.runLater(() -> callback.updateRecordLog(log));
                 // 如果是组合按键的开始，记录轨迹点
                 if (clickBean != null) {
                     // 创建轨迹点记录组合按键
@@ -330,6 +335,9 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 }
                 // 记录按下的按键
                 pressKeyboardKeys.add(keyCode);
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + NativeKeyEvent.getKeyText(keyCode) + " " + log_press();
+                Platform.runLater(() -> callback.updateRecordLog(log));
                 // 如果是组合按键的开始，记录轨迹点
                 if (clickBean != null) {
                     // 创建轨迹点记录组合按键
@@ -411,6 +419,9 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                     callback.stopWorkAll();
                     Platform.runLater(callback::showError);
                 } else {
+                    String log = text_cancelTask() + text_recordClicking() + "\n" +
+                            text_recorded() + (wheelRotation < 0 ? clickType_wheelUp() : clickType_wheelDown());
+                    Platform.runLater(() -> callback.updateRecordLog(log));
                     if (clickBean != null) {
                         List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
                         List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
@@ -526,9 +537,11 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
             callback.addEventsToTable(events, addType);
-            String log = text_cancelTask() + text_recordClicking() + "\n" +
-                    text_recorded() + clickBean.getMouseKey() + text_click() + " X：" + endX + " Y：" + endY;
-            callback.updateRecordLog(log);
+            if (addType != noAdd) {
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + clickBean.getMouseKey() + text_click() + " X：" + endX + " Y：" + endY;
+                callback.updateRecordLog(log);
+            }
         });
     }
 
@@ -542,9 +555,11 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
             callback.addEventsToTable(events, addType);
-            String log = text_cancelTask() + text_recordClicking() + "\n" +
-                    text_recorded() + clickType_keyboard() + " " + event.getKeyboardKey();
-            callback.updateRecordLog(log);
+            if (addType != noAdd) {
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + clickType_keyboard() + " " + event.getKeyboardKey();
+                callback.updateRecordLog(log);
+            }
         });
     }
 
@@ -571,9 +586,11 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
             callback.addEventsToTable(events, addType);
-            String log = text_cancelTask() + text_recordClicking() + "\n" +
-                    text_recorded() + autoClick_mouseTrajectory();
-            callback.updateRecordLog(log);
+            if (addType != noAdd) {
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + autoClick_mouseTrajectory();
+                callback.updateRecordLog(log);
+            }
         });
     }
 

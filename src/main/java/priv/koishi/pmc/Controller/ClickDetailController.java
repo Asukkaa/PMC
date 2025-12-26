@@ -1295,6 +1295,7 @@ public class ClickDetailController extends RootController {
              */
             @Override
             public void updateRecordLog(String log) {
+                keyboard_Det.setText(log.substring(log.lastIndexOf("\n") + 1));
             }
 
             /**
