@@ -261,7 +261,37 @@ public class NodeDisableUtils {
     }
 
     /**
-     * 改变要防重复点击的组件状态
+     * 改变要防重复点击的组件状态（JavaFX 原生不可点击）
+     *
+     * @param taskBean 包含防重复点击组件列表的 taskBean
+     * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
+     */
+    public static void changeNodesDisable(TaskBean<?> taskBean, boolean disable) {
+        List<Node> disableNodes = taskBean.getDisableNodes();
+        changeNodesDisable(disableNodes, disable);
+    }
+
+    /**
+     * 改变要防重复点击的组件状态（JavaFX 原生不可点击）
+     *
+     * @param disableNodes 防重复点击组件列表
+     * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
+     */
+    public static void changeNodesDisable(List<? extends Node> disableNodes, boolean disable) {
+        if (CollectionUtils.isNotEmpty(disableNodes)) {
+            disableNodes.forEach(dc -> {
+                if (dc != null) {
+                    dc.setDisable(disable);
+                    if (!disable) {
+                        setNodeDisable(dc, disable);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 改变要防重复点击的组件状态（自定义不可点击）
      *
      * @param taskBean 包含防重复点击组件列表的 taskBean
      * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
@@ -272,7 +302,7 @@ public class NodeDisableUtils {
     }
 
     /**
-     * 改变要防重复点击的组件状态
+     * 改变要防重复点击的组件状态（自定义不可点击）
      *
      * @param disableNodes 防重复点击组件列表
      * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
@@ -282,6 +312,9 @@ public class NodeDisableUtils {
             disableNodes.forEach(dc -> {
                 if (dc != null) {
                     setNodeDisable(dc, disable);
+                    if (!disable) {
+                        dc.setDisable(disable);
+                    }
                 }
             });
         }

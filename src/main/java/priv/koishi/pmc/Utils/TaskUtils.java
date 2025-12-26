@@ -8,6 +8,7 @@ import priv.koishi.pmc.Bean.TaskBean;
 
 import static priv.koishi.pmc.Finals.i18nFinal.text_taskFailed;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.changeNodesDisable;
 import static priv.koishi.pmc.Utils.UiUtils.showErrLabelText;
 import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
 
@@ -27,8 +28,31 @@ public class TaskUtils {
      * @param taskBean 绑定线程任务所需参数
      */
     public static void bindingTaskNode(Task<?> task, TaskBean<?> taskBean) {
-        // 设置防重复点击按钮不可点击限制
-        changeDisableNodes(taskBean, true);
+        bindingTaskNode(task, taskBean, false);
+    }
+
+    /**
+     * 绑定带进度条的线程
+     *
+     * @param task     要绑定的线程任务
+     * @param taskBean 绑定线程任务所需参数
+     */
+    public static void bindingTaskNode(Task<?> task, TaskBean<?> taskBean, boolean disable) {
+        if (disable) {
+            changeNodesDisable(taskBean, true);
+        } else {
+            changeDisableNodes(taskBean, true);
+        }
+        bindingTaskNodes(task, taskBean);
+    }
+
+    /**
+     * 绑定带进度条的线程
+     *
+     * @param task     要绑定的线程任务
+     * @param taskBean 绑定线程任务所需参数
+     */
+    public static void bindingTaskNodes(Task<?> task, TaskBean<?> taskBean) {
         ProgressBar progressBar = taskBean.getProgressBar();
         if (progressBar != null) {
             // 绑定进度条的值属性
