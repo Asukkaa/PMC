@@ -283,7 +283,7 @@ public class NodeDisableUtils {
                 if (dc != null) {
                     dc.setDisable(disable);
                     if (!disable) {
-                        setNodeDisable(dc, disable);
+                        setNodeDisable(dc, false);
                     }
                 }
             });
@@ -313,7 +313,7 @@ public class NodeDisableUtils {
                 if (dc != null) {
                     setNodeDisable(dc, disable);
                     if (!disable) {
-                        dc.setDisable(disable);
+                        dc.setDisable(false);
                     }
                 }
             });
