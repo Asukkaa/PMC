@@ -1233,13 +1233,13 @@ public class ClickDetailController extends RootController {
             }
 
             /**
-             * 添加操作步骤到操作列表
+             * 保存操作步骤
              *
              * @param events  操作步骤
              * @param addType 添加方式
              */
             @Override
-            public void addEventsToTable(List<? extends ClickPositionVO> events, int addType) {
+            public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
                 // 这里不添加到表格，只用于组合键监听
                 if (combinationBean != null) {
                     // 所有按键松开，组合键录制完成

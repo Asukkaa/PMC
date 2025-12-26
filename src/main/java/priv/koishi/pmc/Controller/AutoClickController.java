@@ -1413,7 +1413,7 @@ public class AutoClickController extends RootController implements MousePosition
              * @param addType 添加方式
              */
             @Override
-            public void addEventsToTable(List<? extends ClickPositionVO> events, int addType) {
+            public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
                 addData(events, addType, tableView_Click, dataNumber_Click, unit_process());
             }
 

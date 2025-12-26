@@ -14,12 +14,12 @@ import java.util.List;
 public interface InputRecordCallback {
 
     /**
-     * 添加操作步骤到操作列表
+     * 保存操作步骤
      *
      * @param events  操作步骤
      * @param addType 添加方式
      */
-    void addEventsToTable(List<? extends ClickPositionVO> events, int addType);
+    void saveAddEvents(List<? extends ClickPositionVO> events, int addType);
 
     /**
      * 更新记录信息

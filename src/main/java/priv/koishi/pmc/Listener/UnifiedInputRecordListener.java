@@ -282,8 +282,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 // 设置点击持续时间
                 clickBean.setClickTime(String.valueOf(duration))
                         .updateRelativePosition();
-                // 添加到表格
-                addMouseEventToTable(clickBean, endX, endY);
+                // 保存操作步骤
+                saveMouseEvent(clickBean, endX, endY);
             }
         }
     }
@@ -395,7 +395,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 // 设置点击持续时间
                 clickBean.setClickTime(String.valueOf(duration))
                         .updateRelativePosition();
-                addKeyEventToTable(clickBean);
+                saveKeyEvent(clickBean);
             }
         }
     }
@@ -453,8 +453,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                                 .setClickTypeEnum(clickType)
                                 .setClickTime("0")
                                 .updateRelativePosition();
-                        // 添加至表格
-                        addWheelEventToTable(wheelBean);
+                        // 保存操作步骤
+                        saveWheelEvent(wheelBean);
                     }
                     releasedTime = System.currentTimeMillis();
                     startMoveTime = System.currentTimeMillis();
@@ -519,24 +519,24 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                     .setStartX(String.valueOf(startX))
                     .setStartY(String.valueOf(startY))
                     .updateRelativePosition();
-            // 添加到表格
-            addTrajectoryEventToTable(movePoint);
+            // 保存操作步骤
+            saveTrajectoryEvent(movePoint);
             hasPendingMoveTrajectory = false;
         }
     }
 
     /**
-     * 添加鼠标点击步骤到表格
+     * 保存鼠标点击步骤
      *
      * @param event 鼠标点击步骤
      * @param endX  终点横坐标
      * @param endY  终点纵坐标
      */
-    private void addMouseEventToTable(ClickPositionVO event, int endX, int endY) {
+    private void saveMouseEvent(ClickPositionVO event, int endX, int endY) {
         Platform.runLater(() -> {
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
-            callback.addEventsToTable(events, addType);
+            callback.saveAddEvents(events, addType);
             if (addType != noAdd) {
                 String log = text_cancelTask() + text_recordClicking() + "\n" +
                         text_recorded() + clickBean.getMouseKey() + text_click() + " X：" + endX + " Y：" + endY;
@@ -546,15 +546,15 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     }
 
     /**
-     * 添加键盘点击步骤到表格
+     * 保存键盘点击步骤
      *
      * @param event 键盘点击步骤
      */
-    private void addKeyEventToTable(ClickPositionVO event) {
+    private void saveKeyEvent(ClickPositionVO event) {
         Platform.runLater(() -> {
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
-            callback.addEventsToTable(events, addType);
+            callback.saveAddEvents(events, addType);
             if (addType != noAdd) {
                 String log = text_cancelTask() + text_recordClicking() + "\n" +
                         text_recorded() + clickType_keyboard() + " " + event.getKeyboardKey();
@@ -564,28 +564,28 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     }
 
     /**
-     * 添加滑轮滚动步骤到表格
+     * 保存滑轮滚动步骤
      *
      * @param event 滑轮滚动步骤
      */
-    private void addWheelEventToTable(ClickPositionVO event) {
+    private void saveWheelEvent(ClickPositionVO event) {
         Platform.runLater(() -> {
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
-            callback.addEventsToTable(events, addType);
+            callback.saveAddEvents(events, addType);
         });
     }
 
     /**
-     * 添加轨迹步骤到表格
+     * 保存轨迹步骤到
      *
      * @param event 轨迹步骤
      */
-    private void addTrajectoryEventToTable(ClickPositionVO event) {
+    private void saveTrajectoryEvent(ClickPositionVO event) {
         Platform.runLater(() -> {
             List<ClickPositionVO> events = new ArrayList<>();
             events.add(event);
-            callback.addEventsToTable(events, addType);
+            callback.saveAddEvents(events, addType);
             if (addType != noAdd) {
                 String log = text_cancelTask() + text_recordClicking() + "\n" +
                         text_recorded() + autoClick_mouseTrajectory();
