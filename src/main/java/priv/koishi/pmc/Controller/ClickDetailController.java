@@ -66,6 +66,7 @@ import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
@@ -982,6 +983,7 @@ public class ClickDetailController extends RootController {
      * 关闭页面
      */
     private void closeStage() {
+        autoClickController.detailStage = null;
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
         hideFloatingWindow(clickFloating, stopFloating, massageFloating);
         removeAll();

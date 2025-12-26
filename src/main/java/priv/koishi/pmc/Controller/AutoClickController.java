@@ -336,6 +336,16 @@ public class AutoClickController extends RootController implements MousePosition
      */
     public static final ObjectProperty<Color> recordTextColorProperty = new SimpleObjectProperty<>(Color.BLUE);
 
+    /**
+     * 详情页舞台
+     */
+    public Stage detailStage;
+
+    /**
+     * 详情页窗口标题
+     */
+    private String detailTitle;
+
     @FXML
     public AnchorPane anchorPane_Click;
 
@@ -676,11 +686,12 @@ public class AutoClickController extends RootController implements MousePosition
             // 更新列表数量
             updateTableViewSizeText(tableView_Click, dataNumber_Click, unit_process());
         });
-        Stage detailStage = new Stage();
+        detailStage = new Stage();
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         String title = item.getName() == null ? "" : item.getName();
-        detailStage.setTitle(title + clickDetail_title());
+        detailTitle = title + clickDetail_title();
+        detailStage.setTitle(detailTitle);
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化
@@ -1329,6 +1340,9 @@ public class AutoClickController extends RootController implements MousePosition
                 mousePosition_Click.setText(text);
                 if (titleCoordinateSet != null && titleCoordinateSet.isSelected()) {
                     mainStage.setTitle(appName + " - " + text);
+                    if (detailStage != null && detailStage.isShowing()) {
+                        detailStage.setTitle(detailTitle + " - " + text);
+                    }
                 } else {
                     mainStage.setTitle(appName);
                 }
