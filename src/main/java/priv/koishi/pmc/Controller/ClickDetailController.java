@@ -1340,6 +1340,36 @@ public class ClickDetailController extends RootController {
             }
 
             /**
+             * 获取是否录制鼠标滚轮事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordMouseWheel() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制键盘事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordKeyboard() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制鼠标点击事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordMouseClick() {
+                return true;
+            }
+
+            /**
              * 处理组合键录制完成
              */
             private void handleCombinationComplete() {

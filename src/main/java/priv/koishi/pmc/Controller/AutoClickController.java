@@ -237,6 +237,21 @@ public class AutoClickController extends RootController implements MousePosition
     private boolean recordDrag;
 
     /**
+     * 录制时记录鼠标滑轮事件
+     */
+    private boolean recordMouseWheel;
+
+    /**
+     * 录制时记录键盘事件
+     */
+    private boolean recordKeyboard;
+
+    /**
+     * 录制时记录鼠标点击事件
+     */
+    private boolean recordMouseClick;
+
+    /**
      * 要防重复点击的组件
      */
     public final List<Node> disableNodes = new ArrayList<>();
@@ -529,6 +544,12 @@ public class AutoClickController extends RootController implements MousePosition
         randomWaitTime = randomWaitTimeCheckBox.isSelected() ? activation : unActivation;
         CheckBox randomClickIntervalCheckBox = settingController.randomClickInterval_Set;
         randomClickInterval = randomClickIntervalCheckBox.isSelected() ? activation : unActivation;
+        CheckBox recordMouseWheelCheckBox = settingController.recordMouseWheel_Set;
+        recordMouseWheel = recordMouseWheelCheckBox.isSelected();
+        CheckBox recordKeyboardCheckBox = settingController.recordKeyboard_Set;
+        recordKeyboard = recordKeyboardCheckBox.isSelected();
+        CheckBox recordMouseClickCheckBox = settingController.recordMouseClick_Set;
+        recordMouseClick = recordMouseClickCheckBox.isSelected();
     }
 
     /**
@@ -1502,6 +1523,36 @@ public class AutoClickController extends RootController implements MousePosition
             @Override
             public void stopWorkAll() {
                 stopAllWork();
+            }
+
+            /**
+             * 获取是否录制鼠标滚轮事件
+             *
+             * @return true-记录
+             */
+            @Override
+            public boolean isRecordMouseWheel() {
+                return recordMouseWheel;
+            }
+
+            /**
+             * 获取是否录制键盘事件
+             *
+             * @return true-记录
+             */
+            @Override
+            public boolean isRecordKeyboard() {
+                return recordKeyboard;
+            }
+
+            /**
+             * 获取是否录制鼠标点击事件
+             *
+             * @return true-记录
+             */
+            @Override
+            public boolean isRecordMouseClick() {
+                return recordMouseClick;
             }
 
         });

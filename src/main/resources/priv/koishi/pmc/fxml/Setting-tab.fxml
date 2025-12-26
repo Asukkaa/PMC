@@ -224,14 +224,31 @@
 
         <HBox spacing="10">
             <HBox styleClass="hBox-short">
-                <Label text="%setting.clickTimeOffset"/>
-                <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
-                <Label text="%unit.ms"/>
+                <CheckBox fx:id="recordMouseWheel_Set" onAction="#recordMouseWheel" styleClass="checkBox-medium"
+                          text="%setting.recordMouseWheel"/>
+            </HBox>
+
+            <HBox styleClass="hBox-short">
+                <CheckBox fx:id="recordKeyboard_Set" onAction="#recordKeyboard" styleClass="checkBox-medium"
+                          text="%setting.recordKeyboard"/>
+            </HBox>
+
+            <HBox styleClass="hBox-short">
+                <CheckBox fx:id="recordMouseClick_Set" onAction="#recordMouseClick" styleClass="checkBox-medium"
+                          text="%setting.recordMouseClick"/>
             </HBox>
 
             <HBox styleClass="hBox-short">
                 <CheckBox fx:id="useRelatively_Set" onAction="#useRelatively" styleClass="checkBox-medium"
                           text="%useRelatively"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox styleClass="hBox-short">
+                <Label text="%setting.clickTimeOffset"/>
+                <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
+                <Label text="%unit.ms"/>
             </HBox>
         </HBox>
 

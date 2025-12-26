@@ -184,7 +184,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeMousePressed(NativeMouseEvent e) {
-        if (isRecording) {
+        if (isRecording && callback.isRecordMouseClick()) {
             int pressButton = e.getButton();
             // 避免重复记录（如果按键已经按下）
             if (!pressMouseButtons.contains(pressButton)) {
@@ -247,7 +247,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeMouseReleased(NativeMouseEvent e) {
-        if (isRecording && clickBean != null) {
+        if (isRecording && clickBean != null && callback.isRecordMouseClick()) {
             // 记录松开的鼠标按键
             pressMouseButtons.remove(Integer.valueOf(e.getButton()));
             Point mousePoint = MousePositionListener.getMousePoint();
@@ -295,7 +295,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeKeyPressed(NativeKeyEvent e) {
-        if (isRecording) {
+        if (isRecording && callback.isRecordKeyboard()) {
             int keyCode = e.getKeyCode();
             // 避免重复记录（如果按键已经按下）
             if (!pressKeyboardKeys.contains(keyCode)) {
@@ -360,7 +360,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
-        if (isRecording && clickBean != null) {
+        if (isRecording && clickBean != null && callback.isRecordKeyboard()) {
             // 记录松开的键盘按键
             pressKeyboardKeys.remove(Integer.valueOf(e.getKeyCode()));
             Point mousePoint = MousePositionListener.getMousePoint();
@@ -407,7 +407,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
      */
     @Override
     public void nativeMouseWheelMoved(NativeMouseWheelEvent e) {
-        if (isRecording) {
+        if (isRecording && callback.isRecordMouseWheel()) {
             // 只记录垂直方向滑动
             if (e.getWheelDirection() == NativeMouseWheelEvent.WHEEL_VERTICAL_DIRECTION) {
                 Point mousePoint = MousePositionListener.getMousePoint();

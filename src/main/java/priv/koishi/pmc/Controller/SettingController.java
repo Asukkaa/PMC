@@ -175,7 +175,8 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
-            openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set;
+            openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set,
+            recordMouseClick_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -410,6 +411,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
         setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, unActivation);
         setControlLastConfig(useRelatively_Set, prop, key_useRelatively, unActivation);
+        setControlLastConfig(recordKeyboard_Set, prop, key_recordKeyboard, activation);
         setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, unActivation);
         setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
@@ -418,6 +420,8 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, activation);
         setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, activation);
         setControlLastConfig(titleCoordinate_Set, prop, key_titleCoordinate, activation);
+        setControlLastConfig(recordMouseWheel_Set, prop, key_recordMouseWheel, activation);
+        setControlLastConfig(recordMouseClick_Set, prop, key_recordMouseClick, activation);
         setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, unActivation);
         setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, activation);
         setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, activation);
@@ -559,7 +563,8 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(stopOpacity_Set, tip_stopOpacity(), String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
         addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set, imgLog_Set,
-                openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set);
+                openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set,
+                recordMouseWheel_Set, recordKeyboard_Set, recordMouseClick_Set);
     }
 
     /**
@@ -1434,6 +1439,36 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void keyboardLog() throws IOException {
         setLoadLastConfigCheckBox(keyboardLog_Set, configFile_Click, key_keyboardLog);
+    }
+
+    /**
+     * 录制时记录键盘事件开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void recordKeyboard() throws IOException {
+        setLoadLastConfigCheckBox(recordKeyboard_Set, configFile_Click, key_recordKeyboard);
+    }
+
+    /**
+     * 录制时记录鼠标滑轮事件开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void recordMouseWheel() throws IOException {
+        setLoadLastConfigCheckBox(recordMouseWheel_Set, configFile_Click, key_recordMouseWheel);
+    }
+
+    /**
+     * 录制时记录鼠标点击事件开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void recordMouseClick() throws IOException {
+        setLoadLastConfigCheckBox(recordMouseClick_Set, configFile_Click, key_recordMouseClick);
     }
 
     /**

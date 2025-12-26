@@ -74,4 +74,25 @@ public interface InputRecordCallback {
      */
     void showError();
 
+    /**
+     * 获取是否录制鼠标滚轮事件
+     *
+     * @return true-记录
+     */
+    boolean isRecordMouseWheel();
+
+    /**
+     * 获取是否录制键盘事件
+     *
+     * @return true-记录
+     */
+    boolean isRecordKeyboard();
+
+    /**
+     * 获取是否录制鼠标点击事件
+     *
+     * @return true-记录
+     */
+    boolean isRecordMouseClick();
+
 }
