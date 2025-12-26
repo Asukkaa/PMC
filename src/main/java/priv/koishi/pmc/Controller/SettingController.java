@@ -175,7 +175,7 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
-            openUrlLog_Set, mouseWheelLog_Set;
+            openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -398,6 +398,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(openUrlLog_Set, prop, key_openUrlLog, activation);
         setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
         setControlLastConfig(openFileLog_Set, prop, key_openFileLog, activation);
+        setControlLastConfig(keyboardLog_Set, prop, key_keyboardLog, activation);
         setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, activation);
         setControlLastConfig(randomClick_Set, prop, key_randomClick, unActivation);
         setControlLastConfig(floatingDistance_Set, prop, key_margin, defaultMargin);
@@ -557,8 +558,8 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(colorPicker_Set.getValue()));
         addValueToolTip(stopOpacity_Set, tip_stopOpacity(), String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
-        addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set,
-                imgLog_Set, openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set);
+        addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set, imgLog_Set,
+                openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set);
     }
 
     /**
@@ -1423,6 +1424,16 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void useRelatively() throws IOException {
         setLoadLastConfigCheckBox(useRelatively_Set, configFile_Click, key_useRelatively);
+    }
+
+    /**
+     * 运行自动流程时记录键盘事件开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void keyboardLog() throws IOException {
+        setLoadLastConfigCheckBox(keyboardLog_Set, configFile_Click, key_keyboardLog);
     }
 
     /**

@@ -845,20 +845,21 @@ public class AutoClickController extends RootController implements MousePosition
      * @param loopTimes        循环次数
      */
     private AutoClickTaskBean buildAutoClickTaskBean(List<ClickPositionVO> clickPositionVOS, int loopTimes) {
-        CheckBox firstClick = settingController.firstClick_Set;
         TextField retrySecond = settingController.retrySecond_Set;
-        TextField overTime = settingController.overtime_Set;
         TextField maxLogNum = settingController.maxLogNum_Set;
+        TextField overTime = settingController.overtime_Set;
+        CheckBox mouseWheelLog = settingController.mouseWheelLog_Set;
+        CheckBox runScriptLog = settingController.runScriptLog_Set;
+        CheckBox keyboardLog = settingController.keyboardLog_Set;
+        CheckBox clickImgLog = settingController.clickImgLog_Set;
+        CheckBox openFileLog = settingController.openFileLog_Set;
+        CheckBox stopImgLog = settingController.stopImgLog_Set;
+        CheckBox firstClick = settingController.firstClick_Set;
+        CheckBox openUrlLog = settingController.openUrlLog_Set;
         CheckBox clickLog = settingController.clickLog_Set;
         CheckBox moveLog = settingController.moveLog_Set;
         CheckBox dragLog = settingController.dragLog_Set;
-        CheckBox clickImgLog = settingController.clickImgLog_Set;
-        CheckBox stopImgLog = settingController.stopImgLog_Set;
         CheckBox waitLog = settingController.waitLog_Set;
-        CheckBox openFileLog = settingController.openFileLog_Set;
-        CheckBox openUrlLog = settingController.openUrlLog_Set;
-        CheckBox runScriptLog = settingController.runScriptLog_Set;
-        CheckBox mouseWheelLog = settingController.mouseWheelLog_Set;
         AutoClickTaskBean taskBean = new AutoClickTaskBean();
         taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                 .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
@@ -867,6 +868,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setRunScriptLog(runScriptLog.isSelected())
                 .setOpenFileLog(openFileLog.isSelected())
                 .setClickImgLog(clickImgLog.isSelected())
+                .setKeyboardLog(keyboardLog.isSelected())
                 .setOpenUrlLog(openUrlLog.isSelected())
                 .setStopImgLog(stopImgLog.isSelected())
                 .setFirstClick(firstClick.isSelected())

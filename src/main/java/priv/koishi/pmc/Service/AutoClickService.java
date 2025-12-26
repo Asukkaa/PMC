@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Service;
 
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -795,6 +796,7 @@ public class AutoClickService {
             MouseButton mouseButton = NativeMouseToMouseButton.get(clickPositionVO.getMouseKeyEnum());
             int keyCode = clickPositionVO.getKeyboardKeyEnum();
             String clickKey = clickPositionVO.getMouseKey();
+            String keyboard = clickPositionVO.getKeyboardKey();
             // 处理随机坐标偏移量
             if (activation.equals(clickPositionVO.getRandomClick())) {
                 int randomX = Integer.parseInt(clickPositionVO.getRandomX());
@@ -874,6 +876,15 @@ public class AutoClickService {
                     }
                 } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
                     robot.keyPress(NativeKeyToKeyCode.get(keyCode));
+                    if (taskBean.isKeyboardLog()) {
+                        ClickLogBean keyPressLog = new ClickLogBean();
+                        keyPressLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setClickKey(keyboard)
+                                .setType(log_press())
+                                .setName(name);
+                        dynamicQueue.add(keyPressLog);
+                    }
                 }
                 actionFuture.complete(null);
             });
@@ -910,6 +921,15 @@ public class AutoClickService {
                             .setType(log_hold())
                             .setName(name);
                     dynamicQueue.add(clickLog);
+                } else if (taskBean.isKeyboardLog() && ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                    ClickLogBean clickLog = new ClickLogBean();
+                    clickLog.setClickTime(String.valueOf(clickTime))
+                            .setX(String.valueOf((int) finalStartX))
+                            .setY(String.valueOf((int) finalStartY))
+                            .setClickKey(keyboard)
+                            .setType(log_hold())
+                            .setName(name);
+                    dynamicQueue.add(clickLog);
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
@@ -926,6 +946,15 @@ public class AutoClickService {
                         }
                     } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
                         robot.keyRelease(NativeKeyToKeyCode.get(keyCode));
+                        if (taskBean.isKeyboardLog()) {
+                            ClickLogBean releaseLog = new ClickLogBean();
+                            releaseLog.setX(String.valueOf((int) finalStartX))
+                                    .setY(String.valueOf((int) finalStartY))
+                                    .setType(log_release())
+                                    .setClickKey(keyboard)
+                                    .setName(name);
+                            dynamicQueue.add(releaseLog);
+                        }
                     }
                     releaseFuture.complete(null);
                 });
@@ -1147,12 +1176,32 @@ public class AutoClickService {
                         });
                     }
                     if (CollectionUtils.isNotEmpty(nowPressKeyboardKeys)) {
-                        nowPressKeyboardKeys.forEach(button ->
-                                robot.keyPress(NativeKeyToKeyCode.get(button)));
+                        nowPressKeyboardKeys.forEach(button -> {
+                            robot.keyPress(NativeKeyToKeyCode.get(button));
+                            if (taskBean.isKeyboardLog()) {
+                                ClickLogBean pressLog = new ClickLogBean();
+                                pressLog.setClickKey(NativeKeyEvent.getKeyText(button))
+                                        .setX(String.valueOf((int) finalX))
+                                        .setY(String.valueOf((int) finalY))
+                                        .setType(log_press())
+                                        .setName(name);
+                                dynamicQueue.add(pressLog);
+                            }
+                        });
                     }
                     if (CollectionUtils.isNotEmpty(finalReleaseKeyboardKeys)) {
-                        finalReleaseKeyboardKeys.forEach(button ->
-                                robot.keyRelease(NativeKeyToKeyCode.get(button)));
+                        finalReleaseKeyboardKeys.forEach(button -> {
+                            robot.keyRelease(NativeKeyToKeyCode.get(button));
+                            if (taskBean.isKeyboardLog()) {
+                                ClickLogBean releaseLog = new ClickLogBean();
+                                releaseLog.setClickKey(NativeKeyEvent.getKeyText(button))
+                                        .setX(String.valueOf((int) finalX))
+                                        .setY(String.valueOf((int) finalY))
+                                        .setType(log_release())
+                                        .setName(name);
+                                dynamicQueue.add(releaseLog);
+                            }
+                        });
                     }
                     robot.mouseMove(finalX, finalY);
                     robot.mouseWheel(wheelRotation);

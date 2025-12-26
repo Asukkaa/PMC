@@ -300,6 +300,13 @@
             </HBox>
 
             <HBox styleClass="hBox-short">
+                <CheckBox fx:id="keyboardLog_Set" onAction="#keyboardLog" styleClass="checkBox-medium"
+                          text="%setting.keyboardLog_Set" selected="true"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox styleClass="hBox-short">
                 <Label text="%setting.maxLogNum"/>
                 <TextField fx:id="maxLogNum_Set" prefWidth="80"/>
                 <Label text="%unit.number"/>

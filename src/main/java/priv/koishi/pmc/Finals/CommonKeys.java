@@ -225,4 +225,6 @@ public class CommonKeys {
 
     public static final String key_mouseWheelLog = "mouseWheelLog";
 
+    public static final String key_keyboardLog = "keyboardLog";
+
 }
