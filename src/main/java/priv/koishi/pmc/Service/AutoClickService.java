@@ -1,6 +1,5 @@
 package priv.koishi.pmc.Service;
 
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -1192,9 +1191,9 @@ public class AutoClickService {
                             robot.keyPress(NativeKeyToKeyCode.get(button));
                             if (taskBean.isKeyboardLog()) {
                                 ClickLogBean pressLog = new ClickLogBean();
-                                pressLog.setClickKey(NativeKeyEvent.getKeyText(button))
-                                        .setX(String.valueOf((int) finalX))
+                                pressLog.setX(String.valueOf((int) finalX))
                                         .setY(String.valueOf((int) finalY))
+                                        .setClickKey(getKeyText(button))
                                         .setType(log_press())
                                         .setName(name);
                                 dynamicQueue.add(pressLog);
@@ -1206,9 +1205,9 @@ public class AutoClickService {
                             robot.keyRelease(NativeKeyToKeyCode.get(button));
                             if (taskBean.isKeyboardLog()) {
                                 ClickLogBean releaseLog = new ClickLogBean();
-                                releaseLog.setClickKey(NativeKeyEvent.getKeyText(button))
-                                        .setX(String.valueOf((int) finalX))
+                                releaseLog.setX(String.valueOf((int) finalX))
                                         .setY(String.valueOf((int) finalY))
+                                        .setClickKey(getKeyText(button))
                                         .setType(log_release())
                                         .setName(name);
                                 dynamicQueue.add(releaseLog);

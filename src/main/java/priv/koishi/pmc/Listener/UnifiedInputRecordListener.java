@@ -15,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Finals.CommonFinals.noAdd;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.getKeyText;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
@@ -336,7 +337,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
                 // 记录按下的按键
                 pressKeyboardKeys.add(keyCode);
                 String log = text_cancelTask() + text_recordClicking() + "\n" +
-                        text_recorded() + NativeKeyEvent.getKeyText(keyCode) + " " + log_press();
+                        text_recorded() + getKeyText(keyCode) + " " + log_press();
                 Platform.runLater(() -> callback.updateRecordLog(log));
                 // 如果是组合按键的开始，记录轨迹点
                 if (clickBean != null) {

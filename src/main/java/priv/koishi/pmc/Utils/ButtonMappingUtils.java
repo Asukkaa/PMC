@@ -187,4 +187,69 @@ public class ButtonMappingUtils {
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_MINUS, KeyCode.MINUS);
     }
 
+    /**
+     * 获取按键名称
+     *
+     * @param keyCode jnativehook.NativeKeyEvent 按键编码
+     * @return 按键名称
+     */
+    public static String getKeyText(int keyCode) {
+        // 使用switch-case结构处理特定的键码
+        return switch (keyCode) {
+            // 控制键
+            case NativeKeyEvent.VC_ENTER -> "↩ Enter";
+            case NativeKeyEvent.VC_BACKSPACE -> "← Back";
+            case NativeKeyEvent.VC_TAB -> "Tab";
+            case NativeKeyEvent.VC_ESCAPE -> "Esc";
+            case NativeKeyEvent.VC_SPACE -> "Space";
+            case NativeKeyEvent.VC_CAPS_LOCK -> "Caps Lock";
+            case NativeKeyEvent.VC_NUM_LOCK -> "Num Lock";
+            case NativeKeyEvent.VC_SCROLL_LOCK -> "Scroll Lock";
+            case NativeKeyEvent.VC_PAUSE -> "Pause";
+            case NativeKeyEvent.VC_INSERT -> "Ins";
+            case NativeKeyEvent.VC_DELETE -> "Del";
+            case NativeKeyEvent.VC_HOME -> "Home";
+            case NativeKeyEvent.VC_END -> "End";
+            case NativeKeyEvent.VC_PAGE_UP -> "PgUp";
+            case NativeKeyEvent.VC_PAGE_DOWN -> "PgDn";
+            // 方向键
+            case NativeKeyEvent.VC_UP -> "↑";
+            case NativeKeyEvent.VC_DOWN -> "↓";
+            case NativeKeyEvent.VC_LEFT -> "←";
+            case NativeKeyEvent.VC_RIGHT -> "→";
+            // 修饰键
+            case NativeKeyEvent.VC_SHIFT -> "Shift";
+            case NativeKeyEvent.VC_CONTROL -> "Ctrl";
+            case NativeKeyEvent.VC_ALT -> "Alt";
+            case NativeKeyEvent.VC_META -> isWin ? "Win" : "Cmd";
+            // 标点符号键 - 直接返回字符
+            case NativeKeyEvent.VC_QUOTE -> "'";
+            case NativeKeyEvent.VC_COMMA -> ",";
+            case NativeKeyEvent.VC_PERIOD -> ".";
+            case NativeKeyEvent.VC_SLASH -> "/";
+            case NativeKeyEvent.VC_SEMICOLON -> ";";
+            case NativeKeyEvent.VC_EQUALS -> "=";
+            case NativeKeyEvent.VC_OPEN_BRACKET -> "[";
+            case NativeKeyEvent.VC_CLOSE_BRACKET -> "]";
+            case NativeKeyEvent.VC_BACK_SLASH -> "\\";
+            case NativeKeyEvent.VC_BACKQUOTE -> "`";
+            case NativeKeyEvent.VC_MINUS -> "-";
+            case NativeKeyEvent.VC_VOLUME_MUTE -> "🔇";
+            // 多媒体键
+            case NativeKeyEvent.VC_VOLUME_UP -> "🔊";
+            case NativeKeyEvent.VC_VOLUME_DOWN -> "🔉";
+            case NativeKeyEvent.VC_MEDIA_PLAY -> "▶ Play";
+            case NativeKeyEvent.VC_MEDIA_STOP -> "⏹ Stop";
+            case NativeKeyEvent.VC_MEDIA_PREVIOUS -> "⏮ Prev";
+            case NativeKeyEvent.VC_MEDIA_NEXT -> "⏭ Next";
+            case NativeKeyEvent.VC_MEDIA_SELECT -> "🎵 Media";
+            // Windows/Linux特有键
+            case NativeKeyEvent.VC_CONTEXT_MENU -> "Menu";
+            // 其他功能键
+            case NativeKeyEvent.VC_PRINTSCREEN -> "PrtSc";
+            case NativeKeyEvent.VC_CLEAR -> "Clear";
+            // 默认情况：对于字母、数字、F功能键，直接使用原生方法获取文本
+            default -> NativeKeyEvent.getKeyText(keyCode);
+        };
+    }
 }

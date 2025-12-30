@@ -1,7 +1,6 @@
 package priv.koishi.pmc.Bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,6 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.getKeyText;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 
 /**
@@ -366,7 +366,7 @@ public class ClickPositionBean {
                     List<Integer> pressKeyboardKeys = t.getPressKeyboardKeys();
                     if (CollectionUtils.isNotEmpty(pressKeyboardKeys)) {
                         for (Integer k : pressKeyboardKeys) {
-                            String s = NativeKeyEvent.getKeyText(k);
+                            String s = getKeyText(k);
                             if (StringUtils.isNoneBlank(s)) {
                                 keySet.add(s);
                             }
@@ -405,7 +405,7 @@ public class ClickPositionBean {
      */
     @JsonIgnore
     public String getKeyboardKey() {
-        return NativeKeyEvent.getKeyText(keyboardKeyEnum);
+        return getKeyText(keyboardKeyEnum);
     }
 
     /**

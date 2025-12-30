@@ -81,8 +81,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -1234,7 +1233,7 @@ public class ClickDetailController extends RootController {
                     // 仅在录制情况下才监听键盘
                     if (recordClicking) {
                         keyCode = e.getKeyCode();
-                        String key = NativeKeyEvent.getKeyText(keyCode);
+                        String key = getKeyText(keyCode);
                         // 检测快捷键 esc
                         if (keyCode == cancelKey) {
                             removeNativeListener(listener);
