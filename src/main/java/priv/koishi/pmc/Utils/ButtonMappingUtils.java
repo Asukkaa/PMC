@@ -196,11 +196,11 @@ public class ButtonMappingUtils {
     public static String getKeyText(int keyCode) {
         return switch (keyCode) {
             // 控制键
-            case NativeKeyEvent.VC_ENTER -> "↩ Enter";
-            case NativeKeyEvent.VC_BACKSPACE -> "← Back";
-            case NativeKeyEvent.VC_TAB -> "Tab";
+            case NativeKeyEvent.VC_ENTER -> "Enter(↩)";
+            case NativeKeyEvent.VC_BACKSPACE -> "Back(←)";
+            case NativeKeyEvent.VC_TAB -> "Tab(⇥)";
             case NativeKeyEvent.VC_ESCAPE -> "Esc";
-            case NativeKeyEvent.VC_SPACE -> "Space";
+            case NativeKeyEvent.VC_SPACE -> "Space(␣)";
             case NativeKeyEvent.VC_CAPS_LOCK -> "Caps Lock";
             case NativeKeyEvent.VC_NUM_LOCK -> "Num Lock";
             case NativeKeyEvent.VC_SCROLL_LOCK -> "Scroll Lock";
@@ -217,10 +217,10 @@ public class ButtonMappingUtils {
             case NativeKeyEvent.VC_LEFT -> "←";
             case NativeKeyEvent.VC_RIGHT -> "→";
             // 修饰键
-            case NativeKeyEvent.VC_SHIFT -> "Shift";
-            case NativeKeyEvent.VC_CONTROL -> "Ctrl";
-            case NativeKeyEvent.VC_ALT -> "Alt";
-            case NativeKeyEvent.VC_META -> isWin ? "Win" : "Cmd";
+            case NativeKeyEvent.VC_SHIFT -> isWin ? "Shift" : "shift(⇧)";
+            case NativeKeyEvent.VC_CONTROL -> isWin ? "Ctrl" : "control(⌃)";
+            case NativeKeyEvent.VC_ALT -> isWin ? "Alt" : "option(⌥)";
+            case NativeKeyEvent.VC_META -> isWin ? "Win" : "command(⌘)";
             // 标点符号键 - 直接返回字符
             case NativeKeyEvent.VC_QUOTE -> "'";
             case NativeKeyEvent.VC_COMMA -> ",";
@@ -237,11 +237,11 @@ public class ButtonMappingUtils {
             // 多媒体键
             case NativeKeyEvent.VC_VOLUME_UP -> "🔊";
             case NativeKeyEvent.VC_VOLUME_DOWN -> "🔉";
-            case NativeKeyEvent.VC_MEDIA_PLAY -> "▶ Play";
-            case NativeKeyEvent.VC_MEDIA_STOP -> "⏹ Stop";
-            case NativeKeyEvent.VC_MEDIA_PREVIOUS -> "⏮ Prev";
-            case NativeKeyEvent.VC_MEDIA_NEXT -> "⏭ Next";
-            case NativeKeyEvent.VC_MEDIA_SELECT -> "🎵 Media";
+            case NativeKeyEvent.VC_MEDIA_PLAY -> "Play(▶)";
+            case NativeKeyEvent.VC_MEDIA_STOP -> "Stop(⏹)";
+            case NativeKeyEvent.VC_MEDIA_PREVIOUS -> "Prev(⏮)";
+            case NativeKeyEvent.VC_MEDIA_NEXT -> "Next(⏭)";
+            case NativeKeyEvent.VC_MEDIA_SELECT -> "Media(🎵)";
             // Windows/Linux特有键
             case NativeKeyEvent.VC_CONTEXT_MENU -> "Menu";
             // 其他功能键

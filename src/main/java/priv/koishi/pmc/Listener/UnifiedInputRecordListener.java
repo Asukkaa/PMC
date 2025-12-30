@@ -298,57 +298,61 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     public void nativeKeyPressed(NativeKeyEvent e) {
         if (isRecording && callback.isRecordKeyboard()) {
             int keyCode = e.getKeyCode();
-            // 避免重复记录（如果按键已经按下）
-            if (!pressKeyboardKeys.contains(keyCode)) {
-                // 停止移动轨迹记录
-                if (callback.isRecordMove()) {
-                    removeNativeListener(moveMotionListener);
-                }
-                // 记录按下时刻的时间戳
-                pressTime = System.currentTimeMillis();
-                long waitTime;
-                // 记录移动轨迹时因为点击和移动是分开的两个步骤，所以点击不用再等待一次移动的时间
-                if (callback.isRecordMove()) {
-                    waitTime = 0;
-                } else {
-                    waitTime = isFirstClick ?
-                            pressTime - recordingStartTime :
-                            pressTime - releasedTime;
-                }
-                // 记录按下的坐标
-                Point mousePoint = MousePositionListener.getMousePoint();
-                int startX = (int) mousePoint.getX();
-                int startY = (int) mousePoint.getY();
-                // 添加移动轨迹到表格
-                addMoveTrajectory(startX, startY);
-                // 创建点击位置对象
-                if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
-                    clickBean = callback.createDefaultClickPosition();
-                    int index = callback.getCurrentStepCount() + 1;
-                    clickBean.setClickTypeEnum(ClickTypeEnum.KEYBOARD.ordinal())
-                            .setName(text_step() + index + text_isRecord())
-                            .setWaitTime(String.valueOf(waitTime))
-                            .setStartX(String.valueOf(startX))
-                            .setStartY(String.valueOf(startY))
-                            .setKeyboardKeyEnum(keyCode);
-                } else {
-                    clickBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
-                }
-                // 记录按下的按键
-                pressKeyboardKeys.add(keyCode);
-                String log = text_cancelTask() + text_recordClicking() + "\n" +
-                        text_recorded() + getKeyText(keyCode) + " " + log_press();
-                Platform.runLater(() -> callback.updateRecordLog(log));
-                // 如果是组合按键的开始，记录轨迹点
-                if (clickBean != null) {
-                    // 创建轨迹点记录组合按键
-                    List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
-                    List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
-                    clickBean.addMovePoint(startX, startY, currentMouseButtons, currentKeyboardKeys, false, 0);
-                }
-                // 开始拖拽轨迹记录
-                if (callback.isRecordDrag()) {
-                    addNativeListener(dragMotionListener);
+            String key = getKeyText(keyCode);
+            // 过滤未知按键
+            if (!key.contains(" keyCode: 0x")) {
+                // 避免重复记录（如果按键已经按下）
+                if (!pressKeyboardKeys.contains(keyCode)) {
+                    // 停止移动轨迹记录
+                    if (callback.isRecordMove()) {
+                        removeNativeListener(moveMotionListener);
+                    }
+                    // 记录按下时刻的时间戳
+                    pressTime = System.currentTimeMillis();
+                    long waitTime;
+                    // 记录移动轨迹时因为点击和移动是分开的两个步骤，所以点击不用再等待一次移动的时间
+                    if (callback.isRecordMove()) {
+                        waitTime = 0;
+                    } else {
+                        waitTime = isFirstClick ?
+                                pressTime - recordingStartTime :
+                                pressTime - releasedTime;
+                    }
+                    // 记录按下的坐标
+                    Point mousePoint = MousePositionListener.getMousePoint();
+                    int startX = (int) mousePoint.getX();
+                    int startY = (int) mousePoint.getY();
+                    // 添加移动轨迹到表格
+                    addMoveTrajectory(startX, startY);
+                    // 创建点击位置对象
+                    if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
+                        clickBean = callback.createDefaultClickPosition();
+                        int index = callback.getCurrentStepCount() + 1;
+                        clickBean.setClickTypeEnum(ClickTypeEnum.KEYBOARD.ordinal())
+                                .setName(text_step() + index + text_isRecord())
+                                .setWaitTime(String.valueOf(waitTime))
+                                .setStartX(String.valueOf(startX))
+                                .setStartY(String.valueOf(startY))
+                                .setKeyboardKeyEnum(keyCode);
+                    } else {
+                        clickBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
+                    }
+                    // 记录按下的按键
+                    pressKeyboardKeys.add(keyCode);
+                    String log = text_cancelTask() + text_recordClicking() + "\n" +
+                            text_recorded() + key + " " + log_press();
+                    Platform.runLater(() -> callback.updateRecordLog(log));
+                    // 如果是组合按键的开始，记录轨迹点
+                    if (clickBean != null) {
+                        // 创建轨迹点记录组合按键
+                        List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                        List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                        clickBean.addMovePoint(startX, startY, currentMouseButtons, currentKeyboardKeys, false, 0);
+                    }
+                    // 开始拖拽轨迹记录
+                    if (callback.isRecordDrag()) {
+                        addNativeListener(dragMotionListener);
+                    }
                 }
             }
         }

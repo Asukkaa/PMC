@@ -1234,19 +1234,22 @@ public class ClickDetailController extends RootController {
                     if (recordClicking) {
                         keyCode = e.getKeyCode();
                         String key = getKeyText(keyCode);
-                        // 检测快捷键 esc
-                        if (keyCode == cancelKey) {
-                            removeNativeListener(listener);
-                            removeNativeListener(nativeKeyListener);
-                            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
-                            setKeyHBox_Det.setCursor(Cursor.HAND);
-                            recordClicking = false;
-                            throw new RuntimeException(key + text_keyConflict());
-                        } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
-                            removeNativeListener(nativeKeyListener);
-                            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
-                            setKeyHBox_Det.setCursor(Cursor.HAND);
-                            recordClicking = false;
+                        // 过滤未知按键
+                        if (!key.contains(" keyCode: 0x")) {
+                            // 检测快捷键 esc
+                            if (keyCode == cancelKey) {
+                                removeNativeListener(listener);
+                                removeNativeListener(nativeKeyListener);
+                                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
+                                setKeyHBox_Det.setCursor(Cursor.HAND);
+                                recordClicking = false;
+                                throw new RuntimeException(key + text_keyConflict());
+                            } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
+                                removeNativeListener(nativeKeyListener);
+                                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
+                                setKeyHBox_Det.setCursor(Cursor.HAND);
+                                recordClicking = false;
+                            }
                         }
                     }
                 });
