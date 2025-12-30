@@ -1235,7 +1235,7 @@ public class ClickDetailController extends RootController {
                         keyCode = e.getKeyCode();
                         String key = getKeyText(keyCode);
                         // 过滤未知按键
-                        if (!key.contains(" keyCode: 0x")) {
+                        if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
                             // 检测快捷键 esc
                             if (keyCode == cancelKey) {
                                 removeNativeListener(listener);

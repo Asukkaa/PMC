@@ -300,7 +300,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             int keyCode = e.getKeyCode();
             String key = getKeyText(keyCode);
             // 过滤未知按键
-            if (!key.contains(" keyCode: 0x")) {
+            if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
                 // 避免重复记录（如果按键已经按下）
                 if (!pressKeyboardKeys.contains(keyCode)) {
                     // 停止移动轨迹记录
