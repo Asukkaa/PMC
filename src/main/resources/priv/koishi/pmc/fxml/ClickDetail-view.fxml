@@ -10,7 +10,7 @@
             <AnchorPane>
                 <VBox fx:id="vBox_Det" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
                     <VBox fx:id="commonVBox_Det" spacing="10">
-                        <HBox spacing="10">
+                        <HBox fx:id="typeHBox_Det" spacing="10">
                             <HBox styleClass="hBox-veryShort">
                                 <Label text="%clickDetail.clickIndex"/>
                                 <Label fx:id="clickIndex_Det"/>
@@ -31,6 +31,8 @@
                                 <ChoiceBox fx:id="clickType_Det" prefWidth="150" onAction="#clickTypeChange"/>
                             </HBox>
 
+                            <CheckBox fx:id="noMove_Det" styleClass="checkBox-short" visible="false"
+                                      text="%clickDetail.noMove_Det"/>
                             <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testLinkAction"/>
                         </HBox>
 

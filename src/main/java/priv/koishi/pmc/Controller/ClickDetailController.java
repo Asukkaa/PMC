@@ -250,7 +250,7 @@ public class ClickDetailController extends RootController {
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det;
+            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -273,7 +273,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
             stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det,
-            minWindow_Det;
+            minWindow_Det, noMove_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
@@ -371,6 +371,7 @@ public class ClickDetailController extends RootController {
         stopRetryNum_Det.setText(item.getStopRetryTimes());
         randomTimeOffset_Det.setText(item.getRandomTime());
         clickRetryNum_Det.setText(item.getClickRetryTimes());
+        noMove_Det.setSelected(activation.equals(item.getNoMove()));
         randomClick_Det.setSelected(activation.equals(item.getRandomClick()));
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         randomWaitTime_Det.setSelected(activation.equals(item.getRandomWaitTime()));
@@ -673,6 +674,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(url_Det, url_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(link_Det, link_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(noMove_Det, noMove_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(workPath_Det, workPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(parameter_Det, parameter_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -861,6 +863,7 @@ public class ClickDetailController extends RootController {
     private void setToolTip() {
         addToolTip(tip_url(), url_Det);
         addToolTip(tip_wait(), wait_Det);
+        addToolTip(tip_noMove(), noMove_Det);
         addToolTip(tip_workDir(), workDir_Det);
         addToolTip(tip_testLink(), testLink_Det);
         addToolTip(tip_pathLink(), pathLink_Det);
@@ -1206,6 +1209,20 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 判断是否为需要交互按钮的类型（键鼠点击和滑轮滚动）
+     *
+     * @param clickType 需要判断的操作类型枚举
+     * @return true 为需要交互按钮的类型
+     */
+    private boolean isClickList(int clickType) {
+        return ClickTypeEnum.CLICK.ordinal() == clickType ||
+                ClickTypeEnum.COMBINATIONS.ordinal() == clickType ||
+                ClickTypeEnum.KEYBOARD.ordinal() == clickType ||
+                ClickTypeEnum.WHEEL_DOWN.ordinal() == clickType ||
+                ClickTypeEnum.WHEEL_UP.ordinal() == clickType;
+    }
+
+    /**
      * 初始化键盘输入监听器
      */
     private NativeKeyListener intitNativeKeyListener() {
@@ -1524,6 +1541,10 @@ public class ClickDetailController extends RootController {
                 trajectory.forEach(t -> t.setX(x).setY(y));
                 selectedItem.setMoveTrajectory(trajectory);
             }
+            if (isClickList(clickType)) {
+                String noMove = noMove_Det.isSelected() ? activation : unActivation;
+                selectedItem.setNoMove(noMove);
+            }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                     clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
             updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
@@ -1733,8 +1754,10 @@ public class ClickDetailController extends RootController {
         setPathLabel(link_Det, null);
         vBox_Det.getChildren().clear();
         vBox_Det.getChildren().add(commonVBox_Det);
+        typeHBox_Det.getChildren().removeAll(noMove_Det, testLink_Det);
         if (linkList.contains(value)) {
             vBox_Det.getChildren().add(pathLinkVBox_Det);
+            typeHBox_Det.getChildren().add(testLink_Det);
             testLink_Det.setVisible(true);
             resolution_Det.setVisible(false);
             randomClickInterval_Det.setVisible(false);
@@ -1756,6 +1779,12 @@ public class ClickDetailController extends RootController {
                 pathTip_Det.setText(pathTip_openUrl());
             }
         } else {
+            if (isClickList(clickTypeMap.getKey(value))) {
+                typeHBox_Det.getChildren().add(noMove_Det);
+                noMove_Det.setVisible(true);
+            } else {
+                noMove_Det.setVisible(false);
+            }
             clickTypeHBox_Det.setVisible(!clickType_move().equals(value) && !clickType_moveTo().equals(value));
             clickKeyHBox_Det.setVisible(!clickType_move().equals(value)
                     && !clickType_moveTo().equals(value)

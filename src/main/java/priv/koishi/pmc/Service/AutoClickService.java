@@ -808,18 +808,30 @@ public class AutoClickService {
             double finalStartY = startY;
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
-                robot.mouseMove(finalStartX, finalStartY);
-                if (taskBean.isMoveLog()) {
-                    ClickLogBean moveLog = new ClickLogBean();
-                    moveLog.setX(String.valueOf((int) finalStartX))
-                            .setY(String.valueOf((int) finalStartY))
-                            .setClickKey(mouseButton_none())
-                            .setType(log_move())
-                            .setName(name);
-                    dynamicQueue.add(moveLog);
+                if (unActivation.equals(clickPositionVO.getNoMove())) {
+                    robot.mouseMove(finalStartX, finalStartY);
+                    if (taskBean.isMoveLog()) {
+                        ClickLogBean moveLog = new ClickLogBean();
+                        moveLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setClickKey(mouseButton_none())
+                                .setType(log_move())
+                                .setName(name);
+                        dynamicQueue.add(moveLog);
+                    }
                 }
                 // 执行自动流程前点击第一个起始坐标
                 if (firstClick.compareAndSet(true, false)) {
+                    robot.mouseMove(finalStartX, finalStartY);
+                    if (taskBean.isMoveLog()) {
+                        ClickLogBean moveLog = new ClickLogBean();
+                        moveLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setClickKey(mouseButton_none())
+                                .setType(log_move())
+                                .setName(name);
+                        dynamicQueue.add(moveLog);
+                    }
                     robot.mousePress(MouseButton.PRIMARY);
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
@@ -1203,7 +1215,9 @@ public class AutoClickService {
                             }
                         });
                     }
-                    robot.mouseMove(finalX, finalY);
+                    if (unActivation.equals(clickPositionVO.getNoMove())) {
+                        robot.mouseMove(finalX, finalY);
+                    }
                     robot.mouseWheel(wheelRotation);
                     if (taskBean.isMouseWheelLog() && wheelRotation != 0) {
                         ClickLogBean wheelLog = new ClickLogBean();

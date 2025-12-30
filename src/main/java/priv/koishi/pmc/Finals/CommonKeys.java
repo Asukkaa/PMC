@@ -233,4 +233,6 @@ public class CommonKeys {
 
     public static final String key_recordMouseClick = "recordMouseClick";
 
+    public static final String key_noMove = "noMove";
+
 }

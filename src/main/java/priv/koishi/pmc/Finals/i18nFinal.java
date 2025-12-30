@@ -1025,16 +1025,23 @@ public class i18nFinal {
     }
 
     /**
+     * @return 勾选后将会忽略鼠标坐标设置，不会移动鼠标仅进行按键或滑轮相关操作
+     */
+    public static String tip_noMove() {
+        return bundle.getString("tip.noMove");
+    }
+
+    /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Amazon.com Inc. 25.0.1+8-LTS
      */
     public static String tip_version() {
         return """
-                %s：%s
+                %s%s
                 %s：%s
                 JDK %s：%s""".formatted(
-                bundle.getString("tip.version"), version,
+                bundle.getString("about.version"), version,
                 bundle.getString("tip.buildDate"), buildDate,
                 bundle.getString("tip.version"), jdkVersion);
     }

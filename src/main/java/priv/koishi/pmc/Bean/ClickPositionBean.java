@@ -273,6 +273,11 @@ public class ClickPositionBean {
     String minScriptWindow = activation;
 
     /**
+     * 是否启用不移动鼠标 0-不启用，1-启用
+     */
+    String noMove = unActivation;
+
+    /**
      * 添加移动轨迹
      *
      * @param x                 横坐标

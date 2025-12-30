@@ -175,7 +175,7 @@ public class SettingController extends RootController implements MousePositionUp
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
-            openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set,
+            openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set, noMove_Set,
             recordMouseClick_Set;
 
     @FXML
@@ -389,6 +389,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(moveLog_Set, prop, key_moveLog, activation);
         setControlLastConfig(dragLog_Set, prop, key_dragLog, activation);
         setControlLastConfig(waitLog_Set, prop, key_waitLog, activation);
+        setControlLastConfig(noMove_Set, prop, key_noMove, unActivation);
         setControlLastConfig(autoSave_Set, prop, key_autoSave, activation);
         setControlLastConfig(clickLog_Set, prop, key_clickLog, activation);
         setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
@@ -507,6 +508,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
+        addToolTip(tip_noMove(), noMove_Set);
         addToolTip(tip_reLaunch(), reLaunch_Set);
         addToolTip(tip_overtime(), overtime_Set);
         addToolTip(tip_firstClick(), firstClick_Set);
@@ -1469,6 +1471,16 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void recordMouseClick() throws IOException {
         setLoadLastConfigCheckBox(recordMouseClick_Set, configFile_Click, key_recordMouseClick);
+    }
+
+    /**
+     * 输入相关操作不移动鼠标开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void noMouseMove() throws IOException {
+        setLoadLastConfigCheckBox(noMove_Set, configFile_Click, key_noMove);
     }
 
     /**

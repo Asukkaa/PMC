@@ -250,6 +250,11 @@
                 <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
                 <Label text="%unit.ms"/>
             </HBox>
+
+            <HBox styleClass="hBox-short">
+                <CheckBox fx:id="noMove_Set" onAction="#noMouseMove" styleClass="checkBox-medium"
+                          text="%noMouseMove"/>
+            </HBox>
         </HBox>
 
         <Separator/>

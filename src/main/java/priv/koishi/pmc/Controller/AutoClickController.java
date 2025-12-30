@@ -1208,6 +1208,7 @@ public class AutoClickController extends RootController implements MousePosition
             throw new RuntimeException(e);
         }
         String useRelatively = settingController.useRelatively_Set.isSelected() ? activation : unActivation;
+        String noMove = settingController.noMove_Set.isSelected() ? activation : unActivation;
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setSampleInterval(Integer.parseInt(sampleInterval))
@@ -1233,6 +1234,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setRandomX(randomClickX)
                 .setRandomY(randomClickY)
                 .setClickInterval("0")
+                .setNoMove(noMove)
                 .setClickNum("1")
                 .setWaitTime("0")
                 .setStartX("0")
