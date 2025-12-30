@@ -194,7 +194,6 @@ public class ButtonMappingUtils {
      * @return 按键名称
      */
     public static String getKeyText(int keyCode) {
-        // 使用switch-case结构处理特定的键码
         return switch (keyCode) {
             // 控制键
             case NativeKeyEvent.VC_ENTER -> "↩ Enter";
