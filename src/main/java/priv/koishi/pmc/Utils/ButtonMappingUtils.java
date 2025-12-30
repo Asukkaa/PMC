@@ -197,7 +197,7 @@ public class ButtonMappingUtils {
         return switch (keyCode) {
             // 控制键
             case NativeKeyEvent.VC_ENTER -> "Enter(↩)";
-            case NativeKeyEvent.VC_BACKSPACE -> "Back(←)";
+            case NativeKeyEvent.VC_BACKSPACE -> isWin ? "Back(←)" : "Back(⌫)";
             case NativeKeyEvent.VC_TAB -> "Tab(⇥)";
             case NativeKeyEvent.VC_ESCAPE -> "Esc";
             case NativeKeyEvent.VC_SPACE -> "Space(␣)";
