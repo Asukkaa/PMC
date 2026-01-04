@@ -29,6 +29,11 @@ public class CommonFinals {
     public static final String version = "4.1.0";
 
     /**
+     * PMC 文件版本
+     */
+    public static final String PMCFileVersion = "2.0";
+
+    /**
      * jdk 版本
      */
     public static final String jdkVersion = System.getProperty("java.vendor") + " " + System.getProperty("java.vm.version");
@@ -36,7 +41,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.12.30";
+    public static final String buildDate = "2026.01.04";
 
     /**
      * 文件后缀名：bat

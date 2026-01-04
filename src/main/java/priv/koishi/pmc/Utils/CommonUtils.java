@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.Finals.CommonFinals.PMCFileVersion;
 import static priv.koishi.pmc.Finals.i18nFinal.text_unknowGC;
 
 /**
@@ -161,6 +162,84 @@ public class CommonUtils {
             return value <= max && Double.isFinite(value);
         }
         return value >= min && value <= max && Double.isFinite(value);
+    }
+
+    /**
+     * 比较版本号
+     *
+     * @param version 要比较的版本号字符串
+     * @return 1 大于当前版本； 0 等于当前版本； -1 小于当前版本
+     */
+    public static int compareToConstant(String version) {
+        // 空值视为旧版本
+        if (version == null || version.trim().isEmpty()) {
+            return -1;
+        }
+        // 格式不正确，视为旧版本
+        if (!isValidVersion(version)) {
+            return -1;
+        }
+        // 分割版本号并比较
+        return compareVersionParts(version);
+    }
+
+    /**
+     * 比较两个版本号的各个部分
+     *
+     * @param version 要比较的版本号字符串
+     * @return 1 大于当前版本； 0 等于当前版本； -1 小于当前版本
+     */
+    private static int compareVersionParts(String version) {
+        String[] parts1 = version.split("\\.");
+        String[] parts2 = PMCFileVersion.split("\\.");
+        // 比较主版本号
+        int major1 = Integer.parseInt(parts1[0]);
+        int major2 = Integer.parseInt(parts2[0]);
+        if (major1 != major2) {
+            return major1 > major2 ? 1 : -1;
+        }
+        // 主版本号相同，比较次版本号
+        int minor1 = Integer.parseInt(parts1[1]);
+        int minor2 = Integer.parseInt(parts2[1]);
+        if (minor1 != minor2) {
+            return minor1 > minor2 ? 1 : -1;
+        }
+        return 0; // 完全相等
+    }
+
+    /**
+     * 验证版本号格式是否为有效的 x.x 格式
+     * <p>规则：
+     * <p>1. x 为数字
+     * <p>2. 只能有一个点
+     * <p>3. 点前后都不能有前导零（除非数字本身就是 0）
+     * <p>4. 不能是负数
+     *
+     * @param version 要验证的版本号
+     * @return true: 符合格式，false: 不符合格式
+     */
+    public static boolean isValidVersion(String version) {
+        if (version == null) {
+            return false;
+        }
+        // 使用正则表达式验证
+        if (!Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$").matcher(version).matches()) {
+            return false;
+        }
+        // 额外验证：确保分割后确实只有两部分
+        String[] parts = version.split("\\.");
+        if (parts.length != 2) {
+            return false;
+        }
+        // 验证每部分都是有效的整数且不会溢出
+        try {
+            long major = Long.parseLong(parts[0]);
+            long minor = Long.parseLong(parts[1]);
+            // 检查是否为负数
+            return major >= 0 && minor >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**

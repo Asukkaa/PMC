@@ -1939,6 +1939,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return PMC 文件版本异常
+     */
+    public static String text_errPMCFile() {
+        return bundle.getString("errPMCFile");
+    }
+
+    /**
+     * @return 文件名称：
+     */
+    public static String text_fileName() {
+        return bundle.getString("fileName");
+    }
+
+    /**
+     * @return 文件路径：
+     */
+    public static String text_filePath() {
+        return bundle.getString("filePath");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
@@ -2286,6 +2307,34 @@ public class i18nFinal {
      */
     public static String confirm_delete() {
         return bundle.getString("confirm.delete");
+    }
+
+    /**
+     * @return 继续
+     */
+    public static String confirm_continue() {
+        return bundle.getString("confirm.continue");
+    }
+
+    /**
+     * @return 这是一个旧版的 PMC 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_isOldPMCConfirm() {
+        return bundle.getString("confirm.isOldPMCConfirm");
+    }
+
+    /**
+     * @return 这是一个新版的 PMC 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_isNewPMCConfirm() {
+        return bundle.getString("confirm.isNewPMCConfirm");
+    }
+
+    /**
+     * @return 这是一个由其他程序生成的 PMC 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_otherPMCConfirm() {
+        return bundle.getString("confirm.otherPMCConfirm");
     }
 
     /**

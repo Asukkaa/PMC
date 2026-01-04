@@ -38,7 +38,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
-import static priv.koishi.pmc.Service.PMCFileService.loadPMC;
+import static priv.koishi.pmc.Service.PMCFileService.buildPMC;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -407,7 +407,7 @@ public class MainApplication extends Application {
                 .setMassageLabel(autoClickController.dataNumber_Click)
                 .setTableView(autoClickController.tableView_Click)
                 .setDisableNodes(autoClickController.disableNodes);
-        autoClickController.loadedPMCTask = loadPMC(taskBean, file);
+        autoClickController.loadedPMCTask = buildPMC(taskBean, file);
         bindingTaskNode(autoClickController.loadedPMCTask, taskBean);
         autoClickController.loadedPMCTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);

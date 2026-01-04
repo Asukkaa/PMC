@@ -284,7 +284,7 @@ public class UiUtils {
                 message = ex.getMessage();
             }
         }
-        if (message.length() > 200 && !message.contains("\n")) {
+        if (message.length() > 200) {
             message = message.substring(0, 200) + " ...";
         }
         alert.setHeaderText(message);

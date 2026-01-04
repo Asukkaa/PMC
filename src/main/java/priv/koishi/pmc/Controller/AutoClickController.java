@@ -88,7 +88,6 @@ import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Service.PMCFileService.*;
-import static priv.koishi.pmc.Service.PMCFileService.loadPMC;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
@@ -1773,7 +1772,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
-            loadedPMCTask = loadPMC(taskBean, new File(loadPMCPath));
+            loadedPMCTask = buildPMC(taskBean, new File(loadPMCPath));
             loadedPMCTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
