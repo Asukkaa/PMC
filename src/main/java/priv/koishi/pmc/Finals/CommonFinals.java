@@ -41,7 +41,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.01.04";
+    public static final String buildDate = "2026.01.06";
 
     /**
      * 文件后缀名：bat
@@ -485,6 +485,11 @@ public class CommonFinals {
      * gitee 地址
      */
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
+
+    /**
+     * 爱发电地址
+     */
+    public static final String afdianLink = "https://afdian.com/a/project_pmc";
 
     /**
      * 存在的文件路径颜色
