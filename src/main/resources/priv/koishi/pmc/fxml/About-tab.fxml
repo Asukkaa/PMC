@@ -27,14 +27,18 @@
         </HBox>
 
         <HBox spacing="5">
-            <Label text="%about.logsPath"/>
-            <HBox prefWidth="400">
-                <Label fx:id="logsPath_Abt"/>
+            <HBox styleClass="hBox-500-5">
+                <Label text="%about.logsPath"/>
+                <HBox prefWidth="400">
+                    <Label fx:id="logsPath_Abt"/>
+                </HBox>
             </HBox>
 
-            <Label text="%about.logsNum"/>
-            <TextField fx:id="logsNum_Abt" styleClass="label-low" prefWidth="50"/>
-            <Label text="%unit.piece"/>
+            <HBox styleClass="hBox-500-5">
+                <Label text="%about.logsNum"/>
+                <TextField fx:id="logsNum_Abt" styleClass="label-low" prefWidth="50"/>
+                <Label text="%unit.piece"/>
+            </HBox>
         </HBox>
 
         <HBox spacing="5">
@@ -43,28 +47,39 @@
         </HBox>
 
         <HBox spacing="5">
-            <Label style="-fx-pref-height: 45" text="%about.appreciate"/>
-            <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style">
-                <graphic>
-                    <ImageView>
-                        <Image url="@../icon/Gift.png"/>
-                    </ImageView>
-                </graphic>
-            </Button>
+            <HBox styleClass="hBox-500-5">
+                <Label style="-fx-pref-height: 45" text="%about.appreciate"/>
+                <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style">
+                    <graphic>
+                        <ImageView>
+                            <Image url="@../icon/Gift.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <HBox styleClass="hBox-500-5">
+                <HBox spacing="5">
+                    <Label text="%about.afdina"/>
+                    <Button fx:id="afdianLinkBtn_Abt" onAction="#openAfdianLink" text="%about.afdinaLink"/>
+                </HBox>
+            </HBox>
         </HBox>
 
         <Separator/>
 
         <Label styleClass="label-low" text="%about.git"/>
 
-        <HBox spacing="10">
-            <Label text="%about.gitHub"/>
-            <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" text="%about.openGitHubLinkBtn_Abt"/>
+        <HBox spacing="5">
+            <HBox styleClass="hBox-500-5">
+                <Label text="%about.gitHub"/>
+                <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" text="%about.openGitHubLinkBtn_Abt"/>
+            </HBox>
 
-            <Label prefWidth="100"/>
-
-            <Label text="%about.gitee"/>
-            <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" text="%about.openGiteeLinkBtn_Abt"/>
+            <HBox styleClass="hBox-500-5">
+                <Label text="%about.gitee"/>
+                <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" text="%about.openGiteeLinkBtn_Abt"/>
+            </HBox>
         </HBox>
 
         <Separator/>
@@ -74,29 +89,29 @@
             <Label styleClass="label-low" text="%about.download"/>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-medium">
+                <HBox styleClass="hBox-400-5">
                     <Label text="%about.openBaiduLinkBtn"/>
                     <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-medium">
+                <HBox styleClass="hBox-400-5">
                     <Label text="%about.openQuarkLinkBtn"/>
                     <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" text="%about.latestVersion"/>
                 </HBox>
 
-                <HBox styleClass="hBox-medium">
+                <HBox styleClass="hBox-400-5">
                     <Label text="%about.openXunleiLinkBtn"/>
                     <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" text="%about.latestVersion"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
-                <HBox styleClass="hBox-medium">
+                <HBox styleClass="hBox-400-5">
                     <Label text="%update.checkUpdate"/>
                     <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" text="%update.checkUpdate_Abt"/>
                 </HBox>
 
-                <HBox styleClass="hBox-medium">
+                <HBox styleClass="hBox-400-5">
                     <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" text="%update.autoCheck_Abt"/>
                 </HBox>
 

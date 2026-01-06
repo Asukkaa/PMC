@@ -11,22 +11,22 @@
                 <VBox fx:id="vBox_Det" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
                     <VBox fx:id="commonVBox_Det" spacing="10">
                         <HBox fx:id="typeHBox_Det" spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.clickIndex"/>
                                 <Label fx:id="clickIndex_Det"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.tableViewSize"/>
                                 <Label fx:id="tableViewSize_Det"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.clickName"/>
                                 <TextField fx:id="clickName_Det"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label fx:id="clickTypeText_Det" text="%clickDetail.clickTypeText_Det"/>
                                 <ChoiceBox fx:id="clickType_Det" prefWidth="150" onAction="#clickTypeChange"/>
                             </HBox>
@@ -37,24 +37,24 @@
                         </HBox>
 
                         <HBox spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.wait"/>
                                 <TextField fx:id="wait_Det" prefWidth="80"/>
                                 <Label text="%unit.ms"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.randomTimeOffset"/>
                                 <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
                                 <Label text="%unit.ms"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short"
                                           text="%randomWaitTime"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short"
                                           text="%randomClickInterval"/>
                             </HBox>
@@ -100,7 +100,7 @@
                                 <TextField fx:id="parameter_Det" prefWidth="450"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="minWindow_Det" styleClass="checkBox-short" selected="true"
                                           text="%clickDetail.minWindow_Det"/>
                             </HBox>
@@ -112,24 +112,24 @@
                     <VBox fx:id="clickVBox_Det" spacing="10">
                         <HBox spacing="10">
                             <HBox spacing="10">
-                                <HBox styleClass="hBox-veryShort">
+                                <HBox styleClass="hBox-270-5">
                                     <Label text="%clickDetail.mouseStartX"/>
                                     <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
                                     <Label text="%unit.px"/>
                                 </HBox>
 
-                                <HBox styleClass="hBox-veryShort">
+                                <HBox styleClass="hBox-270-5">
                                     <Label text="%clickDetail.mouseStartY"/>
                                     <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
                                     <Label text="%unit.px"/>
                                 </HBox>
 
-                                <HBox fx:id="clickKeyHBox_Det" styleClass="hBox-veryShort">
+                                <HBox fx:id="clickKeyHBox_Det" styleClass="hBox-270-5">
                                     <Label text="%clickDetail.clickKey_Det"/>
                                     <ChoiceBox fx:id="clickKey_Det" prefWidth="120" onAction="#clickKeyChange"/>
                                 </HBox>
 
-                                <HBox fx:id="keyboardHBox_Det" styleClass="hBox-veryShort" visible="false">
+                                <HBox fx:id="keyboardHBox_Det" styleClass="hBox-270-5" visible="false">
                                     <Label fx:id="inputKey_Det" text="%clickDetail.keyboard"/>
                                     <HBox fx:id="setKeyHBox_Det" prefWidth="200" style="-fx-cursor: hand"
                                           onMouseClicked="#handleMouseClick">
@@ -140,46 +140,46 @@
                         </HBox>
 
                         <HBox fx:id="relativelyHBox_Det" spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.relativelyX"/>
                                 <TextField fx:id="relativelyX_Det" promptText="0.00 - 100.00" prefWidth="100"/>
                                 <Label text="\%"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.relativelyY"/>
                                 <TextField fx:id="relativelyY_Det" promptText="0.00 - 100.00" prefWidth="100"/>
                                 <Label text="\%"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="useRelatively_Det" onAction="#useRelatively"
                                           styleClass="checkBox-short" text="%useRelatively"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Button fx:id="updateCoordinate_Det" text="%clickDetail.updateCoordinate"
                                         onAction="#updateCoordinate"/>
                             </HBox>
                         </HBox>
 
                         <HBox spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short"
                                           text="%randomTrajectory"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.randomClickX"/>
                                 <TextField fx:id="randomClickX_Det" prefWidth="50"/>
                                 <Label text="%unit.px"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.randomClickY"/>
                                 <TextField fx:id="randomClickY_Det" prefWidth="50"/>
                                 <Label text="%unit.px"/>
@@ -187,51 +187,51 @@
                         </HBox>
 
                         <HBox fx:id="clickTypeHBox_Det" spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.clickNumBer"/>
                                 <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
                                 <Label text="%unit.times"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.timeClick"/>
                                 <TextField fx:id="timeClick_Det" prefWidth="80"/>
                                 <Label text="%unit.ms"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.interval"/>
                                 <TextField fx:id="interval_Det" prefWidth="80"/>
                                 <Label text="%unit.ms"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short"
                                           text="%randomClickTime"/>
                             </HBox>
                         </HBox>
 
                         <HBox spacing="60">
-                            <HBox styleClass="hBox-long">
+                            <HBox styleClass="hBox-500-5">
                                 <Label text="%clickDetail.clickOpacity"/>
                                 <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                                 <Label text="\%"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.clickRetryNum"/>
                                 <TextField fx:id="clickRetryNum_Det" prefWidth="50"/>
                                 <Label text="%unit.times"/>
                             </HBox>
 
-                            <HBox fx:id="noPermissionHBox_Det" visible="false" styleClass="hBox-veryShort">
+                            <HBox fx:id="noPermissionHBox_Det" visible="false" styleClass="hBox-270-5">
                                 <Label fx:id="noPermission_Det" textFill="red" text="%noAutomationPermission"/>
                             </HBox>
                         </HBox>
 
                         <HBox spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%findImgSet.findImgType"/>
                                 <ChoiceBox fx:id="clickFindImgType_Det" prefWidth="150"
                                            onAction="#clickFindImgTypeAction"/>
@@ -239,19 +239,19 @@
 
                             <HBox fx:id="clickRegionInfoHBox_Det" spacing="10">
                                 <HBox fx:id="clickRegionHBox_Det" spacing="10">
-                                    <HBox styleClass="hBox-veryShort">
+                                    <HBox styleClass="hBox-270-5">
                                         <Button fx:id="clickRegion_Det" text="%findImgSet.showRegion"
                                                 onAction="#clickRegionAction"/>
                                     </HBox>
 
-                                    <HBox styleClass="hBox-veryShort">
+                                    <HBox styleClass="hBox-270-5">
                                         <CheckBox fx:id="clickAllRegion_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.allRegion"/>
                                     </HBox>
                                 </HBox>
 
                                 <HBox fx:id="clickWindowInfoHBox_Det" spacing="10">
-                                    <HBox styleClass="hBox-veryShort">
+                                    <HBox styleClass="hBox-270-5">
                                         <CheckBox fx:id="updateClickWindow_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.updateWindowInfo"/>
                                     </HBox>
@@ -300,14 +300,14 @@
                         </HBox>
 
                         <HBox spacing="60">
-                            <HBox styleClass="hBox-long">
+                            <HBox styleClass="hBox-500-5">
                                 <Label text="%clickDetail.stopOpacity"/>
                                 <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
                                 <Label text="\%"/>
                             </HBox>
 
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%clickDetail.stopRetryNum"/>
                                 <TextField fx:id="stopRetryNum_Det" prefWidth="50"/>
                                 <Label text="%unit.times"/>
@@ -315,7 +315,7 @@
                         </HBox>
 
                         <HBox spacing="10">
-                            <HBox styleClass="hBox-veryShort">
+                            <HBox styleClass="hBox-270-5">
                                 <Label text="%findImgSet.findImgType"/>
                                 <ChoiceBox fx:id="stopFindImgType_Det" prefWidth="150"
                                            onAction="#stopFindImgTypeAction"/>
@@ -323,19 +323,19 @@
 
                             <HBox fx:id="stopRegionInfoHBox_Det" spacing="10">
                                 <HBox fx:id="stopRegionHBox_Det" spacing="10">
-                                    <HBox styleClass="hBox-veryShort">
+                                    <HBox styleClass="hBox-270-5">
                                         <Button fx:id="stopRegion_Det" text="%findImgSet.showRegion"
                                                 onAction="#stopRegionAction"/>
                                     </HBox>
 
-                                    <HBox styleClass="hBox-veryShort">
+                                    <HBox styleClass="hBox-270-5">
                                         <CheckBox fx:id="stopAllRegion_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.allRegion"/>
                                     </HBox>
                                 </HBox>
 
                                 <HBox fx:id="stopWindowInfoHBox_Det" spacing="10">
-                                    <HBox styleClass="hBox-veryShort">
+                                    <HBox styleClass="hBox-270-5">
                                         <CheckBox fx:id="updateStopWindow_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.updateWindowInfo"/>
                                     </HBox>

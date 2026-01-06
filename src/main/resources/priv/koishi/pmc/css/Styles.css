@@ -22,27 +22,27 @@
     -fx-pref-height: 25;
 }
 
-.hBox-veryShort {
+.hBox-270-5 {
     -fx-spacing: 5;
     -fx-pref-width: 270;
 }
 
-.hBox-short {
+.hBox-290-5 {
     -fx-spacing: 5;
     -fx-pref-width: 290;
 }
 
-.hBox-medium {
+.hBox-400-5 {
     -fx-spacing: 5;
     -fx-pref-width: 400;
 }
 
-.hBox-long {
+.hBox-500-5 {
     -fx-spacing: 5;
     -fx-pref-width: 500;
 }
 
-.hBox-veryLong {
+.hBox-600-5 {
     -fx-spacing: 5;
     -fx-pref-width: 600;
 }

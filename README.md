@@ -120,3 +120,5 @@ Gitee：https://gitee.com/wowxqt/pmc
 如果喜欢本项目的话可以扫描微信赞赏码给作者一个赞赏
 
 ![](.docs/Appreciate.jpg)
+
+或前往爱发电为作者发电：https://afdian.com/a/project_pmc

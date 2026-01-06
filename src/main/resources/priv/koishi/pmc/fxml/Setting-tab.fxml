@@ -11,22 +11,22 @@
         <Label text="%setting.windowSet"/>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="lastTab_Set" onAction="#loadLastTabAction" styleClass="checkBox-medium"
                           selected="true" text="%setting.lastTab_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="fullWindow_Set" onAction="#loadFullWindowAction" styleClass="checkBox-medium"
                           selected="true" text="%setting.fullWindow_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="maxWindow_Set" onAction="#loadMaxWindowAction" styleClass="checkBox-medium"
                           selected="true" text="%setting.maxWindow_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="titleCoordinate_Set" onAction="#titleCoordinate" styleClass="checkBox-medium"
                           selected="true" text="%setting.titleCoordinate_Set"/>
             </HBox>
@@ -37,34 +37,34 @@
         <Label text="%setting.generalSet"/>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction" styleClass="checkBox-medium"
                           selected="true" text="%setting.loadAutoClick_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="remindClickSave_Set" onAction="#loadClickRemindSaveAction" styleClass="checkBox-medium"
                           text="%setting.remindClickSave_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="remindTaskSave_Set" onAction="#loadTaskRemindSaveAction" styleClass="checkBox-medium"
                           text="%setting.remindTaskSave_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="autoSave_Set" onAction="#loadAutoSaveAction" selected="true"
                           styleClass="checkBox-medium" text="%setting.autoSave_Set"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.language"/>
                 <ChoiceBox fx:id="language_Set" prefWidth="100" onAction="#languageAction"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.theme"/>
                 <ChoiceBox fx:id="theme_Set" prefWidth="150" onAction="#themeAction"/>
             </HBox>
@@ -131,44 +131,44 @@
         <Label text="%setting.featureSet"/>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="hideWindowRun_Set" onAction="#loadHideWindowRunAction" styleClass="checkBox-medium"
                           text="%setting.hideWindowRun_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="showWindowRun_Set" onAction="#loadShowWindowRunAction" styleClass="checkBox-medium"
                           text="%setting.showWindowRun_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="hideWindowRecord_Set" onAction="#loadHideWindowRecordAction"
                           styleClass="checkBox-medium" text="%setting.hideWindowRecord_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="showWindowRecord_Set" onAction="#loadShowWindowRecordAction"
                           styleClass="checkBox-medium" text="%setting.showWindowRecord_Set" selected="true"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="firstClick_Set" onAction="#loadFirstClickAction" styleClass="checkBox-medium"
                           text="%setting.firstClick_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="recordDrag_Set" onAction="#recordDrag" styleClass="checkBox-medium"
                           text="%setting.recordDrag_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="recordMove_Set" onAction="#recordMove" styleClass="checkBox-medium"
                           text="%setting.recordMove_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.sampleInterval"/>
                 <TextField fx:id="sampleInterval_Set" prefWidth="50"/>
                 <Label text="%unit.ms"/>
@@ -176,23 +176,23 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="randomClick_Set" onAction="#randomClick" styleClass="checkBox-medium"
                           text="%randomClick"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="randomTrajectory_Set" onAction="#randomTrajectory" styleClass="checkBox-medium"
                           text="%randomTrajectory"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.randomClickX"/>
                 <TextField fx:id="randomClickX_Set" prefWidth="50"/>
                 <Label text="%unit.px"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.randomClickY"/>
                 <TextField fx:id="randomClickY_Set" prefWidth="50"/>
                 <Label text="%unit.px"/>
@@ -200,22 +200,22 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="randomClickTime_Set" onAction="#randomClickTime" styleClass="checkBox-medium"
                           text="%randomClickTime"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="randomClickInterval_Set" onAction="#randomClickInterval" styleClass="checkBox-medium"
                           text="%randomClickInterval"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="randomWaitTime_Set" onAction="#randomWaitTime" styleClass="checkBox-medium"
                           text="%randomWaitTime"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.randomTimeOffset"/>
                 <TextField fx:id="randomTimeOffset_Set" prefWidth="50"/>
                 <Label text="%unit.ms"/>
@@ -223,35 +223,35 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="recordMouseWheel_Set" onAction="#recordMouseWheel" styleClass="checkBox-medium"
                           text="%setting.recordMouseWheel"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="recordKeyboard_Set" onAction="#recordKeyboard" styleClass="checkBox-medium"
                           text="%setting.recordKeyboard"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="recordMouseClick_Set" onAction="#recordMouseClick" styleClass="checkBox-medium"
                           text="%setting.recordMouseClick"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="useRelatively_Set" onAction="#useRelatively" styleClass="checkBox-medium"
                           text="%useRelatively"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.clickTimeOffset"/>
                 <TextField fx:id="clickTimeOffset_Set" prefWidth="50"/>
                 <Label text="%unit.ms"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="noMove_Set" onAction="#noMouseMove" styleClass="checkBox-medium"
                           text="%noMouseMove"/>
             </HBox>
@@ -262,73 +262,73 @@
         <Label text="%setting.logSet"/>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="clickLog_Set" onAction="#clickLog" styleClass="checkBox-medium"
                           text="%setting.clickLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="moveLog_Set" onAction="#moveLog" styleClass="checkBox-medium"
                           text="%setting.moveLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="dragLog_Set" onAction="#dragLog" styleClass="checkBox-medium"
                           text="%setting.dragLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="waitLog_Set" onAction="#waitLog" styleClass="checkBox-medium"
                           text="%setting.waitLog_Set" selected="true"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="clickImgLog_Set" onAction="#clickImgLog" styleClass="checkBox-medium"
                           text="%setting.clickImgLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="stopImgLog_Set" onAction="#stopImgLog" styleClass="checkBox-medium"
                           text="%setting.stopImgLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="imgLog_Set" onAction="#imgLog" styleClass="checkBox-medium"
                           text="%setting.imgLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="mouseWheelLog_Set" onAction="#mouseWheelLog" styleClass="checkBox-medium"
                           text="%setting.mouseWheelLog_Set" selected="true"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="openFileLog_Set" onAction="#openFileLog" styleClass="checkBox-medium"
                           text="%setting.openFileLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="runScriptLog_Set" onAction="#runScriptLog" styleClass="checkBox-medium"
                           text="%setting.runScriptLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="openUrlLog_Set" onAction="#openUrlLog" styleClass="checkBox-medium"
                           text="%setting.openUrlLog_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="keyboardLog_Set" onAction="#keyboardLog" styleClass="checkBox-medium"
                           text="%setting.keyboardLog_Set" selected="true"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.maxLogNum"/>
                 <TextField fx:id="maxLogNum_Set" prefWidth="80"/>
                 <Label text="%unit.number"/>
@@ -340,46 +340,46 @@
         <Label text="%setting.floatingSet"/>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="floatingRun_Set" onAction="#loadFloatingRunAction" styleClass="checkBox-medium"
                           text="%setting.floatingRun_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="mouseFloatingRun_Set" onAction="#loadMouseFloatingRunAction"
                           styleClass="checkBox-medium" text="%setting.mouseFloatingRun_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="floatingRecord_Set" onAction="#loadFloatingRecordAction" styleClass="checkBox-medium"
                           text="%setting.floatingRecord_Set" selected="true"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="mouseFloatingRecord_Set" onAction="#loadMouseFloatingRecordAction"
                           styleClass="checkBox-medium" text="%setting.mouseFloatingRecord_Set"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.colorPicker"/>
                 <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#colorAction"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.floatingDistance"/>
                 <TextField fx:id="floatingDistance_Set" prefWidth="50"/>
                 <Label text="%unit.px"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.offsetX"/>
                 <TextField fx:id="offsetX_Set" prefWidth="50"/>
                 <Label text="%unit.px"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.offsetY"/>
                 <TextField fx:id="offsetY_Set" prefWidth="50"/>
                 <Label text="%unit.px"/>
@@ -387,11 +387,11 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Button fx:id="massageRegion_Set" onAction="#massageRegionAction" text="%setting.massageRegion_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <CheckBox fx:id="mouseFloating_Set" onAction="#mouseFloatingAction" styleClass="checkBox-medium"
                           text="%setting.mouseFloating_Set"/>
             </HBox>
@@ -413,31 +413,31 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.retrySecond"/>
                 <TextField fx:id="retrySecond_Set" prefWidth="80"/>
                 <Label text="%unit.s"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%setting.overtime"/>
                 <TextField fx:id="overtime_Set" prefWidth="80"/>
                 <Label text="%unit.s"/>
             </HBox>
 
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%findImgSet.waitTime"/>
                 <TextField fx:id="findWindowWait_Set" prefWidth="50"/>
                 <Label text="%unit.s"/>
             </HBox>
 
-            <HBox fx:id="noPermissionHBox_Set" visible="false" styleClass="hBox-short">
+            <HBox fx:id="noPermissionHBox_Set" visible="false" styleClass="hBox-290-5">
                 <Label fx:id="noPermission_Set" textFill="red" text="%noAutomationPermission"/>
             </HBox>
         </HBox>
 
         <HBox>
-            <HBox styleClass="hBox-veryLong">
+            <HBox styleClass="hBox-600-5">
                 <Label text="%setting.clickOpacity"/>
                 <Slider fx:id="clickOpacity_Set" prefWidth="220" value="80" showTickLabels="true" showTickMarks="true"
                         snapToTicks="true" majorTickUnit="10"/>
@@ -452,25 +452,25 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%findImgSet.findImgType"/>
                 <ChoiceBox fx:id="clickFindImgType_Set" prefWidth="150" onAction="#clickFindImgTypeAction"/>
             </HBox>
 
             <HBox fx:id="clickRegionInfoHBox_Set">
                 <HBox fx:id="clickRegionHBox_Set" spacing="10">
-                    <HBox styleClass="hBox-short">
+                    <HBox styleClass="hBox-290-5">
                         <Button fx:id="clickRegion_Set" text="%findImgSet.showRegion" onAction="#clickRegionAction"/>
                     </HBox>
 
-                    <HBox styleClass="hBox-short">
+                    <HBox styleClass="hBox-290-5">
                         <CheckBox fx:id="clickAllRegion_Set" styleClass="checkBox-short"
                                   onAction="#clickAllRegionAction" text="%findImgSet.allRegion"/>
                     </HBox>
                 </HBox>
 
                 <HBox fx:id="clickWindowInfoHBox_Set" spacing="10">
-                    <HBox styleClass="hBox-short">
+                    <HBox styleClass="hBox-290-5">
                         <CheckBox fx:id="updateClickWindow_Set" styleClass="checkBox-medium"
                                   onAction="#updateClickWindowAction" text="%findImgSet.updateWindowInfo"/>
                     </HBox>
@@ -484,7 +484,7 @@
         </HBox>
 
         <HBox>
-            <HBox styleClass="hBox-veryLong">
+            <HBox styleClass="hBox-600-5">
                 <Label text="%setting.stopOpacity"/>
                 <Slider fx:id="stopOpacity_Set" prefWidth="220" value="80" showTickLabels="true" showTickMarks="true"
                         snapToTicks="true" majorTickUnit="10"/>
@@ -499,25 +499,25 @@
         </HBox>
 
         <HBox spacing="10">
-            <HBox styleClass="hBox-short">
+            <HBox styleClass="hBox-290-5">
                 <Label text="%findImgSet.findImgType"/>
                 <ChoiceBox fx:id="stopFindImgType_Set" prefWidth="150" onAction="#stopFindImgTypeAction"/>
             </HBox>
 
             <HBox fx:id="stopRegionInfoHBox_Set">
                 <HBox fx:id="stopRegionHBox_Set" spacing="10">
-                    <HBox styleClass="hBox-short">
+                    <HBox styleClass="hBox-290-5">
                         <Button fx:id="stopRegion_Set" text="%findImgSet.showRegion" onAction="#stopRegionAction"/>
                     </HBox>
 
-                    <HBox styleClass="hBox-short">
+                    <HBox styleClass="hBox-290-5">
                         <CheckBox fx:id="stopAllRegion_Set" styleClass="checkBox-short" onAction="#stopAllRegionAction"
                                   text="%findImgSet.allRegion"/>
                     </HBox>
                 </HBox>
 
                 <HBox fx:id="stopWindowInfoHBox_Set" spacing="10">
-                    <HBox styleClass="hBox-short">
+                    <HBox styleClass="hBox-290-5">
                         <CheckBox fx:id="updateStopWindow_Set" styleClass="checkBox-medium"
                                   onAction="#updateStopWindowAction" text="%findImgSet.updateWindowInfo"/>
                     </HBox>
