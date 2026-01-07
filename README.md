@@ -7,7 +7,6 @@
 <img alt="JavaCV" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=JavaCV&color=orange&logo=opencv&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency'][*[local-name()='artifactId']='javacv-platform']/*[local-name()='version']&cacheSeconds=3600" />
 <img alt="Version" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=PMC&color=blueviolet&logo=github&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='version']&cacheSeconds=3600" />
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Asukkaa/PMC?style=for-the-badge&color=blue" />
-<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Asukkaa/PMC?style=for-the-badge&color=blue" />
 <img alt="GitHub" src="https://img.shields.io/github/license/Asukkaa/PMC?style=for-the-badge&color=blue" />
 
 ----
