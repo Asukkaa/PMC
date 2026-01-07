@@ -29,7 +29,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -1078,6 +1077,7 @@ public class AutoClickService {
         List<TrajectoryPointBean> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
             TrajectoryPointBean lastPoint = null;
+            List<CompletableFuture<Void>> allFutures = new ArrayList<>();
             for (TrajectoryPointBean point : points) {
                 // 当前轨迹点按下的鼠标按键
                 List<Integer> pressMouseKeys = point.getPressMouseKeys();
@@ -1153,10 +1153,23 @@ public class AutoClickService {
                     y = Math.min(Math.max(0, y + (random.nextDouble() * 2 - 1) * randomY), screenHeight);
                 }
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
+                allFutures.add(moveFuture);
                 List<Integer> finalReleaseButtons = releaseMouseKeys;
                 List<Integer> finalReleaseKeyboardKeys = releaseKeyboardKeys;
                 double finalX = x;
                 double finalY = y;
+                // 精确控制时间间隔
+                if (remaining > 0) {
+                    Thread.sleep(remaining);
+                    if (taskBean.isWaitLog()) {
+                        ClickLogBean sleepLog = new ClickLogBean();
+                        sleepLog.setClickTime(String.valueOf(remaining))
+                                .setClickKey(mouseButton_none())
+                                .setType(log_wait())
+                                .setName(name);
+                        dynamicQueue.add(sleepLog);
+                    }
+                }
                 Platform.runLater(() -> {
                     if (CollectionUtils.isNotEmpty(nowPressMouseKeys)) {
                         nowPressMouseKeys.forEach(button -> {
@@ -1255,20 +1268,9 @@ public class AutoClickService {
                     }
                     moveFuture.complete(null);
                 });
-                // 精确控制时间间隔
-                moveFuture.get(remaining + 500, TimeUnit.MILLISECONDS);
-                if (remaining > 0) {
-                    Thread.sleep(remaining);
-                    if (taskBean.isWaitLog()) {
-                        ClickLogBean sleepLog = new ClickLogBean();
-                        sleepLog.setClickTime(String.valueOf(remaining))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_wait())
-                                .setName(name);
-                        dynamicQueue.add(sleepLog);
-                    }
-                }
             }
+            // 等待所有异步操作完成
+            CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).get();
         }
     }
 
