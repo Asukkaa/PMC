@@ -7,6 +7,7 @@ import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Finals.CommonFinals.isWin;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 
@@ -166,6 +167,8 @@ public class ButtonMappingUtils {
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_MUTE, KeyCode.MUTE);
         if (isWin) {
             NativeKeyToKeyCode.put(NativeKeyEvent.VC_META, KeyCode.WINDOWS);
+        } else if (isMac) {
+            NativeKeyToKeyCode.put(NativeKeyEvent.VC_META, KeyCode.COMMAND);
         } else {
             NativeKeyToKeyCode.put(NativeKeyEvent.VC_META, KeyCode.META);
         }
