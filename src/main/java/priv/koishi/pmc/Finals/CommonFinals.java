@@ -41,7 +41,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.01.06";
+    public static final String buildDate = "2026.01.07";
 
     /**
      * 文件后缀名：bat
@@ -362,6 +362,11 @@ public class CommonFinals {
      * Contents 目录
      */
     public static final String contentsDirectory = "/Contents";
+
+    /**
+     * mac app 目录(.app/Contents/app)
+     */
+    public static final String macAppDirectory = appLaunchPath + contentsDirectory + appDirectory;
 
     /**
      * cfg 文件路径

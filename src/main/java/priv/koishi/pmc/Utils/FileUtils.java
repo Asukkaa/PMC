@@ -575,7 +575,7 @@ public class FileUtils {
             if (isWin) {
                 cfgPath = appRootPath + appDirectory + cfgFileName;
             } else {
-                cfgPath = appLaunchPath + contentsDirectory + appDirectory + cfgFileName;
+                cfgPath = macAppDirectory + cfgFileName;
             }
         }
         return cfgPath;
