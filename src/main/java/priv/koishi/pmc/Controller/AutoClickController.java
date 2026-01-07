@@ -2011,6 +2011,8 @@ public class AutoClickController extends RootController implements MousePosition
     private void handleDrop(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         startLoadPMCTask(files);
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
     }
 
     /**

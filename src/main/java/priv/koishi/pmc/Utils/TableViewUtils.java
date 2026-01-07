@@ -935,12 +935,12 @@ public class TableViewUtils {
     public static void acceptDropImg(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         files.forEach(file -> {
-            if (imageType.contains(getExistsFileType(file))) {
+            if (isImgFile(file)) {
                 // 接受拖放
                 dragEvent.acceptTransferModes(TransferMode.COPY);
-                dragEvent.consume();
             }
         });
+        dragEvent.consume();
     }
 
     /**

@@ -20,9 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -276,9 +274,8 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
-            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
-            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det,
-            inputKey_Det;
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, clickTypeText_Det,
+            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -1222,6 +1219,23 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 添加目标图片
+     *
+     * @param selectedFile 选择的图片文件
+     * @throws IOException 配置文件保存异常
+     */
+    private void addClickImg(File selectedFile) throws IOException {
+        if (selectedFile != null) {
+            // 更新所选文件路径显示
+            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
+                    key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
+            showClickImg(clickImgSelectPath);
+            clickType_Det.setValue(clickType_click());
+            clickTypeHBox_Det.setVisible(true);
+        }
+    }
+
+    /**
      * 初始化键盘输入监听器
      */
     private NativeKeyListener intitNativeKeyListener() {
@@ -1648,14 +1662,7 @@ public class ClickDetailController extends RootController {
     private void addClickImgPath(ActionEvent actionEvent) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         File selectedFile = creatImgFileChooser(window, clickImgSelectPath);
-        if (selectedFile != null) {
-            // 更新所选文件路径显示
-            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
-                    key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
-            showClickImg(clickImgSelectPath);
-            clickType_Det.setValue(clickType_click());
-            clickTypeHBox_Det.setVisible(true);
-        }
+        addClickImg(selectedFile);
     }
 
     /**
@@ -1693,6 +1700,8 @@ public class ClickDetailController extends RootController {
     public void handleDrop(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         startLoadImgTask(files);
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
     }
 
     /**
@@ -2122,6 +2131,51 @@ public class ClickDetailController extends RootController {
                 startNativeCombinationsListener();
             }
         }
+    }
+
+    /**
+     * 目标图像拖拽中行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    private void clickImgAcceptDrop(DragEvent dragEvent) {
+        // 检查拖拽的内容是否为文件
+        if (dragEvent.getDragboard().hasFiles()) {
+            List<File> files = dragEvent.getDragboard().getFiles();
+            for (File file : files) {
+                if (isImgFile(file)) {
+                    // 接受复制操作
+                    dragEvent.acceptTransferModes(TransferMode.COPY);
+                    break;
+                }
+            }
+        }
+        dragEvent.consume();
+    }
+
+    /**
+     * 目标图像拖拽释放行为
+     *
+     * @param dragEvent 拖拽事件
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void clickImgHandleDrop(DragEvent dragEvent) throws IOException {
+        Dragboard db = dragEvent.getDragboard();
+        if (db.hasFiles()) {
+            if (dragEvent.getDragboard().hasFiles()) {
+                List<File> files = dragEvent.getDragboard().getFiles();
+                for (File file : files) {
+                    if (isImgFile(file)) {
+                        addClickImg(file);
+                        break;
+                    }
+                }
+            }
+        }
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
     }
 
 }

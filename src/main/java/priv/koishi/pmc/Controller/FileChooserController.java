@@ -667,6 +667,9 @@ public class FileChooserController extends ManuallyChangeThemeController {
             }
         } catch (Exception e) {
             showExceptionAlert(e);
+        } finally {
+            dragEvent.setDropCompleted(true);
+            dragEvent.consume();
         }
     }
 

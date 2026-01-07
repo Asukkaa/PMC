@@ -1604,6 +1604,8 @@ public class SettingController extends RootController implements MousePositionUp
     private void handleDrop(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         startLoadImgTask(files);
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
     }
 
     /**
