@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileType;
 import static priv.koishi.pmc.Utils.FileUtils.readAllFiles;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
@@ -149,7 +150,11 @@ public class ReadDataService {
      * @param reverseSort 是否倒序标识，true-倒序，false-正序
      */
     private static void comparingByName(List<File> fileList, boolean reverseSort) {
-        Comparator<File> comparator = Comparator.comparing(File::getName);
+        Comparator<File> comparator = (f1, f2) -> {
+            String name1 = f1.getName();
+            String name2 = f2.getName();
+            return NATURAL_SORT.compare(name1, name2);
+        };
         List<File> sortedList = fileList.stream()
                 .sorted(reverseSort ? comparator.reversed() : comparator)
                 .toList();

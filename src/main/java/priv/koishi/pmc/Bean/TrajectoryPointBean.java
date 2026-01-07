@@ -12,7 +12,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.RelativeY;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
 
 /**
- * 鼠标移动轨迹点
+ * 操作轨迹点
  *
  * @author KOISHI
  * Date:2025-04-28
@@ -30,12 +30,12 @@ public class TrajectoryPointBean {
     /**
      * 轨迹点横坐标
      */
-    double x;
+    int x;
 
     /**
      * 轨迹点纵坐标
      */
-    double y;
+    int y;
 
     /**
      * 轨迹点相对横（X）坐标
@@ -48,12 +48,17 @@ public class TrajectoryPointBean {
     String relativeY;
 
     /**
-     * 按下的键
+     * 按下的鼠标按键
      */
-    List<Integer> pressButtons;
+    List<Integer> pressMouseKeys;
 
     /**
-     * 滑轮状态（正数上滑，负数下滑，0 为无滑动状态）
+     * 按下的键盘按键
+     */
+    List<Integer> pressKeyboardKeys;
+
+    /**
+     * 滑轮状态（负数上滑，正数下滑，0 为无滑动状态）
      */
     int wheelRotation;
 
@@ -62,7 +67,7 @@ public class TrajectoryPointBean {
      */
     public void updatePosition(WindowInfo windowInfo) {
         if (windowInfo != null) {
-            Map<String, String> relativePosition = calculateRelativePosition(windowInfo, (int) x, (int) y);
+            Map<String, String> relativePosition = calculateRelativePosition(windowInfo, x, y);
             relativeX = relativePosition.get(RelativeX);
             relativeY = relativePosition.get(RelativeY);
         }

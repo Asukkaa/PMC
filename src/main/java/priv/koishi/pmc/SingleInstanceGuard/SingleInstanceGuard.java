@@ -95,7 +95,7 @@ public class SingleInstanceGuard {
                     StandardOpenOption.READ,
                     StandardOpenOption.WRITE);
             fileLock = lockChannel.tryLock();
-            // 若文件已锁定或心跳守护线程启动失败则返回true
+            // 若文件已锁定或心跳守护线程启动失败则返回 true
             if (fileLock == null || !startHeartbeat()) {
                 // 发送激活窗口信号
                 sendActivationSignal(port, args);
@@ -103,7 +103,7 @@ public class SingleInstanceGuard {
                 releaseResources();
                 return true;
             }
-            // 注册JVM关闭钩子
+            // 注册 JVM 关闭钩子
             addShutdownHook();
             return false;
         } catch (IOException e) {

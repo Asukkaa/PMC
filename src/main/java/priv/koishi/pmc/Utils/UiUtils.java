@@ -16,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -55,7 +56,7 @@ import static priv.koishi.pmc.Utils.TableViewUtils.updateTableViewSizeText;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 
 /**
- * ui相关工具类
+ * UI 相关工具类
  *
  * @author KOISHI
  * Date:2024-10-03
@@ -283,7 +284,7 @@ public class UiUtils {
                 message = ex.getMessage();
             }
         }
-        if (message.length() > 200 && !message.contains("\n")) {
+        if (message.length() > 200) {
             message = message.substring(0, 200) + " ...";
         }
         alert.setHeaderText(message);
@@ -295,7 +296,7 @@ public class UiUtils {
      * 创建一个错误弹窗
      *
      * @param errString 要展示的异常信息
-     * @return Alert弹窗对象
+     * @return Alert 弹窗对象
      */
     public static Alert creatErrorAlert(String errString) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -303,12 +304,12 @@ public class UiUtils {
         DialogPane dialogPane = alert.getDialogPane();
         Stage stage = (Stage) dialogPane.getScene().getWindow();
         setWindowLogo(stage, logoPath);
-        // 创建展示异常信息的TextArea
+        // 创建展示异常信息的 TextArea
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
         textArea.setWrapText(true);
         textArea.setText(errString);
-        // 创建VBox并添加TextArea
+        // 创建 VBox 并添加 TextArea
         VBox details = new VBox();
         VBox.setVgrow(textArea, Priority.ALWAYS);
         textArea.setMaxHeight(Double.MAX_VALUE);
@@ -1025,6 +1026,24 @@ public class UiUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 设置绑定的按键
+     *
+     * @param label     设置按键文本栏
+     * @param key       要绑定的按键
+     * @param isBeenSet 是否已经设置过
+     */
+    public static void updateKeyboardLabel(Label label, HBox hBox, String key, boolean isBeenSet) {
+        label.setText(key);
+        if (isBeenSet) {
+            label.setTextFill(Color.CORNFLOWERBLUE);
+            addToolTip(tip_keyboard() + key + "\n" + tip_updateKeyboard(), hBox);
+        } else {
+            label.setTextFill(Color.RED);
+            addToolTip(tip_updateKeyboard(), hBox);
+        }
     }
 
 }

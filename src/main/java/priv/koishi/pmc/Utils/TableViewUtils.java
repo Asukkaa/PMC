@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
@@ -111,7 +112,7 @@ public class TableViewUtils {
         String columnText = column.getText();
         if (StringUtils.isNotBlank(columnText)) {
             Label label = new Label(columnText);
-            // 完全绑定Label宽度到TableColumn宽度
+            // 完全绑定 Labe l宽度到 TableColumn 宽度
             label.prefWidthProperty().bind(column.widthProperty());
             label.setMaxWidth(Control.USE_PREF_SIZE);
             label.setMinWidth(Control.USE_PREF_SIZE);
@@ -150,7 +151,7 @@ public class TableViewUtils {
             Optional<? extends TableColumn<?, ?>> matched = columns.stream().filter(c ->
                     finalFieldName.equals(c.getId())).findFirst();
             matched.ifPresent(m -> {
-                // 添加列名Tooltip
+                // 添加列名 Tooltip
                 addTableColumnToolTip(m);
                 if (f.getType() == Image.class) {
                     // 直接使用类型安全的函数式调用
@@ -934,12 +935,12 @@ public class TableViewUtils {
     public static void acceptDropImg(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         files.forEach(file -> {
-            if (imageType.contains(getExistsFileType(file))) {
+            if (isImgFile(file)) {
                 // 接受拖放
                 dragEvent.acceptTransferModes(TransferMode.COPY);
-                dragEvent.consume();
             }
         });
+        dragEvent.consume();
     }
 
     /**
@@ -970,11 +971,21 @@ public class TableViewUtils {
      *
      * @param sizeColumn 要进行文件大小排序的列
      */
-    public static void fileSizeColum(TableColumn<?, String> sizeColumn) {
+    public static void fileSizeComparator(TableColumn<?, String> sizeColumn) {
         // 自定义比较器
         Comparator<String> customComparator = Comparator.comparingDouble(FileUtils::fileSizeCompareValue);
         // 应用自定义比较器
         sizeColumn.setComparator(customComparator);
+    }
+
+    /**
+     * 文件名称排序
+     *
+     * @param nameColumn 要进行文件名称排序的列
+     */
+    public static void fileNameComparator(TableColumn<?, String> nameColumn) {
+        // 应用自定义比较器
+        nameColumn.setComparator(NATURAL_SORT);
     }
 
 }

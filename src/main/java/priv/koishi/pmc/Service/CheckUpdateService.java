@@ -176,10 +176,10 @@ public class CheckUpdateService {
                 for (int attempt = 0; attempt < downloadLinks.length; attempt++) {
                     // 在 temp 目录创建临时文件
                     tempFile = File.createTempFile("pmc_update_", zip, tempDir);
-                    // 创建使用TLSv1.2的SSLContext
+                    // 创建使用 TLSv1.2 的 SSLContext
                     SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
                     sslContext.init(null, null, null);
-                    // 创建HttpClient，并设置SSLContext
+                    // 创建 HttpClient 并设置 SSLContext
                     Path tempPath = Path.of(PMCTempPath);
                     try (HttpClient client = HttpClient.newBuilder()
                             .sslContext(sslContext)

@@ -37,7 +37,7 @@ public class CommonProperties extends Properties {
                     if (parts.length == 2) {
                         String key = parts[0].trim();
                         String value = parts[1].trim();
-                        // value为空则不处理转义符
+                        // value 为空则不处理转义符
                         if (StringUtils.isNotBlank(value)) {
                             // 由于‘\’在Java中表示转义字符，需要将读取的路径进行转换为‘/’符号,这里“\\\\”代表一个‘\’
                             value = value.replaceAll("\\\\", "/");

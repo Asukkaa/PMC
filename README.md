@@ -1,11 +1,24 @@
 <h1>Perfect Mouse Control</h1>
 
+<p>基于 JavaFX 开发的开源跨平台自动操作工具，支持键鼠自动化、图像识别、流程录制与编辑。</p>
+
+<p>
+    <img alt="Java" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=Java&color=ED8B00&logo=java&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='properties']/*[local-name()='java.version']&cacheSeconds=3600" />
+    <img alt="JavaFX" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=JavaFX&color=007396&logo=java&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='properties']/*[local-name()='javafx.version']&cacheSeconds=3600" />
+    <img alt="JavaCV" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=JavaCV&color=orange&logo=opencv&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency'][*[local-name()='artifactId']='javacv-platform']/*[local-name()='version']&cacheSeconds=3600" />
+    <img alt="Version" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=PMC&color=blueviolet&logo=github&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='version']&cacheSeconds=3600" />
+    <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Asukkaa/PMC?style=for-the-badge&color=blue" />
+    <img alt="GitHub" src="https://img.shields.io/github/license/Asukkaa/PMC?style=for-the-badge&color=blue" />
+</p>
+
+----
+
 ## 项目简介
 
-本项目是一个用 javafx 开发的自动操作工具。
+本项目是一个用 JavaFX 开发的自动操作工具。
 可以编辑自动操作流程或录制自动操作流程，支持导入导出自动操作流程，支持循环自动操作。
 
-本项目图像识别功能基于 javacv 实现的，可在自动操作流程中设置要识别的图片和终止操作图片。
+本项目图像识别功能基于 JavaCV 实现的，可在自动操作流程中设置要识别的图片和终止操作图片。
 
 自动流程文件为 .pmc 文件，本质为 json 文件，更改文件拓展名只为方便过滤可导入的文件。
 
@@ -120,3 +133,5 @@ Gitee：https://gitee.com/wowxqt/pmc
 如果喜欢本项目的话可以扫描微信赞赏码给作者一个赞赏
 
 ![](.docs/Appreciate.jpg)
+
+或前往爱发电为作者发电：https://afdian.com/a/project_pmc

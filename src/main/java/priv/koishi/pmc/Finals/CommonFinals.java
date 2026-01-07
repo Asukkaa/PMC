@@ -26,7 +26,12 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "4.0.1";
+    public static final String version = "4.1.0";
+
+    /**
+     * PMC 文件版本
+     */
+    public static final String PMCFileVersion = "2.0";
 
     /**
      * jdk 版本
@@ -36,7 +41,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2025.12.19";
+    public static final String buildDate = "2026.01.07";
 
     /**
      * 文件后缀名：bat
@@ -359,6 +364,11 @@ public class CommonFinals {
     public static final String contentsDirectory = "/Contents";
 
     /**
+     * mac app 目录(.app/Contents/app)
+     */
+    public static final String macAppDirectory = appLaunchPath + contentsDirectory + appDirectory;
+
+    /**
      * cfg 文件路径
      */
     public static final String cfgFilePath = getCFGPath();
@@ -482,6 +492,11 @@ public class CommonFinals {
     public static final String giteeLink = "https://gitee.com/wowxqt/pmc";
 
     /**
+     * 爱发电地址
+     */
+    public static final String afdianLink = "https://afdian.com/a/project_pmc";
+
+    /**
      * 存在的文件路径颜色
      */
     public static final Color existsFileColor = Color.rgb(0, 88, 128);
@@ -552,9 +567,19 @@ public class CommonFinals {
     public static final int topAdd = 0;
 
     /**
+     * 不添加新数据，用于组合键监听器获取组合键
+     */
+    public static final int noAdd = -99;
+
+    /**
      * 更新窗口信息消息气泡显示事件（单位：秒）
      */
     public static final int updateListMassageTime = 2;
+
+    /**
+     * 无键盘按键
+     */
+    public static final int noKeyboard = -1;
 
     /**
      * 绝对横坐标标识

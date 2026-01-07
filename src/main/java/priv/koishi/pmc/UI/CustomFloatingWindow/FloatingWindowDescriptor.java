@@ -143,22 +143,22 @@ public class FloatingWindowDescriptor {
     boolean transparent;
 
     /**
-     * 保存设置时浮窗横坐标key
+     * 保存设置时浮窗横坐标 key
      */
     String xKey;
 
     /**
-     * 保存设置时浮窗纵坐标key
+     * 保存设置时浮窗纵坐标 key
      */
     String yKey;
 
     /**
-     * 浮窗保存设置时宽度key
+     * 浮窗保存设置时宽度 key
      */
     String widthKey;
 
     /**
-     * 浮窗保存设置时高度key
+     * 浮窗保存设置时高度 key
      */
     String heightKey;
 

@@ -29,7 +29,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,6 +38,7 @@ import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMai
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
@@ -400,7 +400,7 @@ public class AutoClickService {
                     if (clickType >= ClickTypeEnum.MOVE_TRAJECTORY.ordinal()) {
                         clickText = "";
                     } else {
-                        clickText = text_taskInfo() + clickPositionVO.getClickKey() + clickPositionVO.getClickType();
+                        clickText = text_taskInfo() + clickPositionVO.getMouseKey() + clickPositionVO.getClickType();
                     }
                     if (StringUtils.isNotBlank(clickImgPath)) {
                         text += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
@@ -791,8 +791,10 @@ public class AutoClickService {
                     dynamicQueue.add(clickLogBean);
                 }
             }
-            MouseButton mouseButton = NativeMouseToMouseButton.get(clickPositionVO.getClickKeyEnum());
-            String clickKey = clickPositionVO.getClickKey();
+            MouseButton mouseButton = NativeMouseToMouseButton.get(clickPositionVO.getMouseKeyEnum());
+            int keyCode = clickPositionVO.getKeyboardKeyEnum();
+            String clickKey = clickPositionVO.getMouseKey();
+            String keyboard = clickPositionVO.getKeyboardKey();
             // 处理随机坐标偏移量
             if (activation.equals(clickPositionVO.getRandomClick())) {
                 int randomX = Integer.parseInt(clickPositionVO.getRandomX());
@@ -804,18 +806,30 @@ public class AutoClickService {
             double finalStartY = startY;
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
-                robot.mouseMove(finalStartX, finalStartY);
-                if (taskBean.isMoveLog()) {
-                    ClickLogBean moveLog = new ClickLogBean();
-                    moveLog.setX(String.valueOf((int) finalStartX))
-                            .setY(String.valueOf((int) finalStartY))
-                            .setClickKey(mouseButton_none())
-                            .setType(log_move())
-                            .setName(name);
-                    dynamicQueue.add(moveLog);
+                if (unActivation.equals(clickPositionVO.getNoMove())) {
+                    robot.mouseMove(finalStartX, finalStartY);
+                    if (taskBean.isMoveLog()) {
+                        ClickLogBean moveLog = new ClickLogBean();
+                        moveLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setClickKey(mouseButton_none())
+                                .setType(log_move())
+                                .setName(name);
+                        dynamicQueue.add(moveLog);
+                    }
                 }
                 // 执行自动流程前点击第一个起始坐标
                 if (firstClick.compareAndSet(true, false)) {
+                    robot.mouseMove(finalStartX, finalStartY);
+                    if (taskBean.isMoveLog()) {
+                        ClickLogBean moveLog = new ClickLogBean();
+                        moveLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setClickKey(mouseButton_none())
+                                .setType(log_move())
+                                .setName(name);
+                        dynamicQueue.add(moveLog);
+                    }
                     robot.mousePress(MouseButton.PRIMARY);
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
@@ -870,6 +884,17 @@ public class AutoClickService {
                                 .setName(name);
                         dynamicQueue.add(wheelLog);
                     }
+                } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                    robot.keyPress(NativeKeyToKeyCode.get(keyCode));
+                    if (taskBean.isKeyboardLog()) {
+                        ClickLogBean keyPressLog = new ClickLogBean();
+                        keyPressLog.setX(String.valueOf((int) finalStartX))
+                                .setY(String.valueOf((int) finalStartY))
+                                .setClickKey(keyboard)
+                                .setType(log_press())
+                                .setName(name);
+                        dynamicQueue.add(keyPressLog);
+                    }
                 }
                 actionFuture.complete(null);
             });
@@ -883,7 +908,8 @@ public class AutoClickService {
             }
             // 执行长按操作
             if (ClickTypeEnum.DRAG.ordinal() != clickType &&
-                    ClickTypeEnum.MOVE_TRAJECTORY.ordinal() != clickType) {
+                    ClickTypeEnum.MOVE_TRAJECTORY.ordinal() != clickType &&
+                    ClickTypeEnum.COMBINATIONS.ordinal() != clickType) {
                 // 处理随机点击时长偏移
                 if (activation.equals(clickPositionVO.getRandomClickTime())) {
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
@@ -905,6 +931,15 @@ public class AutoClickService {
                             .setType(log_hold())
                             .setName(name);
                     dynamicQueue.add(clickLog);
+                } else if (taskBean.isKeyboardLog() && ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                    ClickLogBean clickLog = new ClickLogBean();
+                    clickLog.setClickTime(String.valueOf(clickTime))
+                            .setX(String.valueOf((int) finalStartX))
+                            .setY(String.valueOf((int) finalStartY))
+                            .setClickKey(keyboard)
+                            .setType(log_hold())
+                            .setName(name);
+                    dynamicQueue.add(clickLog);
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
@@ -916,6 +951,17 @@ public class AutoClickService {
                                     .setY(String.valueOf((int) finalStartY))
                                     .setType(log_release())
                                     .setClickKey(clickKey)
+                                    .setName(name);
+                            dynamicQueue.add(releaseLog);
+                        }
+                    } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                        robot.keyRelease(NativeKeyToKeyCode.get(keyCode));
+                        if (taskBean.isKeyboardLog()) {
+                            ClickLogBean releaseLog = new ClickLogBean();
+                            releaseLog.setX(String.valueOf((int) finalStartX))
+                                    .setY(String.valueOf((int) finalStartY))
+                                    .setType(log_release())
+                                    .setClickKey(keyboard)
                                     .setName(name);
                             dynamicQueue.add(releaseLog);
                         }
@@ -1031,31 +1077,52 @@ public class AutoClickService {
         List<TrajectoryPointBean> points = clickPositionVO.getMoveTrajectory();
         if (!points.isEmpty()) {
             TrajectoryPointBean lastPoint = null;
+            List<CompletableFuture<Void>> allFutures = new ArrayList<>();
             for (TrajectoryPointBean point : points) {
-                // 当前轨迹点按下的按键
-                List<Integer> pressButtons = point.getPressButtons();
-                // 当前轨迹点要抬起的按键
-                List<Integer> releaseButtons = new CopyOnWriteArrayList<>();
-                // 当前轨迹点新增的要按下的按键
-                List<Integer> nowPressButtons;
+                // 当前轨迹点按下的鼠标按键
+                List<Integer> pressMouseKeys = point.getPressMouseKeys();
+                // 当前轨迹点要抬起的鼠标按键
+                List<Integer> releaseMouseKeys = new CopyOnWriteArrayList<>();
+                // 当前轨迹点新增的要按下的鼠标按键
+                List<Integer> nowPressMouseKeys;
+                // 当前轨迹点按下的键盘按键
+                List<Integer> pressKeyboardKeys = point.getPressKeyboardKeys();
+                // 当前轨迹点要抬起的键盘按键
+                List<Integer> releaseKeyboardKeys = new CopyOnWriteArrayList<>();
+                // 当前轨迹点新增的要按下的键盘按键
+                List<Integer> nowPressKeyboardKeys;
                 long remaining = 0;
                 if (lastPoint != null) {
                     remaining = point.getTimestamp() - lastPoint.getTimestamp();
-                    // 上一个轨迹点按下的按键
-                    List<Integer> lastPressButtons = lastPoint.getPressButtons();
-                    if (CollectionUtils.isEmpty(pressButtons)) {
-                        nowPressButtons = null;
-                        releaseButtons = lastPressButtons;
+                    // 上一个轨迹点按下的鼠标按键
+                    List<Integer> lastPressMouseKeys = lastPoint.getPressMouseKeys();
+                    if (CollectionUtils.isEmpty(pressMouseKeys)) {
+                        nowPressMouseKeys = null;
+                        releaseMouseKeys = lastPressMouseKeys;
                     } else {
-                        if (CollectionUtils.isNotEmpty(lastPressButtons)) {
-                            releaseButtons = (List<Integer>) CollectionUtils.subtract(lastPressButtons, pressButtons);
-                            nowPressButtons = (List<Integer>) CollectionUtils.subtract(pressButtons, lastPressButtons);
+                        if (CollectionUtils.isNotEmpty(lastPressMouseKeys)) {
+                            releaseMouseKeys = (List<Integer>) CollectionUtils.subtract(lastPressMouseKeys, pressMouseKeys);
+                            nowPressMouseKeys = (List<Integer>) CollectionUtils.subtract(pressMouseKeys, lastPressMouseKeys);
                         } else {
-                            nowPressButtons = pressButtons;
+                            nowPressMouseKeys = pressMouseKeys;
+                        }
+                    }
+                    // 上一个轨迹点按下的键盘按键
+                    List<Integer> lastPressKeyboardKeys = lastPoint.getPressKeyboardKeys();
+                    if (CollectionUtils.isEmpty(pressKeyboardKeys)) {
+                        nowPressKeyboardKeys = null;
+                        releaseKeyboardKeys = lastPressKeyboardKeys;
+                    } else {
+                        if (CollectionUtils.isNotEmpty(lastPressKeyboardKeys)) {
+                            releaseKeyboardKeys = (List<Integer>) CollectionUtils.subtract(lastPressKeyboardKeys, pressKeyboardKeys);
+                            nowPressKeyboardKeys = (List<Integer>) CollectionUtils.subtract(pressKeyboardKeys, lastPressKeyboardKeys);
+                        } else {
+                            nowPressKeyboardKeys = pressKeyboardKeys;
                         }
                     }
                 } else {
-                    nowPressButtons = pressButtons;
+                    nowPressMouseKeys = pressMouseKeys;
+                    nowPressKeyboardKeys = pressKeyboardKeys;
                 }
                 lastPoint = point;
                 double x = point.getX();
@@ -1086,12 +1153,26 @@ public class AutoClickService {
                     y = Math.min(Math.max(0, y + (random.nextDouble() * 2 - 1) * randomY), screenHeight);
                 }
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
-                List<Integer> finalReleaseButtons = releaseButtons;
+                allFutures.add(moveFuture);
+                List<Integer> finalReleaseButtons = releaseMouseKeys;
+                List<Integer> finalReleaseKeyboardKeys = releaseKeyboardKeys;
                 double finalX = x;
                 double finalY = y;
+                // 精确控制时间间隔
+                if (remaining > 0) {
+                    Thread.sleep(remaining);
+                    if (taskBean.isWaitLog()) {
+                        ClickLogBean sleepLog = new ClickLogBean();
+                        sleepLog.setClickTime(String.valueOf(remaining))
+                                .setClickKey(mouseButton_none())
+                                .setType(log_wait())
+                                .setName(name);
+                        dynamicQueue.add(sleepLog);
+                    }
+                }
                 Platform.runLater(() -> {
-                    if (CollectionUtils.isNotEmpty(nowPressButtons)) {
-                        nowPressButtons.forEach(button -> {
+                    if (CollectionUtils.isNotEmpty(nowPressMouseKeys)) {
+                        nowPressMouseKeys.forEach(button -> {
                             robot.mousePress(NativeMouseToMouseButton.get(button));
                             if (taskBean.isDragLog()) {
                                 ClickLogBean clickLog = new ClickLogBean();
@@ -1118,7 +1199,37 @@ public class AutoClickService {
                             }
                         });
                     }
-                    robot.mouseMove(finalX, finalY);
+                    if (CollectionUtils.isNotEmpty(nowPressKeyboardKeys)) {
+                        nowPressKeyboardKeys.forEach(button -> {
+                            robot.keyPress(NativeKeyToKeyCode.get(button));
+                            if (taskBean.isKeyboardLog()) {
+                                ClickLogBean pressLog = new ClickLogBean();
+                                pressLog.setX(String.valueOf((int) finalX))
+                                        .setY(String.valueOf((int) finalY))
+                                        .setClickKey(getKeyText(button))
+                                        .setType(log_press())
+                                        .setName(name);
+                                dynamicQueue.add(pressLog);
+                            }
+                        });
+                    }
+                    if (CollectionUtils.isNotEmpty(finalReleaseKeyboardKeys)) {
+                        finalReleaseKeyboardKeys.forEach(button -> {
+                            robot.keyRelease(NativeKeyToKeyCode.get(button));
+                            if (taskBean.isKeyboardLog()) {
+                                ClickLogBean releaseLog = new ClickLogBean();
+                                releaseLog.setX(String.valueOf((int) finalX))
+                                        .setY(String.valueOf((int) finalY))
+                                        .setClickKey(getKeyText(button))
+                                        .setType(log_release())
+                                        .setName(name);
+                                dynamicQueue.add(releaseLog);
+                            }
+                        });
+                    }
+                    if (unActivation.equals(clickPositionVO.getNoMove())) {
+                        robot.mouseMove(finalX, finalY);
+                    }
                     robot.mouseWheel(wheelRotation);
                     if (taskBean.isMouseWheelLog() && wheelRotation != 0) {
                         ClickLogBean wheelLog = new ClickLogBean();
@@ -1133,7 +1244,7 @@ public class AutoClickService {
                         }
                         dynamicQueue.add(wheelLog);
                     }
-                    if (CollectionUtils.isEmpty(pressButtons) && taskBean.isMoveLog()) {
+                    if (CollectionUtils.isEmpty(pressMouseKeys) && taskBean.isMoveLog()) {
                         ClickLogBean moveLog = new ClickLogBean();
                         moveLog.setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
@@ -1141,9 +1252,9 @@ public class AutoClickService {
                                 .setType(log_move())
                                 .setName(name);
                         dynamicQueue.add(moveLog);
-                    } else if (CollectionUtils.isNotEmpty(pressButtons) && taskBean.isDragLog()) {
+                    } else if (CollectionUtils.isNotEmpty(pressMouseKeys) && taskBean.isDragLog()) {
                         List<String> clickKeys = new ArrayList<>();
-                        pressButtons.forEach(button -> {
+                        pressMouseKeys.forEach(button -> {
                             String clickKey = recordClickTypeMap.get(button);
                             clickKeys.add(clickKey);
                         });
@@ -1157,20 +1268,9 @@ public class AutoClickService {
                     }
                     moveFuture.complete(null);
                 });
-                // 精确控制时间间隔
-                moveFuture.get(remaining + 500, TimeUnit.MILLISECONDS);
-                if (remaining > 0) {
-                    Thread.sleep(remaining);
-                    if (taskBean.isWaitLog()) {
-                        ClickLogBean sleepLog = new ClickLogBean();
-                        sleepLog.setClickTime(String.valueOf(remaining))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_wait())
-                                .setName(name);
-                        dynamicQueue.add(sleepLog);
-                    }
-                }
             }
+            // 等待所有异步操作完成
+            CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).get();
         }
     }
 

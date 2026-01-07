@@ -102,7 +102,7 @@ public class AboutController extends RootController {
 
     @FXML
     public Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt,
-            openGiteeLinkBtn_Abt, appreciate_Abt, checkUpdate_Abt;
+            openGiteeLinkBtn_Abt, appreciate_Abt, checkUpdate_Abt, afdianLinkBtn_Abt;
 
     /**
      * 读取配置文件
@@ -374,6 +374,16 @@ public class AboutController extends RootController {
     @FXML
     private void openGiteeLink() throws Exception {
         Desktop.getDesktop().browse(new URI(giteeLink));
+    }
+
+    /**
+     * 打开爱发电主页
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openAfdianLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(afdianLink));
     }
 
     /**

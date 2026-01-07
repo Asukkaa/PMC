@@ -6,7 +6,7 @@
 
     <groupId>priv.Koishi</groupId>
     <artifactId>PMC</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <name>PMC</name>
 
     <properties>
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
-            <version>1.5.11</version>
+            <version>1.5.12</version>
         </dependency>
 
         <dependency>

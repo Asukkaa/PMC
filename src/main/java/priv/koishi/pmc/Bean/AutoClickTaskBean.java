@@ -100,6 +100,11 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     boolean mouseWheelLog;
 
     /**
+     * 运行自动流程时记录键盘事件
+     */
+    boolean keyboardLog;
+
+    /**
      * 最大记录数量
      */
     int maxLogNum;

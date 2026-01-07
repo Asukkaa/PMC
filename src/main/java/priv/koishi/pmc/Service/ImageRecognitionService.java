@@ -28,8 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 import static priv.koishi.pmc.Controller.MainController.settingController;
-import static priv.koishi.pmc.Finals.CommonFinals.activation;
-import static priv.koishi.pmc.Finals.CommonFinals.percentage;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
@@ -41,6 +40,13 @@ import static priv.koishi.pmc.Utils.FileUtils.getFileName;
  * Time 10:08
  */
 public class ImageRecognitionService {
+
+    // macOS 加载内置的 libavif，防止操作系统没有安装相关环境
+    static {
+        if (!isRunningFromIDEA && isMac) {
+            System.load(macAppDirectory + "/libavif.16.3.0.dylib");
+        }
+    }
 
     /**
      * 多尺度并行匹配缩放比例

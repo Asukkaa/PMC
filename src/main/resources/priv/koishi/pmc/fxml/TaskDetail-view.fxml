@@ -62,7 +62,7 @@
                 </HBox>
 
                 <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
-                    <Label text="%taskDetail.fileName"/>
+                    <Label text="%fileName"/>
                     <Label fx:id="fileName_DT"/>
                     <Button onAction="#removePath" fx:id="delete_TD" styleClass="img-button-style">
                         <graphic>
@@ -74,7 +74,7 @@
                 </HBox>
 
                 <HBox fx:id="filePathHBox_DT" visible="false">
-                    <Label text="%taskDetail.filePath"/>
+                    <Label text="%filePath"/>
                     <Label fx:id="pmcFilePath_TD" style="-fx-font-size: 15px;"/>
                 </HBox>
             </VBox>

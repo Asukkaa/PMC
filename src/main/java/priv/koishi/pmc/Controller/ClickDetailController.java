@@ -1,5 +1,7 @@
 package priv.koishi.pmc.Controller;
 
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -10,6 +12,7 @@ import javafx.collections.WeakListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -17,7 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.DragEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -32,8 +35,10 @@ import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Callback.InputRecordCallback;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
@@ -41,6 +46,8 @@ import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
+import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -52,10 +59,12 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
 import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
@@ -70,6 +79,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -177,6 +187,31 @@ public class ClickDetailController extends RootController {
     private ListChangeListener<ImgFileVO> tableListener;
 
     /**
+     * 全局键盘监听器
+     */
+    private NativeKeyListener nativeKeyListener;
+
+    /**
+     * 全局组合键监听器
+     */
+    private UnifiedInputRecordListener listener;
+
+    /**
+     * 正在录制标识
+     */
+    public boolean recordClicking;
+
+    /**
+     * 组合键轨迹
+     */
+    private final List<TrajectoryPointBean> trajectory = new CopyOnWriteArrayList<>();
+
+    /**
+     * 键盘按键设置
+     */
+    int keyCode = noKeyboard;
+
+    /**
      * 页面标识符
      */
     private final String tabId = "_Det";
@@ -212,7 +247,7 @@ public class ClickDetailController extends RootController {
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, clickKeyHBox_Det;
+            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -235,12 +270,12 @@ public class ClickDetailController extends RootController {
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
             stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det,
-            minWindow_Det;
+            minWindow_Det, noMove_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
-            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, coordinateTypeText_Det,
-            clickTypeText_Det, openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det;
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, clickTypeText_Det,
+            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -315,7 +350,7 @@ public class ClickDetailController extends RootController {
         imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
         clickName_Det.setText(item.getName());
-        clickKey_Det.setValue(item.getClickKey());
+        clickKey_Det.setValue(item.getMouseKey());
         mouseStartX_Det.setText(item.getStartX());
         mouseStartY_Det.setText(item.getStartY());
         timeClick_Det.setText(item.getClickTime());
@@ -332,6 +367,7 @@ public class ClickDetailController extends RootController {
         stopRetryNum_Det.setText(item.getStopRetryTimes());
         randomTimeOffset_Det.setText(item.getRandomTime());
         clickRetryNum_Det.setText(item.getClickRetryTimes());
+        noMove_Det.setSelected(activation.equals(item.getNoMove()));
         randomClick_Det.setSelected(activation.equals(item.getRandomClick()));
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         randomWaitTime_Det.setSelected(activation.equals(item.getRandomWaitTime()));
@@ -351,19 +387,35 @@ public class ClickDetailController extends RootController {
      * @param item 列表选中的数据
      */
     private void initClickType(ClickPositionVO item) {
-        ObservableList<String> clickTypeItems = clickType_Det.getItems();
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
-        String targetPath = item.getTargetPath();
-        if (CollectionUtils.isEmpty(item.getMoveTrajectory())) {
+        // 处理移动轨迹相关下拉框
+        ObservableList<String> clickTypeItems = clickType_Det.getItems();
+        if (!clickType_moveTrajectory().equals(clickType) &&
+                !clickType_drag().equals(clickType)) {
             clickTypeItems.remove(clickType_moveTrajectory());
             clickTypeItems.remove(clickType_drag());
-        } else if (clickType_drag().equals(clickType) || clickType_moveTrajectory().equals(clickType)) {
+        } else if (clickType_drag().equals(clickType) ||
+                clickType_moveTrajectory().equals(clickType)) {
             clickTypeItems.add(clickType);
             setNodeDisable(clickType_Det, true);
             setNodeDisable(mouseStartX_Det, true);
             setNodeDisable(mouseStartY_Det, true);
         }
+        keyCode = item.getKeyboardKeyEnum();
+        // 处理按键相关组件
+        if (clickType_combinations().equals(clickType)) {
+            trajectory.addAll(item.getMoveTrajectory());
+            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
+            clickKeyHBox_Det.setVisible(false);
+        } else if (keyCode != noKeyboard) {
+            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
+            clickKeyHBox_Det.setVisible(false);
+        } else {
+            clickKeyHBox_Det.setVisible(true);
+        }
+        // 处理打开链接相关组件
+        String targetPath = item.getTargetPath();
         if (clickType_openFile().equals(clickType)) {
             setPathLabel(link_Det, targetPath);
         } else if (clickType_runScript().equals(clickType)) {
@@ -618,6 +670,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(url_Det, url_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(link_Det, link_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(noMove_Det, noMove_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(workPath_Det, workPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(parameter_Det, parameter_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -806,6 +859,7 @@ public class ClickDetailController extends RootController {
     private void setToolTip() {
         addToolTip(tip_url(), url_Det);
         addToolTip(tip_wait(), wait_Det);
+        addToolTip(tip_noMove(), noMove_Det);
         addToolTip(tip_workDir(), workDir_Det);
         addToolTip(tip_testLink(), testLink_Det);
         addToolTip(tip_pathLink(), pathLink_Det);
@@ -819,6 +873,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_mouseStartX(), mouseStartX_Det);
         addToolTip(tip_mouseStartY(), mouseStartY_Det);
         addToolTip(tip_randomClick(), randomClick_Det);
+        addToolTip(tip_updateKeyboard(), setKeyHBox_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
         addToolTip(tip_useRelatively(), useRelatively_Det);
         addToolTip(tip_removeWorkDir(), removeWorkPath_Det);
@@ -927,10 +982,14 @@ public class ClickDetailController extends RootController {
      * 关闭页面
      */
     private void closeStage() {
+        autoClickController.detailStage = null;
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
         hideFloatingWindow(clickFloating, stopFloating, massageFloating);
         removeAll();
         removeAllListeners();
+        // 移除全局输入监听器
+        removeNativeListener(listener);
+        removeNativeListener(nativeKeyListener);
         if (windowMonitorClick != null) {
             windowMonitorClick.stopNativeKeyListener();
             windowMonitorClick = null;
@@ -1120,6 +1179,275 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 开启全局键盘监听
+     */
+    private void startNativeKeyListener() {
+        removeNativeListener(listener);
+        removeNativeListener(nativeKeyListener);
+        // 键盘监听器
+        nativeKeyListener = intitNativeKeyListener();
+        addNativeListener(nativeKeyListener);
+    }
+
+    /**
+     * 开启全局组合键监听
+     */
+    private void startNativeCombinationsListener() {
+        // 移除之前的监听器
+        removeNativeListener(listener);
+        removeNativeListener(nativeKeyListener);
+        startNativeKeyListener();
+        listener = initUnifiedInputRecordListener();
+        // 注册监听器
+        addNativeListener(listener);
+        // 启动录制
+        listener.startRecording();
+    }
+
+    /**
+     * 判断是否为需要交互按钮的类型（键鼠点击和滑轮滚动）
+     *
+     * @param clickType 需要判断的操作类型枚举
+     * @return true 为需要交互按钮的类型
+     */
+    private boolean isClickList(int clickType) {
+        return ClickTypeEnum.CLICK.ordinal() == clickType ||
+                ClickTypeEnum.COMBINATIONS.ordinal() == clickType ||
+                ClickTypeEnum.KEYBOARD.ordinal() == clickType ||
+                ClickTypeEnum.WHEEL_DOWN.ordinal() == clickType ||
+                ClickTypeEnum.WHEEL_UP.ordinal() == clickType;
+    }
+
+    /**
+     * 添加目标图片
+     *
+     * @param selectedFile 选择的图片文件
+     * @throws IOException 配置文件保存异常
+     */
+    private void addClickImg(File selectedFile) throws IOException {
+        if (selectedFile != null) {
+            // 更新所选文件路径显示
+            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
+                    key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
+            showClickImg(clickImgSelectPath);
+            clickType_Det.setValue(clickType_click());
+            clickTypeHBox_Det.setVisible(true);
+        }
+    }
+
+    /**
+     * 初始化键盘输入监听器
+     */
+    private NativeKeyListener intitNativeKeyListener() {
+        // 创建键盘监听器
+        return new NativeKeyListener() {
+            @Override
+            public void nativeKeyPressed(NativeKeyEvent e) {
+                Platform.runLater(() -> {
+                    // 仅在录制情况下才监听键盘
+                    if (recordClicking) {
+                        keyCode = e.getKeyCode();
+                        String key = getKeyText(keyCode);
+                        // 过滤未知按键
+                        if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
+                            // 检测快捷键 esc
+                            if (keyCode == cancelKey) {
+                                removeNativeListener(listener);
+                                removeNativeListener(nativeKeyListener);
+                                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
+                                setKeyHBox_Det.setCursor(Cursor.HAND);
+                                recordClicking = false;
+                                throw new RuntimeException(key + text_keyConflict());
+                            } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
+                                removeNativeListener(nativeKeyListener);
+                                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
+                                setKeyHBox_Det.setCursor(Cursor.HAND);
+                                recordClicking = false;
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * 初始化统一输入录制监听器
+     *
+     * @return 统一输入录制监听器
+     */
+    private UnifiedInputRecordListener initUnifiedInputRecordListener() {
+        // 创建组合键监听器
+        return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
+
+            /**
+             * 用来临时保存组合键的临时操作步骤
+             */
+            private ClickPositionVO combinationBean;
+
+
+            @Override
+            public ClickPositionVO createDefaultClickPosition() {
+                combinationBean = new ClickPositionVO();
+                return combinationBean;
+            }
+
+            /**
+             * 保存操作步骤
+             *
+             * @param events  操作步骤
+             * @param addType 添加方式
+             */
+            @Override
+            public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
+                // 这里不添加到表格，只用于组合键监听
+                if (combinationBean != null) {
+                    // 所有按键松开，组合键录制完成
+                    handleCombinationComplete();
+                }
+                stopRecording();
+            }
+
+            /**
+             * 获取当前步骤数
+             *
+             * @return 临时步骤数
+             */
+            @Override
+            public int getCurrentStepCount() {
+                return -1;
+            }
+
+            /**
+             * 获取是否录制鼠标移动事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMove() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制鼠标拖拽事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordDrag() {
+                return false;
+            }
+
+            /**
+             * 更新滑轮记录信息
+             *
+             * @param wheelRotation 滑轮滚动方向
+             * @param wheelNum      滑轮滚动次数
+             */
+            @Override
+            public void onWheelRecorded(int wheelRotation, int wheelNum) {
+            }
+
+            /**
+             * 更新记录信息
+             *
+             * @param log 记录信息
+             */
+            @Override
+            public void updateRecordLog(String log) {
+                keyboard_Det.setText(log.substring(log.lastIndexOf("\n") + 1));
+            }
+
+            /**
+             * 停止所有任务
+             */
+            @Override
+            public void stopWorkAll() {
+                removeNativeListener(listener);
+                recordClicking = false;
+            }
+
+            /**
+             * 显示错误信息
+             */
+            @Override
+            public void showError() {
+            }
+
+            /**
+             * 获取是否录制鼠标滚轮事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordMouseWheel() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制键盘事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordKeyboard() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制鼠标点击事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordMouseClick() {
+                return true;
+            }
+
+            /**
+             * 处理组合键录制完成
+             */
+            private void handleCombinationComplete() {
+                if (combinationBean.getClickTypeEnum() == ClickTypeEnum.WHEEL_UP.ordinal()) {
+                    int wheelNum = Integer.parseInt(combinationBean.getClickNum());
+                    TrajectoryPointBean wheelBean = new TrajectoryPointBean()
+                            .setWheelRotation(-wheelNum);
+                    combinationBean.setMoveTrajectory(Collections.singletonList(wheelBean));
+                } else if (combinationBean.getClickTypeEnum() == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
+                    int wheelNum = Integer.parseInt(combinationBean.getClickNum());
+                    TrajectoryPointBean wheelBean = new TrajectoryPointBean()
+                            .setWheelRotation(wheelNum);
+                    combinationBean.setMoveTrajectory(Collections.singletonList(wheelBean));
+                }
+                combinationBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
+                trajectory.clear();
+                trajectory.addAll(combinationBean.getMoveTrajectory());
+                // 计算持续时间
+                if (CollectionUtils.isNotEmpty(trajectory)) {
+                    long firstTime = trajectory.getFirst().getTimestamp();
+                    long lastTime = trajectory.getLast().getTimestamp();
+                    long duration = lastTime - firstTime;
+                    timeClick_Det.setText(String.valueOf(duration));
+                }
+            }
+
+            /**
+             * 停止录制
+             */
+            private void stopRecording() {
+                removeNativeListener(listener);
+                recordClicking = false;
+                Platform.runLater(() -> {
+                    if (combinationBean != null) {
+                        updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, combinationBean.getClickKey(), true);
+                    }
+                });
+            }
+
+        });
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -1185,6 +1513,7 @@ public class ClickDetailController extends RootController {
             matchedType = MatchedTypeEnum.CLICK.ordinal();
             retryType = RetryTypeEnum.STOP.ordinal();
             clickKey = NativeMouseEvent.NOBUTTON;
+            keyCode = noKeyboard;
             clickNum = 1;
             useRelatively = unActivation;
             if ((clickType == ClickTypeEnum.OPEN_FILE.ordinal() || clickType == ClickTypeEnum.RUN_SCRIPT.ordinal())
@@ -1205,9 +1534,32 @@ public class ClickDetailController extends RootController {
                     || clickType == ClickTypeEnum.MOVETO.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
                 clickNum = 1;
+                keyCode = noKeyboard;
             } else if (clickType == ClickTypeEnum.WHEEL_UP.ordinal()
                     || clickType == ClickTypeEnum.WHEEL_DOWN.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
+                keyCode = noKeyboard;
+            } else if (clickType == ClickTypeEnum.CLICK.ordinal()) {
+                keyCode = noKeyboard;
+                selectedItem.setKeyboardKeyEnum(keyCode);
+            } else if (clickType == ClickTypeEnum.KEYBOARD.ordinal()) {
+                clickKey = NativeMouseEvent.NOBUTTON;
+                if (keyCode == noKeyboard) {
+                    throw new RuntimeException(text_unSetKeyboard());
+                }
+                selectedItem.setKeyboardKeyEnum(keyCode);
+            } else if (clickType == ClickTypeEnum.COMBINATIONS.ordinal()) {
+                if (text_unSetKeyboard().equals(keyboard_Det.getText())) {
+                    throw new RuntimeException(text_unSetKeyboard());
+                }
+                int x = setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth);
+                int y = setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight);
+                trajectory.forEach(t -> t.setX(x).setY(y));
+                selectedItem.setMoveTrajectory(trajectory);
+            }
+            if (isClickList(clickType)) {
+                String noMove = noMove_Det.isSelected() ? activation : unActivation;
+                selectedItem.setNoMove(noMove);
             }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
                     clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
@@ -1233,7 +1585,7 @@ public class ClickDetailController extends RootController {
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
                 .setTargetPath(link)
-                .setClickKeyEnum(clickKey)
+                .setMouseKeyEnum(clickKey)
                 .setRandomClick(randomClick)
                 .setClickTypeEnum(clickType)
                 .setRetryTypeEnum(retryType)
@@ -1310,14 +1662,7 @@ public class ClickDetailController extends RootController {
     private void addClickImgPath(ActionEvent actionEvent) throws IOException {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         File selectedFile = creatImgFileChooser(window, clickImgSelectPath);
-        if (selectedFile != null) {
-            // 更新所选文件路径显示
-            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
-                    key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
-            showClickImg(clickImgSelectPath);
-            clickType_Det.setValue(clickType_click());
-            clickTypeHBox_Det.setVisible(true);
-        }
+        addClickImg(selectedFile);
     }
 
     /**
@@ -1355,6 +1700,8 @@ public class ClickDetailController extends RootController {
     public void handleDrop(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         startLoadImgTask(files);
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
     }
 
     /**
@@ -1418,8 +1765,10 @@ public class ClickDetailController extends RootController {
         setPathLabel(link_Det, null);
         vBox_Det.getChildren().clear();
         vBox_Det.getChildren().add(commonVBox_Det);
+        typeHBox_Det.getChildren().removeAll(noMove_Det, testLink_Det);
         if (linkList.contains(value)) {
             vBox_Det.getChildren().add(pathLinkVBox_Det);
+            typeHBox_Det.getChildren().add(testLink_Det);
             testLink_Det.setVisible(true);
             resolution_Det.setVisible(false);
             randomClickInterval_Det.setVisible(false);
@@ -1441,6 +1790,12 @@ public class ClickDetailController extends RootController {
                 pathTip_Det.setText(pathTip_openUrl());
             }
         } else {
+            if (isClickList(clickTypeMap.getKey(value))) {
+                typeHBox_Det.getChildren().add(noMove_Det);
+                noMove_Det.setVisible(true);
+            } else {
+                noMove_Det.setVisible(false);
+            }
             clickTypeHBox_Det.setVisible(!clickType_move().equals(value) && !clickType_moveTo().equals(value));
             clickKeyHBox_Det.setVisible(!clickType_move().equals(value)
                     && !clickType_moveTo().equals(value)
@@ -1452,6 +1807,23 @@ public class ClickDetailController extends RootController {
             randomClickInterval_Det.setVisible(true);
             pathTip_Det.setText("");
             resolution_Det.setVisible(true);
+            if (clickType_combinations().equals(value)) {
+                inputKey_Det.setText(clickDetail_combinations());
+                keyboardHBox_Det.setVisible(true);
+                clickKeyHBox_Det.setVisible(false);
+                setNodeDisable(timeClick_Det, true);
+                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
+            } else if (clickType_keyboard().equals(value)) {
+                inputKey_Det.setText(clickDetail_keyboard());
+                keyboardHBox_Det.setVisible(true);
+                clickKeyHBox_Det.setVisible(false);
+                setNodeDisable(timeClick_Det, false);
+                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
+            } else {
+                keyboardHBox_Det.setVisible(false);
+                clickKeyHBox_Det.setVisible(true);
+                setNodeDisable(timeClick_Det, false);
+            }
         }
         ObservableList<String> clickItems = clickKey_Det.getItems();
         if (CollectionUtils.isNotEmpty(clickItems) && !clickItems.contains(clickKey_Det.getValue())) {
@@ -1736,6 +2108,74 @@ public class ClickDetailController extends RootController {
     private void removeWorkPath() {
         setPathLabel(workPath_Det, "");
         removeWorkPath_Det.setVisible(false);
+    }
+
+    /**
+     * 设置绑定键盘按键
+     *
+     * @param mouseEvent 鼠标点击事件
+     */
+    @FXML
+    private void handleMouseClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
+                    MainApplication.class.getResource("icon/Disable.png")).toString());
+            setKeyHBox_Det.setCursor(disableCursor);
+            recordClicking = true;
+            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_setKeyboard(), false);
+            addToolTip(null, setKeyHBox_Det);
+            String value = clickType_Det.getValue();
+            if (clickType_keyboard().equals(value)) {
+                startNativeKeyListener();
+            } else if (clickType_combinations().equals(value)) {
+                startNativeCombinationsListener();
+            }
+        }
+    }
+
+    /**
+     * 目标图像拖拽中行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    private void clickImgAcceptDrop(DragEvent dragEvent) {
+        // 检查拖拽的内容是否为文件
+        if (dragEvent.getDragboard().hasFiles()) {
+            List<File> files = dragEvent.getDragboard().getFiles();
+            for (File file : files) {
+                if (isImgFile(file)) {
+                    // 接受复制操作
+                    dragEvent.acceptTransferModes(TransferMode.COPY);
+                    break;
+                }
+            }
+        }
+        dragEvent.consume();
+    }
+
+    /**
+     * 目标图像拖拽释放行为
+     *
+     * @param dragEvent 拖拽事件
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void clickImgHandleDrop(DragEvent dragEvent) throws IOException {
+        Dragboard db = dragEvent.getDragboard();
+        if (db.hasFiles()) {
+            if (dragEvent.getDragboard().hasFiles()) {
+                List<File> files = dragEvent.getDragboard().getFiles();
+                for (File file : files) {
+                    if (isImgFile(file)) {
+                        addClickImg(file);
+                        break;
+                    }
+                }
+            }
+        }
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
     }
 
 }

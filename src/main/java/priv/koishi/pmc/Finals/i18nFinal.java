@@ -1,7 +1,5 @@
 package priv.koishi.pmc.Finals;
 
-import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
-import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import priv.koishi.pmc.Finals.Enum.*;
@@ -10,7 +8,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.Enum.ClickTypeEnum.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRecordClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRunClickTypeMap;
 
 /**
  * 国际化相关文本常量
@@ -1010,16 +1011,37 @@ public class i18nFinal {
     }
 
     /**
+     * @return 当前按键为：
+     */
+    public static String tip_keyboard() {
+        return bundle.getString("tip.keyboard");
+    }
+
+    /**
+     * @return 鼠标左键点击即可开始替换按键
+     */
+    public static String tip_updateKeyboard() {
+        return bundle.getString("tip.updateKeyboard");
+    }
+
+    /**
+     * @return 勾选后将会忽略鼠标坐标设置，不会移动鼠标仅进行按键或滑轮相关操作
+     */
+    public static String tip_noMove() {
+        return bundle.getString("tip.noMove");
+    }
+
+    /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
-     * JDK版本：Oracle Corporation 25+36-3489
+     * JDK版本：Amazon.com Inc. 25.0.1+8-LTS
      */
     public static String tip_version() {
         return """
-                %s：%s
+                %s%s
                 %s：%s
                 JDK %s：%s""".formatted(
-                bundle.getString("tip.version"), version,
+                bundle.getString("about.version"), version,
                 bundle.getString("tip.buildDate"), buildDate,
                 bundle.getString("tip.version"), jdkVersion);
     }
@@ -1476,13 +1498,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 未知监听类型
-     */
-    public static String text_unknownListener() {
-        return bundle.getString("unknownListener");
-    }
-
-    /**
      * @return 打开文件夹
      */
     public static String text_openDirectory() {
@@ -1903,10 +1918,66 @@ public class i18nFinal {
     }
 
     /**
+     * @return 按下键盘按键即可完成设置
+     */
+    public static String text_setKeyboard() {
+        return bundle.getString("setKeyboard");
+    }
+
+    /**
+     * @return 未设置按键
+     */
+    public static String text_unSetKeyboard() {
+        return bundle.getString("unSetKeyboard");
+    }
+
+    /**
+     * @return 键与 PMC 快捷键配置冲突
+     */
+    public static String text_keyConflict() {
+        return bundle.getString("keyConflict");
+    }
+
+    /**
+     * @return PMC 文件版本异常
+     */
+    public static String text_errPMCFile() {
+        return bundle.getString("errPMCFile");
+    }
+
+    /**
+     * @return 文件名称：
+     */
+    public static String text_fileName() {
+        return bundle.getString("fileName");
+    }
+
+    /**
+     * @return 文件路径：
+     */
+    public static String text_filePath() {
+        return bundle.getString("filePath");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
         return bundle.getString("clickDetail.title");
+    }
+
+    /**
+     * @return 键盘按键:
+     */
+    public static String clickDetail_keyboard() {
+        return bundle.getString("clickDetail.keyboard");
+    }
+
+    /**
+     * @return 组合按键:
+     */
+    public static String clickDetail_combinations() {
+        return bundle.getString("clickDetail.combinations");
     }
 
     /**
@@ -2236,6 +2307,34 @@ public class i18nFinal {
      */
     public static String confirm_delete() {
         return bundle.getString("confirm.delete");
+    }
+
+    /**
+     * @return 继续
+     */
+    public static String confirm_continue() {
+        return bundle.getString("confirm.continue");
+    }
+
+    /**
+     * @return 这是一个旧版的 PMC 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_isOldPMCConfirm() {
+        return bundle.getString("confirm.isOldPMCConfirm");
+    }
+
+    /**
+     * @return 这是一个新版的 PMC 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_isNewPMCConfirm() {
+        return bundle.getString("confirm.isNewPMCConfirm");
+    }
+
+    /**
+     * @return 这是一个由其他程序生成的 PMC 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_otherPMCConfirm() {
+        return bundle.getString("confirm.otherPMCConfirm");
     }
 
     /**
@@ -3263,60 +3362,6 @@ public class i18nFinal {
     }
 
     /**
-     * 自动操作的操作类型选项对应的鼠标行为（操作用）
-     */
-    public static final BidiMap<String, MouseButton> runClickTypeMap = new DualHashBidiMap<>();
-
-    /**
-     * 更新自动操作的操作类型选项对应的鼠标行为（操作用）
-     */
-    public static void updateRunClickTypeMap() {
-        runClickTypeMap.clear();
-        runClickTypeMap.put(mouseButton_primary(), MouseButton.PRIMARY);
-        runClickTypeMap.put(mouseButton_secondary(), MouseButton.SECONDARY);
-        runClickTypeMap.put(mouseButton_middle(), MouseButton.MIDDLE);
-        runClickTypeMap.put(mouseButton_forward(), MouseButton.FORWARD);
-        runClickTypeMap.put(mouseButton_back(), MouseButton.BACK);
-        runClickTypeMap.put(mouseButton_none(), MouseButton.NONE);
-    }
-
-    /**
-     * 自动操作的操作类型选项对应的鼠标行为（录制用）
-     */
-    public static final BidiMap<Integer, String> recordClickTypeMap = new DualHashBidiMap<>();
-
-    /**
-     * 更新自动操作的操作类型选项对应的鼠标行为（录制用）
-     */
-    public static void updateRecordClickTypeMap() {
-        recordClickTypeMap.clear();
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON1, mouseButton_primary());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON2, mouseButton_secondary());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON3, mouseButton_middle());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON4, mouseButton_back());
-        recordClickTypeMap.put(NativeMouseEvent.BUTTON5, mouseButton_forward());
-        recordClickTypeMap.put(NativeMouseEvent.NOBUTTON, mouseButton_none());
-    }
-
-    /**
-     * 录制与点击按键类映射
-     */
-    public static final BidiMap<Integer, MouseButton> NativeMouseToMouseButton = new DualHashBidiMap<>();
-
-    /**
-     * 更新录制与点击按键类映射
-     */
-    public static void updateMouseButton() {
-        NativeMouseToMouseButton.clear();
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON1, MouseButton.PRIMARY);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON2, MouseButton.SECONDARY);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON3, MouseButton.MIDDLE);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON4, MouseButton.BACK);
-        NativeMouseToMouseButton.put(NativeMouseEvent.BUTTON5, MouseButton.FORWARD);
-        NativeMouseToMouseButton.put(NativeMouseEvent.NOBUTTON, MouseButton.NONE);
-    }
-
-    /**
      * @return 打开文件或应用
      */
     public static String clickType_openFile() {
@@ -3387,6 +3432,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 键盘输入
+     */
+    public static String clickType_keyboard() {
+        return bundle.getString("clickType.keyboard");
+    }
+
+    /**
+     * @return 组合键输入
+     */
+    public static String clickType_combinations() {
+        return bundle.getString("clickType.combinations");
+    }
+
+    /**
      * 打开链接相关选项
      */
     public static final List<String> linkList = new ArrayList<>();
@@ -3421,7 +3480,9 @@ public class i18nFinal {
                 clickType_drag(),
                 clickType_moveTo(),
                 clickType_wheelUp(),
-                clickType_wheelDown());
+                clickType_wheelDown(),
+                clickType_keyboard(),
+                clickType_combinations());
         clickTypeList.clear();
         clickTypeList.addAll(linkList);
         clickTypeList.addAll(newList);
@@ -3437,16 +3498,18 @@ public class i18nFinal {
      */
     public static void updateClickTypeMap() {
         clickTypeMap.clear();
-        clickTypeMap.put(ClickTypeEnum.OPEN_FILE.ordinal(), clickType_openFile());
-        clickTypeMap.put(ClickTypeEnum.RUN_SCRIPT.ordinal(), clickType_runScript());
-        clickTypeMap.put(ClickTypeEnum.OPEN_URL.ordinal(), clickType_openUrl());
-        clickTypeMap.put(ClickTypeEnum.MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
-        clickTypeMap.put(ClickTypeEnum.MOVE.ordinal(), clickType_move());
-        clickTypeMap.put(ClickTypeEnum.CLICK.ordinal(), clickType_click());
-        clickTypeMap.put(ClickTypeEnum.DRAG.ordinal(), clickType_drag());
-        clickTypeMap.put(ClickTypeEnum.MOVETO.ordinal(), clickType_moveTo());
-        clickTypeMap.put(ClickTypeEnum.WHEEL_UP.ordinal(), clickType_wheelUp());
-        clickTypeMap.put(ClickTypeEnum.WHEEL_DOWN.ordinal(), clickType_wheelDown());
+        clickTypeMap.put(OPEN_FILE.ordinal(), clickType_openFile());
+        clickTypeMap.put(RUN_SCRIPT.ordinal(), clickType_runScript());
+        clickTypeMap.put(OPEN_URL.ordinal(), clickType_openUrl());
+        clickTypeMap.put(MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
+        clickTypeMap.put(MOVE.ordinal(), clickType_move());
+        clickTypeMap.put(CLICK.ordinal(), clickType_click());
+        clickTypeMap.put(DRAG.ordinal(), clickType_drag());
+        clickTypeMap.put(MOVETO.ordinal(), clickType_moveTo());
+        clickTypeMap.put(WHEEL_UP.ordinal(), clickType_wheelUp());
+        clickTypeMap.put(WHEEL_DOWN.ordinal(), clickType_wheelDown());
+        clickTypeMap.put(KEYBOARD.ordinal(), clickType_keyboard());
+        clickTypeMap.put(COMBINATIONS.ordinal(), clickType_combinations());
     }
 
     /**
@@ -3694,8 +3757,6 @@ public class i18nFinal {
         updateRunClickTypeMap();
         // 更新自动操作的操作类型选项对应的鼠标行为（录制用）
         updateRecordClickTypeMap();
-        // 更新录制与点击按键类映射
-        updateMouseButton();
         // 更新定时任务重复类型映射
         updateRepeatTypeMap();
         // 更新定时任务星期名称与数字映射

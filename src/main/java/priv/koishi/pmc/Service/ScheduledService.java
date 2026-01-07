@@ -67,10 +67,10 @@ public class ScheduledService {
             protected Void call() throws IOException {
                 updateMessage(text_saving());
                 if (isWin) {
-                    // 创建win定时任务
+                    // 创建 win 定时任务
                     createWinLaunchdTask(timedTaskBean);
                 } else if (isMac) {
-                    // 创建mac定时任务
+                    // 创建 mac 定时任务
                     createMacLaunchdTask(timedTaskBean);
                 }
                 updateMessage("");
@@ -134,7 +134,7 @@ public class ScheduledService {
                             updateProgress(i + 1, dataSize);
                             Path path = filteredFiles.get(i);
                             try {
-                                // 解析mac定时任务详情
+                                // 解析 mac 定时任务详情
                                 parseMacTaskContent(taskDetails, path);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
@@ -163,7 +163,7 @@ public class ScheduledService {
                 updateProgress(0, dataSize);
                 for (int i = 0; i < dataSize; i++) {
                     updateProgress(i + 1, dataSize);
-                    // 解析win定时任务内容
+                    // 解析 win 定时任务内容
                     parseWinTaskContent(taskDetails, exePattern, taskBlocks[i]);
                 }
             }
@@ -181,7 +181,7 @@ public class ScheduledService {
         // 只处理包含程序路径的任务块
         if (exePattern.matcher(taskBlocks).find()) {
             TimedTaskBean timedTaskBean = new TimedTaskBean();
-            // 解析Windows任务信息
+            // 解析 Windows 任务信息
             Pattern startDatePattern = Pattern.compile("Start Date:\\s+(.*?)\\n");
             Pattern startTimePattern = Pattern.compile("Start Time:\\s+(.*?)\\n");
             Pattern scheduleTypePattern = Pattern.compile("Schedule Type:\\s+(.*?)\\n");
@@ -256,7 +256,7 @@ public class ScheduledService {
                 String label = labelMatcher.group(1);
                 timedTaskBean.setTaskName(label.substring(label.indexOf(TASK_NAME) + TASK_NAME.length()));
             }
-            // 解析macOS任务信息
+            // 解析 macOS 任务信息
             Pattern pathPattern = Pattern.compile("<string>--r\\s*(.+)</string>");
             Matcher pathMatcher = pathPattern.matcher(content);
             if (pathMatcher.find()) {

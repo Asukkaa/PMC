@@ -267,7 +267,7 @@ public class FileUtils {
     }
 
     /**
-     * 获取app资源文件绝对路径
+     * 获取 app 资源文件绝对路径
      *
      * @param path 资源文件相对路径
      * @return 资源文件绝对路径
@@ -286,7 +286,7 @@ public class FileUtils {
             return userDir + File.separator + logs;
         }
         String logsPath = rootDir + File.separator + logs;
-        // 处理macos打包成.app文件后的路径
+        // 处理 macOS 打包成 .app 文件后的路径
         if (isMac) {
             logsPath = javaHome + logsDir;
         }
@@ -441,14 +441,14 @@ public class FileUtils {
      * 根据操作系统将数值转换为文件大小
      *
      * @param size          没带单位的文件大小
-     * @param distinguishOS 区分操作系统文件大小单位进制，true 区分，false 不区分，macos 文件大小为 1000 进制，内存大小为 1024 进制
+     * @param distinguishOS 区分操作系统文件大小单位进制，true 区分，false 不区分，macOS 文件大小为 1000 进制，内存大小为 1024 进制
      * @return 带单位的文件大小
      */
     public static String getUnitSize(long size, boolean distinguishOS) {
         long winUnit = 1024;
         long macUnit = 1000;
         long kb;
-        // macOS与Windows文件大小进制不同
+        // macOS 与 Windows 文件大小进制不同
         if (isMac && distinguishOS) {
             kb = macUnit;
         } else {
@@ -575,7 +575,7 @@ public class FileUtils {
             if (isWin) {
                 cfgPath = appRootPath + appDirectory + cfgFileName;
             } else {
-                cfgPath = appLaunchPath + contentsDirectory + appDirectory + cfgFileName;
+                cfgPath = macAppDirectory + cfgFileName;
             }
         }
         return cfgPath;
@@ -923,7 +923,7 @@ public class FileUtils {
         double win = 1024;
         double mac = 1000;
         double kb;
-        // macOS与Windows文件大小进制不同
+        // macOS 与 Windows 文件大小进制不同
         if (isMac) {
             kb = mac;
         } else {
