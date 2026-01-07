@@ -2,12 +2,12 @@
 
 <p>基于 JavaFX 开发的开源跨平台自动操作工具，支持键鼠自动化、图像识别、流程录制与编辑。</p>
 
-<img alt="Java" src="https://img.shields.io/badge/dynamic/xml?style=flat-square&label=Java&color=ED8B00&logo=java&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='properties']/*[local-name()='java.version']&cacheSeconds=3600" />
-<img alt="JavaFX" src="https://img.shields.io/badge/dynamic/xml?style=flat-square&label=JavaFX&color=007396&logo=java&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='properties']/*[local-name()='javafx.version']&cacheSeconds=3600" />
-<img alt="JavaCV" src="https://img.shields.io/badge/dynamic/xml?style=flat-square&label=JavaCV&color=orange&logo=opencv&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency'][*[local-name()='artifactId']='javacv-platform']/*[local-name()='version']&cacheSeconds=3600" />
-<img alt="Version" src="https://img.shields.io/badge/dynamic/xml?style=flat-square&label=PMC&color=blueviolet&logo=github&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='version']&cacheSeconds=3600" />
-<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Asukkaa/PMC?style=flat-square&color=blue" />
-<img alt="GitHub" src="https://img.shields.io/github/license/Asukkaa/PMC?style=flat-square&color=blue" />
+<img alt="Java" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=Java&color=ED8B00&logo=java&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='properties']/*[local-name()='java.version']&cacheSeconds=3600" />
+<img alt="JavaFX" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=JavaFX&color=007396&logo=java&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='properties']/*[local-name()='javafx.version']&cacheSeconds=3600" />
+<img alt="JavaCV" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=JavaCV&color=orange&logo=opencv&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency'][*[local-name()='artifactId']='javacv-platform']/*[local-name()='version']&cacheSeconds=3600" />
+<img alt="Version" src="https://img.shields.io/badge/dynamic/xml?style=for-the-badge&label=PMC&color=blueviolet&logo=github&logoColor=white&url=https://raw.githubusercontent.com/Asukkaa/PMC/master/pom.xml&query=//*[local-name()='project']/*[local-name()='version']&cacheSeconds=3600" />
+<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Asukkaa/PMC?style=for-the-badge&color=blue" />
+<img alt="GitHub" src="https://img.shields.io/github/license/Asukkaa/PMC?style=for-the-badge&color=blue" />
 
 ----
 
