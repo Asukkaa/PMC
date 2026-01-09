@@ -591,12 +591,58 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void makeCellCanEdit() {
         tableView_Click.setEditable(true);
+
         name_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setName));
+
         waitTime_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
+
         clickTime_Click.setCellFactory((_) ->
-                new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
+                new EditingCell<>(new ItemConsumer<>() {
+
+                    /**
+                     * 将编辑后的对象属性进行保存.
+                     * 如果不将属性保存到 cell 所在表格的 ObservableList 集合中对象的相应属性中,
+                     * 则只是改变了表格显示的值,一旦表格刷新,则仍会表示旧值.
+                     *
+                     * @param item     当前行数据
+                     * @param value 新值
+                     */
+                    @Override
+                    public void setTProperties(ClickPositionVO item, String value) {
+                        item.setClickTime(value);
+                    }
+
+                    /**
+                     * 检查单元格是否可编辑
+                     *
+                     * @param item 当前行数据
+                     * @return true-可编辑，false-不可编辑
+                     */
+                    @Override
+                    public boolean isEditable(ClickPositionVO item) {
+                        int clickType = item.getClickTypeEnum();
+                        return clickType != ClickTypeEnum.COMBINATIONS.ordinal();
+                    }
+
+                    /**
+                     * 获取单元格禁用时的显示值
+                     *
+                     * @param item 当前行数据
+                     * @return 禁用时显示的值
+                     */
+                    @Override
+                    public String getDisabledValue(ClickPositionVO item) {
+                        int clickType = item.getClickTypeEnum();
+                        if (clickType == ClickTypeEnum.COMBINATIONS.ordinal()) {
+                            return item.getClickTime();
+                        }
+                        return null;
+                    }
+
+                }, true, 0, null));
+
         clickNum_Click.setCellFactory(_ -> new EditingCell<>(
                 new ItemConsumer<>() {
 
