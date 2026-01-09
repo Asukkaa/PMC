@@ -225,51 +225,12 @@ public class SettingController extends RootController implements MousePositionUp
             InputStream input = checkRunningInputStream(configFile_Click);
             Properties prop = new Properties();
             prop.load(input);
-            prop.put(key_offsetX, offsetX_Set.getText());
-            prop.put(key_offsetY, offsetY_Set.getText());
-            prop.put(key_overtime, overtime_Set.getText());
-            prop.put(key_maxLogNum, maxLogNum_Set.getText());
-            prop.put(key_margin, floatingDistance_Set.getText());
-            prop.put(key_retrySecond, retrySecond_Set.getText());
-            prop.put(key_randomClickX, randomClickX_Set.getText());
-            prop.put(key_randomClickY, randomClickY_Set.getText());
-            prop.put(key_findWindowWait, findWindowWait_Set.getText());
-            prop.put(key_sampleInterval, sampleInterval_Set.getText());
-            prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
-            prop.put(key_defaultStopRetryNum, stopRetryNum_Set.getText());
-            prop.put(key_opacity, String.valueOf(opacity_Set.getValue()));
-            prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
-            prop.put(key_defaultClickRetryNum, clickRetryNum_Set.getText());
-            prop.put(key_stopOpacity, String.valueOf(stopOpacity_Set.getValue()));
-            prop.put(key_clickOpacity, String.valueOf(clickOpacity_Set.getValue()));
-            prop.put(key_stopFindImgType, findImgTypeMap.getKey(stopFindImgType_Set.getValue()).toString());
-            prop.put(key_clickFindImgType, findImgTypeMap.getKey(clickFindImgType_Set.getValue()).toString());
-            List<ImgFileVO> list = tableView_Set.getItems();
-            int index = 0;
-            while (index < 10) {
-                prop.remove(key_defaultStopImg + index);
-                index++;
-            }
-            for (int i = 0; i < list.size(); i++) {
-                ImgFileVO bean = list.get(i);
-                prop.put(key_defaultStopImg + i, bean.getPath());
-            }
-            if (clickWindowMonitor != null) {
-                WindowInfo windowInfo = clickWindowMonitor.getWindowInfo();
-                String processPath = "";
-                if (windowInfo != null) {
-                    processPath = windowInfo.getProcessPath();
-                }
-                prop.put(key_clickWindowPath, processPath);
-            }
-            if (stopWindowMonitor != null) {
-                WindowInfo windowInfo = stopWindowMonitor.getWindowInfo();
-                String processPath = "";
-                if (windowInfo != null) {
-                    processPath = windowInfo.getProcessPath();
-                }
-                prop.put(key_stopWindowPath, processPath);
-            }
+            // 保存功能设置
+            saveFunctionConfig(prop);
+            // 保存终止操作图像设置
+            saveStopImg(prop);
+            // 保存绑定的窗口路径
+            saveWindowPath(prop);
             OutputStream output = checkRunningOutputStream(configFile_Click);
             prop.store(output, null);
             input.close();
@@ -281,6 +242,75 @@ public class SettingController extends RootController implements MousePositionUp
             // 更新外观设置
             int them = themeMap.getKey(theme_Set.getValue());
             updateProperties(configFile, key_theme, String.valueOf(them));
+        }
+    }
+
+    /**
+     * 保存功能设置
+     *
+     * @param prop 配置文件
+     */
+    private void saveFunctionConfig(Properties prop) {
+        prop.put(key_offsetX, offsetX_Set.getText());
+        prop.put(key_offsetY, offsetY_Set.getText());
+        prop.put(key_overtime, overtime_Set.getText());
+        prop.put(key_maxLogNum, maxLogNum_Set.getText());
+        prop.put(key_margin, floatingDistance_Set.getText());
+        prop.put(key_retrySecond, retrySecond_Set.getText());
+        prop.put(key_randomClickX, randomClickX_Set.getText());
+        prop.put(key_randomClickY, randomClickY_Set.getText());
+        prop.put(key_findWindowWait, findWindowWait_Set.getText());
+        prop.put(key_sampleInterval, sampleInterval_Set.getText());
+        prop.put(key_clickTimeOffset, clickTimeOffset_Set.getText());
+        prop.put(key_defaultStopRetryNum, stopRetryNum_Set.getText());
+        prop.put(key_opacity, String.valueOf(opacity_Set.getValue()));
+        prop.put(key_randomTimeOffset, randomTimeOffset_Set.getText());
+        prop.put(key_defaultClickRetryNum, clickRetryNum_Set.getText());
+        prop.put(key_stopOpacity, String.valueOf(stopOpacity_Set.getValue()));
+        prop.put(key_clickOpacity, String.valueOf(clickOpacity_Set.getValue()));
+        prop.put(key_stopFindImgType, findImgTypeMap.getKey(stopFindImgType_Set.getValue()).toString());
+        prop.put(key_clickFindImgType, findImgTypeMap.getKey(clickFindImgType_Set.getValue()).toString());
+    }
+
+    /**
+     * 保存终止操作图像设置
+     *
+     * @param prop 配置文件
+     */
+    private void saveStopImg(Properties prop) {
+        List<ImgFileVO> list = tableView_Set.getItems();
+        int index = 0;
+        while (index < 10) {
+            prop.remove(key_defaultStopImg + index);
+            index++;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            ImgFileVO bean = list.get(i);
+            prop.put(key_defaultStopImg + i, bean.getPath());
+        }
+    }
+
+    /**
+     * 保存绑定的窗口路径
+     *
+     * @param prop 配置文件
+     */
+    private static void saveWindowPath(Properties prop) {
+        if (clickWindowMonitor != null) {
+            WindowInfo windowInfo = clickWindowMonitor.getWindowInfo();
+            String processPath = "";
+            if (windowInfo != null) {
+                processPath = windowInfo.getProcessPath();
+            }
+            prop.put(key_clickWindowPath, processPath);
+        }
+        if (stopWindowMonitor != null) {
+            WindowInfo windowInfo = stopWindowMonitor.getWindowInfo();
+            String processPath = "";
+            if (windowInfo != null) {
+                processPath = windowInfo.getProcessPath();
+            }
+            prop.put(key_stopWindowPath, processPath);
         }
     }
 
@@ -374,14 +404,19 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void loadControlLastConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream configFileInput = checkRunningInputStream(configFile);
-        prop.load(configFileInput);
-        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, activation);
-        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, unActivation);
-        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, unActivation);
-        int them = Integer.parseInt(prop.getProperty(key_theme, String.valueOf(ThemeEnum.Auto.ordinal())));
-        theme_Set.setValue(themeMap.get(them));
-        configFileInput.close();
+        // 加载主配置文件
+        loadMainConfig(prop);
+        // 加载功能配置文件
+        loadFunctionConfig(prop);
+    }
+
+    /**
+     * 加载应用功能配置
+     *
+     * @param prop 配置文件
+     * @throws IOException 配置文件读取异常
+     */
+    private void loadFunctionConfig(Properties prop) throws IOException {
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
         setControlLastConfig(overtime_Set, prop, key_overtime);
@@ -445,13 +480,40 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, defaultClickTimeOffset);
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, defaultClickRetryNum);
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, defaultRandomTimeOffset);
+        // 加载应用图像识别配置
+        loadFindImgConfig(prop);
+        clickFileInput.close();
+    }
+
+    /**
+     * 加载应用图像识别配置
+     *
+     * @param prop 配置文件
+     */
+    private void loadFindImgConfig(Properties prop) {
         int stopFindImgType = Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType));
         stopFindImgType_Set.setValue(findImgTypeMap.get(stopFindImgType));
         int clickFindImgType = Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType));
         clickFindImgType_Set.setValue(findImgTypeMap.get(clickFindImgType));
         clickWindowPath = prop.getProperty(key_clickWindowPath);
         stopWindowPath = prop.getProperty(key_stopWindowPath);
-        clickFileInput.close();
+    }
+
+    /**
+     * 加载应用基础配置
+     *
+     * @param prop 配置文件
+     * @throws IOException 配置文件读取异常
+     */
+    private void loadMainConfig(Properties prop) throws IOException {
+        InputStream configFileInput = checkRunningInputStream(configFile);
+        prop.load(configFileInput);
+        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, activation);
+        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, unActivation);
+        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, unActivation);
+        int them = Integer.parseInt(prop.getProperty(key_theme, String.valueOf(ThemeEnum.Auto.ordinal())));
+        theme_Set.setValue(themeMap.get(them));
+        configFileInput.close();
         String language = languageMap.get(bundle.getLocale());
         if (language != null) {
             language_Set.setValue(language);
@@ -915,6 +977,48 @@ public class SettingController extends RootController implements MousePositionUp
         setNodeDisable(clickWindow_Set, true);
         setNodeDisable(noPermissionHBox_Set, true);
         addToolTip(tip_noAutomationPermission(), noPermission_Set);
+    }
+
+    /**
+     * 图像识别区域下拉框处理逻辑
+     *
+     * @param findImgType    要处理的图像识别区域下拉框
+     * @param regionInfoHBox 要处理的图像识别区域下拉框所在容器
+     * @param regionHBox     自定义识别范围选项相关组件所在容器
+     * @param windowInfoHBox 识别指定窗口的选项相关组件所在容器
+     * @param floating       识别范围展示浮动窗口描述符
+     */
+    private void findImgTypeAction(ChoiceBox<String> findImgType, HBox regionInfoHBox, HBox regionHBox,
+                                   HBox windowInfoHBox, FloatingWindowDescriptor floating) {
+        String value = findImgType.getValue();
+        addValueToolTip(findImgType, tip_findImgType(), value);
+        if (findImgType_region().equals(value)) {
+            regionInfoHBox.setVisible(true);
+            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
+            regionInfoHBox.getChildren().add(regionHBox);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
+                floating.setConfig(config);
+            }
+        } else if (findImgType_window().equals(value)) {
+            regionInfoHBox.setVisible(true);
+            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
+            regionInfoHBox.getChildren().add(windowInfoHBox);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                floating.setConfig(config);
+            }
+        } else if (findImgType_all().equals(value)) {
+            regionInfoHBox.setVisible(false);
+            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
+            if (floating != null) {
+                FloatingWindowConfig config = floating.getConfig();
+                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
+                floating.setConfig(config);
+            }
+        }
     }
 
     /**
@@ -1643,35 +1747,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void clickFindImgTypeAction() {
-        String value = clickFindImgType_Set.getValue();
-        addValueToolTip(clickFindImgType_Set, tip_findImgType(), value);
-        if (findImgType_region().equals(value)) {
-            clickRegionInfoHBox_Set.setVisible(true);
-            clickRegionInfoHBox_Set.getChildren().removeAll(clickRegionHBox_Set, clickWindowInfoHBox_Set);
-            clickRegionInfoHBox_Set.getChildren().add(clickRegionHBox_Set);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
-                clickFloating.setConfig(config);
-            }
-        } else if (findImgType_window().equals(value)) {
-            clickRegionInfoHBox_Set.setVisible(true);
-            clickRegionInfoHBox_Set.getChildren().removeAll(clickRegionHBox_Set, clickWindowInfoHBox_Set);
-            clickRegionInfoHBox_Set.getChildren().add(clickWindowInfoHBox_Set);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
-                clickFloating.setConfig(config);
-            }
-        } else if (findImgType_all().equals(value)) {
-            clickRegionInfoHBox_Set.setVisible(false);
-            clickRegionInfoHBox_Set.getChildren().removeAll(clickRegionHBox_Set, clickWindowInfoHBox_Set);
-            if (clickFloating != null) {
-                FloatingWindowConfig config = clickFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
-                clickFloating.setConfig(config);
-            }
-        }
+        findImgTypeAction(clickFindImgType_Set, clickRegionInfoHBox_Set, clickRegionHBox_Set, clickWindowInfoHBox_Set, clickFloating);
     }
 
     /**
@@ -1679,35 +1755,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void stopFindImgTypeAction() {
-        String value = stopFindImgType_Set.getValue();
-        addValueToolTip(stopFindImgType_Set, tip_findImgType(), value);
-        if (findImgType_region().equals(value)) {
-            stopRegionInfoHBox_Set.setVisible(true);
-            stopRegionInfoHBox_Set.getChildren().removeAll(stopRegionHBox_Set, stopWindowInfoHBox_Set);
-            stopRegionInfoHBox_Set.getChildren().add(stopRegionHBox_Set);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
-                stopFloating.setConfig(config);
-            }
-        } else if (findImgType_window().equals(value)) {
-            stopRegionInfoHBox_Set.setVisible(true);
-            stopRegionInfoHBox_Set.getChildren().removeAll(stopRegionHBox_Set, stopWindowInfoHBox_Set);
-            stopRegionInfoHBox_Set.getChildren().add(stopWindowInfoHBox_Set);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
-                stopFloating.setConfig(config);
-            }
-        } else if (findImgType_all().equals(value)) {
-            stopRegionInfoHBox_Set.setVisible(false);
-            stopRegionInfoHBox_Set.getChildren().removeAll(stopRegionHBox_Set, stopWindowInfoHBox_Set);
-            if (stopFloating != null) {
-                FloatingWindowConfig config = stopFloating.getConfig();
-                config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
-                stopFloating.setConfig(config);
-            }
-        }
+        findImgTypeAction(stopFindImgType_Set, stopRegionInfoHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set, stopFloating);
     }
 
     /**
