@@ -590,14 +590,15 @@ public class AutoClickController extends RootController implements MousePosition
      * 设置单元格可编辑
      */
     private void makeCellCanEdit() {
+        // 设置表格可编辑
         tableView_Click.setEditable(true);
-
+        // 设置步骤名称可编辑
         name_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setName));
-
+        // 设置等待时间可编辑
         waitTime_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
-
+        // 设置点击时长可编辑
         clickTime_Click.setCellFactory((_) ->
                 new EditingCell<>(new ItemConsumer<>() {
 
@@ -642,7 +643,7 @@ public class AutoClickController extends RootController implements MousePosition
                     }
 
                 }, true, 0, null));
-
+        // 设置点击次数可编辑
         clickNum_Click.setCellFactory(_ -> new EditingCell<>(
                 new ItemConsumer<>() {
 
