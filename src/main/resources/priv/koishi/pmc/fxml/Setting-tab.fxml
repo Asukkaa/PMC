@@ -2,6 +2,8 @@
 
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -553,6 +555,56 @@
                     <TableColumn fx:id="type_Set" text="%stopImg.type" sortable="false"/>
                 </columns>
             </TableView>
+        </VBox>
+
+        <Separator/>
+
+        <VBox spacing="10">
+            <Label text="%setting.shortcuts"/>
+
+            <HBox spacing="10">
+                <HBox styleClass="hBox-400-5">
+                    <Label fx:id="cancelKeyInput_Set" text="%setting.cancelKeyInput_Set"/>
+                    <HBox fx:id="cancelKeyHBox_Set" prefWidth="200" style="-fx-cursor: hand"
+                          onMouseClicked="#cancelKeyInput">
+                        <Label fx:id="cancelKey_Set" textFill="red" text="%unSetKeyboard"/>
+                    </HBox>
+                </HBox>
+
+                <HBox styleClass="hBox-400-5">
+                    <Label fx:id="recordKeyInput_Set" text="%setting.recordKeyInput_Set"/>
+                    <HBox fx:id="recordKeyHBox_Set" prefWidth="200" style="-fx-cursor: hand"
+                          onMouseClicked="#recordKeyInput">
+                        <Label fx:id="recordKey_Set" textFill="red" text="%unSetKeyboard"/>
+                    </HBox>
+
+                    <Button fx:id="removeRecordKey_Det" onAction="#removeRecordKey" prefHeight="20"
+                            styleClass="img-button-style" visible="false">
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../icon/Trash.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <HBox styleClass="hBox-400-5">
+                    <Label fx:id="runKeyInput_Set" text="%setting.runKeyInput_Set"/>
+                    <HBox fx:id="runKeyHBox_Set" prefWidth="200" style="-fx-cursor: hand"
+                          onMouseClicked="#runKeyInput">
+                        <Label fx:id="runKey_Set" textFill="red" text="%unSetKeyboard"/>
+                    </HBox>
+
+                    <Button fx:id="removeRunKey_Det" onAction="#removeRunKey" prefHeight="20"
+                            styleClass="img-button-style" visible="false">
+                        <graphic>
+                            <ImageView>
+                                <Image url="@../icon/Trash.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </HBox>
         </VBox>
 
         <Separator/>

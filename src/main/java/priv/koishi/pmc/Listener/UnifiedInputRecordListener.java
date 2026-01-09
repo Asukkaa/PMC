@@ -475,6 +475,7 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     public void startRecording() {
         recordingStartTime = System.currentTimeMillis();
         isRecording = true;
+        addNativeListener(this);
         movePoint = callback.createDefaultClickPosition();
     }
 

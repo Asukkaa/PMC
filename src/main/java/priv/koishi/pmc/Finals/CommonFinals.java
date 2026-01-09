@@ -1,10 +1,13 @@
 package priv.koishi.pmc.Finals;
 
+import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
+import priv.koishi.pmc.MainApplication;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -790,5 +793,11 @@ public class CommonFinals {
      * macOS .DS_Store 文件名称
      */
     public static final String DS_Store = ".DS_Store";
+
+    /**
+     * 鼠标禁用图标
+     */
+    public static final Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
+            MainApplication.class.getResource("icon/Disable.png")).toString());
 
 }

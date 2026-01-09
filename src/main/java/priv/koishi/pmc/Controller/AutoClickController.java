@@ -69,10 +69,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -89,8 +87,7 @@ import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -293,7 +290,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 正在录制标识
      */
-    public boolean recordClicking;
+    public static boolean recordClicking;
 
     /**
      * 正在运行自动操作标识
@@ -324,6 +321,11 @@ public class AutoClickController extends RootController implements MousePosition
      * 全局输入监听器
      */
     private UnifiedInputRecordListener listener;
+
+    /**
+     * 全局快捷键监听器
+     */
+    public static UnifiedInputRecordListener shortcutsListener;
 
     /**
      * 信息浮窗设置
@@ -1621,6 +1623,187 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 初始化统一输入录制监听器
+     *
+     * @return 统一输入录制监听器
+     */
+    private UnifiedInputRecordListener initUnifiedInputRecordListener() {
+        // 创建组合键监听器
+        return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
+
+            /**
+             * 用来临时保存组合键的临时操作步骤
+             */
+            private ClickPositionVO combinationBean;
+
+            /**
+             * 组合键轨迹
+             */
+            private final List<TrajectoryPointBean> trajectory = new CopyOnWriteArrayList<>();
+
+            /**
+             * 创建一个具有默认值的自动操作步骤类
+             *
+             * @return clickPositionVO 具有默认值的自动操作步骤类
+             */
+            @Override
+            public ClickPositionVO createDefaultClickPosition() {
+                combinationBean = new ClickPositionVO();
+                return combinationBean;
+            }
+
+            /**
+             * 保存操作步骤
+             *
+             * @param events  操作步骤
+             * @param addType 添加方式
+             */
+            @Override
+            public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
+                // 这里不添加到表格，只用于组合键监听
+                if (combinationBean != null) {
+                    // 所有按键松开，组合键录制完成
+                    handleCombinationComplete();
+                }
+            }
+
+            /**
+             * 获取当前步骤数
+             *
+             * @return 临时步骤数
+             */
+            @Override
+            public int getCurrentStepCount() {
+                return -1;
+            }
+
+            /**
+             * 获取是否录制鼠标移动事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMove() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制鼠标拖拽事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordDrag() {
+                return false;
+            }
+
+            /**
+             * 更新滑轮记录信息
+             *
+             * @param wheelRotation 滑轮滚动方向
+             * @param wheelNum      滑轮滚动次数
+             */
+            @Override
+            public void onWheelRecorded(int wheelRotation, int wheelNum) {
+            }
+
+            /**
+             * 更新记录信息
+             *
+             * @param log 记录信息
+             */
+            @Override
+            public void updateRecordLog(String log) {
+            }
+
+            /**
+             * 停止所有任务
+             */
+            @Override
+            public void stopWorkAll() {
+                removeNativeListener(listener);
+            }
+
+            /**
+             * 显示错误信息
+             */
+            @Override
+            public void showError() {
+            }
+
+            /**
+             * 获取是否录制鼠标滚轮事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMouseWheel() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制键盘事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordKeyboard() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制鼠标点击事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMouseClick() {
+                return false;
+            }
+
+            /**
+             * 处理组合键录制完成
+             */
+            private void handleCombinationComplete() {
+                combinationBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
+                trajectory.clear();
+                trajectory.addAll(combinationBean.getMoveTrajectory());
+                Platform.runLater(() -> {
+                    if (combinationBean != null) {
+                        Set<Integer> keySet = new LinkedHashSet<>();
+                        if (CollectionUtils.isNotEmpty(trajectory)) {
+                            for (TrajectoryPointBean t : trajectory) {
+                                List<Integer> pressKeyboardKeys = t.getPressKeyboardKeys();
+                                if (CollectionUtils.isNotEmpty(pressKeyboardKeys)) {
+                                    keySet.addAll(pressKeyboardKeys);
+                                }
+                            }
+                        }
+                        if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys)) {
+                            // 检测录制快捷键
+                            if (recordKeys.toString().equals(keySet.toString())) {
+                                recordClick();
+                                // 检测运行快捷键
+                            } else if (runKeys.toString().equals(keySet.toString())) {
+                                ObservableList<ClickPositionVO> items = tableView_Click.getItems();
+                                if (CollectionUtils.isNotEmpty(items)) {
+                                    try {
+                                        runClick();
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    }
+
+
+    /**
      * 开始统一录制
      *
      * @param addType 添加方式
@@ -1630,8 +1813,6 @@ public class AutoClickController extends RootController implements MousePosition
         listener = initUnifiedInputRecordListener(addType);
         // 读取设置页面设置的值
         getSetting();
-        // 注册所有监听器
-        addNativeListener(listener);
         // 开始录制
         listener.startRecording();
     }
@@ -1816,6 +1997,8 @@ public class AutoClickController extends RootController implements MousePosition
     private void settingsLoaded(SettingsLoadedEvent event) {
         // 设置要防重复点击的组件
         setDisableNodes();
+        shortcutsListener = initUnifiedInputRecordListener();
+        shortcutsListener.startRecording();
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();

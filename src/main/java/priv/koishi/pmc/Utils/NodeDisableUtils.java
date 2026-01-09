@@ -10,11 +10,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.MainApplication;
 
 import java.util.List;
-import java.util.Objects;
 
+import static priv.koishi.pmc.Finals.CommonFinals.disableCursor;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 
 /**
@@ -45,8 +44,6 @@ public class NodeDisableUtils {
      */
     public static void setNodeDisable(Node node, boolean disable, String tooltipText) {
         if (node != null) {
-            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
-                    MainApplication.class.getResource("icon/Disable.png")).toString());
             if (disable) {
                 node.setOpacity(0.4);
                 node.setCursor(null);

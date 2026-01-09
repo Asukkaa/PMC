@@ -7,6 +7,9 @@ import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Finals.CommonFinals.isWin;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -24,6 +27,16 @@ public class ButtonMappingUtils {
      * 取消按键
      */
     public static int cancelKey = NativeKeyEvent.VC_ESCAPE;
+
+    /**
+     * 录制自动流程快捷键
+     */
+    public static Set<Integer> recordKeys = new LinkedHashSet<>();
+
+    /**
+     * 运行自动流程快捷键
+     */
+    public static Set<Integer> runKeys = new LinkedHashSet<>();
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

@@ -1960,6 +1960,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 录制与运行快捷键重复
+     */
+    public static String text_duplicate() {
+        return bundle.getString("duplicate");
+    }
+
+    /**
+     * @return 删除这个快捷键
+     */
+    public static String text_deleteKey() {
+        return bundle.getString("deleteKey");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

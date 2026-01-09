@@ -2,6 +2,8 @@ package priv.koishi.pmc.Controller;
 
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -9,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -17,6 +20,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -27,10 +32,13 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Callback.InputRecordCallback;
 import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
 import priv.koishi.pmc.Finals.Enum.ThemeEnum;
@@ -38,6 +46,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
+import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -50,8 +59,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
-import static priv.koishi.pmc.Controller.AutoClickController.stopImgSelectPath;
+import static priv.koishi.pmc.Controller.AutoClickController.*;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
@@ -64,9 +75,10 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
-import static priv.koishi.pmc.Utils.ListenerUtils.integerSliderValueListener;
+import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
@@ -135,12 +147,22 @@ public class SettingController extends RootController implements MousePositionUp
      */
     public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
 
+    /**
+     * 全局键盘监听器
+     */
+    private NativeKeyListener nativeKeyListener;
+
+    /**
+     * 全局组合键监听器
+     */
+    private UnifiedInputRecordListener listener;
+
     @FXML
     public AnchorPane anchorPane_Set;
 
     @FXML
-    public HBox clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set, clickWindowInfoHBox_Set,
-            stopRegionInfoHBox_Set, clickRegionInfoHBox_Set, noPermissionHBox_Set;
+    public HBox clickRegionHBox_Set, stopRegionHBox_Set, stopWindowInfoHBox_Set, clickWindowInfoHBox_Set, runKeyHBox_Set,
+            stopRegionInfoHBox_Set, clickRegionInfoHBox_Set, noPermissionHBox_Set, cancelKeyHBox_Set, recordKeyHBox_Set;
 
     @FXML
     public ProgressBar progressBar_Set;
@@ -156,11 +178,12 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Button massageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
-            clickWindow_Set, stopWindow_Set;
+            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
-            gcType_Set, thisPath_Set, noPermission_Set;
+            gcType_Set, thisPath_Set, noPermission_Set, cancelKeyInput_Set, cancelKey_Set, recordKeyInput_Set, runKey_Set,
+            recordKey_Set, runKeyInput_Set;
 
     @FXML
     public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
@@ -411,6 +434,43 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 加载快捷键配置
+     *
+     * @param prop 配置文件
+     */
+    private void loadKeyConfig(Properties prop) {
+        // 取消键
+        cancelKey = Integer.parseInt(prop.getProperty(key_cancelKey, String.valueOf(NativeKeyEvent.VC_ESCAPE)));
+        updateKeyboardLabel(cancelKey_Set, cancelKeyHBox_Set, getKeyText(cancelKey), true);
+        // 录制键
+        String recordKey = prop.getProperty(key_recordKey);
+        if (StringUtils.isNoneBlank(recordKey)) {
+            recordKeys = Arrays.stream(recordKey.split("\\s+"))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            StringBuilder record = new StringBuilder();
+            for (int key : recordKeys) {
+                record.append(getKeyText(key)).append(" ");
+            }
+            updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, record.toString(), true);
+            removeRecordKey_Det.setVisible(true);
+        }
+        // 运行键
+        String runKey = prop.getProperty(key_runKey);
+        if (StringUtils.isNoneBlank(runKey)) {
+            runKeys = Arrays.stream(runKey.split("\\s+"))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            StringBuilder run = new StringBuilder();
+            for (int key : runKeys) {
+                run.append(getKeyText(key)).append(" ");
+            }
+            updateKeyboardLabel(runKey_Set, runKeyHBox_Set, run.toString(), true);
+            removeRunKey_Det.setVisible(true);
+        }
+    }
+
+    /**
      * 加载应用功能配置
      *
      * @param prop 配置文件
@@ -513,6 +573,8 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, unActivation);
         int them = Integer.parseInt(prop.getProperty(key_theme, String.valueOf(ThemeEnum.Auto.ordinal())));
         theme_Set.setValue(themeMap.get(them));
+        // 加载快捷键设置
+        loadKeyConfig(prop);
         configFileInput.close();
         String language = languageMap.get(bundle.getLocale());
         if (language != null) {
@@ -611,6 +673,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(titleCoordinate_Set.getText(), titleCoordinate_Set);
         addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
         addToolTip(tip_allRegion(), clickAllRegion_Set, stopAllRegion_Set);
+        addToolTip(text_deleteKey(), removeRecordKey_Det, removeRunKey_Det);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
@@ -1046,6 +1109,312 @@ public class SettingController extends RootController implements MousePositionUp
                     }
                 });
             }
+        });
+    }
+
+    /**
+     * 开启全局键盘监听
+     *
+     * @param keyLabel  组合键展示栏
+     * @param keyHBox   组合键展示容器
+     * @param configKey 配置项键
+     */
+    private void startNativeKeyListener(boolean isSetting, Label keyLabel, HBox keyHBox, String configKey) {
+        removeNativeListener(listener);
+        removeNativeListener(nativeKeyListener);
+        // 键盘监听器
+        nativeKeyListener = intitNativeKeyListener(isSetting, keyLabel, keyHBox, configKey);
+        addNativeListener(nativeKeyListener);
+    }
+
+    /**
+     * 初始化键盘输入监听器
+     *
+     * @param keyLabel  组合键展示栏
+     * @param keyHBox   组合键展示容器
+     * @param configKey 配置项键
+     */
+    private NativeKeyListener intitNativeKeyListener(boolean isSetting, Label keyLabel, HBox keyHBox, String configKey) {
+        // 创建键盘监听器
+        return new NativeKeyListener() {
+            @Override
+            public void nativeKeyPressed(NativeKeyEvent e) {
+                Platform.runLater(() -> {
+                    // 仅在录制情况下才监听键盘
+                    if (recordClicking) {
+                        int keyCode = e.getKeyCode();
+                        String key = getKeyText(keyCode);
+                        // 过滤未知按键
+                        if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
+                            if (isSetting) {
+                                updateKeyboardLabel(keyLabel, keyHBox, key, true);
+                                keyHBox.setCursor(Cursor.HAND);
+                                cancelKey = keyCode;
+                                try {
+                                    updateProperties(configFile, configKey, String.valueOf(keyCode));
+                                    removeNativeListener(nativeKeyListener);
+                                    recordClicking = false;
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            } else if (keyCode == cancelKey) {
+                                removeNativeListener(listener);
+                                updateKeyboardLabel(keyLabel, keyHBox, text_unSetKeyboard(), false);
+                                keyHBox.setCursor(Cursor.HAND);
+                                try {
+                                    if (keyLabel == recordKey_Set) {
+                                        recordKeys.clear();
+                                    } else if (keyLabel == runKey_Set) {
+                                        runKeys.clear();
+                                    }
+                                    updateProperties(configFile, configKey, "");
+                                    removeNativeListener(nativeKeyListener);
+                                    recordClicking = false;
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                                throw new RuntimeException(key + text_keyConflict());
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * 开启全局组合键监听
+     *
+     * @param keyLabel  组合键展示栏
+     * @param keyHBox   组合键展示容器
+     * @param configKey 配置项键
+     */
+    private void startNativeCombinationsListener(Label keyLabel, HBox keyHBox, String configKey) {
+        // 移除之前的监听器
+        removeNativeListener(listener);
+        removeNativeListener(nativeKeyListener);
+        startNativeKeyListener(false, keyLabel, keyHBox, configKey);
+        listener = initUnifiedInputRecordListener(keyLabel, keyHBox, configKey);
+        // 启动录制
+        listener.startRecording();
+    }
+
+    /**
+     * 初始化统一输入录制监听器
+     *
+     * @param keyLabel  组合键展示栏
+     * @param keyHBox   组合键展示容器
+     * @param configKey 配置项键
+     * @return 统一输入录制监听器
+     */
+    private UnifiedInputRecordListener initUnifiedInputRecordListener(Label keyLabel, HBox keyHBox, String configKey) {
+        // 创建组合键监听器
+        return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
+
+            /**
+             * 用来临时保存组合键的临时操作步骤
+             */
+            private ClickPositionVO combinationBean;
+
+            /**
+             * 组合键轨迹
+             */
+            private final List<TrajectoryPointBean> trajectory = new CopyOnWriteArrayList<>();
+
+            /**
+             * 创建一个具有默认值的自动操作步骤类
+             *
+             * @return clickPositionVO 具有默认值的自动操作步骤类
+             */
+            @Override
+            public ClickPositionVO createDefaultClickPosition() {
+                combinationBean = new ClickPositionVO();
+                return combinationBean;
+            }
+
+            /**
+             * 保存操作步骤
+             *
+             * @param events  操作步骤
+             * @param addType 添加方式
+             */
+            @Override
+            public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
+                // 这里不添加到表格，只用于组合键监听
+                if (combinationBean != null) {
+                    // 所有按键松开，组合键录制完成
+                    handleCombinationComplete();
+                }
+                stopRecording();
+            }
+
+            /**
+             * 获取当前步骤数
+             *
+             * @return 临时步骤数
+             */
+            @Override
+            public int getCurrentStepCount() {
+                return -1;
+            }
+
+            /**
+             * 获取是否录制鼠标移动事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMove() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制鼠标拖拽事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordDrag() {
+                return false;
+            }
+
+            /**
+             * 更新滑轮记录信息
+             *
+             * @param wheelRotation 滑轮滚动方向
+             * @param wheelNum      滑轮滚动次数
+             */
+            @Override
+            public void onWheelRecorded(int wheelRotation, int wheelNum) {
+            }
+
+            /**
+             * 更新记录信息
+             *
+             * @param log 记录信息
+             */
+            @Override
+            public void updateRecordLog(String log) {
+                keyLabel.setText(log.substring(log.lastIndexOf("\n") + 1));
+            }
+
+            /**
+             * 停止所有任务
+             */
+            @Override
+            public void stopWorkAll() {
+                removeNativeListener(listener);
+                recordClicking = false;
+            }
+
+            /**
+             * 显示错误信息
+             */
+            @Override
+            public void showError() {
+            }
+
+            /**
+             * 获取是否录制鼠标滚轮事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMouseWheel() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制键盘事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordKeyboard() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制鼠标点击事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMouseClick() {
+                return false;
+            }
+
+            /**
+             * 处理组合键录制完成
+             */
+            private void handleCombinationComplete() {
+                combinationBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
+                trajectory.clear();
+                trajectory.addAll(combinationBean.getMoveTrajectory());
+            }
+
+            /**
+             * 停止录制
+             */
+            private void stopRecording() {
+                removeNativeListener(listener);
+                Platform.runLater(() -> {
+                    if (combinationBean != null) {
+                        Set<Integer> keySet = new LinkedHashSet<>();
+                        if (CollectionUtils.isNotEmpty(trajectory)) {
+                            for (TrajectoryPointBean t : trajectory) {
+                                List<Integer> pressKeyboardKeys = t.getPressKeyboardKeys();
+                                if (CollectionUtils.isNotEmpty(pressKeyboardKeys)) {
+                                    keySet.addAll(pressKeyboardKeys);
+                                }
+                            }
+                        }
+                        String keys = combinationBean.getClickKey();
+                        boolean success = true;
+                        String settingKeys = String.join(" ", keySet.stream().map(String::valueOf).toList());
+                        if (keyLabel == recordKey_Set) {
+                            recordKeys.clear();
+                            recordKeys.addAll(keySet);
+                            recordKeyHBox_Set.setCursor(Cursor.HAND);
+                        } else if (keyLabel == runKey_Set) {
+                            runKeys.clear();
+                            runKeys.addAll(keySet);
+                            runKeyHBox_Set.setCursor(Cursor.HAND);
+                        }
+                        if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys) &&
+                                recordKeys.toString().equals(runKeys.toString())) {
+                            success = false;
+                            settingKeys = "";
+                            if (keyLabel == recordKey_Set) {
+                                recordKeys.clear();
+                            } else if (keyLabel == runKey_Set) {
+                                runKeys.clear();
+                            }
+                            updateKeyboardLabel(keyLabel, keyHBox, text_unSetKeyboard(), false);
+                        } else {
+                            if (keyLabel == recordKey_Set) {
+                                removeRecordKey_Det.setVisible(true);
+                            } else if (keyLabel == runKey_Set) {
+                                removeRunKey_Det.setVisible(true);
+                            }
+                            updateKeyboardLabel(keyLabel, keyHBox, keys, true);
+                        }
+                        try {
+                            recordClicking = false;
+                            if (shortcutsListener != null) {
+                                shortcutsListener.startRecording();
+                            }
+                            updateProperties(configFile, configKey, settingKeys);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (!success) {
+                            throw new RuntimeException(text_duplicate());
+                        }
+                    }
+                });
+            }
+
         });
     }
 
@@ -1860,6 +2229,86 @@ public class SettingController extends RootController implements MousePositionUp
         if (mainController != null) {
             Platform.runLater(mainController::mainAdaption);
         }
+    }
+
+    /**
+     * 设置取消快捷键
+     *
+     * @param mouseEvent 鼠标事件
+     */
+    @FXML
+    private void cancelKeyInput(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            cancelKeyHBox_Set.setCursor(disableCursor);
+            recordClicking = true;
+            updateKeyboardLabel(cancelKey_Set, cancelKeyHBox_Set, text_setKeyboard(), false);
+            addToolTip(null, cancelKeyHBox_Set);
+            startNativeKeyListener(true, cancelKey_Set, cancelKeyHBox_Set, key_cancelKey);
+        }
+    }
+
+    /**
+     * 设置录制快捷键
+     *
+     * @param mouseEvent 鼠标事件
+     */
+    @FXML
+    private void recordKeyInput(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            recordKeyHBox_Set.setCursor(disableCursor);
+            recordClicking = true;
+            if (shortcutsListener != null) {
+                shortcutsListener.stopRecording();
+            }
+            updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_setKeyboard(), false);
+            addToolTip(null, recordKeyHBox_Set);
+            startNativeCombinationsListener(recordKey_Set, recordKeyHBox_Set, key_recordKey);
+        }
+    }
+
+    /**
+     * 设置运行快捷键
+     *
+     * @param mouseEvent 鼠标事件
+     */
+    @FXML
+    private void runKeyInput(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            runKeyHBox_Set.setCursor(disableCursor);
+            recordClicking = true;
+            if (shortcutsListener != null) {
+                shortcutsListener.stopRecording();
+            }
+            updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_setKeyboard(), false);
+            addToolTip(null, runKeyHBox_Set);
+            startNativeCombinationsListener(runKey_Set, runKeyHBox_Set, key_runKey);
+        }
+    }
+
+    /**
+     * 删除录制快捷键
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void removeRecordKey() throws IOException {
+        recordKeys.clear();
+        updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_unSetKeyboard(), false);
+        updateProperties(configFile, key_recordKey, "");
+        removeRecordKey_Det.setVisible(false);
+    }
+
+    /**
+     * 删除运行快捷键
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void removeRunKey() throws IOException {
+        runKeys.clear();
+        updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_unSetKeyboard(), false);
+        updateProperties(configFile, key_runKey, "");
+        removeRunKey_Det.setVisible(false);
     }
 
 }

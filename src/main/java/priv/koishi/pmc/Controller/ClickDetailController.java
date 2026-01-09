@@ -47,7 +47,6 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
-import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -1198,8 +1197,6 @@ public class ClickDetailController extends RootController {
         removeNativeListener(nativeKeyListener);
         startNativeKeyListener();
         listener = initUnifiedInputRecordListener();
-        // 注册监听器
-        addNativeListener(listener);
         // 启动录制
         listener.startRecording();
     }
@@ -1250,19 +1247,18 @@ public class ClickDetailController extends RootController {
                         String key = getKeyText(keyCode);
                         // 过滤未知按键
                         if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
-                            // 检测快捷键 esc
                             if (keyCode == cancelKey) {
                                 removeNativeListener(listener);
-                                removeNativeListener(nativeKeyListener);
                                 updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
                                 setKeyHBox_Det.setCursor(Cursor.HAND);
                                 recordClicking = false;
+                                removeNativeListener(nativeKeyListener);
                                 throw new RuntimeException(key + text_keyConflict());
                             } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
-                                removeNativeListener(nativeKeyListener);
                                 updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
                                 setKeyHBox_Det.setCursor(Cursor.HAND);
                                 recordClicking = false;
+                                removeNativeListener(nativeKeyListener);
                             }
                         }
                     }
@@ -1285,7 +1281,11 @@ public class ClickDetailController extends RootController {
              */
             private ClickPositionVO combinationBean;
 
-
+            /**
+             * 创建一个具有默认值的自动操作步骤类
+             *
+             * @return clickPositionVO 具有默认值的自动操作步骤类
+             */
             @Override
             public ClickPositionVO createDefaultClickPosition() {
                 combinationBean = new ClickPositionVO();
@@ -2118,8 +2118,6 @@ public class ClickDetailController extends RootController {
     @FXML
     private void handleMouseClick(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
-                    MainApplication.class.getResource("icon/Disable.png")).toString());
             setKeyHBox_Det.setCursor(disableCursor);
             recordClicking = true;
             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_setKeyboard(), false);
