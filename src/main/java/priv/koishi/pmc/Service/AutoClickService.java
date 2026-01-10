@@ -1271,6 +1271,18 @@ public class AutoClickService {
             }
             // 等待所有异步操作完成
             CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).get();
+        } else {
+            String clickTime = clickPositionVO.getClickTime();
+            long waitTime = Long.parseLong(clickTime);
+            Thread.sleep(waitTime);
+            if (taskBean.isWaitLog()) {
+                ClickLogBean sleepLog = new ClickLogBean();
+                sleepLog.setClickTime(String.valueOf(waitTime))
+                        .setClickKey(mouseButton_none())
+                        .setType(log_wait())
+                        .setName(name);
+                dynamicQueue.add(sleepLog);
+            }
         }
     }
 
