@@ -1882,6 +1882,7 @@ public class ClickDetailController extends RootController {
         Stage floatingStage = clickFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
+                updateMassageLabel(clickFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
             } else if (floatingStage.isShowing()) {
@@ -1899,6 +1900,7 @@ public class ClickDetailController extends RootController {
         Stage floatingStage = stopFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
+                updateMassageLabel(stopFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
             } else if (floatingStage.isShowing()) {

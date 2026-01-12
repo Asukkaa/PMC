@@ -470,6 +470,8 @@ public class SettingController extends RootController implements MousePositionUp
             }
             updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, record.toString(), true);
             removeRecordKey_Det.setVisible(true);
+        } else {
+            updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_unSetKeyboard(), false);
         }
         // 运行键
         String runKey = prop.getProperty(key_runKey);
@@ -483,6 +485,8 @@ public class SettingController extends RootController implements MousePositionUp
             }
             updateKeyboardLabel(runKey_Set, runKeyHBox_Set, run.toString(), true);
             removeRunKey_Det.setVisible(true);
+        } else {
+            updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_unSetKeyboard(), false);
         }
     }
 
@@ -1203,11 +1207,7 @@ public class SettingController extends RootController implements MousePositionUp
                                             autoClickController.cancelTip_Click.setText(text_cancelTip_Click());
                                         }
                                     }
-                                    recordClicking = false;
-                                    changeDisableNodes(shortcutDisableNodes, false);
-                                    runKeyHBox_Set.setCursor(Cursor.HAND);
-                                    recordKeyHBox_Set.setCursor(Cursor.HAND);
-                                    cancelKeyHBox_Set.setCursor(Cursor.HAND);
+                                    restoreShortcutUiState();
                                 }
                                 if (cancelKey == noKeyboard) {
                                     throw new RuntimeException(key + text_keyConflict());
@@ -1226,11 +1226,7 @@ public class SettingController extends RootController implements MousePositionUp
                                     throw new RuntimeException(ex);
                                 } finally {
                                     removeNativeListener(nativeKeyListener);
-                                    recordClicking = false;
-                                    changeDisableNodes(shortcutDisableNodes, false);
-                                    runKeyHBox_Set.setCursor(Cursor.HAND);
-                                    recordKeyHBox_Set.setCursor(Cursor.HAND);
-                                    cancelKeyHBox_Set.setCursor(Cursor.HAND);
+                                    restoreShortcutUiState();
                                 }
                                 throw new RuntimeException(key + text_keyConflict());
                             }
@@ -1239,6 +1235,18 @@ public class SettingController extends RootController implements MousePositionUp
                 });
             }
         };
+    }
+
+    /**
+     * 恢复快捷键相关 ui 样式
+     */
+    private void restoreShortcutUiState() {
+        recordClicking = false;
+        changeDisableNodes(shortcutDisableNodes, false);
+        runKey_Set.setCursor(Cursor.HAND);
+        recordKey_Set.setCursor(Cursor.HAND);
+        recordKeyHBox_Set.setCursor(Cursor.HAND);
+        cancelKeyHBox_Set.setCursor(Cursor.HAND);
     }
 
     /**
@@ -1477,11 +1485,7 @@ public class SettingController extends RootController implements MousePositionUp
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         } finally {
-                            recordClicking = false;
-                            changeDisableNodes(shortcutDisableNodes, false);
-                            runKeyHBox_Set.setCursor(Cursor.HAND);
-                            recordKeyHBox_Set.setCursor(Cursor.HAND);
-                            cancelKeyHBox_Set.setCursor(Cursor.HAND);
+                            restoreShortcutUiState();
                             if (shortcutsListener != null) {
                                 shortcutsListener.startRecording();
                             }
@@ -2072,6 +2076,11 @@ public class SettingController extends RootController implements MousePositionUp
             getFloatingSetting(massageFloating, configFile_Click);
             massageFloating.setDisableNodes(baseDisableNodes);
             if (!floatingStage.isShowing()) {
+                if (mouseFloating_Set.isSelected()) {
+                    updateMassageLabel(massageFloating, text_closeFloatingShortcut());
+                } else {
+                    updateMassageLabel(massageFloating, text_saveFindImgConfig());
+                }
                 // 显示浮窗
                 showFloatingWindow(massageFloating);
             } else if (floatingStage.isShowing()) {
@@ -2214,6 +2223,7 @@ public class SettingController extends RootController implements MousePositionUp
         if (clickStage != null) {
             clickFloating.setDisableNodes(clickDisableNodes);
             if (!clickStage.isShowing()) {
+                updateMassageLabel(clickFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
             } else if (clickStage.isShowing()) {
@@ -2240,6 +2250,7 @@ public class SettingController extends RootController implements MousePositionUp
         if (stopStage != null) {
             stopFloating.setDisableNodes(stopDisableNodes);
             if (!stopStage.isShowing()) {
+                updateMassageLabel(stopFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
             } else if (stopStage.isShowing()) {

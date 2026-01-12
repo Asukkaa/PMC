@@ -165,7 +165,6 @@ public class NodeDisableUtils {
                 event.consume();
             }
         };
-
         // 添加拖拽事件过滤器
         node.addEventFilter(DragEvent.ANY, dragFilter);
         node.getProperties().put("nonEditableDragFilter", dragFilter);
@@ -281,15 +280,13 @@ public class NodeDisableUtils {
                 combo.hide();
             }
         }
-        // 注意：我们不设置node.setDisable(true)，因为这会完全禁用组件
-        // 包括拖拽功能。我们只使用事件过滤器来控制交互
     }
 
     /**
      * 获取组件的默认光标
      *
      * @param node 需要修改样式的组件
-     * @return CSS 后缀
+     * @return 默认光标
      */
     private static Cursor getDefaultCursor(Node node) {
         switch (node) {
