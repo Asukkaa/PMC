@@ -133,6 +133,11 @@ public class SettingController extends RootController implements MousePositionUp
     private final List<Node> windowInfoDisableNodes = new ArrayList<>();
 
     /**
+     * 快捷键设置时要防重复点击的组件
+     */
+    private final List<Node> shortcutDisableNodes = new ArrayList<>();
+
+    /**
      * 窗口进程地址
      */
     private String clickWindowPath, stopWindowPath;
@@ -830,10 +835,19 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置要防重复点击的组件
      */
     private void setDisableNodes() {
+        baseDisableNodes.add(language_Set);
+        baseDisableNodes.add(reLaunch_Set);
         baseDisableNodes.add(removeAll_Set);
+        baseDisableNodes.add(tableView_Set);
+        baseDisableNodes.add(nextGcType_Set);
         baseDisableNodes.add(stopImgBtn_Set);
         baseDisableNodes.add(stopWindow_Set);
+        baseDisableNodes.add(runKeyHBox_Set);
         baseDisableNodes.add(clickWindow_Set);
+        baseDisableNodes.add(removeRunKey_Det);
+        baseDisableNodes.add(recordKeyHBox_Set);
+        baseDisableNodes.add(cancelKeyHBox_Set);
+        baseDisableNodes.add(removeRecordKey_Det);
         Node aboutTab = mainScene.lookup("#aboutTab");
         baseDisableNodes.add(aboutTab);
         Node settingTab = mainScene.lookup("#settingTab");
@@ -848,6 +862,10 @@ public class SettingController extends RootController implements MousePositionUp
         stopDisableNodes.add(stopFindImgType_Set);
         clickDisableNodes.addAll(baseDisableNodes);
         clickDisableNodes.add(clickFindImgType_Set);
+        shortcutDisableNodes.addAll(baseDisableNodes);
+        shortcutDisableNodes.add(massageRegion_Set);
+        shortcutDisableNodes.add(stopRegionHBox_Set);
+        shortcutDisableNodes.add(clickRegionHBox_Set);
     }
 
     /**
@@ -1134,6 +1152,7 @@ public class SettingController extends RootController implements MousePositionUp
     private void startNativeKeyListener(boolean isSetting, Label keyLabel, HBox keyHBox, String configKey) {
         removeNativeListener(listener);
         removeNativeListener(nativeKeyListener);
+        changeDisableNodes(shortcutDisableNodes, true);
         // 键盘监听器
         nativeKeyListener = intitNativeKeyListener(isSetting, keyLabel, keyHBox, configKey);
         addNativeListener(nativeKeyListener);
@@ -1171,7 +1190,6 @@ public class SettingController extends RootController implements MousePositionUp
                                     cancelKey = keyCode;
                                     updateKeyboardLabel(keyLabel, keyHBox, key, true);
                                 }
-                                keyHBox.setCursor(Cursor.HAND);
                                 try {
                                     updateProperties(configFile, configKey, String.valueOf(keyCode));
                                 } catch (IOException ex) {
@@ -1186,6 +1204,10 @@ public class SettingController extends RootController implements MousePositionUp
                                         }
                                     }
                                     recordClicking = false;
+                                    changeDisableNodes(shortcutDisableNodes, false);
+                                    runKeyHBox_Set.setCursor(Cursor.HAND);
+                                    recordKeyHBox_Set.setCursor(Cursor.HAND);
+                                    cancelKeyHBox_Set.setCursor(Cursor.HAND);
                                 }
                                 if (cancelKey == noKeyboard) {
                                     throw new RuntimeException(key + text_keyConflict());
@@ -1193,18 +1215,22 @@ public class SettingController extends RootController implements MousePositionUp
                             } else if (keyCode == cancelKey) {
                                 removeNativeListener(listener);
                                 updateKeyboardLabel(keyLabel, keyHBox, text_unSetKeyboard(), false);
-                                keyHBox.setCursor(Cursor.HAND);
+                                if (keyLabel == recordKey_Set) {
+                                    recordKeys.clear();
+                                } else if (keyLabel == runKey_Set) {
+                                    runKeys.clear();
+                                }
                                 try {
-                                    if (keyLabel == recordKey_Set) {
-                                        recordKeys.clear();
-                                    } else if (keyLabel == runKey_Set) {
-                                        runKeys.clear();
-                                    }
                                     updateProperties(configFile, configKey, "");
-                                    removeNativeListener(nativeKeyListener);
-                                    recordClicking = false;
                                 } catch (IOException ex) {
                                     throw new RuntimeException(ex);
+                                } finally {
+                                    removeNativeListener(nativeKeyListener);
+                                    recordClicking = false;
+                                    changeDisableNodes(shortcutDisableNodes, false);
+                                    runKeyHBox_Set.setCursor(Cursor.HAND);
+                                    recordKeyHBox_Set.setCursor(Cursor.HAND);
+                                    cancelKeyHBox_Set.setCursor(Cursor.HAND);
                                 }
                                 throw new RuntimeException(key + text_keyConflict());
                             }
@@ -1412,7 +1438,6 @@ public class SettingController extends RootController implements MousePositionUp
                                 String toolTip = tip_recordClick() + "\n" + text_shortcut() + combinationBean.getClickKey();
                                 addToolTip(toolTip, autoClickController.recordClick_Click);
                             }
-                            recordKeyHBox_Set.setCursor(Cursor.HAND);
                         } else if (keyLabel == runKey_Set) {
                             runKeys.clear();
                             runKeys.addAll(keySet);
@@ -1420,7 +1445,6 @@ public class SettingController extends RootController implements MousePositionUp
                                 String toolTip = tip_runClick() + "\n" + text_shortcut() + combinationBean.getClickKey();
                                 addToolTip(toolTip, autoClickController.runClick_Click);
                             }
-                            runKeyHBox_Set.setCursor(Cursor.HAND);
                         }
                         if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys) &&
                                 recordKeys.toString().equals(runKeys.toString())) {
@@ -1449,13 +1473,18 @@ public class SettingController extends RootController implements MousePositionUp
                             updateKeyboardLabel(keyLabel, keyHBox, keys, true);
                         }
                         try {
-                            recordClicking = false;
-                            if (shortcutsListener != null) {
-                                shortcutsListener.startRecording();
-                            }
                             updateProperties(configFile, configKey, settingKeys);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
+                        } finally {
+                            recordClicking = false;
+                            changeDisableNodes(shortcutDisableNodes, false);
+                            runKeyHBox_Set.setCursor(Cursor.HAND);
+                            recordKeyHBox_Set.setCursor(Cursor.HAND);
+                            cancelKeyHBox_Set.setCursor(Cursor.HAND);
+                            if (shortcutsListener != null) {
+                                shortcutsListener.startRecording();
+                            }
                         }
                         if (!success) {
                             throw new RuntimeException(text_duplicate());
@@ -2318,6 +2347,7 @@ public class SettingController extends RootController implements MousePositionUp
             updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_setKeyboard(), false);
             addToolTip(null, recordKeyHBox_Set);
             startNativeCombinationsListener(recordKey_Set, recordKeyHBox_Set, key_recordKey);
+            removeRecordKey_Det.setVisible(false);
         }
     }
 
@@ -2337,6 +2367,7 @@ public class SettingController extends RootController implements MousePositionUp
             updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_setKeyboard(), false);
             addToolTip(null, runKeyHBox_Set);
             startNativeCombinationsListener(runKey_Set, runKeyHBox_Set, key_runKey);
+            removeRunKey_Det.setVisible(false);
         }
     }
 
