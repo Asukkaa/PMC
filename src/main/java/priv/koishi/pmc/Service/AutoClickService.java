@@ -82,6 +82,11 @@ public class AutoClickService {
     private static DynamicQueue<ClickLogBean> dynamicQueue;
 
     /**
+     * JavaFX 机器人输入标志，true 为机器人输入，将不会触发快捷键取消自动任务
+     */
+    public static volatile boolean isRobotInput = false;
+
+    /**
      * 自动点击任务线程
      *
      * @param taskBean 线程任务参数
@@ -885,6 +890,7 @@ public class AutoClickService {
                         dynamicQueue.add(wheelLog);
                     }
                 } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
+                    isRobotInput = true;
                     robot.keyPress(NativeKeyToKeyCode.get(keyCode));
                     if (taskBean.isKeyboardLog()) {
                         ClickLogBean keyPressLog = new ClickLogBean();
@@ -956,6 +962,7 @@ public class AutoClickService {
                         }
                     } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
                         robot.keyRelease(NativeKeyToKeyCode.get(keyCode));
+                        isRobotInput = false;
                         if (taskBean.isKeyboardLog()) {
                             ClickLogBean releaseLog = new ClickLogBean();
                             releaseLog.setX(String.valueOf((int) finalStartX))
@@ -1201,6 +1208,7 @@ public class AutoClickService {
                     }
                     if (CollectionUtils.isNotEmpty(nowPressKeyboardKeys)) {
                         nowPressKeyboardKeys.forEach(button -> {
+                            isRobotInput = true;
                             robot.keyPress(NativeKeyToKeyCode.get(button));
                             if (taskBean.isKeyboardLog()) {
                                 ClickLogBean pressLog = new ClickLogBean();
@@ -1216,6 +1224,7 @@ public class AutoClickService {
                     if (CollectionUtils.isNotEmpty(finalReleaseKeyboardKeys)) {
                         finalReleaseKeyboardKeys.forEach(button -> {
                             robot.keyRelease(NativeKeyToKeyCode.get(button));
+                            isRobotInput = false;
                             if (taskBean.isKeyboardLog()) {
                                 ClickLogBean releaseLog = new ClickLogBean();
                                 releaseLog.setX(String.valueOf((int) finalX))

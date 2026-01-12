@@ -1426,7 +1426,7 @@ public class AutoClickController extends RootController implements MousePosition
                         // 处理右 shift
                         keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                         // 检测快捷键 esc
-                        if (keyCode == cancelKey) {
+                        if (keyCode == cancelKey && !isRobotInput) {
                             stopAllWork();
                         }
                     }

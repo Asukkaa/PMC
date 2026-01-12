@@ -1256,14 +1256,7 @@ public class ClickDetailController extends RootController {
                         String key = getKeyText(keyCode);
                         // 过滤未知按键
                         if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
-                            if (keyCode == cancelKey) {
-                                removeNativeListener(listener);
-                                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
-                                setKeyHBox_Det.setCursor(Cursor.HAND);
-                                recordClicking = false;
-                                removeNativeListener(nativeKeyListener);
-                                throw new RuntimeException(key + text_keyConflict());
-                            } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
+                            if (clickType_keyboard().equals(clickType_Det.getValue())) {
                                 updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
                                 setKeyHBox_Det.setCursor(Cursor.HAND);
                                 recordClicking = false;
