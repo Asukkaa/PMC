@@ -817,6 +817,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
         if (isFree()) {
+            if (cancelKey == noKeyboard) {
+                throw new RuntimeException(text_noCancelKey());
+            }
             // 标记为正在运行自动操作
             runClicking = true;
             if (clickLogs != null) {
@@ -1827,6 +1830,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void startRecord(int addType) {
         if (isFree()) {
+            if (cancelKey == noKeyboard) {
+                throw new RuntimeException(text_noCancelKey());
+            }
             // 标记为正在录制
             recordClicking = true;
             // 改变要防重复点击的组件状态
@@ -2044,7 +2050,11 @@ public class AutoClickController extends RootController implements MousePosition
      * 设置快捷键提示
      */
     private void setShortcutText() {
-        cancelTip_Click.setText(text_cancelTip_Click());
+        if (cancelKey == noKeyboard) {
+            cancelTip_Click.setText(text_noCancelKey());
+        } else {
+            cancelTip_Click.setText(text_cancelTip_Click());
+        }
         String recordToolTip = tip_recordClick() + "\n" + text_shortcut() + getKeysText(recordKeys);
         addToolTip(recordToolTip, recordClick_Click);
         String runToolTip = tip_runClick() + "\n" + text_shortcut() + getKeysText(runKeys);

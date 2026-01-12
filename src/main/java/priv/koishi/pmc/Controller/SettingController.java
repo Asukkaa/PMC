@@ -448,7 +448,11 @@ public class SettingController extends RootController implements MousePositionUp
     private void loadKeyConfig(Properties prop) {
         // 取消键
         cancelKey = Integer.parseInt(prop.getProperty(key_cancelKey, String.valueOf(NativeKeyEvent.VC_ESCAPE)));
-        updateKeyboardLabel(cancelKey_Set, cancelKeyHBox_Set, getKeyText(cancelKey), true);
+        if (cancelKey == noKeyboard) {
+            updateKeyboardLabel(cancelKey_Set, cancelKeyHBox_Set, text_unSetKeyboard(), false);
+        } else {
+            updateKeyboardLabel(cancelKey_Set, cancelKeyHBox_Set, getKeyText(cancelKey), true);
+        }
         // 录制键
         String recordKey = prop.getProperty(key_recordKey);
         if (StringUtils.isNoneBlank(recordKey)) {
@@ -1122,6 +1126,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 开启全局键盘监听
      *
+     * @param isSetting true 为快捷键设置模式，false 为快捷键冲突检测模式
      * @param keyLabel  组合键展示栏
      * @param keyHBox   组合键展示容器
      * @param configKey 配置项键
@@ -1137,6 +1142,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 初始化键盘输入监听器
      *
+     * @param isSetting true 为快捷键设置模式，false 为快捷键冲突检测模式
      * @param keyLabel  组合键展示栏
      * @param keyHBox   组合键展示容器
      * @param configKey 配置项键
@@ -1156,18 +1162,33 @@ public class SettingController extends RootController implements MousePositionUp
                         // 过滤未知按键
                         if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
                             if (isSetting) {
-                                updateKeyboardLabel(keyLabel, keyHBox, key, true);
+                                // 检测按键冲突
+                                if (recordKeys.contains(keyCode) || runKeys.contains(keyCode)) {
+                                    keyCode = noKeyboard;
+                                    cancelKey = noKeyboard;
+                                    updateKeyboardLabel(keyLabel, keyHBox, text_unSetKeyboard(), false);
+                                } else {
+                                    cancelKey = keyCode;
+                                    updateKeyboardLabel(keyLabel, keyHBox, key, true);
+                                }
                                 keyHBox.setCursor(Cursor.HAND);
-                                cancelKey = keyCode;
                                 try {
                                     updateProperties(configFile, configKey, String.valueOf(keyCode));
-                                    removeNativeListener(nativeKeyListener);
-                                    if (autoClickController != null) {
-                                        autoClickController.cancelTip_Click.setText(text_cancelTip_Click());
-                                    }
-                                    recordClicking = false;
                                 } catch (IOException ex) {
                                     throw new RuntimeException(ex);
+                                } finally {
+                                    removeNativeListener(nativeKeyListener);
+                                    if (autoClickController != null) {
+                                        if (cancelKey == noKeyboard) {
+                                            autoClickController.cancelTip_Click.setText(text_noCancelKey());
+                                        } else {
+                                            autoClickController.cancelTip_Click.setText(text_cancelTip_Click());
+                                        }
+                                    }
+                                    recordClicking = false;
+                                }
+                                if (cancelKey == noKeyboard) {
+                                    throw new RuntimeException(key + text_keyConflict());
                                 }
                             } else if (keyCode == cancelKey) {
                                 removeNativeListener(listener);
@@ -2214,6 +2235,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void findClickWindowAction() throws IOException {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         // 改变要防重复点击的组件状态
         changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏主窗口
@@ -2233,6 +2257,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void findStopWindowAction() throws IOException {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         // 改变要防重复点击的组件状态
         changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏主窗口

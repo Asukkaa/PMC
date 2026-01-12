@@ -1987,6 +1987,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 未设置取消快捷键
+     */
+    public static String text_noCancelKey() {
+        return bundle.getString("noCancelKey");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

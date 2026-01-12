@@ -11,8 +11,7 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static priv.koishi.pmc.Finals.CommonFinals.isMac;
-import static priv.koishi.pmc.Finals.CommonFinals.isWin;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 
 /**
@@ -27,7 +26,7 @@ public class ButtonMappingUtils {
     /**
      * 取消按键
      */
-    public static int cancelKey = NativeKeyEvent.VC_ESCAPE;
+    public static int cancelKey = noKeyboard;
 
     /**
      * 录制自动流程快捷键

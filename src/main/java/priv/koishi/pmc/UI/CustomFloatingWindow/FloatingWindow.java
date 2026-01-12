@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.i18nFinal.text_noCancelKey;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
@@ -422,6 +423,9 @@ public class FloatingWindow {
      */
     public static void showFloatingWindow(FloatingWindowDescriptor config) {
         Platform.runLater(() -> {
+            if (cancelKey == noKeyboard) {
+                throw new RuntimeException(text_noCancelKey());
+            }
             Stage floatingStage = config.getStage();
             Rectangle rectangle = config.getRectangle();
             FloatingWindowConfig windowConfig = config.getConfig();

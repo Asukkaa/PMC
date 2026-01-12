@@ -1185,6 +1185,9 @@ public class ClickDetailController extends RootController {
      * 开启全局键盘监听
      */
     private void startNativeKeyListener() {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         removeNativeListener(listener);
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
@@ -1912,6 +1915,9 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void findClickWindowAction() throws IOException {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         // 改变要防重复点击的组件状态
         changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
@@ -1932,6 +1938,9 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void findStopWindowAction() throws IOException {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         // 改变要防重复点击的组件状态
         changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
