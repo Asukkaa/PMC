@@ -51,6 +51,13 @@ public class NodeDisableUtils {
                 node.setCursor(disableCursor);
                 // 为所有子节点也设置相同的光标
                 setCursorForChildren(node, disableCursor);
+                // 单独处理带有 Graphic 的按钮
+                if (node instanceof ButtonBase button) {
+                    Node graphic = button.getGraphic();
+                    if (graphic != null) {
+                        button.setDisable(true);
+                    }
+                }
             } else {
                 node.setOpacity(1.0);
                 // 恢复可编辑时的默认光标
