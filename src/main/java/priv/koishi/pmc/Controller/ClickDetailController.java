@@ -568,6 +568,8 @@ public class ClickDetailController extends RootController {
         }
         clickFloating.setDisableNodes(clickDisableNodes)
                 .setName(floatingName_click())
+                .setMinHeight(minFindImgHeight)
+                .setMinWidth(minFindImgWidth)
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
         FloatingWindowConfig copyStopWindowConfig = new FloatingWindowConfig();
@@ -581,6 +583,8 @@ public class ClickDetailController extends RootController {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
         stopFloating.setDisableNodes(stopDisableNodes)
+                .setMinHeight(minFindImgHeight)
+                .setMinWidth(minFindImgWidth)
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗

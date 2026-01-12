@@ -494,7 +494,7 @@ public class FloatingWindow {
             point += "X: " + x + " Y: " + y;
         }
         if (config.isEnableResize()) {
-            point += "\nWidth:" + w + " Height:" + h;
+            point += "\nWidth: " + w + " Height: " + h;
         }
         Label floatingPosition = config.getFloatingPosition();
         floatingPosition.setText(point);

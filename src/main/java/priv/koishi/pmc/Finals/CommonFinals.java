@@ -550,6 +550,16 @@ public class CommonFinals {
     public static final int defaultOffsetY = 30;
 
     /**
+     * 默认图像识别范围窗口宽度
+     */
+    public static final int minFindImgWidth = 50;
+
+    /**
+     * 默认图像识别范围窗口高度
+     */
+    public static final int minFindImgHeight = 50;
+
+    /**
      * 在列表所选行第一行上方插入
      */
     public static final int upAdd = 1;

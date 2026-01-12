@@ -377,15 +377,19 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void initFloatingWindow() throws IOException {
         clickFloating = createFloatingWindowDescriptor()
+                .setMinHeight(minFindImgHeight)
                 .setName(floatingName_click())
                 .setHeightKey(key_clickHeight)
+                .setMinWidth(minFindImgWidth)
                 .setWidthKey(key_clickWidth)
                 .setButton(clickRegion_Set)
                 .setXKey(key_clickX)
                 .setYKey(key_clickY);
         clickFloating.getDisableNodes().add(clickFindImgType_Set);
         stopFloating = createFloatingWindowDescriptor()
+                .setMinHeight(minFindImgHeight)
                 .setName(floatingName_stop())
+                .setMinWidth(minFindImgWidth)
                 .setHeightKey(key_stopHeight)
                 .setWidthKey(key_stopWidth)
                 .setButton(stopRegion_Set)
@@ -408,6 +412,9 @@ public class SettingController extends RootController implements MousePositionUp
                 .setXKey(key_massageX)
                 .setYKey(key_massageY)
                 .setMargin(margin);
+        if (mouseFloating_Set.isSelected()) {
+            massageFloating.setMassage(text_closeFloatingShortcut());
+        }
         windowInfoFloating = new FloatingWindowDescriptor()
                 .setConfig(new FloatingWindowConfig())
                 .setName(findImgSet_tagetWindow())
@@ -1993,7 +2000,7 @@ public class SettingController extends RootController implements MousePositionUp
                     addToolTip(tip_closeFloating(), massageRegion_Set);
                 } else {
                     massageFloating.setCloseSave(true);
-                    updateMassageLabel(massageFloating, text_saveFloatingCoordinate());
+                    updateMassageLabel(massageFloating, text_saveFindImgConfig());
                     massageRegion_Set.setText(text_saveCloseFloating());
                     addToolTip(tip_saveFloating(), massageRegion_Set);
                 }
