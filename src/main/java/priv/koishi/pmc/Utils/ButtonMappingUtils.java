@@ -5,6 +5,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import java.util.LinkedHashSet;
@@ -37,6 +38,24 @@ public class ButtonMappingUtils {
      * 运行自动流程快捷键
      */
     public static Set<Integer> runKeys = new LinkedHashSet<>();
+
+    /**
+     * 获取录制或运行快捷键文本
+     *
+     * @param keys 要查询的快捷键 keyCode
+     * @return 如果设置了快捷键则返回对应的快捷键文本，否则返回未设置按键
+     */
+    public static String getKeysText(Set<Integer> keys) {
+        if (CollectionUtils.isNotEmpty(keys)) {
+            StringBuilder record = new StringBuilder();
+            for (int key : keys) {
+                record.append(getKeyText(key)).append(" ");
+            }
+            return record.toString();
+        } else {
+            return text_unSetKeyboard();
+        }
+    }
 
     /**
      * 自动操作的操作类型选项对应的鼠标行为（操作用）

@@ -10,8 +10,7 @@ import java.util.stream.Collectors;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.ClickTypeEnum.*;
 import static priv.koishi.pmc.MainApplication.bundle;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRecordClickTypeMap;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.updateRunClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 
 /**
  * 国际化相关文本常量
@@ -1173,34 +1172,34 @@ public class i18nFinal {
     }
 
     /**
-     * @return 按下 esc 即可取消任务
+     * @return 取消任务快捷键：
      */
     public static String text_cancelTask() {
-        return bundle.getString("cancelTask");
+        return bundle.getString("cancelTask") + getKeyText(cancelKey) + "\n";
     }
 
     /**
      * @return <p>鼠标拖拽浮窗即可移动浮窗</p>
-     * 按下esc 即可保存浮窗位置
+     * 保存浮窗设置快捷键：
      */
     public static String text_saveFloatingCoordinate() {
-        return bundle.getString("saveFloatingCoordinate");
+        return bundle.getString("saveFloatingCoordinate") + bundle.getString("saveFloatingCoordinateShortcut") + getKeyText(cancelKey);
     }
 
     /**
      * @return <p>拖拽浮窗边缘即可调整浮窗大小</p>
      * <p>鼠标拖拽浮窗即可移动浮窗</p>
-     * 按下 esc 即可保存浮窗位置
+     * 保存浮窗设置快捷键：
      */
     public static String text_saveFindImgConfig() {
-        return bundle.getString("saveFindImgConfig") + bundle.getString("saveFloatingCoordinate");
+        return bundle.getString("saveFindImgConfig") + text_saveFloatingCoordinate();
     }
 
     /**
-     * @return 按下 esc 即可关闭浮窗
+     * @return 关闭浮窗快捷键：
      */
-    public static String text_escCloseFloating() {
-        return bundle.getString("escCloseFloating");
+    public static String text_closeFloatingShortcut() {
+        return bundle.getString("closeFloatingShortcut") + getKeyText(cancelKey);
     }
 
     /**
@@ -1946,6 +1945,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 运行或录制自动化任务时按下 即可取消任务
+     */
+    public static String text_cancelTip_Click() {
+        return bundle.getString("autoClick.cancelTip_Click") + getKeyText(cancelKey) + bundle.getString("autoClick.cancelTip");
+    }
+
+    /**
      * @return 文件名称：
      */
     public static String text_fileName() {
@@ -1971,6 +1977,13 @@ public class i18nFinal {
      */
     public static String text_deleteKey() {
         return bundle.getString("deleteKey");
+    }
+
+    /**
+     * @return 快捷键：
+     */
+    public static String text_shortcut() {
+        return bundle.getString("shortcut");
     }
 
     /**

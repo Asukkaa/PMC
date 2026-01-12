@@ -1995,6 +1995,8 @@ public class AutoClickController extends RootController implements MousePosition
      * @param event 设置页加载完成事件
      */
     private void settingsLoaded(SettingsLoadedEvent event) {
+        // 设置快捷键提示
+        setShortcutText();
         // 设置要防重复点击的组件
         setDisableNodes();
         shortcutsListener = initUnifiedInputRecordListener();
@@ -2033,6 +2035,17 @@ public class AutoClickController extends RootController implements MousePosition
             Button saveButton = settingController.massageRegion_Set;
             setNodeDisable(saveButton, true);
         }
+    }
+
+    /**
+     * 设置快捷键提示
+     */
+    private void setShortcutText() {
+        cancelTip_Click.setText(text_cancelTip_Click());
+        String recordToolTip = tip_recordClick() + "\n" + text_shortcut() + getKeysText(recordKeys);
+        addToolTip(recordToolTip, recordClick_Click);
+        String runToolTip = tip_runClick() + "\n" + text_shortcut() + getKeysText(runKeys);
+        addToolTip(runToolTip, runClick_Click);
     }
 
     /**
@@ -2097,7 +2110,7 @@ public class AutoClickController extends RootController implements MousePosition
             tableViewDragRow(tableView_Click);
             // 构建右键菜单
             buildContextMenu();
-            // 运行定时任务
+            // 等待设置加载完毕
             EventBus.subscribe(SettingsLoadedEvent.class, this::settingsLoaded);
         });
     }

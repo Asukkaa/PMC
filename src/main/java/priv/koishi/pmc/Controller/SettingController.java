@@ -1153,6 +1153,9 @@ public class SettingController extends RootController implements MousePositionUp
                                 try {
                                     updateProperties(configFile, configKey, String.valueOf(keyCode));
                                     removeNativeListener(nativeKeyListener);
+                                    if (autoClickController != null) {
+                                        autoClickController.cancelTip_Click.setText(text_cancelTip_Click());
+                                    }
                                     recordClicking = false;
                                 } catch (IOException ex) {
                                     throw new RuntimeException(ex);
@@ -1375,10 +1378,18 @@ public class SettingController extends RootController implements MousePositionUp
                         if (keyLabel == recordKey_Set) {
                             recordKeys.clear();
                             recordKeys.addAll(keySet);
+                            if (autoClickController != null) {
+                                String toolTip = tip_recordClick() + "\n" + text_shortcut() + combinationBean.getClickKey();
+                                addToolTip(toolTip, autoClickController.recordClick_Click);
+                            }
                             recordKeyHBox_Set.setCursor(Cursor.HAND);
                         } else if (keyLabel == runKey_Set) {
                             runKeys.clear();
                             runKeys.addAll(keySet);
+                            if (autoClickController != null) {
+                                String toolTip = tip_runClick() + "\n" + text_shortcut() + combinationBean.getClickKey();
+                                addToolTip(toolTip, autoClickController.runClick_Click);
+                            }
                             runKeyHBox_Set.setCursor(Cursor.HAND);
                         }
                         if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys) &&
@@ -1386,8 +1397,16 @@ public class SettingController extends RootController implements MousePositionUp
                             success = false;
                             settingKeys = "";
                             if (keyLabel == recordKey_Set) {
+                                if (autoClickController != null) {
+                                    String toolTip = tip_recordClick() + "\n" + text_shortcut() + text_unSetKeyboard();
+                                    addToolTip(toolTip, autoClickController.recordClick_Click);
+                                }
                                 recordKeys.clear();
                             } else if (keyLabel == runKey_Set) {
+                                if (autoClickController != null) {
+                                    String toolTip = tip_runClick() + "\n" + text_shortcut() + text_unSetKeyboard();
+                                    addToolTip(toolTip, autoClickController.runClick_Click);
+                                }
                                 runKeys.clear();
                             }
                             updateKeyboardLabel(keyLabel, keyHBox, text_unSetKeyboard(), false);
@@ -1969,7 +1988,7 @@ public class SettingController extends RootController implements MousePositionUp
             if (floatingStage != null && floatingStage.isShowing()) {
                 if (mouseFloating_Set.isSelected()) {
                     massageFloating.setCloseSave(false);
-                    updateMassageLabel(massageFloating, text_escCloseFloating());
+                    updateMassageLabel(massageFloating, text_closeFloatingShortcut());
                     massageRegion_Set.setText(text_closeFloating());
                     addToolTip(tip_closeFloating(), massageRegion_Set);
                 } else {
@@ -2295,6 +2314,8 @@ public class SettingController extends RootController implements MousePositionUp
         recordKeys.clear();
         updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_unSetKeyboard(), false);
         updateProperties(configFile, key_recordKey, "");
+        String toolTip = tip_recordClick() + "\n" + text_shortcut() + text_unSetKeyboard();
+        addToolTip(toolTip, autoClickController.recordClick_Click);
         removeRecordKey_Det.setVisible(false);
     }
 
@@ -2308,6 +2329,8 @@ public class SettingController extends RootController implements MousePositionUp
         runKeys.clear();
         updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_unSetKeyboard(), false);
         updateProperties(configFile, key_runKey, "");
+        String toolTip = tip_runClick() + "\n" + text_shortcut() + text_unSetKeyboard();
+        addToolTip(toolTip, autoClickController.runClick_Click);
         removeRunKey_Det.setVisible(false);
     }
 
