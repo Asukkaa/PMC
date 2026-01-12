@@ -49,6 +49,8 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.getKeyText;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
@@ -837,7 +839,7 @@ public class UiUtils {
                     new MessageBubble(text_windowHidden(), 2);
                 } else {
                     stages.forEach(stage -> stage.setIconified(true));
-                    String info = text_escCloseFloating() + "\n" +
+                    String info = text_closeFloatingShortcut() + getKeyText(cancelKey) + "\n" +
                             findImgSet_PName() + windowInfo.getProcessName() + "\n" +
                             findImgSet_PID() + windowInfo.getPid() + "\n" +
                             findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +

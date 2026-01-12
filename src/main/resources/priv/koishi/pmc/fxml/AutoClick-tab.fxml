@@ -11,7 +11,7 @@
             <Label textFill="coral" text="%autoClick.tip"/>
 
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="cancelTip_Click" textFill="red" text="%autoClick.cancelTip_Click"/>
+            <Label fx:id="cancelTip_Click" textFill="red"/>
         </HBox>
 
         <HBox spacing="10">

@@ -50,4 +50,6 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.Serializer to tools.jackson.databind;
     opens priv.koishi.pmc.Bean.DTO to javafx.fxml;
     exports priv.koishi.pmc.Bean.DTO;
+    exports priv.koishi.pmc.Listener;
+    exports priv.koishi.pmc.Callback;
 }

@@ -235,4 +235,10 @@ public class CommonKeys {
 
     public static final String key_noMove = "noMove";
 
+    public static final String key_cancelKey = "cancelKey";
+
+    public static final String key_recordKey = "recordKey";
+
+    public static final String key_runKey = "runKey";
+
 }

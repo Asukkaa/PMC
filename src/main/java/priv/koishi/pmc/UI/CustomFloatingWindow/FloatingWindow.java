@@ -31,7 +31,9 @@ import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.i18nFinal.text_noCancelKey;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
@@ -421,6 +423,9 @@ public class FloatingWindow {
      */
     public static void showFloatingWindow(FloatingWindowDescriptor config) {
         Platform.runLater(() -> {
+            if (cancelKey == noKeyboard) {
+                throw new RuntimeException(text_noCancelKey());
+            }
             Stage floatingStage = config.getStage();
             Rectangle rectangle = config.getRectangle();
             FloatingWindowConfig windowConfig = config.getConfig();
@@ -494,7 +499,7 @@ public class FloatingWindow {
             point += "X: " + x + " Y: " + y;
         }
         if (config.isEnableResize()) {
-            point += "\nWidth:" + w + " Height:" + h;
+            point += "\nWidth: " + w + " Height: " + h;
         }
         Label floatingPosition = config.getFloatingPosition();
         floatingPosition.setText(point);
@@ -658,8 +663,11 @@ public class FloatingWindow {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
+                    int keyCode = e.getKeyCode();
+                    // 处理右 shift
+                    keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                     // 检测快捷键 esc
-                    if (e.getKeyCode() == cancelKey) {
+                    if (keyCode == cancelKey) {
                         floatingWindows.forEach(floatingConfig -> {
                             Stage stage = floatingConfig.getStage();
                             if (stage != null && stage.isShowing()) {

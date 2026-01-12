@@ -139,6 +139,7 @@ public class WindowMonitor {
             public void removeInfo() {
                 infoLabel.setText("");
             }
+
         };
     }
 

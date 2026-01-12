@@ -1,10 +1,13 @@
 package priv.koishi.pmc.Finals;
 
+import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
+import priv.koishi.pmc.MainApplication;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -41,7 +44,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.01.07";
+    public static final String buildDate = "2026.01.12";
 
     /**
      * 文件后缀名：bat
@@ -547,6 +550,16 @@ public class CommonFinals {
     public static final int defaultOffsetY = 30;
 
     /**
+     * 默认图像识别范围窗口宽度
+     */
+    public static final int minFindImgWidth = 50;
+
+    /**
+     * 默认图像识别范围窗口高度
+     */
+    public static final int minFindImgHeight = 50;
+
+    /**
      * 在列表所选行第一行上方插入
      */
     public static final int upAdd = 1;
@@ -790,5 +803,11 @@ public class CommonFinals {
      * macOS .DS_Store 文件名称
      */
     public static final String DS_Store = ".DS_Store";
+
+    /**
+     * 鼠标禁用图标
+     */
+    public static final Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
+            MainApplication.class.getResource("icon/Disable.png")).toString());
 
 }

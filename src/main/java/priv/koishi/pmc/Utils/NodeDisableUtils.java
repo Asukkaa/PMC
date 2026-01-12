@@ -7,14 +7,14 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.MainApplication;
 
 import java.util.List;
-import java.util.Objects;
 
+import static priv.koishi.pmc.Finals.CommonFinals.disableCursor;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 
 /**
@@ -45,15 +45,19 @@ public class NodeDisableUtils {
      */
     public static void setNodeDisable(Node node, boolean disable, String tooltipText) {
         if (node != null) {
-            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
-                    MainApplication.class.getResource("icon/Disable.png")).toString());
             if (disable) {
                 node.setOpacity(0.4);
-                node.setCursor(null);
                 // 不可编辑时使用默认光标
                 node.setCursor(disableCursor);
                 // 为所有子节点也设置相同的光标
                 setCursorForChildren(node, disableCursor);
+                // 单独处理带有 Graphic 的按钮
+                if (node instanceof ButtonBase button) {
+                    Node graphic = button.getGraphic();
+                    if (graphic != null) {
+                        button.setDisable(true);
+                    }
+                }
             } else {
                 node.setOpacity(1.0);
                 // 恢复可编辑时的默认光标
@@ -110,6 +114,8 @@ public class NodeDisableUtils {
             if (node instanceof ComboBoxBase) {
                 addComboBoxSpecialHandlers((ComboBoxBase<?>) node);
             }
+            // 对于需要拖拽的组件，添加拖拽事件过滤器（而不是设置处理器）
+            addDragEventFilters(node);
         } else {
             // 恢复焦点获取能力
             node.setFocusTraversable(true);
@@ -117,6 +123,73 @@ public class NodeDisableUtils {
             if (node instanceof ComboBoxBase) {
                 removeComboBoxSpecialHandlers((ComboBoxBase<?>) node);
             }
+            // 移除拖拽事件过滤器
+            removeDragEventFilters(node);
+        }
+    }
+
+    /**
+     * 创建鼠标事件过滤器
+     */
+    private static EventHandler<MouseEvent> createMouseEventFilter() {
+        return event -> {
+            // 阻止所有类型的鼠标交互
+            if (event.getEventType() == MouseEvent.MOUSE_PRESSED ||
+                    event.getEventType() == MouseEvent.MOUSE_CLICKED ||
+                    event.getEventType() == MouseEvent.MOUSE_RELEASED ||
+                    event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+                event.consume();
+                // 对于某些组件，需要额外处理
+                if (event.getTarget() instanceof TextInputControl &&
+                        event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+                    // 阻止文本输入框获得焦点
+                    Platform.runLater(() -> ((TextInputControl) event.getTarget()).deselect());
+                }
+                // 对于下拉框，确保它不会展开
+                if (event.getTarget() instanceof ComboBoxBase<?> comboBox) {
+                    if (comboBox.isShowing()) {
+                        comboBox.hide();
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * 为需要拖拽处理的组件添加事件过滤器
+     *
+     * @param node 需要处理的组件
+     */
+    private static void addDragEventFilters(Node node) {
+        // 创建拖拽事件过滤器
+        EventHandler<DragEvent> dragFilter = event -> {
+            // 阻止所有拖拽相关事件
+            if (event.getEventType() == DragEvent.DRAG_OVER ||
+                    event.getEventType() == DragEvent.DRAG_DROPPED ||
+                    event.getEventType() == DragEvent.DRAG_DONE ||
+                    event.getEventType() == DragEvent.DRAG_ENTERED ||
+                    event.getEventType() == DragEvent.DRAG_EXITED) {
+                event.consume();
+            }
+        };
+        // 添加拖拽事件过滤器
+        node.addEventFilter(DragEvent.ANY, dragFilter);
+        node.getProperties().put("nonEditableDragFilter", dragFilter);
+    }
+
+    /**
+     * 移除拖拽事件过滤器
+     *
+     * @param node 需要处理的组件
+     */
+    @SuppressWarnings("unchecked")
+    private static void removeDragEventFilters(Node node) {
+        // 移除拖拽事件过滤器
+        EventHandler<DragEvent> dragFilter =
+                (EventHandler<DragEvent>) node.getProperties().get("nonEditableDragFilter");
+        if (dragFilter != null) {
+            node.removeEventFilter(DragEvent.ANY, dragFilter);
+            node.getProperties().remove("nonEditableDragFilter");
         }
     }
 
@@ -160,8 +233,9 @@ public class NodeDisableUtils {
     @SuppressWarnings("unchecked")
     private static void removeComboBoxSpecialHandlers(ComboBoxBase<?> comboBox) {
         // 恢复原始的事件处理器
-        EventHandler<?> originalOnAction = (EventHandler<?>) comboBox.getProperties().get("originalOnAction");
-        comboBox.setOnAction((EventHandler<ActionEvent>) originalOnAction);
+        EventHandler<ActionEvent> originalOnAction =
+                (EventHandler<ActionEvent>) comboBox.getProperties().get("originalOnAction");
+        comboBox.setOnAction(originalOnAction);
         comboBox.getProperties().remove("originalOnAction");
         // 移除鼠标事件过滤器
         EventHandler<MouseEvent> comboBoxMouseFilter =
@@ -170,33 +244,6 @@ public class NodeDisableUtils {
             comboBox.removeEventFilter(MouseEvent.MOUSE_PRESSED, comboBoxMouseFilter);
             comboBox.getProperties().remove("comboBoxMouseFilter");
         }
-    }
-
-    /**
-     * 创建鼠标事件过滤器
-     */
-    private static EventHandler<MouseEvent> createMouseEventFilter() {
-        return event -> {
-            // 阻止所有类型的鼠标交互
-            if (event.getEventType() == MouseEvent.MOUSE_PRESSED ||
-                    event.getEventType() == MouseEvent.MOUSE_CLICKED ||
-                    event.getEventType() == MouseEvent.MOUSE_RELEASED ||
-                    event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                event.consume();
-                // 对于某些组件，需要额外处理
-                if (event.getTarget() instanceof TextInputControl &&
-                        event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                    // 阻止文本输入框获得焦点
-                    Platform.runLater(() -> ((TextInputControl) event.getTarget()).deselect());
-                }
-                // 对于下拉框，确保它不会展开
-                if (event.getTarget() instanceof ComboBoxBase<?> comboBox) {
-                    if (comboBox.isShowing()) {
-                        comboBox.hide();
-                    }
-                }
-            }
-        };
     }
 
     /**
@@ -217,6 +264,8 @@ public class NodeDisableUtils {
         if (node instanceof ComboBoxBase) {
             removeComboBoxSpecialHandlers((ComboBoxBase<?>) node);
         }
+        // 移除拖拽事件过滤器
+        removeDragEventFilters(node);
     }
 
     /**
@@ -244,7 +293,7 @@ public class NodeDisableUtils {
      * 获取组件的默认光标
      *
      * @param node 需要修改样式的组件
-     * @return CSS 后缀
+     * @return 默认光标
      */
     private static Cursor getDefaultCursor(Node node) {
         switch (node) {

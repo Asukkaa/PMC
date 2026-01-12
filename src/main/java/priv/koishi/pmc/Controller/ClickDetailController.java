@@ -47,7 +47,6 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
-import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -569,6 +568,8 @@ public class ClickDetailController extends RootController {
         }
         clickFloating.setDisableNodes(clickDisableNodes)
                 .setName(floatingName_click())
+                .setMinHeight(minFindImgHeight)
+                .setMinWidth(minFindImgWidth)
                 .setButton(clickRegion_Det);
         FloatingWindowConfig stopWindowConfig = item.getStopWindowConfig();
         FloatingWindowConfig copyStopWindowConfig = new FloatingWindowConfig();
@@ -582,6 +583,8 @@ public class ClickDetailController extends RootController {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
         stopFloating.setDisableNodes(stopDisableNodes)
+                .setMinHeight(minFindImgHeight)
+                .setMinWidth(minFindImgWidth)
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
@@ -1182,6 +1185,9 @@ public class ClickDetailController extends RootController {
      * 开启全局键盘监听
      */
     private void startNativeKeyListener() {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         removeNativeListener(listener);
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
@@ -1198,8 +1204,6 @@ public class ClickDetailController extends RootController {
         removeNativeListener(nativeKeyListener);
         startNativeKeyListener();
         listener = initUnifiedInputRecordListener();
-        // 注册监听器
-        addNativeListener(listener);
         // 启动录制
         listener.startRecording();
     }
@@ -1247,22 +1251,23 @@ public class ClickDetailController extends RootController {
                     // 仅在录制情况下才监听键盘
                     if (recordClicking) {
                         keyCode = e.getKeyCode();
+                        // 处理右 shift
+                        keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                         String key = getKeyText(keyCode);
                         // 过滤未知按键
                         if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
-                            // 检测快捷键 esc
                             if (keyCode == cancelKey) {
                                 removeNativeListener(listener);
-                                removeNativeListener(nativeKeyListener);
                                 updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_unSetKeyboard(), false);
                                 setKeyHBox_Det.setCursor(Cursor.HAND);
                                 recordClicking = false;
+                                removeNativeListener(nativeKeyListener);
                                 throw new RuntimeException(key + text_keyConflict());
                             } else if (clickType_keyboard().equals(clickType_Det.getValue())) {
-                                removeNativeListener(nativeKeyListener);
                                 updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, key, true);
                                 setKeyHBox_Det.setCursor(Cursor.HAND);
                                 recordClicking = false;
+                                removeNativeListener(nativeKeyListener);
                             }
                         }
                     }
@@ -1285,7 +1290,11 @@ public class ClickDetailController extends RootController {
              */
             private ClickPositionVO combinationBean;
 
-
+            /**
+             * 创建一个具有默认值的自动操作步骤类
+             *
+             * @return clickPositionVO 具有默认值的自动操作步骤类
+             */
             @Override
             public ClickPositionVO createDefaultClickPosition() {
                 combinationBean = new ClickPositionVO();
@@ -1873,6 +1882,7 @@ public class ClickDetailController extends RootController {
         Stage floatingStage = clickFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
+                updateMassageLabel(clickFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
             } else if (floatingStage.isShowing()) {
@@ -1890,6 +1900,7 @@ public class ClickDetailController extends RootController {
         Stage floatingStage = stopFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
+                updateMassageLabel(stopFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
             } else if (floatingStage.isShowing()) {
@@ -1906,6 +1917,9 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void findClickWindowAction() throws IOException {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         // 改变要防重复点击的组件状态
         changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
@@ -1926,6 +1940,9 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void findStopWindowAction() throws IOException {
+        if (cancelKey == noKeyboard) {
+            throw new RuntimeException(text_noCancelKey());
+        }
         // 改变要防重复点击的组件状态
         changeDisableNodes(windowInfoDisableNodes, true);
         // 隐藏窗口
@@ -2118,8 +2135,6 @@ public class ClickDetailController extends RootController {
     @FXML
     private void handleMouseClick(MouseEvent mouseEvent) {
         if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-            Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
-                    MainApplication.class.getResource("icon/Disable.png")).toString());
             setKeyHBox_Det.setCursor(disableCursor);
             recordClicking = true;
             updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, text_setKeyboard(), false);

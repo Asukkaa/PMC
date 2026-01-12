@@ -69,10 +69,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -89,8 +87,7 @@ import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
 import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
@@ -293,7 +290,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 正在录制标识
      */
-    public boolean recordClicking;
+    public static boolean recordClicking;
 
     /**
      * 正在运行自动操作标识
@@ -324,6 +321,11 @@ public class AutoClickController extends RootController implements MousePosition
      * 全局输入监听器
      */
     private UnifiedInputRecordListener listener;
+
+    /**
+     * 全局快捷键监听器
+     */
+    public static UnifiedInputRecordListener shortcutsListener;
 
     /**
      * 信息浮窗设置
@@ -590,13 +592,60 @@ public class AutoClickController extends RootController implements MousePosition
      * 设置单元格可编辑
      */
     private void makeCellCanEdit() {
+        // 设置表格可编辑
         tableView_Click.setEditable(true);
+        // 设置步骤名称可编辑
         name_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setName));
+        // 设置等待时间可编辑
         waitTime_Click.setCellFactory((_) ->
                 new EditingCell<>(ClickPositionVO::setWaitTime, true, 0, null));
+        // 设置点击时长可编辑
         clickTime_Click.setCellFactory((_) ->
-                new EditingCell<>(ClickPositionVO::setClickTime, true, 0, null));
+                new EditingCell<>(new ItemConsumer<>() {
+
+                    /**
+                     * 将编辑后的对象属性进行保存.
+                     * 如果不将属性保存到 cell 所在表格的 ObservableList 集合中对象的相应属性中,
+                     * 则只是改变了表格显示的值,一旦表格刷新,则仍会表示旧值.
+                     *
+                     * @param item     当前行数据
+                     * @param value 新值
+                     */
+                    @Override
+                    public void setTProperties(ClickPositionVO item, String value) {
+                        item.setClickTime(value);
+                    }
+
+                    /**
+                     * 检查单元格是否可编辑
+                     *
+                     * @param item 当前行数据
+                     * @return true-可编辑，false-不可编辑
+                     */
+                    @Override
+                    public boolean isEditable(ClickPositionVO item) {
+                        int clickType = item.getClickTypeEnum();
+                        return clickType != ClickTypeEnum.COMBINATIONS.ordinal();
+                    }
+
+                    /**
+                     * 获取单元格禁用时的显示值
+                     *
+                     * @param item 当前行数据
+                     * @return 禁用时显示的值
+                     */
+                    @Override
+                    public String getDisabledValue(ClickPositionVO item) {
+                        int clickType = item.getClickTypeEnum();
+                        if (clickType == ClickTypeEnum.COMBINATIONS.ordinal()) {
+                            return item.getClickTime();
+                        }
+                        return null;
+                    }
+
+                }, true, 0, null));
+        // 设置点击次数可编辑
         clickNum_Click.setCellFactory(_ -> new EditingCell<>(
                 new ItemConsumer<>() {
 
@@ -768,6 +817,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
         if (isFree()) {
+            if (cancelKey == noKeyboard) {
+                throw new RuntimeException(text_noCancelKey());
+            }
             // 标记为正在运行自动操作
             runClicking = true;
             if (clickLogs != null) {
@@ -1370,8 +1422,11 @@ public class AutoClickController extends RootController implements MousePosition
                 Platform.runLater(() -> {
                     // 仅在自动操作与录制情况下才监听键盘
                     if (recordClicking || runClicking) {
+                        int keyCode = e.getKeyCode();
+                        // 处理右 shift
+                        keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                         // 检测快捷键 esc
-                        if (e.getKeyCode() == cancelKey) {
+                        if (keyCode == cancelKey) {
                             stopAllWork();
                         }
                     }
@@ -1574,6 +1629,187 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
+     * 初始化统一输入录制监听器
+     *
+     * @return 统一输入录制监听器
+     */
+    private UnifiedInputRecordListener initUnifiedInputRecordListener() {
+        // 创建组合键监听器
+        return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
+
+            /**
+             * 用来临时保存组合键的临时操作步骤
+             */
+            private ClickPositionVO combinationBean;
+
+            /**
+             * 组合键轨迹
+             */
+            private final List<TrajectoryPointBean> trajectory = new CopyOnWriteArrayList<>();
+
+            /**
+             * 创建一个具有默认值的自动操作步骤类
+             *
+             * @return clickPositionVO 具有默认值的自动操作步骤类
+             */
+            @Override
+            public ClickPositionVO createDefaultClickPosition() {
+                combinationBean = new ClickPositionVO();
+                return combinationBean;
+            }
+
+            /**
+             * 保存操作步骤
+             *
+             * @param events  操作步骤
+             * @param addType 添加方式
+             */
+            @Override
+            public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
+                // 这里不添加到表格，只用于组合键监听
+                if (combinationBean != null) {
+                    // 所有按键松开，组合键录制完成
+                    handleCombinationComplete();
+                }
+            }
+
+            /**
+             * 获取当前步骤数
+             *
+             * @return 临时步骤数
+             */
+            @Override
+            public int getCurrentStepCount() {
+                return -1;
+            }
+
+            /**
+             * 获取是否录制鼠标移动事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMove() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制鼠标拖拽事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordDrag() {
+                return false;
+            }
+
+            /**
+             * 更新滑轮记录信息
+             *
+             * @param wheelRotation 滑轮滚动方向
+             * @param wheelNum      滑轮滚动次数
+             */
+            @Override
+            public void onWheelRecorded(int wheelRotation, int wheelNum) {
+            }
+
+            /**
+             * 更新记录信息
+             *
+             * @param log 记录信息
+             */
+            @Override
+            public void updateRecordLog(String log) {
+            }
+
+            /**
+             * 停止所有任务
+             */
+            @Override
+            public void stopWorkAll() {
+                removeNativeListener(listener);
+            }
+
+            /**
+             * 显示错误信息
+             */
+            @Override
+            public void showError() {
+            }
+
+            /**
+             * 获取是否录制鼠标滚轮事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMouseWheel() {
+                return false;
+            }
+
+            /**
+             * 获取是否录制键盘事件
+             *
+             * @return 记录
+             */
+            @Override
+            public boolean isRecordKeyboard() {
+                return true;
+            }
+
+            /**
+             * 获取是否录制鼠标点击事件
+             *
+             * @return 不记录
+             */
+            @Override
+            public boolean isRecordMouseClick() {
+                return false;
+            }
+
+            /**
+             * 处理组合键录制完成
+             */
+            private void handleCombinationComplete() {
+                combinationBean.setClickTypeEnum(ClickTypeEnum.COMBINATIONS.ordinal());
+                trajectory.clear();
+                trajectory.addAll(combinationBean.getMoveTrajectory());
+                Platform.runLater(() -> {
+                    if (combinationBean != null) {
+                        Set<Integer> keySet = new LinkedHashSet<>();
+                        if (CollectionUtils.isNotEmpty(trajectory)) {
+                            for (TrajectoryPointBean t : trajectory) {
+                                List<Integer> pressKeyboardKeys = t.getPressKeyboardKeys();
+                                if (CollectionUtils.isNotEmpty(pressKeyboardKeys)) {
+                                    keySet.addAll(pressKeyboardKeys);
+                                }
+                            }
+                        }
+                        if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys)) {
+                            // 检测录制快捷键
+                            if (recordKeys.toString().equals(keySet.toString())) {
+                                recordClick();
+                                // 检测运行快捷键
+                            } else if (runKeys.toString().equals(keySet.toString())) {
+                                ObservableList<ClickPositionVO> items = tableView_Click.getItems();
+                                if (CollectionUtils.isNotEmpty(items)) {
+                                    try {
+                                        runClick();
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    }
+
+
+    /**
      * 开始统一录制
      *
      * @param addType 添加方式
@@ -1583,8 +1819,6 @@ public class AutoClickController extends RootController implements MousePosition
         listener = initUnifiedInputRecordListener(addType);
         // 读取设置页面设置的值
         getSetting();
-        // 注册所有监听器
-        addNativeListener(listener);
         // 开始录制
         listener.startRecording();
     }
@@ -1596,6 +1830,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void startRecord(int addType) {
         if (isFree()) {
+            if (cancelKey == noKeyboard) {
+                throw new RuntimeException(text_noCancelKey());
+            }
             // 标记为正在录制
             recordClicking = true;
             // 改变要防重复点击的组件状态
@@ -1767,8 +2004,12 @@ public class AutoClickController extends RootController implements MousePosition
      * @param event 设置页加载完成事件
      */
     private void settingsLoaded(SettingsLoadedEvent event) {
+        // 设置快捷键提示
+        setShortcutText();
         // 设置要防重复点击的组件
         setDisableNodes();
+        shortcutsListener = initUnifiedInputRecordListener();
+        shortcutsListener.startRecording();
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
@@ -1803,6 +2044,21 @@ public class AutoClickController extends RootController implements MousePosition
             Button saveButton = settingController.massageRegion_Set;
             setNodeDisable(saveButton, true);
         }
+    }
+
+    /**
+     * 设置快捷键提示
+     */
+    private void setShortcutText() {
+        if (cancelKey == noKeyboard) {
+            cancelTip_Click.setText(text_noCancelKey());
+        } else {
+            cancelTip_Click.setText(text_cancelTip_Click());
+        }
+        String recordToolTip = tip_recordClick() + "\n" + text_shortcut() + getKeysText(recordKeys);
+        addToolTip(recordToolTip, recordClick_Click);
+        String runToolTip = tip_runClick() + "\n" + text_shortcut() + getKeysText(runKeys);
+        addToolTip(runToolTip, runClick_Click);
     }
 
     /**
@@ -1867,7 +2123,7 @@ public class AutoClickController extends RootController implements MousePosition
             tableViewDragRow(tableView_Click);
             // 构建右键菜单
             buildContextMenu();
-            // 运行定时任务
+            // 等待设置加载完毕
             EventBus.subscribe(SettingsLoadedEvent.class, this::settingsLoaded);
         });
     }
