@@ -15,8 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Finals.CommonFinals.noAdd;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.getKeyText;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 
@@ -298,6 +297,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     public void nativeKeyPressed(NativeKeyEvent e) {
         if (isRecording && callback.isRecordKeyboard()) {
             int keyCode = e.getKeyCode();
+            // 处理右 shift
+            keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
             String key = getKeyText(keyCode);
             // 过滤未知按键
             if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
@@ -366,8 +367,11 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
         if (isRecording && clickBean != null && callback.isRecordKeyboard()) {
+            int keyCode = e.getKeyCode();
+            // 处理右 shift
+            keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
             // 记录松开的键盘按键
-            pressKeyboardKeys.remove(Integer.valueOf(e.getKeyCode()));
+            pressKeyboardKeys.remove(Integer.valueOf(keyCode));
             Point mousePoint = MousePositionListener.getMousePoint();
             int endX = (int) mousePoint.getX();
             int endY = (int) mousePoint.getY();

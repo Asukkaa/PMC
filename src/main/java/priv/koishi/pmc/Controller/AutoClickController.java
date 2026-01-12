@@ -1419,8 +1419,11 @@ public class AutoClickController extends RootController implements MousePosition
                 Platform.runLater(() -> {
                     // 仅在自动操作与录制情况下才监听键盘
                     if (recordClicking || runClicking) {
+                        int keyCode = e.getKeyCode();
+                        // 处理右 shift
+                        keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                         // 检测快捷键 esc
-                        if (e.getKeyCode() == cancelKey) {
+                        if (keyCode == cancelKey) {
                             stopAllWork();
                         }
                     }

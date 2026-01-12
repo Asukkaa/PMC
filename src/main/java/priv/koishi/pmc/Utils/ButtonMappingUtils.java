@@ -40,6 +40,11 @@ public class ButtonMappingUtils {
     public static Set<Integer> runKeys = new LinkedHashSet<>();
 
     /**
+     * 右 shift keyCode
+     */
+    public static final int R_SHIFT = 3638;
+
+    /**
      * 获取录制或运行快捷键文本
      *
      * @param keys 要查询的快捷键 keyCode
@@ -197,6 +202,9 @@ public class ButtonMappingUtils {
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_INSERT, KeyCode.INSERT);
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_DELETE, KeyCode.DELETE);
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_MUTE, KeyCode.MUTE);
+        NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_UP, KeyCode.VOLUME_UP);
+        NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_DOWN, KeyCode.VOLUME_DOWN);
+        NativeKeyToKeyCode.put(R_SHIFT, KeyCode.SHIFT);
         if (isWin) {
             NativeKeyToKeyCode.put(NativeKeyEvent.VC_META, KeyCode.WINDOWS);
         } else if (isMac) {
@@ -256,6 +264,7 @@ public class ButtonMappingUtils {
             case NativeKeyEvent.VC_CONTROL -> isWin ? "Ctrl" : "control(⌃)";
             case NativeKeyEvent.VC_ALT -> isWin ? "Alt" : "option(⌥)";
             case NativeKeyEvent.VC_META -> isWin ? "Win" : "command(⌘)";
+            case R_SHIFT -> isWin ? "Shift" : "shift(⇧)";
             // 标点符号键 - 直接返回字符
             case NativeKeyEvent.VC_QUOTE -> "'";
             case NativeKeyEvent.VC_COMMA -> ",";
@@ -277,7 +286,7 @@ public class ButtonMappingUtils {
             case NativeKeyEvent.VC_MEDIA_PREVIOUS -> "Prev(⏮)";
             case NativeKeyEvent.VC_MEDIA_NEXT -> "Next(⏭)";
             case NativeKeyEvent.VC_MEDIA_SELECT -> "Media(🎵)";
-            // Windows/Linux特有键
+            // Windows/Linux 特有键
             case NativeKeyEvent.VC_CONTEXT_MENU -> "Menu";
             // 其他功能键
             case NativeKeyEvent.VC_PRINTSCREEN -> "PrtSc";

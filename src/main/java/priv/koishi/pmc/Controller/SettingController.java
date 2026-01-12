@@ -1150,6 +1150,8 @@ public class SettingController extends RootController implements MousePositionUp
                     // 仅在录制情况下才监听键盘
                     if (recordClicking) {
                         int keyCode = e.getKeyCode();
+                        // 处理右 shift
+                        keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                         String key = getKeyText(keyCode);
                         // 过滤未知按键
                         if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
