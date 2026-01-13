@@ -1040,7 +1040,7 @@ public class UiUtils {
     public static void updateKeyboardLabel(Label label, HBox hBox, String key, boolean isBeenSet) {
         label.setText(key);
         if (isBeenSet) {
-            label.setTextFill(Color.CORNFLOWERBLUE);
+            label.setTextFill(Color.DEEPSKYBLUE);
             addToolTip(tip_keyboard() + key + "\n" + tip_updateKeyboard(), hBox);
         } else {
             label.setTextFill(Color.RED);
