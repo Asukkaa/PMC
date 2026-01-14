@@ -193,6 +193,15 @@ create_dmg() {
     # 添加应用程序目录快捷方式
     ln -s "/Applications" "$mountPoint/Applications"
 
+    # 复制无法打开说明文件到 dmg
+    txt_file="$script_dir/无法打开看这里.txt"
+    if [ -f "$txt_file" ]; then
+        echo "复制文本文件 [$txt_file] 到 DMG 卷中..."
+        cp "$txt_file" "$mountPoint/" || echo "警告：文本文件复制失败，但继续执行" >&2
+    else
+        echo "警告：找不到文本文件 [$txt_file]，跳过复制" >&2
+    fi
+
     # 设置背景图和窗口样式
     echo "配置 DMG 样式..."
     mkdir "$mountPoint/.background"
@@ -236,21 +245,31 @@ create_dmg() {
                 set win to make new Finder window
                 set target of win to targetDisk
                 set current view of win to icon view
-                set bounds of win to {200, 200, 1224, 700}
+                set bounds of win to {200, 200, 1300, 700}
 
                 -- 配置视图选项
                 set opts to icon view options of win
                 tell opts
                     set arrangement to not arranged
                     set background picture to (POSIX file "$mountPoint/.background/$backgroundImage") as alias
-                    set icon size to 128  -- 设置图标尺寸
+                    set icon size to 100  -- 设置图标尺寸
                 end tell
 
                 -- 定位应用程序图标
                 set appItem to (first item of targetDisk whose name ends with ".app")
-                set position of appItem to {180, 200}
+                set position of appItem to {200, 200}
                 set applicationsAlias to (first item of targetDisk whose name is "Applications")
-                set position of applicationsAlias to {630, 200}
+                set position of applicationsAlias to {610, 200}
+
+                -- 定位无法打开说明文件图标并设置位置
+                try
+                    set txtItem to (first item of targetDisk whose name is "无法打开看这里.txt")
+                    set position of txtItem to {760, 200}
+                    log "已设置文本文件图标位置"
+                on error
+                    log "未找到文本文件，跳过设置"
+                end try
+
 
                 -- 成功标志
                 set success to true
