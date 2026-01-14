@@ -329,7 +329,7 @@ public class AutoClickController extends RootController implements MousePosition
     private UnifiedInputRecordListener listener;
 
     /**
-     * 全局快捷键监听器
+     * 全局录制与运行快捷键监听器
      */
     public static UnifiedInputRecordListener shortcutsListener;
 
@@ -1636,11 +1636,11 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 初始化统一输入录制监听器
+     * 初始化全局录制与运行快捷键监听器
      *
-     * @return 统一输入录制监听器
+     * @return 全局录制与运行快捷键监听器
      */
-    private UnifiedInputRecordListener initUnifiedInputRecordListener() {
+    private UnifiedInputRecordListener initShortcutListener() {
         // 创建组合键监听器
         return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
 
@@ -1801,6 +1801,7 @@ public class AutoClickController extends RootController implements MousePosition
                                     new MessageBubble(text_floatingOpenRecordErr(), 1);
                                 } else {
                                     recordClick();
+                                    mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
                                 }
                             }
                         }
@@ -1816,6 +1817,7 @@ public class AutoClickController extends RootController implements MousePosition
                                     if (CollectionUtils.isNotEmpty(items)) {
                                         try {
                                             runClick();
+                                            mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
                                         } catch (Exception e) {
                                             throw new RuntimeException(e);
                                         }
@@ -2032,7 +2034,7 @@ public class AutoClickController extends RootController implements MousePosition
         setShortcutText();
         // 设置要防重复点击的组件
         setDisableNodes();
-        shortcutsListener = initUnifiedInputRecordListener();
+        shortcutsListener = initShortcutListener();
         shortcutsListener.startRecording();
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
