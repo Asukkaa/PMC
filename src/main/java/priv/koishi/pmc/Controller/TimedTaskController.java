@@ -169,6 +169,7 @@ public class TimedTaskController extends RootController {
         // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
+        AutoClickController.isSonOpening = true;
     }
 
     /**

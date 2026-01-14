@@ -1011,7 +1011,7 @@ public class SettingController extends RootController implements MousePositionUp
                 }
                 new MessageBubble(text_updateNum() + update, updateListMassageTime);
             } else {
-                new MessageBubble(text_noUpdateNum(), updateListMassageTime);
+                new MessageBubble(text_noDateNum(), updateListMassageTime);
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1042,7 +1042,7 @@ public class SettingController extends RootController implements MousePositionUp
                 }
                 new MessageBubble(text_updateNum() + update, updateListMassageTime);
             } else {
-                new MessageBubble(text_noUpdateNum(), updateListMassageTime);
+                new MessageBubble(text_noDateNum(), updateListMassageTime);
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1143,6 +1143,18 @@ public class SettingController extends RootController implements MousePositionUp
                 });
             }
         });
+    }
+
+    /**
+     * 查询是否有开启的浮窗
+     *
+     * @return true 为有开启的浮窗，false 为没有开启的浮窗
+     */
+    public boolean isFloatingOpen() {
+        return clickFloating != null && clickFloating.getStage().isShowing() ||
+                stopFloating != null && stopFloating.getStage().isShowing() ||
+                massageFloating != null && massageFloating.getStage().isShowing() ||
+                windowInfoFloating != null && windowInfoFloating.getStage().isShowing();
     }
 
     /**

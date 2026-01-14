@@ -60,6 +60,7 @@ import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
+import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;
 
@@ -300,7 +301,12 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 正在获取当前窗口信息标志（true 正在获取窗口信息）
      */
-    public boolean findingWindow;
+    public static boolean findingWindow;
+
+    /**
+     * 窗口子页面已打开标识（true 子窗口已打开）
+     */
+    public static boolean isSonOpening;
 
     /**
      * 录制时间线
@@ -323,7 +329,7 @@ public class AutoClickController extends RootController implements MousePosition
     private UnifiedInputRecordListener listener;
 
     /**
-     * 全局快捷键监听器
+     * 全局录制与运行快捷键监听器
      */
     public static UnifiedInputRecordListener shortcutsListener;
 
@@ -751,6 +757,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
+        isSonOpening = true;
     }
 
     /**
@@ -1629,11 +1636,11 @@ public class AutoClickController extends RootController implements MousePosition
     }
 
     /**
-     * 初始化统一输入录制监听器
+     * 初始化全局录制与运行快捷键监听器
      *
-     * @return 统一输入录制监听器
+     * @return 全局录制与运行快捷键监听器
      */
-    private UnifiedInputRecordListener initUnifiedInputRecordListener() {
+    private UnifiedInputRecordListener initShortcutListener() {
         // 创建组合键监听器
         return new UnifiedInputRecordListener(noAdd, new InputRecordCallback() {
 
@@ -1667,7 +1674,7 @@ public class AutoClickController extends RootController implements MousePosition
             @Override
             public void saveAddEvents(List<? extends ClickPositionVO> events, int addType) {
                 // 这里不添加到表格，只用于组合键监听
-                if (combinationBean != null) {
+                if (combinationBean != null && isFree()) {
                     // 所有按键松开，组合键录制完成
                     handleCombinationComplete();
                 }
@@ -1785,18 +1792,37 @@ public class AutoClickController extends RootController implements MousePosition
                                 }
                             }
                         }
-                        if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys)) {
-                            // 检测录制快捷键
+                        // 检测录制快捷键
+                        if (CollectionUtils.isNotEmpty(recordKeys)) {
                             if (recordKeys.toString().equals(keySet.toString())) {
-                                recordClick();
-                                // 检测运行快捷键
-                            } else if (runKeys.toString().equals(keySet.toString())) {
-                                ObservableList<ClickPositionVO> items = tableView_Click.getItems();
-                                if (CollectionUtils.isNotEmpty(items)) {
-                                    try {
-                                        runClick();
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
+                                if (isSonOpening) {
+                                    new MessageBubble(text_sonOpenRecordErr(), 1);
+                                } else if (settingController.isFloatingOpen()) {
+                                    new MessageBubble(text_floatingOpenRecordErr(), 1);
+                                } else {
+                                    recordClick();
+                                    mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
+                                }
+                            }
+                        }
+                        // 检测运行快捷键
+                        if (CollectionUtils.isNotEmpty(runKeys)) {
+                            if (runKeys.toString().equals(keySet.toString())) {
+                                if (isSonOpening) {
+                                    new MessageBubble(text_sonOpenRunErr(), 1);
+                                } else if (settingController.isFloatingOpen()) {
+                                    new MessageBubble(text_floatingOpenRunErr(), 1);
+                                } else {
+                                    ObservableList<ClickPositionVO> items = tableView_Click.getItems();
+                                    if (CollectionUtils.isNotEmpty(items)) {
+                                        try {
+                                            runClick();
+                                            mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
+                                        } catch (Exception e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    } else {
+                                        new MessageBubble(text_noDateNum(), 1);
                                     }
                                 }
                             }
@@ -2008,7 +2034,7 @@ public class AutoClickController extends RootController implements MousePosition
         setShortcutText();
         // 设置要防重复点击的组件
         setDisableNodes();
-        shortcutsListener = initUnifiedInputRecordListener();
+        shortcutsListener = initShortcutListener();
         shortcutsListener.startRecording();
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
@@ -2190,10 +2216,12 @@ public class AutoClickController extends RootController implements MousePosition
                 // 设置回调
                 controller.setFileChooserCallback(this::getSelectFile);
             } else {
+                isSonOpening = true;
                 Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
                 FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
                 List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
                 List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
+                isSonOpening = false;
                 getSelectFile(selectedFile);
             }
         }
@@ -2249,9 +2277,11 @@ public class AutoClickController extends RootController implements MousePosition
     private void addOutPath(ActionEvent actionEvent) throws IOException {
         // 读取配置文件
         getProperties();
+        isSonOpening = true;
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         String outFilePath = outPath_Click.getText();
         File selectedFile = creatDirectoryChooser(window, outFilePath, text_selectDirectory());
+        isSonOpening = false;
         if (selectedFile != null) {
             // 更新所选文件路径显示
             updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click);
@@ -2326,6 +2356,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
+        isSonOpening = true;
     }
 
 }

@@ -410,6 +410,7 @@ public class AboutController extends RootController {
         detailStage.setResizable(false);
         setWindowLogo(detailStage, logoPath);
         detailStage.show();
+        AutoClickController.isSonOpening = true;
     }
 
     /**

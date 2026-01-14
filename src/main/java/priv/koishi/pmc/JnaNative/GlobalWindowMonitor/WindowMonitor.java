@@ -17,6 +17,7 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Controller.AutoClickController;
 import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
 import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
 
@@ -291,7 +292,7 @@ public class WindowMonitor {
                         }
                         // 停止寻找窗口标记
                         findingWindow = false;
-                        autoClickController.findingWindow = false;
+                        AutoClickController.findingWindow = false;
                         if (massageFloating != null) {
                             // 关闭窗口信息浮窗
                             hideFloatingWindow(massageFloating);
@@ -332,7 +333,7 @@ public class WindowMonitor {
             removeNativeListener(clickWindowMouseListener);
             // 启动寻找窗口标记
             findingWindow = true;
-            autoClickController.findingWindow = true;
+            AutoClickController.findingWindow = true;
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparation + findImgSet_wait());

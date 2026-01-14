@@ -1849,8 +1849,8 @@ public class i18nFinal {
     /**
      * @return 操作列表为空
      */
-    public static String text_noUpdateNum() {
-        return bundle.getString("noUpdateNum");
+    public static String text_noDateNum() {
+        return bundle.getString("noDateNum");
     }
 
     /**
@@ -1984,6 +1984,34 @@ public class i18nFinal {
      */
     public static String text_shortcut() {
         return bundle.getString("shortcut");
+    }
+
+    /**
+     * @return 无法在子页面开启的情况下录制
+     */
+    public static String text_sonOpenRecordErr() {
+        return bundle.getString("sonOpenRecordErr");
+    }
+
+    /**
+     * @return 无法在子页面开启的情况下运行
+     */
+    public static String text_sonOpenRunErr() {
+        return bundle.getString("sonOpenRunErr");
+    }
+
+    /**
+     * @return 无法在浮窗开启的情况下录制
+     */
+    public static String text_floatingOpenRecordErr() {
+        return bundle.getString("floatingOpenRecordErr");
+    }
+
+    /**
+     * @return 无法在浮窗开启的情况下运行
+     */
+    public static String text_floatingOpenRunErr() {
+        return bundle.getString("floatingOpenRunErr");
     }
 
     /**

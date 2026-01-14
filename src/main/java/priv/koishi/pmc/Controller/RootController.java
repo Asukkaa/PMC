@@ -32,6 +32,7 @@ public class RootController extends CommonProperties {
      */
     public void removeController() {
         controllers.remove(getClass());
+        AutoClickController.isSonOpening = false;
     }
 
     /**
