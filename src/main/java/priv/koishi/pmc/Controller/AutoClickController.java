@@ -1785,12 +1785,15 @@ public class AutoClickController extends RootController implements MousePosition
                                 }
                             }
                         }
-                        if (CollectionUtils.isNotEmpty(recordKeys) && CollectionUtils.isNotEmpty(runKeys)) {
-                            // 检测录制快捷键
+                        // 检测录制快捷键
+                        if (CollectionUtils.isNotEmpty(recordKeys)) {
                             if (recordKeys.toString().equals(keySet.toString())) {
                                 recordClick();
-                                // 检测运行快捷键
-                            } else if (runKeys.toString().equals(keySet.toString())) {
+                            }
+                        }
+                        // 检测运行快捷键
+                        if (CollectionUtils.isNotEmpty(runKeys)) {
+                            if (runKeys.toString().equals(keySet.toString())) {
                                 ObservableList<ClickPositionVO> items = tableView_Click.getItems();
                                 if (CollectionUtils.isNotEmpty(items)) {
                                     try {
