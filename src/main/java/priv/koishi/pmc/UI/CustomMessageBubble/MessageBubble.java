@@ -59,6 +59,8 @@ public class MessageBubble extends Label implements MousePositionUpdater {
         // 设置当前实例为新的气泡
         currentBubble = this;
         setText(text);
+        setMaxWidth(500);
+        setWrapText(true);
         setTextFill(Color.WHITE);
         setPadding(new Insets(10));
         setStyle("-fx-background-radius: 5; -fx-background-color: black;-fx-opacity: 0.8;");

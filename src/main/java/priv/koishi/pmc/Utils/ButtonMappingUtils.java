@@ -203,7 +203,6 @@ public class ButtonMappingUtils {
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_MUTE, KeyCode.MUTE);
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_UP, KeyCode.VOLUME_UP);
         NativeKeyToKeyCode.put(NativeKeyEvent.VC_VOLUME_DOWN, KeyCode.VOLUME_DOWN);
-        NativeKeyToKeyCode.put(R_SHIFT, KeyCode.SHIFT);
         if (isWin) {
             NativeKeyToKeyCode.put(NativeKeyEvent.VC_META, KeyCode.WINDOWS);
         } else if (isMac) {

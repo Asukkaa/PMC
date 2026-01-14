@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Controller.AutoClickController;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.MainApplication;
@@ -355,6 +356,7 @@ public class UiUtils {
         stage.fireEvent(closeEvent);
         if (!closeEvent.isConsumed()) {
             stage.close();
+            AutoClickController.isSonOpening = false;
         }
         System.gc();
     }

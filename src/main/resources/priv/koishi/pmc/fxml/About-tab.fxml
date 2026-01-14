@@ -27,14 +27,14 @@
         </HBox>
 
         <HBox spacing="5">
-            <HBox styleClass="hBox-500-5">
+            <HBox styleClass="hBox-600-5">
                 <Label text="%about.logsPath"/>
                 <HBox prefWidth="400">
                     <Label fx:id="logsPath_Abt"/>
                 </HBox>
             </HBox>
 
-            <HBox styleClass="hBox-500-5">
+            <HBox styleClass="hBox-600-5">
                 <Label text="%about.logsNum"/>
                 <TextField fx:id="logsNum_Abt" styleClass="label-low" prefWidth="50"/>
                 <Label text="%unit.piece"/>
@@ -47,7 +47,7 @@
         </HBox>
 
         <HBox spacing="5">
-            <HBox styleClass="hBox-500-5">
+            <HBox styleClass="hBox-600-5">
                 <Label style="-fx-pref-height: 45" text="%about.appreciate"/>
                 <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style">
                     <graphic>
@@ -58,7 +58,7 @@
                 </Button>
             </HBox>
 
-            <HBox styleClass="hBox-500-5">
+            <HBox styleClass="hBox-600-5">
                 <HBox spacing="5">
                     <Label text="%about.afdina"/>
                     <Button fx:id="afdianLinkBtn_Abt" onAction="#openAfdianLink" text="%about.afdinaLink"/>
@@ -71,12 +71,12 @@
         <Label styleClass="label-low" text="%about.git"/>
 
         <HBox spacing="5">
-            <HBox styleClass="hBox-500-5">
+            <HBox styleClass="hBox-600-5">
                 <Label text="%about.gitHub"/>
                 <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" text="%about.openGitHubLinkBtn_Abt"/>
             </HBox>
 
-            <HBox styleClass="hBox-500-5">
+            <HBox styleClass="hBox-600-5">
                 <Label text="%about.gitee"/>
                 <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" text="%about.openGiteeLinkBtn_Abt"/>
             </HBox>

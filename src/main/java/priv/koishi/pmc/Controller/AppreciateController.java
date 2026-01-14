@@ -1,7 +1,9 @@
 package priv.koishi.pmc.Controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
+import javafx.stage.Stage;
 
 import static priv.koishi.pmc.Utils.UiUtils.manuallyChangeThemePane;
 
@@ -31,6 +33,10 @@ public class AppreciateController extends ManuallyChangeThemeController {
     @FXML
     private void initialize() {
         manuallyChangeTheme();
+        Platform.runLater(() -> {
+            Stage stage = (Stage) scrollPane_Ap.getScene().getWindow();
+            stage.setOnCloseRequest(_ -> AutoClickController.isSonOpening = false);
+        });
     }
 
 }

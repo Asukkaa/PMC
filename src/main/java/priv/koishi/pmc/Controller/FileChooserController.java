@@ -566,6 +566,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         // 设置 css 样式
         setWindowCss(scene, stylesCss);
         detailStage.show();
+        AutoClickController.isSonOpening = true;
         return controller;
     }
 

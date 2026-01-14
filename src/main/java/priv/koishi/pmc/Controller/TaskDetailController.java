@@ -271,7 +271,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
                     } else {
                         // 直接关闭
                         stage.close();
-                        stage = null;
+                        closeRequest();
                     }
                 }
                 removeAllListeners();
