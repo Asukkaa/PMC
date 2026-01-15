@@ -1700,7 +1700,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 操作内容：识别目标图像：
+     * @return 识别目标图像：
      */
     public static String text_picTarget() {
         return bundle.getString("picTarget");

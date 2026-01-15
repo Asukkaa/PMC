@@ -401,11 +401,9 @@ public class AutoClickService {
                     String interval = clickPositionVO.getClickInterval();
                     String clickImgPath = clickPositionVO.getClickImgPath();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
-                    String clickText;
-                    if (clickType >= ClickTypeEnum.MOVE_TRAJECTORY.ordinal()) {
-                        clickText = "";
-                    } else {
-                        clickText = text_taskInfo() + clickPositionVO.getMouseKey() + clickPositionVO.getClickType();
+                    String clickText = text_taskInfo() + clickPositionVO.getClickType() + " ";
+                    if (clickType >= ClickTypeEnum.CLICK.ordinal()) {
+                        clickText += clickPositionVO.getClickKey();
                     }
                     if (StringUtils.isNotBlank(clickImgPath)) {
                         text += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +

@@ -25,16 +25,6 @@ public enum ClickTypeEnum {
     OPEN_URL,
 
     /**
-     * 点击后松开
-     */
-    CLICK,
-
-    /**
-     * 拖拽
-     */
-    DRAG,
-
-    /**
      * 带轨迹的移动
      */
     MOVE_TRAJECTORY,
@@ -58,6 +48,16 @@ public enum ClickTypeEnum {
      * 滚轮下滑
      */
     WHEEL_DOWN,
+
+    /**
+     * 点击后松开
+     */
+    CLICK,
+
+    /**
+     * 拖拽
+     */
+    DRAG,
 
     /**
      * 键盘输入
