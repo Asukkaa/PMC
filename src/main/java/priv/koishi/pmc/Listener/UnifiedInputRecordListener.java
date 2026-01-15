@@ -248,8 +248,12 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
     @Override
     public void nativeMouseReleased(NativeMouseEvent e) {
         if (isRecording && clickBean != null && callback.isRecordMouseClick()) {
+            int pressButton = e.getButton();
             // 记录松开的鼠标按键
-            pressMouseButtons.remove(Integer.valueOf(e.getButton()));
+            pressMouseButtons.remove(Integer.valueOf(pressButton));
+            String log = text_cancelTask() + text_recordClicking() + "\n" +
+                    text_recorded() + recordClickTypeMap.get(pressButton) + " " + log_release();
+            Platform.runLater(() -> callback.updateRecordLog(log));
             Point mousePoint = MousePositionListener.getMousePoint();
             int endX = (int) mousePoint.getX();
             int endY = (int) mousePoint.getY();
@@ -370,41 +374,48 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
             int keyCode = e.getKeyCode();
             // 处理右 shift
             keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
-            // 记录松开的键盘按键
-            pressKeyboardKeys.remove(Integer.valueOf(keyCode));
-            Point mousePoint = MousePositionListener.getMousePoint();
-            int endX = (int) mousePoint.getX();
-            int endY = (int) mousePoint.getY();
-            // 所有按键都松开后停止记录
-            if (callback.isRecordDrag() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
-                removeNativeListener(dragMotionListener);
-                // 拖拽结束时添加释放鼠标的坐标
-                clickBean.addMovePoint(endX, endY, null, null, true, 0);
-            } else {
-                // 创建轨迹点记录组合按键
-                List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
-                List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
-                clickBean.addMovePoint(endX, endY, currentMouseButtons, currentKeyboardKeys, false, 0);
-            }
-            isFirstClick = false;
-            // 记录移动轨迹
-            if (callback.isRecordMove()) {
-                movePoint = callback.createDefaultClickPosition();
-                // 所有按键都松开后开始移动轨迹记录
-                if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
-                    startMoveTime = System.currentTimeMillis();
-                    addNativeListener(moveMotionListener);
+            String key = getKeyText(keyCode);
+            // 过滤未知按键
+            if (keyCode > 0 && !key.contains(" keyCode: 0x")) {
+                // 记录松开的键盘按键
+                pressKeyboardKeys.remove(Integer.valueOf(keyCode));
+                String log = text_cancelTask() + text_recordClicking() + "\n" +
+                        text_recorded() + key + " " + log_release();
+                Platform.runLater(() -> callback.updateRecordLog(log));
+                Point mousePoint = MousePositionListener.getMousePoint();
+                int endX = (int) mousePoint.getX();
+                int endY = (int) mousePoint.getY();
+                // 所有按键都松开后停止记录
+                if (callback.isRecordDrag() && pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
+                    removeNativeListener(dragMotionListener);
+                    // 拖拽结束时添加释放鼠标的坐标
+                    clickBean.addMovePoint(endX, endY, null, null, true, 0);
+                } else {
+                    // 创建轨迹点记录组合按键
+                    List<Integer> currentMouseButtons = new CopyOnWriteArrayList<>(pressMouseButtons);
+                    List<Integer> currentKeyboardKeys = new CopyOnWriteArrayList<>(pressKeyboardKeys);
+                    clickBean.addMovePoint(endX, endY, currentMouseButtons, currentKeyboardKeys, false, 0);
                 }
-            }
-            // 只有在所有按键都松开时才算一个完整的操作步骤
-            if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
-                releasedTime = System.currentTimeMillis();
-                // 计算点击持续时间（毫秒）
-                long duration = releasedTime - pressTime;
-                // 设置点击持续时间
-                clickBean.setClickTime(String.valueOf(duration))
-                        .updateRelativePosition();
-                saveKeyEvent(clickBean);
+                isFirstClick = false;
+                // 记录移动轨迹
+                if (callback.isRecordMove()) {
+                    movePoint = callback.createDefaultClickPosition();
+                    // 所有按键都松开后开始移动轨迹记录
+                    if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
+                        startMoveTime = System.currentTimeMillis();
+                        addNativeListener(moveMotionListener);
+                    }
+                }
+                // 只有在所有按键都松开时才算一个完整的操作步骤
+                if (pressKeyboardKeys.isEmpty() && pressMouseButtons.isEmpty()) {
+                    releasedTime = System.currentTimeMillis();
+                    // 计算点击持续时间（毫秒）
+                    long duration = releasedTime - pressTime;
+                    // 设置点击持续时间
+                    clickBean.setClickTime(String.valueOf(duration))
+                            .updateRelativePosition();
+                    saveKeyEvent(clickBean);
+                }
             }
         }
     }
