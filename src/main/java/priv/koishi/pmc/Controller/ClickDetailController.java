@@ -66,7 +66,6 @@ import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
-import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -588,7 +587,7 @@ public class ClickDetailController extends RootController {
                 .setName(floatingName_stop())
                 .setButton(stopRegion_Det);
         // 初始化浮窗
-        createFloatingWindows(clickFloating, stopFloating, windowInfoFloating);
+        createFloatingWindows(clickFloating, stopFloating);
     }
 
     /**
@@ -1109,32 +1108,32 @@ public class ClickDetailController extends RootController {
     /**
      * 更新浮窗配置
      *
-     * @param findImgTypeDet    识别区域设置下拉框
-     * @param regionInfoHBoxDet 设置指定识别区域的组件所在容器
-     * @param regionHBoxDet     选项识别指定范围相关设置的组件所在容器
-     * @param windowInfoHBoxDet 选项识别指定窗口相关设置的组件所在容器
-     * @param floating          识别范围展示浮窗
-     * @param windowMonitor     窗口监控
-     * @param checkWindowInfo   是否检查窗口信息为空（true 校验空值）
+     * @param findImgType     识别区域设置下拉框
+     * @param regionInfoHBox  设置指定识别区域的组件所在容器
+     * @param regionHBox      选项识别指定范围相关设置的组件所在容器
+     * @param windowInfoHBox  选项识别指定窗口相关设置的组件所在容器
+     * @param floating        识别范围展示浮窗
+     * @param windowMonitor   窗口监控
+     * @param checkWindowInfo 是否检查窗口信息为空（true 校验空值）
      */
-    private void updateFloatingWindowConfig(ChoiceBox<String> findImgTypeDet, HBox regionInfoHBoxDet, HBox regionHBoxDet,
-                                            HBox windowInfoHBoxDet, FloatingWindowDescriptor floating,
+    private void updateFloatingWindowConfig(ChoiceBox<String> findImgType, HBox regionInfoHBox,
+                                            HBox regionHBox, HBox windowInfoHBox, FloatingWindowDescriptor floating,
                                             WindowMonitor windowMonitor, boolean checkWindowInfo) {
-        String value = findImgTypeDet.getValue();
-        addValueToolTip(findImgTypeDet, tip_findImgType(), value);
+        String value = findImgType.getValue();
+        addValueToolTip(findImgType, tip_findImgType(), value);
         if (findImgType_region().equals(value)) {
-            regionInfoHBoxDet.setVisible(true);
-            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
-            regionInfoHBoxDet.getChildren().add(regionHBoxDet);
+            regionInfoHBox.setVisible(true);
+            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
+            regionInfoHBox.getChildren().add(regionHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
                 floating.setConfig(config);
             }
         } else if (findImgType_window().equals(value)) {
-            regionInfoHBoxDet.setVisible(true);
-            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
-            regionInfoHBoxDet.getChildren().add(windowInfoHBoxDet);
+            regionInfoHBox.setVisible(true);
+            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
+            regionInfoHBox.getChildren().add(windowInfoHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
@@ -1148,8 +1147,8 @@ public class ClickDetailController extends RootController {
                 }
             }
         } else if (findImgType_all().equals(value)) {
-            regionInfoHBoxDet.setVisible(false);
-            regionInfoHBoxDet.getChildren().removeAll(regionHBoxDet, windowInfoHBoxDet);
+            regionInfoHBox.setVisible(false);
+            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());

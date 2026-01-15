@@ -36,6 +36,7 @@ import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
 import static priv.koishi.pmc.Controller.AutoClickController.showFloatingWindow;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
+import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
 import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
@@ -301,6 +302,15 @@ public class WindowMonitor {
                     } else if (windowInfoFloating != null) {
                         // 关闭目标窗口信息浮窗
                         hideFloatingWindow(windowInfoFloating);
+                        if (windowRelativeInfoFloating != null) {
+                            Stage relativeStage = windowRelativeInfoFloating.getStage();
+                            windowRelativeInfoFloating.getConfig().setWindowInfo(windowInfo);
+                            windowRelativeInfoFloating.updateRelativeHeight((int) relativeStage.getHeight())
+                                    .updateRelativeWidth((int) relativeStage.getWidth())
+                                    .updateRelativeX((int) relativeStage.getX())
+                                    .updateRelativeY((int) relativeStage.getY());
+                            hideFloatingWindow(windowRelativeInfoFloating);
+                        }
                         showStage(stage);
                     }
                     // 移除键盘监听器

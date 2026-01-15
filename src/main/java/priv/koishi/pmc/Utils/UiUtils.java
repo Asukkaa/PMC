@@ -46,12 +46,12 @@ import java.util.*;
 import java.util.List;
 
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
+import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.getKeyText;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateSizeConstraints;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
@@ -792,6 +792,8 @@ public class UiUtils {
         buildUpdateDataMenu(windowInfoMenu, windowMonitor);
         // 显示窗口位置信息
         buildShowDataMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
+        // 设置图像识别窗口范围区域
+        buildRelativeWindowMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
         // 删除窗信息据选项
         buildDeleteDataMenu(windowInfoMenu, windowMonitor);
         // 为窗口信息栏添加右键菜单
@@ -841,7 +843,7 @@ public class UiUtils {
                     new MessageBubble(text_windowHidden(), 2);
                 } else {
                     stages.forEach(stage -> stage.setIconified(true));
-                    String info = text_closeFloatingShortcut() + getKeyText(cancelKey) + "\n" +
+                    String info = text_closeFloatingShortcut() + "\n" +
                             findImgSet_PName() + windowInfo.getProcessName() + "\n" +
                             findImgSet_PID() + windowInfo.getPid() + "\n" +
                             findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
@@ -850,13 +852,86 @@ public class UiUtils {
                             findImgSet_windowSize() + " W: " + w + " H: " + h;
                     windowInfoFloating.setMassage(info)
                             .getConfig()
-                            .setHeight(windowInfo.getHeight())
-                            .setWidth(windowInfo.getWidth())
-                            .setX(windowInfo.getX())
-                            .setY(windowInfo.getY());
+                            .setHeight(h)
+                            .setWidth(w)
+                            .setX(x)
+                            .setY(y);
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(disableNodes, true);
                     showFloatingWindow(windowInfoFloating);
+                    windowMonitor.startNativeKeyListener();
+                }
+            } else {
+                new MessageBubble(text_noWindowInfo(), 2);
+            }
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 设置图像识别窗口范围区域
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     * @param disableNodes  要防重复点击的组件
+     * @param stages        需要隐藏的窗口
+     */
+    private static void buildRelativeWindowMenu(ContextMenu contextMenu, WindowMonitor windowMonitor,
+                                                List<? extends Node> disableNodes, List<? extends Stage> stages) {
+        MenuItem menuItem = new MenuItem(findImgSet_showRelativeWindow());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            WindowInfo windowInfo = windowMonitor.getWindowInfo();
+            if (windowInfo != null && windowInfo.getPid() != -1) {
+                int x = windowInfo.getX();
+                int y = windowInfo.getY();
+                int w = windowInfo.getWidth();
+                int h = windowInfo.getHeight();
+                if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
+                    new MessageBubble(text_windowHidden(), 2);
+                } else {
+                    stages.forEach(stage -> stage.setIconified(true));
+                    String info = text_closeFloatingShortcut() + "\n" +
+                            findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                            findImgSet_PID() + windowInfo.getPid() + "\n" +
+                            findImgSet_windowPath() + windowInfo.getProcessPath() + "\n" +
+                            findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
+                            findImgSet_windowLocation() + " X: " + x + " Y: " + y + "\n" +
+                            findImgSet_windowSize() + " W: " + w + " H: " + h;
+                    windowInfoFloating.setMassage(info)
+                            .getConfig()
+                            .setHeight(h)
+                            .setWidth(w)
+                            .setX(x)
+                            .setY(y);
+                    if (windowRelativeInfoFloating != null) {
+                        double relativeX = windowRelativeInfoFloating.getRelativeX();
+                        double relativeY = windowRelativeInfoFloating.getRelativeY();
+                        double relativeWidth = windowRelativeInfoFloating.getRelativeWidth();
+                        double relativeHeight = windowRelativeInfoFloating.getRelativeHeight();
+                        windowRelativeInfoFloating.setMaxHeight(h)
+                                .setMaxWidth(w)
+                                .setMinX(x)
+                                .setMinY(y)
+                                .getConfig()
+                                .setHeight((int) (h * relativeHeight))
+                                .setWidth((int) (w * relativeWidth))
+                                .setX((int) (w * relativeX) + x)
+                                .setY((int) (h * relativeY) + y);
+                        updateSizeConstraints(windowRelativeInfoFloating);
+                        Stage windowStage = windowInfoFloating.getStage();
+                        Stage windowRelativeStage = windowRelativeInfoFloating.getStage();
+                        if (windowRelativeInfoFloating.getOwnerStage() == null) {
+                            windowRelativeStage.initOwner(windowStage);
+                            windowRelativeInfoFloating.setOwnerStage(windowStage);
+                        }
+                    }
+                    // 改变要防重复点击的组件状态
+                    changeDisableNodes(disableNodes, true);
+                    showFloatingWindow(windowInfoFloating);
+                    if (windowRelativeInfoFloating != null) {
+                        showFloatingWindow(windowRelativeInfoFloating);
+                    }
                     windowMonitor.startNativeKeyListener();
                 }
             } else {

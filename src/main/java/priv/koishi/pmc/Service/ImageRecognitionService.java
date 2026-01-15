@@ -54,17 +54,17 @@ public class ImageRecognitionService {
     private static final double[] scales = {0.8, 0.9, 1.0, 1.1, 1.2};
 
     /**
-     * 获取屏幕宽度
+     * 屏幕宽度
      */
     public static int screenWidth;
 
     /**
-     * 获取屏幕高度
+     * 屏幕高度
      */
     public static int screenHeight;
 
     /**
-     * 获取缩放比例
+     * 缩放比例
      */
     public static double dpiScale;
 

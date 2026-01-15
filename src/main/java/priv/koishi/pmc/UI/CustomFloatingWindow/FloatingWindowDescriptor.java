@@ -1,20 +1,25 @@
 package priv.koishi.pmc.UI.CustomFloatingWindow;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingHeightInt;
 import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingWidthInt;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 
 /**
  * 浮窗属性类
@@ -46,6 +51,16 @@ public class FloatingWindowDescriptor {
      * 浮窗 Stage
      */
     Stage stage;
+
+    /**
+     * 浮窗所属 Stage
+     */
+    Stage ownerStage;
+
+    /**
+     * 浮窗是否只隐藏（true 只隐藏，默认直接关闭而不是隐藏）
+     */
+    boolean onlyHide;
 
     /**
      * 信窗信息展示栏
@@ -98,6 +113,16 @@ public class FloatingWindowDescriptor {
     String hideButtonToolTip;
 
     /**
+     * 字体对齐方式（默认左对齐）
+     */
+    TextAlignment textAlignment = TextAlignment.LEFT;
+
+    /**
+     * 浮窗组件对齐方式（默认左上角）
+     */
+    Pos pos = Pos.TOP_LEFT;
+
+    /**
      * 是否允许拖拽移动（true 允许，默认允许）
      */
     boolean enableDrag = true;
@@ -136,6 +161,11 @@ public class FloatingWindowDescriptor {
      * 浮窗透明度（默认 0.5）
      */
     double opacity = 0.5;
+
+    /**
+     * 浮窗背景颜色
+     */
+    Color backgroundColor;
 
     /**
      * 浮窗是否可透明（true 透明）
@@ -183,9 +213,49 @@ public class FloatingWindowDescriptor {
     int minHeight = defaultFloatingHeightInt;
 
     /**
-     * 浮窗是否添加关闭快捷键键（true 添加）
+     * 浮窗最大宽度（默认屏幕宽度）
+     */
+    int maxWidth = screenWidth;
+
+    /**
+     * 浮窗最大高度（默认屏幕高度）
+     */
+    int maxHeight = screenHeight;
+
+    /**
+     * 浮窗最小横轴坐标
+     */
+    int minX;
+
+    /**
+     * 浮窗最小纵轴坐标
+     */
+    int minY;
+
+    /**
+     * 浮窗是否添加关闭快捷键键监听（true 添加，默认添加）
      */
     boolean addCloseKey = true;
+
+    /**
+     * 识别范围相对高度
+     */
+    double relativeHeight = 1;
+
+    /**
+     * 识别范围相对宽度
+     */
+    double relativeWidth = 1;
+
+    /**
+     * 识别范围相对纵坐标
+     */
+    double relativeY = 0;
+
+    /**
+     * 识别范围相对横坐标
+     */
+    double relativeX = 0;
 
     /**
      * 销毁浮窗
@@ -207,6 +277,58 @@ public class FloatingWindowDescriptor {
             stage.close();
             stage = null;
         }
+    }
+
+    /**
+     * 更新识别范围相对横坐标
+     *
+     * @param absoluteX 绝对横坐标
+     * @return 用于链式调用的自身对象
+     */
+    public FloatingWindowDescriptor updateRelativeX(int absoluteX) {
+        DecimalFormat df = new DecimalFormat("#.####");
+        int x = config.getWindowInfo().getX();
+        int width = config.getWindowInfo().getWidth();
+        relativeX = Double.parseDouble(df.format((double) (absoluteX - x) / width));
+        return this;
+    }
+
+    /**
+     * 更新识别范围相对纵坐标
+     *
+     * @param absoluteY 绝对纵坐标
+     */
+    public void updateRelativeY(int absoluteY) {
+        DecimalFormat df = new DecimalFormat("#.####");
+        int y = config.getWindowInfo().getY();
+        int height = config.getWindowInfo().getHeight();
+        relativeY = Double.parseDouble(df.format((double) (absoluteY - y) / height));
+    }
+
+    /**
+     * 更新识别范围相对宽度
+     *
+     * @param absoluteWidth 绝对宽度
+     * @return 用于链式调用的自身对象
+     */
+    public FloatingWindowDescriptor updateRelativeWidth(int absoluteWidth) {
+        DecimalFormat df = new DecimalFormat("#.####");
+        int width = config.getWindowInfo().getWidth();
+        relativeWidth = Double.parseDouble(df.format((double) absoluteWidth / width));
+        return this;
+    }
+
+    /**
+     * 更新识别范围相对高度
+     *
+     * @param absoluteHeight 绝对高度
+     * @return 用于链式调用的自身对象
+     */
+    public FloatingWindowDescriptor updateRelativeHeight(int absoluteHeight) {
+        DecimalFormat df = new DecimalFormat("#.####");
+        int height = config.getWindowInfo().getHeight();
+        relativeHeight = Double.parseDouble(df.format((double) absoluteHeight / height));
+        return this;
     }
 
 }

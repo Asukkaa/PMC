@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -26,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
@@ -145,7 +147,8 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 浮窗设置
      */
-    public static FloatingWindowDescriptor clickFloating, stopFloating, massageFloating, windowInfoFloating;
+    public static FloatingWindowDescriptor clickFloating, stopFloating, massageFloating, windowInfoFloating,
+            windowRelativeInfoFloating;
 
     /**
      * 窗口信息获取器
@@ -426,10 +429,22 @@ public class SettingController extends RootController implements MousePositionUp
                 .setEnableResize(false)
                 .setAddCloseKey(false)
                 .setEnableDrag(false);
+        Color color = new Color(1, 1, 1, 0.6);
+        windowRelativeInfoFloating = new FloatingWindowDescriptor()
+                .setConfig(new FloatingWindowConfig())
+                .setMassage(text_saveFindImgConfig())
+                .setTextAlignment(TextAlignment.LEFT)
+                .setName(floatingName_window())
+                .setMinHeight(minFindImgHeight)
+                .setMinWidth(minFindImgWidth)
+                .setBackgroundColor(color)
+                .setTextFill(Color.BLACK)
+                .setPos(Pos.CENTER)
+                .setOnlyHide(true);
         // 读取配置文件
         loadFloatingWindowConfig();
         // 创建浮窗
-        createFloatingWindows(clickFloating, stopFloating, massageFloating, windowInfoFloating);
+        createFloatingWindows(clickFloating, stopFloating, massageFloating, windowInfoFloating, windowRelativeInfoFloating);
     }
 
     /**

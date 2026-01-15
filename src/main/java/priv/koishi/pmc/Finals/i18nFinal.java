@@ -287,14 +287,14 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击后将会展示浮窗位置，之后按下 esc 可关闭浮窗
+     * @return 点击后将会展示浮窗位置
      */
     public static String tip_massageRegion() {
         return bundle.getString("tip.setFloatingCoordinate");
     }
 
     /**
-     * @return 点击后将会展识别区域浮窗，之后按下 esc 可关闭浮窗
+     * @return 点击后将会展识别区域浮窗
      */
     public static String tip_showRegion() {
         return bundle.getString("tip.showRegion");
@@ -2078,6 +2078,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 设置图像识别窗口范围区域
+     */
+    public static String findImgSet_showRelativeWindow() {
+        return bundle.getString("findImgSet.showRelativeWindow");
+    }
+
+    /**
      * @return 删除窗口信息
      */
     public static String findImgSet_deleteWindow() {
@@ -2201,6 +2208,13 @@ public class i18nFinal {
      */
     public static String floatingName_massage() {
         return bundle.getString("floatingName.massage");
+    }
+
+    /**
+     * @return 图像识别窗口范围区域
+     */
+    public static String floatingName_window() {
+        return bundle.getString("floatingName.window");
     }
 
     /**
