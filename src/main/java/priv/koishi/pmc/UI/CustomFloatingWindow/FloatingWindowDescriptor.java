@@ -247,6 +247,11 @@ public class FloatingWindowDescriptor {
     boolean formattingText;
 
     /**
+     * 是否显示窗口相对位置信息（true 显示，默认不显示）
+     */
+    boolean showRelativeInfo;
+
+    /**
      * 销毁浮窗
      */
     public void dispose() {

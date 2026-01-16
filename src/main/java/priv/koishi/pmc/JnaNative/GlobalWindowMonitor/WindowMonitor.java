@@ -311,11 +311,7 @@ public class WindowMonitor {
                         // 关闭目标窗口信息浮窗
                         hideFloatingWindow(windowInfoFloating);
                         if (windowRelativeInfoFloating != null) {
-                            Stage relativeStage = windowRelativeInfoFloating.getStage();
-                            windowInfo.updateRelativeHeight((int) relativeStage.getHeight())
-                                    .updateRelativeWidth((int) relativeStage.getWidth())
-                                    .updateRelativeX((int) relativeStage.getX())
-                                    .updateRelativeY((int) relativeStage.getY());
+                            updateRelativeInfo(windowInfo);
                             windowRelativeInfoFloating.getConfig().setWindowInfo(windowInfo);
                             hideFloatingWindow(windowRelativeInfoFloating);
                         }
@@ -330,6 +326,24 @@ public class WindowMonitor {
         };
         // 注册监听器
         addNativeListener(nativeKeyListener);
+    }
+
+    /**
+     * 更新相对信息
+     *
+     * @param windowInfo 窗口信息
+     * @return 窗口识别范围相对信息文本
+     */
+    public static String updateRelativeInfo(WindowInfo windowInfo) {
+        Stage relativeStage = windowRelativeInfoFloating.getStage();
+        windowInfo.updateRelativeHeight((int) relativeStage.getHeight())
+                .updateRelativeWidth((int) relativeStage.getWidth())
+                .updateRelativeX((int) relativeStage.getX())
+                .updateRelativeY((int) relativeStage.getY());
+        return "识别范围相对高度：" + String.format("%.2f", windowInfo.getRelativeHeight() * 100) + "%" + "\n" +
+                "识别范围相对宽度：" + String.format("%.2f", windowInfo.getRelativeWidth() * 100) + "%" + "\n" +
+                "识别范围相对横坐标：" + String.format("%.2f", windowInfo.getRelativeX() * 100) + "%" + "\n" +
+                "识别范围相对纵坐标：" + String.format("%.2f", windowInfo.getRelativeY() * 100) + "%";
     }
 
     /**

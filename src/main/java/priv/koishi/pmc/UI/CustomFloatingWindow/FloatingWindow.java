@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -34,6 +35,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_noCancelKey;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.updateRelativeInfo;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
@@ -97,11 +99,13 @@ public class FloatingWindow {
         floatingPosition.setTextFill(color);
         floatingPosition.setStyle(fontSize);
         floatingPosition.setTextAlignment(textAlignment);
+        floatingPosition.setMaxWidth(270);
         config.setFloatingPosition(floatingPosition);
         Label massageLabel = new Label(config.getMassage());
         massageLabel.setTextFill(color);
         massageLabel.setStyle(fontSize);
         massageLabel.setTextAlignment(textAlignment);
+        massageLabel.setMaxWidth(270);
         String name = config.getName();
         config.setMassageLabel(massageLabel);
         Label nameLabel = new Label();
@@ -109,6 +113,7 @@ public class FloatingWindow {
         nameLabel.setStyle(fontSize);
         nameLabel.setTextFill(color);
         nameLabel.setTextAlignment(textAlignment);
+        nameLabel.setMaxWidth(270);
         config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.setAlignment(config.getPos());
@@ -186,14 +191,8 @@ public class FloatingWindow {
      * @param config 浮窗配置
      */
     private static void addDragHandler(StackPane root, FloatingWindowDescriptor config) {
-        Stage stage = config.getStage();
         double[] xOffset = new double[1];
         double[] yOffset = new double[1];
-        int margin = config.getMargin();
-        int minX = config.getMinX();
-        int minY = config.getMinY();
-        int maxWidth = config.getMaxWidth();
-        int maxHeight = config.getMaxHeight();
         root.setCursor(Cursor.MOVE);
         root.setOnMousePressed(event -> {
             xOffset[0] = event.getSceneX();
@@ -201,46 +200,69 @@ public class FloatingWindow {
         });
         root.setOnMouseDragged(event -> {
             config.setModified(true);
-            // 获取当前所在屏幕
-            Screen currentScreen = getCurrentScreen(stage);
-            Rectangle2D screenBounds = currentScreen.getBounds();
-            // 计算自定义矩形边界（考虑最小横纵坐标和最大宽高）
-            double customMinX = minX > 0 ? minX : screenBounds.getMinX() + margin;
-            double customMinY = minY > 0 ? minY : screenBounds.getMinY() + margin;
-            double customMaxX = minX + maxWidth;
-            double customMaxY = minY + maxHeight;
-            // 计算新坐标
-            double newX = event.getScreenX() - xOffset[0];
-            double newY = event.getScreenY() - yOffset[0];
-            int w = (int) stage.getWidth();
-            int h = (int) stage.getHeight();
-            stage.setWidth(w);
-            stage.setHeight(h);
-            // 边界约束（同时考虑屏幕边界和自定义矩形边界）
-            double minXAllowed = Math.max(screenBounds.getMinX() + margin, customMinX);
-            double minYAllowed = Math.max(screenBounds.getMinY() + margin, customMinY);
-            double maxXAllowed = Math.min(screenBounds.getMaxX() - w - margin,
-                    minX > 0 ? customMaxX - w : screenBounds.getMaxX() - w - margin);
-            double maxYAllowed = Math.min(screenBounds.getMaxY() - h - margin,
-                    minY > 0 ? customMaxY - h : screenBounds.getMaxY() - h - margin);
-            // 检查最大横纵坐标约束
-            int maxX = config.getMaxX();
-            int maxY = config.getMaxY();
-            if (maxX > 0) {
-                maxXAllowed = Math.min(maxXAllowed, maxX - w);
-            }
-            if (maxY > 0) {
-                maxYAllowed = Math.min(maxYAllowed, maxY - h);
-            }
-            newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
-            newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
-            int x = (int) newX;
-            int y = (int) newY;
-            // 应用限制后的坐标
-            stage.setX(x);
-            stage.setY(y);
-            setPositionText(config, "");
+            mouseDragged(config, event, xOffset, yOffset);
         });
+    }
+
+    /**
+     * 添加拖拽移动逻辑
+     *
+     * @param config  浮窗配置
+     * @param event   鼠标事件
+     * @param xOffset X 轴偏移量
+     * @param yOffset Y 轴偏移量
+     */
+    private static void mouseDragged(FloatingWindowDescriptor config, MouseEvent event, double[] xOffset,
+                                     double[] yOffset) {
+        Stage stage = config.getStage();
+        int margin = config.getMargin();
+        int minX = config.getMinX();
+        int minY = config.getMinY();
+        int maxWidth = config.getMaxWidth();
+        int maxHeight = config.getMaxHeight();
+        // 获取当前所在屏幕
+        Screen currentScreen = getCurrentScreen(stage);
+        Rectangle2D screenBounds = currentScreen.getBounds();
+        // 计算自定义矩形边界（考虑最小横纵坐标和最大宽高）
+        double customMinX = minX > 0 ? minX : screenBounds.getMinX() + margin;
+        double customMinY = minY > 0 ? minY : screenBounds.getMinY() + margin;
+        double customMaxX = minX + maxWidth;
+        double customMaxY = minY + maxHeight;
+        double newX = stage.getX();
+        double newY = stage.getY();
+        // 计算新坐标
+        if (event != null) {
+            newX = event.getScreenX() - xOffset[0];
+            newY = event.getScreenY() - yOffset[0];
+        }
+        int w = (int) stage.getWidth();
+        int h = (int) stage.getHeight();
+        stage.setWidth(w);
+        stage.setHeight(h);
+        // 边界约束（同时考虑屏幕边界和自定义矩形边界）
+        double minXAllowed = Math.max(screenBounds.getMinX() + margin, customMinX);
+        double minYAllowed = Math.max(screenBounds.getMinY() + margin, customMinY);
+        double maxXAllowed = Math.min(screenBounds.getMaxX() - w - margin,
+                minX > 0 ? customMaxX - w : screenBounds.getMaxX() - w - margin);
+        double maxYAllowed = Math.min(screenBounds.getMaxY() - h - margin,
+                minY > 0 ? customMaxY - h : screenBounds.getMaxY() - h - margin);
+        // 检查最大横纵坐标约束
+        int maxX = config.getMaxX();
+        int maxY = config.getMaxY();
+        if (maxX > 0) {
+            maxXAllowed = Math.min(maxXAllowed, maxX - w);
+        }
+        if (maxY > 0) {
+            maxYAllowed = Math.min(maxYAllowed, maxY - h);
+        }
+        newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
+        newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
+        int x = (int) newX;
+        int y = (int) newY;
+        // 应用限制后的坐标
+        stage.setX(x);
+        stage.setY(y);
+        setPositionText(config, "");
     }
 
     /**
@@ -649,6 +671,10 @@ public class FloatingWindow {
             config.getNameeLabel().setVisible(config.isShowName());
             floatingStage.show();
             setSameLabelWidth(config);
+            // 模拟一次窗口拖拽来校验位置
+            if (config.isShowRelativeInfo()) {
+                mouseDragged(config, null, new double[1], new double[1]);
+            }
             // 监听键盘事件
             if (config.isAddCloseKey()) {
                 startNativeKeyListener();
@@ -697,6 +723,9 @@ public class FloatingWindow {
         }
         if (config.isEnableResize()) {
             point += "\nWidth: " + w + " Height: " + h;
+        }
+        if (config.isShowRelativeInfo()) {
+            point += "\n" + updateRelativeInfo(config.getConfig().getWindowInfo());
         }
         Label floatingPosition = config.getFloatingPosition();
         floatingPosition.setText(point);

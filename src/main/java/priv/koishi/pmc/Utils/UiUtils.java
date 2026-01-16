@@ -882,6 +882,7 @@ public class UiUtils {
                                                 List<? extends Node> disableNodes, List<? extends Stage> stages) {
         MenuItem menuItem = new MenuItem(findImgSet_showRelativeWindow());
         menuItem.setOnAction(_ -> {
+            // 获取窗口区域相对位置设置
             WindowInfo windowInfo = windowMonitor.getWindowInfo();
             double relativeX = 0;
             double relativeY = 0;
@@ -893,6 +894,7 @@ public class UiUtils {
                 relativeWidth = windowInfo.getRelativeWidth();
                 relativeHeight = windowInfo.getRelativeHeight();
             }
+            // 更新窗口信息
             windowMonitor.updateWindowInfo();
             windowInfo = windowMonitor.getWindowInfo();
             if (windowInfo != null && windowInfo.getPid() != -1) {
@@ -917,17 +919,18 @@ public class UiUtils {
                             .setWidth(w)
                             .setX(x)
                             .setY(y);
+                    // 图像识别窗口相对位置设置区域初始化
                     if (windowRelativeInfoFloating != null) {
-                        int rx = Math.max(0, (int) (w * relativeX) + x);
-                        int ry = Math.max(0, (int) (h * relativeY) + y);
                         int maxX = Math.min(x + w, screenWidth);
                         int maxY = Math.min(y + h, screenHeight);
                         int maxW = x < 0 ? w + x : w;
                         int maxH = y < 0 ? h + y : h;
-                        maxW = Math.min(maxW, maxX - rx);
-                        maxH = Math.min(maxH, maxY - ry);
+                        maxW = Math.min(maxW, maxX - x);
+                        maxH = Math.min(maxH, maxY - y);
                         int rw = Math.min((int) (w * relativeWidth), maxW);
                         int rh = Math.min((int) (h * relativeHeight), maxH);
+                        int rx = Math.max(0, (int) (w * relativeX) + x);
+                        int ry = Math.max(0, (int) (h * relativeY) + y);
                         windowRelativeInfoFloating.setMaxHeight(maxH)
                                 .setMaxWidth(maxW)
                                 .setMaxX(maxX)
@@ -935,6 +938,7 @@ public class UiUtils {
                                 .setMinX(x)
                                 .setMinY(y)
                                 .getConfig()
+                                .setWindowInfo(windowInfo)
                                 .setHeight(rh)
                                 .setWidth(rw)
                                 .setX(rx)
