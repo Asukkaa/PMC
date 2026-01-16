@@ -50,6 +50,8 @@ import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFlo
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateSizeConstraints;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
@@ -916,15 +918,27 @@ public class UiUtils {
                             .setX(x)
                             .setY(y);
                     if (windowRelativeInfoFloating != null) {
-                        windowRelativeInfoFloating.setMaxHeight(h)
-                                .setMaxWidth(w)
+                        int rx = Math.max(0, (int) (w * relativeX) + x);
+                        int ry = Math.max(0, (int) (h * relativeY) + y);
+                        int maxX = Math.min(x + w, screenWidth);
+                        int maxY = Math.min(y + h, screenHeight);
+                        int maxW = x < 0 ? w + x : w;
+                        int maxH = y < 0 ? h + y : h;
+                        maxW = Math.min(maxW, maxX - rx);
+                        maxH = Math.min(maxH, maxY - ry);
+                        int rw = Math.min((int) (w * relativeWidth), maxW);
+                        int rh = Math.min((int) (h * relativeHeight), maxH);
+                        windowRelativeInfoFloating.setMaxHeight(maxH)
+                                .setMaxWidth(maxW)
+                                .setMaxX(maxX)
+                                .setMaxY(maxY)
                                 .setMinX(x)
                                 .setMinY(y)
                                 .getConfig()
-                                .setHeight((int) (h * relativeHeight))
-                                .setWidth((int) (w * relativeWidth))
-                                .setX((int) (w * relativeX) + x)
-                                .setY((int) (h * relativeY) + y);
+                                .setHeight(rh)
+                                .setWidth(rw)
+                                .setX(rx)
+                                .setY(ry);
                         updateSizeConstraints(windowRelativeInfoFloating);
                     }
                     // 改变要防重复点击的组件状态

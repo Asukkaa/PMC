@@ -223,6 +223,15 @@ public class FloatingWindow {
                     minX > 0 ? customMaxX - w : screenBounds.getMaxX() - w - margin);
             double maxYAllowed = Math.min(screenBounds.getMaxY() - h - margin,
                     minY > 0 ? customMaxY - h : screenBounds.getMaxY() - h - margin);
+            // 检查最大横纵坐标约束
+            int maxX = config.getMaxX();
+            int maxY = config.getMaxY();
+            if (maxX > 0) {
+                maxXAllowed = Math.min(maxXAllowed, maxX - w);
+            }
+            if (maxY > 0) {
+                maxYAllowed = Math.min(maxYAllowed, maxY - h);
+            }
             newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
             newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
             int x = (int) newX;
@@ -347,13 +356,14 @@ public class FloatingWindow {
     }
 
     /**
-     * 设置调整大小的事件处理器
+     * 设置边界调整大小的事件处理器
      *
      * @param resizeRect   用来拖拽调整大小的矩形
      * @param resizeWidth  是否调整宽度（true 调整）
      * @param resizeHeight 是否调整高度（true 调整）
      * @param adjustX      是否调整 X 坐标（true 调整）
      * @param adjustY      是否调整 Y 坐标（true 调整）
+     * @param config       浮窗配置
      */
     private static void setupBorderResizeHandler(Rectangle resizeRect, boolean resizeWidth, boolean resizeHeight,
                                                  boolean adjustX, boolean adjustY, FloatingWindowDescriptor config) {
@@ -386,12 +396,16 @@ public class FloatingWindow {
             Screen currentScreen = getCurrentScreen(stage);
             Rectangle2D screenBounds = currentScreen.getBounds();
             // 计算自定义矩形边界（考虑最小横纵坐标和最大宽高）
+            int maxX = config.getMaxX();
+            int maxY = config.getMaxY();
             double customMinX = minX > 0 ? minX : screenBounds.getMinX() + margin;
             double customMinY = minY > 0 ? minY : screenBounds.getMinY() + margin;
             double customMaxX = minX + maxWidth;
             double customMaxY = minY + maxHeight;
-            double newWidth = initialWidth[0], newHeight = initialHeight[0];
-            double newX = initialStageX[0], newY = initialStageY[0];
+            double newWidth = initialWidth[0];
+            double newHeight = initialHeight[0];
+            double newX = initialStageX[0];
+            double newY = initialStageY[0];
             if (resizeWidth) {
                 double widthDelta = event.getScreenX() - initialX[0];
                 if (adjustX) {
@@ -410,6 +424,10 @@ public class FloatingWindow {
                 // 确保宽度不超过自定义矩形的右边界
                 if (minX > 0 && newX >= minX) {
                     maxAllowedWidth = Math.min(maxAllowedWidth, customMaxX - newX);
+                }
+                // 确保右边界不超过最大横坐标
+                if (maxX > 0) {
+                    maxAllowedWidth = Math.min(maxAllowedWidth, maxX - newX);
                 }
                 // 宽度边界约束
                 newWidth = Math.max(config.getMinWidth(), Math.min(newWidth, maxAllowedWidth));
@@ -433,6 +451,10 @@ public class FloatingWindow {
                 if (minY > 0 && newY >= minY) {
                     maxAllowedHeight = Math.min(maxAllowedHeight, customMaxY - newY);
                 }
+                // 确保下边界不超过最大纵坐标
+                if (maxY > 0) {
+                    maxAllowedHeight = Math.min(maxAllowedHeight, maxY - newY);
+                }
                 // 高度边界约束
                 newHeight = Math.max(config.getMinHeight(), Math.min(newHeight, maxAllowedHeight));
             }
@@ -443,6 +465,13 @@ public class FloatingWindow {
                     minX > 0 ? customMaxX - newWidth : screenBounds.getMaxX() - newWidth - margin);
             double maxYAllowed = Math.min(screenBounds.getMaxY() - newHeight - margin,
                     minY > 0 ? customMaxY - newHeight : screenBounds.getMaxY() - newHeight - margin);
+            // 检查最大横纵坐标约束
+            if (maxX > 0) {
+                maxXAllowed = Math.min(maxXAllowed, maxX - newWidth);
+            }
+            if (maxY > 0) {
+                maxYAllowed = Math.min(maxYAllowed, maxY - newHeight);
+            }
             newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
             newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
             int x = (int) newX;

@@ -868,7 +868,9 @@ public class SettingController extends RootController implements MousePositionUp
         baseDisableNodes.add(removeRunKey_Det);
         baseDisableNodes.add(recordKeyHBox_Set);
         baseDisableNodes.add(cancelKeyHBox_Set);
+        baseDisableNodes.add(stopWindowInfo_Set);
         baseDisableNodes.add(removeRecordKey_Det);
+        baseDisableNodes.add(clickWindowInfo_Set);
         Node aboutTab = mainScene.lookup("#aboutTab");
         baseDisableNodes.add(aboutTab);
         Node settingTab = mainScene.lookup("#settingTab");

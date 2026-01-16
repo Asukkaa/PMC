@@ -227,6 +227,16 @@ public class FloatingWindowDescriptor {
     int minY;
 
     /**
+     * 浮窗最大横轴坐标
+     */
+    int maxX;
+
+    /**
+     * 浮窗最大纵轴坐标
+     */
+    int maxY;
+
+    /**
      * 浮窗是否添加关闭快捷键键监听（true 添加，默认添加）
      */
     boolean addCloseKey = true;
