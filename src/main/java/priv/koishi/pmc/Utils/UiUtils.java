@@ -880,8 +880,19 @@ public class UiUtils {
                                                 List<? extends Node> disableNodes, List<? extends Stage> stages) {
         MenuItem menuItem = new MenuItem(findImgSet_showRelativeWindow());
         menuItem.setOnAction(_ -> {
-            windowMonitor.updateWindowInfo();
             WindowInfo windowInfo = windowMonitor.getWindowInfo();
+            double relativeX = 0;
+            double relativeY = 0;
+            double relativeWidth = 1;
+            double relativeHeight = 1;
+            if (windowInfo != null) {
+                relativeX = windowInfo.getRelativeX();
+                relativeY = windowInfo.getRelativeY();
+                relativeWidth = windowInfo.getRelativeWidth();
+                relativeHeight = windowInfo.getRelativeHeight();
+            }
+            windowMonitor.updateWindowInfo();
+            windowInfo = windowMonitor.getWindowInfo();
             if (windowInfo != null && windowInfo.getPid() != -1) {
                 int x = windowInfo.getX();
                 int y = windowInfo.getY();
@@ -905,10 +916,6 @@ public class UiUtils {
                             .setX(x)
                             .setY(y);
                     if (windowRelativeInfoFloating != null) {
-                        double relativeX = windowRelativeInfoFloating.getRelativeX();
-                        double relativeY = windowRelativeInfoFloating.getRelativeY();
-                        double relativeWidth = windowRelativeInfoFloating.getRelativeWidth();
-                        double relativeHeight = windowRelativeInfoFloating.getRelativeHeight();
                         windowRelativeInfoFloating.setMaxHeight(h)
                                 .setMaxWidth(w)
                                 .setMinX(x)

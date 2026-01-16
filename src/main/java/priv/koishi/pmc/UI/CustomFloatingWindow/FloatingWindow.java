@@ -445,7 +445,10 @@ public class FloatingWindow {
                     minY > 0 ? customMaxY - newHeight : screenBounds.getMaxY() - newHeight - margin);
             newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
             newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
-            int x = (int) newX, y = (int) newY, w = (int) newWidth, h = (int) newHeight;
+            int x = (int) newX;
+            int y = (int) newY;
+            int w = (int) newWidth;
+            int h = (int) newHeight;
             stage.setX(x);
             stage.setY(y);
             stage.setWidth(w);
@@ -558,7 +561,10 @@ public class FloatingWindow {
                     minY > 0 ? customMaxY - newHeight : screenBounds.getMaxY() - newHeight - margin);
             newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
             newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
-            int x = (int) newX, y = (int) newY, w = (int) newWidth, h = (int) newHeight;
+            int x = (int) newX;
+            int y = (int) newY;
+            int w = (int) newWidth;
+            int h = (int) newHeight;
             stage.setX(x);
             stage.setY(y);
             stage.setWidth(w);

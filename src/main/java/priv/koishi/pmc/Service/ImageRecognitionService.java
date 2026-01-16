@@ -224,10 +224,14 @@ public class ImageRecognitionService {
             if (windowInfo == null) {
                 throw new RuntimeException(findImgSet_noWindow());
             }
-            x = windowInfo.getX();
-            y = windowInfo.getY();
-            w = windowInfo.getWidth();
-            h = windowInfo.getHeight();
+            int infoX = windowInfo.getX();
+            int infoY = windowInfo.getY();
+            int infoW = windowInfo.getWidth();
+            int infoH = windowInfo.getHeight();
+            x = (int) (infoX + infoW * windowInfo.getRelativeX());
+            y = (int) (infoY + infoH * windowInfo.getRelativeY());
+            w = (int) (infoW * windowInfo.getRelativeWidth());
+            h = (int) (infoH * windowInfo.getRelativeHeight());
         } else {
             // 识别次数大于1且开启全屏重试
             if (findPositionConfig.getFindTime() > 1 && activation.equals(config.getAllRegion())) {

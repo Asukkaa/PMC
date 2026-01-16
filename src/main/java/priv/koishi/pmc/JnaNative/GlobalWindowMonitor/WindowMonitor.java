@@ -246,7 +246,15 @@ public class WindowMonitor {
      */
     public void updateWindowInfo() {
         if (windowInfo != null) {
+            double relativeHeight = windowInfo.getRelativeHeight();
+            double relativeWidth = windowInfo.getRelativeWidth();
+            double relativeY = windowInfo.getRelativeY();
+            double relativeX = windowInfo.getRelativeX();
             updateWindowInfo(windowInfo.getProcessPath());
+            windowInfo.setRelativeHeight(relativeHeight)
+                    .setRelativeWidth(relativeWidth)
+                    .setRelativeY(relativeY)
+                    .setRelativeX(relativeX);
         }
     }
 
@@ -304,11 +312,11 @@ public class WindowMonitor {
                         hideFloatingWindow(windowInfoFloating);
                         if (windowRelativeInfoFloating != null) {
                             Stage relativeStage = windowRelativeInfoFloating.getStage();
-                            windowRelativeInfoFloating.getConfig().setWindowInfo(windowInfo);
-                            windowRelativeInfoFloating.updateRelativeHeight((int) relativeStage.getHeight())
+                            windowInfo.updateRelativeHeight((int) relativeStage.getHeight())
                                     .updateRelativeWidth((int) relativeStage.getWidth())
                                     .updateRelativeX((int) relativeStage.getX())
                                     .updateRelativeY((int) relativeStage.getY());
+                            windowRelativeInfoFloating.getConfig().setWindowInfo(windowInfo);
                             hideFloatingWindow(windowRelativeInfoFloating);
                         }
                         showStage(stage);
