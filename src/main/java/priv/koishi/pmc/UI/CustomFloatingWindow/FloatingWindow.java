@@ -319,7 +319,7 @@ public class FloatingWindow {
      * @param config 浮窗配置
      */
     private static void setSameLabelWidth(FloatingWindowDescriptor config) {
-        if (config != null) {
+        if (config.isFormattingText()) {
             double maxWidth = 0;
             Label massageLabel = config.getMassageLabel();
             Label nameLabel = config.getNameeLabel();

@@ -439,6 +439,7 @@ public class SettingController extends RootController implements MousePositionUp
                 .setMinWidth(minFindImgWidth)
                 .setBackgroundColor(color)
                 .setTextFill(Color.BLACK)
+                .setFormattingText(true)
                 .setPos(Pos.CENTER)
                 .setOnlyHide(true);
         // 读取配置文件

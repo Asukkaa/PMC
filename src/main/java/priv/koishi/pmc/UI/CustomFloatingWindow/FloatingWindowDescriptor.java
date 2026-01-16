@@ -232,6 +232,11 @@ public class FloatingWindowDescriptor {
     boolean addCloseKey = true;
 
     /**
+     * 是否格式化文本容器长度（true 格式化，默认不格式化）
+     */
+    boolean formattingText;
+
+    /**
      * 销毁浮窗
      */
     public void dispose() {

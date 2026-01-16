@@ -248,6 +248,11 @@ public class AutoClickService {
                         if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
                             errs.add(err + text_noClickWindowInfo());
                         } else {
+                            // 保留原有的相对坐标和相对大小属性
+                            windowInfo.setRelativeHeight(clickInfo.getRelativeHeight())
+                                    .setRelativeWidth(clickInfo.getRelativeWidth())
+                                    .setRelativeY(clickInfo.getRelativeY())
+                                    .setRelativeX(clickInfo.getRelativeX());
                             clickWindowConfig.setWindowInfo(windowInfo);
                             clickPositionVO.setClickWindowConfig(clickWindowConfig);
                         }
@@ -264,6 +269,11 @@ public class AutoClickService {
                             if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
                                 errs.add(err + text_noStopWindowInfo());
                             } else {
+                                // 保留原有的相对坐标和相对大小属性
+                                windowInfo.setRelativeHeight(stopInfo.getRelativeHeight())
+                                        .setRelativeWidth(stopInfo.getRelativeWidth())
+                                        .setRelativeY(stopInfo.getRelativeY())
+                                        .setRelativeX(stopInfo.getRelativeX());
                                 stopWindowConfig.setWindowInfo(windowInfo);
                                 clickPositionVO.setStopWindowConfig(stopWindowConfig);
                             }
