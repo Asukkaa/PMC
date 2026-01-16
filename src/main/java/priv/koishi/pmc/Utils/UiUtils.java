@@ -919,12 +919,6 @@ public class UiUtils {
                                 .setX((int) (w * relativeX) + x)
                                 .setY((int) (h * relativeY) + y);
                         updateSizeConstraints(windowRelativeInfoFloating);
-                        Stage windowStage = windowInfoFloating.getStage();
-                        Stage windowRelativeStage = windowRelativeInfoFloating.getStage();
-                        if (windowRelativeInfoFloating.getOwnerStage() == null) {
-                            windowRelativeStage.initOwner(windowStage);
-                            windowRelativeInfoFloating.setOwnerStage(windowStage);
-                        }
                     }
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(disableNodes, true);

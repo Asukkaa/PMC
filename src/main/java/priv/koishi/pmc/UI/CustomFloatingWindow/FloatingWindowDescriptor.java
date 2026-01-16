@@ -53,11 +53,6 @@ public class FloatingWindowDescriptor {
     Stage stage;
 
     /**
-     * 浮窗所属 Stage
-     */
-    Stage ownerStage;
-
-    /**
      * 浮窗是否只隐藏（true 只隐藏，默认直接关闭而不是隐藏）
      */
     boolean onlyHide;

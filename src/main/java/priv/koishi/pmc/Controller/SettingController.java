@@ -445,6 +445,7 @@ public class SettingController extends RootController implements MousePositionUp
         loadFloatingWindowConfig();
         // 创建浮窗
         createFloatingWindows(clickFloating, stopFloating, massageFloating, windowInfoFloating, windowRelativeInfoFloating);
+        windowRelativeInfoFloating.getStage().initOwner(windowInfoFloating.getStage());
     }
 
     /**
