@@ -3,7 +3,7 @@ package priv.koishi.pmc.Listener;
 import java.awt.*;
 
 /**
- * 根据鼠标位置更新ui
+ * 根据鼠标位置更新 ui
  *
  * @author KOISHI
  * Date:2025-03-13

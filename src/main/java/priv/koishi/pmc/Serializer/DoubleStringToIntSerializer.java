@@ -18,10 +18,6 @@ public class DoubleStringToIntSerializer extends StdSerializer<String> {
         super(String.class);
     }
 
-    public DoubleStringToIntSerializer(Class<String> t) {
-        super(t);
-    }
-
     /**
      * json 序列化时将非整数字符串转为整数
      *

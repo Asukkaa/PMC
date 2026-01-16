@@ -79,12 +79,12 @@ public class WindowInfo {
     /**
      * 识别范围相对纵坐标
      */
-    double relativeY = 0;
+    double relativeY;
 
     /**
      * 识别范围相对横坐标
      */
-    double relativeX = 0;
+    double relativeX;
 
     /**
      * 更新识别范围相对横坐标

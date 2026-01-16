@@ -355,7 +355,7 @@ public class FloatingWindow {
             Label massageLabel = config.getMassageLabel();
             Label nameLabel = config.getNameeLabel();
             Label floatingPosition = config.getFloatingPosition();
-            Label[] labels = new Label[]{massageLabel, nameLabel, floatingPosition};
+            Label[] labels = {massageLabel, nameLabel, floatingPosition};
             // 找到最宽的 Label
             for (Label label : labels) {
                 if (label != null) {

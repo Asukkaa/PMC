@@ -84,7 +84,7 @@ public class AutoClickService {
     /**
      * JavaFX 机器人输入标志，true 为机器人输入，将不会触发快捷键取消自动任务
      */
-    public static volatile boolean isRobotInput = false;
+    public static volatile boolean isRobotInput;
 
     /**
      * 自动点击任务线程
