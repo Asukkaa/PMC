@@ -58,7 +58,7 @@ public class PMCFileService {
                 updateMessage(text_readData());
                 List<PMCListBean> pmcListBeans = new ArrayList<>();
                 Map<String, String> imgMap = new HashMap<>();
-                AtomicReference<String> lastPMCPathRef = new AtomicReference<>("");
+                String[] lastPMCPathRef = {""};
                 // 读取文件
                 List<ClickPositionVO> allClickPositions = loadFilesCommon(
                         files,
@@ -74,7 +74,7 @@ public class PMCFileService {
                         this::updateProgress);
                 // 匹配图片
                 matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
-                return new PMCSLoadResult(pmcListBeans, lastPMCPathRef.get());
+                return new PMCSLoadResult(pmcListBeans, lastPMCPathRef[0]);
             }
         };
     }
@@ -94,7 +94,7 @@ public class PMCFileService {
                 updateMessage(text_readData());
                 List<ClickPositionVO> allClickPositions = new ArrayList<>();
                 Map<String, String> imgMap = new HashMap<>();
-                AtomicReference<String> lastPMCPathRef = new AtomicReference<>("");
+                String[] lastPMCPathRef = {""};
                 // 读取文件
                 loadFilesCommon(
                         files,
@@ -107,7 +107,7 @@ public class PMCFileService {
                 matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
                 taskBean.getTableView().refresh();
 
-                return new PMCLoadResult(allClickPositions, lastPMCPathRef.get());
+                return new PMCLoadResult(allClickPositions, lastPMCPathRef[0]);
             }
         };
     }
@@ -123,8 +123,7 @@ public class PMCFileService {
      * @return 所有读取到的点击位置列表
      */
     private static List<ClickPositionVO> loadFilesCommon(List<? extends File> files,
-                                                         Map<? super String, ? super String> imgMap,
-                                                         AtomicReference<? super String> lastPMCPathRef,
+                                                         Map<? super String, ? super String> imgMap, String[] lastPMCPathRef,
                                                          BiConsumer<? super File, ? super List<ClickPositionVO>> pmcFileProcessor,
                                                          ProgressUpdater updateProgressFunc) {
         List<ClickPositionVO> allClickPositions = new ArrayList<>();
@@ -134,7 +133,7 @@ public class PMCFileService {
             File file = files.get(i);
             String fileType = getExistsFileType(file);
             if (PMC.equals(fileType)) {
-                lastPMCPathRef.set(file.getPath());
+                lastPMCPathRef[0] = file.getPath();
                 List<ClickPositionVO> clickPositionVOS = loadPMCFile(file);
                 if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
                     allClickPositions.addAll(clickPositionVOS);
@@ -157,8 +156,7 @@ public class PMCFileService {
      * 处理目录
      */
     private static void processDirectory(File directory, Map<? super String, ? super String> imgMap,
-                                         AtomicReference<? super String> lastPMCPathRef,
-                                         List<? super ClickPositionVO> allClickPositions,
+                                         String[] lastPMCPathRef, List<? super ClickPositionVO> allClickPositions,
                                          BiConsumer<? super File, ? super List<ClickPositionVO>> pmcFileProcessor) {
         List<String> filterExtensionList = new ArrayList<>(imageType);
         filterExtensionList.add(PMC);
@@ -171,7 +169,7 @@ public class PMCFileService {
         for (File readFile : readAllFiles(fileConfig)) {
             String fileType = getExistsFileType(readFile);
             if (PMC.equals(fileType)) {
-                lastPMCPathRef.set(readFile.getPath());
+                lastPMCPathRef[0] = readFile.getPath();
                 List<ClickPositionVO> clickPositionVOS = loadPMCFile(readFile);
                 if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
                     allClickPositions.addAll(clickPositionVOS);
