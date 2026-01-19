@@ -71,8 +71,7 @@ public class PMCFileService {
                                     .setPath(pmcFile.getPath());
                             pmcListBeans.add(pmcListBean);
                         },
-                        this::updateProgress
-                );
+                        this::updateProgress);
                 // 匹配图片
                 matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
                 return new PMCSLoadResult(pmcListBeans, lastPMCPathRef.get());
