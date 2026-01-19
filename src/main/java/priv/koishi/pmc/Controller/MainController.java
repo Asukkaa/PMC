@@ -55,7 +55,7 @@ public class MainController extends RootController {
     public TabPane tabPane;
 
     @FXML
-    public Tab settingTab, aboutTab, autoClickTab, timedStartTab;
+    public Tab settingTab, listPMCTab, aboutTab, autoClickTab, timedStartTab;
 
     /**
      * 页面初始化

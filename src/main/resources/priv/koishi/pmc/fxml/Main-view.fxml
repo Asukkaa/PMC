@@ -13,6 +13,14 @@
             </ScrollPane>
         </Tab>
 
+        <Tab style="-fx-cursor: hand" fx:id="listPMCTab" text="%main.PMCListTab">
+            <ScrollPane>
+                <AnchorPane>
+                    <fx:include source="PMCList-tab.fxml"/>
+                </AnchorPane>
+            </ScrollPane>
+        </Tab>
+
         <Tab style="-fx-cursor: hand" fx:id="timedStartTab" text="%main.timedStartTab">
             <ScrollPane>
                 <AnchorPane>

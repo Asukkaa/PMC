@@ -290,6 +290,8 @@ public class CommonFinals {
      */
     public static final String configFile_Click = "config/autoClickConfig.properties";
 
+    public static final String configFile_List = "config/listPMCConfig.properties";
+
     /**
      * 更新脚本名称
      */

@@ -67,9 +67,9 @@
                 <columns>
                     <TableColumn fx:id="index_FC" text="%listText.index" sortable="false"/>
                     <TableColumn fx:id="thumb_FC" text="%listText.thumb" sortable="false"/>
-                    <TableColumn fx:id="name_FC" text="%fileChooser.name_FC"/>
+                    <TableColumn fx:id="name_FC" text="%listText.fileName"/>
                     <TableColumn fx:id="fileType_FC" text="%fileChooser.fileType_FC"/>
-                    <TableColumn fx:id="path_FC" text="%fileChooser.path_FC"/>
+                    <TableColumn fx:id="path_FC" text="%listText.filePath"/>
                     <TableColumn fx:id="size_FC" sortType="DESCENDING" text="%fileChooser.size_FC"/>
                     <TableColumn fx:id="showStatus_FC" text="%fileChooser.showStatus_FC"/>
                     <TableColumn fx:id="creatDate_FC" text="%fileChooser.creatDate_FC"/>

@@ -12,7 +12,9 @@ import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.Config.FileConfig;
 import priv.koishi.pmc.Bean.DTO.PMCFileDTO;
 import priv.koishi.pmc.Bean.ImgFileBean;
+import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
+import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -44,6 +46,113 @@ import static priv.koishi.pmc.Utils.UiUtils.creatConfirmDialog;
  * Time:14:40
  */
 public class PMCFileService {
+
+    public static Task<PMCSLoadResult> loadPMCSFils(TaskBean<PMCListBean> taskBean, List<? extends File> files) {
+        return new Task<>() {
+            @Override
+            protected PMCSLoadResult call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                List<ClickPositionVO> clickPositionBeans = new ArrayList<>();
+                List<PMCListBean> pmcListBeans = new ArrayList<>();
+                Map<String, String> imgMap = new HashMap<>();
+                String lastPMCPath = "";
+                int size = files.size();
+                updateProgress(0, size);
+                for (int i = 0; i < size; i++) {
+                    File file = files.get(i);
+                    if (PMC.equals(getExistsFileType(file))) {
+                        lastPMCPath = file.getPath();
+                        List<ClickPositionVO> clickPositionVOS = loadPMCFile(file);
+                        if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                            clickPositionBeans.addAll(clickPositionVOS);
+                        }
+                        PMCListBean pmcListBean = new PMCListBean()
+                                .setClickPositionVOS(clickPositionVOS)
+                                .setName(file.getName())
+                                .setPath(file.getPath());
+                        pmcListBeans.add(pmcListBean);
+                    } else if (file.isDirectory()) {
+                        List<String> filterExtensionList = new ArrayList<>(imageType);
+                        filterExtensionList.add(PMC);
+                        FileConfig fileConfig = new FileConfig()
+                                .setFilterExtensionList(filterExtensionList)
+                                .setShowDirectory(search_fileDirectory())
+                                .setShowHideFile(hide_noHideFile())
+                                .setPath(file.getPath())
+                                .setRecursion(true);
+                        for (File readFile : readAllFiles(fileConfig)) {
+                            if (PMC.equals(getExistsFileType(readFile))) {
+                                lastPMCPath = readFile.getPath();
+                                List<ClickPositionVO> clickPositionVOS = loadPMCFile(readFile);
+                                if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                                    clickPositionBeans.addAll(clickPositionVOS);
+                                }
+                                PMCListBean pmcListBean = new PMCListBean()
+                                        .setClickPositionVOS(clickPositionVOS)
+                                        .setName(readFile.getName())
+                                        .setPath(readFile.getPath());
+                                pmcListBeans.add(pmcListBean);
+                            } else {
+                                imgMap.put(readFile.getPath(), getExistsFileName(readFile));
+                            }
+                        }
+                    } else if (imageType.contains(getExistsFileType(file))) {
+                        imgMap.put(file.getPath(), getExistsFileName(file));
+                    }
+                    updateProgress(i + 1, size);
+                }
+                // 匹配图片
+                matchSameNameImg(imgMap, clickPositionBeans);
+                return new PMCSLoadResult(pmcListBeans, lastPMCPath);
+            }
+
+            /**
+             * 匹配图片
+             *
+             * @param imgMap 文件夹中用于匹配的图片
+             * @param clickPositionBeans 需要匹配的自动操作步骤
+             */
+            private void matchSameNameImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
+                if (!imgMap.isEmpty()) {
+                    updateMessage(text_matchImg());
+                    int clickPositionBeansSize = clickPositionBeans.size();
+                    updateProgress(0, clickPositionBeansSize);
+                    // 匹配要点击的图片
+                    for (int j = 0; j < clickPositionBeansSize; j++) {
+                        ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
+                        String clickImgPath = clickPositionVO.getClickImgPath();
+                        if (StringUtils.isNotBlank(clickImgPath)) {
+                            File file = new File(clickImgPath);
+                            if (!file.exists()) {
+                                // 通过文件获取路径可消除不同操作系统的路径分隔符的差异
+                                String imgPath = getSameNameImgPath(imgMap, file);
+                                if (StringUtils.isNotBlank(imgPath)) {
+                                    clickPositionVO.setClickImgPath(imgPath);
+                                }
+                            }
+                        }
+                        // 匹配终止操作图片
+                        List<ImgFileBean> stopImgFiles = clickPositionVO.getStopImgFiles();
+                        stopImgFiles.forEach(stopImgFile -> {
+                            String stopImgPath = stopImgFile.getPath();
+                            if (StringUtils.isNotBlank(stopImgPath)) {
+                                File stopFile = new File(stopImgPath);
+                                if (!stopFile.exists()) {
+                                    String imgPath = getSameNameImgPath(imgMap, stopFile);
+                                    if (StringUtils.isNotBlank(imgPath)) {
+                                        stopImgFile.setPath(imgPath);
+                                    }
+                                }
+                            }
+                        });
+                        updateProgress(j + 1, clickPositionBeansSize);
+                    }
+                }
+            }
+        };
+    }
+
 
     /**
      * 批量加载 PMC 文件

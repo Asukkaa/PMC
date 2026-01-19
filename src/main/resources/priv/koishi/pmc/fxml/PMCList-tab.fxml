@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="anchorPane_List" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.ListPMCController">
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
+        <HBox spacing="10">
+            <Label textFill="coral" text="%autoClick.tip"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="cancelTip_List" textFill="red"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox prefWidth="500" spacing="10">
+                <Button fx:id="addOutPath_List" onAction="#addOutPath" text="%autoClick.addOutPath_Click"/>
+                <Label fx:id="outPath_List" style="-fx-font-size: 15px;"/>
+            </HBox>
+
+            <Label text="%autoClick.outFileName"/>
+            <TextField fx:id="outFileName_List" prefWidth="140"/>
+
+            <CheckBox fx:id="openDirectory_List" selected="true" text="%autoClick.openDirectory_Click"/>
+
+            <CheckBox fx:id="notOverwrite_List" selected="true" text="%autoClick.notOverwrite_Click"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox prefWidth="500" spacing="10">
+                <Button fx:id="loadAutoClick_List" onAction="#loadAutoClick" text="%autoClick.loadAutoClick_Click"/>
+                <CheckBox fx:id="loadFolder_List" text="%autoClick.loadFolder_Click"/>
+            </HBox>
+
+            <Button fx:id="exportAutoClick_List" onAction="#exportAutoClick" text="%autoClick.exportAutoClick_Click"/>
+            <Button fx:id="clearButton_List" onAction="#removeAll" text="%listText.removeAll"/>
+        </HBox>
+
+        <HBox spacing="10">
+            <Label text="%autoClick.preparationRunTime"/>
+            <TextField fx:id="preparationRunTime_List" prefWidth="50"/>
+            <Label text="%unit.s"/>
+            <Button fx:id="runClick_List" onAction="#runClick" text="%autoClick.runClick_Click"
+                    styleClass="cornflowerblue-button"/>
+
+            <Label text="%autoClick.loopTime"/>
+            <TextField fx:id="loopTime_List" prefWidth="80"/>
+            <Label text="%unit.times"/>
+
+            <Button fx:id="clickLog_List" onAction="#clickLog" text="%autoClick.clickLog_Click"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="dataNumber_List" text="%listText.null"/>
+        </HBox>
+
+        <TableView fx:id="tableView_List" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+            <placeholder>
+                <Label text="%list.tableView_Click"/>
+            </placeholder>
+
+            <columns>
+                <TableColumn fx:id="index_List" text="%listText.index" sortable="false"/>
+                <TableColumn fx:id="name_List" text="%listText.fileName" sortable="false"/>
+                <TableColumn fx:id="path_List" text="%listText.filePath" sortable="false"/>
+                <TableColumn fx:id="runNum_List" text="%list.runNum_List" sortable="false"/>
+                <TableColumn fx:id="waitTime_List" text="%list.waitTime_List" sortable="false"/>
+            </columns>
+        </TableView>
+
+        <VBox>
+            <HBox spacing="10">
+                <ProgressBar fx:id="progressBar_List" visible="false" progress="0.0"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="tip_List" prefHeight="20" textFill="red" text="%autoClick.tip_Click"/>
+            </HBox>
+
+            <HBox fx:id="logHBox_List" spacing="10">
+                <Label fx:id="log_List" style="-fx-pref-height: -1"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="err_List" textFill="red"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</AnchorPane>
