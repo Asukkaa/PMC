@@ -18,6 +18,8 @@ import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Service.TaskInterface.MessageUpdater;
+import priv.koishi.pmc.Service.TaskInterface.ProgressUpdater;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.MismatchedInputException;
@@ -27,6 +29,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -53,106 +56,29 @@ public class PMCFileService {
             protected PMCSLoadResult call() {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
-                List<ClickPositionVO> clickPositionBeans = new ArrayList<>();
                 List<PMCListBean> pmcListBeans = new ArrayList<>();
                 Map<String, String> imgMap = new HashMap<>();
-                String lastPMCPath = "";
-                int size = files.size();
-                updateProgress(0, size);
-                for (int i = 0; i < size; i++) {
-                    File file = files.get(i);
-                    if (PMC.equals(getExistsFileType(file))) {
-                        lastPMCPath = file.getPath();
-                        List<ClickPositionVO> clickPositionVOS = loadPMCFile(file);
-                        if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-                            clickPositionBeans.addAll(clickPositionVOS);
-                        }
-                        PMCListBean pmcListBean = new PMCListBean()
-                                .setClickPositionVOS(clickPositionVOS)
-                                .setName(file.getName())
-                                .setPath(file.getPath());
-                        pmcListBeans.add(pmcListBean);
-                    } else if (file.isDirectory()) {
-                        List<String> filterExtensionList = new ArrayList<>(imageType);
-                        filterExtensionList.add(PMC);
-                        FileConfig fileConfig = new FileConfig()
-                                .setFilterExtensionList(filterExtensionList)
-                                .setShowDirectory(search_fileDirectory())
-                                .setShowHideFile(hide_noHideFile())
-                                .setPath(file.getPath())
-                                .setRecursion(true);
-                        for (File readFile : readAllFiles(fileConfig)) {
-                            if (PMC.equals(getExistsFileType(readFile))) {
-                                lastPMCPath = readFile.getPath();
-                                List<ClickPositionVO> clickPositionVOS = loadPMCFile(readFile);
-                                if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-                                    clickPositionBeans.addAll(clickPositionVOS);
-                                }
-                                PMCListBean pmcListBean = new PMCListBean()
-                                        .setClickPositionVOS(clickPositionVOS)
-                                        .setName(readFile.getName())
-                                        .setPath(readFile.getPath());
-                                pmcListBeans.add(pmcListBean);
-                            } else {
-                                imgMap.put(readFile.getPath(), getExistsFileName(readFile));
-                            }
-                        }
-                    } else if (imageType.contains(getExistsFileType(file))) {
-                        imgMap.put(file.getPath(), getExistsFileName(file));
-                    }
-                    updateProgress(i + 1, size);
-                }
+                AtomicReference<String> lastPMCPathRef = new AtomicReference<>("");
+                // 读取文件
+                List<ClickPositionVO> allClickPositions = loadFilesCommon(
+                        files,
+                        imgMap,
+                        lastPMCPathRef,
+                        (pmcFile, clickPositionVOS) -> {
+                            PMCListBean pmcListBean = new PMCListBean()
+                                    .setClickPositionVOS(clickPositionVOS)
+                                    .setName(pmcFile.getName())
+                                    .setPath(pmcFile.getPath());
+                            pmcListBeans.add(pmcListBean);
+                        },
+                        this::updateProgress
+                );
                 // 匹配图片
-                matchSameNameImg(imgMap, clickPositionBeans);
-                return new PMCSLoadResult(pmcListBeans, lastPMCPath);
-            }
-
-            /**
-             * 匹配图片
-             *
-             * @param imgMap 文件夹中用于匹配的图片
-             * @param clickPositionBeans 需要匹配的自动操作步骤
-             */
-            private void matchSameNameImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
-                if (!imgMap.isEmpty()) {
-                    updateMessage(text_matchImg());
-                    int clickPositionBeansSize = clickPositionBeans.size();
-                    updateProgress(0, clickPositionBeansSize);
-                    // 匹配要点击的图片
-                    for (int j = 0; j < clickPositionBeansSize; j++) {
-                        ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
-                        String clickImgPath = clickPositionVO.getClickImgPath();
-                        if (StringUtils.isNotBlank(clickImgPath)) {
-                            File file = new File(clickImgPath);
-                            if (!file.exists()) {
-                                // 通过文件获取路径可消除不同操作系统的路径分隔符的差异
-                                String imgPath = getSameNameImgPath(imgMap, file);
-                                if (StringUtils.isNotBlank(imgPath)) {
-                                    clickPositionVO.setClickImgPath(imgPath);
-                                }
-                            }
-                        }
-                        // 匹配终止操作图片
-                        List<ImgFileBean> stopImgFiles = clickPositionVO.getStopImgFiles();
-                        stopImgFiles.forEach(stopImgFile -> {
-                            String stopImgPath = stopImgFile.getPath();
-                            if (StringUtils.isNotBlank(stopImgPath)) {
-                                File stopFile = new File(stopImgPath);
-                                if (!stopFile.exists()) {
-                                    String imgPath = getSameNameImgPath(imgMap, stopFile);
-                                    if (StringUtils.isNotBlank(imgPath)) {
-                                        stopImgFile.setPath(imgPath);
-                                    }
-                                }
-                            }
-                        });
-                        updateProgress(j + 1, clickPositionBeansSize);
-                    }
-                }
+                matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
+                return new PMCSLoadResult(pmcListBeans, lastPMCPathRef.get());
             }
         };
     }
-
 
     /**
      * 批量加载 PMC 文件
@@ -167,94 +93,144 @@ public class PMCFileService {
             protected PMCLoadResult call() {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
-                List<ClickPositionVO> clickPositionBeans = new ArrayList<>();
+                List<ClickPositionVO> allClickPositions = new ArrayList<>();
                 Map<String, String> imgMap = new HashMap<>();
-                String lastPMCPath = "";
-                int size = files.size();
-                updateProgress(0, size);
-                for (int i = 0; i < size; i++) {
-                    File file = files.get(i);
-                    if (PMC.equals(getExistsFileType(file))) {
-                        lastPMCPath = file.getPath();
-                        List<ClickPositionVO> clickPositionVOS = loadPMCFile(file);
-                        if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-                            clickPositionBeans.addAll(clickPositionVOS);
-                        }
-                    } else if (file.isDirectory()) {
-                        List<String> filterExtensionList = new ArrayList<>(imageType);
-                        filterExtensionList.add(PMC);
-                        FileConfig fileConfig = new FileConfig()
-                                .setFilterExtensionList(filterExtensionList)
-                                .setShowDirectory(search_fileDirectory())
-                                .setShowHideFile(hide_noHideFile())
-                                .setPath(file.getPath())
-                                .setRecursion(true);
-                        for (File readFile : readAllFiles(fileConfig)) {
-                            if (PMC.equals(getExistsFileType(readFile))) {
-                                lastPMCPath = readFile.getPath();
-                                List<ClickPositionVO> clickPositionVOS = loadPMCFile(readFile);
-                                if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-                                    clickPositionBeans.addAll(clickPositionVOS);
-                                }
-                            } else {
-                                imgMap.put(readFile.getPath(), getExistsFileName(readFile));
-                            }
-                        }
-                    } else if (imageType.contains(getExistsFileType(file))) {
-                        imgMap.put(file.getPath(), getExistsFileName(file));
-                    }
-                    updateProgress(i + 1, size);
-                }
+                AtomicReference<String> lastPMCPathRef = new AtomicReference<>("");
+                // 读取文件
+                loadFilesCommon(
+                        files,
+                        imgMap,
+                        lastPMCPathRef,
+                        (_, clickPositionVOS) ->
+                                allClickPositions.addAll(clickPositionVOS),
+                        this::updateProgress);
                 // 匹配图片
-                matchSameNameImg(imgMap, clickPositionBeans);
+                matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
                 taskBean.getTableView().refresh();
-                return new PMCLoadResult(clickPositionBeans, lastPMCPath);
-            }
 
-            /**
-             * 匹配图片
-             *
-             * @param imgMap 文件夹中用于匹配的图片
-             * @param clickPositionBeans 需要匹配的自动操作步骤
-             */
-            private void matchSameNameImg(Map<String, String> imgMap, List<? extends ClickPositionVO> clickPositionBeans) {
-                if (!imgMap.isEmpty()) {
-                    updateMessage(text_matchImg());
-                    int clickPositionBeansSize = clickPositionBeans.size();
-                    updateProgress(0, clickPositionBeansSize);
-                    // 匹配要点击的图片
-                    for (int j = 0; j < clickPositionBeansSize; j++) {
-                        ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
-                        String clickImgPath = clickPositionVO.getClickImgPath();
-                        if (StringUtils.isNotBlank(clickImgPath)) {
-                            File file = new File(clickImgPath);
-                            if (!file.exists()) {
-                                // 通过文件获取路径可消除不同操作系统的路径分隔符的差异
-                                String imgPath = getSameNameImgPath(imgMap, file);
-                                if (StringUtils.isNotBlank(imgPath)) {
-                                    clickPositionVO.setClickImgPath(imgPath);
-                                }
-                            }
-                        }
-                        // 匹配终止操作图片
-                        List<ImgFileBean> stopImgFiles = clickPositionVO.getStopImgFiles();
-                        stopImgFiles.forEach(stopImgFile -> {
-                            String stopImgPath = stopImgFile.getPath();
-                            if (StringUtils.isNotBlank(stopImgPath)) {
-                                File stopFile = new File(stopImgPath);
-                                if (!stopFile.exists()) {
-                                    String imgPath = getSameNameImgPath(imgMap, stopFile);
-                                    if (StringUtils.isNotBlank(imgPath)) {
-                                        stopImgFile.setPath(imgPath);
-                                    }
-                                }
-                            }
-                        });
-                        updateProgress(j + 1, clickPositionBeansSize);
-                    }
-                }
+                return new PMCLoadResult(allClickPositions, lastPMCPathRef.get());
             }
         };
+    }
+
+    /**
+     * 通用的 PMC 文件读取逻辑
+     *
+     * @param files              文件列表
+     * @param imgMap             图片映射表
+     * @param lastPMCPathRef     最后一个 PMC 文件路径的引用
+     * @param pmcFileProcessor   PMC 文件处理器回调
+     * @param updateProgressFunc 进度更新函数
+     * @return 所有读取到的点击位置列表
+     */
+    private static List<ClickPositionVO> loadFilesCommon(List<? extends File> files,
+                                                         Map<? super String, ? super String> imgMap,
+                                                         AtomicReference<? super String> lastPMCPathRef,
+                                                         BiConsumer<? super File, ? super List<ClickPositionVO>> pmcFileProcessor,
+                                                         ProgressUpdater updateProgressFunc) {
+        List<ClickPositionVO> allClickPositions = new ArrayList<>();
+        int size = files.size();
+        updateProgressFunc.update(0, size);
+        for (int i = 0; i < size; i++) {
+            File file = files.get(i);
+            String fileType = getExistsFileType(file);
+            if (PMC.equals(fileType)) {
+                lastPMCPathRef.set(file.getPath());
+                List<ClickPositionVO> clickPositionVOS = loadPMCFile(file);
+                if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                    allClickPositions.addAll(clickPositionVOS);
+                }
+                // 调用回调处理 PMC 文件
+                if (pmcFileProcessor != null) {
+                    pmcFileProcessor.accept(file, clickPositionVOS);
+                }
+            } else if (file.isDirectory()) {
+                processDirectory(file, imgMap, lastPMCPathRef, allClickPositions, pmcFileProcessor);
+            } else if (imageType.contains(fileType)) {
+                imgMap.put(file.getPath(), getExistsFileName(file));
+            }
+            updateProgressFunc.update(i + 1, size);
+        }
+        return allClickPositions;
+    }
+
+    /**
+     * 处理目录
+     */
+    private static void processDirectory(File directory, Map<? super String, ? super String> imgMap,
+                                         AtomicReference<? super String> lastPMCPathRef,
+                                         List<? super ClickPositionVO> allClickPositions,
+                                         BiConsumer<? super File, ? super List<ClickPositionVO>> pmcFileProcessor) {
+        List<String> filterExtensionList = new ArrayList<>(imageType);
+        filterExtensionList.add(PMC);
+        FileConfig fileConfig = new FileConfig()
+                .setFilterExtensionList(filterExtensionList)
+                .setShowDirectory(search_fileDirectory())
+                .setShowHideFile(hide_noHideFile())
+                .setPath(directory.getPath())
+                .setRecursion(true);
+        for (File readFile : readAllFiles(fileConfig)) {
+            String fileType = getExistsFileType(readFile);
+            if (PMC.equals(fileType)) {
+                lastPMCPathRef.set(readFile.getPath());
+                List<ClickPositionVO> clickPositionVOS = loadPMCFile(readFile);
+                if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                    allClickPositions.addAll(clickPositionVOS);
+                }
+                // 调用回调处理 PMC 文件
+                if (pmcFileProcessor != null) {
+                    pmcFileProcessor.accept(readFile, clickPositionVOS);
+                }
+            } else {
+                imgMap.put(readFile.getPath(), getExistsFileName(readFile));
+            }
+        }
+    }
+
+    /**
+     * 匹配图片
+     *
+     * @param imgMap             文件夹中用于匹配的图片
+     * @param clickPositionBeans 需要匹配的自动操作步骤
+     * @param updateMessageFunc  消息更新函数
+     * @param updateProgressFunc 进度更新函数
+     */
+    private static void matchSameNameImg(Map<String, String> imgMap,
+                                         List<? extends ClickPositionVO> clickPositionBeans,
+                                         MessageUpdater updateMessageFunc, ProgressUpdater updateProgressFunc) {
+        if (!imgMap.isEmpty()) {
+            updateMessageFunc.update(text_matchImg());
+            int clickPositionBeansSize = clickPositionBeans.size();
+            updateProgressFunc.update(0, clickPositionBeansSize);
+            for (int j = 0; j < clickPositionBeansSize; j++) {
+                ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
+                String clickImgPath = clickPositionVO.getClickImgPath();
+                if (StringUtils.isNotBlank(clickImgPath)) {
+                    File file = new File(clickImgPath);
+                    if (!file.exists()) {
+                        String imgPath = getSameNameImgPath(imgMap, file);
+                        if (StringUtils.isNotBlank(imgPath)) {
+                            clickPositionVO.setClickImgPath(imgPath);
+                        }
+                    }
+                }
+                // 匹配终止操作图片
+                List<ImgFileBean> stopImgFiles = clickPositionVO.getStopImgFiles();
+                stopImgFiles.forEach(stopImgFile -> {
+                    String stopImgPath = stopImgFile.getPath();
+                    if (StringUtils.isNotBlank(stopImgPath)) {
+                        File stopFile = new File(stopImgPath);
+                        if (!stopFile.exists()) {
+                            String imgPath = getSameNameImgPath(imgMap, stopFile);
+                            if (StringUtils.isNotBlank(imgPath)) {
+                                stopImgFile.setPath(imgPath);
+                            }
+                        }
+                    }
+                });
+                updateProgressFunc.update(j + 1, clickPositionBeansSize);
+            }
+        }
     }
 
     /**
