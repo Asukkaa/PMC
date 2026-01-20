@@ -56,6 +56,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.Queue.DynamicQueue;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
@@ -77,6 +78,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
+import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -820,9 +822,10 @@ public class AutoClickController extends RootController implements MousePosition
      *
      * @param clickPositionVOS 自动操作流程
      * @param loopTimes        循环次数
+     * @param isBatch          是否为批量执行 PMC 文件（true 批量执行）
      * @throws IOException 配置文件读取异常
      */
-    private void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes) throws IOException {
+    public void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes, boolean isBatch) throws IOException {
         if (isFree()) {
             if (cancelKey == noKeyboard) {
                 throw new RuntimeException(text_noCancelKey());
@@ -832,8 +835,9 @@ public class AutoClickController extends RootController implements MousePosition
             if (clickLogs != null) {
                 clickLogs.clear();
             }
-            updateLabel(log_Click, "");
-            AutoClickTaskBean taskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes);
+            Label logLabel = isBatch ? listPMCController.log_List : log_Click;
+            updateLabel(logLabel, "");
+            AutoClickTaskBean taskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes, isBatch);
             CheckBox hideWindowRun = settingController.hideWindowRun_Set;
             if (hideWindowRun.isSelected()) {
                 mainStage.setIconified(true);
@@ -841,22 +845,29 @@ public class AutoClickController extends RootController implements MousePosition
             // 刷新屏幕参数
             refreshScreenParameters();
             // 开启键盘监听
-            startNativeKeyListener();
-            autoClickTask = autoClick(taskBean, new Robot());
+            startNativeKeyListener(taskBean);
+            if (isBatch) {
+                ObservableList<PMCListBean> pmcListBeans = listPMCController.tableView_List.getItems();
+                autoClickTask = autoClicks(new Robot(), pmcListBeans, taskBean);
+            } else {
+                autoClickTask = autoClick(taskBean, new Robot(), new DynamicQueue<>());
+            }
             // 绑定带进度条的线程
             bindingTaskNode(autoClickTask, taskBean, true);
             setTaskEvent(taskBean);
             if (runTimeline == null) {
+                TextField preparationRunTime = isBatch ?
+                        listPMCController.preparationRunTime_List : preparationRunTime_Click;
                 // 获取准备时间值
-                int preparation = setDefaultIntValue(preparationRunTime_Click,
+                int preparation = setDefaultIntValue(preparationRunTime,
                         Integer.parseInt(defaultPreparationRun), 0, null);
                 // 设置浮窗文本显示准备时间
                 String text = text_cancelTask() + preparation + text_run();
                 updateMassageLabel(massageFloating, text);
-                log_Click.setText(text);
+                logLabel.setText(text);
                 showFloatingWindow(true);
                 // 延时执行任务
-                runTimeline = executeRunTimeLine(preparation);
+                runTimeline = executeRunTimeLine(preparation, isBatch);
             }
         }
     }
@@ -873,8 +884,9 @@ public class AutoClickController extends RootController implements MousePosition
                 taskNotSuccess(taskBean, text_taskFailed());
             } else {
                 taskUnbind(taskBean);
-                log_Click.setTextFill(Color.GREEN);
-                log_Click.setText(text_taskFinished());
+                Label logLabel = taskBean.getMassageLabel();
+                logLabel.setTextFill(Color.GREEN);
+                logLabel.setText(text_taskFinished());
                 CheckBox showWindowRun = settingController.showWindowRun_Set;
                 if (showWindowRun.isSelected()) {
                     if (mainStage.isIconified()) {
@@ -933,8 +945,9 @@ public class AutoClickController extends RootController implements MousePosition
      *
      * @param clickPositionVOS 自动操作流程
      * @param loopTimes        循环次数
+     * @param isBatch          是否为批量执行 PMC 文件（true 批量执行）
      */
-    private AutoClickTaskBean buildAutoClickTaskBean(List<ClickPositionVO> clickPositionVOS, int loopTimes) {
+    private AutoClickTaskBean buildAutoClickTaskBean(List<ClickPositionVO> clickPositionVOS, int loopTimes, boolean isBatch) {
         TextField retrySecond = settingController.retrySecond_Set;
         TextField maxLogNum = settingController.maxLogNum_Set;
         TextField overTime = settingController.overtime_Set;
@@ -969,11 +982,11 @@ public class AutoClickController extends RootController implements MousePosition
                 .setWaitLog(waitLog.isSelected())
                 .setRunTimeline(runTimeline)
                 .setLoopTimes(loopTimes)
-                .setProgressBar(progressBar_Click)
-                .setBindingMassageLabel(false)
-                .setDisableNodes(disableNodes)
+                .setProgressBar(isBatch ? listPMCController.progressBar_List : progressBar_Click)
+                .setDisableNodes(isBatch ? listPMCController.disableNodes : disableNodes)
+                .setMassageLabel(isBatch ? listPMCController.log_List : log_Click)
                 .setBeanList(clickPositionVOS)
-                .setMassageLabel(log_Click);
+                .setBindingMassageLabel(false);
         return taskBean;
     }
 
@@ -981,9 +994,10 @@ public class AutoClickController extends RootController implements MousePosition
      * 延时执行任务
      *
      * @param preparation 准备时间
+     * @param isBatch     是否为批量执行 PMC 文件（true 批量执行）
      * @return runTimeline 运行时间线
      */
-    private Timeline executeRunTimeLine(int preparation) {
+    private Timeline executeRunTimeLine(int preparation, boolean isBatch) {
         if (preparation == 0) {
             if (!autoClickTask.isRunning()) {
                 // 使用新线程启动
@@ -1000,7 +1014,8 @@ public class AutoClickController extends RootController implements MousePosition
             if (preparationTime.get() > 0) {
                 String text = text_cancelTask() + preparationTime + text_run();
                 updateMassageLabel(massageFloating, text);
-                log_Click.setText(text);
+                Label logLabel = isBatch ? listPMCController.log_List : log_Click;
+                logLabel.setText(text);
             } else {
                 // 停止 Timeline
                 finalTimeline.stop();
@@ -1077,7 +1092,7 @@ public class AutoClickController extends RootController implements MousePosition
             List<ClickPositionVO> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
                 try {
-                    launchClickTask(selectedItem, 1);
+                    launchClickTask(selectedItem, 1, false);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -1420,7 +1435,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 开启全局键盘监听
      */
-    private void startNativeKeyListener() {
+    private void startNativeKeyListener(AutoClickTaskBean taskBean) {
         removeNativeListener(nativeKeyListener);
         // 键盘监听器
         nativeKeyListener = new NativeKeyListener() {
@@ -1434,7 +1449,7 @@ public class AutoClickController extends RootController implements MousePosition
                         keyCode = (keyCode == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : keyCode;
                         // 检测快捷键 esc
                         if (keyCode == cancelKey && !isRobotInput) {
-                            stopAllWork();
+                            stopAllWork(taskBean);
                         }
                     }
                 });
@@ -1446,7 +1461,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 停止所有任务
      */
-    private void stopAllWork() {
+    private void stopAllWork(AutoClickTaskBean taskBean) {
         if (listener != null) {
             listener.stopRecording();
         }
@@ -1466,9 +1481,11 @@ public class AutoClickController extends RootController implements MousePosition
             runTimeline.stop();
             runTimeline = null;
             autoClickTask = null;
-            AutoClickTaskBean taskBean = new AutoClickTaskBean();
-            taskBean.setProgressBar(progressBar_Click)
-                    .setMassageLabel(log_Click);
+            if (taskBean == null) {
+                taskBean = new AutoClickTaskBean();
+                taskBean.setProgressBar(progressBar_Click)
+                        .setMassageLabel(log_Click);
+            }
             taskNotSuccess(taskBean, text_taskCancelled());
         }
         // 改变要防重复点击的组件状态
@@ -1599,7 +1616,7 @@ public class AutoClickController extends RootController implements MousePosition
              */
             @Override
             public void stopWorkAll() {
-                stopAllWork();
+                stopAllWork(null);
             }
 
             /**
@@ -1875,7 +1892,7 @@ public class AutoClickController extends RootController implements MousePosition
                 mainStage.setIconified(true);
             }
             // 开启键盘监听
-            startNativeKeyListener();
+            startNativeKeyListener(null);
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparationTimeValue + text_preparation());
@@ -2165,8 +2182,9 @@ public class AutoClickController extends RootController implements MousePosition
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new RuntimeException(text_noAutoClickToRun());
         }
+        int loopTimes = setDefaultIntValue(loopTime_Click, 1, 0, null);
         // 启动自动操作流程
-        launchClickTask(tableViewItems, setDefaultIntValue(loopTime_Click, 1, 0, null));
+        launchClickTask(tableViewItems, loopTimes, false);
     }
 
     /**

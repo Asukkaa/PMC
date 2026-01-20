@@ -50,6 +50,13 @@ import static priv.koishi.pmc.Utils.UiUtils.creatConfirmDialog;
  */
 public class PMCFileService {
 
+    /**
+     * 批量加载 PMC 文件（批量运行多个文件）
+     *
+     * @param taskBean 线程任务参数
+     * @param files    文件列表
+     * @return PMC 文件列表
+     */
     public static Task<PMCSLoadResult> loadPMCSFils(TaskBean<PMCListBean> taskBean, List<? extends File> files) {
         return new Task<>() {
             @Override
@@ -80,11 +87,11 @@ public class PMCFileService {
     }
 
     /**
-     * 批量加载 PMC 文件
+     * 批量加载 PMC 文件（合并多个文件到一个流程）
      *
      * @param taskBean 线程任务参数
      * @param files    文件列表
-     * @return PMC 文件列表
+     * @return PMC 操作列表
      */
     public static Task<PMCLoadResult> loadPMCFils(TaskBean<ClickPositionVO> taskBean, List<? extends File> files) {
         return new Task<>() {
@@ -106,17 +113,16 @@ public class PMCFileService {
                 // 匹配图片
                 matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
                 taskBean.getTableView().refresh();
-
                 return new PMCLoadResult(allClickPositions, lastPMCPathRef[0]);
             }
         };
     }
 
     /**
-     * 通用的 PMC 文件读取逻辑
+     * 通用 PMC 文件读取逻辑
      *
      * @param files              文件列表
-     * @param imgMap             图片映射表
+     * @param imgMap             图片映射表（图片路径与名称映射）
      * @param lastPMCPathRef     最后一个 PMC 文件路径的引用
      * @param pmcFileProcessor   PMC 文件处理器回调
      * @param updateProgressFunc 进度更新函数
@@ -154,6 +160,11 @@ public class PMCFileService {
 
     /**
      * 处理目录
+     *
+     * @param directory         要处理的目录
+     * @param imgMap            图片映射表（图片路径与名称映射）
+     * @param allClickPositions 完整的操作流程列表
+     * @param pmcFileProcessor  PMC 文件处理器回调
      */
     private static void processDirectory(File directory, Map<? super String, ? super String> imgMap,
                                          String[] lastPMCPathRef, List<? super ClickPositionVO> allClickPositions,

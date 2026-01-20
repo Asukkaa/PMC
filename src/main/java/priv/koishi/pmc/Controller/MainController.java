@@ -51,6 +51,8 @@ public class MainController extends RootController {
      */
     public static TimedTaskController timedTaskController;
 
+    public static ListPMCController listPMCController;
+
     @FXML
     public TabPane tabPane;
 
@@ -69,6 +71,7 @@ public class MainController extends RootController {
             settingController = getController(SettingController.class);
             autoClickController = getController(AutoClickController.class);
             timedTaskController = getController(TimedTaskController.class);
+            listPMCController = getController(ListPMCController.class);
             setupTabDragging();
         });
     }

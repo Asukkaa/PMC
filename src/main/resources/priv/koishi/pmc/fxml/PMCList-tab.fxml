@@ -37,17 +37,21 @@
         </HBox>
 
         <HBox spacing="10">
-            <Label text="%autoClick.preparationRunTime"/>
-            <TextField fx:id="preparationRunTime_List" prefWidth="50"/>
-            <Label text="%unit.s"/>
-            <Button fx:id="runClick_List" onAction="#runClick" text="%autoClick.runClick_Click"
-                    styleClass="cornflowerblue-button"/>
+            <HBox prefWidth="500" spacing="10">
+                <Label text="%autoClick.preparationRunTime"/>
+                <TextField fx:id="preparationRunTime_List" prefWidth="50"/>
+                <Label text="%unit.s"/>
+                <Button fx:id="runClick_List" onAction="#runClick" text="%autoClick.runClick_Click"
+                        styleClass="cornflowerblue-button"/>
+            </HBox>
 
-            <Label text="%autoClick.loopTime"/>
-            <TextField fx:id="loopTime_List" prefWidth="80"/>
-            <Label text="%unit.times"/>
+            <HBox prefWidth="500" spacing="10">
+                <Label text="%autoClick.loopTime"/>
+                <TextField fx:id="loopTime_List" prefWidth="80"/>
+                <Label text="%unit.times"/>
 
-            <Button fx:id="clickLog_List" onAction="#clickLog" text="%autoClick.clickLog_Click"/>
+                <Button fx:id="clickLog_List" onAction="#clickLog" text="%autoClick.clickLog_Click"/>
+            </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="dataNumber_List" text="%listText.null"/>

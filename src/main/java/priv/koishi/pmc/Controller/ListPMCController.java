@@ -1,9 +1,8 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,7 +28,6 @@ import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;
@@ -46,14 +44,13 @@ import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
-import static priv.koishi.pmc.Controller.SettingController.massageFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.PMCFileService.loadPMCSFils;
-import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
@@ -98,19 +95,9 @@ public class ListPMCController extends RootController {
     public final List<Node> disableNodes = new ArrayList<>();
 
     /**
-     * 自动点击任务
-     */
-    public Task<List<ClickLogBean>> autoClickTask;
-
-    /**
      * 批量导入 PMC 文件任务
      */
     public Task<PMCSLoadResult> loadPMCFilsTask;
-
-    /**
-     * 导入 PMC 文件任务
-     */
-    public Task<List<ClickPositionVO>> loadedPMCTask;
 
     /**
      * 导出 PMC 文件任务
@@ -121,11 +108,6 @@ public class ListPMCController extends RootController {
      * 页面标识符
      */
     private final String tabId = "_List";
-
-    /**
-     * 录制信息字体颜色绑定
-     */
-    public static final ObjectProperty<Color> recordTextColorProperty = new SimpleObjectProperty<>(Color.BLUE);
 
     @FXML
     public AnchorPane anchorPane_List;
@@ -382,18 +364,6 @@ public class ListPMCController extends RootController {
     }
 
     /**
-     * 更新记录信息
-     *
-     * @param log 记录信息
-     */
-    private void updateLog(String log) {
-        log_List.textFillProperty().unbind();
-        log_List.textFillProperty().bind(recordTextColorProperty);
-        log_List.setText(log);
-        updateMassageLabel(massageFloating, log);
-    }
-
-    /**
      * 启动加载自动操作文件任务
      *
      * @param files 要加载的文件
@@ -487,6 +457,8 @@ public class ListPMCController extends RootController {
             setToolTip();
             // 设置文本输入框提示
             setPromptText();
+            // 设置快捷键提示
+            setShortcutText();
             // 设置要防重复点击的组件
             setDisableNodes();
             // 给输入框添加内容变化监听
@@ -519,8 +491,13 @@ public class ListPMCController extends RootController {
      *
      */
     @FXML
-    public void runClick() {
-
+    public void runClick() throws IOException {
+        ObservableList<PMCListBean> tableViewItems = tableView_List.getItems();
+        if (CollectionUtils.isEmpty(tableViewItems)) {
+            throw new RuntimeException(text_noAutoClickToRun());
+        }
+        int loopTimes = setDefaultIntValue(loopTime_List, 1, 0, null);
+        autoClickController.launchClickTask(null, loopTimes, true);
     }
 
     /**

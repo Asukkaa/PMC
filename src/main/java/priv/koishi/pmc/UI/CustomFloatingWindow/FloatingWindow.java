@@ -119,7 +119,7 @@ public class FloatingWindow {
         vBox.setAlignment(config.getPos());
         vBox.getChildren().addAll(floatingPosition, massageLabel, nameLabel);
         root.getChildren().addAll(rectangle, vBox);
-        StackPane.setMargin(vBox, new Insets(15, 15, 15, 15));
+        StackPane.setMargin(vBox, new Insets(15, 15, 0, 15));
         // 创建浮窗舞台
         Stage stage = new Stage();
         Scene scene = new Scene(root, Color.TRANSPARENT);
