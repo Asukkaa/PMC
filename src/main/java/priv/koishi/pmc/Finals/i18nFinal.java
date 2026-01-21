@@ -2022,6 +2022,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return 子任务未完成
+     */
+    public static String text_subTaskNoFinished() {
+        return bundle.getString("subTaskNoFinished");
+    }
+
+    /**
+     * @return PMC 文件执行失败:
+     */
+    public static String text_subTaskFailed() {
+        return bundle.getString("subTaskFailed");
+    }
+
+    /**
+     * @return 正在校验 PMC 文件：
+     */
+    public static String text_checkPMCFile() {
+        return bundle.getString("checkPMCFile");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

@@ -360,7 +360,7 @@ public class PMCFileService {
      *
      * @param jsonFile 要解析的文件
      */
-    private static List<ClickPositionVO> loadPMCFile(File jsonFile) {
+    public static List<ClickPositionVO> loadPMCFile(File jsonFile) {
         // 配置忽略未知字段
         ObjectMapper objectMapper = JsonMapper.builder()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

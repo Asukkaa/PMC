@@ -36,6 +36,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
+import static priv.koishi.pmc.Service.PMCFileService.loadPMCFile;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMessageLabel;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
@@ -97,11 +98,19 @@ public class AutoClickService {
         return new Task<>() {
             @Override
             protected List<ClickLogBean> call() throws Exception {
-                if (CollectionUtils.isEmpty(pmcListBeans)) {
-                    return new ArrayList<>();
-                }
                 int totalPMCs = pmcListBeans.size();
                 updateProgress(0, totalPMCs);
+                for (int i = 0; i < totalPMCs; i++) {
+                    PMCListBean pmcListBean = pmcListBeans.get(i);
+                    String path = pmcListBean.getPath();
+                    String text = text_checkPMCFile() +
+                            "\n" + text_fileName() + pmcListBean.getName() +
+                            "\n" + text_filePath() + path;
+                    updateMessage(text);
+                    updateProgress(i + 1, totalPMCs);
+                    List<ClickPositionVO> clickPositionVOS = loadPMCFile(new File(path));
+                    pmcListBean.setClickPositionVOS(clickPositionVOS);
+                }
                 clickLog = new DynamicQueue<>();
                 int maxLogNum = baseTaskBean.getMaxLogNum();
                 if (maxLogNum > 0) {
@@ -124,7 +133,7 @@ public class AutoClickService {
                             String loopTimeText = text_cancelTask() + text_execution() + loopCount + " / ∞" + text_executionTime();
                             updateMessage(loopTimeText);
                             // 执行当前批次
-                            if (executeBatch(pmcListBeans, executor, totalPMCs, baseTaskBean, 0, loopCount, loopTimeText)) {
+                            if (executeBatch(pmcListBeans, executor, baseTaskBean, 0, loopTimeText)) {
                                 break;
                             }
                         }
@@ -135,7 +144,7 @@ public class AutoClickService {
                                     overallLoopTimes + text_executionTime();
                             updateMessage(loopTimeText);
                             // 执行当前批次
-                            if (executeBatch(pmcListBeans, executor, totalPMCs, baseTaskBean, loop, overallLoopTimes, loopTimeText)) {
+                            if (executeBatch(pmcListBeans, executor, baseTaskBean, loop, loopTimeText)) {
                                 break;
                             }
                         }
@@ -150,22 +159,21 @@ public class AutoClickService {
              *
              * @param pmcListBeans 需要批量运行的 PMC 文件列表
              * @param executor     线程执行器
-             * @param totalPMCs    总 PMC 文件数
              * @param baseTaskBean 任务参数
              * @param currentLoop  当前批次索引
-             * @param totalLoops   当前文件重复次数
              * @param loopText     当前循环信息
              */
             private boolean executeBatch(List<? extends PMCListBean> pmcListBeans, ExecutorService executor,
-                                         int totalPMCs, AutoClickTaskBean baseTaskBean, int currentLoop,
-                                         int totalLoops, String loopText) throws Exception {
+                                         AutoClickTaskBean baseTaskBean, int currentLoop, String loopText) throws Exception {
+                int totalPMCs = pmcListBeans.size();
+                updateProgress(0, totalPMCs);
                 for (int i = 0; i < totalPMCs; i++) {
                     if (isCancelled()) {
                         return true;
                     }
                     PMCListBean pmc = pmcListBeans.get(i);
                     String text = loopText +
-                            text_progress() + i + 1 + " / " + pmc.getClickPositionVOS().size() +
+                            text_progress() + i + 1 + " / " + totalPMCs +
                             text_willBe() + pmc.getWaitTime() + text_msWillBe() + pmc.getName();
                     updateMessage(text);
                     // 执行前等待
@@ -191,7 +199,9 @@ public class AutoClickService {
                         }
                         subTaskBean.setBeanList(pmc.getClickPositionVOS());
                         // 只有在整体第一次循环的第一个任务才需要点击起始坐标
-                        subTaskBean.setFirstClick(currentLoop == 0 && i == 0);
+                        if (baseTaskBean.isFirstClick()) {
+                            subTaskBean.setFirstClick(currentLoop == 0 && i == 0);
+                        }
                         // 创建子任务
                         Task<List<ClickLogBean>> subTask = autoClick(subTaskBean, robot, clickLog);
                         // 使用 CountDownLatch 等待子任务完成
@@ -223,12 +233,12 @@ public class AutoClickService {
                             throw taskException.get();
                         }
                         if (!taskSuccess.get()) {
-                            throw new RuntimeException("子任务执行未完成");
+                            throw new RuntimeException(text_subTaskNoFinished());
                         }
                     } catch (Exception e) {
-                        throw new RuntimeException("PMC 文件执行失败: " + pmc.getPath(), e);
+                        throw new RuntimeException(text_subTaskFailed() + pmc.getPath(), e);
                     }
-                    updateProgress((long) currentLoop * totalPMCs + i + 1, (long) totalLoops * totalPMCs);
+                    updateProgress(i + 1, totalPMCs);
                 }
                 return false;
             }
