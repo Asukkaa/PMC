@@ -15,6 +15,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
@@ -646,7 +647,7 @@ public class TableViewUtils {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildFilePathItem(TableView<ImgFileVO> tableView, ContextMenu contextMenu) {
+    public static void buildFilePathItem(TableView<? extends FilePath> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu(menu_viewFile());
         // 创建二级菜单项
         MenuItem openFile = new MenuItem(menuItem_openSelected());
@@ -666,8 +667,8 @@ public class TableViewUtils {
      *
      * @param tableView 文件列表
      */
-    private static void openFileMenuItem(TableView<ImgFileVO> tableView) {
-        List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
+    private static void openFileMenuItem(TableView<? extends FilePath> tableView) {
+        List<? extends FilePath> fileBeans = tableView.getSelectionModel().getSelectedItems();
         fileBeans.forEach(fileBean -> openFile(fileBean.getPath()));
     }
 
@@ -676,9 +677,9 @@ public class TableViewUtils {
      *
      * @param tableView 要添加右键菜单的列表
      */
-    private static void openDirectorMenuItem(TableView<ImgFileVO> tableView) {
-        List<ImgFileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
-        List<String> pathList = fileBeans.stream().map(ImgFileVO::getPath).distinct().toList();
+    private static void openDirectorMenuItem(TableView<? extends FilePath> tableView) {
+        List<? extends FilePath> fileBeans = tableView.getSelectionModel().getSelectedItems();
+        List<String> pathList = fileBeans.stream().map(FilePath::getPath).distinct().toList();
         pathList.forEach(FileUtils::openDirectory);
     }
 
@@ -687,8 +688,8 @@ public class TableViewUtils {
      *
      * @param tableView 要添加右键菜单的列表
      */
-    private static void copyFilePathItem(TableView<? extends ImgFileVO> tableView) {
-        ImgFileVO fileBean = tableView.getSelectionModel().getSelectedItem();
+    private static void copyFilePathItem(TableView<? extends FilePath> tableView) {
+        FilePath fileBean = tableView.getSelectionModel().getSelectedItem();
         copyText(fileBean.getPath());
     }
 

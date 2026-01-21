@@ -77,7 +77,7 @@ public class ListPMCController extends RootController {
     /**
      * 操作记录
      */
-    private List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
+    private final List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
 
     /**
      * 记录页高度
@@ -278,20 +278,58 @@ public class ListPMCController extends RootController {
     }
 
     /**
-     * 显示详情页
-     */
-    private void showDetail() {
-
-    }
-
-    /**
      * 构建右键菜单
      */
     private void buildContextMenu() {
         // 添加列表右键菜单
         ContextMenu tableMenu = new ContextMenu();
+        // 查看详情选项
+        buildDetailMenuItem(tableMenu);
+        // 将所选项全部添加到操作列表
+        buildAddAllMenuItem(tableMenu);
+        // 移动数据选项
+        buildMoveDataMenu(tableView_List, tableMenu);
+        // 查看文件选项
+        buildFilePathItem(tableView_List, tableMenu);
+        // 取消选中选项
+        buildClearSelectedData(tableView_List, tableMenu);
+        // 删除所选数据选项
+        buildDeleteDataMenuItem(tableView_List, dataNumber_List, tableMenu, unit_files());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(tableMenu, tableView_List);
+    }
+
+    /**
+     * 查看所选项第一行详情选项
+     *
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildDetailMenuItem(ContextMenu contextMenu) {
+        MenuItem detailItem = new MenuItem(menu_detailMenu());
+        detailItem.setOnAction(_ -> {
+            PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
+            if (selected != null) {
+                autoClickController.startLoadPMCTask(List.of(new File(selected.getPath())), true);
+            }
+        });
+        contextMenu.getItems().add(detailItem);
+    }
+
+    /**
+     * 将所选项全部添加到操作列表选项
+     *
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildAddAllMenuItem(ContextMenu contextMenu) {
+        MenuItem addAllItem = new MenuItem(menu_addAllMenu());
+        addAllItem.setOnAction(_ -> {
+            List<PMCListBean> selected = tableView_List.getSelectionModel().getSelectedItems();
+            if (CollectionUtils.isNotEmpty(selected)) {
+                List<File> files = selected.stream().map(PMCListBean::getPath).map(File::new).toList();
+                autoClickController.startLoadPMCTask(files, false);
+            }
+        });
+        contextMenu.getItems().add(addAllItem);
     }
 
     /**
@@ -358,7 +396,7 @@ public class ListPMCController extends RootController {
      */
     public void addAutoClickPositions(List<? extends PMCListBean> clickPositionVOS, String filePath) {
         // 向列表添加数据
-        addData(clickPositionVOS, append, tableView_List, dataNumber_List, unit_process());
+        addData(clickPositionVOS, append, tableView_List, dataNumber_List, unit_files());
         updateLabel(log_List, text_loadSuccess() + filePath);
         Platform.runLater(() -> log_List.setTextFill(Color.GREEN));
     }

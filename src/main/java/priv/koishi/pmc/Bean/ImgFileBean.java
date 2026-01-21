@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Interface.FilePath;
 
 /**
  * 图片文件信息类
@@ -14,7 +15,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class ImgFileBean {
+public class ImgFileBean implements FilePath {
 
     /**
      * 文件名称

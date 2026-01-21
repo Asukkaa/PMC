@@ -2,6 +2,7 @@ package priv.koishi.pmc.Bean;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Interface.FilePath;
 
 /**
  * @author KOISHI
@@ -10,7 +11,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class FileBean {
+public class FileBean implements FilePath {
 
     /**
      * 文件列表展示名称

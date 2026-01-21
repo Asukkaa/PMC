@@ -1581,13 +1581,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 个文件
-     */
-    public static String text_file() {
-        return bundle.getString("file");
-    }
-
-    /**
      * @return 隐藏
      */
     public static String text_hidden() {
@@ -2040,6 +2033,20 @@ public class i18nFinal {
      */
     public static String text_checkPMCFile() {
         return bundle.getString("checkPMCFile");
+    }
+
+    /**
+     * @return 操作列表已存在操作流程
+     */
+    public static String text_listNotNull() {
+        return bundle.getString("listNotNull");
+    }
+
+    /**
+     * @return 是否清空操作列表并导入所选流程？
+     */
+    public static String text_isClearList() {
+        return bundle.getString("isClearList");
     }
 
     /**
@@ -2631,6 +2638,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 将所选项全部添加到操作列表
+     */
+    public static String menu_addAllMenu() {
+        return bundle.getString("menu.addAllDateMenu");
+    }
+
+    /**
      * @return 按下
      */
     public static String log_press() {
@@ -2796,6 +2810,13 @@ public class i18nFinal {
      */
     public static String unit_times() {
         return bundle.getString("unit.times");
+    }
+
+    /**
+     * @return 个文件
+     */
+    public static String unit_files() {
+        return bundle.getString("unit.files");
     }
 
     /**

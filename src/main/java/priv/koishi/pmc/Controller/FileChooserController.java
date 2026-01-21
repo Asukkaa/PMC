@@ -24,10 +24,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FileConfig;
+import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Callback.FileChooserCallback;
-import priv.koishi.pmc.Utils.FileUtils;
 import priv.koishi.pmc.Utils.UiUtils;
 
 import java.io.File;
@@ -220,7 +220,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
                 }
                 // 获取所选文件路径
                 setPathLabel(filePath_FC, selectedPath);
-                updateTableViewSizeText(tableView_FC, fileNumber_FC, text_file());
+                updateTableViewSizeText(tableView_FC, fileNumber_FC, unit_files());
             });
             if (!readAllFilesTask.isRunning()) {
                 Thread.ofVirtual()
@@ -324,7 +324,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
      *
      * @param fileVO 列表数据
      */
-    private void handleFileDoubleClick(FileVO fileVO) {
+    private void handleFileDoubleClick(FilePath fileVO) {
         if (fileVO != null) {
             // 双击文件夹时进入下级目录
             if (new File(fileVO.getPath()).isDirectory()) {
@@ -351,63 +351,11 @@ public class FileChooserController extends ManuallyChangeThemeController {
     }
 
     /**
-     * 查看文件选项
-     *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     */
-    public static void buildFilePathItem(TableView<FileVO> tableView, ContextMenu contextMenu) {
-        Menu menu = new Menu(menu_viewFile());
-        // 创建二级菜单项
-        MenuItem openFile = new MenuItem(menuItem_openSelected());
-        MenuItem openDirector = new MenuItem(menuItem_openDirectory());
-        MenuItem copyFilePath = new MenuItem(menuItem_copyFilePath());
-        // 为每个菜单项添加事件处理
-        openFile.setOnAction(_ -> openFileMenuItem(tableView));
-        openDirector.setOnAction(_ -> openDirectorMenuItem(tableView));
-        copyFilePath.setOnAction(_ -> copyFilePathItem(tableView));
-        // 将菜单添加到菜单列表
-        menu.getItems().addAll(openFile, openDirector, copyFilePath);
-        contextMenu.getItems().add(menu);
-    }
-
-    /**
-     * 打开所选文件选项
-     *
-     * @param tableView 文件列表
-     */
-    private static void openFileMenuItem(TableView<FileVO> tableView) {
-        List<FileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
-        fileBeans.forEach(fileBean -> openFile(fileBean.getPath()));
-    }
-
-    /**
-     * 打开所选文件所在文件夹选项
-     *
-     * @param tableView 要添加右键菜单的列表
-     */
-    private static void openDirectorMenuItem(TableView<FileVO> tableView) {
-        List<FileVO> fileBeans = tableView.getSelectionModel().getSelectedItems();
-        List<String> pathList = fileBeans.stream().map(FileVO::getPath).distinct().toList();
-        pathList.forEach(FileUtils::openDirectory);
-    }
-
-    /**
-     * 复制文件路径选项
-     *
-     * @param tableView 要添加右键菜单的列表
-     */
-    private static void copyFilePathItem(TableView<? extends FileVO> tableView) {
-        FileVO fileBean = tableView.getSelectionModel().getSelectedItem();
-        copyText(fileBean.getPath());
-    }
-
-    /**
      * 构建右键菜单
      *
      * @param tableView 要添加右键菜单的列表
      */
-    public void tableViewContextMenu(TableView<FileVO> tableView) {
+    public void tableViewContextMenu(TableView<? extends FilePath> tableView) {
         // 添加右键菜单
         ContextMenu contextMenu = new ContextMenu();
         // 查询所选文件选项
@@ -426,10 +374,10 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单
      */
-    private void buildSelectPathItem(TableView<? extends FileVO> tableView, ContextMenu contextMenu) {
+    private void buildSelectPathItem(TableView<? extends FilePath> tableView, ContextMenu contextMenu) {
         MenuItem selectPathItem = new MenuItem(text_checkFirstFile());
         selectPathItem.setOnAction(_ -> {
-            FileVO selectedItem = tableView.getSelectionModel().getSelectedItems().getFirst();
+            FilePath selectedItem = tableView.getSelectionModel().getSelectedItems().getFirst();
             handleFileDoubleClick(selectedItem);
         });
         contextMenu.getItems().add(selectPathItem);

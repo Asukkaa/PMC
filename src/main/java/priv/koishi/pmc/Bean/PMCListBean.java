@@ -2,6 +2,7 @@ package priv.koishi.pmc.Bean;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class PMCListBean implements Indexable {
+public class PMCListBean implements Indexable, FilePath {
 
     /**
      * 序号
