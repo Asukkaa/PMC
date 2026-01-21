@@ -190,8 +190,8 @@ public class TimedTaskController extends RootController {
         TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Task)
                 .setDisableNodes(disableNodes)
-                .setBindingMassageLabel(true)
-                .setMassageLabel(log_Task);
+                .setBindingMessageLabel(true)
+                .setMessageLabel(log_Task);
         Task<List<TimedTaskBean>> task = getTaskDetailsTask();
         bindingTaskNode(task, taskBean);
         task.setOnSucceeded(_ -> {

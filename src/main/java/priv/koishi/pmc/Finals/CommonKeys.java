@@ -41,13 +41,13 @@ public class CommonKeys {
 
     public static final String key_logHeight = "logHeight";
 
-    public static final String key_massageX = "massageX";
+    public static final String key_messageX = "messageX";
 
-    public static final String key_massageY = "massageY";
+    public static final String key_messageY = "messageY";
 
-    public static final String key_massageWidth = "massageWidth";
+    public static final String key_messageWidth = "messageWidth";
 
-    public static final String key_massageHeight = "massageHeight";
+    public static final String key_messageHeight = "messageHeight";
 
     public static final String key_stopX = "stopX";
 

@@ -588,7 +588,7 @@ public class CommonFinals {
     /**
      * 更新窗口信息消息气泡显示事件（单位：秒）
      */
-    public static final int updateListMassageTime = 2;
+    public static final int updateListMessageTime = 2;
 
     /**
      * 无键盘按键

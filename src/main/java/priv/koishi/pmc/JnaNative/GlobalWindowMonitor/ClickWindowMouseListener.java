@@ -5,7 +5,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMessageLabel;
 
 /**
  * 记录焦点窗口鼠标点击监听器
@@ -19,7 +19,7 @@ public class ClickWindowMouseListener implements NativeMouseListener {
     /**
      * 信息浮窗
      */
-    private final FloatingWindowDescriptor massageFloating;
+    private final FloatingWindowDescriptor messageFloating;
 
     /**
      * 是否正在处理事件（true 正在获取窗口信息）
@@ -34,11 +34,11 @@ public class ClickWindowMouseListener implements NativeMouseListener {
     /**
      * 构造函数
      *
-     * @param massageFloating 信息浮窗
+     * @param messageFloating 信息浮窗
      * @param windowMonitor   关联的窗口监视器
      */
-    public ClickWindowMouseListener(FloatingWindowDescriptor massageFloating, WindowMonitor windowMonitor) {
-        this.massageFloating = massageFloating;
+    public ClickWindowMouseListener(FloatingWindowDescriptor messageFloating, WindowMonitor windowMonitor) {
+        this.messageFloating = messageFloating;
         this.windowMonitor = windowMonitor;
     }
 
@@ -52,8 +52,8 @@ public class ClickWindowMouseListener implements NativeMouseListener {
         if (processingEvent) {
             return;
         }
-        if (massageFloating != null) {
-            updateMassageLabel(massageFloating, findImgSet_released());
+        if (messageFloating != null) {
+            updateMessageLabel(messageFloating, findImgSet_released());
         }
     }
 
@@ -68,16 +68,16 @@ public class ClickWindowMouseListener implements NativeMouseListener {
             return;
         }
         try {
-            if (massageFloating != null) {
+            if (messageFloating != null) {
                 processingEvent = true;
-                updateMassageLabel(massageFloating, findImgSet_finding());
+                updateMessageLabel(messageFloating, findImgSet_finding());
                 WindowInfo windowInfo = windowMonitor.getFocusWindowInfo();
                 if (windowInfo != null) {
                     windowMonitor.setWindowInfo(windowInfo);
                     windowMonitor.showWindowInfo();
-                    updateMassageLabel(massageFloating, findImgSet_getInfo() + windowInfo.getProcessName());
+                    updateMessageLabel(messageFloating, findImgSet_getInfo() + windowInfo.getProcessName());
                 } else {
-                    updateMassageLabel(massageFloating, findImgSet_notFind());
+                    updateMessageLabel(messageFloating, findImgSet_notFind());
                 }
             }
         } finally {

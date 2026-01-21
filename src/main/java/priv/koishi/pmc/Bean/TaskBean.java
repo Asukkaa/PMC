@@ -38,7 +38,7 @@ public class TaskBean<T> {
     /**
      * 线程信息栏
      */
-    Label massageLabel;
+    Label messageLabel;
 
     /**
      * 页面标识符
@@ -53,6 +53,6 @@ public class TaskBean<T> {
     /**
      * 是否绑定线程信息栏（true 绑定，false 不绑定）
      */
-    boolean bindingMassageLabel = true;
+    boolean bindingMessageLabel = true;
 
 }

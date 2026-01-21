@@ -59,7 +59,7 @@ public class FloatingWindowDescriptor {
     /**
      * 信窗信息展示栏
      */
-    Label massageLabel;
+    Label messageLabel;
 
     /**
      * 浮窗坐标展示栏
@@ -84,7 +84,7 @@ public class FloatingWindowDescriptor {
     /**
      * 信窗信息展示栏文本
      */
-    String massage;
+    String message;
 
     /**
      * 显示浮窗按钮文本

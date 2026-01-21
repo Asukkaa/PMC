@@ -34,7 +34,7 @@ import java.util.Properties;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_noCancelKey;
-import static priv.koishi.pmc.Finals.i18nFinal.tip_massageRegion;
+import static priv.koishi.pmc.Finals.i18nFinal.tip_messageRegion;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.updateRelativeInfo;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
@@ -101,13 +101,13 @@ public class FloatingWindow {
         floatingPosition.setTextAlignment(textAlignment);
         floatingPosition.setMaxWidth(270);
         config.setFloatingPosition(floatingPosition);
-        Label massageLabel = new Label(config.getMassage());
-        massageLabel.setTextFill(color);
-        massageLabel.setStyle(fontSize);
-        massageLabel.setTextAlignment(textAlignment);
-        massageLabel.setMaxWidth(270);
+        Label messageLabel = new Label(config.getMessage());
+        messageLabel.setTextFill(color);
+        messageLabel.setStyle(fontSize);
+        messageLabel.setTextAlignment(textAlignment);
+        messageLabel.setMaxWidth(270);
         String name = config.getName();
-        config.setMassageLabel(massageLabel);
+        config.setMessageLabel(messageLabel);
         Label nameLabel = new Label();
         nameLabel.setText(name);
         nameLabel.setStyle(fontSize);
@@ -117,7 +117,7 @@ public class FloatingWindow {
         config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.setAlignment(config.getPos());
-        vBox.getChildren().addAll(floatingPosition, massageLabel, nameLabel);
+        vBox.getChildren().addAll(floatingPosition, messageLabel, nameLabel);
         root.getChildren().addAll(rectangle, vBox);
         StackPane.setMargin(vBox, new Insets(15, 15, 0, 15));
         // 创建浮窗舞台
@@ -352,10 +352,10 @@ public class FloatingWindow {
     private static void setSameLabelWidth(FloatingWindowDescriptor config) {
         if (config.isFormattingText()) {
             double maxWidth = 0;
-            Label massageLabel = config.getMassageLabel();
+            Label messageLabel = config.getMessageLabel();
             Label nameLabel = config.getNameeLabel();
             Label floatingPosition = config.getFloatingPosition();
-            Label[] labels = {massageLabel, nameLabel, floatingPosition};
+            Label[] labels = {messageLabel, nameLabel, floatingPosition};
             // 找到最宽的 Label
             for (Label label : labels) {
                 if (label != null) {
@@ -661,7 +661,7 @@ public class FloatingWindow {
             floatingStage.setY(y);
             floatingStage.setWidth(w);
             floatingStage.setHeight(h);
-            config.getMassageLabel().setText(config.getMassage());
+            config.getMessageLabel().setText(config.getMessage());
             setPositionText(config, "");
             Button button = config.getButton();
             if (button != null) {
@@ -774,7 +774,7 @@ public class FloatingWindow {
                         Button button = floatingConfig.getButton();
                         if (button != null) {
                             button.setText(floatingConfig.getShowButtonText());
-                            addToolTip(tip_massageRegion(), button);
+                            addToolTip(tip_messageRegion(), button);
                         }
                         // 改变要防重复点击的组件状态
                         if (isChangeDisableNodes) {
@@ -822,11 +822,11 @@ public class FloatingWindow {
      * @param config 要更新的浮窗配置
      * @param text   要更新的信息
      */
-    public static void updateMassageLabel(FloatingWindowDescriptor config, String text) {
+    public static void updateMessageLabel(FloatingWindowDescriptor config, String text) {
         Platform.runLater(() -> {
-            Label massageLabel = config.getMassageLabel();
-            massageLabel.setText(text);
-            config.setMassage(text);
+            Label messageLabel = config.getMessageLabel();
+            messageLabel.setText(text);
+            config.setMessage(text);
             setSameLabelWidth(config);
         });
     }
@@ -843,9 +843,9 @@ public class FloatingWindow {
             if (nameeLabel != null) {
                 nameeLabel.setTextFill(color);
             }
-            Label massageLabel = config.getMassageLabel();
-            if (massageLabel != null) {
-                massageLabel.setTextFill(color);
+            Label messageLabel = config.getMessageLabel();
+            if (messageLabel != null) {
+                messageLabel.setTextFill(color);
             }
             Label floatingPosition = config.getFloatingPosition();
             if (floatingPosition != null) {
@@ -864,23 +864,23 @@ public class FloatingWindow {
     /**
      * 初始化浮窗坐标与宽高
      *
-     * @param massageFloating 浮窗属性类
+     * @param messageFloating 浮窗属性类
      * @param configPath      配置文件路径
      * @throws IOException 配置文件读取异常
      */
-    public static void getFloatingSetting(FloatingWindowDescriptor massageFloating, String configPath) throws IOException {
-        if (massageFloating != null) {
-            FloatingWindowConfig config = massageFloating.getConfig();
+    public static void getFloatingSetting(FloatingWindowDescriptor messageFloating, String configPath) throws IOException {
+        if (messageFloating != null) {
+            FloatingWindowConfig config = messageFloating.getConfig();
             if (config != null) {
                 Properties prop = new Properties();
                 InputStream input = checkRunningInputStream(configPath);
                 prop.load(input);
-                config.setHeight(Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight)))
-                        .setWidth(Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth)))
-                        .setX(Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX)))
-                        .setY(Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY)));
+                config.setHeight(Integer.parseInt(prop.getProperty(key_messageHeight, defaultFloatingHeight)))
+                        .setWidth(Integer.parseInt(prop.getProperty(key_messageWidth, defaultFloatingWidth)))
+                        .setX(Integer.parseInt(prop.getProperty(key_messageX, defaultFloatingX)))
+                        .setY(Integer.parseInt(prop.getProperty(key_messageY, defaultFloatingY)));
                 input.close();
-                massageFloating.setConfig(config);
+                messageFloating.setConfig(config);
             }
         }
     }

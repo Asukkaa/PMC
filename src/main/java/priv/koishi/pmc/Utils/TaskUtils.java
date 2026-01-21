@@ -62,12 +62,12 @@ public class TaskUtils {
             progressBar.setProgress(0);
             progressBar.progressProperty().bind(task.progressProperty());
         }
-        Label massageLabel = taskBean.getMassageLabel();
-        if (massageLabel != null && taskBean.isBindingMassageLabel()) {
+        Label messageLabel = taskBean.getMessageLabel();
+        if (messageLabel != null && taskBean.isBindingMessageLabel()) {
             // 绑定 TextField 的值属性
-            massageLabel.textProperty().unbind();
-            updateLabel(massageLabel, "");
-            Platform.runLater(() -> massageLabel.textProperty().bind(task.messageProperty()));
+            messageLabel.textProperty().unbind();
+            updateLabel(messageLabel, "");
+            Platform.runLater(() -> messageLabel.textProperty().bind(task.messageProperty()));
         }
         // 设置默认的异常处理
         throwTaskException(task, taskBean);
@@ -98,9 +98,9 @@ public class TaskUtils {
         // 解除防重复点击按钮不可点击限制
         changeDisableNodes(taskBean, false);
         // 隐藏和解绑消息通知组件
-        Label massageLabel = taskBean.getMassageLabel();
-        if (massageLabel != null) {
-            massageLabel.textProperty().unbind();
+        Label messageLabel = taskBean.getMessageLabel();
+        if (messageLabel != null) {
+            messageLabel.textProperty().unbind();
         }
         // 隐藏和解绑进度条
         ProgressBar progressBar = taskBean.getProgressBar();
@@ -119,7 +119,7 @@ public class TaskUtils {
      */
     public static void taskNotSuccess(TaskBean<?> taskBean, String log) {
         taskUnbind(taskBean);
-        showErrLabelText(taskBean.getMassageLabel(), log);
+        showErrLabelText(taskBean.getMessageLabel(), log);
     }
 
     /**

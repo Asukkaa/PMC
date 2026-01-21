@@ -109,7 +109,7 @@ public class ProgressDialog {
     public void updateProgress(double progress, String message) {
         Platform.runLater(() -> {
             progressBar.setProgress(progress);
-            updateMassage(message);
+            updateMessage(message);
         });
     }
 
@@ -118,7 +118,7 @@ public class ProgressDialog {
      *
      * @param message 提示信息
      */
-    public void updateMassage(String message) {
+    public void updateMessage(String message) {
         messageLabel.setText(message);
     }
 

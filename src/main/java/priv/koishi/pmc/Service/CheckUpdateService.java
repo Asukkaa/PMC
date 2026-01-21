@@ -223,12 +223,12 @@ public class CheckUpdateService {
                                         double progress = (double) downloadedBytes / contentLength;
                                         int progressPercentage = (int) (progress * 100);
                                         String fileSize = getUnitSize(downloadedBytes) + " / " + getUnitSize(contentLength);
-                                        String massage = update_downloadingUpdate() + " : " + fileSize + " (" + progressPercentage + "%)";
-                                        progressDialog.updateProgress(progress, massage);
+                                        String message = update_downloadingUpdate() + " : " + fileSize + " (" + progressPercentage + "%)";
+                                        progressDialog.updateProgress(progress, message);
                                         // 支付宝云可能无法显示下载进度
                                     } else if (updateInfo.getAlipayFileLink().equals(downloadLink)) {
                                         String fileSize = getUnitSize(downloadedBytes);
-                                        Platform.runLater(() -> progressDialog.updateMassage(update_downloadingUpdate() + " : " + fileSize));
+                                        Platform.runLater(() -> progressDialog.updateMessage(update_downloadingUpdate() + " : " + fileSize));
                                     }
                                 }
                                 // 如果任务被取消，删除临时文件夹

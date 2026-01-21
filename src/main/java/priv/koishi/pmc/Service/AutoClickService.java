@@ -36,7 +36,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
-import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMessageLabel;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
@@ -63,12 +63,12 @@ public class AutoClickService {
     /**
      * 浮窗信息栏
      */
-    private static FloatingWindowDescriptor massageFloating;
+    private static FloatingWindowDescriptor messageFloating;
 
     /**
      * 程序界面信息栏
      */
-    private static Label massageLabel;
+    private static Label messageLabel;
 
     /**
      * 随机数
@@ -102,7 +102,6 @@ public class AutoClickService {
                 }
                 int totalPMCs = pmcListBeans.size();
                 updateProgress(0, totalPMCs);
-                updateMessage("开始批量执行...");
                 clickLog = new DynamicQueue<>();
                 int maxLogNum = baseTaskBean.getMaxLogNum();
                 if (maxLogNum > 0) {
@@ -122,23 +121,25 @@ public class AutoClickService {
                         int loopCount = 0;
                         while (!isCancelled()) {
                             loopCount++;
-                            updateMessage(String.format("开始第 %d 次整体循环", loopCount));
+                            String loopTimeText = text_cancelTask() + text_execution() + loopCount + " / ∞" + text_executionTime();
+                            updateMessage(loopTimeText);
                             // 执行当前批次
-                            if (executeBatch(pmcListBeans, executor, totalPMCs, baseTaskBean, 0, loopCount)) {
+                            if (executeBatch(pmcListBeans, executor, totalPMCs, baseTaskBean, 0, loopCount, loopTimeText)) {
                                 break;
                             }
                         }
                     } else {
                         // 有限循环
                         for (int loop = 0; loop < overallLoopTimes && !isCancelled(); loop++) {
-                            updateMessage(String.format("执行整体循环: %d/%d", loop + 1, overallLoopTimes));
+                            String loopTimeText = text_cancelTask() + text_execution() + (loop + 1) + " / " +
+                                    overallLoopTimes + text_executionTime();
+                            updateMessage(loopTimeText);
                             // 执行当前批次
-                            if (executeBatch(pmcListBeans, executor, totalPMCs, baseTaskBean, loop, overallLoopTimes)) {
+                            if (executeBatch(pmcListBeans, executor, totalPMCs, baseTaskBean, loop, overallLoopTimes, loopTimeText)) {
                                 break;
                             }
                         }
                     }
-                    updateMessage("批量执行完成");
                 }
                 // 返回所有日志
                 return clickLog.getSnapshot();
@@ -153,22 +154,20 @@ public class AutoClickService {
              * @param baseTaskBean 任务参数
              * @param currentLoop  当前批次索引
              * @param totalLoops   当前文件重复次数
+             * @param loopText     当前循环信息
              */
             private boolean executeBatch(List<? extends PMCListBean> pmcListBeans, ExecutorService executor,
-                                         int totalPMCs, AutoClickTaskBean baseTaskBean,
-                                         int currentLoop, int totalLoops) throws Exception {
+                                         int totalPMCs, AutoClickTaskBean baseTaskBean, int currentLoop,
+                                         int totalLoops, String loopText) throws Exception {
                 for (int i = 0; i < totalPMCs; i++) {
                     if (isCancelled()) {
                         return true;
                     }
                     PMCListBean pmc = pmcListBeans.get(i);
-                    // 更新消息，显示循环信息
-                    if (totalLoops > 1) {
-                        updateMessage(String.format("执行中: 整体循环%d/%d - %s (%d/%d)",
-                                currentLoop + 1, totalLoops, pmc.getName(), i + 1, totalPMCs));
-                    } else {
-                        updateMessage(String.format("执行中: %s (%d/%d)", pmc.getName(), i + 1, totalPMCs));
-                    }
+                    String text = loopText +
+                            text_progress() + i + 1 + " / " + pmc.getClickPositionVOS().size() +
+                            text_willBe() + pmc.getWaitTime() + text_msWillBe() + pmc.getName();
+                    updateMessage(text);
                     // 执行前等待
                     String waitTime = pmc.getWaitTime();
                     if (StringUtils.isNotBlank(waitTime)) {
@@ -227,7 +226,7 @@ public class AutoClickService {
                             throw new RuntimeException("子任务执行未完成");
                         }
                     } catch (Exception e) {
-                        throw new RuntimeException("PMC 文件执行失败: " + pmc.getName(), e);
+                        throw new RuntimeException("PMC 文件执行失败: " + pmc.getPath(), e);
                     }
                     updateProgress((long) currentLoop * totalPMCs + i + 1, (long) totalLoops * totalPMCs);
                 }
@@ -305,7 +304,7 @@ public class AutoClickService {
                 List<String> errs = new ArrayList<>();
                 int maxIndex = clickPositionVOS.size();
                 updateProgress(0, maxIndex);
-                updateMassage(text_checkJumpSetting());
+                updateFloatingMessage(text_checkJumpSetting());
                 for (int i = 0; i < maxIndex; i++) {
                     updateProgress(i + 1, maxIndex);
                     ClickPositionVO clickPositionVO = clickPositionVOS.get(i);
@@ -347,7 +346,7 @@ public class AutoClickService {
             private List<String> updateWindowInfos(List<? extends ClickPositionVO> tableViewItems) {
                 Set<String> processPaths = new HashSet<>();
                 int tableSize = tableViewItems.size();
-                updateMassage(text_checkingWindowInfo());
+                updateFloatingMessage(text_checkingWindowInfo());
                 List<String> errs = new ArrayList<>();
                 updateProgress(0, tableSize);
                 // 错误的窗口设置集合
@@ -358,12 +357,12 @@ public class AutoClickService {
                 // 更新窗口信息
                 Map<String, WindowInfo> windowInfoMap = new HashMap<>();
                 int pathSize = processPaths.size();
-                updateMassage(text_gettingWindowInfo());
+                updateFloatingMessage(text_gettingWindowInfo());
                 updateProgress(0, pathSize);
                 updateWindowInfo(pathSize, processPaths, windowInfoMap);
                 // 校验窗口是否存在
                 if (!windowInfoMap.isEmpty()) {
-                    updateMassage(text_updatingWindowInfo());
+                    updateFloatingMessage(text_updatingWindowInfo());
                     updateProgress(0, tableSize);
                     checkWindowExists(tableViewItems, clickErrIndex, windowInfoMap, errs, stopErrIndex);
                 }
@@ -514,8 +513,8 @@ public class AutoClickService {
                 // 复制要执行的操作步骤
                 List<ClickPositionVO> backup = creatBackUp(tableViewItems);
                 int dataSize = backup.size();
-                massageFloating = taskBean.getMassageFloating();
-                massageLabel = taskBean.getMassageLabel();
+                messageFloating = taskBean.getMessageFloating();
+                messageLabel = taskBean.getMessageLabel();
                 firstClick.set(taskBean.isFirstClick());
                 updateProgress(0, dataSize);
                 int currentStep = 0;
@@ -527,7 +526,7 @@ public class AutoClickService {
                     String waitTime = clickPositionVO.getWaitTime();
                     String name = clickPositionVO.getName();
                     String text = loopTimeText +
-                            text_progress() + progress + "/" + dataSize +
+                            text_progress() + progress + " / " + dataSize +
                             text_willBe() + waitTime + text_msWillBe() + name;
                     if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
                         if (openLinkPath(text, clickPositionVO)) {
@@ -575,7 +574,7 @@ public class AutoClickService {
                                 text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
                     }
                     // 更新操作信息
-                    updateMassage(text);
+                    updateFloatingMessage(text);
                     long wait = Long.parseLong(waitTime);
                     // 处理随机等待时间偏移
                     if (activation.equals(clickPositionVO.getRandomWaitTime())) {
@@ -631,7 +630,7 @@ public class AutoClickService {
                 String waitTime = clickPositionVO.getWaitTime();
                 String name = clickPositionVO.getName();
                 text += text_taskInfo() + clickPositionVO.getClickType();
-                updateMassage(text);
+                updateFloatingMessage(text);
                 long wait = Long.parseLong(waitTime);
                 if (activation.equals(clickPositionVO.getRandomWaitTime())) {
                     int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
@@ -824,7 +823,7 @@ public class AutoClickService {
             fileName.set(getExistsFileName(new File(clickPath)));
             String text = loopTimeText + text_searchingClick() + fileName.get();
             // 更新操作信息
-            updateMassage(text);
+            updateFloatingMessage(text);
             long start = System.currentTimeMillis();
             int retryType = clickPositionVO.getRetryTypeEnum();
             double clickMatchThreshold = Double.parseDouble(clickPositionVO.getClickMatchThreshold());
@@ -1171,7 +1170,7 @@ public class AutoClickService {
                 fileName.set(getExistsFileName(new File(stopPath)));
                 String text = loopTimeText + text_searchingStop() + fileName.get();
                 // 更新操作信息
-                updateMassage(text);
+                updateFloatingMessage(text);
                 long start = System.currentTimeMillis();
                 double stopMatchThreshold = Double.parseDouble(clickPositionVO.getStopMatchThreshold());
                 FloatingWindowConfig stopWindowConfig = clickPositionVO.getStopWindowConfig();
@@ -1459,13 +1458,13 @@ public class AutoClickService {
      *
      * @param message 要更新的信息
      */
-    private static void updateMassage(String message) {
+    private static void updateFloatingMessage(String message) {
         Platform.runLater(() -> {
-            if (massageLabel != null) {
-                massageLabel.setText(message);
+            if (messageLabel != null) {
+                messageLabel.setText(message);
             }
-            if (massageFloating != null) {
-                updateMassageLabel(massageFloating, message);
+            if (messageFloating != null) {
+                updateMessageLabel(messageFloating, message);
             }
         });
     }
@@ -1474,8 +1473,8 @@ public class AutoClickService {
      * 解除组件引用
      */
     public static void clearReferences() {
-        massageFloating = null;
-        massageLabel = null;
+        messageFloating = null;
+        messageLabel = null;
         clickLog = null;
     }
 

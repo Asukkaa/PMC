@@ -289,7 +289,7 @@ public class i18nFinal {
     /**
      * @return 点击后将会展示浮窗位置
      */
-    public static String tip_massageRegion() {
+    public static String tip_messageRegion() {
         return bundle.getString("tip.setFloatingCoordinate");
     }
 
@@ -2206,8 +2206,8 @@ public class i18nFinal {
     /**
      * @return 信息展示栏区域
      */
-    public static String floatingName_massage() {
-        return bundle.getString("floatingName.massage");
+    public static String floatingName_message() {
+        return bundle.getString("floatingName.message");
     }
 
     /**

@@ -338,7 +338,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 信息浮窗设置
      */
-    public static FloatingWindowDescriptor massageFloating;
+    public static FloatingWindowDescriptor messageFloating;
 
     /**
      * 录制信息字体颜色绑定
@@ -766,9 +766,9 @@ public class AutoClickController extends RootController implements MousePosition
      * 初始化浮窗
      */
     private void initFloatingWindow() {
-        massageFloating = new FloatingWindowDescriptor()
-                .setConfig(SettingController.massageFloating.getConfig())
-                .setName(floatingName_massage())
+        messageFloating = new FloatingWindowDescriptor()
+                .setConfig(SettingController.messageFloating.getConfig())
+                .setName(floatingName_message())
                 .setEnableResize(false)
                 .setAddCloseKey(false)
                 .setTransparent(true)
@@ -777,7 +777,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setShowName(false)
                 .setFontSize(14);
         // 创建浮窗
-        createFloatingWindows(massageFloating);
+        createFloatingWindows(messageFloating);
     }
 
     /**
@@ -795,14 +795,14 @@ public class AutoClickController extends RootController implements MousePosition
         boolean isShow = isRun ? floatingRun.isSelected() : floatingRecord.isSelected();
         Slider slider = settingController.opacity_Set;
         if (isShow) {
-            getFloatingSetting(massageFloating, configFile_Click);
+            getFloatingSetting(messageFloating, configFile_Click);
             Platform.runLater(() -> {
-                if (massageFloating != null) {
-                    massageFloating.setConfig(SettingController.massageFloating.getConfig())
+                if (messageFloating != null) {
+                    messageFloating.setConfig(SettingController.messageFloating.getConfig())
                             .setOpacity(slider.getValue())
                             .setTextFill(color);
-                    updateFloatingWindow(massageFloating);
-                    FloatingWindow.showFloatingWindow(massageFloating);
+                    updateFloatingWindow(messageFloating);
+                    FloatingWindow.showFloatingWindow(messageFloating);
                 }
             });
         }
@@ -863,7 +863,7 @@ public class AutoClickController extends RootController implements MousePosition
                         Integer.parseInt(defaultPreparationRun), 0, null);
                 // 设置浮窗文本显示准备时间
                 String text = text_cancelTask() + preparation + text_run();
-                updateMassageLabel(massageFloating, text);
+                updateMessageLabel(messageFloating, text);
                 logLabel.setText(text);
                 showFloatingWindow(true);
                 // 延时执行任务
@@ -884,7 +884,7 @@ public class AutoClickController extends RootController implements MousePosition
                 taskNotSuccess(taskBean, text_taskFailed());
             } else {
                 taskUnbind(taskBean);
-                Label logLabel = taskBean.getMassageLabel();
+                Label logLabel = taskBean.getMessageLabel();
                 logLabel.setTextFill(Color.GREEN);
                 logLabel.setText(text_taskFinished());
                 CheckBox showWindowRun = settingController.showWindowRun_Set;
@@ -895,7 +895,7 @@ public class AutoClickController extends RootController implements MousePosition
                 }
             }
             clearReferences();
-            hideFloatingWindow(massageFloating);
+            hideFloatingWindow(messageFloating);
             // 移除键盘监听器
             removeNativeListener(nativeKeyListener);
             autoClickTask = null;
@@ -905,7 +905,7 @@ public class AutoClickController extends RootController implements MousePosition
         autoClickTask.setOnFailed(_ -> {
             clickLogs = getNowLogs();
             taskNotSuccess(taskBean, text_taskFailed());
-            hideFloatingWindow(massageFloating);
+            hideFloatingWindow(messageFloating);
             CheckBox showWindowRun = settingController.showWindowRun_Set;
             if (showWindowRun.isSelected()) {
                 showStage(mainStage);
@@ -926,7 +926,7 @@ public class AutoClickController extends RootController implements MousePosition
         autoClickTask.setOnCancelled(_ -> {
             clickLogs = getNowLogs();
             taskNotSuccess(taskBean, text_taskCancelled());
-            hideFloatingWindow(massageFloating);
+            hideFloatingWindow(messageFloating);
             CheckBox showWindowRun = settingController.showWindowRun_Set;
             if (showWindowRun.isSelected()) {
                 showStage(mainStage);
@@ -975,7 +975,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setOpenUrlLog(openUrlLog.isSelected())
                 .setStopImgLog(stopImgLog.isSelected())
                 .setFirstClick(firstClick.isSelected())
-                .setMassageFloating(massageFloating)
+                .setMessageFloating(messageFloating)
                 .setClickLog(clickLog.isSelected())
                 .setMoveLog(moveLog.isSelected())
                 .setDragLog(dragLog.isSelected())
@@ -984,9 +984,9 @@ public class AutoClickController extends RootController implements MousePosition
                 .setLoopTimes(loopTimes)
                 .setProgressBar(isBatch ? listPMCController.progressBar_List : progressBar_Click)
                 .setDisableNodes(isBatch ? listPMCController.disableNodes : disableNodes)
-                .setMassageLabel(isBatch ? listPMCController.log_List : log_Click)
+                .setMessageLabel(isBatch ? listPMCController.log_List : log_Click)
                 .setBeanList(clickPositionVOS)
-                .setBindingMassageLabel(false);
+                .setBindingMessageLabel(false);
         return taskBean;
     }
 
@@ -1013,7 +1013,7 @@ public class AutoClickController extends RootController implements MousePosition
             preparationTime.getAndDecrement();
             if (preparationTime.get() > 0) {
                 String text = text_cancelTask() + preparationTime + text_run();
-                updateMassageLabel(massageFloating, text);
+                updateMessageLabel(messageFloating, text);
                 Label logLabel = isBatch ? listPMCController.log_List : log_Click;
                 logLabel.setText(text);
             } else {
@@ -1371,7 +1371,7 @@ public class AutoClickController extends RootController implements MousePosition
     private TaskBean<ClickPositionVO> creatTaskBean() {
         TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Click)
-                .setMassageLabel(dataNumber_Click)
+                .setMessageLabel(dataNumber_Click)
                 .setTableView(tableView_Click)
                 .setDisableNodes(disableNodes);
         return taskBean;
@@ -1398,8 +1398,8 @@ public class AutoClickController extends RootController implements MousePosition
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
         Platform.runLater(() -> {
-            if (massageFloating != null) {
-                Stage floatingStage = massageFloating.getStage();
+            if (messageFloating != null) {
+                Stage floatingStage = messageFloating.getStage();
                 int x = (int) mousePoint.getX();
                 int y = (int) mousePoint.getY();
                 String text = autoClick_nowMousePos() + "X: " + x + " Y: " + y;
@@ -1422,7 +1422,7 @@ public class AutoClickController extends RootController implements MousePosition
                     mainStage.setTitle(appName);
                 }
                 if (floatingStage != null && floatingStage.isShowing()) {
-                    setPositionText(massageFloating, autoClick_nowMousePos() + "\nX: " + x + " Y: " + y);
+                    setPositionText(messageFloating, autoClick_nowMousePos() + "\nX: " + x + " Y: " + y);
                     if ((mouseFloatingRun.isSelected() && runClicking) || findingWindow
                             || (mouseFloatingRecord.isSelected() && recordClicking)) {
                         floatingMove(floatingStage, mousePoint, offsetX, offsetY);
@@ -1484,13 +1484,13 @@ public class AutoClickController extends RootController implements MousePosition
             if (taskBean == null) {
                 taskBean = new AutoClickTaskBean();
                 taskBean.setProgressBar(progressBar_Click)
-                        .setMassageLabel(log_Click);
+                        .setMessageLabel(log_Click);
             }
             taskNotSuccess(taskBean, text_taskCancelled());
         }
         // 改变要防重复点击的组件状态
         changeDisableNodes(disableNodes, false);
-        hideFloatingWindow(massageFloating);
+        hideFloatingWindow(messageFloating);
         // 弹出程序主窗口
         CheckBox showWindowRecord = settingController.showWindowRecord_Set;
         if (showWindowRecord.isSelected()) {
@@ -1511,7 +1511,7 @@ public class AutoClickController extends RootController implements MousePosition
         log_Click.textFillProperty().unbind();
         log_Click.textFillProperty().bind(recordTextColorProperty);
         log_Click.setText(log);
-        updateMassageLabel(massageFloating, log);
+        updateMessageLabel(messageFloating, log);
     }
 
     /**
@@ -1896,7 +1896,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparationTimeValue + text_preparation());
-            updateMassageLabel(massageFloating, text.get());
+            updateMessageLabel(messageFloating, text.get());
             log_Click.textFillProperty().unbind();
             log_Click.textFillProperty().bind(recordTextColorProperty);
             log_Click.setText(text.get());
@@ -1912,7 +1912,7 @@ public class AutoClickController extends RootController implements MousePosition
                 startUnifiedRecording(addType);
                 // 更新浮窗文本
                 text.set(text_cancelTask() + text_recordClicking());
-                updateMassageLabel(massageFloating, text.get());
+                updateMessageLabel(messageFloating, text.get());
                 log_Click.setText(text.get());
             } else {
                 AtomicInteger preparationTime = new AtomicInteger(preparationTimeValue);
@@ -1930,7 +1930,7 @@ public class AutoClickController extends RootController implements MousePosition
                         // 更新浮窗文本
                         text.set(text_cancelTask() + text_recordClicking());
                     }
-                    updateMassageLabel(massageFloating, text.get());
+                    updateMessageLabel(messageFloating, text.get());
                     log_Click.setText(text.get());
                 }));
                 // 设置 Timeline 的循环次数
@@ -2084,7 +2084,7 @@ public class AutoClickController extends RootController implements MousePosition
         }
         // 禁用需要辅助控制权限的组件
         if (isNativeHookException) {
-            Button saveButton = settingController.massageRegion_Set;
+            Button saveButton = settingController.messageRegion_Set;
             setNodeDisable(saveButton, true);
         }
     }
@@ -2260,7 +2260,7 @@ public class AutoClickController extends RootController implements MousePosition
                 throw new RuntimeException(text_outPathNull());
             }
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
-            taskBean.setMassageLabel(log_Click)
+            taskBean.setMessageLabel(log_Click)
                     .setBeanList(tableViewItems);
             String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
             exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_Click.isSelected());

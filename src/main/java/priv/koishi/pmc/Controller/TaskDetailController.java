@@ -413,8 +413,8 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_TD)
                 .setDisableNodes(disableNodes)
-                .setBindingMassageLabel(true)
-                .setMassageLabel(log_TD);
+                .setBindingMessageLabel(true)
+                .setMessageLabel(log_TD);
         // 创建定时任务
         Task<Void> task = createTask(timedTaskBean);
         bindingTaskNode(task, taskBean);

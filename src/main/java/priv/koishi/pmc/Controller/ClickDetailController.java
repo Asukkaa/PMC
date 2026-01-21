@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
-import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
+import static priv.koishi.pmc.Controller.AutoClickController.messageFloating;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
@@ -602,7 +602,7 @@ public class ClickDetailController extends RootController {
                 .setShowButtonText(findImgSet_showRegion())
                 .setHideButtonText(findImgSet_saveRegion())
                 .setShowButtonToolTip(tip_showRegion())
-                .setMassage(text_saveFindImgConfig())
+                .setMessage(text_saveFindImgConfig())
                 .setTextFill(textFill);
     }
 
@@ -986,7 +986,7 @@ public class ClickDetailController extends RootController {
     private void closeStage() {
         autoClickController.detailStage = null;
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
-        hideFloatingWindow(clickFloating, stopFloating, massageFloating);
+        hideFloatingWindow(clickFloating, stopFloating, messageFloating);
         removeAll();
         removeAllListeners();
         // 移除全局输入监听器
@@ -1021,7 +1021,7 @@ public class ClickDetailController extends RootController {
     private TaskBean<ImgFileVO> creatTaskBean() {
         TaskBean<ImgFileVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Det)
-                .setMassageLabel(dataNumber_Det)
+                .setMessageLabel(dataNumber_Det)
                 .setDisableNodes(disableNodes)
                 .setTableView(tableView_Det);
         return taskBean;
@@ -1874,7 +1874,7 @@ public class ClickDetailController extends RootController {
         Stage floatingStage = clickFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
-                updateMassageLabel(clickFloating, text_saveFindImgConfig());
+                updateMessageLabel(clickFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
             } else if (floatingStage.isShowing()) {
@@ -1892,7 +1892,7 @@ public class ClickDetailController extends RootController {
         Stage floatingStage = stopFloating.getStage();
         if (floatingStage != null) {
             if (!floatingStage.isShowing()) {
-                updateMassageLabel(stopFloating, text_saveFindImgConfig());
+                updateMessageLabel(stopFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
             } else if (floatingStage.isShowing()) {
@@ -2058,7 +2058,7 @@ public class ClickDetailController extends RootController {
                     String workDir = workPath_Det.getText();
                     String parameter = parameter_Det.getText();
                     TaskBean<?> taskBean = creatTaskBean()
-                            .setMassageLabel(log_Det);
+                            .setMessageLabel(log_Det);
                     Task<Void> scriptTask = scriptRun(taskBean, file, workDir, parameter, minWindow_Det.isSelected());
                     bindingTaskNode(scriptTask, taskBean);
                     scriptTask.setOnSucceeded(_ -> {

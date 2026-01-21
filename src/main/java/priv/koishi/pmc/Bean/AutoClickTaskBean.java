@@ -32,7 +32,7 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     /**
      * 执行自动操作时的信息输出栏
      */
-    FloatingWindowDescriptor massageFloating;
+    FloatingWindowDescriptor messageFloating;
 
     /**
      * 运行时间线

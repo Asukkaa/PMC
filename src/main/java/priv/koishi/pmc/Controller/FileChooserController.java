@@ -206,7 +206,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
                     .setReverseSort(true);
             TaskBean<FileVO> taskBean = new TaskBean<>();
             taskBean.setProgressBar(progressBar_FC)
-                    .setMassageLabel(fileNumber_FC)
+                    .setMessageLabel(fileNumber_FC)
                     .setDisableNodes(disableNodes)
                     .setTableView(tableView_FC);
             readAllFilesTask = readAllFilesTask(taskBean, fileConfig);

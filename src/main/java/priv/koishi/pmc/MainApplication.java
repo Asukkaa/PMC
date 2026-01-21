@@ -404,7 +404,7 @@ public class MainApplication extends Application {
     private static void creatLoadedPMCTask(File file, TabPane tabPane, Tab autoClickTab) {
         TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(autoClickController.progressBar_Click)
-                .setMassageLabel(autoClickController.dataNumber_Click)
+                .setMessageLabel(autoClickController.dataNumber_Click)
                 .setTableView(autoClickController.tableView_Click)
                 .setDisableNodes(autoClickController.disableNodes);
         autoClickController.loadedPMCTask = buildPMC(taskBean, file);

@@ -98,7 +98,7 @@ public class AboutController extends RootController {
     public CheckBox autoCheck_Abt;
 
     @FXML
-    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMassage_Abt, checkDate_Abt;
+    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMessage_Abt, checkDate_Abt;
 
     @FXML
     public Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt,
@@ -420,9 +420,9 @@ public class AboutController extends RootController {
     public void checkUpdate() {
         checkDate_Abt.setText("");
         TaskBean<?> taskBean = new TaskBean<>();
-        taskBean.setMassageLabel(checkMassage_Abt)
+        taskBean.setMessageLabel(checkMessage_Abt)
                 .setDisableNodes(disableNodes)
-                .setBindingMassageLabel(true);
+                .setBindingMessageLabel(true);
         Task<CheckUpdateBean> task = checkLatestVersion();
         bindingTaskNode(task, taskBean);
         task.setOnSucceeded(_ -> {
@@ -430,10 +430,10 @@ public class AboutController extends RootController {
             CheckUpdateBean updateInfo = task.getValue();
             // 检查是否有新版本
             if (isNewVersionAvailable(updateInfo)) {
-                checkMassage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
+                checkMessage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
                 //更新最后检查日期
                 updateCheckDate(Color.BLUE);
-                checkMassage_Abt.setTextFill(Color.BLUE);
+                checkMessage_Abt.setTextFill(Color.BLUE);
                 if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
                     // 弹出更新对话框
                     Optional<ButtonType> result = showUpdateDialog(updateInfo);
@@ -462,10 +462,10 @@ public class AboutController extends RootController {
                     }
                 }
             } else {
-                checkMassage_Abt.setText(update_nowIsLast());
+                checkMessage_Abt.setText(update_nowIsLast());
                 //更新最后检查日期
                 updateCheckDate(Color.GREEN);
-                checkMassage_Abt.setTextFill(Color.GREEN);
+                checkMessage_Abt.setTextFill(Color.GREEN);
             }
         });
         task.setOnFailed(_ -> {

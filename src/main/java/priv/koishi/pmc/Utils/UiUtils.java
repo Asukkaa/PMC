@@ -253,13 +253,13 @@ public class UiUtils {
     /**
      * 展示错误信息栏
      *
-     * @param massageLabel 错误信息栏
+     * @param messageLabel 错误信息栏
      * @param log          要展示的错误信息
      */
-    public static void showErrLabelText(Label massageLabel, String log) {
+    public static void showErrLabelText(Label messageLabel, String log) {
         Platform.runLater(() -> {
-            massageLabel.setTextFill(Color.RED);
-            massageLabel.setText(log);
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText(log);
         });
     }
 
@@ -852,7 +852,7 @@ public class UiUtils {
                             findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
                             findImgSet_windowLocation() + " X: " + x + " Y: " + y + "\n" +
                             findImgSet_windowSize() + " W: " + w + " H: " + h;
-                    windowInfoFloating.setMassage(info)
+                    windowInfoFloating.setMessage(info)
                             .getConfig()
                             .setHeight(h)
                             .setWidth(w)
@@ -913,7 +913,7 @@ public class UiUtils {
                             findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
                             findImgSet_windowLocation() + " X: " + x + " Y: " + y + "\n" +
                             findImgSet_windowSize() + " W: " + w + " H: " + h;
-                    windowInfoFloating.setMassage(info)
+                    windowInfoFloating.setMessage(info)
                             .getConfig()
                             .setHeight(h)
                             .setWidth(w)

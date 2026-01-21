@@ -119,7 +119,7 @@
             </HBox>
 
             <VBox>
-                <Label styleClass="label-low" fx:id="checkMassage_Abt"/>
+                <Label styleClass="label-low" fx:id="checkMessage_Abt"/>
                 <Label styleClass="label-low" fx:id="checkDate_Abt"/>
             </VBox>
 

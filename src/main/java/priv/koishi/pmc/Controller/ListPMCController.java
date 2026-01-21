@@ -344,7 +344,7 @@ public class ListPMCController extends RootController {
     private TaskBean<PMCListBean> creatTaskBean() {
         TaskBean<PMCListBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_List)
-                .setMassageLabel(dataNumber_List)
+                .setMessageLabel(dataNumber_List)
                 .setTableView(tableView_List)
                 .setDisableNodes(disableNodes);
         return taskBean;
@@ -556,7 +556,7 @@ public class ListPMCController extends RootController {
             throw new RuntimeException(text_outPathNull());
         }
         TaskBean<PMCListBean> taskBean = creatTaskBean();
-        taskBean.setMassageLabel(log_List)
+        taskBean.setMessageLabel(log_List)
                 .setBeanList(tableViewItems);
         String fileName = setDefaultFileName(outFileName_List, defaultOutFileName());
 //        exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_List.isSelected());

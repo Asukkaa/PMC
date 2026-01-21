@@ -390,7 +390,7 @@
 
         <HBox spacing="10">
             <HBox styleClass="hBox-290-5">
-                <Button fx:id="massageRegion_Set" onAction="#massageRegionAction" text="%setting.massageRegion_Set"/>
+                <Button fx:id="messageRegion_Set" onAction="#messageRegionAction" text="%setting.messageRegion_Set"/>
             </HBox>
 
             <HBox styleClass="hBox-290-5">

@@ -147,7 +147,7 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 浮窗设置
      */
-    public static FloatingWindowDescriptor clickFloating, stopFloating, massageFloating, windowInfoFloating,
+    public static FloatingWindowDescriptor clickFloating, stopFloating, messageFloating, windowInfoFloating,
             windowRelativeInfoFloating;
 
     /**
@@ -185,7 +185,7 @@ public class SettingController extends RootController implements MousePositionUp
     public ChoiceBox<String> nextGcType_Set, language_Set, clickFindImgType_Set, stopFindImgType_Set, theme_Set;
 
     @FXML
-    public Button massageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
+    public Button messageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
             clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det;
 
     @FXML
@@ -374,7 +374,7 @@ public class SettingController extends RootController implements MousePositionUp
                 .setHideButtonToolTip(tip_saveFloating())
                 .setTextFill(colorPicker_Set.getValue())
                 .setShowButtonToolTip(tip_showRegion())
-                .setMassage(text_saveFindImgConfig())
+                .setMessage(text_saveFindImgConfig())
                 .setConfigFile(configFile_Click);
     }
 
@@ -407,21 +407,21 @@ public class SettingController extends RootController implements MousePositionUp
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
         String hideButtonText = mouseFloating_Set.isSelected() ? text_closeFloating() : text_saveCloseFloating();
         String hideButtonToolTip = mouseFloating_Set.isSelected() ? tip_closeFloating() : tip_saveFloating();
-        massageFloating = createFloatingWindowDescriptor()
-                .setShowButtonToolTip(tip_massageRegion())
+        messageFloating = createFloatingWindowDescriptor()
+                .setShowButtonToolTip(tip_messageRegion())
                 .setHideButtonToolTip(hideButtonToolTip)
                 .setShowButtonText(text_showFloating())
                 .setOpacity(opacity_Set.getValue())
                 .setHideButtonText(hideButtonText)
-                .setName(floatingName_massage())
-                .setHeightKey(key_massageHeight)
-                .setWidthKey(key_massageWidth)
-                .setButton(massageRegion_Set)
-                .setXKey(key_massageX)
-                .setYKey(key_massageY)
+                .setName(floatingName_message())
+                .setHeightKey(key_messageHeight)
+                .setWidthKey(key_messageWidth)
+                .setButton(messageRegion_Set)
+                .setXKey(key_messageX)
+                .setYKey(key_messageY)
                 .setMargin(margin);
         if (mouseFloating_Set.isSelected()) {
-            massageFloating.setMassage(text_closeFloatingShortcut());
+            messageFloating.setMessage(text_closeFloatingShortcut());
         }
         windowInfoFloating = new FloatingWindowDescriptor()
                 .setConfig(new FloatingWindowConfig())
@@ -432,7 +432,7 @@ public class SettingController extends RootController implements MousePositionUp
         Color color = new Color(1, 1, 1, 0.6);
         windowRelativeInfoFloating = new FloatingWindowDescriptor()
                 .setConfig(new FloatingWindowConfig())
-                .setMassage(text_saveFindImgConfig())
+                .setMessage(text_saveFindImgConfig())
                 .setTextAlignment(TextAlignment.LEFT)
                 .setName(floatingName_window())
                 .setMinHeight(minFindImgHeight)
@@ -446,7 +446,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 读取配置文件
         loadFloatingWindowConfig();
         // 创建浮窗
-        createFloatingWindows(clickFloating, stopFloating, massageFloating, windowInfoFloating, windowRelativeInfoFloating);
+        createFloatingWindows(clickFloating, stopFloating, messageFloating, windowInfoFloating, windowRelativeInfoFloating);
         windowRelativeInfoFloating.getStage().initOwner(windowInfoFloating.getStage());
     }
 
@@ -629,16 +629,16 @@ public class SettingController extends RootController implements MousePositionUp
         Properties prop = new Properties();
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
-        int massageX = Integer.parseInt(prop.getProperty(key_massageX, defaultFloatingX));
-        int massageY = Integer.parseInt(prop.getProperty(key_massageY, defaultFloatingY));
-        int massageWidth = Integer.parseInt(prop.getProperty(key_massageWidth, defaultFloatingWidth));
-        int massageHeight = Integer.parseInt(prop.getProperty(key_massageHeight, defaultFloatingHeight));
-        FloatingWindowConfig massageConfig = new FloatingWindowConfig();
-        massageConfig.setHeight(Math.max(1, Math.min(massageHeight, screenHeight)))
-                .setWidth(Math.max(1, Math.min(massageWidth, screenHeight)))
-                .setX(Math.max(0, Math.min(massageX, screenWidth)))
-                .setY(Math.max(0, Math.min(massageY, screenHeight)));
-        massageFloating.setConfig(massageConfig);
+        int messageX = Integer.parseInt(prop.getProperty(key_messageX, defaultFloatingX));
+        int messageY = Integer.parseInt(prop.getProperty(key_messageY, defaultFloatingY));
+        int messageWidth = Integer.parseInt(prop.getProperty(key_messageWidth, defaultFloatingWidth));
+        int messageHeight = Integer.parseInt(prop.getProperty(key_messageHeight, defaultFloatingHeight));
+        FloatingWindowConfig messageConfig = new FloatingWindowConfig();
+        messageConfig.setHeight(Math.max(1, Math.min(messageHeight, screenHeight)))
+                .setWidth(Math.max(1, Math.min(messageWidth, screenHeight)))
+                .setX(Math.max(0, Math.min(messageX, screenWidth)))
+                .setY(Math.max(0, Math.min(messageY, screenHeight)));
+        messageFloating.setConfig(messageConfig);
         int clickHeight = Integer.parseInt(prop.getProperty(key_clickHeight, defaultFloatingHeight));
         int clickWidth = Integer.parseInt(prop.getProperty(key_clickWidth, defaultFloatingWidth));
         int clickX = Integer.parseInt(prop.getProperty(key_clickX, defaultFloatingX));
@@ -688,7 +688,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_hideWindowRun(), hideWindowRun_Set);
         addToolTip(tip_showWindowRun(), showWindowRun_Set);
         addToolTip(maxWindow_Set.getText(), maxWindow_Set);
-        addToolTip(tip_massageRegion(), massageRegion_Set);
+        addToolTip(tip_messageRegion(), messageRegion_Set);
         addToolTip(tip_useRelatively(), useRelatively_Set);
         addToolTip(tip_defaultStopImgBtn(), stopImgBtn_Set);
         addToolTip(tip_remindTaskSave(), remindTaskSave_Set);
@@ -778,9 +778,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setColorsListener() {
         colorPicker_Set.valueProperty().addListener((_, _, newValue) -> {
-            if (massageFloating != null) {
-                massageFloating.setTextFill(newValue);
-                updateFloatingWindow(massageFloating);
+            if (messageFloating != null) {
+                messageFloating.setTextFill(newValue);
+                updateFloatingWindow(messageFloating);
             }
             addValueToolTip(colorPicker_Set, tip_colorPicker(), String.valueOf(newValue));
         });
@@ -795,8 +795,8 @@ public class SettingController extends RootController implements MousePositionUp
             if (newValue.doubleValue() != rounded) {
                 opacity_Set.setValue(rounded);
             }
-            if (massageFloating != null) {
-                Rectangle rectangle = massageFloating.getRectangle();
+            if (messageFloating != null) {
+                Rectangle rectangle = messageFloating.getRectangle();
                 if (rectangle != null) {
                     if (rounded == 0) {
                         rectangle.setFill(new Color(0, 0, 0, 0.01));
@@ -887,7 +887,7 @@ public class SettingController extends RootController implements MousePositionUp
         clickDisableNodes.addAll(baseDisableNodes);
         clickDisableNodes.add(clickFindImgType_Set);
         shortcutDisableNodes.addAll(baseDisableNodes);
-        shortcutDisableNodes.add(massageRegion_Set);
+        shortcutDisableNodes.add(messageRegion_Set);
         shortcutDisableNodes.add(stopRegionHBox_Set);
         shortcutDisableNodes.add(clickRegionHBox_Set);
     }
@@ -953,7 +953,7 @@ public class SettingController extends RootController implements MousePositionUp
     private TaskBean<ImgFileVO> creatTaskBean() {
         TaskBean<ImgFileVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Set)
-                .setMassageLabel(dataNumber_Set)
+                .setMessageLabel(dataNumber_Set)
                 .setTableView(tableView_Set)
                 .setDisableNodes(windowInfoDisableNodes);
         return taskBean;
@@ -1029,9 +1029,9 @@ public class SettingController extends RootController implements MousePositionUp
                         }
                     }
                 }
-                new MessageBubble(text_updateNum() + update, updateListMassageTime);
+                new MessageBubble(text_updateNum() + update, updateListMessageTime);
             } else {
-                new MessageBubble(text_noDateNum(), updateListMassageTime);
+                new MessageBubble(text_noDateNum(), updateListMessageTime);
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1060,9 +1060,9 @@ public class SettingController extends RootController implements MousePositionUp
                         }
                     }
                 }
-                new MessageBubble(text_updateNum() + update, updateListMassageTime);
+                new MessageBubble(text_updateNum() + update, updateListMessageTime);
             } else {
-                new MessageBubble(text_noDateNum(), updateListMassageTime);
+                new MessageBubble(text_noDateNum(), updateListMessageTime);
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1173,7 +1173,7 @@ public class SettingController extends RootController implements MousePositionUp
     public boolean isFloatingOpen() {
         return clickFloating != null && clickFloating.getStage().isShowing() ||
                 stopFloating != null && stopFloating.getStage().isShowing() ||
-                massageFloating != null && massageFloating.getStage().isShowing() ||
+                messageFloating != null && messageFloating.getStage().isShowing() ||
                 windowInfoFloating != null && windowInfoFloating.getStage().isShowing();
     }
 
@@ -1540,14 +1540,14 @@ public class SettingController extends RootController implements MousePositionUp
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
         Platform.runLater(() -> {
-            if (massageFloating != null) {
-                Stage floatingStage = massageFloating.getStage();
+            if (messageFloating != null) {
+                Stage floatingStage = messageFloating.getStage();
                 if (floatingStage != null) {
                     if (floatingStage.isShowing() && mouseFloating_Set.isSelected()) {
                         int offsetX = setDefaultIntValue(offsetX_Set, defaultOffsetX, -screenWidth, screenWidth);
                         int offsetY = setDefaultIntValue(offsetY_Set, defaultOffsetY, -screenHeight, screenHeight);
                         floatingMove(floatingStage, mousePoint, offsetX, offsetY);
-                        setPositionText(massageFloating, "");
+                        setPositionText(messageFloating, "");
                     }
                 }
             }
@@ -2078,19 +2078,19 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void mouseFloatingAction() throws IOException {
         setLoadLastConfigCheckBox(mouseFloating_Set, configFile_Click, key_mouseFloating);
-        if (massageFloating != null) {
-            Stage floatingStage = massageFloating.getStage();
+        if (messageFloating != null) {
+            Stage floatingStage = messageFloating.getStage();
             if (floatingStage != null && floatingStage.isShowing()) {
                 if (mouseFloating_Set.isSelected()) {
-                    massageFloating.setCloseSave(false);
-                    updateMassageLabel(massageFloating, text_closeFloatingShortcut());
-                    massageRegion_Set.setText(text_closeFloating());
-                    addToolTip(tip_closeFloating(), massageRegion_Set);
+                    messageFloating.setCloseSave(false);
+                    updateMessageLabel(messageFloating, text_closeFloatingShortcut());
+                    messageRegion_Set.setText(text_closeFloating());
+                    addToolTip(tip_closeFloating(), messageRegion_Set);
                 } else {
-                    massageFloating.setCloseSave(true);
-                    updateMassageLabel(massageFloating, text_saveFindImgConfig());
-                    massageRegion_Set.setText(text_saveCloseFloating());
-                    addToolTip(tip_saveFloating(), massageRegion_Set);
+                    messageFloating.setCloseSave(true);
+                    updateMessageLabel(messageFloating, text_saveFindImgConfig());
+                    messageRegion_Set.setText(text_saveCloseFloating());
+                    addToolTip(tip_saveFloating(), messageRegion_Set);
                 }
             }
         }
@@ -2102,32 +2102,32 @@ public class SettingController extends RootController implements MousePositionUp
      * @throws IOException 配置文件读取异常
      */
     @FXML
-    private void massageRegionAction() throws IOException {
-        Stage floatingStage = massageFloating.getStage();
+    private void messageRegionAction() throws IOException {
+        Stage floatingStage = messageFloating.getStage();
         if (floatingStage != null) {
-            getFloatingSetting(massageFloating, configFile_Click);
-            massageFloating.setDisableNodes(baseDisableNodes);
+            getFloatingSetting(messageFloating, configFile_Click);
+            messageFloating.setDisableNodes(baseDisableNodes);
             if (!floatingStage.isShowing()) {
                 if (mouseFloating_Set.isSelected()) {
-                    updateMassageLabel(massageFloating, text_closeFloatingShortcut());
+                    updateMessageLabel(messageFloating, text_closeFloatingShortcut());
                 } else {
-                    updateMassageLabel(massageFloating, text_saveFindImgConfig());
+                    updateMessageLabel(messageFloating, text_saveFindImgConfig());
                 }
                 // 显示浮窗
-                showFloatingWindow(massageFloating);
+                showFloatingWindow(messageFloating);
             } else if (floatingStage.isShowing()) {
                 // 还原鼠标跟随前的坐标
                 if (mouseFloating_Set.isSelected()) {
-                    massageFloating.setHideButtonText(text_closeFloating())
+                    messageFloating.setHideButtonText(text_closeFloating())
                             .setHideButtonToolTip(tip_closeFloating())
                             .setCloseSave(false);
                 } else {
-                    massageFloating.setHideButtonText(text_saveCloseFloating())
+                    messageFloating.setHideButtonText(text_saveCloseFloating())
                             .setHideButtonToolTip(tip_saveFloating())
                             .setCloseSave(true);
                 }
                 // 隐藏浮窗
-                hideFloatingWindow(false, massageFloating);
+                hideFloatingWindow(false, messageFloating);
                 // 只有所有浮窗都关闭时才恢复其他节点可交互状态
                 Stage clickStage = clickFloating.getStage();
                 Stage stopStage = stopFloating.getStage();
@@ -2255,7 +2255,7 @@ public class SettingController extends RootController implements MousePositionUp
         if (clickStage != null) {
             clickFloating.setDisableNodes(clickDisableNodes);
             if (!clickStage.isShowing()) {
-                updateMassageLabel(clickFloating, text_saveFindImgConfig());
+                updateMessageLabel(clickFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(clickFloating);
             } else if (clickStage.isShowing()) {
@@ -2264,9 +2264,9 @@ public class SettingController extends RootController implements MousePositionUp
                 setNodeDisable(clickFindImgType_Set, false);
                 // 只有所有浮窗都关闭时才恢复其他节点可交互状态
                 Stage stopStage = stopFloating.getStage();
-                Stage massageStage = massageFloating.getStage();
+                Stage messageStage = messageFloating.getStage();
                 if ((stopStage == null || !stopStage.isShowing()) &&
-                        (massageStage == null || !massageStage.isShowing())) {
+                        (messageStage == null || !messageStage.isShowing())) {
                     changeDisableNodes(clickDisableNodes, false);
                 }
             }
@@ -2282,7 +2282,7 @@ public class SettingController extends RootController implements MousePositionUp
         if (stopStage != null) {
             stopFloating.setDisableNodes(stopDisableNodes);
             if (!stopStage.isShowing()) {
-                updateMassageLabel(stopFloating, text_saveFindImgConfig());
+                updateMessageLabel(stopFloating, text_saveFindImgConfig());
                 // 显示浮窗
                 showFloatingWindow(stopFloating);
             } else if (stopStage.isShowing()) {
@@ -2291,9 +2291,9 @@ public class SettingController extends RootController implements MousePositionUp
                 setNodeDisable(stopFindImgType_Set, false);
                 // 只有所有浮窗都关闭时才恢复其他节点可交互状态
                 Stage clickStage = clickFloating.getStage();
-                Stage massageStage = massageFloating.getStage();
+                Stage messageStage = messageFloating.getStage();
                 if ((clickStage == null || !clickStage.isShowing()) &&
-                        (massageStage == null || !massageStage.isShowing())) {
+                        (messageStage == null || !messageStage.isShowing())) {
                     changeDisableNodes(stopDisableNodes, false);
                 }
             }

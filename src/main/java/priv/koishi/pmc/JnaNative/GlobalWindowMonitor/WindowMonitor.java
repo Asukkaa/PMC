@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static priv.koishi.pmc.Controller.AutoClickController.massageFloating;
+import static priv.koishi.pmc.Controller.AutoClickController.messageFloating;
 import static priv.koishi.pmc.Controller.AutoClickController.showFloatingWindow;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
@@ -43,7 +43,7 @@ import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.dpiScale;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.hideFloatingWindow;
-import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMassageLabel;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMessageLabel;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
@@ -302,9 +302,9 @@ public class WindowMonitor {
                         // 停止寻找窗口标记
                         findingWindow = false;
                         AutoClickController.findingWindow = false;
-                        if (massageFloating != null) {
+                        if (messageFloating != null) {
                             // 关闭窗口信息浮窗
-                            hideFloatingWindow(massageFloating);
+                            hideFloatingWindow(messageFloating);
                         }
                         showStage(stage);
                     } else if (windowInfoFloating != null) {
@@ -369,7 +369,7 @@ public class WindowMonitor {
             // 设置浮窗文本显示准备时间
             AtomicReference<String> text = new AtomicReference<>(text_cancelTask()
                     + preparation + findImgSet_wait());
-            updateMassageLabel(massageFloating, text.get());
+            updateMessageLabel(messageFloating, text.get());
             // 显示浮窗
             showFloatingWindow(false);
             // 启动键盘监听器
@@ -377,12 +377,12 @@ public class WindowMonitor {
             findingWindowTimeline = new Timeline();
             if (preparation == 0) {
                 // 创建新监听器
-                clickWindowMouseListener = new ClickWindowMouseListener(massageFloating, this);
+                clickWindowMouseListener = new ClickWindowMouseListener(messageFloating, this);
                 // 注册监听器
                 addNativeListener(clickWindowMouseListener);
                 // 更新浮窗文本
                 text.set(text_cancelTask() + findImgSet_recording());
-                updateMassageLabel(massageFloating, text.get());
+                updateMessageLabel(messageFloating, text.get());
             } else {
                 AtomicInteger preparationTime = new AtomicInteger(preparation);
                 // 创建 Timeline 来实现倒计时
@@ -393,7 +393,7 @@ public class WindowMonitor {
                         text.set(text_cancelTask() + preparationTime + findImgSet_wait());
                     } else {
                         // 创建新监听器
-                        clickWindowMouseListener = new ClickWindowMouseListener(massageFloating, this);
+                        clickWindowMouseListener = new ClickWindowMouseListener(messageFloating, this);
                         // 注册监听器
                         addNativeListener(clickWindowMouseListener);
                         // 停止 Timeline
@@ -401,7 +401,7 @@ public class WindowMonitor {
                         // 更新浮窗文本
                         text.set(text_cancelTask() + findImgSet_recording());
                     }
-                    updateMassageLabel(massageFloating, text.get());
+                    updateMessageLabel(messageFloating, text.get());
                 }));
                 // 设置 Timeline 的循环次数
                 findingWindowTimeline.setCycleCount(preparation);
