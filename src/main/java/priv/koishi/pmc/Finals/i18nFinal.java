@@ -22,21 +22,39 @@ import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 public class i18nFinal {
 
     /**
-     * 自动保存文件名
+     * PMC 文件自动保存名称
      *
-     * @return PMC自动导出流程
+     * @return PMC 自动导出流程
      */
-    public static String autoSaveFileName() {
-        return bundle.getString("autoSaveFileName");
+    public static String autoSavePMCFileName() {
+        return bundle.getString("autoSavePMCFileName");
     }
 
     /**
-     * 默认导出文件名称
+     * PMCS 文件自动保存名称
      *
-     * @return PMC自动操作流程
+     * @return PMC 自动导出流程集合
      */
-    public static String defaultOutFileName() {
-        return bundle.getString("defaultOutFileName");
+    public static String autoSavePMCSFileName() {
+        return bundle.getString("autoSavePMCSFileName");
+    }
+
+    /**
+     * 默认 PMC 文件导出名称
+     *
+     * @return PMC 自动操作流程
+     */
+    public static String defaultPMCFileName() {
+        return bundle.getString("defaultPMCFileName");
+    }
+
+    /**
+     * 默认 PMCS 文件导出名称
+     *
+     * @return PMC 自动操作流程集合
+     */
+    public static String defaultPMCSFileName() {
+        return bundle.getString("defaultPMCSFileName");
     }
 
     /**
@@ -3002,7 +3020,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 导入pmc文件
+     * @return 导入 PMC 文件
      */
     public static String import_title() {
         return bundle.getString("import.title");

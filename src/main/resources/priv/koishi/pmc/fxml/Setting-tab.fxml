@@ -55,12 +55,17 @@
             </HBox>
 
             <HBox styleClass="hBox-290-5">
-                <CheckBox fx:id="autoSave_Set" onAction="#loadAutoSaveAction" selected="true"
-                          styleClass="checkBox-medium" text="%setting.autoSave_Set"/>
+                <CheckBox fx:id="autoSavePMC_Set" onAction="#autoSavePMCAction" selected="true"
+                          styleClass="checkBox-medium" text="%setting.autoSavePMC_Set"/>
             </HBox>
         </HBox>
 
         <HBox spacing="10">
+            <HBox styleClass="hBox-290-5">
+                <CheckBox fx:id="loadPMCS_Set" onAction="#loadPMMCSAction" styleClass="checkBox-medium"
+                          selected="true" text="%setting.loadPMCS_Set"/>
+            </HBox>
+
             <HBox styleClass="hBox-290-5">
                 <Label text="%setting.language"/>
                 <ChoiceBox fx:id="language_Set" prefWidth="100" onAction="#languageAction"/>
@@ -69,6 +74,11 @@
             <HBox styleClass="hBox-290-5">
                 <Label text="%setting.theme"/>
                 <ChoiceBox fx:id="theme_Set" prefWidth="150" onAction="#themeAction"/>
+            </HBox>
+
+            <HBox styleClass="hBox-290-5">
+                <CheckBox fx:id="autoSavePMCS_Set" onAction="#autoSavePMCSAction" selected="true"
+                          styleClass="checkBox-medium" text="%setting.autoSavePMCS_Set"/>
             </HBox>
         </HBox>
 

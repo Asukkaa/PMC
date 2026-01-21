@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.Config.FileConfig;
 import priv.koishi.pmc.Bean.DTO.PMCFileDTO;
+import priv.koishi.pmc.Bean.DTO.PMCSFileDTO;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
@@ -272,6 +273,49 @@ public class PMCFileService {
                 changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 return loadPMCFile(file);
+            }
+        };
+    }
+
+    /**
+     * 导出 PMCS 文件
+     *
+     * @param taskBean    线程任务参数
+     * @param fileName    要导出的文件名
+     * @param outFilePath 导出文件夹路径
+     * @return 导出文件路径
+     */
+    public static Task<String> exportPMCS(TaskBean<PMCListBean> taskBean, String fileName,
+                                          String outFilePath, boolean notOverwrite) {
+        return new Task<>() {
+            @Override
+            protected String call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_exportData());
+                List<PMCListBean> tableViewItems = taskBean.getBeanList();
+                String path = outFilePath + File.separator + fileName + PMCS;
+                if (notOverwrite) {
+                    path = notOverwritePath(path);
+                }
+                List<PMCListBean> exportList = tableViewItems.stream()
+                        .map(vo -> {
+                            PMCListBean bean = new PMCListBean();
+                            try {
+                                // 复制所有属性
+                                copyAllProperties(vo, bean);
+                            } catch (IllegalAccessException e) {
+                                throw new RuntimeException(e);
+                            }
+                            return bean;
+                        }).toList();
+                // 构建导出文件基本信息
+                PMCSFileDTO pmcsFileDTO = new PMCSFileDTO()
+                        .setPmcsList(exportList);
+                // 序列化数据
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writeValue(new File(path), pmcsFileDTO);
+                updateMessage(text_saveSuccess() + path);
+                return path;
             }
         };
     }

@@ -23,14 +23,11 @@ import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.ClickLogBean;
-import priv.koishi.pmc.Bean.ClickPositionBean;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,8 +47,9 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.Service.PMCFileService.exportPMCS;
 import static priv.koishi.pmc.Service.PMCFileService.loadPMCSFils;
-import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
+import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
@@ -61,7 +59,7 @@ import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
- * 自动操作工具页面控制器
+ * 批量执行 PMC 文件页面控制器
  *
  * @author KOISHI
  * Date:2025-02-17
@@ -126,7 +124,7 @@ public class ListPMCController extends RootController {
 
     @FXML
     public Button clearButton_List, runClick_List, addPosition_List, loadAutoClick_List, exportAutoClick_List,
-            addOutPath_List, recordClick_List, clickLog_List;
+            addOutPath_List, clickLog_List;
 
     @FXML
     public TextField loopTime_List, outFileName_List, preparationRunTime_List;
@@ -190,7 +188,7 @@ public class ListPMCController extends RootController {
             prop.store(output, null);
             input.close();
             output.close();
-            CheckBox autoSave = settingController.autoSave_Set;
+            CheckBox autoSave = settingController.autoSavePMCS_Set;
             // 自动保存
             autoSave(autoSave, outPathValue);
         }
@@ -203,17 +201,26 @@ public class ListPMCController extends RootController {
      */
     private void autoSave(CheckBox autoSave, String outPath) {
         if (autoSave.isSelected()) {
-            List<?> tableViewItems = new ArrayList<>(tableView_List.getItems());
+            List<PMCListBean> tableViewItems = new ArrayList<>(tableView_List.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String path = outPath + File.separator + autoSaveFileName() + PMC;
-                if (notOverwrite_List.isSelected()) {
-                    path = notOverwritePath(path);
-                }
-                // 构建基类类型信息
-                JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
-                // 使用基类类型进行序列化
-                objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
+                TaskBean<PMCListBean> taskBean = creatTaskBean();
+                taskBean.setMessageLabel(log_List)
+                        .setBeanList(tableViewItems);
+                exportPMCTask = exportPMCS(taskBean, autoSavePMCSFileName(), outPath, notOverwrite_List.isSelected());
+                bindingTaskNode(exportPMCTask, taskBean);
+                exportPMCTask.setOnSucceeded(_ -> {
+                    taskUnbind(taskBean);
+                    log_List.setTextFill(Color.GREEN);
+                    exportPMCTask = null;
+                });
+                exportPMCTask.setOnFailed(event -> {
+                    exportPMCTask = null;
+                    taskNotSuccess(taskBean, text_taskFailed());
+                    throw new RuntimeException(event.getSource().getException());
+                });
+                Thread.ofVirtual()
+                        .name("exportPMCTask-vThread" + tabId)
+                        .start(exportPMCTask);
             }
         }
     }
@@ -233,7 +240,7 @@ public class ListPMCController extends RootController {
             setControlLastConfig(loopTime_List, prop, key_lastLoopTime, defaultLoopTime);
             setControlLastConfig(notOverwrite_List, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_List, prop, key_lastOpenDirectory, activation);
-            setControlLastConfig(outFileName_List, prop, key_lastOutFileName, defaultOutFileName());
+            setControlLastConfig(outFileName_List, prop, key_lastOutFileName, defaultPMCFileName());
             setControlLastConfig(preparationRunTime_List, prop, key_lastPreparationRunTime, defaultPreparationRun);
         }
         if (StringUtils.isBlank(outPath_List.getText())) {
@@ -255,12 +262,6 @@ public class ListPMCController extends RootController {
         logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
         logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
         input.close();
-    }
-
-    /**
-     * 读取设置页面设置的值
-     */
-    private void getSetting() {
     }
 
     /**
@@ -337,7 +338,7 @@ public class ListPMCController extends RootController {
      */
     private void textFieldChangeListener() {
         // 导出自动流程文件名称文本输入框鼠标悬停提示
-        textFieldValueListener(outFileName_List, tip_autoClickFileName() + defaultOutFileName());
+        textFieldValueListener(outFileName_List, tip_autoClickFileName() + defaultPMCFileName());
         // 限制循环次数文本输入框内容
         integerRangeTextField(loopTime_List, 0, null, tip_loopTime());
         // 限制运行准备时间文本输入框内容
@@ -354,14 +355,13 @@ public class ListPMCController extends RootController {
         addToolTip(tip_loopTime(), loopTime_List);
         addToolTip(tip_learButton(), clearButton_List);
         addToolTip(tip_addPosition(), addPosition_List);
-        addToolTip(tip_recordClick(), recordClick_List);
         addToolTip(tip_notOverwrite(), notOverwrite_List);
         addToolTip(tip_loadFolder_Click(), loadFolder_List);
         addToolTip(tip_loadAutoClick(), loadAutoClick_List);
         addToolTip(tip_outAutoClickPath(), addOutPath_List);
         addToolTip(tip_openDirectory(), openDirectory_List);
         addToolTip(tip_exportAutoClick(), exportAutoClick_List);
-        addToolTip(tip_autoClickFileName() + defaultOutFileName(), outFileName_List);
+        addToolTip(tip_autoClickFileName() + defaultPMCFileName(), outFileName_List);
         addToolTip(tip_preparationRunTime() + defaultPreparationRun, preparationRunTime_List);
     }
 
@@ -370,7 +370,7 @@ public class ListPMCController extends RootController {
      */
     private void setPromptText() {
         loopTime_List.setPromptText(defaultLoopTime);
-        outFileName_List.setPromptText(defaultOutFileName());
+        outFileName_List.setPromptText(defaultPMCFileName());
         preparationRunTime_List.setPromptText(defaultPreparationRun);
     }
 
@@ -438,13 +438,14 @@ public class ListPMCController extends RootController {
         disableNodes.add(clickLog_List);
         disableNodes.add(runClick_List);
         disableNodes.add(tableView_List);
-        disableNodes.add(recordClick_List);
         disableNodes.add(addPosition_List);
         disableNodes.add(clearButton_List);
         disableNodes.add(loadAutoClick_List);
         disableNodes.add(exportAutoClick_List);
         Node aboutTab = mainScene.lookup("#aboutTab");
         disableNodes.add(aboutTab);
+        Node listPMCTab = mainScene.lookup("#listPMCTab");
+        disableNodes.add(listPMCTab);
         Node settingTab = mainScene.lookup("#settingTab");
         disableNodes.add(settingTab);
         Node autoClickTab = mainScene.lookup("#autoClickTab");
@@ -462,10 +463,6 @@ public class ListPMCController extends RootController {
         } else {
             cancelTip_List.setText(text_cancelTip_Click());
         }
-        String recordToolTip = tip_recordClick() + "\n" + text_shortcut() + getKeysText(recordKeys);
-        addToolTip(recordToolTip, recordClick_List);
-        String runToolTip = tip_runClick() + "\n" + text_shortcut() + getKeysText(runKeys);
-        addToolTip(runToolTip, runClick_List);
     }
 
     /**
@@ -596,8 +593,8 @@ public class ListPMCController extends RootController {
         TaskBean<PMCListBean> taskBean = creatTaskBean();
         taskBean.setMessageLabel(log_List)
                 .setBeanList(tableViewItems);
-        String fileName = setDefaultFileName(outFileName_List, defaultOutFileName());
-//        exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_List.isSelected());
+        String fileName = setDefaultFileName(outFileName_List, defaultPMCSFileName());
+        exportPMCTask = exportPMCS(taskBean, fileName, outFilePath, notOverwrite_List.isSelected());
         bindingTaskNode(exportPMCTask, taskBean);
         exportPMCTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);

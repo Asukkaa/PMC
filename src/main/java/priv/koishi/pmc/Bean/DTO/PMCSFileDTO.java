@@ -2,14 +2,14 @@ package priv.koishi.pmc.Bean.DTO;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Finals.CommonFinals;
 import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.util.List;
 
 /**
- * PMC 导出文件描述
+ * PMCS 导出文件描述
  *
  * @author KOISHI
  * Date:2026-01-04
@@ -17,17 +17,17 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class PMCFileDTO {
+public class PMCSFileDTO {
 
     /**
      * 文件拓展名
      */
-    String ext = CommonFinals.PMC;
+    String ext = CommonFinals.PMCS;
 
     /**
      * PMC 文件版本
      */
-    String version = CommonFinals.PMCFileVersion;
+    String version = CommonFinals.PMCFSileVersion;
 
     /**
      * 程序名称
@@ -37,7 +37,7 @@ public class PMCFileDTO {
     /**
      * 脚本内容
      */
-    @JsonSerialize(contentAs = ClickPositionBean.class)
-    List<ClickPositionBean> pmcList;
+    @JsonSerialize(contentAs = PMCListBean.class)
+    List<PMCListBean> pmcsList;
 
 }

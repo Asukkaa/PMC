@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Interface.FilePath;
@@ -22,6 +23,7 @@ public class PMCListBean implements Indexable, FilePath {
     /**
      * 序号
      */
+    @JsonIgnore
     Integer index;
 
     /**
@@ -47,6 +49,7 @@ public class PMCListBean implements Indexable, FilePath {
     /**
      * PMC 文件解析后的数据
      */
+    @JsonIgnore
     List<ClickPositionVO> clickPositionVOS;
 
     /**

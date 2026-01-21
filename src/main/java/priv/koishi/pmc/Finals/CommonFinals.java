@@ -36,6 +36,11 @@ public class CommonFinals {
     public static final String PMCFileVersion = "2.1";
 
     /**
+     * PMCS 文件版本
+     */
+    public static final String PMCFSileVersion = "1.0";
+
+    /**
      * jdk 版本
      */
     public static final String jdkVersion = System.getProperty("java.vendor") + " " + System.getProperty("java.vm.version");
@@ -104,6 +109,11 @@ public class CommonFinals {
      * 文件后缀名：pmc
      */
     public static final String PMC = ".pmc";
+
+    /**
+     * 文件后缀名：pmcs
+     */
+    public static final String PMCS = ".pmcs";
 
     /**
      * 文件后缀名：exe
@@ -286,10 +296,13 @@ public class CommonFinals {
     public static final String configFile = "config/config.properties";
 
     /**
-     * 读取自动操作工具功能配置文件路径
+     * 读取自动操作工具页面配置文件路径
      */
     public static final String configFile_Click = "config/autoClickConfig.properties";
 
+    /**
+     * 批量执行 PMC 文件页面配置文件路径
+     */
     public static final String configFile_List = "config/listPMCConfig.properties";
 
     /**

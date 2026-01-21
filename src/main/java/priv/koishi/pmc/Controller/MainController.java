@@ -51,6 +51,9 @@ public class MainController extends RootController {
      */
     public static TimedTaskController timedTaskController;
 
+    /**
+     * 批量执行 PMC 文件页面控制器
+     */
     public static ListPMCController listPMCController;
 
     @FXML
@@ -89,6 +92,8 @@ public class MainController extends RootController {
         settingController.adaption();
         // 定时任务页组件宽度自适应
         timedTaskController.adaption();
+        // 批量执行 PMC 文件页面组件宽度自适应
+        listPMCController.adaption();
     }
 
     /**
@@ -263,6 +268,10 @@ public class MainController extends RootController {
         // 保存日志文件数量设置
         if (aboutController != null) {
             aboutController.saveLastConfig();
+        }
+        // 保存批量执行 PMC 文件页面设置
+        if (listPMCController != null) {
+            listPMCController.saveLastConfig();
         }
         // 保存关程序闭前页面状态设置
         saveLastConfig();

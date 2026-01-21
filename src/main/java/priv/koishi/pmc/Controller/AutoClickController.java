@@ -62,8 +62,6 @@ import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.ObjectMapper;
 
 import java.awt.*;
 import java.io.File;
@@ -446,7 +444,7 @@ public class AutoClickController extends RootController implements MousePosition
             prop.store(output, null);
             input.close();
             output.close();
-            CheckBox autoSave = settingController.autoSave_Set;
+            CheckBox autoSave = settingController.autoSavePMC_Set;
             // 自动保存
             autoSave(autoSave, outPathValue);
         }
@@ -459,17 +457,26 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void autoSave(CheckBox autoSave, String outPath) {
         if (autoSave.isSelected()) {
-            List<?> tableViewItems = new ArrayList<>(tableView_Click.getItems());
+            List<ClickPositionVO> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isNotEmpty(tableViewItems)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String path = outPath + File.separator + autoSaveFileName() + PMC;
-                if (notOverwrite_Click.isSelected()) {
-                    path = notOverwritePath(path);
-                }
-                // 构建基类类型信息
-                JavaType baseType = objectMapper.getTypeFactory().constructParametricType(List.class, ClickPositionBean.class);
-                // 使用基类类型进行序列化
-                objectMapper.writerFor(baseType).writeValue(new File(path), tableViewItems);
+                TaskBean<ClickPositionVO> taskBean = creatTaskBean();
+                taskBean.setMessageLabel(log_Click)
+                        .setBeanList(tableViewItems);
+                exportPMCTask = exportPMC(taskBean, autoSavePMCFileName(), outPath, notOverwrite_Click.isSelected());
+                bindingTaskNode(exportPMCTask, taskBean);
+                exportPMCTask.setOnSucceeded(_ -> {
+                    taskUnbind(taskBean);
+                    log_Click.setTextFill(Color.GREEN);
+                    exportPMCTask = null;
+                });
+                exportPMCTask.setOnFailed(event -> {
+                    exportPMCTask = null;
+                    taskNotSuccess(taskBean, text_taskFailed());
+                    throw new RuntimeException(event.getSource().getException());
+                });
+                Thread.ofVirtual()
+                        .name("exportPMCTask-vThread" + tabId)
+                        .start(exportPMCTask);
             }
         }
     }
@@ -489,7 +496,7 @@ public class AutoClickController extends RootController implements MousePosition
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
             setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
-            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultOutFileName());
+            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultPMCFileName());
             setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRun);
             setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, defaultPreparationRecord);
         }
@@ -1322,7 +1329,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void textFieldChangeListener() {
         // 导出自动流程文件名称文本输入框鼠标悬停提示
-        textFieldValueListener(outFileName_Click, tip_autoClickFileName() + defaultOutFileName());
+        textFieldValueListener(outFileName_Click, tip_autoClickFileName() + defaultPMCFileName());
         // 限制循环次数文本输入框内容
         integerRangeTextField(loopTime_Click, 0, null, tip_loopTime());
         // 限制运行准备时间文本输入框内容
@@ -1348,7 +1355,7 @@ public class AutoClickController extends RootController implements MousePosition
         addToolTip(tip_outAutoClickPath(), addOutPath_Click);
         addToolTip(tip_openDirectory(), openDirectory_Click);
         addToolTip(tip_exportAutoClick(), exportAutoClick_Click);
-        addToolTip(tip_autoClickFileName() + defaultOutFileName(), outFileName_Click);
+        addToolTip(tip_autoClickFileName() + defaultPMCFileName(), outFileName_Click);
         addToolTip(tip_preparationRunTime() + defaultPreparationRun, preparationRunTime_Click);
         addToolTip(tip_preparationRecordTime() + defaultPreparationRecord, preparationRecordTime_Click);
     }
@@ -1358,7 +1365,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setPromptText() {
         loopTime_Click.setPromptText(defaultLoopTime);
-        outFileName_Click.setPromptText(defaultOutFileName());
+        outFileName_Click.setPromptText(defaultPMCFileName());
         preparationRunTime_Click.setPromptText(defaultPreparationRun);
         preparationRecordTime_Click.setPromptText(defaultPreparationRecord);
     }
@@ -2031,6 +2038,8 @@ public class AutoClickController extends RootController implements MousePosition
         disableNodes.add(exportAutoClick_Click);
         Node aboutTab = mainScene.lookup("#aboutTab");
         disableNodes.add(aboutTab);
+        Node listPMCTab = mainScene.lookup("#listPMCTab");
+        disableNodes.add(listPMCTab);
         Node settingTab = mainScene.lookup("#settingTab");
         disableNodes.add(settingTab);
         Node autoClickTab = mainScene.lookup("#autoClickTab");
@@ -2287,7 +2296,7 @@ public class AutoClickController extends RootController implements MousePosition
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
             taskBean.setMessageLabel(log_Click)
                     .setBeanList(tableViewItems);
-            String fileName = setDefaultFileName(outFileName_Click, defaultOutFileName());
+            String fileName = setDefaultFileName(outFileName_Click, defaultPMCFileName());
             exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_Click.isSelected());
             bindingTaskNode(exportPMCTask, taskBean);
             exportPMCTask.setOnSucceeded(_ -> {

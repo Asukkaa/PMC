@@ -200,14 +200,14 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public CheckBox lastTab_Set, fullWindow_Set, loadAutoClick_Set, hideWindowRun_Set, showWindowRun_Set, dragLog_Set,
-            autoSave_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
+            autoSavePMC_Set, recordDrag_Set, recordMove_Set, randomClick_Set, randomTrajectory_Set, clickAllRegion_Set,
             randomClickInterval_Set, randomWaitTime_Set, clickLog_Set, moveLog_Set, firstClick_Set, clickImgLog_Set,
             hideWindowRecord_Set, showWindowRecord_Set, floatingRun_Set, floatingRecord_Set, randomClickTime_Set,
             mouseFloatingRun_Set, mouseFloatingRecord_Set, mouseFloating_Set, maxWindow_Set, remindClickSave_Set,
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
             openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set, noMove_Set,
-            recordMouseClick_Set;
+            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -523,7 +523,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(dragLog_Set, prop, key_dragLog, activation);
         setControlLastConfig(waitLog_Set, prop, key_waitLog, activation);
         setControlLastConfig(noMove_Set, prop, key_noMove, unActivation);
-        setControlLastConfig(autoSave_Set, prop, key_autoSave, activation);
+        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, activation);
         setControlLastConfig(clickLog_Set, prop, key_clickLog, activation);
         setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
         setControlLastConfig(clickImgLog_Set, prop, key_clickLog, activation);
@@ -581,6 +581,11 @@ public class SettingController extends RootController implements MousePositionUp
         // 加载应用图像识别配置
         loadFindImgConfig(prop);
         clickFileInput.close();
+        InputStream listConfigInput = checkRunningInputStream(configFile_List);
+        prop.load(listConfigInput);
+        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, activation);
+        setControlLastConfig(loadPMCS_Set, prop, key_loadLastConfig, activation);
+        listConfigInput.close();
     }
 
     /**
@@ -709,7 +714,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
         addToolTip(titleCoordinate_Set.getText(), titleCoordinate_Set);
-        addToolTip(tip_autoSave() + autoSaveFileName(), autoSave_Set);
+        addToolTip(tip_autoSave() + autoSavePMCFileName(), autoSavePMC_Set);
         addToolTip(tip_allRegion(), clickAllRegion_Set, stopAllRegion_Set);
         addToolTip(text_deleteKey(), removeRecordKey_Det, removeRunKey_Det);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
@@ -728,8 +733,8 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(stopOpacity_Set, tip_stopOpacity(), String.valueOf((int) stopOpacity_Set.getValue()));
         addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
         addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set, imgLog_Set,
-                openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set,
-                recordMouseWheel_Set, recordKeyboard_Set, recordMouseClick_Set);
+                openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, loadPMCS_Set,
+                recordMouseWheel_Set, recordKeyboard_Set, recordMouseClick_Set, autoSavePMCS_Set);
     }
 
     /**
@@ -876,6 +881,8 @@ public class SettingController extends RootController implements MousePositionUp
         baseDisableNodes.add(aboutTab);
         Node settingTab = mainScene.lookup("#settingTab");
         baseDisableNodes.add(settingTab);
+        Node listPMCTab = mainScene.lookup("#listPMCTab");
+        baseDisableNodes.add(listPMCTab);
         Node autoClickTab = mainScene.lookup("#autoClickTab");
         baseDisableNodes.add(autoClickTab);
         Node timedStartTab = mainScene.lookup("#timedStartTab");
@@ -1606,13 +1613,23 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 自动操作工具功能加载上次设置信息
+     * 自动操作工具页面加载上次设置信息
      *
      * @throws IOException 配置文件保存异常
      */
     @FXML
     private void loadAutoClickAction() throws IOException {
         setLoadLastConfigCheckBox(loadAutoClick_Set, configFile_Click, key_loadLastConfig);
+    }
+
+    /**
+     * 批量执行 PMC 文件页面加载上次设置信息
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void loadPMMCSAction() throws IOException {
+        setLoadLastConfigCheckBox(loadPMCS_Set, configFile_List, key_loadLastConfig);
     }
 
     /**
@@ -1636,13 +1653,23 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 关闭程序时自动保存列表操作步骤
+     * 关闭应用时自动保存 PMC 文件
      *
      * @throws IOException 配置文件保存异常
      */
     @FXML
-    private void loadAutoSaveAction() throws IOException {
-        setLoadLastConfigCheckBox(autoSave_Set, configFile_Click, key_autoSave);
+    private void autoSavePMCAction() throws IOException {
+        setLoadLastConfigCheckBox(autoSavePMC_Set, configFile_Click, key_autoSave);
+    }
+
+    /**
+     * 关闭应用时自动保存 PMCS 文件
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void autoSavePMCSAction() throws IOException {
+        setLoadLastConfigCheckBox(autoSavePMCS_Set, configFile_List, key_autoSave);
     }
 
     /**
