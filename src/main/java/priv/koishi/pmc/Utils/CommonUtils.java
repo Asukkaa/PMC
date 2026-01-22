@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static priv.koishi.pmc.Finals.CommonFinals.PMCFileVersion;
 import static priv.koishi.pmc.Finals.i18nFinal.text_unknowGC;
 
 /**
@@ -167,31 +166,48 @@ public class CommonUtils {
     /**
      * 比较版本号
      *
-     * @param version 要比较的版本号字符串
-     * @return 1 大于当前版本； 0 等于当前版本； -1 小于当前版本
+     * @param version          要比较的版本号字符串
+     * @param referenceVersion 参考版本号字符串
+     * @return 1 大于参考版本； 0 等于参考版本； -1 小于参考版本
      */
-    public static int compareToConstant(String version) {
-        // 空值视为旧版本
-        if (version == null || version.trim().isEmpty()) {
+    public static int compareToConstant(String version, String referenceVersion) {
+        // 检查版本号是否有效
+        if (checkVersionFormat(version)) {
             return -1;
         }
-        // 格式不正确，视为旧版本
-        if (!isValidVersion(version)) {
+        // 检查参考版本是否有效
+        if (checkVersionFormat(referenceVersion)) {
             return -1;
         }
         // 分割版本号并比较
-        return compareVersionParts(version);
+        return compareVersionParts(version, referenceVersion);
+    }
+
+    /**
+     * 检查版本号格式是否正确
+     *
+     * @param version 要检查的版本号字符串
+     * @return true 表示格式不正确，false 表示格式正确
+     */
+    private static boolean checkVersionFormat(String version) {
+        // 空值视为旧版本
+        if (version == null || version.trim().isEmpty()) {
+            return true;
+        }
+        // 格式不正确，视为旧版本
+        return !isValidVersion(version);
     }
 
     /**
      * 比较两个版本号的各个部分
      *
-     * @param version 要比较的版本号字符串
-     * @return 1 大于当前版本； 0 等于当前版本； -1 小于当前版本
+     * @param version          要比较的版本号字符串
+     * @param referenceVersion 参考版本号字符串
+     * @return 1 大于参考版本； 0 等于参考版本； -1 小于参考版本
      */
-    private static int compareVersionParts(String version) {
+    private static int compareVersionParts(String version, String referenceVersion) {
         String[] parts1 = version.split("\\.");
-        String[] parts2 = PMCFileVersion.split("\\.");
+        String[] parts2 = referenceVersion.split("\\.");
         // 比较主版本号
         int major1 = Integer.parseInt(parts1[0]);
         int major2 = Integer.parseInt(parts2[0]);
@@ -204,7 +220,8 @@ public class CommonUtils {
         if (minor1 != minor2) {
             return minor1 > minor2 ? 1 : -1;
         }
-        return 0; // 完全相等
+        // 完全相等
+        return 0;
     }
 
     /**

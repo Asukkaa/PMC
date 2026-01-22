@@ -2,12 +2,15 @@ package priv.koishi.pmc.Bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.AbstractBean.BaseCopyBean;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 批量执行 PMC 流程数据类
@@ -18,7 +21,14 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class PMCListBean implements Indexable, FilePath {
+@EqualsAndHashCode(callSuper = true)
+public class PMCListBean extends BaseCopyBean implements Indexable, FilePath {
+
+    /**
+     * 唯一标识符
+     */
+    @JsonIgnore
+    String uuid = UUID.randomUUID().toString();
 
     /**
      * 序号
@@ -60,6 +70,14 @@ public class PMCListBean implements Indexable, FilePath {
     @Override
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    /**
+     * 更新 UUID
+     */
+    @Override
+    public void updateUuid() {
+        uuid = UUID.randomUUID().toString();
     }
 
 }

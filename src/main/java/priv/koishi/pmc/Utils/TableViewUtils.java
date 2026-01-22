@@ -15,6 +15,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Interface.CopyBean;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
 import priv.koishi.pmc.Bean.Interface.Indexable;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
-import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
@@ -696,11 +696,13 @@ public class TableViewUtils {
     /**
      * 复制所选数据选项
      *
-     * @param tableView   要添加右键菜单的列表
-     * @param contextMenu 右键菜单集合
-     * @param dataNumber  列表数据数量文本框
+     * @param tableView      要添加右键菜单的列表
+     * @param contextMenu    右键菜单集合
+     * @param dataNumber     列表数据数量文本框
+     * @param dataNumberUnit 数据数量单位
      */
-    public static void buildCopyDataMenu(TableView<ClickPositionVO> tableView, ContextMenu contextMenu, Label dataNumber) {
+    public static <T extends CopyBean> void buildCopyDataMenu(TableView<T> tableView, ContextMenu contextMenu,
+                                                              Label dataNumber, String dataNumberUnit) {
         Menu menu = new Menu(menu_copy());
         // 创建二级菜单项
         MenuItem upCopy = new MenuItem(menuItem_upCopy());
@@ -708,10 +710,10 @@ public class TableViewUtils {
         MenuItem appendCopy = new MenuItem(menuItem_appendCopy());
         MenuItem topCopy = new MenuItem(menuItem_topCopy());
         // 为每个菜单项添加事件处理
-        upCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_upCopy(), dataNumber));
-        downCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_downCopy(), dataNumber));
-        appendCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber));
-        topCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber));
+        upCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_upCopy(), dataNumber, dataNumberUnit));
+        downCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_downCopy(), dataNumber, dataNumberUnit));
+        appendCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber, dataNumberUnit));
+        topCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber, dataNumberUnit));
         // 将菜单添加到菜单列表
         menu.getItems().addAll(upCopy, downCopy, appendCopy, topCopy);
         contextMenu.getItems().add(menu);
@@ -720,20 +722,22 @@ public class TableViewUtils {
     /**
      * 复制所选数据二级菜单选项
      *
-     * @param tableView  要处理的数据列表
-     * @param copyType   复制类型
-     * @param dataNumber 列表数据数量文本框
+     * @param tableView      要处理的数据列表
+     * @param copyType       复制类型
+     * @param dataNumber     列表数据数量文本框
+     * @param dataNumberUnit 数据数量单位
      */
-    private static void copyDataMenuItem(TableView<ClickPositionVO> tableView, String copyType, Label dataNumber) {
-        List<ClickPositionVO> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
+    private static <T extends CopyBean> void copyDataMenuItem(TableView<T> tableView, String copyType,
+                                                              Label dataNumber, String dataNumberUnit) {
+        List<T> copiedList = getCopyList(tableView.getSelectionModel().getSelectedItems());
         if (menuItem_upCopy().equals(copyType)) {
-            addData(copiedList, upAdd, tableView, dataNumber, unit_process());
+            addData(copiedList, upAdd, tableView, dataNumber, dataNumberUnit);
         } else if (menuItem_downCopy().equals(copyType)) {
-            addData(copiedList, downAdd, tableView, dataNumber, unit_process());
+            addData(copiedList, downAdd, tableView, dataNumber, dataNumberUnit);
         } else if (menuItem_appendCopy().equals(copyType)) {
-            addData(copiedList, append, tableView, dataNumber, unit_process());
+            addData(copiedList, append, tableView, dataNumber, dataNumberUnit);
         } else if (menuItem_topCopy().equals(copyType)) {
-            addData(copiedList, topAdd, tableView, dataNumber, unit_process());
+            addData(copiedList, topAdd, tableView, dataNumber, dataNumberUnit);
         }
     }
 
@@ -743,17 +747,16 @@ public class TableViewUtils {
      * @param selectedItem 选中的数据
      * @return 复制的数据
      */
-    private static List<ClickPositionVO> getCopyList(List<ClickPositionVO> selectedItem) {
-        List<ClickPositionVO> copiedList = new ArrayList<>();
-        selectedItem.forEach(clickPositionBean -> {
-            ClickPositionVO copyClickPositionVO = new ClickPositionVO();
+    private static <T extends CopyBean> List<T> getCopyList(List<? extends T> selectedItem) {
+        List<T> copiedList = new ArrayList<>();
+        selectedItem.forEach(bean -> {
+            T copyBean;
             try {
-                copyAllProperties(clickPositionBean, copyClickPositionVO);
-            } catch (IllegalAccessException e) {
+                copyBean = bean.createCopy();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            copyClickPositionVO.setUuid(UUID.randomUUID().toString());
-            copiedList.add(copyClickPositionVO);
+            copiedList.add(copyBean);
         });
         return copiedList;
     }

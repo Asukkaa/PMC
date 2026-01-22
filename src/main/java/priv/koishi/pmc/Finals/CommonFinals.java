@@ -38,7 +38,7 @@ public class CommonFinals {
     /**
      * PMCS 文件版本
      */
-    public static final String PMCFSileVersion = "1.0";
+    public static final String PMCSFileVersion = "1.0";
 
     /**
      * jdk 版本

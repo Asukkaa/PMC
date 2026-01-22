@@ -27,7 +27,10 @@ import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -79,6 +82,7 @@ public class PMCFileService {
                                     .setPath(pmcFile.getPath());
                             pmcListBeans.add(pmcListBean);
                         },
+                        (_, pmcsList) -> pmcListBeans.addAll(pmcsList),
                         this::updateProgress);
                 // 匹配图片
                 matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
@@ -110,6 +114,7 @@ public class PMCFileService {
                         lastPMCPathRef,
                         (_, clickPositionVOS) ->
                                 allClickPositions.addAll(clickPositionVOS),
+                        null,
                         this::updateProgress);
                 // 匹配图片
                 matchSameNameImg(imgMap, allClickPositions, this::updateMessage, this::updateProgress);
@@ -132,6 +137,7 @@ public class PMCFileService {
     private static List<ClickPositionVO> loadFilesCommon(List<? extends File> files,
                                                          Map<? super String, ? super String> imgMap, String[] lastPMCPathRef,
                                                          BiConsumer<? super File, ? super List<ClickPositionVO>> pmcFileProcessor,
+                                                         BiConsumer<? super File, ? super List<PMCListBean>> pmcsFileProcessor,
                                                          ProgressUpdater updateProgressFunc) {
         List<ClickPositionVO> allClickPositions = new ArrayList<>();
         int size = files.size();
@@ -148,6 +154,11 @@ public class PMCFileService {
                 // 调用回调处理 PMC 文件
                 if (pmcFileProcessor != null) {
                     pmcFileProcessor.accept(file, clickPositionVOS);
+                }
+            } else if (PMCS.equals(fileType)) {
+                if (pmcsFileProcessor != null) {
+                    List<PMCListBean> pmcsList = loadPMCSFile(file);
+                    pmcsFileProcessor.accept(file, pmcsList);
                 }
             } else if (file.isDirectory()) {
                 processDirectory(file, imgMap, lastPMCPathRef, allClickPositions, pmcFileProcessor);
@@ -423,10 +434,10 @@ public class PMCFileService {
                 if (!appName.equals(app)) {
                     isErrFormat = true;
                     errText += confirm_otherPMCConfirm();
-                } else if (compareToConstant(version) > 0) {
+                } else if (compareToConstant(version, PMCFileVersion) > 0) {
                     isErrFormat = true;
                     errText += confirm_isNewPMCConfirm();
-                } else if (compareToConstant(version) < 0) {
+                } else if (compareToConstant(version, PMCFileVersion) < 0) {
                     isErrFormat = true;
                     errText += confirm_isOldPMCConfirm();
                 }
@@ -500,17 +511,42 @@ public class PMCFileService {
     }
 
     /**
-     * 构建自动操作流程
+     * 构建 PMC 自动操作流程
      *
-     * @param clickPositionBeans 导入的数据
-     * @param clickPositionVOS   处理后的数据
+     * @param input  导入的数据
+     * @param output 处理后的数据
      */
-    private static void buildPMC(List<? extends ClickPositionBean> clickPositionBeans,
-                                 List<? super ClickPositionVO> clickPositionVOS) {
-        if (CollectionUtils.isNotEmpty(clickPositionBeans)) {
+    private static void buildPMC(List<? extends ClickPositionBean> input, List<? super ClickPositionVO> output) {
+        if (CollectionUtils.isNotEmpty(input)) {
             // 定时执行导入自动操作并执行时如果不立刻设置序号会导致运行时找不到序号
             int index = 0;
-            for (ClickPositionBean bean : clickPositionBeans) {
+            for (ClickPositionBean bean : input) {
+                if (!retryTypeMap.containsKey(bean.getRetryTypeEnum())
+                        || !clickTypeMap.containsKey(bean.getClickTypeEnum())
+                        || !matchedTypeMap.containsKey(bean.getMatchedTypeEnum())
+                        || !recordClickTypeMap.containsKey(bean.getMouseKeyEnum())
+                        || !activationList.contains(bean.getRandomClick())
+                        || !activationList.contains(bean.getRandomWaitTime())
+                        || !activationList.contains(bean.getRandomClickTime())
+                        || !activationList.contains(bean.getRandomTrajectory())
+                        || !activationList.contains(bean.getRandomClickInterval())
+                        || !isInIntegerRange(bean.getStartX(), 0, null)
+                        || !isInIntegerRange(bean.getStartY(), 0, null)
+                        || !isInIntegerRange(bean.getRandomX(), 0, null)
+                        || !isInIntegerRange(bean.getRandomY(), 0, null)
+                        || !isInIntegerRange(bean.getImgX(), null, null)
+                        || !isInIntegerRange(bean.getImgY(), null, null)
+                        || !isInIntegerRange(bean.getWaitTime(), 0, null)
+                        || !isInIntegerRange(bean.getClickNum(), 0, null)
+                        || !isInIntegerRange(bean.getClickTime(), 0, null)
+                        || !isInIntegerRange(bean.getClickInterval(), 0, null)
+                        || !isInIntegerRange(bean.getStopRetryTimes(), 0, null)
+                        || !isInIntegerRange(bean.getClickRetryTimes(), 0, null)
+                        || !isInIntegerRange(bean.getRandomClickTime(), 0, null)
+                        || !isInIntegerRange(bean.getStopMatchThreshold(), 0, 100)
+                        || !isInIntegerRange(bean.getClickMatchThreshold(), 0, 100)) {
+                    throw new RuntimeException(text_missingKeyData());
+                }
                 ClickPositionVO vo = new ClickPositionVO();
                 try {
                     // 自动拷贝父类中的属性
@@ -521,35 +557,141 @@ public class PMCFileService {
                 // 初始化子类特有属性
                 vo.setTableView(autoClickController.tableView_Click)
                         .setRemove(false)
-                        .setUuid(UUID.randomUUID().toString());
+                        .updateUuid();
                 vo.setIndex(index++);
-                if (!retryTypeMap.containsKey(vo.getRetryTypeEnum())
-                        || !clickTypeMap.containsKey(vo.getClickTypeEnum())
-                        || !matchedTypeMap.containsKey(vo.getMatchedTypeEnum())
-                        || !recordClickTypeMap.containsKey(vo.getMouseKeyEnum())
-                        || !activationList.contains(vo.getRandomClick())
-                        || !activationList.contains(vo.getRandomWaitTime())
-                        || !activationList.contains(vo.getRandomClickTime())
-                        || !activationList.contains(vo.getRandomTrajectory())
-                        || !activationList.contains(vo.getRandomClickInterval())
-                        || !isInIntegerRange(vo.getStartX(), 0, null)
-                        || !isInIntegerRange(vo.getStartY(), 0, null)
-                        || !isInIntegerRange(vo.getRandomX(), 0, null)
-                        || !isInIntegerRange(vo.getRandomY(), 0, null)
-                        || !isInIntegerRange(vo.getImgX(), null, null)
-                        || !isInIntegerRange(vo.getImgY(), null, null)
-                        || !isInIntegerRange(vo.getWaitTime(), 0, null)
-                        || !isInIntegerRange(vo.getClickNum(), 0, null)
-                        || !isInIntegerRange(vo.getClickTime(), 0, null)
-                        || !isInIntegerRange(vo.getClickInterval(), 0, null)
-                        || !isInIntegerRange(vo.getStopRetryTimes(), 0, null)
-                        || !isInIntegerRange(vo.getClickRetryTimes(), 0, null)
-                        || !isInIntegerRange(vo.getRandomClickTime(), 0, null)
-                        || !isInIntegerRange(vo.getStopMatchThreshold(), 0, 100)
-                        || !isInIntegerRange(vo.getClickMatchThreshold(), 0, 100)) {
+                output.add(vo);
+            }
+        }
+    }
+
+    /**
+     * 加载 PMCS 文件
+     *
+     * @param jsonFile 要解析的 PMCS 文件
+     * @return PMCListBean 列表
+     */
+    private static List<PMCListBean> loadPMCSFile(File jsonFile) {
+        // 配置忽略未知字段
+        ObjectMapper objectMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
+        String filePath = jsonFile.getAbsolutePath();
+        List<PMCListBean> pmcsList;
+        boolean isErrFormat = false;
+        String errText = text_fileName() + getFileName(filePath) + "\n" +
+                text_filePath() + filePath + "\n";
+        try {
+            // 首先尝试解析为 PMCFileBean 格式
+            PMCSFileDTO pmcsFileDTO = objectMapper.readValue(jsonFile, PMCSFileDTO.class);
+            if (pmcsFileDTO != null && CollectionUtils.isNotEmpty(pmcsFileDTO.getPmcsList())) {
+                String version = pmcsFileDTO.getVersion();
+                String app = pmcsFileDTO.getAppName();
+                if (!appName.equals(app)) {
+                    isErrFormat = true;
+                    errText += confirm_otherPMCSConfirm();
+                } else if (compareToConstant(version, PMCSFileVersion) > 0) {
+                    isErrFormat = true;
+                    errText += confirm_isNewPMCSConfirm();
+                } else if (compareToConstant(version, PMCSFileVersion) < 0) {
+                    isErrFormat = true;
+                    errText += confirm_isOldPMCSConfirm();
+                }
+                pmcsList = new ArrayList<>(pmcsFileDTO.getPmcsList());
+            } else {
+                // 如果 pmcList 为空，尝试旧格式
+                pmcsList = objectMapper.readValue(jsonFile,
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, PMCListBean.class));
+                isErrFormat = true;
+                errText += confirm_isOldPMCSConfirm();
+            }
+        } catch (MismatchedInputException e) {
+            // PMCFileBean 解析失败，尝试旧格式
+            try {
+                pmcsList = objectMapper.readValue(jsonFile,
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, PMCListBean.class));
+                isErrFormat = true;
+                errText += confirm_isOldPMCSConfirm();
+            } catch (MismatchedInputException e2) {
+                // 两种格式都失败，抛出异常
+                throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
+            }
+        }
+        // 自动任务加载时不提示旧版本
+        if (runPMCFile) {
+            isErrFormat = false;
+        }
+        List<PMCListBean> pmcListBeans = new ArrayList<>();
+        if (isErrFormat) {
+            CountDownLatch latch = new CountDownLatch(1);
+            AtomicReference<List<PMCListBean>> resultRef = new AtomicReference<>();
+            AtomicReference<Exception> exceptionRef = new AtomicReference<>();
+            String finalErrText = errText;
+            List<PMCListBean> finalPmcsList = pmcsList;
+            Platform.runLater(() -> {
+                try {
+                    ButtonType result = creatConfirmDialog(
+                            text_errPMCSFile(),
+                            finalErrText,
+                            confirm_continue(),
+                            confirm_cancel());
+                    ButtonBar.ButtonData buttonData = result.getButtonData();
+                    if (!buttonData.isCancelButton()) {
+                        buildPMCS(finalPmcsList, pmcListBeans);
+                        resultRef.set(pmcListBeans);
+                    } else {
+                        resultRef.set(new ArrayList<>());
+                    }
+                } catch (Exception e) {
+                    exceptionRef.set(e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+            try {
+                // 等待用户选择完成
+                latch.await();
+                Exception e = exceptionRef.get();
+                if (e != null) {
+                    throw new RuntimeException(e);
+                }
+                return resultRef.get();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
+        } else {
+            buildPMCS(pmcsList, pmcListBeans);
+        }
+        return pmcListBeans;
+    }
+
+    /**
+     * 构建 PMCS 自动操作流程集合
+     *
+     * @param input  导入的数据
+     * @param output 处理后的数据
+     */
+    private static void buildPMCS(List<? extends PMCListBean> input, List<? super PMCListBean> output) {
+        if (CollectionUtils.isNotEmpty(input)) {
+            int index = 0;
+            for (PMCListBean bean : input) {
+                File file = new File(bean.getPath());
+                if (!file.exists()
+                        || !isInIntegerRange(bean.getRunNum(), 1, null)
+                        || !isInIntegerRange(bean.getWaitTime(), 0, null)) {
                     throw new RuntimeException(text_missingKeyData());
                 }
-                clickPositionVOS.add(vo);
+                List<ClickPositionVO> clickPositionVOS = loadPMCFile(file);
+                PMCListBean pmcListBean = new PMCListBean();
+                try {
+                    // 自动拷贝父类中的属性
+                    copyAllProperties(bean, pmcListBean);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                pmcListBean.setClickPositionVOS(clickPositionVOS)
+                        .setIndex(index++);
+                output.add(pmcListBean);
             }
         }
     }

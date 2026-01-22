@@ -292,6 +292,8 @@ public class ListPMCController extends RootController {
         buildMoveDataMenu(tableView_List, tableMenu);
         // 查看文件选项
         buildFilePathItem(tableView_List, tableMenu);
+        // 复制数据选项
+        buildCopyDataMenu(tableView_List, tableMenu, dataNumber_List, unit_files());
         // 取消选中选项
         buildClearSelectedData(tableView_List, tableMenu);
         // 删除所选数据选项
@@ -397,8 +399,10 @@ public class ListPMCController extends RootController {
     public void addAutoClickPositions(List<? extends PMCListBean> clickPositionVOS, String filePath) {
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_List, dataNumber_List, unit_files());
-        updateLabel(log_List, text_loadSuccess() + filePath);
-        Platform.runLater(() -> log_List.setTextFill(Color.GREEN));
+        if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+            updateLabel(log_List, text_loadSuccess() + filePath);
+            Platform.runLater(() -> log_List.setTextFill(Color.GREEN));
+        }
     }
 
     /**
@@ -415,9 +419,7 @@ public class ListPMCController extends RootController {
             PMCSLoadResult value = loadPMCFilsTask.getValue();
             String lastPMCPath = value.lastPMCPath();
             List<PMCListBean> clickPositionVOS = value.pmcListBeans();
-            if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-                addAutoClickPositions(clickPositionVOS, lastPMCPath);
-            }
+            addAutoClickPositions(clickPositionVOS, lastPMCPath);
             loadPMCFilsTask = null;
         });
         loadPMCFilsTask.setOnFailed(event -> {

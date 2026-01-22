@@ -27,7 +27,7 @@ public class PMCSFileDTO {
     /**
      * PMC 文件版本
      */
-    String version = CommonFinals.PMCFSileVersion;
+    String version = CommonFinals.PMCSFileVersion;
 
     /**
      * 程序名称

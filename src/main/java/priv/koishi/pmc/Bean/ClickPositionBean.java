@@ -1,13 +1,18 @@
 package priv.koishi.pmc.Bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.AbstractBean.BaseCopyBean;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 import tools.jackson.databind.annotation.JsonSerialize;
@@ -30,7 +35,8 @@ import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
  */
 @Data
 @Accessors(chain = true)
-public class ClickPositionBean {
+@EqualsAndHashCode(callSuper = true)
+public class ClickPositionBean extends BaseCopyBean {
 
     /**
      * 唯一标识符
@@ -46,12 +52,12 @@ public class ClickPositionBean {
     /**
      * 起始横（X）坐标
      */
-    String startX;
+    String startX = "0";
 
     /**
      * 起始纵（Y）坐标
      */
-    String startY;
+    String startY = "0";
 
     /**
      * 相对横（X）坐标
@@ -76,17 +82,17 @@ public class ClickPositionBean {
     /**
      * 操作次数
      */
-    String clickNum;
+    String clickNum = "1";
 
     /**
      * 操作间隔时间（单位：毫秒）
      */
-    String clickInterval;
+    String clickInterval = "0";
 
     /**
      * 操作执行前等待时间（单位：毫秒）
      */
-    String waitTime;
+    String waitTime = "0";
 
     /**
      * 操作按键
@@ -97,7 +103,7 @@ public class ClickPositionBean {
     /**
      * 鼠标按键枚举值
      */
-    int mouseKeyEnum;
+    int mouseKeyEnum = NativeMouseEvent.BUTTON1;
 
     /**
      * 键盘按键枚举值
@@ -119,23 +125,23 @@ public class ClickPositionBean {
      * 要识别的图片识别匹配阈值
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
-    String clickMatchThreshold;
+    String clickMatchThreshold = defaultClickOpacity;
 
     /**
      * 终止操作的图片识别匹配阈值
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
-    String stopMatchThreshold;
+    String stopMatchThreshold = defaultStopOpacity;
 
     /**
      * 要识别的图片识别重试次数
      */
-    String clickRetryTimes;
+    String clickRetryTimes = defaultClickRetryNum;
 
     /**
      * 终止操作的图片识别重试次数
      */
-    String stopRetryTimes;
+    String stopRetryTimes = defaultStopRetryNum;
 
     /**
      * 要识别的图像识别重试设置
@@ -146,7 +152,7 @@ public class ClickPositionBean {
     /**
      * 要识别的图像识别重试设置枚举值
      */
-    int retryTypeEnum;
+    int retryTypeEnum = RetryTypeEnum.STOP.ordinal();
 
     /**
      * 要识别的图像识别失败后要跳转的步骤序号
@@ -162,7 +168,7 @@ public class ClickPositionBean {
     /**
      * 图像识别匹配逻辑枚举值
      */
-    int matchedTypeEnum;
+    int matchedTypeEnum = MatchedTypeEnum.CLICK.ordinal();
 
     /**
      * 要识别的图像匹配成功后要跳转的步骤序号
@@ -179,7 +185,7 @@ public class ClickPositionBean {
      * 轨迹采样间隔配置（单位：毫秒）
      */
     @JsonIgnore
-    int sampleInterval;
+    int sampleInterval = Integer.parseInt(defaultSampleInterval);
 
     /**
      * 操作类型
@@ -190,17 +196,17 @@ public class ClickPositionBean {
     /**
      * 操作类型枚举值
      */
-    int clickTypeEnum;
+    int clickTypeEnum = ClickTypeEnum.CLICK.ordinal();
 
     /**
      * 横轴随机偏移量
      */
-    String randomX;
+    String randomX = defaultRandomClickX;
 
     /**
      * 纵轴随机偏移量
      */
-    String randomY;
+    String randomY = defaultRandomClickY;
 
     /**
      * 是否启用随机点击坐标 0-不启用，1-启用
@@ -215,7 +221,7 @@ public class ClickPositionBean {
     /**
      * 随机偏移时长（单位：毫秒）
      */
-    String randomTime;
+    String randomTime = defaultRandomTime;
 
     /**
      * 是否启用随机点击时长 0-不启用，1-启用
@@ -235,12 +241,12 @@ public class ClickPositionBean {
     /**
      * 匹配图像坐标横轴偏移量
      */
-    String imgX;
+    String imgX = "0";
 
     /**
      * 匹配图像坐标纵轴偏移量
      */
-    String imgY;
+    String imgY = "0";
 
     /**
      * 要识别的图像区域设置
@@ -433,6 +439,14 @@ public class ClickPositionBean {
      */
     public String getClickType() {
         return clickTypeMap.get(clickTypeEnum);
+    }
+
+    /**
+     * 更新 UUID
+     */
+    @Override
+    public void updateUuid() {
+        uuid = UUID.randomUUID().toString();
     }
 
 }

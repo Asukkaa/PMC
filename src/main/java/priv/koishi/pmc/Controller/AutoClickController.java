@@ -4,7 +4,6 @@ import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -50,8 +49,6 @@ import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
-import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
-import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
@@ -1063,7 +1060,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 插入数据选项
         insertDataMenu(tableMenu);
         // 复制数据选项
-        buildCopyDataMenu(tableView_Click, tableMenu, dataNumber_Click);
+        buildCopyDataMenu(tableView_Click, tableMenu, dataNumber_Click, unit_process());
         // 取消选中选项
         buildClearSelectedData(tableView_Click, tableMenu);
         // 删除所选数据选项
@@ -1292,12 +1289,8 @@ public class AutoClickController extends RootController implements MousePosition
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setSampleInterval(Integer.parseInt(sampleInterval))
-                .setMatchedTypeEnum(MatchedTypeEnum.CLICK.ordinal())
-                .setClickTypeEnum(ClickTypeEnum.CLICK.ordinal())
-                .setRetryTypeEnum(RetryTypeEnum.STOP.ordinal())
                 .setRandomClickInterval(randomClickInterval)
                 .setClickMatchThreshold(defaultClickOpacity)
-                .setMouseKeyEnum(NativeMouseEvent.BUTTON1)
                 .setStopMatchThreshold(defaultStopOpacity)
                 .setRandomTrajectory(randomTrajectory)
                 .setStopImgFiles(defaultStopImgFiles)
@@ -1313,14 +1306,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setRandomTime(randomTime)
                 .setRandomX(randomClickX)
                 .setRandomY(randomClickY)
-                .setClickInterval("0")
-                .setNoMove(noMove)
-                .setClickNum("1")
-                .setWaitTime("0")
-                .setStartX("0")
-                .setStartY("0")
-                .setImgX("0")
-                .setImgY("0");
+                .setNoMove(noMove);
         return clickPositionVO;
     }
 
@@ -1393,8 +1379,10 @@ public class AutoClickController extends RootController implements MousePosition
     public void addAutoClickPositions(List<? extends ClickPositionVO> clickPositionVOS, String filePath) {
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, unit_process());
-        updateLabel(log_Click, text_loadSuccess() + filePath);
-        Platform.runLater(() -> log_Click.setTextFill(Color.GREEN));
+        if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+            updateLabel(log_Click, text_loadSuccess() + filePath);
+            Platform.runLater(() -> log_Click.setTextFill(Color.GREEN));
+        }
     }
 
     /**
@@ -1985,31 +1973,29 @@ public class AutoClickController extends RootController implements MousePosition
             String lastPMCPath = value.lastPMCPath();
             List<ClickPositionVO> clickPositionVOS = value.clickPositionList();
             boolean add = true;
-            if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+            if (clearList && CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                ObservableList<ClickPositionVO> items = tableView_Click.getItems();
+                if (CollectionUtils.isNotEmpty(items)) {
+                    ButtonType result = creatConfirmDialog(
+                            text_listNotNull(),
+                            text_isClearList(),
+                            confirm_continue(),
+                            confirm_cancel());
+                    ButtonBar.ButtonData buttonData = result.getButtonData();
+                    if (buttonData.isCancelButton()) {
+                        add = false;
+                    } else {
+                        tableView_Click.getItems().clear();
+                    }
+                }
+            }
+            if (add) {
+                addAutoClickPositions(clickPositionVOS, lastPMCPath);
                 if (clearList) {
-                    ObservableList<ClickPositionVO> items = tableView_Click.getItems();
-                    if (CollectionUtils.isNotEmpty(items)) {
-                        ButtonType result = creatConfirmDialog(
-                                text_listNotNull(),
-                                text_isClearList(),
-                                confirm_continue(),
-                                confirm_cancel());
-                        ButtonBar.ButtonData buttonData = result.getButtonData();
-                        if (buttonData.isCancelButton()) {
-                            add = false;
-                        } else {
-                            tableView_Click.getItems().clear();
-                        }
-                    }
+                    String fileName = getFileName(files.getFirst().getPath());
+                    outFileName_Click.setText(fileName);
                 }
-                if (add) {
-                    addAutoClickPositions(clickPositionVOS, lastPMCPath);
-                    if (clearList) {
-                        String fileName = getFileName(files.getFirst().getPath());
-                        outFileName_Click.setText(fileName);
-                    }
-                    mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
-                }
+                mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
             }
             loadPMCFilsTask = null;
         });

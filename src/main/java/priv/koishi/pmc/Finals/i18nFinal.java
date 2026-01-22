@@ -1956,6 +1956,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return PMCS 文件版本异常
+     */
+    public static String text_errPMCSFile() {
+        return bundle.getString("errPMCSFile");
+    }
+
+    /**
      * @return 运行或录制自动化任务时按下 即可取消任务
      */
     public static String text_cancelTip_Click() {
@@ -2457,6 +2464,27 @@ public class i18nFinal {
      */
     public static String confirm_otherPMCConfirm() {
         return bundle.getString("confirm.otherPMCConfirm");
+    }
+
+    /**
+     * @return 这是一个旧版的 PMCS 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_isOldPMCSConfirm() {
+        return bundle.getString("confirm.isOldPMCSConfirm");
+    }
+
+    /**
+     * @return 这是一个新版的 PMCS 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_isNewPMCSConfirm() {
+        return bundle.getString("confirm.isNewPMCSConfirm");
+    }
+
+    /**
+     * @return 这是一个由其他程序生成的 PMCS 文件，可能无法正常解析，是否继续？
+     */
+    public static String confirm_otherPMCSConfirm() {
+        return bundle.getString("confirm.otherPMCSConfirm");
     }
 
     /**

@@ -100,6 +100,20 @@ public class FileUtils {
     }
 
     /**
+     * 校验文件是为可导入的 PMC 相关文件
+     *
+     * @param file 要校验的文件
+     * @return true-可导入，false-不可导入
+     */
+    public static boolean isPMCFile(File file) {
+        if (file.isFile()) {
+            String fileType = getExistsFileType(file);
+            return PMC.equals(fileType) || PMCS.equals(fileType);
+        }
+        return file.isDirectory();
+    }
+
+    /**
      * 更新配置文件
      *
      * @param properties 要更新的配置文件
