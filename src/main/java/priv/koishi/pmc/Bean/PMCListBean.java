@@ -52,7 +52,7 @@ public class PMCListBean extends BaseCopyBean implements Indexable, FilePath {
     String runNum = "1";
 
     /**
-     * 每个文件执行前等待时间
+     * 文件执行前等待时间（单位毫秒）
      */
     String waitTime = "0";
 

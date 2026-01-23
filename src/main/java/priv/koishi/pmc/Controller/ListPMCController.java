@@ -75,7 +75,7 @@ public class ListPMCController extends RootController {
     /**
      * 操作记录
      */
-    private final List<PMCLogBean> clickLogs = new CopyOnWriteArrayList<>();
+    public List<PMCLogBean> clickLogs = new CopyOnWriteArrayList<>();
 
     /**
      * 记录页高度
@@ -158,9 +158,9 @@ public class ListPMCController extends RootController {
     private void bindPrefWidthProperty() {
         index_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.1));
         name_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.2));
-        path_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.5));
+        path_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.4));
         runNum_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.1));
-        waitTime_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.1));
+        waitTime_List.prefWidthProperty().bind(tableView_List.widthProperty().multiply(0.2));
     }
 
     /**
@@ -439,7 +439,6 @@ public class ListPMCController extends RootController {
             taskUnbind(taskBean);
             PMCSLoadResult value = loadPMCFilsTask.getValue();
             String lastPMCPath = value.lastPMCPath();
-            System.out.println("lastPMCPath: " + lastPMCPath);
             List<PMCListBean> clickPositionVOS = value.pmcListBeans();
             addPMCSFile(clickPositionVOS, lastPMCPath);
             loadPMCFilsTask = null;

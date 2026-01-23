@@ -21,14 +21,14 @@
 
                 <columns>
                     <TableColumn fx:id="index_Log" text="%listText.index" sortable="false"/>
-                    <TableColumn fx:id="date_Log" text="%clickLog.date_Log" sortable="false"/>
-                    <TableColumn fx:id="name_Log" text="%clickLog.name_Log" sortable="false"/>
-                    <TableColumn fx:id="type_Log" text="%clickLog.type_Log" sortable="false"/>
-                    <TableColumn fx:id="X_Log" text="%clickLog.X_Log" sortable="false"/>
-                    <TableColumn fx:id="Y_Log" text="%clickLog.Y_Log" sortable="false"/>
-                    <TableColumn fx:id="clickTime_Log" text="%clickLog.clickTime_Log" sortable="false"/>
-                    <TableColumn fx:id="clickKey_Log" text="%clickLog.clickKey_Log" sortable="false"/>
-                    <TableColumn fx:id="result_Log" text="%clickLog.result_Log" sortable="false"/>
+                    <TableColumn fx:id="date_Log" text="%clickLog.date" sortable="false"/>
+                    <TableColumn fx:id="name_Log" text="%clickLog.name" sortable="false"/>
+                    <TableColumn fx:id="type_Log" text="%clickLog.type" sortable="false"/>
+                    <TableColumn fx:id="X_Log" text="%clickLog.X" sortable="false"/>
+                    <TableColumn fx:id="Y_Log" text="%clickLog.Y" sortable="false"/>
+                    <TableColumn fx:id="clickTime_Log" text="%clickLog.clickTime" sortable="false"/>
+                    <TableColumn fx:id="clickKey_Log" text="%clickLog.clickKey" sortable="false"/>
+                    <TableColumn fx:id="result_Log" text="%clickLog.result" sortable="false"/>
                 </columns>
             </TableView>
         </VBox>

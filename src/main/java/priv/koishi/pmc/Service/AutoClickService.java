@@ -12,6 +12,7 @@ import org.bytedeco.opencv.opencv_core.Point;
 import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
+import priv.koishi.pmc.Bean.Result.PMCLogResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
@@ -29,6 +30,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -76,9 +78,14 @@ public class AutoClickService {
     private static final Random random = new Random();
 
     /**
-     * 日志动态容量队列
+     * 操作日志动态容量队列
      */
     private static DynamicQueue<ClickLogBean> clickLog;
+
+    /**
+     * PMC 执行日志动态容量队列
+     */
+    private static DynamicQueue<PMCLogBean> pmcLog;
 
     /**
      * JavaFX 机器人输入标志，true 为机器人输入，将不会触发快捷键取消自动任务
@@ -92,11 +99,11 @@ public class AutoClickService {
      * @param pmcListBeans 需要批量运行的 PMC 文件列表
      * @param baseTaskBean 任务参数
      */
-    public static Task<List<ClickLogBean>> autoClicks(Robot robot, List<? extends PMCListBean> pmcListBeans,
-                                                      AutoClickTaskBean baseTaskBean) {
+    public static Task<PMCLogResult> autoClicks(Robot robot, List<? extends PMCListBean> pmcListBeans,
+                                                AutoClickTaskBean baseTaskBean) {
         return new Task<>() {
             @Override
-            protected List<ClickLogBean> call() throws Exception {
+            protected PMCLogResult call() throws Exception {
                 int totalPMCs = pmcListBeans.size();
                 updateProgress(0, totalPMCs);
                 for (int i = 0; i < totalPMCs; i++) {
@@ -113,9 +120,11 @@ public class AutoClickService {
                     pmcListBean.setClickPositionVOS(clickPositionVOS);
                 }
                 clickLog = new DynamicQueue<>();
+                pmcLog = new DynamicQueue<>();
                 int maxLogNum = baseTaskBean.getMaxLogNum();
                 if (maxLogNum > 0) {
                     clickLog.setMaxSize(maxLogNum);
+                    pmcLog.setMaxSize(maxLogNum);
                 }
                 // 获取整体循环次数
                 int overallLoopTimes = baseTaskBean.getLoopTimes();
@@ -152,7 +161,7 @@ public class AutoClickService {
                     }
                 }
                 // 返回所有日志
-                return clickLog.getSnapshot();
+                return new PMCLogResult(clickLog.getSnapshot(), pmcLog.getSnapshot());
             }
 
             /**
@@ -166,22 +175,34 @@ public class AutoClickService {
              */
             private boolean executeBatch(List<? extends PMCListBean> pmcListBeans, ExecutorService executor,
                                          AutoClickTaskBean baseTaskBean, int currentLoop, String loopText) throws Exception {
+                AtomicLong start = new AtomicLong();
                 int totalPMCs = pmcListBeans.size();
+                messageFloating = baseTaskBean.getMessageFloating();
+                messageLabel = baseTaskBean.getMessageLabel();
                 updateProgress(0, totalPMCs);
                 for (int i = 0; i < totalPMCs; i++) {
+                    PMCListBean pmc = pmcListBeans.get(i);
+                    String name = pmc.getName();
+                    String path = pmc.getPath();
                     if (isCancelled()) {
                         return true;
                     }
-                    PMCListBean pmc = pmcListBeans.get(i);
                     String text = loopText +
                             text_progress() + i + 1 + " / " + totalPMCs +
-                            text_willBe() + pmc.getWaitTime() + text_msWillBe() + pmc.getName();
+                            text_willBe() + pmc.getWaitTime() + text_msWillBe() + name;
                     updateMessage(text);
+                    updateFloatingMessage(text);
                     // 执行前等待
                     String waitTime = pmc.getWaitTime();
                     if (StringUtils.isNotBlank(waitTime)) {
                         long waitMillis = Long.parseLong(waitTime);
                         Thread.sleep(waitMillis);
+                        PMCLogBean pmcLogBean = new PMCLogBean();
+                        pmcLogBean.setResult(log_wait())
+                                .setTime(waitTime)
+                                .setName(name)
+                                .setPath(path);
+                        pmcLog.add(pmcLogBean);
                     }
                     try {
                         // 准备并执行单个任务
@@ -204,7 +225,7 @@ public class AutoClickService {
                             subTaskBean.setFirstClick(currentLoop == 0 && i == 0);
                         }
                         // 创建子任务
-                        Task<List<ClickLogBean>> subTask = autoClick(subTaskBean, robot, clickLog);
+                        Task<PMCLogResult> subTask = autoClick(subTaskBean, robot, clickLog);
                         // 使用 CountDownLatch 等待子任务完成
                         CountDownLatch latch = new CountDownLatch(1);
                         AtomicBoolean taskSuccess = new AtomicBoolean(false);
@@ -215,17 +236,46 @@ public class AutoClickService {
                             } finally {
                                 latch.countDown();
                             }
+                            long end = System.currentTimeMillis();
+                            PMCLogBean pmcLogBean = new PMCLogBean();
+                            pmcLogBean.setTime(String.valueOf(end - start.get()))
+                                    .setResult(log_success())
+                                    .setName(name)
+                                    .setPath(path);
+                            pmcLog.add(pmcLogBean);
                         });
                         subTask.setOnFailed(_ -> {
                             taskException.set((Exception) subTask.getException());
                             latch.countDown();
+                            long end = System.currentTimeMillis();
+                            PMCLogBean pmcLogBean = new PMCLogBean();
+                            pmcLogBean.setTime(String.valueOf(end - start.get()))
+                                    .setResult(log_fail())
+                                    .setName(name)
+                                    .setPath(path);
+                            pmcLog.add(pmcLogBean);
                         });
-                        subTask.setOnCancelled(_ -> latch.countDown());
+                        subTask.setOnCancelled(_ -> {
+                            latch.countDown();
+                            long end = System.currentTimeMillis();
+                            PMCLogBean pmcLogBean = new PMCLogBean();
+                            pmcLogBean.setTime(String.valueOf(end - start.get()))
+                                    .setResult(log_cancel())
+                                    .setName(name)
+                                    .setPath(path);
+                            pmcLog.add(pmcLogBean);
+                        });
                         // 在单独的线程中执行子任务
                         executor.execute(() -> {
                             Thread subThread = new Thread(subTask);
                             subThread.setDaemon(true);
                             subThread.start();
+                            start.set(System.currentTimeMillis());
+                            PMCLogBean pmcLogBean = new PMCLogBean();
+                            pmcLogBean.setResult(log_start())
+                                    .setName(name)
+                                    .setPath(path);
+                            pmcLog.add(pmcLogBean);
                         });
                         // 等待子任务完成
                         latch.await();
@@ -237,7 +287,7 @@ public class AutoClickService {
                             throw new RuntimeException(text_subTaskNoFinished());
                         }
                     } catch (Exception e) {
-                        throw new RuntimeException(text_subTaskFailed() + pmc.getPath(), e);
+                        throw new RuntimeException(text_subTaskFailed() + path, e);
                     }
                     updateProgress(i + 1, totalPMCs);
                 }
@@ -253,11 +303,11 @@ public class AutoClickService {
      * @param robot    Robot 实例
      * @return 执行记录
      */
-    public static Task<List<ClickLogBean>> autoClick(AutoClickTaskBean taskBean, Robot robot,
-                                                     DynamicQueue<ClickLogBean> clickLogQueue) {
+    public static Task<PMCLogResult> autoClick(AutoClickTaskBean taskBean, Robot robot,
+                                               DynamicQueue<ClickLogBean> clickLogQueue) {
         return new Task<>() {
             @Override
-            protected List<ClickLogBean> call() throws Exception {
+            protected PMCLogResult call() throws Exception {
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
                 List<String> errs;
                 // 检查跳转逻辑参数与操作类型设置是否合理
@@ -287,7 +337,7 @@ public class AutoClickService {
                         i++;
                         String loopTimeText = text_cancelTask() + text_execution() + i + " / ∞" + text_executionTime();
                         if (isCancelled()) {
-                            return clickLogBeans;
+                            return new PMCLogResult(clickLogBeans, null);
                         }
                         // 执行操作流程
                         clickLogBeans = clicks(tableViewItems, loopTimeText);
@@ -296,13 +346,13 @@ public class AutoClickService {
                     for (int i = 0; i < loopTime && !isCancelled(); i++) {
                         String loopTimeText = text_cancelTask() + text_execution() + (i + 1) + " / " + loopTime + text_executionTime();
                         if (isCancelled()) {
-                            return clickLogBeans;
+                            return new PMCLogResult(clickLogBeans, null);
                         }
                         // 执行操作流程
                         clickLogBeans = clicks(tableViewItems, loopTimeText);
                     }
                 }
-                return clickLogBeans;
+                return new PMCLogResult(clickLogBeans, null);
             }
 
             /**

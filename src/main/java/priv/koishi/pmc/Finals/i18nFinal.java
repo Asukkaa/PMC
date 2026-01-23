@@ -2733,6 +2733,34 @@ public class i18nFinal {
     }
 
     /**
+     * @return 取消任务
+     */
+    public static String log_cancel() {
+        return bundle.getString("log.cancel");
+    }
+
+    /**
+     * @return 任务开始
+     */
+    public static String log_start() {
+        return bundle.getString("log.start");
+    }
+
+    /**
+     * @return 执行成功
+     */
+    public static String log_success() {
+        return bundle.getString("log.success");
+    }
+
+    /**
+     * @return 执行失败
+     */
+    public static String log_fail() {
+        return bundle.getString("log.fail");
+    }
+
+    /**
      * @return 识别目标图像
      */
     public static String log_clickImg() {

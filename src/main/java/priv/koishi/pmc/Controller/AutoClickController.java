@@ -42,6 +42,7 @@ import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
+import priv.koishi.pmc.Bean.Result.PMCLogResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Callback.InputRecordCallback;
@@ -253,7 +254,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 自动点击任务
      */
-    public Task<List<ClickLogBean>> autoClickTask;
+    public Task<PMCLogResult> autoClickTask;
 
     /**
      * 批量导入 PMC 文件任务
@@ -883,7 +884,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setTaskEvent(AutoClickTaskBean taskBean) {
         autoClickTask.setOnSucceeded(_ -> {
-            clickLogs = autoClickTask.getValue();
+            PMCLogResult value = autoClickTask.getValue();
+            clickLogs = value.clickLogBeans();
+            listPMCController.clickLogs = value.pmcLogBeans();
             if (clickLogs == null) {
                 taskNotSuccess(taskBean, text_taskFailed());
             } else {
