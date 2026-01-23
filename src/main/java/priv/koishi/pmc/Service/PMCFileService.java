@@ -76,11 +76,13 @@ public class PMCFileService {
                         imgMap,
                         lastPMCPathRef,
                         (pmcFile, clickPositionVOS) -> {
-                            PMCListBean pmcListBean = new PMCListBean()
-                                    .setClickPositionVOS(clickPositionVOS)
-                                    .setName(pmcFile.getName())
-                                    .setPath(pmcFile.getPath());
-                            pmcListBeans.add(pmcListBean);
+                            if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                                PMCListBean pmcListBean = new PMCListBean()
+                                        .setClickPositionVOS(clickPositionVOS)
+                                        .setName(pmcFile.getName())
+                                        .setPath(pmcFile.getPath());
+                                pmcListBeans.add(pmcListBean);
+                            }
                         },
                         (_, pmcsList) -> pmcListBeans.addAll(pmcsList),
                         this::updateProgress);
@@ -156,6 +158,7 @@ public class PMCFileService {
                     pmcFileProcessor.accept(file, clickPositionVOS);
                 }
             } else if (PMCS.equals(fileType)) {
+                // 调用回调处理 PMCS 文件
                 if (pmcsFileProcessor != null) {
                     List<PMCListBean> pmcsList = loadPMCSFile(file);
                     pmcsFileProcessor.accept(file, pmcsList);
@@ -580,45 +583,23 @@ public class PMCFileService {
         boolean isErrFormat = false;
         String errText = text_fileName() + getFileName(filePath) + "\n" +
                 text_filePath() + filePath + "\n";
-        try {
-            // 首先尝试解析为 PMCFileBean 格式
-            PMCSFileDTO pmcsFileDTO = objectMapper.readValue(jsonFile, PMCSFileDTO.class);
-            if (pmcsFileDTO != null && CollectionUtils.isNotEmpty(pmcsFileDTO.getPmcsList())) {
-                String version = pmcsFileDTO.getVersion();
-                String app = pmcsFileDTO.getAppName();
-                if (!appName.equals(app)) {
-                    isErrFormat = true;
-                    errText += confirm_otherPMCSConfirm();
-                } else if (compareToConstant(version, PMCSFileVersion) > 0) {
-                    isErrFormat = true;
-                    errText += confirm_isNewPMCSConfirm();
-                } else if (compareToConstant(version, PMCSFileVersion) < 0) {
-                    isErrFormat = true;
-                    errText += confirm_isOldPMCSConfirm();
-                }
-                pmcsList = new ArrayList<>(pmcsFileDTO.getPmcsList());
-            } else {
-                // 如果 pmcList 为空，尝试旧格式
-                pmcsList = objectMapper.readValue(jsonFile,
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, PMCListBean.class));
+        PMCSFileDTO pmcsFileDTO = objectMapper.readValue(jsonFile, PMCSFileDTO.class);
+        if (pmcsFileDTO != null && CollectionUtils.isNotEmpty(pmcsFileDTO.getPmcsList())) {
+            String version = pmcsFileDTO.getVersion();
+            String app = pmcsFileDTO.getAppName();
+            if (!appName.equals(app)) {
+                isErrFormat = true;
+                errText += confirm_otherPMCSConfirm();
+            } else if (compareToConstant(version, PMCSFileVersion) > 0) {
+                isErrFormat = true;
+                errText += confirm_isNewPMCSConfirm();
+            } else if (compareToConstant(version, PMCSFileVersion) < 0) {
                 isErrFormat = true;
                 errText += confirm_isOldPMCSConfirm();
             }
-        } catch (MismatchedInputException e) {
-            // PMCFileBean 解析失败，尝试旧格式
-            try {
-                pmcsList = objectMapper.readValue(jsonFile,
-                        objectMapper.getTypeFactory().constructCollectionType(List.class, PMCListBean.class));
-                isErrFormat = true;
-                errText += confirm_isOldPMCSConfirm();
-            } catch (MismatchedInputException e2) {
-                // 两种格式都失败，抛出异常
-                throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
-            }
-        }
-        // 自动任务加载时不提示旧版本
-        if (runPMCFile) {
-            isErrFormat = false;
+            pmcsList = new ArrayList<>(pmcsFileDTO.getPmcsList());
+        } else {
+            throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
         }
         List<PMCListBean> pmcListBeans = new ArrayList<>();
         if (isErrFormat) {
@@ -626,7 +607,6 @@ public class PMCFileService {
             AtomicReference<List<PMCListBean>> resultRef = new AtomicReference<>();
             AtomicReference<Exception> exceptionRef = new AtomicReference<>();
             String finalErrText = errText;
-            List<PMCListBean> finalPmcsList = pmcsList;
             Platform.runLater(() -> {
                 try {
                     ButtonType result = creatConfirmDialog(
@@ -636,7 +616,7 @@ public class PMCFileService {
                             confirm_cancel());
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
-                        buildPMCS(finalPmcsList, pmcListBeans);
+                        buildPMCS(pmcsList, pmcListBeans);
                         resultRef.set(pmcListBeans);
                     } else {
                         resultRef.set(new ArrayList<>());
