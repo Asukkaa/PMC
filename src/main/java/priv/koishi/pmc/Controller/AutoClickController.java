@@ -1960,10 +1960,9 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 启动加载自动操作文件任务
      *
-     * @param files     要加载的文件
-     * @param clearList 是否清空当前操作列表（true 清空后导入并选中自动操作工具页面，false 直接导入）
+     * @param files 要加载的文件
      */
-    public void startLoadPMCTask(List<? extends File> files, boolean clearList) {
+    public void startLoadPMCTask(List<? extends File> files) {
         TaskBean<ClickPositionVO> taskBean = creatTaskBean();
         loadPMCFilsTask = loadPMCFils(taskBean, files);
         bindingTaskNode(loadPMCFilsTask, taskBean);
@@ -1972,31 +1971,8 @@ public class AutoClickController extends RootController implements MousePosition
             PMCLoadResult value = loadPMCFilsTask.getValue();
             String lastPMCPath = value.lastPMCPath();
             List<ClickPositionVO> clickPositionVOS = value.clickPositionList();
-            boolean add = true;
-            if (clearList && CollectionUtils.isNotEmpty(clickPositionVOS)) {
-                ObservableList<ClickPositionVO> items = tableView_Click.getItems();
-                if (CollectionUtils.isNotEmpty(items)) {
-                    ButtonType result = creatConfirmDialog(
-                            text_listNotNull(),
-                            text_isClearList(),
-                            confirm_continue(),
-                            confirm_cancel());
-                    ButtonBar.ButtonData buttonData = result.getButtonData();
-                    if (buttonData.isCancelButton()) {
-                        add = false;
-                    } else {
-                        tableView_Click.getItems().clear();
-                    }
-                }
-            }
-            if (add) {
-                addAutoClickPositions(clickPositionVOS, lastPMCPath);
-                if (clearList) {
-                    String fileName = getFileName(files.getFirst().getPath());
-                    outFileName_Click.setText(fileName);
-                }
-                mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
-            }
+            addAutoClickPositions(clickPositionVOS, lastPMCPath);
+            mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
             loadPMCFilsTask = null;
         });
         loadPMCFilsTask.setOnFailed(event -> {
@@ -2133,7 +2109,7 @@ public class AutoClickController extends RootController implements MousePosition
         if (CollectionUtils.isNotEmpty(selectedFile)) {
             inFilePath = selectedFile.getFirst().getPath();
             updateProperties(configFile_Click, key_inFilePath, new File(inFilePath).getParent());
-            startLoadPMCTask(selectedFile, false);
+            startLoadPMCTask(selectedFile);
         }
     }
 
@@ -2334,7 +2310,7 @@ public class AutoClickController extends RootController implements MousePosition
     @FXML
     private void handleDrop(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
-        startLoadPMCTask(files, false);
+        startLoadPMCTask(files);
         dragEvent.setDropCompleted(true);
         dragEvent.consume();
     }

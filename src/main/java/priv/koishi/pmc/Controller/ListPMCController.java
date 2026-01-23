@@ -22,11 +22,12 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.PMCListBean;
+import priv.koishi.pmc.Bean.PMCLogBean;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 
 import java.io.File;
@@ -35,7 +36,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -75,7 +75,7 @@ public class ListPMCController extends RootController {
     /**
      * 操作记录
      */
-    private final List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
+    private final List<PMCLogBean> clickLogs = new CopyOnWriteArrayList<>();
 
     /**
      * 记录页高度
@@ -312,7 +312,23 @@ public class ListPMCController extends RootController {
         detailItem.setOnAction(_ -> {
             PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
-                autoClickController.startLoadPMCTask(List.of(new File(selected.getPath())), true);
+                List<ClickPositionVO> clickPositionVOS = selected.getClickPositionVOS();
+                if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                    ObservableList<ClickPositionVO> items = autoClickController.tableView_Click.getItems();
+                    if (CollectionUtils.isNotEmpty(items)) {
+                        ButtonType result = creatConfirmDialog(
+                                text_listNotNull(),
+                                text_isClearList(),
+                                confirm_continue(),
+                                confirm_cancel());
+                        ButtonBar.ButtonData buttonData = result.getButtonData();
+                        if (!buttonData.isCancelButton()) {
+                            items.clear();
+                        }
+                    }
+                    autoClickController.addAutoClickPositions(clickPositionVOS, selected.getPath());
+                    mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
+                }
             }
         });
         contextMenu.getItems().add(detailItem);
@@ -328,8 +344,13 @@ public class ListPMCController extends RootController {
         addAllItem.setOnAction(_ -> {
             List<PMCListBean> selected = tableView_List.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selected)) {
-                List<File> files = selected.stream().map(PMCListBean::getPath).map(File::new).toList();
-                autoClickController.startLoadPMCTask(files, false);
+                selected.forEach(pmcListBean -> {
+                    List<ClickPositionVO> clickPositionVOS = pmcListBean.getClickPositionVOS();
+                    if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
+                        autoClickController.addAutoClickPositions(clickPositionVOS, pmcListBean.getPath());
+                    }
+                });
+                mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
             }
         });
         contextMenu.getItems().add(addAllItem);
@@ -396,7 +417,7 @@ public class ListPMCController extends RootController {
      * @param clickPositionVOS 自动流程集合
      * @param filePath         要导入的文件路径
      */
-    public void addAutoClickPositions(List<? extends PMCListBean> clickPositionVOS, String filePath) {
+    public void addPMCSFile(List<? extends PMCListBean> clickPositionVOS, String filePath) {
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_List, dataNumber_List, unit_files());
         if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
@@ -418,8 +439,9 @@ public class ListPMCController extends RootController {
             taskUnbind(taskBean);
             PMCSLoadResult value = loadPMCFilsTask.getValue();
             String lastPMCPath = value.lastPMCPath();
+            System.out.println("lastPMCPath: " + lastPMCPath);
             List<PMCListBean> clickPositionVOS = value.pmcListBeans();
-            addAutoClickPositions(clickPositionVOS, lastPMCPath);
+            addPMCSFile(clickPositionVOS, lastPMCPath);
             loadPMCFilsTask = null;
         });
         loadPMCFilsTask.setOnFailed(event -> {
@@ -556,6 +578,7 @@ public class ListPMCController extends RootController {
         if (loadFolder_List.isSelected()) {
             List<String> extensionFilter = new ArrayList<>();
             extensionFilter.add(PMC);
+            extensionFilter.add(PMCS);
             extensionFilter.add(extension_folder());
             FileChooserConfig fileConfig = new FileChooserConfig();
             fileConfig.setExtensionFilter(extensionFilter)
@@ -571,8 +594,10 @@ public class ListPMCController extends RootController {
         } else {
             AutoClickController.isSonOpening = true;
             Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
-            FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
-            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
+            List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+            extensionFilters.add(new FileChooser.ExtensionFilter(appName, allPMC, allPMCS));
+            extensionFilters.add(new FileChooser.ExtensionFilter(appName, allPMC));
+            extensionFilters.add(new FileChooser.ExtensionFilter(appName, allPMCS));
             List<File> selectedFile = creatFilesChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
             AutoClickController.isSonOpening = false;
             getSelectFile(selectedFile);
@@ -670,13 +695,13 @@ public class ListPMCController extends RootController {
      */
     @FXML
     private void clickLog() throws IOException {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickLog-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/PMCLog-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root = loader.load();
-        ClickLogController controller = loader.getController();
+        PMCLogController controller = loader.getController();
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> {
-            List<ClickLogBean> logs = controller.getClickLogs();
+            List<PMCLogBean> logs = controller.getClickLogs();
             if (CollectionUtils.isEmpty(logs)) {
                 clickLogs.clear();
             }

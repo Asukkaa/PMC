@@ -106,6 +106,11 @@ public class CommonFinals {
     public static final String allPMC = "*.pmc";
 
     /**
+     * 文件后缀名匹配符：pmcs
+     */
+    public static final String allPMCS = "*.pmcs";
+
+    /**
      * 文件后缀名：pmc
      */
     public static final String PMC = ".pmc";

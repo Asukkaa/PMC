@@ -41,8 +41,7 @@ import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateMessa
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
-import static priv.koishi.pmc.Utils.FileUtils.getExistsFileName;
-import static priv.koishi.pmc.Utils.FileUtils.openFile;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
 import static priv.koishi.pmc.Utils.UiUtils.showStageAlert;
@@ -109,6 +108,8 @@ public class AutoClickService {
                     updateMessage(text);
                     updateProgress(i + 1, totalPMCs);
                     List<ClickPositionVO> clickPositionVOS = loadPMCFile(new File(path));
+                    // 校验图片路径
+                    checkImgPath(pmcListBean, clickPositionVOS);
                     pmcListBean.setClickPositionVOS(clickPositionVOS);
                 }
                 clickLog = new DynamicQueue<>();
@@ -1459,6 +1460,62 @@ public class AutoClickService {
                         .setType(log_wait())
                         .setName(name);
                 clickLog.add(sleepLog);
+            }
+        }
+    }
+
+    /**
+     * 校验图片路径
+     *
+     * @param pmcListBean 需要校验的 PMCS 文件数据
+     * @param newDataList 重新读取到的脚本数据
+     */
+    private static void checkImgPath(PMCListBean pmcListBean, List<? extends ClickPositionVO> newDataList) {
+        List<ClickPositionVO> oldDataList = pmcListBean.getClickPositionVOS();
+        int size = newDataList.size();
+        if (size == oldDataList.size()) {
+            for (int i = 0; i < size; i++) {
+                ClickPositionVO newData = newDataList.get(i);
+                // 校验目标图像路径
+                String newClickImg = newData.getClickImgPath();
+                if (StringUtils.isNoneBlank(newClickImg)) {
+                    File newClickFile = new File(newClickImg);
+                    if (!newClickFile.exists()) {
+                        String oldClickImg = oldDataList.get(i).getClickImgPath();
+                        if (StringUtils.isNoneBlank(oldClickImg)) {
+                            File oldClickFile = new File(oldClickImg);
+                            if (oldClickFile.exists()) {
+                                if (getFileFullName(oldClickFile).equals(getFileFullName(newClickFile))) {
+                                    newData.setClickImgPath(oldClickImg);
+                                }
+                            }
+                        }
+                    }
+                }
+                // 校验终止图像路径
+                List<ImgFileBean> newStopImgs = newData.getStopImgFiles();
+                List<ImgFileBean> oldStopImgs = oldDataList.get(i).getStopImgFiles();
+                int stopImgSize = newStopImgs.size();
+                if (stopImgSize == oldStopImgs.size()) {
+                    for (int j = 0; j < stopImgSize; j++) {
+                        ImgFileBean newStopImg = newStopImgs.get(j);
+                        String newStopImgPath = newStopImg.getPath();
+                        if (StringUtils.isNoneBlank(newStopImgPath)) {
+                            File newStopImgFile = new File(newStopImgPath);
+                            if (!newStopImgFile.exists()) {
+                                String oldStopImgPath = oldStopImgs.get(j).getPath();
+                                if (StringUtils.isNoneBlank(oldStopImgPath)) {
+                                    File oldStopImgFile = new File(oldStopImgPath);
+                                    if (oldStopImgFile.exists()) {
+                                        if (getFileFullName(oldStopImgFile).equals(getFileFullName(newStopImgFile))) {
+                                            newStopImg.setPath(oldStopImgPath);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

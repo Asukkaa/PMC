@@ -455,16 +455,20 @@ public class ClickDetailController extends RootController {
         stopWindowMonitor = new WindowMonitor(windowInfoDisableNodes, stage);
         stopWindowMonitor.setWindowInfoHandler(creatDefaultWindowInfoHandler(stopWindowInfo_Det));
         FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
-        WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
-        updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
-        stopWindowMonitor.setWindowInfo(stopWindowInfo);
+        if (stopWindowConfig != null) {
+            WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
+            updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
+            stopWindowMonitor.setWindowInfo(stopWindowInfo);
+        }
         stopWindowMonitor.updateWindowInfo();
         windowMonitorClick = new WindowMonitor(windowInfoDisableNodes, stage);
         windowMonitorClick.setWindowInfoHandler(creatWindowInfoHandler());
         FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
-        WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
-        updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
-        windowMonitorClick.setWindowInfo(clickWindowInfo);
+        if (clickWindowConfig != null) {
+            WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
+            updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
+            windowMonitorClick.setWindowInfo(clickWindowInfo);
+        }
         windowMonitorClick.updateWindowInfo();
         WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
         if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
