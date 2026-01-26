@@ -1850,7 +1850,6 @@ public class AutoClickController extends RootController implements MousePosition
         });
     }
 
-
     /**
      * 开始统一录制
      *
