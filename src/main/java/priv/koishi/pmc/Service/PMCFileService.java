@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
+import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.runPMCFile;
@@ -395,6 +396,12 @@ public class PMCFileService {
                 // 序列化数据
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.writeValue(new File(path), pmcFileDTO);
+                // 更新 PMC 文件列表数据
+                for (PMCListBean bean : listPMCController.tableView_List.getItems()) {
+                    if (bean.getPath().equals(path)) {
+                        bean.setClickPositionVOS(tableViewItems);
+                    }
+                }
                 updateMessage(text_saveSuccess() + path);
                 return path;
             }
@@ -698,6 +705,33 @@ public class PMCFileService {
                 output.add(pmcListBean);
             }
         }
+    }
+
+    /**
+     * 复制 PMC 文件数据
+     *
+     * @param origin   原始数据
+     * @param taskBean 任务信息
+     * @return 新的 PMC 文件数据
+     */
+    public static Task<List<ClickPositionVO>> copyPMC(List<? extends ClickPositionVO> origin, TaskBean<ClickPositionVO> taskBean) {
+        return new Task<>() {
+            @Override
+            protected List<ClickPositionVO> call() throws Exception {
+                updateMessage(text_readData());
+                List<ClickPositionVO> copyList = new ArrayList<>();
+                int size = origin.size();
+                updateProgress(0, size);
+                for (int i = 0; i < size; i++) {
+                    ClickPositionVO clickPositionVO = origin.get(i);
+                    ClickPositionVO copy = clickPositionVO.createCopy();
+                    copy.setTableView(taskBean.getTableView());
+                    copyList.add(copy);
+                    updateProgress(i + 1, size);
+                }
+                return copyList;
+            }
+        };
     }
 
 }
