@@ -27,7 +27,7 @@
                 <TableColumn fx:id="repeat_Task" text="%timedTask.repeat_Task"/>
                 <TableColumn fx:id="days_Task" text="%timedTask.days_Task"/>
                 <TableColumn fx:id="name_Task" text="%timedTask.name_Task"/>
-                <TableColumn fx:id="path_Task" text="%timedTask.path_Task"/>
+                <TableColumn fx:id="path_Task" text="%listText.filePath"/>
             </columns>
         </TableView>
 

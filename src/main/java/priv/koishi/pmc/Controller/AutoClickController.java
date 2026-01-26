@@ -1364,7 +1364,7 @@ public class AutoClickController extends RootController implements MousePosition
      *
      * @return 任务参数对象
      */
-    private TaskBean<ClickPositionVO> creatTaskBean() {
+    public TaskBean<ClickPositionVO> creatTaskBean() {
         TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Click)
                 .setMessageLabel(dataNumber_Click)

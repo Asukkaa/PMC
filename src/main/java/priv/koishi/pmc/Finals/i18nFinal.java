@@ -4,6 +4,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import priv.koishi.pmc.Finals.Enum.*;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -2065,6 +2066,14 @@ public class i18nFinal {
      */
     public static String text_listNotNull() {
         return bundle.getString("listNotNull");
+    }
+
+    /**
+     * @param fileName 文件名
+     * @return 所选文件 {0} 已经不存在，是否查看旧数据？
+     */
+    public static String text_noExistsPMC(String fileName) {
+        return MessageFormat.format(bundle.getString("noExistsPMC"), fileName);
     }
 
     /**

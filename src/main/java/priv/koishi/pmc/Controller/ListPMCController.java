@@ -48,8 +48,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
-import static priv.koishi.pmc.Service.PMCFileService.exportPMCS;
-import static priv.koishi.pmc.Service.PMCFileService.loadPMCSFils;
+import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
@@ -316,6 +315,19 @@ public class ListPMCController extends RootController {
             updateLabel(log_List, "");
             PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
+                String path = selected.getPath();
+                if (!new File(path).exists()) {
+                    String text = text_noExistsPMC(selected.getName()) + "\n" + text_filePath() + path;
+                    ButtonType result = creatConfirmDialog(
+                            text_fileNotExists(),
+                            text,
+                            confirm_continue(),
+                            confirm_cancel());
+                    ButtonBar.ButtonData buttonData = result.getButtonData();
+                    if (buttonData.isCancelButton()) {
+                        return;
+                    }
+                }
                 List<ClickPositionVO> clickPositionVOS = selected.getClickPositionVOS();
                 if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
                     ObservableList<ClickPositionVO> items = autoClickController.tableView_Click.getItems();
@@ -330,8 +342,18 @@ public class ListPMCController extends RootController {
                             items.clear();
                         }
                     }
-                    autoClickController.addAutoClickPositions(clickPositionVOS, selected.getPath());
                     mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
+                    TaskBean<ClickPositionVO> taskBean = autoClickController.creatTaskBean();
+                    Task<List<ClickPositionVO>> copyPMCTask = copyPMC(clickPositionVOS, taskBean);
+                    bindingTaskNode(copyPMCTask, taskBean);
+                    copyPMCTask.setOnSucceeded(_ -> {
+                        taskUnbind(taskBean);
+                        List<ClickPositionVO> copy = copyPMCTask.getValue();
+                        autoClickController.addAutoClickPositions(copy, selected.getPath());
+                    });
+                    Thread.ofVirtual()
+                            .name("copyPMCSTask-vThread" + tabId)
+                            .start(copyPMCTask);
                 }
             }
         });
