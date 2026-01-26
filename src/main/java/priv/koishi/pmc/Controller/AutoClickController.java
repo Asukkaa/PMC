@@ -2018,8 +2018,8 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setNativeHookExceptionLog() {
         isNativeHookException = true;
-        setNodeDisable(runClick_Click, true);
-        setNodeDisable(recordClick_Click, true);
+        setNodeDisable(runClick_Click, true, autoClick_noPermissions());
+        setNodeDisable(recordClick_Click, true, autoClick_noPermissions());
         String errorMessage = appName + autoClick_noPermissions();
         if (isMac) {
             errorMessage = tip_NativeHookException();
@@ -2034,7 +2034,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setNoScreenCapturePermissionLog() {
         noScreenCapturePermission = true;
-        setNodeDisable(runClick_Click, true);
+        setNodeDisable(runClick_Click, true, autoClick_noPermissions());
         err_Click.setText(tip_noScreenCapturePermission());
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
         adaption();

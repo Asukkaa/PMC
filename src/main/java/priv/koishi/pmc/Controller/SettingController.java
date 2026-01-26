@@ -38,6 +38,7 @@ import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Callback.InputRecordCallback;
+import priv.koishi.pmc.Event.AutoClickLoadedEvent;
 import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
@@ -1306,6 +1307,19 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 页面加载完毕后的执行逻辑
+     *
+     * @param event 设置页加载完成事件
+     */
+    private void autoClickLoaded(AutoClickLoadedEvent event) {
+        if (isNativeHookException) {
+            setNodeDisable(runKey_Set, true, autoClick_noPermissions());
+            setNodeDisable(recordKey_Set, true, autoClick_noPermissions());
+            setNodeDisable(cancelKey_Set, true, autoClick_noPermissions());
+        }
+    }
+
+    /**
      * 初始化统一输入录制监听器
      *
      * @param keyLabel  组合键展示栏
@@ -1605,10 +1619,12 @@ public class SettingController extends RootController implements MousePositionUp
             buildContextMenu();
             // 设置要防重复点击的组件
             setDisableNodes();
-            // 加载完成后发布事件
-            EventBus.publish(new SettingsLoadedEvent());
             // 标记页面加载完毕
             initializedFinished = true;
+            // 加载完成后发布事件
+            EventBus.publish(new SettingsLoadedEvent());
+            // 等待设置加载完毕
+            EventBus.subscribe(AutoClickLoadedEvent.class, this::autoClickLoaded);
         });
     }
 

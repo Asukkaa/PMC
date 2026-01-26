@@ -589,7 +589,7 @@ public class ListPMCController extends RootController {
      */
     private void autoClickLoaded(AutoClickLoadedEvent event) {
         if (noScreenCapturePermission) {
-            setNodeDisable(runClick_List, true);
+            setNodeDisable(runClick_List, true, autoClick_noPermissions());
             err_List.setText(tip_noScreenCapturePermission());
             err_List.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
             adaption();
@@ -599,7 +599,7 @@ public class ListPMCController extends RootController {
             if (isMac) {
                 errorMessage = tip_NativeHookException();
             }
-            setNodeDisable(runClick_List, true);
+            setNodeDisable(runClick_List, true, autoClick_noPermissions());
             err_List.setText(errorMessage);
             err_List.setTooltip(creatTooltip(tip_NativeHookException()));
             adaption();
