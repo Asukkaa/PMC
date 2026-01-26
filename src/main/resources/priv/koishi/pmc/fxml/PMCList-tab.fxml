@@ -83,7 +83,7 @@
                 <Label fx:id="log_List" style="-fx-pref-height: -1"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="err_List" textFill="red"/>
+                <Label fx:id="err_List" textFill="red" style="-fx-pref-height: -1"/>
             </HBox>
         </VBox>
     </VBox>
