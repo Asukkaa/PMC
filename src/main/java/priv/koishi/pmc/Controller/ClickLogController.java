@@ -12,6 +12,7 @@ import priv.koishi.pmc.Bean.ClickLogBean;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_removeAll_Log;
 import static priv.koishi.pmc.Finals.i18nFinal.unit_log;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
@@ -116,6 +117,7 @@ public class ClickLogController extends RootController {
             stage = (Stage) scrollPane_Log.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
             stage.setOnCloseRequest(_ -> {
+                autoClickController.logStage = null;
                 removeController();
                 stage = null;
             });

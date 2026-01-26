@@ -342,9 +342,9 @@ public class AutoClickController extends RootController implements MousePosition
     public static final ObjectProperty<Color> recordTextColorProperty = new SimpleObjectProperty<>(Color.BLUE);
 
     /**
-     * 详情页舞台
+     * 详情页、日志页舞台
      */
-    public Stage detailStage;
+    public Stage detailStage, logStage;
 
     /**
      * 详情页窗口标题
@@ -1416,6 +1416,9 @@ public class AutoClickController extends RootController implements MousePosition
                     if (detailStage != null && detailStage.isShowing()) {
                         detailStage.setTitle(detailTitle + " - " + text);
                     }
+                    if (logStage != null && logStage.isShowing()) {
+                        logStage.setTitle(clickLog_title() + " - " + text);
+                    }
                 } else {
                     mainStage.setTitle(appName);
                 }
@@ -2355,21 +2358,21 @@ public class AutoClickController extends RootController implements MousePosition
                 clickLogs.clear();
             }
         });
-        Stage detailStage = new Stage();
+        logStage = new Stage();
         Scene scene = new Scene(root, logWidth, logHeight);
-        detailStage.setScene(scene);
-        detailStage.setTitle(clickLog_title());
-        detailStage.initModality(Modality.APPLICATION_MODAL);
-        setWindowLogo(detailStage, logoPath);
+        logStage.setScene(scene);
+        logStage.setTitle(clickLog_title());
+        logStage.initModality(Modality.APPLICATION_MODAL);
+        setWindowLogo(logStage, logoPath);
         // 监听窗口面板宽度变化
-        detailStage.widthProperty().addListener((_, _, _) ->
+        logStage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 监听窗口面板高度变化
-        detailStage.heightProperty().addListener((_, _, _) ->
+        logStage.heightProperty().addListener((_, _, _) ->
                 Platform.runLater(controller::adaption));
         // 设置 css 样式
         setWindowCss(scene, stylesCss);
-        detailStage.show();
+        logStage.show();
         isSonOpening = true;
     }
 
