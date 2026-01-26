@@ -194,7 +194,7 @@ create_dmg() {
     ln -s "/Applications" "$mountPoint/Applications"
 
     # 复制无法打开说明文件到 dmg
-    txt_file="$script_dir/无法打开看这里.txt"
+    txt_file="$script_dir/无法打开看这里.pages"
     if [ -f "$txt_file" ]; then
         echo "复制文本文件 [$txt_file] 到 DMG 卷中..."
         cp "$txt_file" "$mountPoint/" || echo "警告：文本文件复制失败，但继续执行" >&2
@@ -263,7 +263,7 @@ create_dmg() {
 
                 -- 定位无法打开说明文件图标并设置位置
                 try
-                    set txtItem to (first item of targetDisk whose name is "无法打开看这里.txt")
+                    set txtItem to (first item of targetDisk whose name is "无法打开看这里.pages")
                     set position of txtItem to {760, 200}
                     log "已设置文本文件图标位置"
                 on error
