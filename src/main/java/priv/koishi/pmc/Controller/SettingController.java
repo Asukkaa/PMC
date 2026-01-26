@@ -1603,12 +1603,12 @@ public class SettingController extends RootController implements MousePositionUp
             tableViewDragRow(tableView_Set);
             // 构建右键菜单
             buildContextMenu();
+            // 设置要防重复点击的组件
+            setDisableNodes();
             // 加载完成后发布事件
             EventBus.publish(new SettingsLoadedEvent());
             // 标记页面加载完毕
             initializedFinished = true;
-            // 设置要防重复点击的组件
-            setDisableNodes();
         });
     }
 

@@ -46,6 +46,7 @@ import priv.koishi.pmc.Bean.Result.PMCLogResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Callback.InputRecordCallback;
+import priv.koishi.pmc.Event.AutoClickLoadedEvent;
 import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
@@ -2020,17 +2021,13 @@ public class AutoClickController extends RootController implements MousePosition
         isNativeHookException = true;
         setNodeDisable(runClick_Click, true);
         setNodeDisable(recordClick_Click, true);
-        setNodeDisable(listPMCController.runClick_List, true);
         String errorMessage = appName + autoClick_noPermissions();
         if (isMac) {
             errorMessage = tip_NativeHookException();
         }
         err_Click.setText(errorMessage);
         err_Click.setTooltip(creatTooltip(tip_NativeHookException()));
-        listPMCController.err_List.setText(errorMessage);
-        listPMCController.err_List.setTooltip(creatTooltip(tip_NativeHookException()));
         adaption();
-        listPMCController.adaption();
     }
 
     /**
@@ -2041,10 +2038,7 @@ public class AutoClickController extends RootController implements MousePosition
         setNodeDisable(runClick_Click, true);
         err_Click.setText(tip_noScreenCapturePermission());
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
-        listPMCController.err_List.setText(tip_noScreenCapturePermission());
-        listPMCController.err_List.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
         adaption();
-        listPMCController.adaption();
     }
 
     /**
@@ -2174,6 +2168,8 @@ public class AutoClickController extends RootController implements MousePosition
             buildContextMenu();
             // 等待设置加载完毕
             EventBus.subscribe(SettingsLoadedEvent.class, this::settingsLoaded);
+            // 加载完成后发布事件
+            EventBus.publish(new AutoClickLoadedEvent());
         });
     }
 

@@ -35,6 +35,8 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
 
 /**
+ * 定时任务服务类
+ *
  * @author KOISHI
  * Date:2025-05-16
  * Time:16:36

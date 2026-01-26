@@ -28,6 +28,8 @@ import priv.koishi.pmc.Bean.PMCLogBean;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
+import priv.koishi.pmc.Event.AutoClickLoadedEvent;
+import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 
 import java.io.File;
@@ -41,6 +43,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static priv.koishi.pmc.Controller.AutoClickController.isNativeHookException;
+import static priv.koishi.pmc.Controller.AutoClickController.noScreenCapturePermission;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
@@ -53,9 +57,11 @@ import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -577,6 +583,30 @@ public class ListPMCController extends RootController {
     }
 
     /**
+     * 页面加载完毕后的执行逻辑
+     *
+     * @param event 设置页加载完成事件
+     */
+    private void autoClickLoaded(AutoClickLoadedEvent event) {
+        if (noScreenCapturePermission) {
+            setNodeDisable(runClick_List, true);
+            err_List.setText(tip_noScreenCapturePermission());
+            err_List.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
+            adaption();
+        }
+        if (isNativeHookException) {
+            String errorMessage = appName + autoClick_noPermissions();
+            if (isMac) {
+                errorMessage = tip_NativeHookException();
+            }
+            setNodeDisable(runClick_List, true);
+            err_List.setText(errorMessage);
+            err_List.setTooltip(creatTooltip(tip_NativeHookException()));
+            adaption();
+        }
+    }
+
+    /**
      * 页面初始化
      */
     @FXML
@@ -616,6 +646,8 @@ public class ListPMCController extends RootController {
             tableViewDragRow(tableView_List);
             // 构建右键菜单
             buildContextMenu();
+            // 等待设置加载完毕
+            EventBus.subscribe(AutoClickLoadedEvent.class, this::autoClickLoaded);
         });
     }
 
