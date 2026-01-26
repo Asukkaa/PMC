@@ -2041,7 +2041,10 @@ public class AutoClickController extends RootController implements MousePosition
         setNodeDisable(runClick_Click, true);
         err_Click.setText(tip_noScreenCapturePermission());
         err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
+        listPMCController.err_List.setText(tip_noScreenCapturePermission());
+        listPMCController.err_List.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
         adaption();
+        listPMCController.adaption();
     }
 
     /**
