@@ -246,7 +246,7 @@ public class ListPMCController extends RootController {
             setControlLastConfig(loopTime_List, prop, key_lastLoopTime, defaultLoopTime);
             setControlLastConfig(notOverwrite_List, prop, key_lastNotOverwrite, activation);
             setControlLastConfig(openDirectory_List, prop, key_lastOpenDirectory, activation);
-            setControlLastConfig(outFileName_List, prop, key_lastOutFileName, defaultPMCFileName());
+            setControlLastConfig(outFileName_List, prop, key_lastOutFileName, defaultPMCSFileName());
             setControlLastConfig(preparationRunTime_List, prop, key_lastPreparationRunTime, defaultPreparationRun);
         }
         if (StringUtils.isBlank(outPath_List.getText())) {
@@ -442,7 +442,7 @@ public class ListPMCController extends RootController {
      */
     private void textFieldChangeListener() {
         // 导出自动流程文件名称文本输入框鼠标悬停提示
-        textFieldValueListener(outFileName_List, tip_autoClickFileName() + defaultPMCFileName());
+        textFieldValueListener(outFileName_List, tip_autoClickFileName() + defaultPMCSFileName());
         // 限制循环次数文本输入框内容
         integerRangeTextField(loopTime_List, 0, null, tip_loopTime());
         // 限制运行准备时间文本输入框内容
@@ -465,7 +465,7 @@ public class ListPMCController extends RootController {
         addToolTip(tip_outAutoClickPath(), addOutPath_List);
         addToolTip(tip_openDirectory(), openDirectory_List);
         addToolTip(tip_exportAutoClick(), exportAutoClick_List);
-        addToolTip(tip_autoClickFileName() + defaultPMCFileName(), outFileName_List);
+        addToolTip(tip_autoClickFileName() + defaultPMCSFileName(), outFileName_List);
         addToolTip(tip_preparationRunTime() + defaultPreparationRun, preparationRunTime_List);
     }
 
@@ -474,7 +474,7 @@ public class ListPMCController extends RootController {
      */
     private void setPromptText() {
         loopTime_List.setPromptText(defaultLoopTime);
-        outFileName_List.setPromptText(defaultPMCFileName());
+        outFileName_List.setPromptText(defaultPMCSFileName());
         preparationRunTime_List.setPromptText(defaultPreparationRun);
     }
 
