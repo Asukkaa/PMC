@@ -161,7 +161,9 @@ public class MainApplication extends Application {
         }
         input.close();
         // 初始化 macOS 系统应用菜单
-        initMenu(tabPane);
+        if (isMac) {
+            initMenu(tabPane);
+        }
         // 监听窗口面板宽度变化
         stage.widthProperty().addListener((_, _, _) ->
                 Platform.runLater(mainController::mainAdaption));
