@@ -604,6 +604,9 @@ public class ListPMCController extends RootController {
             err_List.setTooltip(creatTooltip(tip_NativeHookException()));
             adaption();
         }
+        if (StringUtils.isBlank(err_List.getText())) {
+            logHBox_List.getChildren().remove(err_List);
+        }
     }
 
     /**
@@ -631,9 +634,6 @@ public class ListPMCController extends RootController {
                 setLastConfig();
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }
-            if (StringUtils.isBlank(err_List.getText())) {
-                logHBox_List.getChildren().remove(err_List);
             }
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_List, PMCListBean.class, tabId, index_List);
