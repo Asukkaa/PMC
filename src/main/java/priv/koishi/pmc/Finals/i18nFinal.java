@@ -2691,6 +2691,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 更换所选第一行文件地址
+     */
+    public static String menu_setPathMenu() {
+        return bundle.getString("menu.setPathMenu");
+    }
+
+    /**
      * @return 按下
      */
     public static String log_press() {

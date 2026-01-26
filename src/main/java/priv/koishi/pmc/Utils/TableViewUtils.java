@@ -21,6 +21,7 @@ import priv.koishi.pmc.Bean.Interface.ImgBean;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
+import priv.koishi.pmc.Controller.AutoClickController;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
@@ -777,6 +779,9 @@ public class TableViewUtils {
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ImgFileVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
+                if (tableView == settingController.tableView_Set) {
+                    AutoClickController.isSonOpening = true;
+                }
                 File file = creatImgFileChooser(window, selectedItem.getPath());
                 if (file != null) {
                     List<ImgFileVO> allImg = tableView.getItems();
@@ -801,6 +806,9 @@ public class TableViewUtils {
                     selectedItem.updateThumb();
                     updateTableViewSizeText(tableView, dataNumber, unit);
                 }
+                if (tableView == settingController.tableView_Set) {
+                    AutoClickController.isSonOpening = false;
+                }
             }
         });
         contextMenu.getItems().add(upMoveDataMenuItem);
@@ -819,11 +827,13 @@ public class TableViewUtils {
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ClickPositionVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
+                AutoClickController.isSonOpening = true;
                 File file = creatImgFileChooser(window, selectedItem.getClickImgPath());
                 if (file != null) {
                     selectedItem.setClickImgPath(file.getAbsolutePath());
                     selectedItem.updateThumb();
                 }
+                AutoClickController.isSonOpening = false;
             }
         });
         contextMenu.getItems().add(upMoveDataMenuItem);

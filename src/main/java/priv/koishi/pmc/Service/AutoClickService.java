@@ -1543,17 +1543,17 @@ public class AutoClickService {
                     }
                 }
                 // 校验终止图像路径
-                List<ImgFileBean> newStopImgs = newData.getStopImgFiles();
-                List<ImgFileBean> oldStopImgs = oldDataList.get(i).getStopImgFiles();
-                int stopImgSize = newStopImgs.size();
-                if (stopImgSize == oldStopImgs.size()) {
+                List<ImgFileBean> newStopImgList = newData.getStopImgFiles();
+                List<ImgFileBean> oldStopImgList = oldDataList.get(i).getStopImgFiles();
+                int stopImgSize = newStopImgList.size();
+                if (stopImgSize == oldStopImgList.size()) {
                     for (int j = 0; j < stopImgSize; j++) {
-                        ImgFileBean newStopImg = newStopImgs.get(j);
+                        ImgFileBean newStopImg = newStopImgList.get(j);
                         String newStopImgPath = newStopImg.getPath();
                         if (StringUtils.isNoneBlank(newStopImgPath)) {
                             File newStopImgFile = new File(newStopImgPath);
                             if (!newStopImgFile.exists()) {
-                                String oldStopImgPath = oldStopImgs.get(j).getPath();
+                                String oldStopImgPath = oldStopImgList.get(j).getPath();
                                 if (StringUtils.isNoneBlank(oldStopImgPath)) {
                                     File oldStopImgFile = new File(oldStopImgPath);
                                     if (oldStopImgFile.exists()) {

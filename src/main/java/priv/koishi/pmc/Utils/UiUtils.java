@@ -162,25 +162,25 @@ public class UiUtils {
     /**
      * 创建一个多图片选择器（只支持 png、jpg、jpeg 格式）
      *
-     * @param window        文件选择器窗口
-     * @param imgSelectPath 默认路径
+     * @param window     文件选择器窗口
+     * @param selectPath 默认路径
      * @return 选择的图片
      */
-    public static List<File> creatImgFilesChooser(Window window, String imgSelectPath) {
+    public static List<File> creatImgFilesChooser(Window window, String selectPath) {
         List<FileChooser.ExtensionFilter> extensionFilters = creatImgExtensionFilter();
-        return creatFilesChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
+        return creatFilesChooser(window, selectPath, extensionFilters, text_selectTemplateImg());
     }
 
     /**
      * 创建一个单图片选择器（只支持 png、jpg、jpeg 格式）
      *
-     * @param window        文件选择器窗口
-     * @param imgSelectPath 默认路径
+     * @param window     文件选择器窗口
+     * @param selectPath 默认路径
      * @return 选择的图片
      */
-    public static File creatImgFileChooser(Window window, String imgSelectPath) {
+    public static File creatImgFileChooser(Window window, String selectPath) {
         List<FileChooser.ExtensionFilter> extensionFilters = creatImgExtensionFilter();
-        return creatFileChooser(window, imgSelectPath, extensionFilters, text_selectTemplateImg());
+        return creatFileChooser(window, selectPath, extensionFilters, text_selectTemplateImg());
     }
 
     /**

@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -219,7 +220,7 @@ public class ListPMCController extends RootController {
                     throw new RuntimeException(event.getSource().getException());
                 });
                 Thread.ofVirtual()
-                        .name("exportPMCTask-vThread" + tabId)
+                        .name("exportPMCSTask-vThread" + tabId)
                         .start(exportPMCTask);
             }
         }
@@ -292,6 +293,8 @@ public class ListPMCController extends RootController {
         buildMoveDataMenu(tableView_List, tableMenu);
         // 查看文件选项
         buildFilePathItem(tableView_List, tableMenu);
+        // 更换所选第一行文件地址选项
+        buildSetPathMenuItem(tableMenu);
         // 复制数据选项
         buildCopyDataMenu(tableView_List, tableMenu, dataNumber_List, unit_files());
         // 取消选中选项
@@ -354,6 +357,32 @@ public class ListPMCController extends RootController {
             }
         });
         contextMenu.getItems().add(addAllItem);
+    }
+
+    /**
+     * 更换所选第一行文件地址选项
+     *
+     * @param contextMenu 右键菜单集合
+     */
+    private void buildSetPathMenuItem(ContextMenu contextMenu) {
+        MenuItem detailItem = new MenuItem(menu_setPathMenu());
+        detailItem.setOnAction(_ -> {
+            PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
+            if (selected != null) {
+                Window window = tableView_List.getScene().getWindow();
+                FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
+                List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
+                AutoClickController.isSonOpening = true;
+                File file = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
+                if (file != null) {
+                    selected.setPath(file.getAbsolutePath())
+                            .setName(file.getName());
+                    tableView_List.refresh();
+                }
+                AutoClickController.isSonOpening = false;
+            }
+        });
+        contextMenu.getItems().add(detailItem);
     }
 
     /**
