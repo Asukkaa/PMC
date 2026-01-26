@@ -1313,10 +1313,10 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void autoClickLoaded(AutoClickLoadedEvent event) {
         if (isNativeHookException) {
-            setNodeDisable(runKey_Set, true, autoClick_noPermissions());
-            setNodeDisable(recordKey_Set, true, autoClick_noPermissions());
-            setNodeDisable(cancelKey_Set, true, autoClick_noPermissions());
+            setNodeDisable(runKeyHBox_Set, true, autoClick_noPermissions());
             setNodeDisable(removeRunKey_Det, true, autoClick_noPermissions());
+            setNodeDisable(recordKeyHBox_Set, true, autoClick_noPermissions());
+            setNodeDisable(cancelKeyHBox_Set, true, autoClick_noPermissions());
             setNodeDisable(removeRecordKey_Det, true, autoClick_noPermissions());
         }
     }
