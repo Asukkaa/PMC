@@ -1169,6 +1169,8 @@ public class ClickDetailController extends RootController {
             addToolTip(tip_noAutomationPermission(), noPermission_Det);
             setNodeDisable(stopWindow_Det, true, tip_noAutomationPermission());
             setNodeDisable(clickWindow_Det, true, tip_noAutomationPermission());
+            setNodeDisable(stopWindowInfo_Det, true, tip_noAutomationPermission());
+            setNodeDisable(clickWindowInfo_Det, true, tip_noAutomationPermission());
         }
         // 禁用需要辅助功能权限的组件
         if (isNativeHookException) {
@@ -1176,6 +1178,8 @@ public class ClickDetailController extends RootController {
             setNodeDisable(stopRegion_Det, true, tip_NativeHookException());
             setNodeDisable(clickWindow_Det, true, tip_NativeHookException());
             setNodeDisable(clickRegion_Det, true, tip_NativeHookException());
+            setNodeDisable(stopWindowInfo_Det, true, tip_NativeHookException());
+            setNodeDisable(clickWindowInfo_Det, true, tip_NativeHookException());
         }
     }
 

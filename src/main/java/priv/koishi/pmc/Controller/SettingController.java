@@ -1100,6 +1100,8 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_noAutomationPermission(), noPermission_Set);
         setNodeDisable(stopWindow_Set, true, tip_noAutomationPermission());
         setNodeDisable(clickWindow_Set, true, tip_noAutomationPermission());
+        setNodeDisable(stopWindowInfo_Set, true, tip_noAutomationPermission());
+        setNodeDisable(clickWindowInfo_Set, true, tip_noAutomationPermission());
         setNodeDisable(noPermissionHBox_Set, true, tip_noAutomationPermission());
     }
 
@@ -1321,6 +1323,8 @@ public class SettingController extends RootController implements MousePositionUp
             setNodeDisable(removeRunKey_Det, true, tip_NativeHookException());
             setNodeDisable(recordKeyHBox_Set, true, tip_NativeHookException());
             setNodeDisable(cancelKeyHBox_Set, true, tip_NativeHookException());
+            setNodeDisable(stopWindowInfo_Set, true, tip_NativeHookException());
+            setNodeDisable(clickWindowInfo_Set, true, tip_NativeHookException());
             setNodeDisable(removeRecordKey_Det, true, tip_NativeHookException());
         }
     }
