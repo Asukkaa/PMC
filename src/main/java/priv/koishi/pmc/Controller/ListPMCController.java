@@ -289,12 +289,12 @@ public class ListPMCController extends RootController {
         buildDetailMenuItem(tableMenu);
         // 将所选项全部添加到操作列表
         buildAddAllMenuItem(tableMenu);
+        // 更换所选第一行文件地址选项
+        buildSetPathMenuItem(tableMenu);
         // 移动数据选项
         buildMoveDataMenu(tableView_List, tableMenu);
         // 查看文件选项
         buildFilePathItem(tableView_List, tableMenu);
-        // 更换所选第一行文件地址选项
-        buildSetPathMenuItem(tableMenu);
         // 复制数据选项
         buildCopyDataMenu(tableView_List, tableMenu, dataNumber_List, unit_files());
         // 取消选中选项
@@ -313,6 +313,7 @@ public class ListPMCController extends RootController {
     private void buildDetailMenuItem(ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_detailMenu());
         detailItem.setOnAction(_ -> {
+            updateLabel(log_List, "");
             PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 List<ClickPositionVO> clickPositionVOS = selected.getClickPositionVOS();
@@ -345,6 +346,7 @@ public class ListPMCController extends RootController {
     private void buildAddAllMenuItem(ContextMenu contextMenu) {
         MenuItem addAllItem = new MenuItem(menu_addAllMenu());
         addAllItem.setOnAction(_ -> {
+            updateLabel(log_List, "");
             List<PMCListBean> selected = tableView_List.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selected)) {
                 selected.forEach(pmcListBean -> {
@@ -367,6 +369,7 @@ public class ListPMCController extends RootController {
     private void buildSetPathMenuItem(ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_setPathMenu());
         detailItem.setOnAction(_ -> {
+            updateLabel(log_List, "");
             PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 Window window = tableView_List.getScene().getWindow();
@@ -375,9 +378,30 @@ public class ListPMCController extends RootController {
                 AutoClickController.isSonOpening = true;
                 File file = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
                 if (file != null) {
-                    selected.setPath(file.getAbsolutePath())
-                            .setName(file.getName());
-                    tableView_List.refresh();
+                    TaskBean<PMCListBean> taskBean = creatTaskBean();
+                    loadPMCFilsTask = loadPMCSFils(taskBean, Collections.singletonList(file));
+                    bindingTaskNode(loadPMCFilsTask, taskBean);
+                    loadPMCFilsTask.setOnSucceeded(_ -> {
+                        taskUnbind(taskBean);
+                        PMCSLoadResult value = loadPMCFilsTask.getValue();
+                        List<PMCListBean> clickPositionVOS = value.pmcListBeans();
+                        List<ClickPositionVO> vos = clickPositionVOS.getFirst().getClickPositionVOS();
+                        selected.setPath(file.getAbsolutePath())
+                                .setClickPositionVOS(vos)
+                                .setName(file.getName());
+                        updateTableViewSizeText(tableView_List, dataNumber_List, unit_files());
+                        tableView_List.refresh();
+                        loadPMCFilsTask = null;
+                    });
+                    loadPMCFilsTask.setOnFailed(event -> {
+                        taskUnbind(taskBean);
+                        taskNotSuccess(taskBean, text_taskFailed());
+                        loadPMCFilsTask = null;
+                        throw new RuntimeException(event.getSource().getException());
+                    });
+                    Thread.ofVirtual()
+                            .name("loadPMCSFilsTask-vThread" + tabId)
+                            .start(loadPMCFilsTask);
                 }
                 AutoClickController.isSonOpening = false;
             }
