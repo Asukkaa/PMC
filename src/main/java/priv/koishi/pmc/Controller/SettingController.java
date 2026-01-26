@@ -1316,6 +1316,8 @@ public class SettingController extends RootController implements MousePositionUp
             setNodeDisable(runKey_Set, true, autoClick_noPermissions());
             setNodeDisable(recordKey_Set, true, autoClick_noPermissions());
             setNodeDisable(cancelKey_Set, true, autoClick_noPermissions());
+            setNodeDisable(removeRunKey_Det, true, autoClick_noPermissions());
+            setNodeDisable(removeRecordKey_Det, true, autoClick_noPermissions());
         }
     }
 
