@@ -765,9 +765,12 @@ public class i18nFinal {
      * 5. 重启 {@value priv.koishi.pmc.Finals.CommonFinals#appName}{@value priv.koishi.pmc.Finals.CommonFinals#app}
      */
     public static String tip_NativeHookException() {
-        return bundle.getString("tip.NativeHookException") + appName + app +
-                bundle.getString("tip.ifHave") + appName + app +
-                bundle.getString("tip.addList") + appName + app;
+        if (isMac) {
+            return bundle.getString("tip.NativeHookException") + appName + app +
+                    bundle.getString("tip.ifHave") + appName + app +
+                    bundle.getString("tip.addList") + appName + app;
+        }
+        return appName + autoClick_noPermissions();
     }
 
     /**

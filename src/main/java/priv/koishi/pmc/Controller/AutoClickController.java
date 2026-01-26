@@ -95,7 +95,6 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
-import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -2018,14 +2017,10 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setNativeHookExceptionLog() {
         isNativeHookException = true;
-        setNodeDisable(runClick_Click, true, autoClick_noPermissions());
-        setNodeDisable(recordClick_Click, true, autoClick_noPermissions());
-        String errorMessage = appName + autoClick_noPermissions();
-        if (isMac) {
-            errorMessage = tip_NativeHookException();
-        }
-        err_Click.setText(errorMessage);
-        err_Click.setTooltip(creatTooltip(tip_NativeHookException()));
+        err_Click.setText(tip_NativeHookException());
+        addToolTip(tip_NativeHookException(), err_Click);
+        setNodeDisable(runClick_Click, true, tip_NativeHookException());
+        setNodeDisable(recordClick_Click, true, tip_NativeHookException());
         adaption();
     }
 
@@ -2034,9 +2029,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setNoScreenCapturePermissionLog() {
         noScreenCapturePermission = true;
-        setNodeDisable(runClick_Click, true, autoClick_noPermissions());
         err_Click.setText(tip_noScreenCapturePermission());
-        err_Click.setTooltip(creatTooltip(tip_noScreenCapturePermission()));
+        addToolTip(tip_noScreenCapturePermission(), err_Click);
+        setNodeDisable(runClick_Click, true, tip_noScreenCapturePermission());
         adaption();
     }
 

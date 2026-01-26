@@ -1097,10 +1097,10 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setNoPermissionLog() {
         noAutomationPermission = true;
-        setNodeDisable(stopWindow_Set, true);
-        setNodeDisable(clickWindow_Set, true);
-        setNodeDisable(noPermissionHBox_Set, true);
         addToolTip(tip_noAutomationPermission(), noPermission_Set);
+        setNodeDisable(stopWindow_Set, true, tip_noAutomationPermission());
+        setNodeDisable(clickWindow_Set, true, tip_noAutomationPermission());
+        setNodeDisable(noPermissionHBox_Set, true, tip_noAutomationPermission());
     }
 
     /**
@@ -1313,11 +1313,15 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void autoClickLoaded(AutoClickLoadedEvent event) {
         if (isNativeHookException) {
-            setNodeDisable(runKeyHBox_Set, true, autoClick_noPermissions());
-            setNodeDisable(removeRunKey_Det, true, autoClick_noPermissions());
-            setNodeDisable(recordKeyHBox_Set, true, autoClick_noPermissions());
-            setNodeDisable(cancelKeyHBox_Set, true, autoClick_noPermissions());
-            setNodeDisable(removeRecordKey_Det, true, autoClick_noPermissions());
+            setNodeDisable(runKeyHBox_Set, true, tip_NativeHookException());
+            setNodeDisable(stopRegion_Set, true, tip_NativeHookException());
+            setNodeDisable(stopWindow_Set, true, tip_NativeHookException());
+            setNodeDisable(clickWindow_Set, true, tip_NativeHookException());
+            setNodeDisable(clickRegion_Set, true, tip_NativeHookException());
+            setNodeDisable(removeRunKey_Det, true, tip_NativeHookException());
+            setNodeDisable(recordKeyHBox_Set, true, tip_NativeHookException());
+            setNodeDisable(cancelKeyHBox_Set, true, tip_NativeHookException());
+            setNodeDisable(removeRecordKey_Det, true, tip_NativeHookException());
         }
     }
 

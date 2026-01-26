@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
 
+import static priv.koishi.pmc.Controller.AutoClickController.isNativeHookException;
 import static priv.koishi.pmc.Controller.AutoClickController.messageFloating;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
@@ -1161,14 +1162,21 @@ public class ClickDetailController extends RootController {
         }
     }
 
-    /**
-     * 禁用需要自动化权限的组件
-     */
-    private void setNoPermissionLog() {
-        setNodeDisable(stopWindow_Det, true);
-        setNodeDisable(clickWindow_Det, true);
-        noPermissionHBox_Det.setVisible(true);
-        addToolTip(tip_noAutomationPermission(), noPermission_Det);
+    private void checkSystemProperties() {
+        // 禁用需要自动化权限的组件
+        if (noAutomationPermission) {
+            noPermissionHBox_Det.setVisible(true);
+            addToolTip(tip_noAutomationPermission(), noPermission_Det);
+            setNodeDisable(stopWindow_Det, true, tip_noAutomationPermission());
+            setNodeDisable(clickWindow_Det, true, tip_noAutomationPermission());
+        }
+        // 禁用需要辅助功能权限的组件
+        if (isNativeHookException) {
+            setNodeDisable(stopWindow_Det, true, tip_NativeHookException());
+            setNodeDisable(stopRegion_Det, true, tip_NativeHookException());
+            setNodeDisable(clickWindow_Det, true, tip_NativeHookException());
+            setNodeDisable(clickRegion_Det, true, tip_NativeHookException());
+        }
     }
 
     /**
@@ -1469,10 +1477,8 @@ public class ClickDetailController extends RootController {
             initWindowMonitor();
             // 组件宽高自适应
             adaption();
-            // 禁用需要自动化权限的组件
-            if (noAutomationPermission) {
-                setNoPermissionLog();
-            }
+            // 检查系统权限
+            checkSystemProperties();
             // 设置要防重复点击的组件
             setDisableNodes();
             // 添加确认关闭确认框
