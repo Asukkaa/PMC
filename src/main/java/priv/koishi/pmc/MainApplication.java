@@ -171,6 +171,8 @@ public class MainApplication extends Application {
         // 设置默认选中的 Tab
         if (loadPMC) {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
+        } else if (loadPMCS) {
+            tabPane.getSelectionModel().select(mainController.listPMCTab);
         } else if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
             for (Tab tab : tabPane.getTabs()) {
                 if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
@@ -540,13 +542,20 @@ public class MainApplication extends Application {
             // windows --r pmcFilePath 算两个参数，macOS算一个
             if (r.trim().equals(arg)) {
                 runPMCFile = true;
-            } else if (arg.contains(PMC)) {
+            } else if (arg.endsWith(PMC)) {
                 loadPMCPath = arg;
                 if (loadPMCPath.contains(r)) {
                     loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf(r) + r.length());
                     runPMCFile = true;
                 }
                 loadPMC = true;
+            } else if (arg.endsWith(PMCS)) {
+                loadPMCSPath = arg;
+                if (loadPMCSPath.contains(r)) {
+                    loadPMCSPath = loadPMCSPath.substring(loadPMCSPath.indexOf(r) + r.length());
+                    runPMCSFile = true;
+                }
+                loadPMCS = true;
             }
             logger.info("参数 {}: {}", i, arg);
         }

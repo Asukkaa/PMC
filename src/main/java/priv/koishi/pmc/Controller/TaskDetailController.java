@@ -28,7 +28,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
@@ -374,9 +373,11 @@ public class TaskDetailController extends ManuallyChangeThemeController {
      */
     @FXML
     private void loadAutoClick(ActionEvent actionEvent) throws IOException {
-        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter(appName, allPMC);
-        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>(Collections.singleton(filter));
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+        extensionFilters.add(new FileChooser.ExtensionFilter(appName, allPMC, allPMCS));
+        extensionFilters.add(new FileChooser.ExtensionFilter(appName, allPMC));
+        extensionFilters.add(new FileChooser.ExtensionFilter(appName, allPMCS));
         File selectedFile = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
         if (selectedFile != null) {
             inFilePath = selectedFile.getPath();
