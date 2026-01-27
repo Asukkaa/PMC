@@ -258,7 +258,7 @@ public class ImageRecognitionService {
         checkInterruption();
         // 初始化匹配结果存储变量
         MatchPointBean matchPointBean = new MatchPointBean();
-        AtomicReference<Double> bestVal = new AtomicReference<>(-1.0);
+        AtomicReference<Double> bestVal = new AtomicReference<>(0.0);
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
         // 读取图片为byte数组，防止中文路径乱码
         byte[] bytes = Files.readAllBytes(new File(findPositionConfig.getTemplatePath()).toPath());
