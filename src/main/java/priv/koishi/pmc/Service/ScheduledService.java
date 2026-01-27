@@ -225,7 +225,9 @@ public class ScheduledService {
                     .setDate(startDate)
                     .setDays(daysCN);
             if (taskToRun.contains(PMC)) {
-                String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length());
+                // 处理文件路径中的空格
+                String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length())
+                        .replaceAll("\\*", " ");
                 String name = getFileName(path);
                 timedTaskBean.setPath(path)
                         .setName(name);
@@ -409,7 +411,8 @@ public class ScheduledService {
      */
     private static void createWinLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
         String workingDir = Paths.get(appLaunchPath).getParent().toString();
-        String PMCFilePath = timedTaskBean.getPath();
+        // 处理文件路径中的空格
+        String PMCFilePath = timedTaskBean.getPath().replaceAll(" ", "*");
         LocalDateTime triggerTime = timedTaskBean.getDateTime();
         String repeatType = timedTaskBean.getRepeat();
         List<Integer> days = timedTaskBean.getDayList();

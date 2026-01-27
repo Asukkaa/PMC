@@ -504,7 +504,6 @@ public class MainApplication extends Application {
         });
     }
 
-
     /**
      * 清空启动参数
      */
@@ -539,18 +538,18 @@ public class MainApplication extends Application {
         logger.info("启动参数数量: {}", args.length);
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
-            // windows --r pmcFilePath 算两个参数，macOS算一个
+            // windows --r pmcFilePath 算两个参数，macOS算一个，并使用 * 替代空格
             if (r.trim().equals(arg)) {
                 runPMCFile = true;
             } else if (arg.endsWith(PMC)) {
-                loadPMCPath = arg;
+                loadPMCPath = arg.replaceAll("\\*", " ");
                 if (loadPMCPath.contains(r)) {
                     loadPMCPath = loadPMCPath.substring(loadPMCPath.indexOf(r) + r.length());
                     runPMCFile = true;
                 }
                 loadPMC = true;
             } else if (arg.endsWith(PMCS)) {
-                loadPMCSPath = arg;
+                loadPMCSPath = arg.replaceAll("\\*", " ");
                 if (loadPMCSPath.contains(r)) {
                     loadPMCSPath = loadPMCSPath.substring(loadPMCSPath.indexOf(r) + r.length());
                     runPMCSFile = true;
