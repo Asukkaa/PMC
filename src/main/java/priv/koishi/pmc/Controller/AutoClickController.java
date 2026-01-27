@@ -262,7 +262,7 @@ public class AutoClickController extends RootController implements MousePosition
     public Task<PMCLoadResult> loadPMCFilsTask;
 
     /**
-     * 导入 PMC 文件任务
+     * 人口参数导入 PMC 文件任务
      */
     public Task<List<ClickPositionVO>> loadedPMCTask;
 

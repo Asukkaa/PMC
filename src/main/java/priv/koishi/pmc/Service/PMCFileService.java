@@ -317,6 +317,24 @@ public class PMCFileService {
     }
 
     /**
+     * 加载 PMCS 文件
+     *
+     * @param taskBean 线程任务参数
+     * @param file     要加载的文件
+     * @return PMCS 文件列表
+     */
+    public static Task<List<PMCListBean>> buildPMCS(TaskBean<PMCListBean> taskBean, File file) {
+        return new Task<>() {
+            @Override
+            protected List<PMCListBean> call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                return loadPMCSFile(file);
+            }
+        };
+    }
+
+    /**
      * 导出 PMCS 文件
      *
      * @param taskBean    线程任务参数

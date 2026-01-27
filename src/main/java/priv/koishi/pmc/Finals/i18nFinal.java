@@ -3109,14 +3109,14 @@ public class i18nFinal {
     }
 
     /**
-     * @return 在操作列表下方追加流程
+     * @return 在操作列表下方追加
      */
     public static String import_append() {
         return bundle.getString("import.append");
     }
 
     /**
-     * @return 清空操作列表后导入流程
+     * @return 清空操作列表后导入
      */
     public static String import_clear() {
         return bundle.getString("import.clear");

@@ -104,6 +104,11 @@ public class ListPMCController extends RootController {
     public Task<PMCSLoadResult> loadPMCFilsTask;
 
     /**
+     * 人口参数导入 PMCS 文件任务
+     */
+    public Task<List<PMCListBean>> loadedPMCSTask;
+
+    /**
      * 导出 PMC 文件任务
      */
     public Task<String> exportPMCTask;
@@ -606,6 +611,35 @@ public class ListPMCController extends RootController {
         }
         if (StringUtils.isBlank(err_List.getText())) {
             logHBox_List.getChildren().remove(err_List);
+        }
+        // 运行定时任务
+        if (StringUtils.isNotBlank(loadPMCPath)) {
+            TaskBean<PMCListBean> taskBean = creatTaskBean();
+            loadedPMCSTask = buildPMCS(taskBean, new File(loadPMCPath));
+            loadedPMCSTask.setOnSucceeded(_ -> {
+                taskUnbind(taskBean);
+                List<PMCListBean> beans = loadedPMCSTask.getValue();
+                addPMCSFile(beans, loadPMCPath);
+                loadedPMCSTask = null;
+                try {
+                    // 运行自动操作
+                    if (runPMCFile) {
+                        runClick();
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+                // 清空启动参数
+                clearArgs();
+            });
+            loadedPMCSTask.setOnFailed(e -> {
+                taskNotSuccess(taskBean, text_taskFailed());
+                loadedPMCSTask = null;
+                throw new RuntimeException(e.getSource().getException());
+            });
+            Thread.ofVirtual()
+                    .name("loadedPMCSTask-vThread" + tabId)
+                    .start(loadedPMCSTask);
         }
     }
 

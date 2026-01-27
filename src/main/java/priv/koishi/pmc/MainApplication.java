@@ -15,10 +15,12 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
+import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Controller.MainController;
@@ -33,15 +35,18 @@ import java.util.*;
 
 import static priv.koishi.pmc.Controller.AutoClickController.recordTextColorProperty;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
+import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.buildPMC;
+import static priv.koishi.pmc.Service.PMCFileService.buildPMCS;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
@@ -74,19 +79,34 @@ public class MainApplication extends Application {
     private static ServerSocket serverSocket;
 
     /**
-     * 程序启动后要自动加载的 pmc 文件路径
+     * 程序启动后要自动加载的 PMC 文件路径
      */
     public static String loadPMCPath;
 
     /**
-     * 程序启动后运行 pmc 流程标志（true-运行 false-不运行）
+     * 程序启动后运行 PMC 流程标志（true-运行 false-不运行）
      */
     public static boolean runPMCFile;
 
     /**
-     * 重新启动后自动加载过 pmc 文件标志（true-加载过 false-没有加载过）
+     * 程序启动后自动加载过 PMC 文件标志（true-加载过 false-没有加载过）
      */
     public static boolean loadPMC;
+
+    /**
+     * 程序启动后要自动加载的 PMCS 文件路径
+     */
+    public static String loadPMCSPath;
+
+    /**
+     * 程序启动后运行 PMCS 流程标志（true-运行 false-不运行）
+     */
+    public static boolean runPMCSFile;
+
+    /**
+     * 程序启动后自动加载过 PMCS 文件标志（true-加载过 false-没有加载过）
+     */
+    public static boolean loadPMCS;
 
     /**
      * 程序启动时的参数
@@ -353,29 +373,38 @@ public class MainApplication extends Application {
                 // 只处理手动打开文件的行为，忽略自动任务导入
                 if (arg.contains(r.trim())) {
                     break;
-                } else if (arg.contains(PMC)) {
+                } else if (arg.endsWith(PMC) && FilenameUtils.getPrefixLength(arg) != -1) {
                     loadPMCPath = arg;
                     loadPMC = true;
+                    break;
+                } else if (arg.endsWith(PMCS) && FilenameUtils.getPrefixLength(arg) != -1) {
+                    loadPMCSPath = arg;
+                    loadPMCS = true;
                     break;
                 }
             }
             Platform.runLater(() -> {
                 showStage(mainStage);
+                Dialog<ButtonType> dialog = new Dialog<>();
+                dialog.setTitle(import_title());
+                dialog.setHeaderText(import_header());
+                Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+                stage.setAlwaysOnTop(true);
+                setWindowLogo(stage, logoPath);
+                ButtonType appendButton = new ButtonType(import_append(), ButtonBar.ButtonData.APPLY);
+                ButtonType clearButton = new ButtonType(import_clear(), ButtonBar.ButtonData.OTHER);
+                ButtonType cancelButton = new ButtonType(import_cancel(), ButtonBar.ButtonData.CANCEL_CLOSE);
+                dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
+                Button appendBtn = (Button) dialog.getDialogPane().lookupButton(appendButton);
+                Button clearBtn = (Button) dialog.getDialogPane().lookupButton(clearButton);
+                Button cancelBtn = (Button) dialog.getDialogPane().lookupButton(cancelButton);
+                addToolTip(appendBtn, clearBtn, cancelBtn);
+                TabPane tabPane = mainController.tabPane;
                 if (loadPMC) {
                     File file = new File(loadPMCPath);
                     if (file.exists()) {
-                        Dialog<ButtonType> dialog = new Dialog<>();
-                        dialog.setTitle(import_title());
-                        dialog.setHeaderText(import_header());
-                        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
-                        setWindowLogo(stage, logoPath);
-                        ButtonType appendButton = new ButtonType(import_append(), ButtonBar.ButtonData.APPLY);
-                        ButtonType clearButton = new ButtonType(import_clear(), ButtonBar.ButtonData.OTHER);
-                        ButtonType cancelButton = new ButtonType(import_cancel(), ButtonBar.ButtonData.CANCEL_CLOSE);
-                        dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
-                        ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
-                        TabPane tabPane = mainController.tabPane;
                         Tab autoClickTab = mainController.autoClickTab;
+                        ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
                         if (buttonType == appendButton) {
                             creatLoadedPMCTask(file, tabPane, autoClickTab);
                             Thread.ofVirtual()
@@ -390,6 +419,25 @@ public class MainApplication extends Application {
                         }
                     }
                 }
+                if (loadPMCS) {
+                    File file = new File(loadPMCSPath);
+                    if (file.exists()) {
+                        Tab listPMCTab = mainController.listPMCTab;
+                        ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
+                        if (buttonType == appendButton) {
+                            creatLoadedPMCSTask(file, tabPane, listPMCTab);
+                            Thread.ofVirtual()
+                                    .name("loadedPMCSTask-vThread")
+                                    .start(listPMCController.loadedPMCSTask);
+                        } else if (buttonType == clearButton) {
+                            autoClickController.removeAll();
+                            creatLoadedPMCSTask(file, tabPane, listPMCTab);
+                            Thread.ofVirtual()
+                                    .name("loadedPMCSTask-vThread")
+                                    .start(listPMCController.loadedPMCSTask);
+                        }
+                    }
+                }
                 // 清空启动参数
                 clearArgs();
             });
@@ -397,7 +445,7 @@ public class MainApplication extends Application {
     }
 
     /**
-     * 创建加载 pmc 文件任务
+     * 创建加载 PMC 文件任务
      *
      * @param file         要加载的文件
      * @param tabPane      主页面布局
@@ -426,12 +474,45 @@ public class MainApplication extends Application {
     }
 
     /**
+     * 创建加载 PMCS 文件任务
+     *
+     * @param file       要加载的文件
+     * @param tabPane    主页面布局
+     * @param listPMCTab 批量执行 PMC 文件页面
+     */
+    private static void creatLoadedPMCSTask(File file, TabPane tabPane, Tab listPMCTab) {
+        TaskBean<PMCListBean> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(listPMCController.progressBar_List)
+                .setMessageLabel(listPMCController.dataNumber_List)
+                .setTableView(listPMCController.tableView_List)
+                .setDisableNodes(listPMCController.disableNodes);
+        listPMCController.loadedPMCSTask = buildPMCS(taskBean, file);
+        bindingTaskNode(listPMCController.loadedPMCSTask, taskBean);
+        listPMCController.loadedPMCSTask.setOnSucceeded(_ -> {
+            taskUnbind(taskBean);
+            List<PMCListBean> clickPositionVOS = listPMCController.loadedPMCSTask.getValue();
+            listPMCController.addPMCSFile(clickPositionVOS, file.getPath());
+            tabPane.getSelectionModel().select(listPMCTab);
+            listPMCController.loadedPMCSTask = null;
+        });
+        listPMCController.loadedPMCSTask.setOnFailed(e -> {
+            taskNotSuccess(taskBean, text_taskFailed());
+            listPMCController.loadedPMCSTask = null;
+            throw new RuntimeException(e.getSource().getException());
+        });
+    }
+
+
+    /**
      * 清空启动参数
      */
     public static void clearArgs() {
         loadPMCPath = null;
+        loadPMCSPath = null;
         loadPMC = false;
+        loadPMCS = false;
         runPMCFile = false;
+        runPMCSFile = false;
         args = null;
     }
 
