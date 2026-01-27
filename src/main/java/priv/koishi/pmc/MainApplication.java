@@ -538,9 +538,10 @@ public class MainApplication extends Application {
         logger.info("启动参数数量: {}", args.length);
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
-            // windows --r pmcFilePath 算两个参数，macOS算一个，并使用 * 替代空格
+            // windows --r pmcFilePath 算两个参数，macOS算一个，并使用 * 替代路径中的空格
             if (r.trim().equals(arg)) {
                 runPMCFile = true;
+                runPMCSFile = true;
             } else if (arg.endsWith(PMC)) {
                 loadPMCPath = arg.replaceAll("\\*", " ");
                 if (loadPMCPath.contains(r)) {
