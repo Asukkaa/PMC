@@ -56,7 +56,7 @@ public class ListenerUtils {
     }
 
     /**
-     * 限制输入框只能输入指定范围内的整数
+     * 限制输入框只能输入指定范围内的整数（不允许 0 开头）
      *
      * @param textField 要处理的文本输入框
      * @param min       可输入的最小值，为空则不限制
@@ -65,12 +65,29 @@ public class ListenerUtils {
      * @return 监听器删除函数
      */
     public static Runnable integerRangeTextField(TextField textField, Integer min, Integer max, String tip) {
+        return integerRangeTextField(textField, min, max, false, tip);
+    }
+
+    /**
+     * 限制输入框只能输入指定范围内的整数
+     *
+     * @param textField 要处理的文本输入框
+     * @param min       可输入的最小值，为空则不限制
+     * @param max       可输入的最大值，为空则不限制
+     * @param zeroStart 是否允许 0 开头
+     * @param tip       鼠标悬停提示文案
+     * @return 监听器删除函数
+     */
+    public static Runnable integerRangeTextField(TextField textField, Integer min, Integer max,
+                                                 boolean zeroStart, String tip) {
         ChangeListener<Boolean> focusedListener = (_, oldFocused, newFocused) -> {
             if (oldFocused && !newFocused) {
                 String newValue = textField.getText();
-                if (!isInIntegerRange(newValue, min, max) && StringUtils.isNotBlank(newValue)) {
+                if (!isInIntegerRange(newValue, min, max, zeroStart) && StringUtils.isNotBlank(newValue)) {
                     textField.setText("");
                     new MessageBubble(text_errRange(), 1);
+                } else if (zeroStart && newValue.startsWith("0") && newValue.length() > 1) {
+                    textField.setText(newValue.substring(1));
                 }
                 addValueToolTip(textField, tip);
             }

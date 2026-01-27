@@ -75,7 +75,7 @@ public class CommonUtils {
     }
 
     /**
-     * 正则表达式用于匹配指定范围的整数
+     * 正则表达式用于匹配指定范围的整数（不允许 0 开头）
      *
      * @param str 要校验的字符串
      * @param min 最小值，为空则不限制
@@ -83,15 +83,32 @@ public class CommonUtils {
      * @return 在设置范围内为 true，不在范围内为 false
      */
     public static boolean isInIntegerRange(String str, Integer min, Integer max) {
+        return isInIntegerRange(str, min, max, false);
+    }
+
+    /**
+     * 正则表达式用于匹配指定范围的整数
+     *
+     * @param str       要校验的字符串
+     * @param min       最小值，为空则不限制
+     * @param max       最大值，为空则不限制
+     * @param zeroStart 是否允许 0 开头的数字
+     * @return 在设置范围内为 true，不在范围内为 false
+     */
+    public static boolean isInIntegerRange(String str, Integer min, Integer max, boolean zeroStart) {
         if (StringUtils.isBlank(str)) {
             return false;
         }
-        // 禁止出现0开头的非0数字
-        if (str.indexOf("0") == 0 && str.length() > 1) {
+        // 禁止出现 0 开头的非 0 数字
+        if (!zeroStart && str.startsWith("0") && str.length() > 1) {
             return false;
         }
-        // 禁止出现负数开头的0
-        if (str.indexOf("-0") == 0) {
+        // 禁止出现 00 开头的数字
+        if (zeroStart && str.startsWith("00") && str.length() > 2) {
+            return false;
+        }
+        // 禁止出现负数开头的 0
+        if (str.startsWith("-0")) {
             return false;
         }
         Pattern integerPattern = Pattern.compile("^-?\\d{1,10}$");

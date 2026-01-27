@@ -354,11 +354,13 @@ public class UiUtils {
         if (runnable != null) {
             runnable.run();
         }
-        WindowEvent closeEvent = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
-        stage.fireEvent(closeEvent);
-        if (!closeEvent.isConsumed()) {
-            stage.close();
-            AutoClickController.isSonOpening = false;
+        if (stage != null) {
+            WindowEvent closeEvent = new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST);
+            stage.fireEvent(closeEvent);
+            if (!closeEvent.isConsumed()) {
+                stage.close();
+                AutoClickController.isSonOpening = false;
+            }
         }
         System.gc();
     }

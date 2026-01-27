@@ -205,10 +205,10 @@ public class TaskDetailController extends ManuallyChangeThemeController {
      */
     private void textFieldChangeListener() {
         // 限制小时文本输入框内容
-        Runnable hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, tip_hour());
+        Runnable hourFieldListener = integerRangeTextField(hourField_TD, 0, 23, true, tip_hour());
         listenerRemovers.add(hourFieldListener);
         // 限制分钟文本输入框内容
-        Runnable minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, tip_minute());
+        Runnable minuteFieldListener = integerRangeTextField(minuteField_TD, 0, 59, true, tip_minute());
         listenerRemovers.add(minuteFieldListener);
         // 限制任务名称文本输入框内容
         Runnable taskNameFieldListener = textFieldValueListener(taskNameField_TD, tip_taskName() + selectedItem.getTaskName());
@@ -408,6 +408,8 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     @FXML
     private void saveDetail() {
         TimedTaskBean timedTaskBean = getTimedTaskBean();
+        selectedItem = timedTaskBean;
+        isModified = false;
         if (StringUtils.isBlank(timedTaskBean.getDays())) {
             throw new IllegalArgumentException(taskDetail_noWeekDay());
         }
@@ -419,17 +421,18 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         // 创建定时任务
         Task<Void> task = createTask(timedTaskBean);
         bindingTaskNode(task, taskBean);
-        task.setOnSucceeded(_ -> Platform.runLater(() -> {
-            taskUnbind(taskBean);
-            // 复制成功消息气泡
-            new MessageBubble(text_successSave(), 2);
-            removeAllListeners();
-            closeStage(stage, this::closeRequest);
-            // 触发列表刷新（通过回调）
-            if (refreshCallback != null) {
-                refreshCallback.run();
-            }
-        }));
+        task.setOnSucceeded(_ ->
+                Platform.runLater(() -> {
+                    taskUnbind(taskBean);
+                    // 复制成功消息气泡
+                    new MessageBubble(text_successSave(), 2);
+                    removeAllListeners();
+                    closeStage(stage, this::closeRequest);
+                    // 触发列表刷新（通过回调）
+                    if (refreshCallback != null) {
+                        refreshCallback.run();
+                    }
+                }));
         Thread.ofVirtual()
                 .name("task-save-vThread" + "_TD")
                 .start(task);
