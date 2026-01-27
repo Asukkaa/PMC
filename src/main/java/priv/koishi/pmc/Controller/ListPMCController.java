@@ -613,17 +613,17 @@ public class ListPMCController extends RootController {
             logHBox_List.getChildren().remove(err_List);
         }
         // 运行定时任务
-        if (StringUtils.isNotBlank(loadPMCPath)) {
+        if (StringUtils.isNotBlank(loadPMCSPath)) {
             TaskBean<PMCListBean> taskBean = creatTaskBean();
-            loadedPMCSTask = buildPMCS(taskBean, new File(loadPMCPath));
+            loadedPMCSTask = buildPMCS(taskBean, new File(loadPMCSPath));
             loadedPMCSTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 List<PMCListBean> beans = loadedPMCSTask.getValue();
-                addPMCSFile(beans, loadPMCPath);
+                addPMCSFile(beans, loadPMCSPath);
                 loadedPMCSTask = null;
                 try {
                     // 运行自动操作
-                    if (runPMCFile) {
+                    if (runPMCSFile) {
                         runClick();
                     }
                 } catch (Exception ex) {
