@@ -40,6 +40,7 @@ import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.runPMCFile;
+import static priv.koishi.pmc.MainApplication.runPMCSFile;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -649,6 +650,10 @@ public class PMCFileService {
             pmcsList = new ArrayList<>(pmcsFileDTO.getPmcsList());
         } else {
             throw new RuntimeException(text_loadAutoClick() + filePath + text_formatError());
+        }
+        // 自动任务加载时不提示旧版本
+        if (runPMCSFile) {
+            isErrFormat = false;
         }
         List<PMCListBean> pmcListBeans = new ArrayList<>();
         if (isErrFormat) {
