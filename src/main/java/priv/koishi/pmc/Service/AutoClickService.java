@@ -1148,23 +1148,23 @@ public class AutoClickService {
                     break;
                 }
                 if (taskBean.isClickLog() && !mouseButton_none().equals(clickKey)) {
-                    ClickLogBean clickLog = new ClickLogBean();
-                    clickLog.setClickTime(String.valueOf(clickTime))
+                    ClickLogBean logBean = new ClickLogBean();
+                    logBean.setClickTime(String.valueOf(clickTime))
                             .setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
                             .setClickKey(clickKey)
                             .setType(log_hold())
                             .setName(name);
-                    AutoClickService.clickLog.add(clickLog);
+                    clickLog.add(logBean);
                 } else if (taskBean.isKeyboardLog() && ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
-                    ClickLogBean clickLog = new ClickLogBean();
-                    clickLog.setClickTime(String.valueOf(clickTime))
+                    ClickLogBean logBean = new ClickLogBean();
+                    logBean.setClickTime(String.valueOf(clickTime))
                             .setX(String.valueOf((int) finalStartX))
                             .setY(String.valueOf((int) finalStartY))
                             .setClickKey(keyboard)
                             .setType(log_hold())
                             .setName(name);
-                    AutoClickService.clickLog.add(clickLog);
+                    clickLog.add(logBean);
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
