@@ -5,6 +5,10 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinUser;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Finals.CommonFinals.isWin;
 
 /**
@@ -29,6 +33,8 @@ public class WindowMove {
     public static boolean moveWindow(WindowInfo windowInfo, int x, int y, int width, int height) {
         if (isWin) {
             return moveWindowWin(windowInfo, x, y, width, height);
+        } else if (isMac) {
+            return moveWindowMac(windowInfo, x, y, width, height);
         }
         return false;
     }
@@ -46,7 +52,7 @@ public class WindowMove {
     }
 
     /**
-     * Windows平台窗口移动实现
+     * Windows 平台窗口移动实现
      *
      * @param windowInfo 窗口信息
      * @param x          目标 X 坐标
@@ -88,4 +94,90 @@ public class WindowMove {
         }
     }
 
+    /**
+     * macOS 平台窗口移动实现
+     *
+     * @param windowInfo 窗口信息
+     * @param x          目标X坐标
+     * @param y          目标Y坐标
+     * @param width      目标宽度（0 表示保持原大小）
+     * @param height     目标高度（0 表示保持原大小）
+     * @return 是否移动成功
+     */
+    private static boolean moveWindowMac(WindowInfo windowInfo, int x, int y, int width, int height) {
+        try {
+            String appName = windowInfo.getProcessName();
+            width = width > 0 ? width : windowInfo.getWidth();
+            height = height > 0 ? height : windowInfo.getHeight();
+            return moveWindowMethod(appName, x, y, width, height);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 移动窗口
+     *
+     * @param appName 要移动的应用名称
+     * @param x       移动后窗口 X 坐标
+     * @param y       移动后窗口 Y 坐标
+     * @param width   移动后窗口宽度
+     * @param height  移动后窗口高度
+     */
+    private static boolean moveWindowMethod(String appName, int x, int y, int width, int height) {
+        try {
+            String script = "tell application \"" + appName + "\"\n" +
+                    "  activate\n" +
+                    "  try\n" +
+                    "    set win to window 1\n" +
+                    "    set bounds of win to {" +
+                    x + ", " +
+                    y + ", " +
+                    (x + width) + ", " +
+                    (y + height) + "}\n" +
+                    "    return true\n" +
+                    "  on error\n" +
+                    "    return false\n" +
+                    "  end try\n" +
+                    "end tell\n";
+            String result = executeAppleScript(script);
+            return "true".equals(result);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 执行 AppleScript 移动窗口
+     *
+     * @param script AppleScript 脚本
+     * @return 执行结果
+     */
+    private static String executeAppleScript(String script) {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
+            // 读取错误输出
+            BufferedReader errorReader = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream()));
+            StringBuilder error = new StringBuilder();
+            String line;
+            while ((line = errorReader.readLine()) != null) {
+                error.append(line);
+            }
+            // 读取标准输出
+            BufferedReader outputReader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            while ((line = outputReader.readLine()) != null) {
+                output.append(line);
+            }
+            process.waitFor();
+            if (!error.isEmpty()) {
+                throw new RuntimeException(String.valueOf(error));
+            }
+            return output.toString().trim();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
