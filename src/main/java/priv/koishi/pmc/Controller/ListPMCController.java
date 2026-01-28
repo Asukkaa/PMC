@@ -360,7 +360,8 @@ public class ListPMCController extends RootController {
                     copyPMCTask.setOnSucceeded(_ -> {
                         taskUnbind(taskBean);
                         List<ClickPositionVO> copy = copyPMCTask.getValue();
-                        autoClickController.addAutoClickPositions(copy, selected.getPath());
+                        autoClickController.addAutoClickPositions(copy, path);
+                        autoClickController.outFileName_Click.setText(getFileName(path));
                     });
                     Thread.ofVirtual()
                             .name("copyPMCSTask-vThread" + tabId)
