@@ -1,10 +1,11 @@
 package priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 
-import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinUser;
+
+import static priv.koishi.pmc.Finals.CommonFinals.isWin;
 
 /**
  * 跨平台窗口移动工具类
@@ -18,16 +19,16 @@ public class WindowMove {
     /**
      * 移动窗口到指定位置
      *
-     * @param windowId 窗口ID（Windows: HWND, macOS: CGWindowID）
-     * @param x        目标X坐标（屏幕坐标）
-     * @param y        目标Y坐标（屏幕坐标）
-     * @param width    目标宽度（为 0 时保持原大小）
-     * @param height   目标高度（为 0 时保持原大小）
+     * @param windowInfo 窗口信息
+     * @param x          目标X坐标（屏幕坐标）
+     * @param y          目标Y坐标（屏幕坐标）
+     * @param width      目标宽度（为 0 时保持原大小）
+     * @param height     目标高度（为 0 时保持原大小）
      * @return 是否移动成功
      */
-    public static boolean moveWindow(long windowId, int x, int y, int width, int height) {
-        if (Platform.isWindows()) {
-            return moveWindowWin(windowId, x, y, width, height);
+    public static boolean moveWindow(WindowInfo windowInfo, int x, int y, int width, int height) {
+        if (isWin) {
+            return moveWindowWin(windowInfo, x, y, width, height);
         }
         return false;
     }
@@ -35,26 +36,27 @@ public class WindowMove {
     /**
      * 仅移动窗口位置（保持原大小）
      *
-     * @param windowId 窗口ID
-     * @param x        目标X坐标
-     * @param y        目标Y坐标
+     * @param windowInfo 窗口信息
+     * @param x          目标X坐标
+     * @param y          目标Y坐标
      * @return 是否移动成功
      */
-    public static boolean moveWindow(long windowId, int x, int y) {
-        return moveWindow(windowId, x, y, 0, 0);
+    public static boolean moveWindow(WindowInfo windowInfo, int x, int y) {
+        return moveWindow(windowInfo, x, y, 0, 0);
     }
 
     /**
      * Windows平台窗口移动实现
      *
-     * @param windowId 窗口句柄（HWND）的数值
-     * @param x        目标 X 坐标
-     * @param y        目标 Y 坐标
-     * @param width    目标宽度（0 表示保持原大小）
-     * @param height   目标高度（0 表示保持原大小）
+     * @param windowInfo 窗口信息
+     * @param x          目标 X 坐标
+     * @param y          目标 Y 坐标
+     * @param width      目标宽度（0 表示保持原大小）
+     * @param height     目标高度（0 表示保持原大小）
      * @return 是否移动成功
      */
-    private static boolean moveWindowWin(long windowId, int x, int y, int width, int height) {
+    private static boolean moveWindowWin(WindowInfo windowInfo, int x, int y, int width, int height) {
+        long windowId = windowInfo.getId();
         try {
             User32 user32 = User32.INSTANCE;
             WinDef.HWND hwnd = new WinDef.HWND(Pointer.createConstant(windowId));
