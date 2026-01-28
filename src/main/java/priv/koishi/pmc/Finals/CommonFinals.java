@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Finals;
 
+import com.sun.jna.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
 
@@ -316,11 +317,6 @@ public class CommonFinals {
     public static final String updateScript = "pmc_update";
 
     /**
-     * 当前程序运行操作系统名称
-     */
-    public static final String systemName = System.getProperty("os.name").toLowerCase();
-
-    /**
      * win 操作系统简称
      */
     public static final String win = "win";
@@ -333,12 +329,12 @@ public class CommonFinals {
     /**
      * 是否为 win 操作系统（true-win 系统，false-非 win 系统）
      */
-    public static final boolean isWin = systemName.contains(win);
+    public static final boolean isWin = Platform.isWindows();
 
     /**
      * 是否为 mac 操作系统（true-mac 系统，false-非 mac 系统）
      */
-    public static final boolean isMac = systemName.contains(mac);
+    public static final boolean isMac = Platform.isMac();
 
     /**
      * 用户主目录

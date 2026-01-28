@@ -5,8 +5,8 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
- * 调用 macOS Foundation 框架原生接口的 JNA 接口定义。
- * 提供基础数据类型转换和创建功能。
+ * 调用 macOS Foundation 框架原生接口的 JNA 接口定义
+ * <p>提供基础数据类型转换和创建功能
  *
  * @author applesaucepenguin
  * Date 2025-09-10

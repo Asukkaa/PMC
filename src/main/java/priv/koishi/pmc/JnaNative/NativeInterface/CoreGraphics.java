@@ -5,8 +5,8 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 
 /**
- * 调用 macOS CoreGraphics 框架原生接口的 JNA 接口定义。
- * 提供访问窗口管理、屏幕捕获权限检测等相关功能。
+ * 调用 macOS CoreGraphics 框架原生接口的 JNA 接口定义
+ * <p>提供访问窗口管理、屏幕捕获权限检测等相关功能
  *
  * @author koishi
  * Date 2025/04/21
