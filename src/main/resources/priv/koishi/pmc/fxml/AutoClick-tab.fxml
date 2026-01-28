@@ -21,7 +21,7 @@
             </HBox>
 
             <Label text="%autoClick.outFileName"/>
-            <TextField fx:id="outFileName_Click" prefWidth="140"/>
+            <TextField fx:id="outFileName_Click" prefWidth="200"/>
 
             <CheckBox fx:id="openDirectory_Click" selected="true" text="%autoClick.openDirectory_Click"/>
 
