@@ -124,7 +124,7 @@ public class FileUtils {
      * @param openPath 要打开的路径
      */
     public static void openFile(String openPath) {
-        if (StringUtils.isNotEmpty(openPath)) {
+        if (StringUtils.isNotBlank(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
                 throw new RuntimeException(text_fileNotExists());
@@ -143,7 +143,7 @@ public class FileUtils {
      * @param openPath 要打开的路径
      */
     public static void openDirectory(String openPath) {
-        if (StringUtils.isNotEmpty(openPath)) {
+        if (StringUtils.isNotBlank(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
                 throw new RuntimeException(text_fileNotExists());
@@ -167,7 +167,7 @@ public class FileUtils {
      * @param openPath 目标文件的路径
      */
     public static void openParentDirectory(String openPath) {
-        if (StringUtils.isNotEmpty(openPath)) {
+        if (StringUtils.isNotBlank(openPath)) {
             File file = new File(openPath);
             if (!file.exists()) {
                 throw new RuntimeException(text_fileNotExists());
