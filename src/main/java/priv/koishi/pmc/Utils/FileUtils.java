@@ -193,6 +193,7 @@ public class FileUtils {
      * @return 如果文件名有效，返回 true 否则返回 false
      */
     public static boolean isValidFileName(String fileName) {
+        // 文件名可为空字符串
         if (StringUtils.isEmpty(fileName)) {
             return false;
         }
