@@ -284,6 +284,11 @@ public class ClickPositionBean extends BaseCopyBean {
     String noMove = unActivation;
 
     /**
+     * 是否启用忽略移动窗口失败 0-不启用，1-启用
+     */
+    String ignoreFailure = activation;
+
+    /**
      * 添加移动轨迹
      *
      * @param x                 横坐标

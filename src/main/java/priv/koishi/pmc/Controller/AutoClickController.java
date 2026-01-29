@@ -586,7 +586,9 @@ public class AutoClickController extends RootController implements MousePosition
         return clickType != ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
                 && clickType != ClickTypeEnum.MOVE.ordinal()
                 && clickType != ClickTypeEnum.MOVETO.ordinal()
-                && clickType > ClickTypeEnum.OPEN_URL.ordinal();
+                && clickType != ClickTypeEnum.OPEN_URL.ordinal()
+                && clickType != ClickTypeEnum.OPEN_FILE.ordinal()
+                && clickType != ClickTypeEnum.RUN_SCRIPT.ordinal();
     }
 
     /**
@@ -958,6 +960,7 @@ public class AutoClickController extends RootController implements MousePosition
         TextField retrySecond = settingController.retrySecond_Set;
         TextField maxLogNum = settingController.maxLogNum_Set;
         TextField overTime = settingController.overtime_Set;
+        CheckBox moveWindowLog = settingController.moveWindowLog_Set;
         CheckBox mouseWheelLog = settingController.mouseWheelLog_Set;
         CheckBox runScriptLog = settingController.runScriptLog_Set;
         CheckBox keyboardLog = settingController.keyboardLog_Set;
@@ -974,6 +977,7 @@ public class AutoClickController extends RootController implements MousePosition
         taskBean.setRetrySecondValue(setDefaultIntValue(retrySecond, 1, 0, null))
                 .setOverTimeValue(setDefaultIntValue(overTime, 0, 1, null))
                 .setMaxLogNum(setDefaultIntValue(maxLogNum, 0, 1, null))
+                .setMoveWindowLog(moveWindowLog.isSelected())
                 .setMouseWheelLog(mouseWheelLog.isSelected())
                 .setRunScriptLog(runScriptLog.isSelected())
                 .setOpenFileLog(openFileLog.isSelected())

@@ -67,6 +67,11 @@ public enum ClickTypeEnum {
     /**
      * 组合键输入
      */
-    COMBINATIONS
+    COMBINATIONS,
+
+    /**
+     * 移动窗口
+     */
+    MOVE_WINDOW
 
 }

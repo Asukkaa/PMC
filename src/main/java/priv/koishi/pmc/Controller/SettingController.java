@@ -208,7 +208,7 @@ public class SettingController extends RootController implements MousePositionUp
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
             openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set, noMove_Set,
-            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set;
+            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -524,10 +524,10 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(dragLog_Set, prop, key_dragLog, activation);
         setControlLastConfig(waitLog_Set, prop, key_waitLog, activation);
         setControlLastConfig(noMove_Set, prop, key_noMove, unActivation);
-        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, activation);
         setControlLastConfig(clickLog_Set, prop, key_clickLog, activation);
         setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
         setControlLastConfig(clickImgLog_Set, prop, key_clickLog, activation);
+        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, activation);
         setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, activation);
         setControlLastConfig(recordDrag_Set, prop, key_recordDrag, activation);
         setControlLastConfig(recordMove_Set, prop, key_recordMove, activation);
@@ -538,6 +538,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, activation);
         setControlLastConfig(randomClick_Set, prop, key_randomClick, unActivation);
         setControlLastConfig(floatingDistance_Set, prop, key_margin, defaultMargin);
+        setControlLastConfig(moveWindowLog_Set, prop, key_moveWindowLog, activation);
         setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, unActivation);
         setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, activation);
         setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
@@ -735,7 +736,7 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(clickOpacity_Set, tip_clickOpacity(), String.valueOf((int) clickOpacity_Set.getValue()));
         addToolTip(clickLog_Set, moveLog_Set, dragLog_Set, waitLog_Set, clickImgLog_Set, stopImgLog_Set, imgLog_Set,
                 openFileLog_Set, runScriptLog_Set, openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, loadPMCS_Set,
-                recordMouseWheel_Set, recordKeyboard_Set, recordMouseClick_Set, autoSavePMCS_Set);
+                recordMouseWheel_Set, recordKeyboard_Set, recordMouseClick_Set, autoSavePMCS_Set, moveWindowLog_Set);
     }
 
     /**
@@ -2081,6 +2082,16 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void keyboardLog() throws IOException {
         setLoadLastConfigCheckBox(keyboardLog_Set, configFile_Click, key_keyboardLog);
+    }
+
+    /**
+     * 运行自动流程时记录窗口移动事件开关
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void moveWindowLog() throws IOException {
+        setLoadLastConfigCheckBox(moveWindowLog_Set, configFile_Click, key_moveWindowLog);
     }
 
     /**

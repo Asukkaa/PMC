@@ -72,6 +72,7 @@ import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.windowInfoShow;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMove.moveWindow;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.AutoClickService.scriptRun;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
@@ -228,7 +229,7 @@ public class ClickDetailController extends RootController {
     /**
      * 窗口信息获取器
      */
-    public static WindowMonitor windowMonitorClick, stopWindowMonitor;
+    public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
 
     /**
      * 更新数据用的回调函数
@@ -246,7 +247,7 @@ public class ClickDetailController extends RootController {
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det;
+            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det, moveWindowHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -264,23 +265,23 @@ public class ClickDetailController extends RootController {
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
             updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
-            workDir_Det, removeWorkPath_Det;
+            workDir_Det, removeWorkPath_Det, moveWindow_Det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
             stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det,
-            minWindow_Det, noMove_Det;
+            minWindow_Det, noMove_Det, ignoreFailure_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
             tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, clickTypeText_Det,
-            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det;
+            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det, moveWindowInfo_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
-            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det,
-            parameter_Det, url_Det;
+            randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det, url_Det,
+            parameter_Det, windowX_Det, windowY_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -350,8 +351,6 @@ public class ClickDetailController extends RootController {
         wait_Det.setText(item.getWaitTime());
         clickName_Det.setText(item.getName());
         clickKey_Det.setValue(item.getMouseKey());
-        mouseStartX_Det.setText(item.getStartX());
-        mouseStartY_Det.setText(item.getStartY());
         timeClick_Det.setText(item.getClickTime());
         clickNumBer_Det.setText(item.getClickNum());
         retryType_Det.setValue(item.getRetryType());
@@ -388,34 +387,14 @@ public class ClickDetailController extends RootController {
     private void initClickType(ClickPositionVO item) {
         String clickType = item.getClickType();
         clickType_Det.setValue(clickType);
-        // 处理移动轨迹相关下拉框
         ObservableList<String> clickTypeItems = clickType_Det.getItems();
-        if (!clickType_moveTrajectory().equals(clickType) &&
-                !clickType_drag().equals(clickType)) {
-            clickTypeItems.remove(clickType_moveTrajectory());
-            clickTypeItems.remove(clickType_drag());
-        } else if (clickType_drag().equals(clickType) ||
-                clickType_moveTrajectory().equals(clickType)) {
-            clickTypeItems.add(clickType);
-            setNodeDisable(clickType_Det, true);
-            setNodeDisable(mouseStartX_Det, true);
-            setNodeDisable(mouseStartY_Det, true);
-        }
-        keyCode = item.getKeyboardKeyEnum();
-        // 处理按键相关组件
-        if (clickType_combinations().equals(clickType)) {
-            trajectory.addAll(item.getMoveTrajectory());
-            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
-            clickKeyHBox_Det.setVisible(false);
-        } else if (keyCode != noKeyboard) {
-            updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
-            clickKeyHBox_Det.setVisible(false);
-        } else {
-            clickKeyHBox_Det.setVisible(true);
-        }
-        // 处理打开链接相关组件
         String targetPath = item.getTargetPath();
-        if (clickType_openFile().equals(clickType)) {
+        if (clickType_moveWindow().equals(clickType)) {
+            windowX_Det.setText(item.getStartX());
+            windowY_Det.setText(item.getStartY());
+            ignoreFailure_Det.setSelected(item.getIgnoreFailure().equals(activation));
+            // 处理打开链接相关组件
+        } else if (clickType_openFile().equals(clickType)) {
             setPathLabel(link_Det, targetPath);
         } else if (clickType_runScript().equals(clickType)) {
             setPathLabel(link_Det, targetPath);
@@ -424,6 +403,34 @@ public class ClickDetailController extends RootController {
             minWindow_Det.setSelected(item.getMinScriptWindow().equals(activation));
         } else if (clickType_openUrl().equals(clickType)) {
             url_Det.setText(targetPath);
+        } else {
+            mouseStartX_Det.setText(item.getStartX());
+            mouseStartY_Det.setText(item.getStartY());
+            // 处理移动轨迹相关下拉框
+            if (!clickType_moveTrajectory().equals(clickType) &&
+                    !clickType_drag().equals(clickType)) {
+                clickTypeItems.remove(clickType_moveTrajectory());
+                clickTypeItems.remove(clickType_drag());
+            } else if (clickType_drag().equals(clickType) ||
+                    clickType_moveTrajectory().equals(clickType)) {
+                clickTypeItems.add(clickType);
+                setNodeDisable(clickType_Det, true);
+                setNodeDisable(mouseStartX_Det, true);
+                setNodeDisable(mouseStartY_Det, true);
+            } else {
+                // 处理按键相关组件
+                keyCode = item.getKeyboardKeyEnum();
+                if (clickType_combinations().equals(clickType)) {
+                    trajectory.addAll(item.getMoveTrajectory());
+                    updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
+                    clickKeyHBox_Det.setVisible(false);
+                } else if (keyCode != noKeyboard) {
+                    updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
+                    clickKeyHBox_Det.setVisible(false);
+                } else {
+                    clickKeyHBox_Det.setVisible(true);
+                }
+            }
         }
     }
 
@@ -462,16 +469,16 @@ public class ClickDetailController extends RootController {
             stopWindowMonitor.setWindowInfo(stopWindowInfo);
         }
         stopWindowMonitor.updateWindowInfo();
-        windowMonitorClick = new WindowMonitor(windowInfoDisableNodes, stage);
-        windowMonitorClick.setWindowInfoHandler(creatWindowInfoHandler());
+        clickWindowMonitor = new WindowMonitor(windowInfoDisableNodes, stage);
+        clickWindowMonitor.setWindowInfoHandler(creatWindowInfoHandler());
         FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
         if (clickWindowConfig != null) {
             WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
             updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
-            windowMonitorClick.setWindowInfo(clickWindowInfo);
+            clickWindowMonitor.setWindowInfo(clickWindowInfo);
         }
-        windowMonitorClick.updateWindowInfo();
-        WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
+        clickWindowMonitor.updateWindowInfo();
+        WindowInfo windowInfo = clickWindowMonitor.getWindowInfo();
         if (windowInfo == null || StringUtils.isBlank(windowInfo.getProcessPath())) {
             setNodeDisable(relativelyHBox_Det, true);
             useRelatively_Det.setSelected(false);
@@ -488,6 +495,8 @@ public class ClickDetailController extends RootController {
      * @return 窗口信息处理器
      */
     private WindowInfoHandler creatWindowInfoHandler() {
+        String clickType = clickType_Det.getValue();
+        Label windowInfoLabel = clickType_moveWindow().equals(clickType) ? moveWindowInfo_Det : clickWindowInfo_Det;
         return new WindowInfoHandler() {
 
             /**
@@ -498,8 +507,8 @@ public class ClickDetailController extends RootController {
             @Override
             public void showInfo(WindowInfo windowInfo) {
                 Platform.runLater(() -> {
-                    windowInfoShow(windowInfo, clickWindowInfo_Det);
-                    if (windowInfo != null) {
+                    windowInfoShow(windowInfo, windowInfoLabel);
+                    if (windowInfo != null && !clickType_moveWindow().equals(clickType)) {
                         setNodeDisable(relativelyHBox_Det, false);
                         if (useRelatively_Det.isSelected()) {
                             calculateAbsolutePosition(windowInfo);
@@ -518,7 +527,7 @@ public class ClickDetailController extends RootController {
             @Override
             public void removeInfo() {
                 setNodeDisable(relativelyHBox_Det, true);
-                clickWindowInfo_Det.setText("");
+                windowInfoLabel.setText("");
                 relativelyX_Det.setText("");
                 relativelyY_Det.setText("");
             }
@@ -677,6 +686,8 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(url_Det, url_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(wait_Det, wait_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(link_Det, link_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(windowX_Det, windowX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(windowY_Det, windowY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(noMove_Det, noMove_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(workPath_Det, workPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -697,6 +708,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(randomClickY_Det, randomClickY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopWindowInfo_Det, stopWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(moveWindowInfo_Det, moveWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickWindowInfo_Det, clickWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(useRelatively_Det, useRelatively_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
@@ -840,6 +852,12 @@ public class ClickDetailController extends RootController {
         // 限制要点击的图片识别失败重试次数文本输入框内容
         Runnable clickRetryNumRemover = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
         listenerRemovers.add(clickRetryNumRemover);
+        // 限制窗口移动目标位置横(X)坐标文本输入框内容
+        Runnable windowXRemover = integerRangeTextField(windowX_Det, 0, null, tip_mouseStartX());
+        listenerRemovers.add(windowXRemover);
+        // 限制窗口移动目标位置纵(Y)坐标文本输入框内容
+        Runnable windowYRemover = integerRangeTextField(windowY_Det, 0, null, tip_mouseStartY());
+        listenerRemovers.add(windowYRemover);
     }
 
     /**
@@ -873,6 +891,8 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_minWindow(), minWindow_Det);
         addToolTip(tip_parameter(), parameter_Det);
         addToolTip(tip_clickName(), clickName_Det);
+        addValueToolTip(windowX_Det, tip_windowX());
+        addValueToolTip(windowY_Det, tip_windowY());
         addToolTip(tip_stopImgBtn(), stopImgBtn_Det);
         addToolTip(tip_clickInterval(), interval_Det);
         addToolTip(tip_clickImgBtn(), clickImgBtn_Det);
@@ -883,6 +903,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_updateKeyboard(), setKeyHBox_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
         addToolTip(tip_useRelatively(), useRelatively_Det);
+        addToolTip(tip_ignoreFailure(), ignoreFailure_Det);
         addToolTip(tip_removeWorkDir(), removeWorkPath_Det);
         addToolTip(tip_randomWaitTime(), randomWaitTime_Det);
         addToolTip(tip_randomClickTime(), randomClickTime_Det);
@@ -997,9 +1018,9 @@ public class ClickDetailController extends RootController {
         // 移除全局输入监听器
         removeNativeListener(listener);
         removeNativeListener(nativeKeyListener);
-        if (windowMonitorClick != null) {
-            windowMonitorClick.stopNativeKeyListener();
-            windowMonitorClick = null;
+        if (clickWindowMonitor != null) {
+            clickWindowMonitor.stopNativeKeyListener();
+            clickWindowMonitor = null;
         }
         if (stopWindowMonitor != null) {
             stopWindowMonitor.stopNativeKeyListener();
@@ -1088,7 +1109,8 @@ public class ClickDetailController extends RootController {
         List<Stage> stages = List.of(stage, mainStage);
         // 构建窗口信息栏右键菜单
         buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
-        buildWindowInfoMenu(clickWindowInfo_Det, windowMonitorClick, windowInfoDisableNodes, stages);
+        buildWindowInfoMenu(clickWindowInfo_Det, clickWindowMonitor, windowInfoDisableNodes, stages);
+        buildWindowInfoMenu(moveWindowInfo_Det, clickWindowMonitor, false, windowInfoDisableNodes, stages);
     }
 
     /**
@@ -1524,7 +1546,13 @@ public class ClickDetailController extends RootController {
         String stopWindowUpdate = updateStopWindow_Det.isSelected() ? activation : unActivation;
         String clickWindowUpdate = updateClickWindow_Det.isSelected() ? activation : unActivation;
         String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
-        if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
+        String startX = String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth));
+        String startY = String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight));
+        FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
+        if (clickType == ClickTypeEnum.OPEN_URL.ordinal() ||
+                clickType == ClickTypeEnum.RUN_SCRIPT.ordinal() ||
+                clickType == ClickTypeEnum.OPEN_FILE.ordinal() ||
+                clickType == ClickTypeEnum.MOVE_WINDOW.ordinal()) {
             matchedType = MatchedTypeEnum.CLICK.ordinal();
             retryType = RetryTypeEnum.STOP.ordinal();
             clickKey = NativeMouseEvent.NOBUTTON;
@@ -1542,6 +1570,17 @@ public class ClickDetailController extends RootController {
                 } else {
                     throw new RuntimeException(text_urlErr());
                 }
+            } else if (clickType == ClickTypeEnum.MOVE_WINDOW.ordinal()) {
+                if (StringUtils.isBlank(moveWindowInfo_Det.getText())) {
+                    throw new RuntimeException(text_windowInfoNull());
+                }
+                startX = String.valueOf(setDefaultIntValue(windowX_Det, 0, 0, screenWidth));
+                startY = String.valueOf(setDefaultIntValue(windowY_Det, 0, 0, screenHeight));
+                String ignoreFailure = ignoreFailure_Det.isSelected() ? activation : unActivation;
+                clickWindowMonitor.updateWindowInfo();
+                clickFloatingConfig.setWindowInfo(clickWindowMonitor.getWindowInfo());
+                selectedItem.setClickWindowConfig(clickFloatingConfig)
+                        .setIgnoreFailure(ignoreFailure);
             }
         } else {
             if (clickType == ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
@@ -1577,19 +1616,18 @@ public class ClickDetailController extends RootController {
                 selectedItem.setNoMove(noMove);
             }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
-                    clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, true);
+                    clickWindowInfoHBox_Det, clickFloating, clickWindowMonitor, true);
             updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
                     stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
             saveFloatingWindow(clickFloating, stopFloating);
             FloatingWindowConfig stopFloatingConfig = stopFloating.getConfig();
-            FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
             stopFloatingConfig.setAllRegion(stopAllRegion)
                     .setAlwaysRefresh(stopWindowUpdate);
             clickFloatingConfig.setAllRegion(clickAllRegion)
                     .setAlwaysRefresh(clickWindowUpdate);
             selectedItem.setStopWindowConfig(stopFloatingConfig)
                     .setClickWindowConfig(clickFloatingConfig);
-            if (windowMonitorClick.getWindowInfo() != null) {
+            if (clickWindowMonitor.getWindowInfo() != null) {
                 if (FindImgTypeEnum.WINDOW.ordinal() == clickFloatingConfig.getFindImgTypeEnum()) {
                     updateCoordinate();
                     selectedItem.setRelativeX(relativelyX_Det.getText())
@@ -1600,6 +1638,8 @@ public class ClickDetailController extends RootController {
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
                 .setTargetPath(link)
+                .setStartX(startX)
+                .setStartY(startY)
                 .setMouseKeyEnum(clickKey)
                 .setRandomClick(randomClick)
                 .setClickTypeEnum(clickType)
@@ -1622,8 +1662,6 @@ public class ClickDetailController extends RootController {
                 .setWaitTime(String.valueOf(setDefaultIntValue(wait_Det, 0, 0, null)))
                 .setImgX(String.valueOf(setDefaultIntValue(imgX_Det, 0, -screenWidth, screenWidth)))
                 .setImgY(String.valueOf(setDefaultIntValue(imgY_Det, 0, -screenHeight, screenHeight)))
-                .setStartX(String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth)))
-                .setStartY(String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight)))
                 .setClickInterval(String.valueOf(setDefaultIntValue(interval_Det, 0, 0, null)))
                 .setClickTime(String.valueOf(setDefaultIntValue(timeClick_Det, Integer.parseInt(defaultClickTimeOffset), 0, null)))
                 .setRandomX(String.valueOf(setDefaultIntValue(randomClickX_Det, Integer.parseInt(defaultRandomClickX), 0, screenWidth)))
@@ -1774,6 +1812,10 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void clickTypeChange() {
+        if (clickWindowMonitor != null) {
+            clickWindowMonitor.setWindowInfoHandler(creatWindowInfoHandler());
+            clickWindowMonitor.updateWindowInfo();
+        }
         String value = clickType_Det.getValue();
         addValueToolTip(clickType_Det, tip_clickType(), value);
         addValueToolTip(clickTypeText_Det, tip_clickType(), value);
@@ -1781,13 +1823,13 @@ public class ClickDetailController extends RootController {
         vBox_Det.getChildren().clear();
         vBox_Det.getChildren().add(commonVBox_Det);
         typeHBox_Det.getChildren().removeAll(noMove_Det, testLink_Det);
-        if (linkList.contains(value)) {
+        if (linkList.contains(value) || clickType_moveWindow().equals(value)) {
             vBox_Det.getChildren().add(pathLinkVBox_Det);
             typeHBox_Det.getChildren().add(testLink_Det);
             testLink_Det.setVisible(true);
             resolution_Det.setVisible(false);
             randomClickInterval_Det.setVisible(false);
-            pathLinkVBox_Det.getChildren().removeAll(parameterHBox_Det, pathTip_Det);
+            pathLinkVBox_Det.getChildren().removeAll(parameterHBox_Det, pathTip_Det, moveWindowHBox_Det);
             pathLinkHBox_Det.getChildren().clear();
             if (clickType_openFile().equals(value)) {
                 pathLinkVBox_Det.getChildren().add(pathTip_Det);
@@ -1803,6 +1845,11 @@ public class ClickDetailController extends RootController {
                 pathLinkVBox_Det.getChildren().add(pathTip_Det);
                 pathLinkHBox_Det.getChildren().add(urlHBox_Det);
                 pathTip_Det.setText(pathTip_openUrl());
+            } else if (clickType_moveWindow().equals(value)) {
+                pathLinkVBox_Det.getChildren().add(pathTip_Det);
+                pathLinkHBox_Det.getChildren().add(moveWindowHBox_Det);
+                workDirHBox_Det.setVisible(false);
+                pathTip_Det.setText(pathTip_moveWindow());
             }
         } else {
             if (isClickList(clickTypeMap.getKey(value))) {
@@ -1860,7 +1907,7 @@ public class ClickDetailController extends RootController {
     @FXML
     private void clickFindImgTypeAction() {
         updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
-                clickWindowInfoHBox_Det, clickFloating, windowMonitorClick, false);
+                clickWindowInfoHBox_Det, clickFloating, clickWindowMonitor, false);
         if (findImgType_window().equals(clickFindImgType_Det.getValue())) {
             setNodeDisable(relativelyHBox_Det, false);
             useRelatively();
@@ -1934,8 +1981,8 @@ public class ClickDetailController extends RootController {
         // 获取准备时间值
         int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
                 Integer.parseInt(defaultPreparationRecord), 0, null);
-        if (windowMonitorClick != null) {
-            windowMonitorClick.startClickWindowMouseListener(preparation);
+        if (clickWindowMonitor != null) {
+            clickWindowMonitor.startClickWindowMouseListener(preparation);
         }
     }
 
@@ -1967,8 +2014,8 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void updateCoordinate() {
-        windowMonitorClick.updateWindowInfo();
-        WindowInfo windowInfo = windowMonitorClick.getWindowInfo();
+        clickWindowMonitor.updateWindowInfo();
+        WindowInfo windowInfo = clickWindowMonitor.getWindowInfo();
         if (windowInfo != null) {
             if (useRelatively_Det.isSelected()) {
                 calculateAbsolutePosition(windowInfo);
@@ -2041,12 +2088,12 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 测试目标路径按钮
+     * 测试当前设置按钮
      *
      * @throws Exception 网址打开失败
      */
     @FXML
-    private void testLinkAction() throws Exception {
+    private void testAction() throws Exception {
         String value = clickType_Det.getValue();
         int time = 2;
         if (clickType_openFile().equals(value)) {
@@ -2101,6 +2148,26 @@ public class ClickDetailController extends RootController {
                 }
             } else {
                 new MessageBubble(text_pathNull(), time);
+            }
+        } else if (clickType_moveWindow().equals(value)) {
+            clickWindowMonitor.updateWindowInfo();
+            WindowInfo windowInfo = clickWindowMonitor.getWindowInfo();
+            if (windowInfo == null) {
+                throw new Exception(text_windowInfoNull());
+            }
+            int x = setDefaultIntValue(windowX_Det, 0, 0, screenWidth);
+            int y = setDefaultIntValue(windowY_Det, 0, 0, screenHeight);
+            boolean moved = moveWindow(windowInfo, x, y);
+            String log = log_moveWindow();
+            if (moved) {
+                log += log_success();
+                new MessageBubble(log, time);
+            } else {
+                log += log_fail();
+                new MessageBubble(log, time);
+                if (!ignoreFailure_Det.isSelected()) {
+                    throw new RuntimeException(log);
+                }
             }
         }
     }

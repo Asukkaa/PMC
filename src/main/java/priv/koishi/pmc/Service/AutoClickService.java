@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.getMainWindowInfo;
+import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMove.moveWindow;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.loadPMCFile;
@@ -532,7 +533,9 @@ public class AutoClickService {
                     updateProgress(i + 1, tableSize);
                     ClickPositionVO clickPositionVO = tableViewItems.get(i);
                     int clickType = clickPositionVO.getClickTypeEnum();
-                    if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
+                    if (clickType == ClickTypeEnum.OPEN_URL.ordinal() ||
+                            clickType == ClickTypeEnum.OPEN_FILE.ordinal() ||
+                            clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
                         continue;
                     }
                     int index = clickPositionVO.getIndex();
@@ -589,18 +592,47 @@ public class AutoClickService {
                     String text = loopTimeText +
                             text_progress() + progress + " / " + dataSize +
                             text_willBe() + waitTime + text_msWillBe() + name;
-                    if (clickType <= ClickTypeEnum.OPEN_URL.ordinal()) {
+                    int startX = Integer.parseInt((clickPositionVO.getStartX()));
+                    int startY = Integer.parseInt((clickPositionVO.getStartY()));
+                    FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
+                    if (clickType == ClickTypeEnum.OPEN_URL.ordinal() ||
+                            clickType == ClickTypeEnum.OPEN_FILE.ordinal() ||
+                            clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
                         if (openLinkPath(text, clickPositionVO)) {
                             break;
                         }
                         currentStep++;
                         continue;
+                    } else if (clickType == ClickTypeEnum.MOVE_WINDOW.ordinal()) {
+                        if (clickWindowConfig != null) {
+                            WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
+                            boolean moved = moveWindow(windowInfo, startX, startY);
+                            ClickLogBean logBean = new ClickLogBean();
+                            logBean.setClickKey(mouseButton_none())
+                                    .setX(String.valueOf(startX))
+                                    .setY(String.valueOf(startY))
+                                    .setType(log_moveWindow())
+                                    .setName(name);
+                            if (moved) {
+                                if (taskBean.isMoveWindowLog()) {
+                                    logBean.setResult(log_success());
+                                    clickLog.add(logBean);
+                                }
+                            } else {
+                                if (taskBean.isMoveWindowLog()) {
+                                    logBean.setResult(log_fail());
+                                    clickLog.add(logBean);
+                                }
+                                if (unActivation.equals(clickPositionVO.getIgnoreFailure())) {
+                                    throw new RuntimeException(log_moveWindow() + log_fail());
+                                }
+                            }
+                            currentStep++;
+                            continue;
+                        }
                     }
-                    int startX = Integer.parseInt((clickPositionVO.getStartX()));
-                    int startY = Integer.parseInt((clickPositionVO.getStartY()));
                     // 处理相对路径
                     String useRelative = clickPositionVO.getUseRelative();
-                    FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
                     if (clickWindowConfig != null &&
                             FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
                         WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
@@ -623,7 +655,10 @@ public class AutoClickService {
                     String clickImgPath = clickPositionVO.getClickImgPath();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     String clickText = text_taskInfo() + clickPositionVO.getClickType() + " ";
-                    if (clickType >= ClickTypeEnum.CLICK.ordinal()) {
+                    if (clickType == ClickTypeEnum.CLICK.ordinal() ||
+                            clickType == ClickTypeEnum.DRAG.ordinal() ||
+                            clickType == ClickTypeEnum.KEYBOARD.ordinal() ||
+                            clickType == ClickTypeEnum.COMBINATIONS.ordinal()) {
                         clickText += clickPositionVO.getClickKey();
                     }
                     if (StringUtils.isNotBlank(clickImgPath)) {

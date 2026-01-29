@@ -31,6 +31,16 @@ public class WindowMove {
      * @return 是否移动成功
      */
     public static boolean moveWindow(WindowInfo windowInfo, int x, int y, int width, int height) {
+        if (windowInfo == null) {
+            return false;
+        }
+        int wX = windowInfo.getX();
+        int wY = windowInfo.getY();
+        int w = windowInfo.getWidth();
+        int h = windowInfo.getHeight();
+        if (wX < 0 && wY < 0 && Math.abs(wX) > w && Math.abs(wY) > h) {
+            return false;
+        }
         if (isWin) {
             return moveWindowWin(windowInfo, x, y, width, height);
         } else if (isMac) {

@@ -12,49 +12,61 @@
                     <VBox fx:id="commonVBox_Det" spacing="10">
                         <HBox fx:id="typeHBox_Det" spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--步骤序号:-->
                                 <Label text="%clickDetail.clickIndex"/>
                                 <Label fx:id="clickIndex_Det"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--列表操作步骤数量:-->
                                 <Label text="%clickDetail.tableViewSize"/>
                                 <Label fx:id="tableViewSize_Det"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--步骤名称:-->
                                 <Label text="%clickDetail.clickName"/>
                                 <TextField fx:id="clickName_Det"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--操作类型:-->
                                 <Label fx:id="clickTypeText_Det" text="%clickDetail.clickTypeText_Det"/>
                                 <ChoiceBox fx:id="clickType_Det" prefWidth="150" onAction="#clickTypeChange"/>
                             </HBox>
 
+                            <!--不移动鼠标-->
                             <CheckBox fx:id="noMove_Det" styleClass="checkBox-short" visible="false"
                                       text="%clickDetail.noMove_Det"/>
-                            <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testLinkAction"/>
+                            <!--测试当前设置-->
+                            <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testAction"/>
                         </HBox>
 
                         <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--执行前等待时间:-->
                                 <Label text="%clickDetail.wait"/>
                                 <TextField fx:id="wait_Det" prefWidth="80"/>
+                                <!--毫秒-->
                                 <Label text="%unit.ms"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--时长随机偏移量: ±-->
                                 <Label text="%clickDetail.randomTimeOffset"/>
                                 <TextField fx:id="randomTimeOffset_Det" prefWidth="50"/>
+                                <!--毫秒-->
                                 <Label text="%unit.ms"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--运行时启用随机执行前等待时间偏移-->
                                 <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short"
                                           text="%randomWaitTime"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--运行时启用随机操作间隔时间偏移-->
                                 <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short"
                                           text="%randomClickInterval"/>
                             </HBox>
@@ -64,6 +76,7 @@
                     <VBox fx:id="pathLinkVBox_Det" spacing="10">
                         <HBox fx:id="pathLinkHBox_Det" spacing="10">
                             <HBox fx:id="pathHBox_Det" spacing="10">
+                                <!--选择目标路径-->
                                 <Button fx:id="pathLink_Det" text="%clickDetail.pathLink_Det"
                                         onAction="#pathLinkAction"/>
                                 <HBox prefWidth="445">
@@ -71,6 +84,7 @@
                                 </HBox>
 
                                 <HBox fx:id="workDirHBox_Det" spacing="10">
+                                    <!--选择工作路径-->
                                     <Button fx:id="workDir_Det" text="%clickDetail.workPath_Det"
                                             onAction="#workPathAction"/>
                                     <HBox prefWidth="445" spacing="5">
@@ -89,6 +103,7 @@
                             </HBox>
 
                             <HBox fx:id="urlHBox_Det" spacing="10">
+                                <!--目标网址：-->
                                 <Label fx:id="openUrl_Det" text="%clickDetail.openUrl_Det"/>
                                 <TextField fx:id="url_Det" prefWidth="1000"/>
                             </HBox>
@@ -96,14 +111,46 @@
 
                         <HBox fx:id="parameterHBox_Det" spacing="10">
                             <HBox spacing="10" prefWidth="550">
+                                <!--运行参数：-->
                                 <Label text="%clickDetail.parameter_Det"/>
                                 <TextField fx:id="parameter_Det" prefWidth="450"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--运行时最小化终端窗口-->
                                 <CheckBox fx:id="minWindow_Det" styleClass="checkBox-short" selected="true"
                                           text="%clickDetail.minWindow_Det"/>
                             </HBox>
+                        </HBox>
+
+                        <HBox fx:id="moveWindowHBox_Det" spacing="10">
+                            <HBox styleClass="hBox-550-5">
+                                <!--记录窗口信息-->
+                                <Button fx:id="moveWindow_Det" text="%findImgSet.getWindow"
+                                        onAction="#findClickWindowAction"/>
+                                <!--记录到的窗口-->
+                                <Label text="%findImgSet.windowInfo"/>
+                                <Label maxWidth="500" textFill="cornflowerblue" fx:id="moveWindowInfo_Det"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-270-5">
+                                <!--目标位置横(X)坐标:-->
+                                <Label text="%clickDetail.windowX"/>
+                                <TextField fx:id="windowX_Det" prefWidth="60"/>
+                                <!--像素-->
+                                <Label text="%unit.px"/>
+                            </HBox>
+
+                            <HBox styleClass="hBox-270-5">
+                                <!--目标位置纵(Y)坐标:-->
+                                <Label text="%clickDetail.windowY"/>
+                                <TextField fx:id="windowY_Det" prefWidth="60"/>
+                                <!--像素-->
+                                <Label text="%unit.px"/>
+                            </HBox>
+
+                            <CheckBox fx:id="ignoreFailure_Det" styleClass="checkBox-short" selected="true"
+                                      text="%clickDetail.ignoreFailure_Det"/>
                         </HBox>
 
                         <Label fx:id="pathTip_Det" style="-fx-pref-height: -1" textFill="red"/>
@@ -113,26 +160,33 @@
                         <HBox spacing="10">
                             <HBox spacing="10">
                                 <HBox styleClass="hBox-270-5">
+                                    <!--点击起始绝对横(X)坐标:-->
                                     <Label text="%clickDetail.mouseStartX"/>
                                     <TextField fx:id="mouseStartX_Det" prefWidth="80"/>
+                                    <!--像素-->
                                     <Label text="%unit.px"/>
                                 </HBox>
 
                                 <HBox styleClass="hBox-270-5">
+                                    <!--点击起始绝对纵(Y)坐标:-->
                                     <Label text="%clickDetail.mouseStartY"/>
                                     <TextField fx:id="mouseStartY_Det" prefWidth="80"/>
+                                    <!--像素-->
                                     <Label text="%unit.px"/>
                                 </HBox>
 
                                 <HBox fx:id="clickKeyHBox_Det" styleClass="hBox-270-5">
+                                    <!--操作按键:-->
                                     <Label text="%clickDetail.clickKey_Det"/>
                                     <ChoiceBox fx:id="clickKey_Det" prefWidth="120" onAction="#clickKeyChange"/>
                                 </HBox>
 
                                 <HBox fx:id="keyboardHBox_Det" styleClass="hBox-270-5" visible="false">
+                                    <!--键盘按键:-->
                                     <Label fx:id="inputKey_Det" text="%clickDetail.keyboard"/>
                                     <HBox fx:id="setKeyHBox_Det" prefWidth="200" style="-fx-cursor: hand"
                                           onMouseClicked="#handleMouseClick">
+                                        <!--未设置按键-->
                                         <Label fx:id="keyboard_Det" textFill="red" text="%unSetKeyboard"/>
                                     </HBox>
                                 </HBox>
@@ -141,23 +195,27 @@
 
                         <HBox fx:id="relativelyHBox_Det" spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--点击起始相对横(X)坐标:-->
                                 <Label text="%clickDetail.relativelyX"/>
                                 <TextField fx:id="relativelyX_Det" promptText="0.00 - 100.00" prefWidth="100"/>
                                 <Label text="\%"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--点击起始相对纵(Y)坐标:-->
                                 <Label text="%clickDetail.relativelyY"/>
                                 <TextField fx:id="relativelyY_Det" promptText="0.00 - 100.00" prefWidth="100"/>
                                 <Label text="\%"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--使用相对坐标-->
                                 <CheckBox fx:id="useRelatively_Det" onAction="#useRelatively"
                                           styleClass="checkBox-short" text="%useRelatively"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--更新坐标信息-->
                                 <Button fx:id="updateCoordinate_Det" text="%clickDetail.updateCoordinate"
                                         onAction="#updateCoordinate"/>
                             </HBox>
@@ -165,47 +223,60 @@
 
                         <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--运行时启用随机点击坐标偏移-->
                                 <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--运行时启用随机轨迹坐标偏移-->
                                 <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short"
                                           text="%randomTrajectory"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--横坐标随机偏移量: ±-->
                                 <Label text="%clickDetail.randomClickX"/>
                                 <TextField fx:id="randomClickX_Det" prefWidth="50"/>
+                                <!--像素-->
                                 <Label text="%unit.px"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--纵坐标随机偏移量: ±-->
                                 <Label text="%clickDetail.randomClickY"/>
                                 <TextField fx:id="randomClickY_Det" prefWidth="50"/>
+                                <!--像素-->
                                 <Label text="%unit.px"/>
                             </HBox>
                         </HBox>
 
                         <HBox fx:id="clickTypeHBox_Det" spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--操作次数:-->
                                 <Label text="%clickDetail.clickNumBer"/>
                                 <TextField fx:id="clickNumBer_Det" prefWidth="80"/>
+                                <!--次-->
                                 <Label text="%unit.times"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--单次操作点击时长:-->
                                 <Label text="%clickDetail.timeClick"/>
                                 <TextField fx:id="timeClick_Det" prefWidth="80"/>
+                                <!--毫秒-->
                                 <Label text="%unit.ms"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--单次操作点击间隔时间:-->
                                 <Label text="%clickDetail.interval"/>
                                 <TextField fx:id="interval_Det" prefWidth="80"/>
+                                <!--毫秒-->
                                 <Label text="%unit.ms"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--运行时启用随机点击时长偏移-->
                                 <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short"
                                           text="%randomClickTime"/>
                             </HBox>
@@ -213,6 +284,7 @@
 
                         <HBox spacing="60">
                             <HBox styleClass="hBox-500-5">
+                                <!--要识别的图像识别匹配匹配度:-->
                                 <Label text="%clickDetail.clickOpacity"/>
                                 <Slider fx:id="clickOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -220,18 +292,22 @@
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--要识别的图像识别失败重试次数:-->
                                 <Label text="%clickDetail.clickRetryNum"/>
                                 <TextField fx:id="clickRetryNum_Det" prefWidth="50"/>
+                                <!--次-->
                                 <Label text="%unit.times"/>
                             </HBox>
 
                             <HBox fx:id="noPermissionHBox_Det" visible="false" styleClass="hBox-270-5">
+                                <!--未开启自动化权限，鼠标悬停查看开启方法-->
                                 <Label fx:id="noPermission_Det" textFill="red" text="%noAutomationPermission"/>
                             </HBox>
                         </HBox>
 
                         <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--识别区域设置:-->
                                 <Label text="%findImgSet.findImgType"/>
                                 <ChoiceBox fx:id="clickFindImgType_Det" prefWidth="150"
                                            onAction="#clickFindImgTypeAction"/>
@@ -240,11 +316,13 @@
                             <HBox fx:id="clickRegionInfoHBox_Det" spacing="10">
                                 <HBox fx:id="clickRegionHBox_Det" spacing="10">
                                     <HBox styleClass="hBox-270-5">
+                                        <!--显示识别区域-->
                                         <Button fx:id="clickRegion_Det" text="%findImgSet.showRegion"
                                                 onAction="#clickRegionAction"/>
                                     </HBox>
 
                                     <HBox styleClass="hBox-270-5">
+                                        <!--第一次识别失败后改为识别整个屏幕-->
                                         <CheckBox fx:id="clickAllRegion_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.allRegion"/>
                                     </HBox>
@@ -252,13 +330,16 @@
 
                                 <HBox fx:id="clickWindowInfoHBox_Det" spacing="10">
                                     <HBox styleClass="hBox-270-5">
+                                        <!--操作前更新窗口信息-->
                                         <CheckBox fx:id="updateClickWindow_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.updateWindowInfo"/>
                                     </HBox>
 
+                                    <!--记录窗口信息-->
                                     <Button fx:id="clickWindow_Det" text="%findImgSet.getWindow"
                                             onAction="#findClickWindowAction"/>
 
+                                    <!--记录到的窗口：-->
                                     <Label text="%findImgSet.windowInfo"/>
                                     <Label maxWidth="500" textFill="cornflowerblue" fx:id="clickWindowInfo_Det"/>
                                 </HBox>
@@ -268,12 +349,14 @@
                         <HBox spacing="10">
                             <HBox prefWidth="550" spacing="10">
                                 <HBox spacing="10">
+                                    <!--图像识别匹配逻辑:-->
                                     <Label text="%clickDetail.matchedType_Det"/>
                                     <ChoiceBox fx:id="matchedType_Det" prefWidth="210" onAction="#matchedTypeChange"/>
                                 </HBox>
 
                                 <HBox fx:id="matchedStepHBox_Det" spacing="10">
-                                    <Label text="%clickDetail.matchedStep"/>
+                                    <!--要跳转的步骤序号:-->
+                                    <Label text="%clickDetail.jumpStep"/>
                                     <TextField fx:id="matchedStep_Det" prefWidth="60"/>
                                     <ImageView fx:id="matchedStepWarning_Det" fitWidth="25" fitHeight="25"
                                                visible="false">
@@ -284,12 +367,14 @@
 
                             <HBox spacing="10">
                                 <HBox spacing="10">
+                                    <!--要匹配的图像重试逻辑:-->
                                     <Label text="%clickDetail.retryType_Det"/>
                                     <ChoiceBox fx:id="retryType_Det" prefWidth="210" onAction="#retryTypeChange"/>
                                 </HBox>
 
                                 <HBox fx:id="retryStepHBox_Det" spacing="10" visible="false">
-                                    <Label text="%clickDetail.retryStep"/>
+                                    <!--要跳转的步骤序号:-->
+                                    <Label text="%clickDetail.jumpStep"/>
                                     <TextField fx:id="retryStep_Det" prefWidth="60"/>
                                     <ImageView fx:id="retryStepWarning_Det" fitWidth="25" fitHeight="25"
                                                visible="false">
@@ -301,6 +386,7 @@
 
                         <HBox spacing="60">
                             <HBox styleClass="hBox-500-5">
+                                <!--终止操作图像识别匹配匹配度:-->
                                 <Label text="%clickDetail.stopOpacity"/>
                                 <Slider fx:id="stopOpacity_Det" prefWidth="220" value="80" showTickLabels="true"
                                         showTickMarks="true" snapToTicks="true" majorTickUnit="10"/>
@@ -308,14 +394,17 @@
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
+                                <!--终止操作图像识别失败重试次数:-->
                                 <Label text="%clickDetail.stopRetryNum"/>
                                 <TextField fx:id="stopRetryNum_Det" prefWidth="50"/>
+                                <!--次-->
                                 <Label text="%unit.times"/>
                             </HBox>
                         </HBox>
 
                         <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
+                                <!--识别区域设置:-->
                                 <Label text="%findImgSet.findImgType"/>
                                 <ChoiceBox fx:id="stopFindImgType_Det" prefWidth="150"
                                            onAction="#stopFindImgTypeAction"/>
@@ -324,11 +413,13 @@
                             <HBox fx:id="stopRegionInfoHBox_Det" spacing="10">
                                 <HBox fx:id="stopRegionHBox_Det" spacing="10">
                                     <HBox styleClass="hBox-270-5">
+                                        <!--显示识别区域-->
                                         <Button fx:id="stopRegion_Det" text="%findImgSet.showRegion"
                                                 onAction="#stopRegionAction"/>
                                     </HBox>
 
                                     <HBox styleClass="hBox-270-5">
+                                        <!--第一次识别失败后改为识别整个屏幕-->
                                         <CheckBox fx:id="stopAllRegion_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.allRegion"/>
                                     </HBox>
@@ -336,13 +427,16 @@
 
                                 <HBox fx:id="stopWindowInfoHBox_Det" spacing="10">
                                     <HBox styleClass="hBox-270-5">
+                                        <!--操作前更新窗口信息-->
                                         <CheckBox fx:id="updateStopWindow_Det" styleClass="checkBox-short"
                                                   text="%findImgSet.updateWindowInfo"/>
                                     </HBox>
 
+                                    <!--记录窗口信息-->
                                     <Button fx:id="stopWindow_Det" text="%findImgSet.getWindow"
                                             onAction="#findStopWindowAction"/>
 
+                                    <!--记录到的窗口：-->
                                     <Label maxWidth="500" text="%findImgSet.windowInfo"/>
                                     <Label textFill="cornflowerblue" fx:id="stopWindowInfo_Det"/>
                                 </HBox>
@@ -352,24 +446,33 @@
                         <HBox spacing="20">
                             <VBox spacing="10">
                                 <HBox spacing="10">
+                                    <!--选择终止操作的图片-->
                                     <Button fx:id="stopImgBtn_Det" onAction="#addStopImgPath"
                                             text="%clickDetail.stopImgBtn_Det"/>
+                                    <!--清空列表-->
                                     <Button fx:id="removeAll_Det" onAction="#removeAll" text="%listText.removeAll"/>
 
                                     <Region HBox.hgrow="ALWAYS"/>
+                                    <!--列表为空-->
                                     <Label fx:id="dataNumber_Det" text="%listText.null"/>
                                 </HBox>
 
                                 <TableView fx:id="tableView_Det" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
                                     <placeholder>
+                                        <!--拖拽图片文件或点击选择终止操作的图片即可追加止操作的图片-->
                                         <Label text="%clickDetail.tableView_Det"/>
                                     </placeholder>
 
                                     <columns>
+                                        <!--序号-->
                                         <TableColumn fx:id="index_Det" text="%listText.index" sortable="false"/>
+                                        <!--缩略图-->
                                         <TableColumn fx:id="thumb_Det" text="%listText.thumb" sortable="false"/>
+                                        <!--图片名称-->
                                         <TableColumn fx:id="name_Det" text="%stopImg.name" sortable="false"/>
+                                        <!--图片地址-->
                                         <TableColumn fx:id="path_Det" text="%stopImg.path" sortable="false"/>
+                                        <!--图片类型-->
                                         <TableColumn fx:id="type_Det" text="%stopImg.type" sortable="false"/>
                                     </columns>
                                 </TableView>
@@ -377,6 +480,7 @@
 
                             <VBox spacing="10">
                                 <HBox spacing="5">
+                                    <!--选择要点击的图片-->
                                     <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath"
                                             onDragDropped="#clickImgHandleDrop" onDragOver="#clickImgAcceptDrop"
                                             text="%clickDetail.clickImgBtn_Det"/>
@@ -399,26 +503,33 @@
                                                preserveRatio="true"/>
 
                                     <HBox spacing="10">
+                                        <!--图片名称:-->
                                         <Label maxHeight="25" text="%clickDetail.clickImgName"/>
                                         <Label maxHeight="25" fx:id="clickImgName_Det"/>
+                                        <!--更新步骤名称-->
                                         <Button fx:id="updateClickName_Det" onAction="#updateClickName"
                                                 text="%clickDetail.updateClickName_Det"/>
                                     </HBox>
 
                                     <HBox spacing="10">
+                                        <!--图片类型:-->
                                         <Label maxHeight="25" text="%clickDetail.clickImgType"/>
                                         <Label maxHeight="25" fx:id="clickImgType_Det"/>
                                     </HBox>
 
                                     <HBox spacing="10">
+                                        <!--匹配图像坐标横(X)轴偏移量：-->
                                         <Label maxHeight="25" text="%clickDetail.imgX"/>
                                         <TextField fx:id="imgX_Det" prefWidth="60" promptText="0"/>
+                                        <!--像素-->
                                         <Label maxHeight="25" text="%unit.px"/>
                                     </HBox>
 
                                     <HBox spacing="10">
+                                        <!--匹配图像坐标纵(Y)轴偏移量：-->
                                         <Label maxHeight="25" text="%clickDetail.imgY"/>
                                         <TextField fx:id="imgY_Det" prefWidth="60" promptText="0"/>
+                                        <!--像素-->
                                         <Label maxHeight="25" text="%unit.px"/>
                                     </HBox>
                                 </VBox>
@@ -437,10 +548,13 @@
                 <Label fx:id="log_Det"/>
             </VBox>
 
+            <!--保存并关闭-->
             <Button text="%detail.save" onAction="#saveDetail"/>
+            <!--删除这个流程-->
             <Button text="%clickDetail.removeDetail" onAction="#removeDetail"/>
 
             <Region HBox.hgrow="ALWAYS"/>
+            <!--更改屏幕分辨率后可能需要重新截图才能准确进行图像识别-->
             <Label fx:id="resolution_Det" textFill="red" text="%clickDetail.tip"/>
         </HBox>
     </bottom>

@@ -34,7 +34,7 @@ public class CommonFinals {
     /**
      * PMC 文件版本
      */
-    public static final String PMCFileVersion = "2.1";
+    public static final String PMCFileVersion = "2.2";
 
     /**
      * PMCS 文件版本

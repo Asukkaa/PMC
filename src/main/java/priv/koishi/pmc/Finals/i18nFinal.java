@@ -1053,6 +1053,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return 将会把目标窗口左上角横坐标移动到这个位置，只能填自然数，不填默认为 0
+     */
+    public static String tip_windowX() {
+        return bundle.getString("tip.windowX");
+    }
+
+    /**
+     * @return 将会把目标窗口左上角纵坐标移动到这个位置，只能填自然数，不填默认为 0
+     */
+    public static String tip_windowY() {
+        return bundle.getString("tip.windowY");
+    }
+
+    /**
+     * @return 勾选后移动窗口失败后不会终止后续步骤
+     */
+    public static String tip_ignoreFailure() {
+        return bundle.getString("tip.ignoreFailure");
+    }
+
+    /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Amazon.com Inc. 25.0.1+8-LTS
@@ -2801,6 +2822,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 移动窗口
+     */
+    public static String log_moveWindow() {
+        return bundle.getString("log.moveWindow");
+    }
+
+    /**
      * @return 重试直到图像出现
      */
     public static String retryType_continuously() {
@@ -3192,6 +3220,13 @@ public class i18nFinal {
      */
     public static String pathTip_runScript() {
         return bundle.getString("pathTip.runScript");
+    }
+
+    /**
+     * @return 并非所有窗口都支持移动，最好先进行测试
+     */
+    public static String pathTip_moveWindow() {
+        return bundle.getString("pathTip.moveWindow");
     }
 
     /**
@@ -3594,6 +3629,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 移动窗口
+     */
+    public static String clickType_moveWindow() {
+        return bundle.getString("clickType.moveWindow");
+    }
+
+    /**
      * @return 带轨迹的移动
      */
     public static String clickType_moveTrajectory() {
@@ -3685,6 +3727,7 @@ public class i18nFinal {
         // 更新打开链接相关选项
         updateLinkList();
         List<String> newList = Arrays.asList(
+                clickType_moveWindow(),
                 clickType_moveTrajectory(),
                 clickType_move(),
                 clickType_click(),
@@ -3712,6 +3755,7 @@ public class i18nFinal {
         clickTypeMap.put(OPEN_FILE.ordinal(), clickType_openFile());
         clickTypeMap.put(RUN_SCRIPT.ordinal(), clickType_runScript());
         clickTypeMap.put(OPEN_URL.ordinal(), clickType_openUrl());
+        clickTypeMap.put(MOVE_WINDOW.ordinal(), clickType_moveWindow());
         clickTypeMap.put(MOVE_TRAJECTORY.ordinal(), clickType_moveTrajectory());
         clickTypeMap.put(MOVE.ordinal(), clickType_move());
         clickTypeMap.put(CLICK.ordinal(), clickType_click());

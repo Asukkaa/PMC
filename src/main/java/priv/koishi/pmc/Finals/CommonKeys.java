@@ -227,6 +227,8 @@ public class CommonKeys {
 
     public static final String key_keyboardLog = "keyboardLog";
 
+    public static final String key_moveWindowLog = "moveWindowLog";
+
     public static final String key_recordKeyboard = "recordKeyboard";
 
     public static final String key_recordMouseWheel = "recordMouseWheel";

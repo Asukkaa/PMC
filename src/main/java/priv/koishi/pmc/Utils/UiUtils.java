@@ -790,14 +790,31 @@ public class UiUtils {
      */
     public static ContextMenu buildWindowInfoMenu(Label label, WindowMonitor windowMonitor,
                                                   List<? extends Node> disableNodes, List<? extends Stage> stages) {
+        return buildWindowInfoMenu(label, windowMonitor, true, disableNodes, stages);
+    }
+
+    /**
+     * 构建窗口信息栏右键菜单
+     *
+     * @param label         窗口信息栏
+     * @param windowMonitor 窗口监视器
+     * @param showRelative  是否显示图像识别窗口范围区域
+     * @param disableNodes  要防重复点击的组件
+     * @param stages        需要隐藏的窗口
+     * @return 右键菜单
+     */
+    public static ContextMenu buildWindowInfoMenu(Label label, WindowMonitor windowMonitor, boolean showRelative,
+                                                  List<? extends Node> disableNodes, List<? extends Stage> stages) {
         // 添加窗口信息右键菜单
         ContextMenu windowInfoMenu = new ContextMenu();
         // 更新窗口信息选项
         buildUpdateDataMenu(windowInfoMenu, windowMonitor);
         // 显示窗口位置信息
         buildShowDataMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
-        // 设置图像识别窗口范围区域
-        buildRelativeWindowMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
+        if (showRelative) {
+            // 设置图像识别窗口范围区域
+            buildRelativeWindowMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
+        }
         // 删除窗信息据选项
         buildDeleteDataMenu(windowInfoMenu, windowMonitor);
         // 为窗口信息栏添加右键菜单

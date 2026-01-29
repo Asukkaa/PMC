@@ -105,6 +105,11 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     boolean keyboardLog;
 
     /**
+     * 运行自动流程时记录窗口移动事件
+     */
+    boolean moveWindowLog;
+
+    /**
      * 最大记录数量
      */
     int maxLogNum;
