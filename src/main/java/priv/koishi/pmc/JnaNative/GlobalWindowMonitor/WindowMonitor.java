@@ -340,10 +340,10 @@ public class WindowMonitor {
                 .updateRelativeWidth((int) relativeStage.getWidth())
                 .updateRelativeX((int) relativeStage.getX())
                 .updateRelativeY((int) relativeStage.getY());
-        return "识别范围相对高度：" + String.format("%.2f", windowInfo.getRelativeHeight() * 100) + "%" + "\n" +
-                "识别范围相对宽度：" + String.format("%.2f", windowInfo.getRelativeWidth() * 100) + "%" + "\n" +
-                "识别范围相对横坐标：" + String.format("%.2f", windowInfo.getRelativeX() * 100) + "%" + "\n" +
-                "识别范围相对纵坐标：" + String.format("%.2f", windowInfo.getRelativeY() * 100) + "%";
+        return identify_relativeHeight() + String.format("%.2f", windowInfo.getRelativeHeight() * 100) + "%" + "\n" +
+                identify_relativeWidth() + String.format("%.2f", windowInfo.getRelativeWidth() * 100) + "%" + "\n" +
+                identify_relativeX() + String.format("%.2f", windowInfo.getRelativeX() * 100) + "%" + "\n" +
+                identify_relativeY() + String.format("%.2f", windowInfo.getRelativeY() * 100) + "%";
     }
 
     /**

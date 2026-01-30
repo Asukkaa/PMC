@@ -815,6 +815,7 @@ public class UiUtils {
             // 设置图像识别窗口范围区域
             buildRelativeWindowMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
         }
+        buildOpenFileMenu(windowInfoMenu, windowMonitor);
         // 删除窗信息据选项
         buildDeleteDataMenu(windowInfoMenu, windowMonitor);
         // 为窗口信息栏添加右键菜单
@@ -824,6 +825,22 @@ public class UiUtils {
             }
         });
         return windowInfoMenu;
+    }
+
+    /**
+     * 打开窗口进程所在位置选项
+     *
+     * @param contextMenu   右键菜单集合
+     * @param windowMonitor 窗口监视器
+     */
+    private static void buildOpenFileMenu(ContextMenu contextMenu, WindowMonitor windowMonitor) {
+        MenuItem menuItem = new MenuItem(findImgSet_openFile());
+        menuItem.setOnAction(_ -> {
+            windowMonitor.updateWindowInfo();
+            String path = windowMonitor.getWindowInfo().getProcessPath();
+            openDirectory(path);
+        });
+        contextMenu.getItems().add(menuItem);
     }
 
     /**

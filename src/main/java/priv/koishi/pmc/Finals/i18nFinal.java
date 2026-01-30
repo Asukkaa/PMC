@@ -2276,6 +2276,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 打开窗口进程所在位置
+     */
+    public static String findImgSet_openFile() {
+        return bundle.getString("findImgSet.openFile");
+    }
+
+    /**
      * @return 要点击的图像识别区域
      */
     public static String floatingName_click() {
@@ -3120,6 +3127,34 @@ public class i18nFinal {
      */
     public static String update_nowIsLast() {
         return bundle.getString("update.nowIsLast");
+    }
+
+    /**
+     * @return 识别范围相对高度：
+     */
+    public static String identify_relativeHeight() {
+        return bundle.getString("identify.relativeHeight");
+    }
+
+    /**
+     * @return 识别范围相对宽度：
+     */
+    public static String identify_relativeWidth() {
+        return bundle.getString("identify.relativeWidth");
+    }
+
+    /**
+     * @return 识别范围相对横坐标：
+     */
+    public static String identify_relativeX() {
+        return bundle.getString("identify.relativeX");
+    }
+
+    /**
+     * @return 识别范围相对纵坐标：
+     */
+    public static String identify_relativeY() {
+        return bundle.getString("identify.relativeY");
     }
 
     /**
