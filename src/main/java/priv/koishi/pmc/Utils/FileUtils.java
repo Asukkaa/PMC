@@ -977,4 +977,16 @@ public class FileUtils {
         return compareValue;
     }
 
+    /**
+     * 获取 dylib 所在目录
+     *
+     * @return 根据不同运行环境获取的目录
+     */
+    public static String getDylibPath() {
+        if (!isRunningFromIDEA && isMac) {
+            return macAppDirectory;
+        }
+        return userDir + "/appBuilder/mac";
+    }
+
 }
