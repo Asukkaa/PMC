@@ -85,6 +85,16 @@ WindowInfo getMacWindowInfo(const char* processPath) {
     if (!processPath || strlen(processPath) == 0) {
         return info;
     }
+    // 检查传入的路径是否以 .app 结尾
+    int isAppPath = 0;
+    const char* appExtension = ".app";
+    size_t pathLen = strlen(processPath);
+    size_t appExtLen = strlen(appExtension);
+    if (pathLen >= appExtLen) {
+        if (strcmp(processPath + pathLen - appExtLen, appExtension) == 0) {
+            isAppPath = 1;
+        }
+    }
     // 获取所有窗口
     CFArrayRef windowList = CGWindowListCopyWindowInfo(
         kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
@@ -109,8 +119,20 @@ WindowInfo getMacWindowInfo(const char* processPath) {
         // 获取该进程的完整路径
         char currentProcessPath[1024] = {0};
         getProcessInfo(pid, NULL, currentProcessPath, sizeof(currentProcessPath));
-        // 仅进行完整路径匹配（区分大小写）
-        if (strcmp(currentProcessPath, processPath) == 0) {
+        // 匹配逻辑
+        int match = 0;
+        if (isAppPath) {
+            // 如果传入的路径以 .app 结尾，则检查当前进程路径是否包含该 .app 路径，例如：传入 "/Applications/Safari.app" 应该匹配 "/Applications/Safari.app/Contents/MacOS/Safari"
+            if (strstr(currentProcessPath, processPath) != NULL) {
+                match = 1;
+            }
+        } else {
+            // 否则进行完整路径匹配（保持向后兼容）
+            if (strcmp(currentProcessPath, processPath) == 0) {
+                match = 1;
+            }
+        }
+        if (match) {
             // 获取窗口ID
             CFNumberRef windowIdRef = CFDictionaryGetValue(window, kCGWindowNumber);
             if (windowIdRef) {

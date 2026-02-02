@@ -5,6 +5,8 @@ import com.sun.jna.Structure;
 import java.util.Arrays;
 import java.util.List;
 
+import static priv.koishi.pmc.Finals.CommonFinals.app;
+
 /**
  *
  * @author applesaucepenguin
@@ -94,6 +96,9 @@ public class MacNativeWindowInfo extends Structure {
      * @return 转换后的窗口信息类
      */
     public WindowInfo toWindowInfo() {
+        if (windowId == 0) {
+            return null;
+        }
         return new WindowInfo()
                 .setProcessName(getProcessNameString())
                 .setProcessPath(getProcessPathString())
@@ -125,7 +130,11 @@ public class MacNativeWindowInfo extends Structure {
      * 获取进程路径字符串
      */
     public String getProcessPathString() {
-        return getNullTerminatedString(processPath);
+        String path = getNullTerminatedString(processPath);
+        if (path.contains(app)) {
+            path = path.substring(0, path.indexOf(app) + app.length());
+        }
+        return path;
     }
 
     /**
