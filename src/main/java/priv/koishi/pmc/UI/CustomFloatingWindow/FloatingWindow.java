@@ -348,7 +348,8 @@ public class FloatingWindow {
      */
     private static void setSameLabelWidth(FloatingWindowDescriptor config) {
         if (config.isFormattingText()) {
-            double maxWidth = 100;
+            int minWidth = 100;
+            double maxWidth = minWidth;
             Label messageLabel = config.getMessageLabel();
             Label nameLabel = config.getNameeLabel();
             Label floatingPosition = config.getFloatingPosition();
@@ -363,7 +364,7 @@ public class FloatingWindow {
                     }
                 }
             }
-            if (maxWidth > 100) {
+            if (maxWidth > minWidth) {
                 for (Label label : labels) {
                     if (label != null) {
                         label.setMinWidth(maxWidth);
