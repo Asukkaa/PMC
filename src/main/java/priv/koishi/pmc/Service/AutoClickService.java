@@ -310,6 +310,7 @@ public class AutoClickService {
             @Override
             protected PMCLogResult call() throws Exception {
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
+                Map<String, Set<ClickPositionVO>> windowPathMap = new HashMap<>();
                 List<String> errs;
                 // 检查跳转逻辑参数与操作类型设置是否合理
                 errs = checkJumpSetting(tableViewItems);
@@ -317,7 +318,7 @@ public class AutoClickService {
                     return null;
                 }
                 // 校验并更新识别范围设置
-                errs = updateWindowInfos(tableViewItems);
+                errs = updateWindowInfos(tableViewItems, windowPathMap);
                 if (showErrAlert(errs, text_windowInfoErr())) {
                     return null;
                 }
@@ -341,7 +342,7 @@ public class AutoClickService {
                             return new PMCLogResult(clickLogBeans, null);
                         }
                         // 执行操作流程
-                        clickLogBeans = clicks(tableViewItems, loopTimeText);
+                        clickLogBeans = clicks(tableViewItems, loopTimeText, windowPathMap);
                     }
                 } else {
                     for (int i = 0; i < loopTime && !isCancelled(); i++) {
@@ -350,7 +351,7 @@ public class AutoClickService {
                             return new PMCLogResult(clickLogBeans, null);
                         }
                         // 执行操作流程
-                        clickLogBeans = clicks(tableViewItems, loopTimeText);
+                        clickLogBeans = clicks(tableViewItems, loopTimeText, windowPathMap);
                     }
                 }
                 return new PMCLogResult(clickLogBeans, null);
@@ -403,9 +404,11 @@ public class AutoClickService {
              * 更新窗口信息
              *
              * @param tableViewItems 自动操作设置列表
+             * @param windowPathMap  窗口路径映射表
              * @return 错误信息
              */
-            private List<String> updateWindowInfos(List<? extends ClickPositionVO> tableViewItems) {
+            private List<String> updateWindowInfos(List<? extends ClickPositionVO> tableViewItems,
+                                                   Map<? super String, Set<ClickPositionVO>> windowPathMap) {
                 Set<String> processPaths = new HashSet<>();
                 int tableSize = tableViewItems.size();
                 updateFloatingMessage(text_checkingWindowInfo());
@@ -415,7 +418,7 @@ public class AutoClickService {
                 List<Integer> clickErrIndex = new ArrayList<>();
                 List<Integer> stopErrIndex = new ArrayList<>();
                 // 校验窗口信息设置是否有误
-                checkWindowInfoSet(tableViewItems, errs, clickErrIndex, processPaths, stopErrIndex);
+                checkWindowInfoSet(tableViewItems, errs, clickErrIndex, processPaths, stopErrIndex, windowPathMap);
                 // 更新窗口信息
                 Map<String, WindowInfo> windowInfoMap = new HashMap<>();
                 int pathSize = processPaths.size();
@@ -497,8 +500,8 @@ public class AutoClickService {
             /**
              * 校验窗口设置是否有误
              *
-             * @param pathSize       窗口进程路径数量
-             * @param processPaths   窗口进程路径
+             * @param pathSize      窗口进程路径数量
+             * @param processPaths  窗口进程路径
              * @param windowInfoMap 窗口信息集合
              */
             private void updateWindowInfo(int pathSize, Set<String> processPaths, Map<? super String, ? super WindowInfo> windowInfoMap) {
@@ -524,10 +527,12 @@ public class AutoClickService {
              * @param clickErrIndex  目标窗口错误设置步骤索引
              * @param processPaths   窗口进程路径
              * @param stopErrIndex   终止操作窗口错误设置步骤索引
+             * @param windowPathMap  窗口路径映射表
              */
             private void checkWindowInfoSet(List<? extends ClickPositionVO> tableViewItems,
                                             List<? super String> errs, List<? super Integer> clickErrIndex,
-                                            Set<? super String> processPaths, List<? super Integer> stopErrIndex) {
+                                            Set<? super String> processPaths, List<? super Integer> stopErrIndex,
+                                            Map<? super String, Set<ClickPositionVO>> windowPathMap) {
                 int tableSize = tableViewItems.size();
                 for (int i = 0; i < tableSize; i++) {
                     updateProgress(i + 1, tableSize);
@@ -548,7 +553,9 @@ public class AutoClickService {
                             errs.add(err + text_noClickWindowInfo());
                             clickErrIndex.add(index);
                         } else {
-                            processPaths.add(clickInfo.getProcessPath());
+                            String path = clickInfo.getProcessPath();
+                            processPaths.add(path);
+                            updateWindowPathMap(windowPathMap, path, clickPositionVO);
                         }
                     }
                     // 校验终止操作窗口设置是否有误
@@ -560,7 +567,9 @@ public class AutoClickService {
                                 errs.add(err + text_noStopWindowInfo());
                                 stopErrIndex.add(index);
                             } else {
-                                processPaths.add(stopInfo.getProcessPath());
+                                String path = stopInfo.getProcessPath();
+                                processPaths.add(path);
+                                updateWindowPathMap(windowPathMap, path, clickPositionVO);
                             }
                         }
                     }
@@ -571,9 +580,12 @@ public class AutoClickService {
              * 执行操作流程
              *
              * @param tableViewItems 自动操作设置列表
-             * @param loopTimeText 循环信息文案
+             * @param loopTimeText   循环信息文案
+             * @param windowPathMap  窗口路径映射表
+             * @throws Exception 运行脚本时发生错误、链接操作异常
              */
-            private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText) throws Exception {
+            private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText,
+                                              Map<? super String, ? extends Set<ClickPositionVO>> windowPathMap) throws Exception {
                 // 复制要执行的操作步骤
                 List<ClickPositionVO> backup = creatBackUp(tableViewItems);
                 int dataSize = backup.size();
@@ -613,7 +625,7 @@ public class AutoClickService {
                             if (wait(clickPositionVO)) {
                                 break;
                             }
-                            windowMove(clickPositionVO, taskBean);
+                            windowMove(clickPositionVO, taskBean, windowPathMap);
                             currentStep++;
                             continue;
                         }
@@ -720,8 +732,10 @@ public class AutoClickService {
      *
      * @param clickPositionVO 自动操作参数
      * @param taskBean        任务参数
+     * @param windowPathMap   窗口路径映射表
      */
-    private static void windowMove(ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) {
+    private static void windowMove(ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean,
+                                   Map<? super String, ? extends Set<ClickPositionVO>> windowPathMap) {
         int startX = Integer.parseInt((clickPositionVO.getStartX()));
         int startY = Integer.parseInt((clickPositionVO.getStartY()));
         WindowInfo windowInfo = clickPositionVO.getClickWindowConfig().getWindowInfo();
@@ -737,6 +751,13 @@ public class AutoClickService {
                 logBean.setResult(log_success());
                 clickLog.add(logBean);
             }
+            String path = windowInfo.getProcessPath();
+            // 更新窗口位置
+            Set<ClickPositionVO> steps = windowPathMap.get(path);
+            for (ClickPositionVO step : steps) {
+                updateWindowPosition(step.getClickWindowConfig(), path, startX, startY);
+                updateWindowPosition(step.getStopWindowConfig(), path, startX, startY);
+            }
         } else {
             if (taskBean.isMoveWindowLog()) {
                 logBean.setResult(log_fail());
@@ -745,6 +766,44 @@ public class AutoClickService {
             if (unActivation.equals(clickPositionVO.getIgnoreFailure())) {
                 throw new RuntimeException(log_moveWindow() + log_fail());
             }
+        }
+    }
+
+    /**
+     * 更新窗口位置
+     *
+     * @param windowConfig 窗口配置
+     * @param processPath  进程路径
+     * @param newX         新的 X 坐标
+     * @param newY         新的 Y 坐标
+     */
+    private static void updateWindowPosition(FloatingWindowConfig windowConfig, String processPath, int newX, int newY) {
+        if (windowConfig != null &&
+                windowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
+            WindowInfo windowInfo = windowConfig.getWindowInfo();
+            if (windowInfo != null && windowInfo.getProcessPath().equals(processPath)) {
+                // 只更新窗口位置，保留其他所有属性
+                windowInfo.setX(newX)
+                        .setY(newY);
+            }
+        }
+    }
+
+    /**
+     * 更新窗口路径映射表
+     *
+     * @param windowPathMap   窗口路径映射表
+     * @param path            窗口路径
+     * @param clickPositionVO 点击位置参数
+     */
+    private static void updateWindowPathMap(Map<? super String, Set<ClickPositionVO>> windowPathMap,
+                                            String path, ClickPositionVO clickPositionVO) {
+        if (CollectionUtils.isEmpty(windowPathMap.get(path))) {
+            Set<ClickPositionVO> vos = new HashSet<>();
+            vos.add(clickPositionVO);
+            windowPathMap.put(path, vos);
+        } else {
+            windowPathMap.get(path).add(clickPositionVO);
         }
     }
 
