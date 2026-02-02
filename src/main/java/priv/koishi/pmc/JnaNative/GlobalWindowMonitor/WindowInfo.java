@@ -19,7 +19,7 @@ public class WindowInfo {
     /**
      * 窗口唯一标识（Windows 为 HWND 的数值，macOS 为 CGWindowID）
      */
-    long id;
+    long windowId;
 
     /**
      * 窗口横坐标

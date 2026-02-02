@@ -150,7 +150,11 @@ public class FileUtils {
             }
             try {
                 if (file.isDirectory()) {
-                    Desktop.getDesktop().open(file);
+                    if (app.equals(getFileType(openPath))) {
+                        openParentDirectory(openPath);
+                    } else {
+                        Desktop.getDesktop().open(file);
+                    }
                 }
                 if (file.isFile()) {
                     openParentDirectory(openPath);

@@ -12,6 +12,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <libproc.h>
+#include <pwd.h>
+#include <stdint.h>
 
 // 工具函数：从 CFString 复制到 C 字符串
 static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t bufferSize) {
@@ -27,6 +30,41 @@ static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t buffer
     Boolean success = CFStringGetCString(cfStr, buffer, maxSize, kCFStringEncodingUTF8);
     if (!success) {
         buffer[0] = '\0';
+    }
+}
+
+// 工具函数：获取进程名称和路径
+static void getProcessInfo(pid_t pid, char* processName, char* processPath, size_t pathSize) {
+    // 初始化字符串
+    processName[0] = '\0';
+    processPath[0] = '\0';
+    // 获取进程名称
+    int nameResult = proc_name(pid, processName, 256);
+    if (nameResult <= 0) {
+        snprintf(processName, 256, "Unknown");
+    }
+    // 获取进程路径 - 使用显式类型转换
+    int pathResult = proc_pidpath(pid, processPath, (uint32_t)pathSize);
+    if (pathResult <= 0) {
+        // 使用 proc_pidinfo 获取进程信息
+        struct proc_bsdinfo procInfo;
+        if (proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &procInfo, sizeof(procInfo)) > 0) {
+            snprintf(processName, 256, "%s", procInfo.pbi_name);
+        }
+        // 构建可能的路径
+        char pidStr[32];
+        snprintf(pidStr, sizeof(pidStr), "%d", pid);
+        // 尝试从 /proc 读取
+        char procPath[1024];
+        snprintf(procPath, sizeof(procPath), "/proc/%s/exe", pidStr);
+        char resolvedPath[1024];
+        if (readlink(procPath, resolvedPath, sizeof(resolvedPath) - 1) > 0) {
+            strncpy(processPath, resolvedPath, pathSize - 1);
+            processPath[pathSize - 1] = '\0';
+        } else {
+            // 最后回退方案
+            snprintf(processPath, pathSize, "/usr/bin/unknown");
+        }
     }
 }
 
@@ -117,12 +155,13 @@ WindowInfo getFocusedWindowInfo(void) {
     CFIndex count = CFArrayGetCount(windowList);
     for (CFIndex i = 0; i < count; i++) {
         CFDictionaryRef window = CFArrayGetValueAtIndex(windowList, i);
-        // 获取窗口层级，层级最小的通常在最前面
+        // 获取窗口层级
         CFNumberRef layer = CFDictionaryGetValue(window, kCGWindowLayer);
         if (layer) {
             int layerValue;
             CFNumberGetValue(layer, kCFNumberIntType, &layerValue);
-            // 通常应用窗口的层级是 0
+            info.layer = layerValue;
+            // 通常应用窗口的层级是 0，我们优先查找层级为0的窗口
             if (layerValue == 0) {
                 // 获取进程 ID
                 CFNumberRef pidRef = CFDictionaryGetValue(window, kCGWindowOwnerPID);
@@ -150,14 +189,23 @@ WindowInfo getFocusedWindowInfo(void) {
                         info.height = (int)bounds.size.height;
                     }
                 }
+                // 获取进程信息
+                if (info.pid > 0) {
+                    getProcessInfo(info.pid, info.processName, info.processPath, sizeof(info.processPath));
+                }
                 break;
             }
         }
     }
-    CFRelease(windowList);
-    // 如果没有找到，尝试通过进程名获取
+    
+    // 如果没有找到层级为0的窗口，使用第一个窗口
     if (info.pid == 0 && count > 0) {
         CFDictionaryRef firstWindow = CFArrayGetValueAtIndex(windowList, 0);
+        // 获取窗口层级
+        CFNumberRef layer = CFDictionaryGetValue(firstWindow, kCGWindowLayer);
+        if (layer) {
+            CFNumberGetValue(layer, kCFNumberIntType, &info.layer);
+        }
         CFNumberRef pidRef = CFDictionaryGetValue(firstWindow, kCGWindowOwnerPID);
         if (pidRef) {
             CFNumberGetValue(pidRef, kCFNumberIntType, &info.pid);
@@ -179,8 +227,13 @@ WindowInfo getFocusedWindowInfo(void) {
                     info.height = (int)bounds.size.height;
                 }
             }
+            // 获取进程信息
+            if (info.pid > 0) {
+                getProcessInfo(info.pid, info.processName, info.processPath, sizeof(info.processPath));
+            }
         }
     }
+    CFRelease(windowList);
     return info;
 }
 
@@ -206,16 +259,6 @@ WindowInfo* getAllWindows(int* count) {
     CFIndex validCount = 0;
     for (CFIndex i = 0; i < totalCount; i++) {
         CFDictionaryRef window = CFArrayGetValueAtIndex(windowList, i);
-        // 检查窗口层级，过滤掉系统窗口
-        CFNumberRef layer = CFDictionaryGetValue(window, kCGWindowLayer);
-        if (layer) {
-            int layerValue;
-            CFNumberGetValue(layer, kCFNumberIntType, &layerValue);
-            // 通常我们只关心普通应用窗口（层级0）
-            if (layerValue != 0) {
-                continue;
-            }
-        }
         WindowInfo* current = &windows[validCount];
         memset(current, 0, sizeof(WindowInfo));
         // 获取进程ID
@@ -243,6 +286,15 @@ WindowInfo* getAllWindows(int* count) {
                 current->width = (int)bounds.size.width;
                 current->height = (int)bounds.size.height;
             }
+        }
+        // 获取窗口层级
+        CFNumberRef layerRef = CFDictionaryGetValue(window, kCGWindowLayer);
+        if (layerRef) {
+            CFNumberGetValue(layerRef, kCFNumberIntType, &current->layer);
+        }
+        // 获取进程信息
+        if (current->pid > 0) {
+            getProcessInfo(current->pid, current->processName, current->processPath, sizeof(current->processPath));
         }
         validCount++;
     }

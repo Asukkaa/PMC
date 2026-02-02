@@ -70,7 +70,7 @@ public class WindowMove {
      * @return 是否移动成功
      */
     private static boolean moveWindowWin(WindowInfo windowInfo, int x, int y, int width, int height) {
-        long windowId = windowInfo.getId();
+        long windowId = windowInfo.getWindowId();
         try {
             User32 user32 = User32.INSTANCE;
             WinDef.HWND hwnd = new WinDef.HWND(Pointer.createConstant(windowId));

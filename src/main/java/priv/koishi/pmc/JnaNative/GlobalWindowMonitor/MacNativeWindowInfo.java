@@ -48,42 +48,97 @@ public class MacNativeWindowInfo extends Structure {
      */
     public int height;
 
+    /**
+     * 窗口层级
+     */
+    public int layer;
+
+    /**
+     * 进程名称
+     */
+    public byte[] processName = new byte[256];
+
+    /**
+     * 进程路径
+     */
+    public byte[] processPath = new byte[1024];
+
     @Override
     protected List<String> getFieldOrder() {
         return Arrays.asList(
-                "pid", "windowId", "title",
-                "x", "y", "width", "height"
+                "pid",
+                "windowId",
+                "title",
+                "x",
+                "y",
+                "width",
+                "height",
+                "layer",
+                "processName",
+                "processPath"
         );
     }
 
+    public static class ByValue extends MacNativeWindowInfo implements Structure.ByValue {
+
+        @Override
+        protected List<String> getFieldOrder() {
+            return super.getFieldOrder();
+        }
+
+    }
+
+    /**
+     * 将 MacNativeWindowInfo 转换为 WindowInfo
+     *
+     * @return 转换后的窗口信息类
+     */
     public WindowInfo toWindowInfo() {
-        WindowInfo info = new WindowInfo();
-        info.setPid(pid);
-        info.setId(windowId);
-        info.setX(x);
-        info.setY(y);
-        info.setWidth(width);
-        info.setHeight(height);
-        // 转换字节数组为字符串
-        String titleStr = new String(title).trim();
-        info.setTitle(titleStr);
-        // 其他字段保持默认或另行设置
-        info.setLayer(0);  // macOS 可以使用层级信息，但需要额外获取
-        info.setProcessName("");  // 需要额外获取
-        info.setProcessPath("");  // 需要额外获取
-        return info;
+        return new WindowInfo()
+                .setProcessName(getProcessNameString())
+                .setProcessPath(getProcessPathString())
+                .setTitle(getTitleString())
+                .setWindowId(windowId)
+                .setHeight(height)
+                .setWidth(width)
+                .setLayer(layer)
+                .setPid(pid)
+                .setX(x)
+                .setY(y);
     }
 
     /**
      * 从字符串获取标题（处理字节数组）
      */
     public String getTitleString() {
-        // 找到第一个空字符
+        return getNullTerminatedString(title);
+    }
+
+    /**
+     * 获取进程名称字符串
+     */
+    public String getProcessNameString() {
+        return getNullTerminatedString(processName);
+    }
+
+    /**
+     * 获取进程路径字符串
+     */
+    public String getProcessPathString() {
+        return getNullTerminatedString(processPath);
+    }
+
+    /**
+     * 从字节数组获取以 null 结尾的字符串
+     *
+     * @param byteArray 需要处理的字节数组
+     */
+    private String getNullTerminatedString(byte[] byteArray) {
         int length = 0;
-        while (length < title.length && title[length] != 0) {
+        while (length < byteArray.length && byteArray[length] != 0) {
             length++;
         }
-        return new String(title, 0, length);
+        return new String(byteArray, 0, length);
     }
 
 }

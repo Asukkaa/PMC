@@ -16,13 +16,16 @@ extern "C" {
 
 // 窗口信息结构体
 typedef struct {
-    int pid;            // 进程ID
-    int windowId;       // 窗口ID
-    char title[256];    // 窗口标题
-    int x;              // 窗口X坐标
-    int y;              // 窗口Y坐标
-    int width;          // 窗口宽度
-    int height;         // 窗口高度
+    int pid;                // 进程ID
+    int windowId;           // 窗口ID
+    char title[256];        // 窗口标题
+    int x;                  // 窗口X坐标
+    int y;                  // 窗口Y坐标
+    int width;              // 窗口宽度
+    int height;             // 窗口高度
+    int layer;              // 窗口层级
+    char processName[256];  // 进程名称
+    char processPath[1024]; // 进程路径
 } WindowInfo;
 
 // 函数声明

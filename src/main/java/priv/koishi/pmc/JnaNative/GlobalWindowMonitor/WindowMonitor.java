@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Controller.AutoClickController;
 import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
 import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
+import priv.koishi.pmc.JnaNative.NativeInterface.MacWindowManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -520,7 +521,7 @@ public class WindowMonitor {
                 .setProcessPath(processPath)
                 .setHeight(height)
                 .setWidth(width)
-                .setId(windowId)
+                .setWindowId(windowId)
                 .setTitle(title)
                 .setPid(pid)
                 .setX(x)
@@ -585,7 +586,7 @@ public class WindowMonitor {
                                 .setProcessPath(processPath)
                                 .setHeight(height)
                                 .setWidth(width)
-                                .setId(windowId)
+                                .setWindowId(windowId)
                                 .setTitle(title)
                                 .setPid(pid)
                                 .setX(x)
@@ -667,57 +668,13 @@ public class WindowMonitor {
     }
 
     /**
-     * 获取 Mac 聚焦窗口信息（使用 Core Graphics API）
+     * 获取 Mac 聚焦窗口信息
      *
      * @return 窗口信息
      */
     public WindowInfo getMacFocusWindowInfo() {
-        WindowInfo result;
-        try {
-            // 使用 AppleScript 获取当前焦点应用的 PID
-            String script = """
-                    tell application "System Events"
-                        set frontApp to first application process whose frontmost is true
-                        set appPID to unix id of frontApp
-                        return appPID
-                    end tell""";
-            Process process = Runtime.getRuntime().exec(new String[]{"osascript", "-e", script});
-            int frontAppPid = getMacFrontAppPid(process);
-            process.waitFor();
-            // 获取进程路径
-            String processPath = getMacProcessPathByPid(frontAppPid);
-            if (processPath == null) {
-                throw new RuntimeException(text_geFocusPathErr());
-            }
-            if (processPath.contains(app)) {
-                processPath = processPath.substring(0, processPath.lastIndexOf(app) + app.length());
-            }
-            result = getMainMacWindowInfo(processPath);
-        } catch (Exception e) {
-            throw new RuntimeException(text_getMacFocusErr(), e);
-        }
-        return result;
-    }
-
-    /**
-     * 获取 Mac 焦点窗口进程 pid
-     *
-     * @param process pid 查询命令进程
-     * @throws IOException 命令结果读取异常
-     */
-    private static int getMacFrontAppPid(Process process) throws IOException {
-        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String error = errorReader.readLine();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String pidStr = reader.readLine();
-        if (pidStr == null) {
-            String err = text_getPidErr();
-            if (error != null) {
-                err = err + error;
-            }
-            throw new RuntimeException(err);
-        }
-        return Integer.parseInt(pidStr.trim());
+        MacNativeWindowInfo.ByValue nativeWindowInfo = MacWindowManager.INSTANCE.getFocusedWindowInfo();
+        return nativeWindowInfo.toWindowInfo();
     }
 
     /**
@@ -850,7 +807,7 @@ public class WindowMonitor {
                                                     .setHeight(height)
                                                     .setWidth(width)
                                                     .setTitle(title)
-                                                    .setId(windowId)
+                                                    .setWindowId(windowId)
                                                     .setLayer(layer)
                                                     .setPid(pid)
                                                     .setX(x)
