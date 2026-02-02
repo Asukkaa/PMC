@@ -136,7 +136,7 @@
                             <HBox styleClass="hBox-270-5">
                                 <!--目标位置横(X)坐标:-->
                                 <Label text="%clickDetail.windowX"/>
-                                <TextField fx:id="windowX_Det" prefWidth="60"/>
+                                <TextField fx:id="windowX_Det" promptText="0" prefWidth="60"/>
                                 <!--像素-->
                                 <Label text="%unit.px"/>
                             </HBox>
@@ -144,7 +144,7 @@
                             <HBox styleClass="hBox-270-5">
                                 <!--目标位置纵(Y)坐标:-->
                                 <Label text="%clickDetail.windowY"/>
-                                <TextField fx:id="windowY_Det" prefWidth="60"/>
+                                <TextField fx:id="windowY_Det" promptText="0" prefWidth="60"/>
                                 <!--像素-->
                                 <Label text="%unit.px"/>
                             </HBox>
