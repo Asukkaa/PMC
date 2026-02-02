@@ -36,36 +36,116 @@ static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t buffer
 // 工具函数：获取进程名称和路径
 static void getProcessInfo(pid_t pid, char* processName, char* processPath, size_t pathSize) {
     // 初始化字符串
-    processName[0] = '\0';
-    processPath[0] = '\0';
+    if (processName) {
+        processName[0] = '\0';
+    }
+    if (processPath) {
+        processPath[0] = '\0';
+    }
+    // 安全检查
+    if (pid <= 0) {
+        if (processName) {
+            strncpy(processName, "Invalid PID", 255);
+        }
+        return;
+    }
     // 获取进程名称
-    int nameResult = proc_name(pid, processName, 256);
-    if (nameResult <= 0) {
-        snprintf(processName, 256, "Unknown");
-    }
-    // 获取进程路径 - 使用显式类型转换
-    int pathResult = proc_pidpath(pid, processPath, (uint32_t)pathSize);
-    if (pathResult <= 0) {
-        // 使用 proc_pidinfo 获取进程信息
-        struct proc_bsdinfo procInfo;
-        if (proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &procInfo, sizeof(procInfo)) > 0) {
-            snprintf(processName, 256, "%s", procInfo.pbi_name);
-        }
-        // 构建可能的路径
-        char pidStr[32];
-        snprintf(pidStr, sizeof(pidStr), "%d", pid);
-        // 尝试从 /proc 读取
-        char procPath[1024];
-        snprintf(procPath, sizeof(procPath), "/proc/%s/exe", pidStr);
-        char resolvedPath[1024];
-        if (readlink(procPath, resolvedPath, sizeof(resolvedPath) - 1) > 0) {
-            strncpy(processPath, resolvedPath, pathSize - 1);
-            processPath[pathSize - 1] = '\0';
+    if (processName) {
+        int nameResult = proc_name(pid, processName, 255);
+        if (nameResult <= 0) {
+            snprintf(processName, 255, "Unknown");
         } else {
-            // 最后回退方案
-            snprintf(processPath, pathSize, "/usr/bin/unknown");
+            // 确保终止
+            processName[255] = '\0';
         }
     }
+    // 获取进程路径
+    if (processPath && pathSize > 0) {
+        int pathResult = proc_pidpath(pid, processPath, (uint32_t)MIN(pathSize, UINT32_MAX));
+        if (pathResult <= 0) {
+            // 尝试其他方法
+            struct proc_bsdinfo procInfo;
+            if (proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &procInfo, sizeof(procInfo)) > 0) {
+                if (processName) {
+                    snprintf(processName, 255, "%s", procInfo.pbi_name);
+                }
+            }
+            // 使用默认路径
+            snprintf(processPath, pathSize, "/usr/bin/unknown");
+        } else {
+            // 确保终止
+            processPath[pathSize - 1] = '\0';
+        }
+    }
+}
+
+// 主函数：根据进程路径获取窗口信息
+WindowInfo getMacWindowInfo(const char* processPath) {
+    WindowInfo info = {0};
+    if (!processPath || strlen(processPath) == 0) {
+        return info;
+    }
+    // 获取所有窗口
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(
+        kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
+        kCGNullWindowID
+    );
+    if (!windowList) {
+        return info;
+    }
+    CFIndex count = CFArrayGetCount(windowList);
+    for (CFIndex i = 0; i < count; i++) {
+        CFDictionaryRef window = CFArrayGetValueAtIndex(windowList, i);
+        // 获取进程ID
+        CFNumberRef pidRef = CFDictionaryGetValue(window, kCGWindowOwnerPID);
+        if (!pidRef) {
+            continue;
+        }
+        pid_t pid;
+        CFNumberGetValue(pidRef, kCFNumberIntType, &pid);
+        if (pid <= 0) {
+            continue;
+        }
+        // 获取该进程的完整路径
+        char currentProcessPath[1024] = {0};
+        getProcessInfo(pid, NULL, currentProcessPath, sizeof(currentProcessPath));
+        // 仅进行完整路径匹配（区分大小写）
+        if (strcmp(currentProcessPath, processPath) == 0) {
+            // 获取窗口ID
+            CFNumberRef windowIdRef = CFDictionaryGetValue(window, kCGWindowNumber);
+            if (windowIdRef) {
+                CFNumberGetValue(windowIdRef, kCFNumberIntType, &info.windowId);
+            }
+            // 获取窗口标题
+            CFStringRef titleRef = CFDictionaryGetValue(window, kCGWindowName);
+            if (titleRef) {
+                copyCFStringToCString(titleRef, info.title, sizeof(info.title));
+            }
+            // 获取窗口位置和大小
+            CFDictionaryRef boundsRef = CFDictionaryGetValue(window, kCGWindowBounds);
+            if (boundsRef) {
+                CGRect bounds;
+                if (CGRectMakeWithDictionaryRepresentation(boundsRef, &bounds)) {
+                    info.x = (int)bounds.origin.x;
+                    info.y = (int)bounds.origin.y;
+                    info.width = (int)bounds.size.width;
+                    info.height = (int)bounds.size.height;
+                }
+            }
+            // 获取窗口层级
+            CFNumberRef layerRef = CFDictionaryGetValue(window, kCGWindowLayer);
+            if (layerRef) {
+                CFNumberGetValue(layerRef, kCFNumberIntType, &info.layer);
+            }
+            // 设置进程信息
+            info.pid = pid;
+            getProcessInfo(pid, info.processName, info.processPath, sizeof(info.processPath));
+            CFRelease(windowList);
+            return info;
+        }
+    }
+    CFRelease(windowList);
+    return info;
 }
 
 // 主函数：移动窗口

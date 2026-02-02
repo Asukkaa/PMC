@@ -32,6 +32,7 @@ typedef struct {
 bool moveWindow(int pid, int x, int y);
 bool resizeWindow(int pid, int width, int height);
 WindowInfo getFocusedWindowInfo(void);
+WindowInfo getMacWindowInfo(const char* processPath);
 WindowInfo* getAllWindows(int* count);
 void freeWindowList(WindowInfo* windows);
 
