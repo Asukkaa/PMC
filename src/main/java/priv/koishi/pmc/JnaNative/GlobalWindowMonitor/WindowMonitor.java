@@ -18,14 +18,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Controller.AutoClickController;
-import priv.koishi.pmc.JnaNative.NativeInterface.CoreGraphics;
-import priv.koishi.pmc.JnaNative.NativeInterface.Foundation;
 import priv.koishi.pmc.JnaNative.NativeInterface.MacWindowManager;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +35,6 @@ import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.EXCLUDE_DESKTOP_ELEMENTS;
-import static priv.koishi.pmc.Finals.Enum.WindowListOptionEnum.ON_SCREEN_ONLY;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.dpiScale;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.hideFloatingWindow;
@@ -556,7 +550,7 @@ public class WindowMonitor {
             if (!user32.IsWindowVisible(hwnd)) {
                 return true;
             }
-            // 获取进程ID - 使用IntByReference而不是DWORDByReference
+            // 获取进程ID - 使用 IntByReference 而不是 DWORDByReference
             IntByReference pidRef = new IntByReference();
             user32.GetWindowThreadProcessId(hwnd, pidRef);
             int pid = pidRef.getValue();
@@ -635,205 +629,30 @@ public class WindowMonitor {
     }
 
     /**
-     * 通过进程 ID 获取 macOS 进程地址
-     *
-     * @param pid 进程 ID
-     * @return 进程地址
-     */
-    private static String getMacProcessPathByPid(int pid) {
-        try {
-            // 使用 ps 命令通过 PID 获取进程名称
-            Process process = Runtime.getRuntime().exec(new String[]{"ps", "-p", String.valueOf(pid), "-o", "comm="});
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-            String name = reader.readLine();
-            if (name != null && !name.trim().isEmpty()) {
-                return name.trim();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
-    /**
-     * 创建 CFString 对象
-     *
-     * @param str 要创建的 CFString 键
-     * @return CFString 对象
-     */
-    private static Pointer createCFString(String str) {
-        Foundation foundation = Foundation.INSTANCE;
-        return foundation.CFStringCreateWithCString(Pointer.NULL, str, 0x08000100);
-    }
-
-    /**
-     * 获取 Mac 聚焦窗口信息
+     * 获取 macOS 聚焦窗口信息
      *
      * @return 窗口信息
      */
     public WindowInfo getMacFocusWindowInfo() {
         MacNativeWindowInfo.ByValue nativeWindowInfo = MacWindowManager.INSTANCE.getFocusedWindowInfo();
+        if (nativeWindowInfo == null) {
+            return null;
+        }
         return nativeWindowInfo.toWindowInfo();
     }
 
     /**
-     * 根据 mac 进程路径获取主窗口信息
+     * 根据 macOS 进程路径获取主窗口信息
      *
      * @param appPath app 进程路径
      * @return 窗口信息，如果没有找到则返回 null
      */
     public static WindowInfo getMainMacWindowInfo(String appPath) {
-        List<WindowInfo> windows = getMacWindowInfos(appPath);
-        return windows.isEmpty() ? null : windows.getFirst();
-    }
-
-    /**
-     * 使用 Core Graphics API 根据应用程序 Bundle 路径获取窗口信息
-     *
-     * @param appPath 应用程序 Bundle 路径（ .app 结尾）
-     * @return 窗口信息列表
-     */
-    public static List<WindowInfo> getMacWindowInfos(String appPath) {
-        List<WindowInfo> result = new ArrayList<>();
-        try {
-            CoreGraphics cg = CoreGraphics.INSTANCE;
-            Pointer windowArray = cg.CGWindowListCopyWindowInfo(
-                    ON_SCREEN_ONLY.getValue() | EXCLUDE_DESKTOP_ELEMENTS.getValue(),
-                    0);
-            if (windowArray != null) {
-                try {
-                    int count = cg.CFArrayGetCount(windowArray);
-                    // 创建必要的 CFString 键
-                    Pointer kCGWindowName = createCFString("kCGWindowName");
-                    Pointer kCGWindowOwnerName = createCFString("kCGWindowOwnerName");
-                    Pointer kCGWindowOwnerPID = createCFString("kCGWindowOwnerPID");
-                    Pointer kCGWindowBounds = createCFString("kCGWindowBounds");
-                    Pointer kCGWindowLayer = createCFString("kCGWindowLayer");
-                    Pointer kCGWindowNumber = createCFString("kCGWindowNumber");
-                    // 定义 Core Foundation 类型常量
-                    final int kCFNumberIntType = 9;
-                    final int kCFNumberDoubleType = 13;
-                    for (int i = 0; i < count; i++) {
-                        Pointer windowInfo = cg.CFArrayGetValueAtIndex(windowArray, i);
-                        // 获取进程 ID
-                        Pointer pidValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerPID);
-                        int pid = 0;
-                        if (pidValue != null) {
-                            int[] pidArr = new int[1];
-                            if (cg.CFNumberGetValue(pidValue, kCFNumberIntType, pidArr)) {
-                                pid = pidArr[0];
-                            }
-                        }
-                        // 根据 PID 获取进程路径
-                        String process = getMacProcessPathByPid(pid);
-                        // 检查进程路径是否匹配
-                        if (process != null && process.startsWith(appPath)) {
-                            // 获取窗口 ID
-                            Pointer windowIdValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowNumber);
-                            long windowId = 0;
-                            if (windowIdValue != null) {
-                                int[] idArr = new int[1];
-                                if (cg.CFNumberGetValue(windowIdValue, kCFNumberIntType, idArr)) {
-                                    windowId = idArr[0];
-                                }
-                            }
-                            // 获取窗口边界
-                            Pointer boundsValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowBounds);
-                            if (boundsValue != null) {
-                                Pointer xKey = createCFString("X");
-                                Pointer yKey = createCFString("Y");
-                                Pointer widthKey = createCFString("Width");
-                                Pointer heightKey = createCFString("Height");
-                                Pointer xValue = cg.CFDictionaryGetValue(boundsValue, xKey);
-                                Pointer yValue = cg.CFDictionaryGetValue(boundsValue, yKey);
-                                Pointer widthValue = cg.CFDictionaryGetValue(boundsValue, widthKey);
-                                Pointer heightValue = cg.CFDictionaryGetValue(boundsValue, heightKey);
-                                // 立即释放临时键
-                                cg.CFRelease(xKey);
-                                cg.CFRelease(yKey);
-                                cg.CFRelease(widthKey);
-                                cg.CFRelease(heightKey);
-                                if (xValue != null && yValue != null && widthValue != null && heightValue != null) {
-                                    double[] xArr = new double[1];
-                                    double[] yArr = new double[1];
-                                    double[] widthArr = new double[1];
-                                    double[] heightArr = new double[1];
-                                    if (cg.CFNumberGetValue(xValue, kCFNumberDoubleType, xArr) &&
-                                            cg.CFNumberGetValue(yValue, kCFNumberDoubleType, yArr) &&
-                                            cg.CFNumberGetValue(widthValue, kCFNumberDoubleType, widthArr) &&
-                                            cg.CFNumberGetValue(heightValue, kCFNumberDoubleType, heightArr)) {
-                                        int x = (int) Math.round(xArr[0]);
-                                        int y = (int) Math.round(yArr[0]);
-                                        int width = (int) Math.round(widthArr[0]);
-                                        int height = (int) Math.round(heightArr[0]);
-                                        // 获取窗口标题
-                                        Pointer titleValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowName);
-                                        String title = "";
-                                        if (titleValue != null) {
-                                            title = cg.CFStringGetCStringPtr(titleValue, 0x08000100);
-                                        }
-                                        if (title == null) {
-                                            title = "";
-                                        }
-                                        // 获取应用程序名称
-                                        Pointer ownerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowOwnerName);
-                                        String processName = "";
-                                        String processPath = "";
-                                        if (ownerValue != null) {
-                                            processName = cg.CFStringGetCStringPtr(ownerValue, 0x08000100);
-                                        }
-                                        if (StringUtils.isBlank(processName)) {
-                                            processName = process.substring(process.lastIndexOf(File.separator) + 1);
-                                        }
-                                        if (process.contains(app)) {
-                                            processPath = process.substring(0, process.lastIndexOf(app) + app.length());
-                                        }
-                                        // 获取窗口层级
-                                        Pointer layerValue = cg.CFDictionaryGetValue(windowInfo, kCGWindowLayer);
-                                        int layer = -1;
-                                        if (layerValue != null) {
-                                            int[] layerArr = new int[1];
-                                            if (cg.CFNumberGetValue(layerValue, kCFNumberIntType, layerArr)) {
-                                                layer = layerArr[0];
-                                            }
-                                        }
-                                        if (width > 0 && height > 0 && layer >= 0 && layer <= 100 &&
-                                                !macSysNoWindowPath.contains(processPath) &&
-                                                StringUtils.isNotBlank(processPath)) {
-                                            WindowInfo windowInfoObj = new WindowInfo()
-                                                    .setProcessName(processName)
-                                                    .setProcessPath(processPath)
-                                                    .setHeight(height)
-                                                    .setWidth(width)
-                                                    .setTitle(title)
-                                                    .setWindowId(windowId)
-                                                    .setLayer(layer)
-                                                    .setPid(pid)
-                                                    .setX(x)
-                                                    .setY(y);
-                                            result.add(windowInfoObj);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // 释放 CFString 对象
-                    cg.CFRelease(kCGWindowName);
-                    cg.CFRelease(kCGWindowOwnerName);
-                    cg.CFRelease(kCGWindowOwnerPID);
-                    cg.CFRelease(kCGWindowBounds);
-                    cg.CFRelease(kCGWindowLayer);
-                    cg.CFRelease(kCGWindowNumber);
-                } finally {
-                    cg.CFRelease(windowArray);
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        MacNativeWindowInfo.ByValue nativeWindowInfo = MacWindowManager.INSTANCE.getMacWindowInfo(appPath);
+        if (nativeWindowInfo == null) {
+            return null;
         }
-        return result;
+        return nativeWindowInfo.toWindowInfo();
     }
 
 }

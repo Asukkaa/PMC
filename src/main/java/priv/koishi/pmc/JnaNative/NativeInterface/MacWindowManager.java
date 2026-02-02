@@ -2,8 +2,6 @@ package priv.koishi.pmc.JnaNative.NativeInterface;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.ptr.IntByReference;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.MacNativeWindowInfo;
 
 import static priv.koishi.pmc.Utils.FileUtils.getDylibPath;
@@ -50,17 +48,11 @@ public interface MacWindowManager extends Library {
     MacNativeWindowInfo.ByValue getFocusedWindowInfo();
 
     /**
-     * 获取所有窗口
+     * 根据进程路径获取窗口信息
      *
-     * @param count 用于接收窗口数量的输出参数
+     * @param processPath 进程路径
+     * @return 窗口信息
      */
-    Pointer getAllWindows(IntByReference count);
-
-    /**
-     * 释放内存
-     *
-     * @param windows 需要释放的窗口指针
-     */
-    void freeWindowList(Pointer windows);
+    MacNativeWindowInfo.ByValue getMacWindowInfo(String processPath);
 
 }
