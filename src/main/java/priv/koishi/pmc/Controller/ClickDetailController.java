@@ -1578,7 +1578,8 @@ public class ClickDetailController extends RootController {
                 startY = String.valueOf(setDefaultIntValue(windowY_Det, 0, 0, screenHeight));
                 String ignoreFailure = ignoreFailure_Det.isSelected() ? activation : unActivation;
                 clickWindowMonitor.updateWindowInfo();
-                clickFloatingConfig.setWindowInfo(clickWindowMonitor.getWindowInfo());
+                clickFloatingConfig.setWindowInfo(clickWindowMonitor.getWindowInfo())
+                        .setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
                 selectedItem.setClickWindowConfig(clickFloatingConfig)
                         .setIgnoreFailure(ignoreFailure);
             }
