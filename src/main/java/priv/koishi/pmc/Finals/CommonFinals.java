@@ -457,16 +457,6 @@ public class CommonFinals {
     public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
 
     /**
-     * macOS 要排除窗口识别的进程地址
-     */
-    public static final List<String> macSysNoWindowPath = Arrays.asList(
-            "/System/Library/CoreServices/Spotlight.app",
-            "/System/Library/CoreServices/ControlCenter.app",
-            "/System/Library/CoreServices/SystemUIServer.app",
-            "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
-    );
-
-    /**
      * 更新服务阿里云 uniCloud 地址
      */
     public static final String uniCloudCheckUpdateURL_aliyun = "https://fc-mp-f42cc448-2bf2-4edf-9bb8-8f060ec60dd6.next.bspapp.com/PMCUpdate";
