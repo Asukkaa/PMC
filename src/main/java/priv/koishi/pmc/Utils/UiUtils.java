@@ -983,10 +983,11 @@ public class UiUtils {
                     }
                     // 改变要防重复点击的组件状态
                     changeDisableNodes(disableNodes, true);
-                    showFloatingWindow(windowInfoFloating);
-                    if (windowRelativeInfoFloating != null) {
-                        showFloatingWindow(windowRelativeInfoFloating);
-                    }
+                    showFloatingWindow(windowInfoFloating, () -> {
+                        if (windowRelativeInfoFloating != null) {
+                            showFloatingWindow(windowRelativeInfoFloating);
+                        }
+                    });
                     windowMonitor.startNativeKeyListener();
                 }
             } else {

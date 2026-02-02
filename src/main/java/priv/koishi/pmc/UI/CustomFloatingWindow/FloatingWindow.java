@@ -99,13 +99,13 @@ public class FloatingWindow {
         floatingPosition.setTextFill(color);
         floatingPosition.setStyle(fontSize);
         floatingPosition.setTextAlignment(textAlignment);
-        floatingPosition.setMaxWidth(270);
+//        floatingPosition.setMaxWidth(270);
         config.setFloatingPosition(floatingPosition);
         Label messageLabel = new Label(config.getMessage());
         messageLabel.setTextFill(color);
         messageLabel.setStyle(fontSize);
         messageLabel.setTextAlignment(textAlignment);
-        messageLabel.setMaxWidth(270);
+//        messageLabel.setMaxWidth(270);
         String name = config.getName();
         config.setMessageLabel(messageLabel);
         Label nameLabel = new Label();
@@ -113,7 +113,7 @@ public class FloatingWindow {
         nameLabel.setStyle(fontSize);
         nameLabel.setTextFill(color);
         nameLabel.setTextAlignment(textAlignment);
-        nameLabel.setMaxWidth(270);
+//        nameLabel.setMaxWidth(270);
         config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.setAlignment(config.getPos());
@@ -640,6 +640,15 @@ public class FloatingWindow {
      * @param config 浮窗配置
      */
     public static void showFloatingWindow(FloatingWindowDescriptor config) {
+        showFloatingWindow(config, null);
+    }
+
+    /**
+     * 显示浮窗
+     *
+     * @param config 浮窗配置
+     */
+    public static void showFloatingWindow(FloatingWindowDescriptor config, Runnable onShownCallback) {
         Platform.runLater(() -> {
             if (cancelKey == noKeyboard) {
                 throw new RuntimeException(text_noCancelKey());
@@ -653,14 +662,6 @@ public class FloatingWindow {
             int h = windowConfig.getHeight();
             // 改变要防重复点击的组件状态
             changeDisableNodes(config.getDisableNodes(), true);
-            rectangle.setX(x);
-            rectangle.setY(y);
-            rectangle.setWidth(w);
-            rectangle.setHeight(h);
-            floatingStage.setX(x);
-            floatingStage.setY(y);
-            floatingStage.setWidth(w);
-            floatingStage.setHeight(h);
             config.getMessageLabel().setText(config.getMessage());
             setPositionText(config, "");
             Button button = config.getButton();
@@ -670,6 +671,14 @@ public class FloatingWindow {
             }
             config.getNameeLabel().setVisible(config.isShowName());
             floatingStage.show();
+            rectangle.setX(x);
+            rectangle.setY(y);
+            rectangle.setWidth(w);
+            rectangle.setHeight(h);
+            floatingStage.setX(x);
+            floatingStage.setY(y);
+            floatingStage.setWidth(w);
+            floatingStage.setHeight(h);
             setSameLabelWidth(config);
             // 模拟一次窗口拖拽来校验位置
             if (config.isShowRelativeInfo()) {
@@ -679,6 +688,9 @@ public class FloatingWindow {
             if (config.isAddCloseKey()) {
                 startNativeKeyListener();
                 floatingWindows.add(config);
+            }
+            if (onShownCallback != null) {
+                onShownCallback.run();
             }
         });
     }
