@@ -204,6 +204,7 @@ public class WindowMonitor {
                 infoLabel.setTextFill(Color.CORNFLOWERBLUE);
                 infoLabel.setText(windowInfo.getProcessName());
                 String info = findImgSet_PName() + windowInfo.getProcessName() + "\n" +
+                        findImgSet_PID() + windowInfo.getPid() + "\n" +
                         findImgSet_windowPath() + processPath + "\n" +
                         findImgSet_windowTitle() + windowInfo.getTitle() + "\n" +
                         findImgSet_windowLocation() + " X: " + windowInfo.getX() + " Y: " + windowInfo.getY() + "\n" +
