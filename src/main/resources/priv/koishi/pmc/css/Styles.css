@@ -161,3 +161,10 @@
     -fx-alignment: CENTER;
     -fx-content-display: CENTER;
 }
+
+.table-row-cell {
+    -fx-cell-size: 35px;
+    -fx-pref-height: 35px;
+    -fx-min-height: 35px;
+    -fx-max-height: 35px;
+}

@@ -570,7 +570,7 @@ public class MainApplication extends Application {
                 Locale locale = languageMap.getKey(prop.getProperty(key_language));
                 Locale.setDefault(locale);
                 bundle = ResourceBundle.getBundle(languagePath, locale);
-                // 处理非zh_TW的繁体中文
+                // 处理非 zh_TW 的繁体中文
             } else if (Locale.getDefault().getDisplayName().contains("繁體")) {
                 Locale.setDefault(Locale.TRADITIONAL_CHINESE);
                 bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
