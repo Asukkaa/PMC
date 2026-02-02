@@ -598,35 +598,22 @@ public class AutoClickService {
                     if (clickType == ClickTypeEnum.OPEN_URL.ordinal() ||
                             clickType == ClickTypeEnum.OPEN_FILE.ordinal() ||
                             clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
-                        if (openLinkPath(text, clickPositionVO)) {
+                        text += text_taskInfo() + clickPositionVO.getClickType();
+                        updateFloatingMessage(text);
+                        if (wait(clickPositionVO)) {
                             break;
                         }
+                        openLink(clickPositionVO, taskBean);
                         currentStep++;
                         continue;
                     } else if (clickType == ClickTypeEnum.MOVE_WINDOW.ordinal()) {
                         if (clickWindowConfig != null) {
-                            WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
-                            boolean moved = moveWindow(windowInfo, startX, startY);
-                            ClickLogBean logBean = new ClickLogBean();
-                            logBean.setClickKey(mouseButton_none())
-                                    .setX(String.valueOf(startX))
-                                    .setY(String.valueOf(startY))
-                                    .setType(log_moveWindow())
-                                    .setName(name);
-                            if (moved) {
-                                if (taskBean.isMoveWindowLog()) {
-                                    logBean.setResult(log_success());
-                                    clickLog.add(logBean);
-                                }
-                            } else {
-                                if (taskBean.isMoveWindowLog()) {
-                                    logBean.setResult(log_fail());
-                                    clickLog.add(logBean);
-                                }
-                                if (unActivation.equals(clickPositionVO.getIgnoreFailure())) {
-                                    throw new RuntimeException(log_moveWindow() + log_fail());
-                                }
+                            text += text_point() + " X：" + startX + " Y：" + startY;
+                            updateFloatingMessage(text);
+                            if (wait(clickPositionVO)) {
+                                break;
                             }
+                            windowMove(clickPositionVO, taskBean);
                             currentStep++;
                             continue;
                         }
@@ -671,27 +658,8 @@ public class AutoClickService {
                     }
                     // 更新操作信息
                     updateFloatingMessage(text);
-                    long wait = Long.parseLong(waitTime);
-                    // 处理随机等待时间偏移
-                    if (activation.equals(clickPositionVO.getRandomWaitTime())) {
-                        int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
-                        wait = (long) Math.max(0, wait + (random.nextDouble() * 2 - 1) * randomTime);
-                    }
-                    // 执行前等待时间
-                    try {
-                        Thread.sleep(wait);
-                    } catch (InterruptedException e) {
-                        if (isCancelled()) {
-                            break;
-                        }
-                    }
-                    if (taskBean.isWaitLog()) {
-                        ClickLogBean waitLog = new ClickLogBean();
-                        waitLog.setClickTime(String.valueOf(wait))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_wait())
-                                .setName(name);
-                        clickLog.add(waitLog);
+                    if (wait(clickPositionVO)) {
+                        break;
                     }
                     // 执行自动流程
                     ClickResultBean clickResultBean = click(clickPositionVO, robot, loopTimeText, taskBean);
@@ -715,23 +683,18 @@ public class AutoClickService {
             }
 
             /**
-             * 处理要链接相关操作
+             * 处理执行前等待
              *
-             * @param text 提示信息
-             * @param clickPositionVO 自动操作设置信息
-             *
-             * @throws Exception 链接操作异常
+             * @param clickPositionVO 自动操作参数
              */
-            private boolean openLinkPath(String text, ClickPositionVO clickPositionVO) throws Exception {
-                String waitTime = clickPositionVO.getWaitTime();
-                String name = clickPositionVO.getName();
-                text += text_taskInfo() + clickPositionVO.getClickType();
-                updateFloatingMessage(text);
-                long wait = Long.parseLong(waitTime);
+            private boolean wait(ClickPositionVO clickPositionVO) {
+                long wait = Long.parseLong(clickPositionVO.getWaitTime());
+                // 处理随机等待时间偏移
                 if (activation.equals(clickPositionVO.getRandomWaitTime())) {
                     int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
                     wait = (long) Math.max(0, wait + (random.nextDouble() * 2 - 1) * randomTime);
                 }
+                // 执行前等待时间
                 try {
                     Thread.sleep(wait);
                 } catch (InterruptedException e) {
@@ -741,16 +704,48 @@ public class AutoClickService {
                 }
                 if (taskBean.isWaitLog()) {
                     ClickLogBean waitLog = new ClickLogBean();
-                    waitLog.setClickTime(String.valueOf(wait))
+                    waitLog.setName(clickPositionVO.getName())
+                            .setClickTime(String.valueOf(wait))
                             .setClickKey(mouseButton_none())
-                            .setType(log_wait())
-                            .setName(name);
+                            .setType(log_wait());
                     clickLog.add(waitLog);
                 }
-                openLink(clickPositionVO, taskBean);
                 return false;
             }
         };
+    }
+
+    /**
+     * 执行移动窗口
+     *
+     * @param clickPositionVO 自动操作参数
+     * @param taskBean        任务参数
+     */
+    private static void windowMove(ClickPositionVO clickPositionVO, AutoClickTaskBean taskBean) {
+        int startX = Integer.parseInt((clickPositionVO.getStartX()));
+        int startY = Integer.parseInt((clickPositionVO.getStartY()));
+        WindowInfo windowInfo = clickPositionVO.getClickWindowConfig().getWindowInfo();
+        boolean moved = moveWindow(windowInfo, startX, startY);
+        ClickLogBean logBean = new ClickLogBean();
+        logBean.setClickKey(mouseButton_none())
+                .setX(String.valueOf(startX))
+                .setY(String.valueOf(startY))
+                .setType(log_moveWindow())
+                .setName(clickPositionVO.getName());
+        if (moved) {
+            if (taskBean.isMoveWindowLog()) {
+                logBean.setResult(log_success());
+                clickLog.add(logBean);
+            }
+        } else {
+            if (taskBean.isMoveWindowLog()) {
+                logBean.setResult(log_fail());
+                clickLog.add(logBean);
+            }
+            if (unActivation.equals(clickPositionVO.getIgnoreFailure())) {
+                throw new RuntimeException(log_moveWindow() + log_fail());
+            }
+        }
     }
 
     /**
