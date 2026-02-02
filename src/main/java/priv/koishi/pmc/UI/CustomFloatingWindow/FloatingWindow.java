@@ -99,13 +99,11 @@ public class FloatingWindow {
         floatingPosition.setTextFill(color);
         floatingPosition.setStyle(fontSize);
         floatingPosition.setTextAlignment(textAlignment);
-//        floatingPosition.setMaxWidth(270);
         config.setFloatingPosition(floatingPosition);
         Label messageLabel = new Label(config.getMessage());
         messageLabel.setTextFill(color);
         messageLabel.setStyle(fontSize);
         messageLabel.setTextAlignment(textAlignment);
-//        messageLabel.setMaxWidth(270);
         String name = config.getName();
         config.setMessageLabel(messageLabel);
         Label nameLabel = new Label();
@@ -113,7 +111,6 @@ public class FloatingWindow {
         nameLabel.setStyle(fontSize);
         nameLabel.setTextFill(color);
         nameLabel.setTextAlignment(textAlignment);
-//        nameLabel.setMaxWidth(270);
         config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.setAlignment(config.getPos());
