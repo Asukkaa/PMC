@@ -17,7 +17,15 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.checkScreenCapture
 public class MacChecker {
 
     /**
+     * 检测自动化权限开关（true 需要检查）
+     * 预留功能，后续需要检测权限时移除这个字段
+     */
+    public static boolean needCheckAutomationPermission;
+
+    /**
      * 检查 macOS 屏幕录制权限方法
+     *
+     * @return 拥有权限或非 macOS true
      */
     public static boolean hasScreenCapturePermission() {
         // 非 macOS 系统直接返回 true
@@ -50,6 +58,9 @@ public class MacChecker {
     public static boolean hasAutomationPermission() {
         // 非 macOS 系统直接返回 true
         if (!isMac) {
+            return true;
+        }
+        if (!needCheckAutomationPermission) {
             return true;
         }
         try {
