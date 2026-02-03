@@ -20,7 +20,11 @@
 
 本项目图像识别功能基于 JavaCV 实现的，可在自动操作流程中设置要识别的图片和终止操作图片。
 
-自动流程文件为 .pmc 文件，本质为 json 文件，更改文件拓展名只为方便过滤可导入的文件。
+自动流程文件为 .pmc 与 .pmcs 文件，本质为 json 文件，更改文件拓展名只为方便过滤可导入的文件。
+
+.pmc 文件为包含操作流程步骤信息的文件，可直接解析并执行。
+
+.pmcs 文件为多个 .pmc 文件的集合设置文件，用于批量执行 .pmc 文件，只记录了文件信息，不包含具体操作流程，需与 .pmc 文件配合使用。
 
 本项目打包工具为 maven javafx:jlink 插件 + jpackage ，使用 jdk 版本为 Amazon Corretto 25 。
 
@@ -39,7 +43,7 @@
 在 maven 依赖都下载完毕后需要对 jna-5.18.1.jar 、 jna-platform-5.18.1.jar
 这几个不支持模块化的包进行模块化注入，具体方法可参考： https://blog.csdn.net/weixin_44167999/article/details/135753822
 
-由于 jna-platform 依赖 jna
+由于 jna-platform 依赖 Jna
 ，需要手动处理，具体方法较复杂，建议直接使用项目中提供的 [module-info.class](appBuilder/module-info.class) ，
 将 [module-info.class](appBuilder/module-info.class) 使用任意支持向压缩包中添加文件的解压工具添加即可。
 
@@ -75,9 +79,18 @@ macOS [x86_64](appBuilder/mac) 版本全部整理完毕， [arm](appBuilder/mac_
 macOS 依赖文件中的 [libopenblas_nolapack.0.dylib](appBuilder/mac/libopenblas_nolapack.0.dylib.zip)
 因文件太大所以进行了压缩，打包时需要在对应目录放入解压后的文件。
 
+因为需要获取其他进程的窗口信息并进行移动，本项目使用 Jna 调用操作系统 api 获取相关信息， 在 win 系统下直接可以调用操作系统
+api， 但在 macOS 下则需要使用更底层的语言去调用相关 api，本项目使用 Jna 调用 C 语言编写的 dylib 文件实现相关功能。
+
+C 语言编写的 Native 代码在 [NativeCode](NativeCode) 这个目录下的 [MacWindowManager](NativeCode/MacWindowManager) 目录中，
+其中 [MacWindowManager.xcodeproj](NativeCode/MacWindowManager/MacWindowManager.xcodeproj) 文件是 Xcode 项目文件，
+[MacWindowManager.c](NativeCode/MacWindowManager/MacWindowManager.c)
+和 [MacWindowManager.h](NativeCode/MacWindowManager/MacWindowManager.h) 文件是 C 语言编写的源码文件，需要使用 Xcode 编译为
+.dylib 文件才可使用，编译后的文件为 [libMacWindowManager.dylib](appBuilder/mac/libMacWindowManager.dylib) 。
+
 需要注意 macOS 可能只能在应用程序文件夹下运行，且需要开启辅助操作权限。如果开启辅助操作权限仍然无法启动程序，需要将 Perfect
 Mouse Control.app 从辅助操作权限列表中移除后再重新添加并开启。
-图像识别功能的权限检测使用 jna 实现，不同版本的 macOS
+图像识别功能的权限检测使用 Jna 实现，不同版本的 macOS
 可能鉴权方式不太一样，如果遇到开启权限仍然无法使用相关功能可将该部分代码去掉后自己实现，申请权限方式与辅助控制相似，只不过权限为录屏与系统录音权限。
 
 如果打包后 macOS 的文件选择器 ui 为英文则需修改 Info.plist 将 CFBundleDevelopmentRegion 属性的值改为 zh_CN 。
@@ -98,8 +111,7 @@ jvm 参数。
 
 # macOS 应用签名
 
-因为项目中需要使用 AppleScript 获取焦点窗口信息，所以需要自动化权限，否则执行脚本命令时将会报错 53:102: execution error:
-未获得授权将Apple事件发送给System Events。 (-1743)
+在 macOS 中如果应用不签名则无法在其他电脑上安装，使用自签名需要手动去信任应用，否则无法运行。
 
 应用签名则需要使用证书，所以需要在钥匙串中创建一个用来代码签名的证书，签名后才会弹出自动化权限申请的系统对话框，后续才能在
 系统设置-意识与安全性-自动化 中找到这个应用的权限开关。
