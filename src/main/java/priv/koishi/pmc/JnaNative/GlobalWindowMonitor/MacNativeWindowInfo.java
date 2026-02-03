@@ -8,6 +8,7 @@ import java.util.List;
 import static priv.koishi.pmc.Finals.CommonFinals.app;
 
 /**
+ * macOS Native 窗口信息类
  *
  * @author applesaucepenguin
  * Date 2026-01-30
@@ -65,6 +66,11 @@ public class MacNativeWindowInfo extends Structure {
      */
     public byte[] processPath = new byte[1024];
 
+    /**
+     * 获取字段顺序列表，定义了结构体中各个字段的排列顺序
+     *
+     * @return 包含字段名称的有序列表
+     */
     @Override
     protected List<String> getFieldOrder() {
         return Arrays.asList(
@@ -81,8 +87,16 @@ public class MacNativeWindowInfo extends Structure {
         );
     }
 
+    /**
+     * 内部类，用于表示结构体的值
+     */
     public static class ByValue extends MacNativeWindowInfo implements Structure.ByValue {
 
+        /**
+         * 获取字段顺序列表，继承父类的字段顺序定义
+         *
+         * @return 父类定义的字段顺序列表
+         */
         @Override
         protected List<String> getFieldOrder() {
             return super.getFieldOrder();
@@ -114,6 +128,8 @@ public class MacNativeWindowInfo extends Structure {
 
     /**
      * 从字符串获取标题（处理字节数组）
+     *
+     * @return 标题字符串
      */
     public String getTitleString() {
         return getNullTerminatedString(title);
@@ -121,6 +137,8 @@ public class MacNativeWindowInfo extends Structure {
 
     /**
      * 获取进程名称字符串
+     *
+     * @return 进程名称字符串
      */
     public String getProcessNameString() {
         return getNullTerminatedString(processName);
@@ -128,6 +146,8 @@ public class MacNativeWindowInfo extends Structure {
 
     /**
      * 获取进程路径字符串
+     *
+     * @return 进程路径字符串
      */
     public String getProcessPathString() {
         String path = getNullTerminatedString(processPath);
