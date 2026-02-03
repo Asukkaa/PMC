@@ -16,7 +16,13 @@
 #include <pwd.h>
 #include <stdint.h>
 
-// 工具函数：从 CFString 复制到 C 字符串
+/**
+ * @brief 将CFString复制到C字符串
+ *
+ * @param cfStr 源CFString字符串
+ * @param buffer 目标C字符串缓冲区
+ * @param bufferSize 缓冲区大小
+ */
 static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t bufferSize) {
     if (!cfStr || !buffer || bufferSize == 0) {
         buffer[0] = '\0';
@@ -33,7 +39,14 @@ static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t buffer
     }
 }
 
-// 工具函数：获取进程名称和路径
+/**
+ * @brief 获取进程信息（名称和路径）
+ *
+ * @param pid 进程ID
+ * @param[out] processName 进程名称缓冲区（可选，可为NULL）
+ * @param[out] processPath 进程路径缓冲区（可选，可为NULL）
+ * @param pathSize 进程路径缓冲区大小
+ */
 static void getProcessInfo(pid_t pid, char* processName, char* processPath, size_t pathSize) {
     // 初始化字符串
     if (processName) {
@@ -79,7 +92,16 @@ static void getProcessInfo(pid_t pid, char* processName, char* processPath, size
     }
 }
 
-// 主函数：根据进程路径获取窗口信息
+/**
+ * @brief 根据进程路径获取窗口信息
+ *
+ * 支持两种路径格式：
+ * 1. 应用程序路径（以.app结尾）：匹配包含该路径的进程
+ * 2. 可执行文件路径：精确匹配进程路径
+ *
+ * @param processPath 进程路径或应用程序路径
+ * @return WindowInfo 窗口信息结构体，如果未找到则所有字段为0
+ */
 WindowInfo getMacWindowInfo(const char* processPath) {
     WindowInfo info = {0};
     if (!processPath || strlen(processPath) == 0) {
@@ -170,7 +192,18 @@ WindowInfo getMacWindowInfo(const char* processPath) {
     return info;
 }
 
-// 主函数：移动窗口
+/**
+ * @brief 移动指定进程的窗口到新位置
+ *
+ * 使用 macOS Accessibility API 移动窗口。
+ * 注意：应用需要获取辅助功能权限才能调用此函数。
+ *
+ * @param pid 目标进程ID
+ * @param x 新位置的X坐标（屏幕坐标）
+ * @param y 新位置的Y坐标（屏幕坐标）
+ * @return true 移动成功
+ * @return false 移动失败（进程不存在、窗口不存在或权限不足）
+ */
 bool moveWindow(int pid, int x, int y) {
     bool success = false;
     AXUIElementRef appElement = NULL;
@@ -208,7 +241,18 @@ cleanup:
     return success;
 }
 
-// 主函数：调整窗口大小
+/**
+ * @brief 调整指定进程的窗口大小
+ *
+ * 使用 macOS Accessibility API 调整窗口大小。
+ * 注意：应用需要获取辅助功能权限才能调用此函数。
+ *
+ * @param pid 目标进程ID
+ * @param width 新宽度（像素）
+ * @param height 新高度（像素）
+ * @return true 调整成功
+ * @return false 调整失败（进程不存在、窗口不存在或权限不足）
+ */
 bool resizeWindow(int pid, int width, int height) {
     bool success = false;
     AXUIElementRef appElement = NULL;
@@ -242,7 +286,14 @@ cleanup:
     return success;
 }
 
-// 主函数：获取焦点窗口信息
+/**
+ * @brief 获取当前获得焦点的窗口信息
+ *
+ * 优先返回层级为 0（普通应用窗口）的窗口信息。
+ * 如果没有找到焦点窗口，返回第一个非桌面元素的窗口信息。
+ *
+ * @return WindowInfo 窗口信息结构体，如果失败则所有字段为0
+ */
 WindowInfo getFocusedWindowInfo(void) {
     WindowInfo info = {0};
     // 获取所有窗口
@@ -299,7 +350,6 @@ WindowInfo getFocusedWindowInfo(void) {
             }
         }
     }
-    
     // 如果没有找到层级为0的窗口，使用第一个窗口
     if (info.pid == 0 && count > 0) {
         CFDictionaryRef firstWindow = CFArrayGetValueAtIndex(windowList, 0);
@@ -339,7 +389,15 @@ WindowInfo getFocusedWindowInfo(void) {
     return info;
 }
 
-// 主函数：获取所有窗口
+/**
+ * @brief 获取所有可见窗口的信息
+ *
+ * 不包括桌面元素（如桌面图标、Dock 等）。
+ * 返回的数组需要调用 freeWindowList() 释放内存。
+ *
+ * @param[out] count 窗口数量
+ * @return WindowInfo* 窗口信息数组指针，失败返回 NULL
+ */
 WindowInfo* getAllWindows(int* count) {
     *count = 0;
     // 获取所有窗口
@@ -405,7 +463,11 @@ WindowInfo* getAllWindows(int* count) {
     return windows;
 }
 
-// 主函数：释放窗口列表
+/**
+ * @brief 释放getAllWindows分配的窗口列表内存
+ *
+ * @param windows 由getAllWindows返回的窗口数组指针
+ */
 void freeWindowList(WindowInfo* windows) {
     if (windows) {
         free(windows);
