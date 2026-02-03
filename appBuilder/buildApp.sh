@@ -18,6 +18,8 @@ appMainClass="priv.koishi.pmc/priv.koishi.pmc.MainApplication"
 runtimeImage="app"
 language="zh_CN"
 entitlements_file="$script_dir/entitlements.plist"
+# 应用签名开关 true 启用签名，false 跳过签名
+ENABLE_SIGNING=false
 
 # 关闭正在运行的程序
 echo "强制关闭正在运行的 $appName..."
@@ -90,25 +92,29 @@ else
 fi
 
 # 代码签名部分
-echo "正在对应用进行代码签名..."
-if codesign --deep --force --verbose --sign "PMC" --entitlements "$entitlements_file" "$appFullPath"; then
-    echo "应用签名成功"
+if [ "$ENABLE_SIGNING" = true ]; then
+    echo "签名开关已启用，正在对应用进行代码签名..."
+    if codesign --deep --force --verbose --sign "PMC" --entitlements "$entitlements_file" "$appFullPath"; then
+        echo "应用签名成功"
 
-    # 验证签名
-    echo "正在验证签名..."
-    if codesign --verify --verbose "$appFullPath"; then
-        echo "签名验证通过"
+        # 验证签名
+        echo "正在验证签名..."
+        if codesign --verify --verbose "$appFullPath"; then
+            echo "签名验证通过"
+        else
+            echo "签名验证警告，但应用仍可运行"
+        fi
     else
-        echo "签名验证警告，但应用仍可运行"
+        echo "应用签名失败，尝试使用临时签名..."
+        # 备用方案：使用临时签名
+        if codesign --deep --force --verbose --sign - "$appFullPath"; then
+            echo "临时签名成功"
+        else
+            echo "签名完全失败，继续打包流程..."
+        fi
     fi
 else
-    echo "应用签名失败，尝试使用临时签名..."
-    # 备用方案：使用临时签名
-    if codesign --deep --force --verbose --sign - "$appFullPath"; then
-        echo "临时签名成功"
-    else
-        echo "签名完全失败，继续打包流程..."
-    fi
+    echo "签名开关已禁用，跳过代码签名步骤"
 fi
 
 appZipFile="$target/${appName}-${appVersion}-mac.zip"
