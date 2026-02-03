@@ -1841,27 +1841,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 无法获取当前焦点应用 PID:
-     */
-    public static String text_getPidErr() {
-        return bundle.getString("getPidErr");
-    }
-
-    /**
-     * @return 获取 Mac 焦点窗口信息失败
-     */
-    public static String text_getMacFocusErr() {
-        return bundle.getString("getMacFocusErr");
-    }
-
-    /**
-     * @return 无法获取焦点应用路径
-     */
-    public static String text_geFocusPathErr() {
-        return bundle.getString("geFocusPathErr");
-    }
-
-    /**
      * @return 无法获取窗口信息，窗口可能已经关闭
      */
     public static String text_noWindowInfo() {
