@@ -10,58 +10,76 @@
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">
                 <HBox spacing="5">
+                    <!--任务名称：-->
                     <Label text="%taskDetail.taskNameField"/>
                     <TextField fx:id="taskNameField_TD" prefWidth="200"/>
                 </HBox>
 
                 <HBox spacing="5">
+                    <!--设置小时：-->
                     <Label text="%taskDetail.hourField"/>
                     <TextField fx:id="hourField_TD" prefWidth="70" promptText="0"/>
-
+                    <!--设置分钟:-->
                     <Label text="%taskDetail.minuteField"/>
                     <TextField fx:id="minuteField_TD" prefWidth="70" promptText="0"/>
                 </HBox>
 
                 <HBox spacing="5">
+                    <!--重复类型：-->
                     <Label text="%taskDetail.repeatType"/>
                     <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefWidth="100"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="5">
+                <!--起始日期：-->
                 <Label text="%taskDetail.startDate"/>
                 <HBox spacing="10">
+                    <!--点击选择日期-->
                     <DatePicker onAction="#datePickerAction" fx:id="datePicker_TD" editable="false"
                                 promptText="%taskDetail.datePicker_TD"/>
+                    <!--重复类型选择 仅一次 时才可修改，其他重复类型只能设置当天生效-->
                     <Label text="%taskDetail.dateTip" textFill="red"/>
                 </HBox>
             </HBox>
 
             <VBox spacing="10">
                 <HBox spacing="10">
+                    <!--选择星期：-->
                     <Label text="%taskDetail.weekField"/>
+                    <!--重复类型选择 每周 时才可修改，其他重复类型只能选择当天，无论哪种重复类型都至少要选择一天-->
                     <Label text="%taskDetail.weekTip" textFill="red"/>
                 </HBox>
 
                 <HBox spacing="20">
+                    <!--星期一-->
                     <CheckBox fx:id="monday_TD" text="%monday"/>
+                    <!--星期二-->
                     <CheckBox fx:id="tuesday_TD" text="%tuesday"/>
+                    <!--星期三-->
                     <CheckBox fx:id="wednesday_TD" text="%wednesday"/>
+                    <!--星期四-->
                     <CheckBox fx:id="thursday_TD" text="%thursday"/>
+                    <!--星期五-->
                     <CheckBox fx:id="friday_TD" text="%friday"/>
+                    <!--星期六-->
                     <CheckBox fx:id="saturday_TD" text="%saturday"/>
+                    <!--星期日-->
                     <CheckBox fx:id="sunday_TD" text="%sunday"/>
                 </HBox>
             </VBox>
 
             <VBox spacing="10">
                 <HBox spacing="10">
+                    <!--选择操作流程-->
                     <Button fx:id="loadAutoClick_TD" onAction="#loadAutoClick"
                             text="%taskDetail.loadAutoClick_TD"/>
+                    <!--如果不设置可以执行的操作流程文件，时间到了后应用只会定时启动-->
                     <Label text="%taskDetail.loadAutoClickTip" textFill="red"/>
                 </HBox>
 
                 <HBox fx:id="fileNameHBox_TD" spacing="10" visible="false">
+                    <!--文件名称：-->
                     <Label text="%fileName"/>
                     <Label fx:id="fileName_DT"/>
                     <Button onAction="#removePath" fx:id="delete_TD" styleClass="img-button-style">
@@ -74,6 +92,7 @@
                 </HBox>
 
                 <HBox fx:id="filePathHBox_DT" visible="false">
+                    <!--文件路径：-->
                     <Label text="%filePath"/>
                     <Label fx:id="pmcFilePath_TD" style="-fx-font-size: 15px;"/>
                 </HBox>
@@ -85,7 +104,9 @@
                     <Label fx:id="log_TD"/>
                 </VBox>
 
+                <!--保存并关闭-->
                 <Button fx:id="saveDetail_TD" text="%detail.save" onAction="#saveDetail"/>
+                <!--删除这个任务-->
                 <Button fx:id="removeDetail_TD" text="%taskDetail.removeDetail_TD" onAction="#removeDetail"/>
             </HBox>
         </VBox>

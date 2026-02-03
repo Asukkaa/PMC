@@ -7,6 +7,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AboutController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
+        <!--关于：-->
         <Label styleClass="label-low" text="%about.aboutLabel0"/>
 
         <HBox spacing="10">
@@ -17,17 +18,23 @@
             <VBox spacing="10">
                 <HBox>
                     <Label styleClass="label-low" fx:id="title_Abt" textFill="hotpink"/>
+                    <!-- 是一个由 JavaFX 实现的按照设置流程进行自动操作的跨平台开源工具。-->
                     <Label styleClass="label-low" text="%about.aboutLabel1"/>
                 </HBox>
+                <!--自动操作功能目前支持鼠标左右键、鼠标中键、鼠标前后侧键点击长按、曲线拖拽、记录鼠标移动轨迹等功能。-->
                 <Label styleClass="label-low" text="%about.aboutLabel2"/>
+                <!--可以编辑操作流程或直接录制操作流程，可在操作步骤中设置图形识别逻辑，设置完毕后自动流程可进行循环操作，可读取或导出自动任务并定时执行。-->
                 <Label styleClass="label-low" text="%about.aboutLabel3"/>
+                <!--目前软件正在继续开发中，仍有很多功能还未实现，问题肯定也不少，有问题或建议可以给下面邮箱发邮件反馈。-->
                 <Label styleClass="label-low" text="%about.aboutLabel4"/>
+                <!--如果遇到报错可到将 logs 文件夹压缩后发送给反馈邮件。-->
                 <Label styleClass="label-low" text="%about.aboutLabel5"/>
             </VBox>
         </HBox>
 
         <HBox spacing="5">
             <HBox styleClass="hBox-600-5">
+                <!--logs 文件夹目录：-->
                 <Label text="%about.logsPath"/>
                 <HBox prefWidth="400">
                     <Label fx:id="logsPath_Abt"/>
@@ -35,19 +42,23 @@
             </HBox>
 
             <HBox styleClass="hBox-600-5">
+                <!--log 文件保留数量：-->
                 <Label text="%about.logsNum"/>
                 <TextField fx:id="logsNum_Abt" styleClass="label-low" prefWidth="50"/>
+                <!--个-->
                 <Label text="%unit.piece"/>
             </HBox>
         </HBox>
 
         <HBox spacing="5">
+            <!--反馈邮箱：-->
             <Label styleClass="label-low" text="%about.email"/>
             <Label fx:id="mail_Abt" styleClass="label-low" textFill="blue" text="csolxqt@foxmail.com"/>
         </HBox>
 
         <HBox spacing="5">
             <HBox styleClass="hBox-600-5">
+                <!--如果喜欢本应用的话可以点击此按钮后扫描微信赞赏码给作者一个赞赏 —>-->
                 <Label style="-fx-pref-height: 45" text="%about.appreciate"/>
                 <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style">
                     <graphic>
@@ -60,7 +71,9 @@
 
             <HBox styleClass="hBox-600-5">
                 <HBox spacing="5">
+                    <!--前往爱发电主页：-->
                     <Label text="%about.afdina"/>
+                    <!--感谢你的发电！-->
                     <Button fx:id="afdianLinkBtn_Abt" onAction="#openAfdianLink" text="%about.afdinaLink"/>
                 </HBox>
             </HBox>
@@ -68,16 +81,21 @@
 
         <Separator/>
 
+        <!--Git 地址：-->
         <Label styleClass="label-low" text="%about.git"/>
 
         <HBox spacing="5">
             <HBox styleClass="hBox-600-5">
+                <!--Github 地址：-->
                 <Label text="%about.gitHub"/>
+                <!--点击查看本项目 GitHub 主页-->
                 <Button fx:id="openGitHubLinkBtn_Abt" onAction="#openGitHubLink" text="%about.openGitHubLinkBtn_Abt"/>
             </HBox>
 
             <HBox styleClass="hBox-600-5">
+                <!--Gitee 地址：-->
                 <Label text="%about.gitee"/>
+                <!--点击查看本项目 Gitee 主页-->
                 <Button fx:id="openGiteeLinkBtn_Abt" onAction="#openGiteeLink" text="%about.openGiteeLinkBtn_Abt"/>
             </HBox>
         </HBox>
@@ -85,36 +103,48 @@
         <Separator/>
 
         <VBox spacing="5">
+            <!--版本更新：-->
             <Label styleClass="label-low" text="%about.versionUpdate"/>
+            <!--目前主要下载渠道为网盘下载，最新版本将会在下列网盘发布，点击查看最新版本即可跳转对应网盘分享页面。-->
             <Label styleClass="label-low" text="%about.download"/>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-400-5">
+                    <!--百度网盘：-->
                     <Label text="%about.openBaiduLinkBtn"/>
+                    <!--点击查看最新版本-->
                     <Button fx:id="openBaiduLinkBtn_Abt" onAction="#openBaiduLink" text="%about.latestVersion"/>
                 </HBox>
 
                 <HBox styleClass="hBox-400-5">
+                    <!--夸克网盘：-->
                     <Label text="%about.openQuarkLinkBtn"/>
+                    <!--点击查看最新版本-->
                     <Button fx:id="openQuarkLinkBtn_Abt" onAction="#openQuarkLink" text="%about.latestVersion"/>
                 </HBox>
 
                 <HBox styleClass="hBox-400-5">
+                    <!--迅雷网盘：-->
                     <Label text="%about.openXunleiLinkBtn"/>
+                    <!--点击查看最新版本-->
                     <Button fx:id="openXunleiLinkBtn_Abt" onAction="#openXunleiLink" text="%about.latestVersion"/>
                 </HBox>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-400-5">
+                    <!--检查更新：-->
                     <Label text="%update.checkUpdate"/>
+                    <!--检查并下载更新-->
                     <Button fx:id="checkUpdate_Abt" onAction="#checkUpdate" text="%update.checkUpdate_Abt"/>
                 </HBox>
 
                 <HBox styleClass="hBox-400-5">
+                    <!--应用启动后自动检测更新-->
                     <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" text="%update.autoCheck_Abt"/>
                 </HBox>
 
+                <!--自动更新功能因为每月流量有限，可能无法更新成功。-->
                 <Label textFill="red" text="%about.autoUpdate"/>
             </HBox>
 
@@ -124,6 +154,7 @@
             </VBox>
 
             <HBox spacing="5">
+                <!--当前版本：-->
                 <Label styleClass="label-low" text="%about.version"/>
                 <Label styleClass="label-low" fx:id="version_Abt" textFill="limegreen"/>
             </HBox>
