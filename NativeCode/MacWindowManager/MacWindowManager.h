@@ -56,7 +56,7 @@ typedef struct {
 /**
  * @brief 移动指定进程的窗口到新位置
  *
- * @param pid 目标进程ID
+ * @param pid 目标进程 ID
  * @param x 新位置的X坐标（屏幕坐标）
  * @param y 新位置的Y坐标（屏幕坐标）
  * @return true 移动成功
@@ -67,7 +67,7 @@ bool moveWindow(int pid, int x, int y);
 /**
  * @brief 调整指定进程的窗口大小
  *
- * @param pid 目标进程ID
+ * @param pid 目标进程 ID
  * @param width 新宽度（像素）
  * @param height 新高度（像素）
  * @return true 调整成功
@@ -78,10 +78,10 @@ bool resizeWindow(int pid, int width, int height);
 /**
  * @brief 获取当前获得焦点的窗口信息
  *
- * 优先返回层级为0（普通应用窗口）的窗口信息。
+ * 优先返回层级为 0（普通应用窗口）的窗口信息。
  * 如果没有找到焦点窗口，返回第一个非桌面元素的窗口信息。
  *
- * @return WindowInfo 窗口信息结构体，如果失败则所有字段为0
+ * @return WindowInfo 窗口信息结构体，如果失败则所有字段为 0
  */
 WindowInfo getFocusedWindowInfo(void);
 
@@ -89,31 +89,31 @@ WindowInfo getFocusedWindowInfo(void);
  * @brief 根据进程路径获取窗口信息
  *
  * 支持两种路径格式：
- * 1. 应用程序路径（以.app结尾）：匹配包含该路径的进程
+ * 1. 应用程序路径（以 .app 结尾）：匹配包含该路径的进程
  * 2. 可执行文件路径：精确匹配进程路径
  *
  * 注意：当存在多个匹配窗口时，返回第一个找到的窗口。
  *
  * @param processPath 进程路径或应用程序路径
- * @return WindowInfo 窗口信息结构体，如果未找到则所有字段为0
+ * @return WindowInfo 窗口信息结构体，如果未找到则所有字段为 0
  */
 WindowInfo getMacWindowInfo(const char* processPath);
 
 /**
  * @brief 获取所有可见窗口的信息
  *
- * 不包括桌面元素（如桌面图标、Dock等）。
- * 返回的数组需要调用freeWindowList()释放内存。
+ * 不包括桌面元素（如桌面图标、Dock 等）。
+ * 返回的数组需要调用 freeWindowList()  释放内存。
  *
  * @param[out] count 窗口数量
- * @return WindowInfo* 窗口信息数组指针，失败返回NULL
+ * @return WindowInfo* 窗口信息数组指针，失败返回 NULL
  */
 WindowInfo* getAllWindows(int* count);
 
 /**
- * @brief 释放getAllWindows分配的窗口列表内存
+ * @brief 释放 getAllWindows 分配的窗口列表内存
  *
- * @param windows 由getAllWindows返回的窗口数组指针
+ * @param windows 由 getAllWindows 返回的窗口数组指针
  */
 void freeWindowList(WindowInfo* windows);
 

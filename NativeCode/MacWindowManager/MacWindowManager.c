@@ -17,10 +17,10 @@
 #include <stdint.h>
 
 /**
- * @brief 将CFString复制到C字符串
+ * @brief 将 CFString 复制到 C 字符串
  *
- * @param cfStr 源CFString字符串
- * @param buffer 目标C字符串缓冲区
+ * @param cfStr 源 CFString 字符串
+ * @param buffer 目标 C 字符串缓冲区
  * @param bufferSize 缓冲区大小
  */
 static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t bufferSize) {
@@ -43,8 +43,8 @@ static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t buffer
  * @brief 获取进程信息（名称和路径）
  *
  * @param pid 进程ID
- * @param[out] processName 进程名称缓冲区（可选，可为NULL）
- * @param[out] processPath 进程路径缓冲区（可选，可为NULL）
+ * @param[out] processName 进程名称缓冲区（可选，可为 NULL）
+ * @param[out] processPath 进程路径缓冲区（可选，可为 NULL）
  * @param pathSize 进程路径缓冲区大小
  */
 static void getProcessInfo(pid_t pid, char* processName, char* processPath, size_t pathSize) {
@@ -96,11 +96,11 @@ static void getProcessInfo(pid_t pid, char* processName, char* processPath, size
  * @brief 根据进程路径获取窗口信息
  *
  * 支持两种路径格式：
- * 1. 应用程序路径（以.app结尾）：匹配包含该路径的进程
+ * 1. 应用程序路径（以 .app 结尾）：匹配包含该路径的进程
  * 2. 可执行文件路径：精确匹配进程路径
  *
  * @param processPath 进程路径或应用程序路径
- * @return WindowInfo 窗口信息结构体，如果未找到则所有字段为0
+ * @return WindowInfo 窗口信息结构体，如果未找到则所有字段为 0
  */
 WindowInfo getMacWindowInfo(const char* processPath) {
     WindowInfo info = {0};
@@ -155,7 +155,7 @@ WindowInfo getMacWindowInfo(const char* processPath) {
             }
         }
         if (match) {
-            // 获取窗口ID
+            // 获取窗口 ID
             CFNumberRef windowIdRef = CFDictionaryGetValue(window, kCGWindowNumber);
             if (windowIdRef) {
                 CFNumberGetValue(windowIdRef, kCFNumberIntType, &info.windowId);
@@ -198,9 +198,9 @@ WindowInfo getMacWindowInfo(const char* processPath) {
  * 使用 macOS Accessibility API 移动窗口。
  * 注意：应用需要获取辅助功能权限才能调用此函数。
  *
- * @param pid 目标进程ID
- * @param x 新位置的X坐标（屏幕坐标）
- * @param y 新位置的Y坐标（屏幕坐标）
+ * @param pid 目标进程 ID
+ * @param x 新位置的 X 坐标（屏幕坐标）
+ * @param y 新位置的 Y 坐标（屏幕坐标）
  * @return true 移动成功
  * @return false 移动失败（进程不存在、窗口不存在或权限不足）
  */
@@ -247,7 +247,7 @@ cleanup:
  * 使用 macOS Accessibility API 调整窗口大小。
  * 注意：应用需要获取辅助功能权限才能调用此函数。
  *
- * @param pid 目标进程ID
+ * @param pid 目标进程 ID
  * @param width 新宽度（像素）
  * @param height 新高度（像素）
  * @return true 调整成功
@@ -292,7 +292,7 @@ cleanup:
  * 优先返回层级为 0（普通应用窗口）的窗口信息。
  * 如果没有找到焦点窗口，返回第一个非桌面元素的窗口信息。
  *
- * @return WindowInfo 窗口信息结构体，如果失败则所有字段为0
+ * @return WindowInfo 窗口信息结构体，如果失败则所有字段为 0
  */
 WindowInfo getFocusedWindowInfo(void) {
     WindowInfo info = {0};
@@ -314,7 +314,7 @@ WindowInfo getFocusedWindowInfo(void) {
             int layerValue;
             CFNumberGetValue(layer, kCFNumberIntType, &layerValue);
             info.layer = layerValue;
-            // 通常应用窗口的层级是 0，我们优先查找层级为0的窗口
+            // 通常应用窗口的层级是 0，我们优先查找层级为 0 的窗口
             if (layerValue == 0) {
                 // 获取进程 ID
                 CFNumberRef pidRef = CFDictionaryGetValue(window, kCGWindowOwnerPID);
@@ -350,7 +350,7 @@ WindowInfo getFocusedWindowInfo(void) {
             }
         }
     }
-    // 如果没有找到层级为0的窗口，使用第一个窗口
+    // 如果没有找到层级为 0 的窗口，使用第一个窗口
     if (info.pid == 0 && count > 0) {
         CFDictionaryRef firstWindow = CFArrayGetValueAtIndex(windowList, 0);
         // 获取窗口层级
@@ -421,7 +421,7 @@ WindowInfo* getAllWindows(int* count) {
         CFDictionaryRef window = CFArrayGetValueAtIndex(windowList, i);
         WindowInfo* current = &windows[validCount];
         memset(current, 0, sizeof(WindowInfo));
-        // 获取进程ID
+        // 获取进程 ID
         CFNumberRef pidRef = CFDictionaryGetValue(window, kCGWindowOwnerPID);
         if (pidRef) {
             CFNumberGetValue(pidRef, kCFNumberIntType, &current->pid);
@@ -464,9 +464,9 @@ WindowInfo* getAllWindows(int* count) {
 }
 
 /**
- * @brief 释放getAllWindows分配的窗口列表内存
+ * @brief 释放 getAllWindows 分配的窗口列表内存
  *
- * @param windows 由getAllWindows返回的窗口数组指针
+ * @param windows 由 getAllWindows 返回的窗口数组指针
  */
 void freeWindowList(WindowInfo* windows) {
     if (windows) {
