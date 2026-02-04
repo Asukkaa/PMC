@@ -32,11 +32,9 @@ public class WindowMove {
         if (windowInfo == null) {
             return false;
         }
-        int wX = windowInfo.getX();
-        int wY = windowInfo.getY();
         int w = windowInfo.getWidth();
         int h = windowInfo.getHeight();
-        if (wX < 0 && wY < 0 && Math.abs(wX) > w && Math.abs(wY) > h) {
+        if (w == 0 && h == 0) {
             return false;
         }
         if (isWin) {
