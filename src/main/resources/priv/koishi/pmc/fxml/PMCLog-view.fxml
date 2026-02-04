@@ -7,24 +7,33 @@
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
             <HBox spacing="10">
+                <!--清空列表-->
                 <Button fx:id="removeAll_PLog" onAction="#removeAll" style="-fx-cursor: hand"
                         text="%listText.removeAll"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
+                <!--列表为空-->
                 <Label fx:id="dataNumber_PLog" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_PLog">
                 <placeholder>
+                    <!--暂无操作记录-->
                     <Label text="%clickLog.tableView_Log"/>
                 </placeholder>
 
                 <columns>
+                    <!--序号-->
                     <TableColumn fx:id="index_PLog" text="%listText.index" sortable="false"/>
+                    <!--操作时间-->
                     <TableColumn fx:id="date_PLog" text="%clickLog.date" sortable="false"/>
+                    <!--文件名称-->
                     <TableColumn fx:id="name_PLog" text="%listText.fileName" sortable="false"/>
+                    <!--文件路径-->
                     <TableColumn fx:id="path_PLog" text="%listText.filePath" sortable="false"/>
+                    <!--操作时长(毫秒)-->
                     <TableColumn fx:id="time_PLog" text="%clickLog.clickTime" sortable="false"/>
+                    <!--操作结果-->
                     <TableColumn fx:id="result_PLog" text="%clickLog.result" sortable="false"/>
                 </columns>
             </TableView>

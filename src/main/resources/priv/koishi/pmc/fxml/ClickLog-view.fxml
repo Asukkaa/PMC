@@ -7,27 +7,39 @@
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
             <HBox spacing="10">
+                <!--清空列表-->
                 <Button fx:id="removeAll_Log" onAction="#removeAll" style="-fx-cursor: hand"
                         text="%listText.removeAll"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
+                <!--列表为空-->
                 <Label fx:id="dataNumber_Log" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_Log">
                 <placeholder>
+                    <!--暂无操作记录-->
                     <Label text="%clickLog.tableView_Log"/>
                 </placeholder>
 
                 <columns>
+                    <!--序号-->
                     <TableColumn fx:id="index_Log" text="%listText.index" sortable="false"/>
+                    <!--操作时间-->
                     <TableColumn fx:id="date_Log" text="%clickLog.date" sortable="false"/>
+                    <!--操作名称-->
                     <TableColumn fx:id="name_Log" text="%clickLog.name" sortable="false"/>
+                    <!--操作类型-->
                     <TableColumn fx:id="type_Log" text="%clickLog.type" sortable="false"/>
+                    <!--横(X)坐标-->
                     <TableColumn fx:id="X_Log" text="%clickLog.X" sortable="false"/>
+                    <!--纵(Y)坐标-->
                     <TableColumn fx:id="Y_Log" text="%clickLog.Y" sortable="false"/>
+                    <!--操作时长(毫秒)-->
                     <TableColumn fx:id="clickTime_Log" text="%clickLog.clickTime" sortable="false"/>
+                    <!--操作按键-->
                     <TableColumn fx:id="clickKey_Log" text="%clickLog.clickKey" sortable="false"/>
+                    <!--操作结果-->
                     <TableColumn fx:id="result_Log" text="%clickLog.result" sortable="false"/>
                 </columns>
             </TableView>

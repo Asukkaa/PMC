@@ -7,17 +7,20 @@
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
             <HBox spacing="10">
+                <!--选择要查询的文件夹-->
                 <Button fx:id="selectPathButton_FC" onAction="#selectFilePath" text="%fileChooser.selectPathButton_FC"/>
                 <Label fx:id="filePath_FC" style="-fx-font-size: 15px;"/>
             </HBox>
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-500-5">
+                    <!--文件与文件夹查询设置：-->
                     <Label text="%fileChooser.fileFilter"/>
                     <ChoiceBox fx:id="fileFilter_FC" prefWidth="200" onAction="#fileFilterAction"/>
                 </HBox>
 
                 <HBox spacing="10">
+                    <!--隐藏文件查询设置：-->
                     <Label text="%fileChooser.hideFileType"/>
                     <ChoiceBox fx:id="hideFileType_FC" prefWidth="200" onAction="#hideFileTypeAction"/>
                 </HBox>
@@ -25,6 +28,7 @@
 
             <HBox spacing="10">
                 <HBox styleClass="hBox-500-5">
+                    <!--文件名查询设置：-->
                     <Label text="%fileChooser.fileNameType"/>
                     <ChoiceBox fx:id="fileNameType_FC" prefWidth="180" onAction="#fileNameTypeAction"/>
 
@@ -32,8 +36,9 @@
                 </HBox>
 
                 <HBox spacing="30">
+                    <!--反向查询文件名-->
                     <CheckBox fx:id="reverse_FC" text="%fileChooser.reverse_FC" onAction="#reverseAction"/>
-
+                    <!--区分文件名大小写-->
                     <CheckBox fx:id="filterNameCase_FC" text="%fileChooser.filterNameCase_FC"
                               onAction="#filterNameCaseAction"/>
                 </HBox>
@@ -41,38 +46,54 @@
 
             <HBox fx:id="fileTypeHBox_FC" visible="false" spacing="10">
                 <HBox styleClass="hBox-500-5">
+                    <!--需要识别的文件拓展名:-->
                     <Label text="%fileChooser.filterFileType"/>
                     <TextField fx:id="filterFileType_FC" prefWidth="300"/>
                 </HBox>
 
+                <!--反向过滤文件类型-->
                 <CheckBox fx:id="reverseFileType_FC" text="%fileChooser.reverseFileType_FC"/>
             </HBox>
 
             <HBox spacing="10">
+                <!--前往上级文件夹-->
                 <Button fx:id="gotoParentButton_FC" onAction="#gotoParent" styleClass="cornflowerblue-button"
                         text="%fileChooser.gotoParentButton_FC"/>
+                <!--刷新列表-->
                 <Button fx:id="refreshButton_FC" onAction="#refreshTable" styleClass="cadetblue-button"
                         text="%listText.refresh"/>
+                <!--双击文件夹所在数据行可查询该目录下的文件，按住 shift 可多选-->
                 <Label fx:id="tip_FC" textFill="red" text="%fileChooser.tip_FC"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
+                <!--列表为空-->
                 <Label fx:id="fileNumber_FC" text="%listText.null"/>
             </HBox>
 
             <TableView fx:id="tableView_FC" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
                 <placeholder>
+                    <!--无符合条件的文件或文件，拖拽文件或文件夹可跳转至所在目录-->
                     <Label text="%fileChooser.tableView_FC"/>
                 </placeholder>
 
                 <columns>
+                    <!--序号-->
                     <TableColumn fx:id="index_FC" text="%listText.index" sortable="false"/>
+                    <!--缩略图-->
                     <TableColumn fx:id="thumb_FC" text="%listText.thumb" sortable="false"/>
+                    <!--文件名称-->
                     <TableColumn fx:id="name_FC" text="%listText.fileName"/>
+                    <!--文件类型-->
                     <TableColumn fx:id="fileType_FC" text="%fileChooser.fileType_FC"/>
+                    <!--文件路径-->
                     <TableColumn fx:id="path_FC" text="%listText.filePath"/>
+                    <!--文件大小-->
                     <TableColumn fx:id="size_FC" sortType="DESCENDING" text="%fileChooser.size_FC"/>
+                    <!--是否隐藏-->
                     <TableColumn fx:id="showStatus_FC" text="%fileChooser.showStatus_FC"/>
+                    <!--创建时间-->
                     <TableColumn fx:id="creatDate_FC" text="%fileChooser.creatDate_FC"/>
+                    <!--修改时间-->
                     <TableColumn fx:id="updateDate_FC" text="%fileChooser.updateDate_FC"/>
                 </columns>
             </TableView>
@@ -83,7 +104,9 @@
                     <Label fx:id="log_FC" prefHeight="20"/>
                 </VBox>
 
+                <!--确认选择-->
                 <Button fx:id="confirm_FC" text="%confirm.select" onAction="#confirmSelect"/>
+                <!--取消-->
                 <Button fx:id="close_FC" text="%confirm.cancel" onAction="#closeWindow"/>
             </HBox>
         </VBox>

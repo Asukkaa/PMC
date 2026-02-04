@@ -6,27 +6,40 @@
             fx:controller="priv.koishi.pmc.Controller.TimedTaskController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <HBox spacing="10">
+            <!--添加定时任务-->
             <Button fx:id="addTimedTask_Task" text="%timedTask.addTimedTask_Task" onAction="#addTimedTask"/>
+            <!--查询定时任务-->
             <Button fx:id="getScheduleTask_Task" text="%timedTask.getScheduleTask_Task" onAction="#getScheduleTask"/>
+            <!--定时任务只有在电脑没有锁屏或关机且本应用没有启动时才会正常执行，移动应用目录也会导致任务无法正常执行-->
             <Label text="%timedTask.tip" textFill="red"/>
 
             <Region HBox.hgrow="ALWAYS"/>
+            <!--列表为空-->
             <Label fx:id="dataNumber_Task" text="%listText.null"/>
         </HBox>
 
         <TableView fx:id="tableView_Task">
             <placeholder>
+                <!--当前未设置定时任务-->
                 <Label text="%timedTask.tableView_Task"/>
             </placeholder>
 
             <columns>
+                <!--序号-->
                 <TableColumn fx:id="index_Task" text="%listText.index"/>
+                <!--任务名称-->
                 <TableColumn fx:id="taskName_Task" text="%timedTask.taskName_Task"/>
+                <!--起始日期-->
                 <TableColumn fx:id="date_Task" text="%timedTask.date_Task"/>
+                <!--触发时间-->
                 <TableColumn fx:id="time_Task" text="%timedTask.time_Task"/>
+                <!--重复类型-->
                 <TableColumn fx:id="repeat_Task" text="%timedTask.repeat_Task"/>
+                <!--重复日-->
                 <TableColumn fx:id="days_Task" text="%timedTask.days_Task"/>
+                <!--执行流程-->
                 <TableColumn fx:id="name_Task" text="%timedTask.name_Task"/>
+                <!--文件路径-->
                 <TableColumn fx:id="path_Task" text="%listText.filePath"/>
             </columns>
         </TableView>
@@ -36,6 +49,7 @@
                 <ProgressBar fx:id="progressBar_Task" visible="false" progress="0.0"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
+                <!--设置操作步骤后上下拖拽数据行可调整数据顺序，右键点击数据行可进行调整或编辑操作，按住 shift 可多选-->
                 <Label fx:id="tip_Task" prefHeight="20" textFill="red" text="%timedTask.tip_Task"/>
             </HBox>
 

@@ -10,6 +10,7 @@
             stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AppreciateController">
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="50">
+            <!--本应用为开源软件，赞赏行为纯属自愿，与软件使用权益无关！-->
             <Label textFill="red" text="%appreciate.tip"/>
 
             <ImageView fitWidth="400" fitHeight="400" preserveRatio="true">

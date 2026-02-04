@@ -5,6 +5,7 @@
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="priv.koishi.pmc.Controller.MainController">
     <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+        <!--自动操作工具-->
         <Tab style="-fx-cursor: hand" fx:id="autoClickTab" text="%main.autoClickTab">
             <ScrollPane>
                 <AnchorPane>
@@ -13,6 +14,7 @@
             </ScrollPane>
         </Tab>
 
+        <!--批量执行 PMC 文件-->
         <Tab style="-fx-cursor: hand" fx:id="listPMCTab" text="%main.PMCListTab">
             <ScrollPane>
                 <AnchorPane>
@@ -21,6 +23,7 @@
             </ScrollPane>
         </Tab>
 
+        <!--定时启动任务-->
         <Tab style="-fx-cursor: hand" fx:id="timedStartTab" text="%main.timedStartTab">
             <ScrollPane>
                 <AnchorPane>
@@ -29,6 +32,7 @@
             </ScrollPane>
         </Tab>
 
+        <!--设置-->
         <Tab style="-fx-cursor: hand" fx:id="settingTab" text="%main.settingTab">
             <ScrollPane>
                 <AnchorPane>
@@ -37,6 +41,7 @@
             </ScrollPane>
         </Tab>
 
+        <!--关于-->
         <Tab style="-fx-cursor: hand" fx:id="aboutTab" text="%main.aboutTab">
             <ScrollPane>
                 <AnchorPane>
