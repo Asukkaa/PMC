@@ -42,7 +42,7 @@ static void copyCFStringToCString(CFStringRef cfStr, char* buffer, size_t buffer
 /**
  * @brief 获取进程信息（名称和路径）
  *
- * @param pid 进程ID
+ * @param pid 进程 ID
  * @param[out] processName 进程名称缓冲区（可选，可为 NULL）
  * @param[out] processPath 进程路径缓冲区（可选，可为 NULL）
  * @param pathSize 进程路径缓冲区大小
