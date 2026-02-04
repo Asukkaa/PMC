@@ -2,6 +2,7 @@ package priv.koishi.pmc.JnaNative.GlobalWindowMonitor;
 
 import com.sun.jna.Structure;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,8 +58,9 @@ public class MacNativeWindowInfo extends Structure {
     public int layer;
 
     /**
-     * 进程名称
+     * 进程名称（需要与 C 结构体保持一致，但实际上后续会使用进程路径去获取）
      */
+    @SuppressWarnings("unused")
     public final byte[] processName = new byte[256];
 
     /**
@@ -127,7 +129,7 @@ public class MacNativeWindowInfo extends Structure {
     }
 
     /**
-     * 从字符串获取标题（处理字节数组）
+     * 从字符串获取标题
      *
      * @return 标题字符串
      */
@@ -141,7 +143,8 @@ public class MacNativeWindowInfo extends Structure {
      * @return 进程名称字符串
      */
     public String getProcessNameString() {
-        return getNullTerminatedString(processName);
+        String path = getProcessPathString();
+        return new File(path).getName();
     }
 
     /**
