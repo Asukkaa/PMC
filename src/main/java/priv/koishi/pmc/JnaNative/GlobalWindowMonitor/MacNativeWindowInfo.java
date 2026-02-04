@@ -29,7 +29,7 @@ public class MacNativeWindowInfo extends Structure {
     /**
      * 窗口标题
      */
-    public byte[] title = new byte[256];
+    public final byte[] title = new byte[256];
 
     /**
      * 窗口横坐标
@@ -59,12 +59,12 @@ public class MacNativeWindowInfo extends Structure {
     /**
      * 进程名称
      */
-    public byte[] processName = new byte[256];
+    public final byte[] processName = new byte[256];
 
     /**
      * 进程路径
      */
-    public byte[] processPath = new byte[1024];
+    public final byte[] processPath = new byte[1024];
 
     /**
      * 获取字段顺序列表，定义了结构体中各个字段的排列顺序

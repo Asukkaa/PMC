@@ -82,7 +82,7 @@ public class UiUtils {
     /**
      * 无法切换深色布局的页面控制器类集合
      */
-    public static Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
+    public static final Set<Class<?>> manuallyChangeThemeList = new HashSet<>();
 
     /**
      * 创建一个文件选择器

@@ -15,10 +15,8 @@ module priv.koishi.pmc {
     requires org.bytedeco.opencv;
     requires com.sun.jna;
     requires jdk.localedata;
-    requires jdk.httpserver;
     requires java.net.http;
     requires com.sun.jna.platform;
-    requires jdk.naming.dns;
     requires atlantafx.base;
     requires tools.jackson.databind;
 

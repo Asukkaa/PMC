@@ -259,27 +259,27 @@ public class CommonFinals {
     /**
      * 程序 logo
      */
-    public static String logoPath = "icon/PMC.png";
+    public static final String logoPath = "icon/PMC.png";
 
     /**
      * css 样式文件路径
      */
-    public static String stylesCss = "css/Styles.css";
+    public static final String stylesCss = "css/Styles.css";
 
     /**
      * 资源文件夹地址前缀
      */
-    public static String resourcePath = "/priv/koishi/pmc/";
+    public static final String resourcePath = "/priv/koishi/pmc/";
 
     /**
      * 打包前资源文件夹地址前缀
      */
-    public static String resourcesPath = "src/main/resources" + resourcePath;
+    public static final String resourcesPath = "src/main/resources" + resourcePath;
 
     /**
      * jpackage 打包后的资源文件路径
      */
-    public static String packagePath = "/bin/";
+    public static final String packagePath = "/bin/";
 
     /**
      * log 文件夹名称
@@ -294,7 +294,7 @@ public class CommonFinals {
     /**
      * log4j 配置文件名称
      */
-    public static String log4j2 = "log4j2.xml";
+    public static final String log4j2 = "log4j2.xml";
 
     /**
      * app 配置文件路径
@@ -602,22 +602,22 @@ public class CommonFinals {
     /**
      * 绝对横坐标标识
      */
-    public static String AbsoluteX = "absoluteX";
+    public static final String AbsoluteX = "absoluteX";
 
     /**
      * 绝对纵坐标标识
      */
-    public static String AbsoluteY = "absoluteY";
+    public static final String AbsoluteY = "absoluteY";
 
     /**
      * 相对横坐标标识
      */
-    public static String RelativeX = "relativeX";
+    public static final String RelativeX = "relativeX";
 
     /**
      * 相对纵坐标标识
      */
-    public static String RelativeY = "relativeY";
+    public static final String RelativeY = "relativeY";
 
     /**
      * 默认循环次数

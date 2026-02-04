@@ -973,11 +973,7 @@ public class ClickDetailController extends RootController {
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
-                        try {
-                            saveDetail();
-                        } catch (IllegalAccessException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                        saveDetail();
                     } else {
                         // 直接关闭
                         closeStage();
@@ -1522,11 +1518,9 @@ public class ClickDetailController extends RootController {
 
     /**
      * 保存更改并关闭详情页按钮
-     *
-     * @throws IllegalAccessException 浮窗设置类复制异常
      */
     @FXML
-    private void saveDetail() throws IllegalAccessException {
+    private void saveDetail() {
         String url = url_Det.getText();
         String link = link_Det.getText();
         int selectIndex = selectedItem.getIndex();

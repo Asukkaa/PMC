@@ -125,9 +125,8 @@ public class SingleInstanceGuard {
      * 清理过期锁文件
      *
      * @param lockPath 要清理的锁文件路径
-     * @throws IOException 文件操作异常时抛出
      */
-    private static void cleanStaleLock(Path lockPath) throws IOException {
+    private static void cleanStaleLock(Path lockPath) {
         if (Files.exists(lockPath)) {
             // 尝试获取测试锁
             try (FileChannel ch = FileChannel.open(lockPath, StandardOpenOption.WRITE)) {
