@@ -21,9 +21,9 @@ exports.main = async (event) => {
     // 客户端当前版本
     const clientVersion = requestBody.version;
     // 服务端最新版本
-    const serverVersion = "4.3.0";
+    const serverVersion = "4.3.1";
     // 构建日期
-    const buildDate = "2026.02.04";
+    const buildDate = "2026.02.07";
     // 获取更新信息
     const versionInfo = i18n[clientLang];
     // 拼接更新信息
