@@ -408,7 +408,7 @@ public class AutoClickService {
              * @return 错误信息
              */
             private List<String> updateWindowInfos(List<? extends ClickPositionVO> tableViewItems,
-                                                   Map<? super String, Set<ClickPositionVO>> windowPathMap) {
+                                                   Map<? super String, Set<ClickPositionVO>> windowPathMap) throws IllegalAccessException {
                 Set<String> processPaths = new HashSet<>();
                 int tableSize = tableViewItems.size();
                 updateFloatingMessage(text_checkingWindowInfo());
@@ -445,7 +445,7 @@ public class AutoClickService {
              */
             private void checkWindowExists(List<? extends ClickPositionVO> tableViewItems,
                                            List<Integer> clickErrIndex, Map<String, ? extends WindowInfo> windowInfoMap,
-                                           List<? super String> errs, List<Integer> stopErrIndex) {
+                                           List<? super String> errs, List<Integer> stopErrIndex) throws IllegalAccessException {
                 int tableSize = tableViewItems.size();
                 for (int i = 0; i < tableSize; i++) {
                     updateProgress(i + 1, tableSize);
@@ -464,11 +464,13 @@ public class AutoClickService {
                             errs.add(err + text_noClickWindowInfo());
                         } else {
                             // 保留原有的相对坐标和相对大小属性
-                            windowInfo.setRelativeHeight(clickInfo.getRelativeHeight())
+                            WindowInfo newInfo = new WindowInfo();
+                            copyAllProperties(windowInfo, newInfo);
+                            newInfo.setRelativeHeight(clickInfo.getRelativeHeight())
                                     .setRelativeWidth(clickInfo.getRelativeWidth())
                                     .setRelativeY(clickInfo.getRelativeY())
                                     .setRelativeX(clickInfo.getRelativeX());
-                            clickWindowConfig.setWindowInfo(windowInfo);
+                            clickWindowConfig.setWindowInfo(newInfo);
                             clickPositionVO.setClickWindowConfig(clickWindowConfig);
                         }
                     }
@@ -485,11 +487,13 @@ public class AutoClickService {
                                 errs.add(err + text_noStopWindowInfo());
                             } else {
                                 // 保留原有的相对坐标和相对大小属性
-                                windowInfo.setRelativeHeight(stopInfo.getRelativeHeight())
+                                WindowInfo newInfo = new WindowInfo();
+                                copyAllProperties(windowInfo, newInfo);
+                                newInfo.setRelativeHeight(stopInfo.getRelativeHeight())
                                         .setRelativeWidth(stopInfo.getRelativeWidth())
                                         .setRelativeY(stopInfo.getRelativeY())
                                         .setRelativeX(stopInfo.getRelativeX());
-                                stopWindowConfig.setWindowInfo(windowInfo);
+                                stopWindowConfig.setWindowInfo(newInfo);
                                 clickPositionVO.setStopWindowConfig(stopWindowConfig);
                             }
                         }
