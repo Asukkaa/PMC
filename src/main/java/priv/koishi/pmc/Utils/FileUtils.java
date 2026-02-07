@@ -130,8 +130,14 @@ public class FileUtils {
                 throw new RuntimeException(text_fileNotExists());
             }
             try {
-                Desktop.getDesktop().open(file);
-            } catch (IOException e) {
+                if (app.equals(getFileType(openPath)) && isMac) {
+                    ProcessBuilder pb = new ProcessBuilder("open", openPath);
+                    Process process = pb.start();
+                    process.waitFor();
+                } else {
+                    Desktop.getDesktop().open(file);
+                }
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -150,7 +156,7 @@ public class FileUtils {
             }
             try {
                 if (file.isDirectory()) {
-                    if (app.equals(getFileType(openPath))) {
+                    if (app.equals(getFileType(openPath)) && isMac) {
                         openParentDirectory(openPath);
                     } else {
                         Desktop.getDesktop().open(file);
