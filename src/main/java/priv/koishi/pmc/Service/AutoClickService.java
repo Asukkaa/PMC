@@ -606,16 +606,16 @@ public class AutoClickService {
                     String waitTime = clickPositionVO.getWaitTime();
                     String name = clickPositionVO.getName();
                     String text = loopTimeText +
-                            text_progress() + progress + " / " + dataSize +
-                            text_willBe() + waitTime + text_msWillBe() + name;
+                            text_progress() + progress + " / " + dataSize;
+                    String nowText = text + text_willBe() + waitTime + text_msWillBe() + name;
                     int startX = Integer.parseInt((clickPositionVO.getStartX()));
                     int startY = Integer.parseInt((clickPositionVO.getStartY()));
                     FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
                     if (clickType == ClickTypeEnum.OPEN_URL.ordinal() ||
                             clickType == ClickTypeEnum.OPEN_FILE.ordinal() ||
                             clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
-                        text += text_taskInfo() + clickPositionVO.getClickType();
-                        updateFloatingMessage(text);
+                        nowText += text_taskInfo() + clickPositionVO.getClickType();
+                        updateFloatingMessage(nowText);
                         if (waitAndLog(clickPositionVO)) {
                             break;
                         }
@@ -624,8 +624,8 @@ public class AutoClickService {
                         continue;
                     } else if (clickType == ClickTypeEnum.MOVE_WINDOW.ordinal()) {
                         if (clickWindowConfig != null) {
-                            text += text_point() + " X：" + startX + " Y：" + startY;
-                            updateFloatingMessage(text);
+                            nowText += text_point() + " X：" + startX + " Y：" + startY;
+                            updateFloatingMessage(nowText);
                             if (waitAndLog(clickPositionVO)) {
                                 break;
                             }
@@ -665,20 +665,20 @@ public class AutoClickService {
                         clickText += clickPositionVO.getClickKey();
                     }
                     if (StringUtils.isNotBlank(clickImgPath)) {
-                        text += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
+                        nowText += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
                                 text_afterMatch() + clickPositionVO.getMatchedType();
                     } else {
-                        text += text_point() + " X：" + startX + " Y：" + startY + clickText +
+                        nowText += text_point() + " X：" + startX + " Y：" + startY + clickText +
                                 text_clickTime() + clickTime + " " + unit_ms() +
                                 text_repeat() + clickNum + text_interval() + interval + " " + unit_ms();
                     }
                     // 更新操作信息
-                    updateFloatingMessage(text);
+                    updateFloatingMessage(nowText);
                     if (waitAndLog(clickPositionVO)) {
                         break;
                     }
                     // 执行自动流程
-                    ClickResultBean clickResultBean = click(clickPositionVO, robot, loopTimeText, taskBean);
+                    ClickResultBean clickResultBean = click(clickPositionVO, robot, text, taskBean);
                     int stepIndex = clickResultBean.getStepIndex();
                     // 点击匹配图像直到图像不存在
                     if (stepIndex == -1) {
@@ -972,15 +972,16 @@ public class AutoClickService {
         String name = clickPositionVO.getName();
         double startX = Double.parseDouble(clickPositionVO.getStartX());
         double startY = Double.parseDouble(clickPositionVO.getStartY());
+        String nowText = loopTimeText + text_nowExecution() + name;
         // 匹配终止操作图像
-        matchStopImg(clickPositionVO, loopTimeText, taskBean, clickResultBean);
+        matchStopImg(clickPositionVO, nowText, taskBean, clickResultBean);
         // 匹配要点击的图像
         String clickPath = clickPositionVO.getClickImgPath();
         int clickType = clickPositionVO.getClickTypeEnum();
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             fileName.set(getExistsFileName(new File(clickPath)));
-            String text = loopTimeText + text_searchingClick() + fileName.get();
+            String text = nowText + text_searchingClick() + fileName.get();
             // 更新操作信息
             updateFloatingMessage(text);
             long start = System.currentTimeMillis();

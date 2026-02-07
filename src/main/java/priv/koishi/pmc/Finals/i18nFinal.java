@@ -1215,6 +1215,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 正在执行：
+     */
+    public static String text_nowExecution() {
+        return bundle.getString("nowExecution");
+    }
+
+    /**
      * @return 取消任务快捷键：
      */
     public static String text_cancelTask() {
