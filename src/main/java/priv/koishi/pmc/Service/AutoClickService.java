@@ -612,7 +612,7 @@ public class AutoClickService {
                             clickType == ClickTypeEnum.RUN_SCRIPT.ordinal()) {
                         text += text_taskInfo() + clickPositionVO.getClickType();
                         updateFloatingMessage(text);
-                        if (wait(clickPositionVO)) {
+                        if (waitAndLog(clickPositionVO)) {
                             break;
                         }
                         openLink(clickPositionVO, taskBean);
@@ -622,7 +622,7 @@ public class AutoClickService {
                         if (clickWindowConfig != null) {
                             text += text_point() + " X：" + startX + " Y：" + startY;
                             updateFloatingMessage(text);
-                            if (wait(clickPositionVO)) {
+                            if (waitAndLog(clickPositionVO)) {
                                 break;
                             }
                             windowMove(clickPositionVO, taskBean, windowPathMap);
@@ -670,7 +670,7 @@ public class AutoClickService {
                     }
                     // 更新操作信息
                     updateFloatingMessage(text);
-                    if (wait(clickPositionVO)) {
+                    if (waitAndLog(clickPositionVO)) {
                         break;
                     }
                     // 执行自动流程
@@ -699,7 +699,7 @@ public class AutoClickService {
              *
              * @param clickPositionVO 自动操作参数
              */
-            private boolean wait(ClickPositionVO clickPositionVO) {
+            private boolean waitAndLog(ClickPositionVO clickPositionVO) {
                 long wait = Long.parseLong(clickPositionVO.getWaitTime());
                 // 处理随机等待时间偏移
                 if (activation.equals(clickPositionVO.getRandomWaitTime())) {
@@ -739,6 +739,9 @@ public class AutoClickService {
         int startX = Integer.parseInt((clickPositionVO.getStartX()));
         int startY = Integer.parseInt((clickPositionVO.getStartY()));
         WindowInfo windowInfo = clickPositionVO.getClickWindowConfig().getWindowInfo();
+        String path = windowInfo.getProcessPath();
+        // 移动前先更新一下窗口信息，如果窗口是在脚本执行后才打开的不更新则无法获取窗口信息
+        windowInfo = getMainWindowInfo(path);
         boolean moved = moveWindow(windowInfo, startX, startY);
         ClickLogBean logBean = new ClickLogBean();
         logBean.setClickKey(mouseButton_none())
@@ -751,12 +754,13 @@ public class AutoClickService {
                 logBean.setResult(log_success());
                 clickLog.add(logBean);
             }
-            String path = windowInfo.getProcessPath();
+            windowInfo.setX(startX)
+                    .setY(startY);
             // 更新窗口位置
             Set<ClickPositionVO> steps = windowPathMap.get(path);
             for (ClickPositionVO step : steps) {
-                updateWindowPosition(step.getClickWindowConfig(), path, startX, startY);
-                updateWindowPosition(step.getStopWindowConfig(), path, startX, startY);
+                updateWindowPosition(step.getClickWindowConfig(), path, windowInfo);
+                updateWindowPosition(step.getStopWindowConfig(), path, windowInfo);
             }
         } else {
             if (taskBean.isMoveWindowLog()) {
@@ -772,19 +776,20 @@ public class AutoClickService {
     /**
      * 更新窗口位置
      *
-     * @param windowConfig 窗口配置
-     * @param processPath  进程路径
-     * @param newX         新的 X 坐标
-     * @param newY         新的 Y 坐标
+     * @param windowConfig  窗口配置
+     * @param processPath   进程路径
+     * @param newWindowInfo 移动后的窗口信息
      */
-    private static void updateWindowPosition(FloatingWindowConfig windowConfig, String processPath, int newX, int newY) {
+    private static void updateWindowPosition(FloatingWindowConfig windowConfig, String processPath, WindowInfo newWindowInfo) {
         if (windowConfig != null &&
                 windowConfig.getFindImgTypeEnum() == FindImgTypeEnum.WINDOW.ordinal()) {
             WindowInfo windowInfo = windowConfig.getWindowInfo();
             if (windowInfo != null && windowInfo.getProcessPath().equals(processPath)) {
-                // 只更新窗口位置，保留其他所有属性
-                windowInfo.setX(newX)
-                        .setY(newY);
+                // 更新位置与宽高，因为窗口如果是脚本执行后启动的不更新无法获取正确的宽高信息
+                windowInfo.setHeight(newWindowInfo.getHeight())
+                        .setWidth(newWindowInfo.getWidth())
+                        .setX(newWindowInfo.getX())
+                        .setY(newWindowInfo.getY());
             }
         }
     }
