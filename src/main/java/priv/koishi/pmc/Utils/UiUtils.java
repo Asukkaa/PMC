@@ -815,6 +815,7 @@ public class UiUtils {
             // 设置图像识别窗口范围区域
             buildRelativeWindowMenu(windowInfoMenu, windowMonitor, disableNodes, stages);
         }
+        // 打开窗口进程所在位置选项
         buildOpenFileMenu(windowInfoMenu, windowMonitor);
         // 删除窗信息据选项
         buildDeleteDataMenu(windowInfoMenu, windowMonitor);
@@ -880,7 +881,7 @@ public class UiUtils {
                 if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
                     new MessageBubble(text_windowHidden(), 2);
                 } else {
-                    stages.forEach(stage -> stage.setIconified(true));
+                    Platform.runLater(() -> stages.forEach(stage -> stage.setIconified(true)));
                     String info = text_closeFloatingShortcut() + "\n" +
                             findImgSet_PName() + windowInfo.getProcessName() + "\n" +
                             findImgSet_PID() + windowInfo.getPid() + "\n" +
@@ -941,7 +942,7 @@ public class UiUtils {
                 if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
                     new MessageBubble(text_windowHidden(), 2);
                 } else {
-                    stages.forEach(stage -> stage.setIconified(true));
+                    Platform.runLater(() -> stages.forEach(stage -> stage.setIconified(true)));
                     String info = text_closeFloatingShortcut() + "\n" +
                             findImgSet_PName() + windowInfo.getProcessName() + "\n" +
                             findImgSet_PID() + windowInfo.getPid() + "\n" +
