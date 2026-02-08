@@ -887,20 +887,30 @@ public class AutoClickController extends RootController implements MousePosition
     private void setTaskEvent(AutoClickTaskBean taskBean) {
         autoClickTask.setOnSucceeded(_ -> {
             PMCLogResult value = autoClickTask.getValue();
-            clickLogs = value.clickLogBeans();
-            listPMCController.clickLogs = value.pmcLogBeans();
-            if (clickLogs == null) {
-                taskNotSuccess(taskBean, text_taskFailed());
+            if (value != null) {
+                clickLogs = value.clickLogBeans();
+                listPMCController.clickLogs = value.pmcLogBeans();
+                if (clickLogs == null) {
+                    taskNotSuccess(taskBean, text_taskFailed());
+                } else {
+                    taskUnbind(taskBean);
+                    Label logLabel = taskBean.getMessageLabel();
+                    logLabel.setTextFill(Color.GREEN);
+                    logLabel.setText(text_taskFinished());
+                    CheckBox showWindowRun = settingController.showWindowRun_Set;
+                    if (showWindowRun.isSelected()) {
+                        if (mainStage.isIconified()) {
+                            showStage(mainStage);
+                        }
+                    }
+                }
             } else {
                 taskUnbind(taskBean);
                 Label logLabel = taskBean.getMessageLabel();
-                logLabel.setTextFill(Color.GREEN);
-                logLabel.setText(text_taskFinished());
-                CheckBox showWindowRun = settingController.showWindowRun_Set;
-                if (showWindowRun.isSelected()) {
-                    if (mainStage.isIconified()) {
-                        showStage(mainStage);
-                    }
+                logLabel.setTextFill(Color.RED);
+                logLabel.setText(text_taskFailed());
+                if (mainStage.isIconified()) {
+                    showStage(mainStage);
                 }
             }
             clearReferences();
