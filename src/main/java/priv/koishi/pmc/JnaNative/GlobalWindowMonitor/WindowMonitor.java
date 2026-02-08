@@ -332,10 +332,15 @@ public class WindowMonitor {
      */
     public static String updateRelativeInfo(WindowInfo windowInfo) {
         Stage relativeStage = windowRelativeInfoFloating.getStage();
-        windowInfo.updateRelativeHeight((int) relativeStage.getHeight())
-                .updateRelativeWidth((int) relativeStage.getWidth())
-                .updateRelativeX((int) relativeStage.getX())
-                .updateRelativeY((int) relativeStage.getY());
+        if (!Double.isNaN(relativeStage.getX()) &&
+                !Double.isNaN(relativeStage.getY()) &&
+                !Double.isNaN(relativeStage.getWidth()) &&
+                !Double.isNaN(relativeStage.getHeight())) {
+            windowInfo.updateRelativeHeight((int) relativeStage.getHeight())
+                    .updateRelativeWidth((int) relativeStage.getWidth())
+                    .updateRelativeX((int) relativeStage.getX())
+                    .updateRelativeY((int) relativeStage.getY());
+        }
         return identify_relativeHeight() + String.format("%.2f", windowInfo.getRelativeHeight() * 100) + "%" + "\n" +
                 identify_relativeWidth() + String.format("%.2f", windowInfo.getRelativeWidth() * 100) + "%" + "\n" +
                 identify_relativeX() + String.format("%.2f", windowInfo.getRelativeX() * 100) + "%" + "\n" +
