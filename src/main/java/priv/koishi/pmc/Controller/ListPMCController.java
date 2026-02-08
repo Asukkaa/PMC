@@ -340,6 +340,7 @@ public class ListPMCController extends RootController {
                     }
                 }
                 List<ClickPositionVO> clickPositionVOS = selected.getClickPositionVOS();
+                boolean loadData = true;
                 if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
                     ObservableList<ClickPositionVO> items = autoClickController.tableView_Click.getItems();
                     if (CollectionUtils.isNotEmpty(items)) {
@@ -351,21 +352,25 @@ public class ListPMCController extends RootController {
                         ButtonBar.ButtonData buttonData = result.getButtonData();
                         if (!buttonData.isCancelButton()) {
                             items.clear();
+                        } else {
+                            loadData = false;
                         }
                     }
-                    mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
-                    TaskBean<ClickPositionVO> taskBean = autoClickController.creatTaskBean();
-                    Task<List<ClickPositionVO>> copyPMCTask = copyPMC(clickPositionVOS, taskBean);
-                    bindingTaskNode(copyPMCTask, taskBean);
-                    copyPMCTask.setOnSucceeded(_ -> {
-                        taskUnbind(taskBean);
-                        List<ClickPositionVO> copy = copyPMCTask.getValue();
-                        autoClickController.addAutoClickPositions(copy, path);
-                        autoClickController.outFileName_Click.setText(getFileName(path));
-                    });
-                    Thread.ofVirtual()
-                            .name("copyPMCSTask-vThread" + tabId)
-                            .start(copyPMCTask);
+                    if (loadData) {
+                        mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
+                        TaskBean<ClickPositionVO> taskBean = autoClickController.creatTaskBean();
+                        Task<List<ClickPositionVO>> copyPMCTask = copyPMC(clickPositionVOS, taskBean);
+                        bindingTaskNode(copyPMCTask, taskBean);
+                        copyPMCTask.setOnSucceeded(_ -> {
+                            taskUnbind(taskBean);
+                            List<ClickPositionVO> copy = copyPMCTask.getValue();
+                            autoClickController.addAutoClickPositions(copy, path);
+                            autoClickController.outFileName_Click.setText(getFileName(path));
+                        });
+                        Thread.ofVirtual()
+                                .name("copyPMCSTask-vThread" + tabId)
+                                .start(copyPMCTask);
+                    }
                 }
             }
         });
