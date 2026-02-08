@@ -23,7 +23,7 @@ exports.main = async (event) => {
     // 服务端最新版本
     const serverVersion = "4.3.1";
     // 构建日期
-    const buildDate = "2026.02.07";
+    const buildDate = "2026.02.08";
     // 获取更新信息
     const versionInfo = i18n[clientLang];
     // 拼接更新信息
