@@ -8,7 +8,8 @@ module.exports = {
         修复自动任务参数校验不通过时无法正确取消任务的问题
         修复窗口相对位置可能显示不正确的问题
         修复详情页显示窗口范围浮窗时，如果需要最小化的页面有多个时，macOS 会弹出最后隐藏的窗口的问题
-        修复【批量执行 PMC 文件】页面查看 pmc 文件详情在操作列表有数据时，选择取消查看也加载要查看的数据的问题`,
+        修复【批量执行 PMC 文件】页面查看 pmc 文件详情在操作列表有数据时，选择取消查看也加载要查看的数据的问题
+        修复【批量执行 PMC 文件】跳转逻辑检查有误的问题`,
         invalidJson: "无效的JSON请求体",
         invalidOS: "无效的操作系统参数"
     },
@@ -21,7 +22,8 @@ module.exports = {
         修復自動任務參數校驗不通過時無法正確取消任務的問題
         修復視窗相對位置可能顯示不正確的問題
         修復詳情頁顯示視窗範圍浮動視窗時，如果需要最小化的頁面有多個時，macOS 會彈出最後隱藏的視窗的問題
-        修復【批量執行 PMC 文件】頁面查看 pmc 檔案詳情時，在操作列表有資料時，選擇取消查看也會載入要查看的資料的問題`,
+        修復【批量執行 PMC 文件】頁面查看 pmc 檔案詳情時，在操作列表有資料時，選擇取消查看也會載入要查看的資料的問題
+        修復【批量執行 PMC 文件】跳轉邏輯檢查有誤的問題`,
         invalidJson: "無效的JSON請求體",
         invalidOS: "無效的作業系統參數"
     },
@@ -34,7 +36,8 @@ module.exports = {
         Fix the issue where tasks cannot be correctly canceled when automatic task parameter validation fails
         Fix the issue where the relative position of windows may display incorrectly
         Fix the issue where, when displaying a floating window within the window range on the details page, if there are multiple pages that need to be minimized, macOS will pop up the last hidden window
-        Fix the issue where, on the【Batch PMC Execution】 page, when viewing PMC file details, if there is data in the operation list, selecting to cancel the view still loads the data to be viewed`,
+        Fix the issue where, on the【Batch PMC Execution】 page, when viewing PMC file details, if there is data in the operation list, selecting to cancel the view still loads the data to be viewed
+        Fix the issue of incorrect jump logic check for 【Batch PMC Execution】`,
         invalidJson: "Invalid JSON request body",
         invalidOS: "Invalid OS parameter"
     }
