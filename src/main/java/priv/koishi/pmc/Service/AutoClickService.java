@@ -220,7 +220,13 @@ public class AutoClickService {
                         } else {
                             subTaskBean.setLoopTimes(1);
                         }
-                        subTaskBean.setBeanList(pmc.getClickPositionVOS());
+                        List<ClickPositionVO> clickPositionVOS = pmc.getClickPositionVOS();
+                        // 避免序号从 0 开始
+                        for (int j = 0; j < clickPositionVOS.size(); j++) {
+                            ClickPositionVO clickPositionVO = clickPositionVOS.get(j);
+                            clickPositionVO.setIndex(j + 1);
+                        }
+                        subTaskBean.setBeanList(clickPositionVOS);
                         // 只有在整体第一次循环的第一个任务才需要点击起始坐标
                         if (baseTaskBean.isFirstClick()) {
                             subTaskBean.setFirstClick(currentLoop == 0 && i == 0);
