@@ -2945,13 +2945,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 检查并下载更新
-     */
-    public static String update_checkUpdate_Abt() {
-        return bundle.getString("update.checkUpdate_Abt");
-    }
-
-    /**
      * @return 发现新版本
      */
     public static String update_newVersion() {
