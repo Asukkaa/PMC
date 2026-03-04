@@ -93,8 +93,28 @@ public class ScheduledService {
             new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start();
         } else if (isMac) {
             Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
+            // 卸载定时任务
+            ProcessBuilder bootoutPb = new ProcessBuilder("launchctl", "bootout",
+                    "gui/" + getCurrentUserId(), plistFile.toString());
+            Process bootoutProcess = bootoutPb.start();
+            try {
+                bootoutProcess.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             Files.deleteIfExists(plistFile);
         }
+    }
+
+    /**
+     * 获取当前用户的 ID
+     *
+     * @return 前用户的 ID
+     * @throws IOException 获取失败
+     */
+    private static String getCurrentUserId() throws IOException {
+        Process process = new ProcessBuilder("id", "-u").start();
+        return readProcessOutput(process).trim();
     }
 
     /**
