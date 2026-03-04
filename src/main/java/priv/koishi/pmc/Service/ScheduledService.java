@@ -272,7 +272,7 @@ public class ScheduledService {
                             .setPath(path);
                 }
             }
-            if (content.contains(repeatType_daily())) {
+            if (content.contains("Daily")) {
                 Pattern dailyPattern = Pattern.compile(
                         "<key>StartCalendarInterval</key>\\s*<dict>"
                                 + "\\s*<key>Hour</key><integer>(\\d+)</integer>"
@@ -340,9 +340,9 @@ public class ScheduledService {
                     LocalDateTime triggerTime = LocalDateTime.of(year, month, day, hour, minute);
                     timedTaskBean.setDate(triggerTime.toLocalDate().toString())
                             .setTime(triggerTime.format(TIME_FORMATTER))
-                            .setDateTime(triggerTime)
                             .setRepeat(repeatType_once())
-                            .setDays(repeatType_once());
+                            .setDays(repeatType_once())
+                            .setDateTime(triggerTime);
                 }
             }
             taskDetails.add(timedTaskBean);
@@ -476,11 +476,10 @@ public class ScheduledService {
                             <key>StartDate</key>
                             <string>%s</string>
                             <key>RepeatType</key>
-                            <string>%s</string>""",
+                            <string>Daily</string>""",
                     triggerTime.getHour(),
                     triggerTime.getMinute(),
-                    triggerTime.toLocalDate(),
-                    repeatType);
+                    triggerTime.toLocalDate());
         } else if (repeatType_weekly().equals(repeatType)) {
             // 支持多天执行
             String intervals = days.stream().map(day -> String.format("""
