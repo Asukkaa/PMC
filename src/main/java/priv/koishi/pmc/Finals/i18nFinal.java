@@ -1087,7 +1087,7 @@ public class i18nFinal {
                 %s%s
                 %s：%s
                 JDK %s：%s""".formatted(
-                bundle.getString("about.version"), version,
+                about_version(), version,
                 bundle.getString("tip.buildDate"), buildDate,
                 bundle.getString("tip.version"), jdkVersion);
     }
@@ -2364,6 +2364,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 当前版本：
+     */
+    public static String about_version() {
+        return bundle.getString("about.version");
+    }
+
+    /**
      * @return 日志文件删除失败
      */
     public static String about_deleteFailed() {
@@ -2945,6 +2952,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 发现新版本
+     */
+    public static String update_newVersion() {
+        return bundle.getString("update.newVersion");
+    }
+
+    /**
      * @return 下载更新失败
      */
     public static String update_downloadFailed() {
@@ -2952,10 +2966,17 @@ public class i18nFinal {
     }
 
     /**
-     * @return 发现新版本：
+     * @return 最新版本：
      */
     public static String update_findNewVersion() {
         return bundle.getString("update.findNewVersion");
+    }
+
+    /**
+     * @return 当前版本：
+     */
+    public static String update_currentVersion() {
+        return bundle.getString("update.currentVersion");
     }
 
     /**

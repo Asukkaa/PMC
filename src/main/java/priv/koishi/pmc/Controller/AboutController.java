@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -271,9 +272,11 @@ public class AboutController extends RootController {
      */
     private static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(update_checkUpdate_Abt());
-        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        " +
-                update_releaseDate() + updateInfo.getBuildDate());
+        alert.setTitle(update_newVersion());
+        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        "
+                + update_releaseDate() + updateInfo.getBuildDate() + "\n"
+                + update_currentVersion() + version + "        "
+                + update_releaseDate() + buildDate);
         // 创建包含更新信息的文本区域
         TextArea textArea = new TextArea(updateInfo.getWhatsNew());
         textArea.setEditable(false);
@@ -287,6 +290,14 @@ public class AboutController extends RootController {
         ButtonType updateButton = new ButtonType(update_updateButton());
         ButtonType laterButton = new ButtonType(update_laterButton(), ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(updateButton, laterButton);
+        Platform.runLater(() -> {
+            alert.getDialogPane().lookupButton(updateButton).setCursor(javafx.scene.Cursor.HAND);
+            alert.getDialogPane().lookupButton(laterButton).setCursor(Cursor.HAND);
+            Label headerLabel = (Label) alert.getDialogPane().lookup(".header-panel .label");
+            if (headerLabel != null) {
+                headerLabel.setStyle("-fx-font-family: 'Consolas', 'Monaco', 'Courier New', monospace;");
+            }
+        });
         // 设置窗口图标
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
         setWindowLogo(stage, logoPath);
