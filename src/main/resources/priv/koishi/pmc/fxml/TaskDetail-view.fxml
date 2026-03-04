@@ -29,6 +29,10 @@
                     <Label text="%taskDetail.repeatType"/>
                     <ChoiceBox fx:id="repeatType_TD" onAction="#repeatTypeChange" prefWidth="100"/>
                 </HBox>
+
+                <!--查看自动任务文件-->
+                <Button fx:id="showFile_TD" text="%taskDetail.showTaskFile_TD" onAction="#showTaskFile"
+                        visible="false"/>
             </HBox>
 
             <HBox spacing="5">

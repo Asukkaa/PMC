@@ -46,7 +46,7 @@ public class ScheduledService {
     /**
      * 定时任务名称
      */
-    private static final String TASK_NAME = "PMC-";
+    public static final String TASK_NAME = "PMC-";
 
     /**
      * 读取定时任务时间格式
@@ -460,7 +460,7 @@ public class ScheduledService {
      */
     private static void createMacLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
         String taskName = TASK_NAME + timedTaskBean.getTaskName();
-        Path plistPath = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
+        Path plistPath = getTaskFilePath(taskName);
         LocalDateTime triggerTime = timedTaskBean.getDateTime();
         List<Integer> days = timedTaskBean.getDayList();
         String repeatType = timedTaskBean.getRepeat();
@@ -542,6 +542,19 @@ public class ScheduledService {
         new ProcessBuilder("launchctl", "unload", plistPath.toString()).start();
         // 加载任务
         new ProcessBuilder("launchctl", "load", plistPath.toString()).start();
+    }
+
+    /**
+     * 获取 macOS 定时任务文件路径
+     *
+     * @param taskName 任务名（可不带 PMC 前缀，会自动判断并添加）
+     * @return 任务文件路径
+     */
+    public static Path getTaskFilePath(String taskName) {
+        if (!taskName.startsWith(TASK_NAME)) {
+            taskName = TASK_NAME + taskName;
+        }
+        return Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
     }
 
 }

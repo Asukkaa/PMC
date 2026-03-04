@@ -1073,6 +1073,10 @@ public class i18nFinal {
         return bundle.getString("tip.ignoreFailure");
     }
 
+    public static String tip_showTaskFile() {
+        return bundle.getString("tip.showTaskFile");
+    }
+
     /**
      * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>

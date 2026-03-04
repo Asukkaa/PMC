@@ -21,6 +21,7 @@ import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,10 +35,8 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.key_inFilePath;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.Service.ScheduledService.createTask;
-import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
-import static priv.koishi.pmc.Utils.FileUtils.getFileName;
-import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
+import static priv.koishi.pmc.Service.ScheduledService.*;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
@@ -127,7 +126,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     public TextField hourField_TD, minuteField_TD, taskNameField_TD;
 
     @FXML
-    public Button delete_TD, saveDetail_TD, removeDetail_TD, loadAutoClick_TD;
+    public Button delete_TD, saveDetail_TD, removeDetail_TD, loadAutoClick_TD, showFile_TD;
 
     @FXML
     public CheckBox monday_TD, tuesday_TD, wednesday_TD, thursday_TD, friday_TD, saturday_TD, sunday_TD;
@@ -284,6 +283,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     private void setToolTip() {
         addToolTip(tip_deletePath(), delete_TD);
         addValueToolTip(hourField_TD, tip_hour());
+        addToolTip(tip_showTaskFile(), showFile_TD);
         addValueToolTip(minuteField_TD, tip_minute());
         addToolTip(tip_loadAutoClickBtn(), loadAutoClick_TD);
         addValueToolTip(datePicker_TD.getEditor(), tip_datePicker());
@@ -362,6 +362,9 @@ public class TaskDetailController extends ManuallyChangeThemeController {
             // 编辑模式添加确认关闭确认框
             if (isEdit) {
                 addCloseConfirm();
+                if (isMac) {
+                    showFile_TD.setVisible(true);
+                }
             }
         });
     }
@@ -491,6 +494,13 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         DayOfWeek dayOfWeek = datePicker_TD.getValue().getDayOfWeek();
         weekCheckBoxMap.forEach((_, checkBox) -> checkBox.setSelected(false));
         weekCheckBoxMap.get(dayOfWeek).setSelected(true);
+    }
+
+    @FXML
+    private void showTaskFile() {
+        String taskName = TASK_NAME + selectedItem.getTaskName();
+        Path plistPath = getTaskFilePath(taskName);
+        openDirectory(String.valueOf(plistPath));
     }
 
 }
