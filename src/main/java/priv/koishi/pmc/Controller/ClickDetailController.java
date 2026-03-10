@@ -417,19 +417,18 @@ public class ClickDetailController extends RootController {
                 setNodeDisable(clickType_Det, true);
                 setNodeDisable(mouseStartX_Det, true);
                 setNodeDisable(mouseStartY_Det, true);
+            }
+            // 处理按键相关组件
+            keyCode = item.getKeyboardKeyEnum();
+            if (clickType_combinations().equals(clickType)) {
+                trajectory.addAll(item.getMoveTrajectory());
+                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
+                clickKeyHBox_Det.setVisible(false);
+            } else if (clickType_keyboard().equals(clickType)) {
+                updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
+                clickKeyHBox_Det.setVisible(false);
             } else {
-                // 处理按键相关组件
-                keyCode = item.getKeyboardKeyEnum();
-                if (clickType_combinations().equals(clickType)) {
-                    trajectory.addAll(item.getMoveTrajectory());
-                    updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getClickKey(), true);
-                    clickKeyHBox_Det.setVisible(false);
-                } else if (keyCode != noKeyboard) {
-                    updateKeyboardLabel(keyboard_Det, setKeyHBox_Det, item.getKeyboardKey(), true);
-                    clickKeyHBox_Det.setVisible(false);
-                } else {
-                    clickKeyHBox_Det.setVisible(true);
-                }
+                clickKeyHBox_Det.setVisible(true);
             }
         }
     }
@@ -1267,7 +1266,6 @@ public class ClickDetailController extends RootController {
             clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
                     key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
             showClickImg(clickImgSelectPath);
-            clickType_Det.setValue(clickType_click());
             clickTypeHBox_Det.setVisible(true);
         }
     }
@@ -1786,7 +1784,7 @@ public class ClickDetailController extends RootController {
     private void retryTypeChange() {
         String value = retryType_Det.getValue();
         retryStep_Det.setText("");
-        retryStepHBox_Det.setVisible(retryType_Step().equals(value));
+        retryStepHBox_Det.setVisible(retryType_step().equals(value));
         addValueToolTip(retryType_Det, tip_retryType(), value);
     }
 
