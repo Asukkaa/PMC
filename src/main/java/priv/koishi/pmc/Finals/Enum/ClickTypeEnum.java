@@ -35,11 +35,6 @@ public enum ClickTypeEnum {
     MOVE,
 
     /**
-     * 移动到设置坐标
-     */
-    MOVETO,
-
-    /**
      * 滚轮上滑
      */
     WHEEL_UP,

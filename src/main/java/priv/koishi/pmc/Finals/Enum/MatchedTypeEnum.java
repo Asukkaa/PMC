@@ -10,7 +10,7 @@ package priv.koishi.pmc.Finals.Enum;
 public enum MatchedTypeEnum {
 
     /**
-     * 点击匹配的图像
+     * 按操作类型设置处理匹配的图像
      */
     CLICK,
 
@@ -25,12 +25,12 @@ public enum MatchedTypeEnum {
     STEP,
 
     /**
-     * 点击匹配图像后跳转指定步骤
+     * 处理匹配图像后跳转指定步骤
      */
     CLICK_STEP,
 
     /**
-     * 匹配图像存在则重复点击
+     * 匹配图像存在则重复执行
      */
     CLICK_WHILE
 

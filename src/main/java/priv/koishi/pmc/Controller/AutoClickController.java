@@ -585,7 +585,6 @@ public class AutoClickController extends RootController implements MousePosition
     private static boolean canEdit(int clickType) {
         return clickType != ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
                 && clickType != ClickTypeEnum.MOVE.ordinal()
-                && clickType != ClickTypeEnum.MOVETO.ordinal()
                 && clickType != ClickTypeEnum.OPEN_URL.ordinal()
                 && clickType != ClickTypeEnum.OPEN_FILE.ordinal()
                 && clickType != ClickTypeEnum.RUN_SCRIPT.ordinal();

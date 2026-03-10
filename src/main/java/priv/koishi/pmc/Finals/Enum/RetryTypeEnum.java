@@ -15,7 +15,7 @@ public enum RetryTypeEnum {
     CONTINUOUSLY,
 
     /**
-     * 按设置次数重试后点击设置位置
+     * 按设置次数重试后执行设置操作
      */
     CLICK,
 
@@ -32,6 +32,11 @@ public enum RetryTypeEnum {
     /**
      * 按设置次数重试后跳转指定步骤
      */
-    STEP
+    STEP,
+
+    /**
+     * 按设置操作直到图像出现
+     */
+    CLICK_RETRY
 
 }

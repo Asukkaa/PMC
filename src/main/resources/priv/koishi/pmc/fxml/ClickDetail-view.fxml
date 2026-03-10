@@ -149,6 +149,7 @@
                                 <Label text="%unit.px"/>
                             </HBox>
 
+                            <!--忽略移动失败-->
                             <CheckBox fx:id="ignoreFailure_Det" styleClass="checkBox-short" selected="true"
                                       text="%clickDetail.ignoreFailure_Det"/>
                         </HBox>
@@ -190,6 +191,8 @@
                                         <Label fx:id="keyboard_Det" textFill="red" text="%unSetKeyboard"/>
                                     </HBox>
                                 </HBox>
+
+                                <CheckBox fx:id="ignoreImg_Det" text="%clickDetail.ignoreImg_Det"/>
                             </HBox>
                         </HBox>
 

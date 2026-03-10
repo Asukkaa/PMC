@@ -1169,6 +1169,7 @@ public class UiUtils {
      *
      * @param label     设置按键文本栏
      * @param key       要绑定的按键
+     * @param hBox      组件所在容器
      * @param isBeenSet 是否已经设置过
      */
     public static void updateKeyboardLabel(Label label, HBox hBox, String key, boolean isBeenSet) {

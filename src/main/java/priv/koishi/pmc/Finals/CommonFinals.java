@@ -34,7 +34,7 @@ public class CommonFinals {
     /**
      * PMC 文件版本
      */
-    public static final String PMCFileVersion = "2.2";
+    public static final String PMCFileVersion = "2.3";
 
     /**
      * PMCS 文件版本
@@ -49,7 +49,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.03.04";
+    public static final String buildDate = "2026.03.10";
 
     /**
      * 文件后缀名：bat
@@ -707,7 +707,7 @@ public class CommonFinals {
     /**
      * 默认操作步骤详情窗口宽度
      */
-    public static final String defaultClickDetailWidth = "1300";
+    public static final String defaultClickDetailWidth = "1350";
 
     /**
      * 默认操作步骤详情窗口高度
@@ -747,7 +747,7 @@ public class CommonFinals {
     /**
      * 默认应用窗口宽度
      */
-    public static final String defaultAppWidth = "1300";
+    public static final String defaultAppWidth = "1350";
 
     /**
      * 默认应用窗口高度

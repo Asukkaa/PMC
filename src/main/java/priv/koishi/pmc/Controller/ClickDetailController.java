@@ -270,7 +270,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
             stopAllRegion_Det, randomClickInterval_Det, updateClickWindow_Det, updateStopWindow_Det, useRelatively_Det,
-            minWindow_Det, noMove_Det, ignoreFailure_Det;
+            minWindow_Det, noMove_Det, ignoreFailure_Det, ignoreImg_Det;
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
@@ -366,6 +366,7 @@ public class ClickDetailController extends RootController {
         randomTimeOffset_Det.setText(item.getRandomTime());
         clickRetryNum_Det.setText(item.getClickRetryTimes());
         noMove_Det.setSelected(activation.equals(item.getNoMove()));
+        ignoreImg_Det.setSelected(activation.equals(item.getIgnoreImg()));
         randomClick_Det.setSelected(activation.equals(item.getRandomClick()));
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
         randomWaitTime_Det.setSelected(activation.equals(item.getRandomWaitTime()));
@@ -890,6 +891,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_minWindow(), minWindow_Det);
         addToolTip(tip_parameter(), parameter_Det);
         addToolTip(tip_clickName(), clickName_Det);
+        addToolTip(tip_ignoreImg(), ignoreImg_Det);
         addValueToolTip(windowX_Det, tip_windowX());
         addValueToolTip(windowY_Det, tip_windowY());
         addToolTip(tip_stopImgBtn(), stopImgBtn_Det);
@@ -1527,6 +1529,7 @@ public class ClickDetailController extends RootController {
         Integer retryType = retryTypeMap.getKey(retryType_Det.getValue());
         Integer clickKey = recordClickTypeMap.getKey(clickKey_Det.getValue());
         Integer matchedType = matchedTypeMap.getKey(matchedType_Det.getValue());
+        String ignoreImg = ignoreImg_Det.isSelected() ? activation : unActivation;
         String minWindow = minWindow_Det.isSelected() ? activation : unActivation;
         String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
         String useRelatively = useRelatively_Det.isSelected() ? activation : unActivation;
@@ -1577,8 +1580,7 @@ public class ClickDetailController extends RootController {
             }
         } else {
             if (clickType == ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
-                    || clickType == ClickTypeEnum.MOVE.ordinal()
-                    || clickType == ClickTypeEnum.MOVETO.ordinal()) {
+                    || clickType == ClickTypeEnum.MOVE.ordinal()) {
                 clickKey = NativeMouseEvent.NOBUTTON;
                 clickNum = 1;
                 keyCode = noKeyboard;
@@ -1633,6 +1635,7 @@ public class ClickDetailController extends RootController {
                 .setTargetPath(link)
                 .setStartX(startX)
                 .setStartY(startY)
+                .setIgnoreImg(ignoreImg)
                 .setMouseKeyEnum(clickKey)
                 .setRandomClick(randomClick)
                 .setClickTypeEnum(clickType)
@@ -1851,9 +1854,8 @@ public class ClickDetailController extends RootController {
             } else {
                 noMove_Det.setVisible(false);
             }
-            clickTypeHBox_Det.setVisible(!clickType_move().equals(value) && !clickType_moveTo().equals(value));
+            clickTypeHBox_Det.setVisible(!clickType_move().equals(value));
             clickKeyHBox_Det.setVisible(!clickType_move().equals(value)
-                    && !clickType_moveTo().equals(value)
                     && !clickType_moveTrajectory().equals(value)
                     && !clickType_wheelUp().equals(value)
                     && !clickType_wheelDown().equals(value));

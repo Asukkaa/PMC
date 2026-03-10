@@ -289,6 +289,11 @@ public class ClickPositionBean extends BaseCopyBean {
     String ignoreFailure = activation;
 
     /**
+     * 是否启用忽略图片识别坐标 0-不启用，1-启用
+     */
+    String ignoreImg = unActivation;
+
+    /**
      * 添加移动轨迹
      *
      * @param x                 横坐标

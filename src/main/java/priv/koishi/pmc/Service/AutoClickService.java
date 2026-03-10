@@ -59,6 +59,16 @@ import static priv.koishi.pmc.Utils.UiUtils.showStageAlert;
 public class AutoClickService {
 
     /**
+     * 匹配图像存在则重复点击跳转枚举
+     */
+    private static final int CLICK_WHILE = -1;
+
+    /**
+     * 按设置操作直到图像出现跳转枚举
+     */
+    private static final int CLICK_RETRY = -2;
+
+    /**
      * 执行自动流程前点击第一个起始坐标标识
      */
     private static final AtomicBoolean firstClick = new AtomicBoolean();
@@ -603,6 +613,7 @@ public class AutoClickService {
                 messageLabel = taskBean.getMessageLabel();
                 firstClick.set(taskBean.isFirstClick());
                 updateProgress(0, dataSize);
+                // 当前步骤索引
                 int currentStep = 0;
                 while (currentStep < dataSize) {
                     int progress = currentStep + 1;
@@ -687,11 +698,15 @@ public class AutoClickService {
                     ClickResultBean clickResultBean = click(clickPositionVO, robot, text, taskBean);
                     int stepIndex = clickResultBean.getStepIndex();
                     // 点击匹配图像直到图像不存在
-                    if (stepIndex == -1) {
-                        // 设置重复点击时运行参数
-                        clickPositionVO.setRetryTypeEnum(RetryTypeEnum.BREAK.ordinal())
-                                .setWaitTime(clickPositionVO.getClickInterval())
-                                .setClickNum("1");
+                    if (stepIndex == CLICK_WHILE) {
+                        // 重试直到图像不存在后跳过
+                        clickPositionVO.setRetryTypeEnum(RetryTypeEnum.BREAK.ordinal());
+                        backup.set(currentStep, clickPositionVO);
+                        continue;
+                        // 按设置操作直到图像出现
+                    } else if (stepIndex == CLICK_RETRY) {
+                        // 重试直到图像存在后跳过
+                        clickPositionVO.setMatchedTypeEnum(MatchedTypeEnum.BREAK.ordinal());
                         backup.set(currentStep, clickPositionVO);
                         continue;
                         // 跳转到指定步骤
@@ -983,7 +998,6 @@ public class AutoClickService {
         matchStopImg(clickPositionVO, nowText, taskBean, clickResultBean);
         // 匹配要点击的图像
         String clickPath = clickPositionVO.getClickImgPath();
-        int clickType = clickPositionVO.getClickTypeEnum();
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             fileName.set(getExistsFileName(new File(clickPath)));
@@ -1014,7 +1028,9 @@ public class AutoClickService {
             try (Point position = matchPointBean.getPoint()) {
                 int matchedType = clickPositionVO.getMatchedTypeEnum();
                 long end = System.currentTimeMillis();
-                if (ClickTypeEnum.MOVETO.ordinal() != clickType) {
+                // 如果开启忽略图像识别坐标后则使用原始配置的坐标
+                if (unActivation.equals(clickPositionVO.getIgnoreImg()) &&
+                        retryType != RetryTypeEnum.CLICK.ordinal()) {
                     startX = position.x() + Integer.parseInt(clickPositionVO.getImgX());
                     startY = position.y() + Integer.parseInt(clickPositionVO.getImgY());
                 }
@@ -1045,7 +1061,7 @@ public class AutoClickService {
                         clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getMatchedStep()));
                         // 匹配图像存在则重复点击
                     } else if (MatchedTypeEnum.CLICK_WHILE.ordinal() == matchedType) {
-                        clickResultBean.setStepIndex(-1);
+                        clickResultBean.setStepIndex(CLICK_WHILE);
                     }
                     // 匹配失败后或图像识别匹配逻辑为 匹配图像存在则重复点击 跳过本次操作
                 } else if (RetryTypeEnum.BREAK.ordinal() == retryType ||
@@ -1070,6 +1086,9 @@ public class AutoClickService {
                     clickResultBean.setStepIndex(Integer.parseInt(clickPositionVO.getRetryStep()))
                             .setClickLogs(clickLog.getSnapshot());
                     return clickResultBean;
+                    // 按设置操作直到图像出现
+                } else if (RetryTypeEnum.CLICK_RETRY.ordinal() == retryType) {
+                    clickResultBean.setStepIndex(CLICK_RETRY);
                 }
             }
         }

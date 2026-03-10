@@ -518,6 +518,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 勾选后运行自动操作时将会把设置的坐标作为操作坐标，而不会将图像识别到的坐标作为操作坐标
+     */
+    public static String tip_ignoreImg() {
+        return bundle.getString("tip.ignoreImg");
+    }
+
+    /**
      * @return 勾选后将会在录制自动操作时记录鼠标没有拖拽时的移动轨迹
      */
     public static String tip_recordMove() {
@@ -2840,7 +2847,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 按设置次数重试后点击设置位置
+     * @return 按设置次数重试后执行设置操作
      */
     public static String retryType_click() {
         return bundle.getString("retryType.click");
@@ -2863,8 +2870,15 @@ public class i18nFinal {
     /**
      * @return 按设置次数重试后跳转指定步骤
      */
-    public static String retryType_Step() {
+    public static String retryType_step() {
         return bundle.getString("retryType.step");
+    }
+
+    /**
+     * @return 按设置操作直到图像出现
+     */
+    public static String retryType_clickRetry() {
+        return bundle.getString("retryType.clickRetry");
     }
 
     /**
@@ -3492,7 +3506,8 @@ public class i18nFinal {
                 retryType_click(),
                 retryType_stop(),
                 retryType_break(),
-                retryType_Step());
+                retryType_step(),
+                retryType_clickRetry());
         retryTypeList.clear();
         retryTypeList.addAll(newList);
     }
@@ -3511,7 +3526,8 @@ public class i18nFinal {
         retryTypeMap.put(RetryTypeEnum.CLICK.ordinal(), retryType_click());
         retryTypeMap.put(RetryTypeEnum.STOP.ordinal(), retryType_stop());
         retryTypeMap.put(RetryTypeEnum.BREAK.ordinal(), retryType_break());
-        retryTypeMap.put(RetryTypeEnum.STEP.ordinal(), retryType_Step());
+        retryTypeMap.put(RetryTypeEnum.STEP.ordinal(), retryType_step());
+        retryTypeMap.put(RetryTypeEnum.CLICK_RETRY.ordinal(), retryType_clickRetry());
     }
 
     /**
@@ -3536,14 +3552,14 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击匹配图像后跳转指定步骤
+     * @return 处理匹配图像后跳转指定步骤
      */
     public static String clickMatched_clickStep() {
         return bundle.getString("clickMatched.clickStep");
     }
 
     /**
-     * @return 匹配图像存在则重复点击
+     * @return 匹配图像存在则重复执行
      */
     public static String clickMatched_clickWhile() {
         return bundle.getString("clickMatched.clickWhile");
@@ -3703,13 +3719,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 移动到设置坐标
-     */
-    public static String clickType_moveTo() {
-        return bundle.getString("clickType.moveTo");
-    }
-
-    /**
      * @return 滚轮上滑
      */
     public static String clickType_wheelUp() {
@@ -3771,7 +3780,6 @@ public class i18nFinal {
                 clickType_move(),
                 clickType_click(),
                 clickType_drag(),
-                clickType_moveTo(),
                 clickType_wheelUp(),
                 clickType_wheelDown(),
                 clickType_keyboard(),
@@ -3799,7 +3807,6 @@ public class i18nFinal {
         clickTypeMap.put(MOVE.ordinal(), clickType_move());
         clickTypeMap.put(CLICK.ordinal(), clickType_click());
         clickTypeMap.put(DRAG.ordinal(), clickType_drag());
-        clickTypeMap.put(MOVETO.ordinal(), clickType_moveTo());
         clickTypeMap.put(WHEEL_UP.ordinal(), clickType_wheelUp());
         clickTypeMap.put(WHEEL_DOWN.ordinal(), clickType_wheelDown());
         clickTypeMap.put(KEYBOARD.ordinal(), clickType_keyboard());
