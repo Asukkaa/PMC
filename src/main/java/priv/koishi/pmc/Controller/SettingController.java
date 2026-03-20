@@ -32,6 +32,8 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TrajectoryPointBean;
@@ -99,6 +101,11 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
  * Time:下午4:51
  */
 public class SettingController extends RootController implements MousePositionUpdater {
+
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(SettingController.class);
 
     /**
      * 页面标识符
@@ -2221,7 +2228,9 @@ public class SettingController extends RootController implements MousePositionUp
                 processBuilder = new ProcessBuilder("open", "-n", appLaunchPath);
             }
             if (processBuilder != null) {
-                processBuilder.start();
+                try (Process _ = processBuilder.start()) {
+                    logger.info("==============程序重启中====================");
+                }
             }
         }
     }
