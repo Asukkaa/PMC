@@ -1022,7 +1022,7 @@ public class AutoClickService {
                     .setMatchThreshold(clickMatchThreshold)
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
-                    .setTemplatePath(clickPath)
+                    .setTemplate(clickPath)
                     .setName(name);
             MatchPointBean matchPointBean = findPosition(findPositionConfig, clickLog);
             try (Point position = matchPointBean.getPoint()) {
@@ -1372,7 +1372,7 @@ public class AutoClickService {
                         .setMatchThreshold(stopMatchThreshold)
                         .setRetryWait(retrySecondValue)
                         .setOverTime(overTimeValue)
-                        .setTemplatePath(stopPath)
+                        .setTemplate(stopPath)
                         .setContinuously(false)
                         .setName(name);
                 MatchPointBean matchPointBean;

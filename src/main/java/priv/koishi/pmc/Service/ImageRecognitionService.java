@@ -1,7 +1,9 @@
 package priv.koishi.pmc.Service;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.DoublePointer;
+import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
@@ -9,17 +11,21 @@ import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Size;
+import org.bytedeco.tesseract.ResultIterator;
+import org.bytedeco.tesseract.TessBaseAPI;
 import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.MatchPointBean;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RecognitionTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Queue.DynamicQueue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.concurrent.*;
@@ -27,6 +33,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
+import static org.bytedeco.tesseract.global.tesseract.PSM_AUTO;
+import static org.bytedeco.tesseract.global.tesseract.RIL_WORD;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -88,7 +96,7 @@ public class ImageRecognitionService {
      */
     public static MatchPointBean findPosition(FindPositionConfig config, DynamicQueue<? super ClickLogBean> dynamicQueue) throws Exception {
         double matchThreshold = config.getMatchThreshold();
-        String templatePath = config.getTemplatePath();
+        String templatePath = config.getTemplate();
         int overTime = config.getOverTime();
         String name = config.getName();
         File file = new File(templatePath);
@@ -258,10 +266,36 @@ public class ImageRecognitionService {
         checkInterruption();
         // 初始化匹配结果存储变量
         MatchPointBean matchPointBean = new MatchPointBean();
+        int recognitionType = findPositionConfig.getRecognitionType();
+        // 图像识别
+        if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            matchPointBean = getImgMatchPointBean(findPositionConfig, screenImg, x, y);
+            // 颜色识别
+        } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            matchPointBean = colorRecognition(screenImg, findPositionConfig, x, y);
+            // 文字识别
+        } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            matchPointBean = textRecognition(screenImg, findPositionConfig, x, y);
+        }
+        return matchPointBean;
+    }
+
+    /**
+     * 图像识别
+     *
+     * @param findPositionConfig 配置信息
+     * @param screenImg          截图图像
+     * @param offsetX            截图在屏幕上的 X 偏移
+     * @param offsetY            截图在屏幕上的 Y 偏移
+     * @return 匹配点及相似度
+     * @throws IOException 读取图片失败时抛出异常
+     */
+    private static MatchPointBean getImgMatchPointBean(FindPositionConfig findPositionConfig, BufferedImage screenImg,
+                                                       int offsetX, int offsetY) throws IOException {
         AtomicReference<Double> bestVal = new AtomicReference<>(0.0);
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
-        // 读取图片为byte数组，防止中文路径乱码
-        byte[] bytes = Files.readAllBytes(new File(findPositionConfig.getTemplatePath()).toPath());
+        // 读取图片为 byte 数组，防止中文路径乱码
+        byte[] bytes = Files.readAllBytes(new File(findPositionConfig.getTemplate()).toPath());
         try (Mat screenMat = bufferedImageToMat(screenImg);
              Mat templateMat = opencv_imgcodecs.imdecode(new Mat(bytes), opencv_imgcodecs.IMREAD_UNCHANGED)) {
             // 转换为灰度图提升处理效率
@@ -297,8 +331,8 @@ public class ImageRecognitionService {
                                         double templateHeight = resizedTemplate.rows();
                                         double relX = (maxLoc.x() + templateWidth / 2.0) / scale;
                                         double relY = (maxLoc.y() + templateHeight / 2.0) / scale;
-                                        int absX = (int) Math.round(relX) + x;
-                                        int absY = (int) Math.round(relY) + y;
+                                        int absX = (int) Math.round(relX) + offsetX;
+                                        int absY = (int) Math.round(relY) + offsetY;
                                         bestLocRef.set(new Point(absX, absY));
                                     }
                                 }
@@ -309,6 +343,7 @@ public class ImageRecognitionService {
                     });
                 }
             }
+            MatchPointBean matchPointBean = new MatchPointBean();
             matchPointBean.setPoint(bestLocRef.get())
                     .setMatchThreshold((int) (bestVal.get() * 100));
             // 匹配成功返回匹配坐标和匹配度，否则只返回匹配度
@@ -316,7 +351,159 @@ public class ImageRecognitionService {
                 return matchPointBean;
             }
         }
-        return matchPointBean;
+        return null;
+    }
+
+    /**
+     * 颜色识别
+     *
+     * @param screenImg 截图图像
+     * @param config    配置信息
+     * @param offsetX   截图在屏幕上的 X 偏移
+     * @param offsetY   截图在屏幕上的 Y 偏移
+     * @return 匹配点及相似度
+     */
+    private static MatchPointBean colorRecognition(BufferedImage screenImg, FindPositionConfig config,
+                                                   int offsetX, int offsetY) {
+        // 解析目标颜色（假设 template 字段存储的是颜色值，例如 "#FF0000" 或 "255,0,0"）
+        String colorStr = config.getTemplate();
+        Color targetColor = parseColor(colorStr);
+        int tolerance = config.getColorTolerance();
+        int width = screenImg.getWidth();
+        int height = screenImg.getHeight();
+        double bestSimilarity = 0.0;
+        int bestX = 0, bestY = 0;
+        // 遍历每个像素
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgb = screenImg.getRGB(x, y);
+                Color pixelColor = new Color(rgb);
+                double similarity = colorSimilarity(pixelColor, targetColor, tolerance);
+                if (similarity > bestSimilarity) {
+                    bestSimilarity = similarity;
+                    bestX = x;
+                    bestY = y;
+                    // 完全匹配，提前退出
+                    if (bestSimilarity >= 0.99) {
+                        break;
+                    }
+                }
+            }
+            if (bestSimilarity >= 0.99) break;
+        }
+        MatchPointBean result = new MatchPointBean();
+        result.setPoint(new Point(bestX + offsetX, bestY + offsetY));
+        result.setMatchThreshold((int) (bestSimilarity * 100));
+        return result;
+    }
+
+    /**
+     * 解析颜色字符串，支持 "#RRGGBB" 或 "R,G,B" 格式
+     */
+    private static Color parseColor(String colorStr) {
+        if (colorStr.startsWith("#")) {
+            return Color.decode(colorStr);
+        } else if (colorStr.contains(",")) {
+            String[] parts = colorStr.split(",");
+            int r = Integer.parseInt(parts[0].trim());
+            int g = Integer.parseInt(parts[1].trim());
+            int b = Integer.parseInt(parts[2].trim());
+            return new Color(r, g, b);
+        } else {
+            throw new IllegalArgumentException("不支持的颜色格式: " + colorStr);
+        }
+    }
+
+    /**
+     * 计算两个颜色的相似度（基于 RGB 欧氏距离，带容差）
+     *
+     * @return 0~1 之间的相似度，1 表示完全相同（或在容差范围内）
+     */
+    private static double colorSimilarity(Color c1, Color c2, int tolerance) {
+        double dr = c1.getRed() - c2.getRed();
+        double dg = c1.getGreen() - c2.getGreen();
+        double db = c1.getBlue() - c2.getBlue();
+        double distance = Math.sqrt(dr * dr + dg * dg + db * db);
+        // 最大可能距离 sqrt(3 * 255^2) ≈ 441.67
+        if (distance <= tolerance) {
+            return 1.0;
+        }
+        return 1.0 - Math.min(1.0, distance / 441.67);
+    }
+
+    /**
+     * 文字识别
+     *
+     * @param screenImg 截图图像
+     * @param config    配置信息
+     * @param offsetX   截图偏移
+     * @param offsetY   截图偏移
+     * @return 匹配点及置信度
+     */
+    private static MatchPointBean textRecognition(BufferedImage screenImg, FindPositionConfig config,
+                                                  int offsetX, int offsetY) {
+        String targetText = config.getTemplate();
+        if (StringUtils.isEmpty(targetText)) {
+            throw new IllegalArgumentException("待识别的文字不能为空");
+        }
+        // 1. 转换为 Mat 并灰度化
+        Mat imageMat = bufferedImageToMat(screenImg);
+        Mat grayMat = new Mat();
+        cvtColor(imageMat, grayMat, COLOR_BGR2GRAY);
+        // 2. 初始化 Tesseract
+        try (TessBaseAPI api = new TessBaseAPI()) {
+            String dataPath = "tessdata/简体中文.traineddata";
+            String language = config.getOcrLanguage();
+            if (api.Init(dataPath, language) != 0) {
+                throw new RuntimeException("Tesseract 初始化失败，请检查 tessdata 路径: " + dataPath);
+            }
+            // 设置页面分割模式为自动
+            api.SetPageSegMode(PSM_AUTO);
+            // 将灰度图数据传递给 Tesseract
+            api.SetImage(grayMat.data(), grayMat.cols(), grayMat.rows(),
+                    (int) grayMat.elemSize(), (int) grayMat.step1());
+            // 3. 获取结果迭代器
+            ResultIterator ri = api.GetIterator();
+            if (ri == null) {
+                return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
+            }
+            float bestConfidence = 0.0f;
+            Point bestCenter = null;
+            // 4. 遍历所有单词
+            do {
+                // 获取单词文本
+                BytePointer wordTextPtr = ri.GetUTF8Text(RIL_WORD);
+                if (wordTextPtr == null) continue;
+                String word = wordTextPtr.getString().trim();
+                wordTextPtr.deallocate();
+                if (word.equalsIgnoreCase(targetText)) {
+                    // 获取单词边界框
+                    IntPointer x1 = new IntPointer(1);
+                    IntPointer y1 = new IntPointer(1);
+                    IntPointer x2 = new IntPointer(1);
+                    IntPointer y2 = new IntPointer(1);
+                    if (ri.BoundingBox(RIL_WORD, x1, y1, x2, y2)) {
+                        float confidence = ri.Confidence(RIL_WORD);
+                        if (confidence > bestConfidence) {
+                            bestConfidence = confidence;
+                            int centerX = (x1.get() + x2.get()) / 2 + offsetX;
+                            int centerY = (y1.get() + y2.get()) / 2 + offsetY;
+                            bestCenter = new Point(centerX, centerY);
+                        }
+                    }
+                }
+            } while (ri.Next(RIL_WORD));
+            if (bestCenter != null) {
+                // 将浮点置信度转为整数（四舍五入）
+                int matchThreshold = Math.round(bestConfidence);
+                return new MatchPointBean()
+                        .setPoint(bestCenter)
+                        .setMatchThreshold(matchThreshold);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("文字识别失败: " + e.getMessage(), e);
+        }
+        return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
     }
 
     /**

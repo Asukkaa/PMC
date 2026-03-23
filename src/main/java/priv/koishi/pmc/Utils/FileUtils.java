@@ -132,8 +132,9 @@ public class FileUtils {
             try {
                 if (app.equals(getFileType(openPath)) && isMac) {
                     ProcessBuilder pb = new ProcessBuilder("open", openPath);
-                    Process process = pb.start();
-                    process.waitFor();
+                    try (Process process = pb.start()) {
+                        process.waitFor();
+                    }
                 } else {
                     Desktop.getDesktop().open(file);
                 }
@@ -188,9 +189,9 @@ public class FileUtils {
             } else {
                 processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
             }
-            try {
-                processBuilder.start();
-            } catch (IOException e) {
+            try (Process process = processBuilder.start()) {
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }

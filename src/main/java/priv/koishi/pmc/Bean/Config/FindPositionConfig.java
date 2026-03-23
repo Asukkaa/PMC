@@ -15,9 +15,24 @@ import lombok.experimental.Accessors;
 public class FindPositionConfig {
 
     /**
-     * 要识别的图像路径
+     * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
      */
-    String templatePath;
+    int recognitionType;
+
+    /**
+     * 根据识别类型匹配要识别的图像路径/要识别的颜色/要识别的文字
+     */
+    String template;
+
+    /**
+     * 颜色容差（0-255）
+     */
+    int colorTolerance = 10;
+
+    /**
+     * OCR 语言，默认简体中文
+     */
+    String ocrLanguage = "chi_sim";
 
     /**
      * 最大重试次数

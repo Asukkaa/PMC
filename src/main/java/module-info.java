@@ -19,6 +19,7 @@ module priv.koishi.pmc {
     requires com.sun.jna.platform;
     requires atlantafx.base;
     requires tools.jackson.databind;
+    requires org.bytedeco.tesseract;
 
     opens priv.koishi.pmc to javafx.fxml;
     exports priv.koishi.pmc;
