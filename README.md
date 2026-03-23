@@ -26,7 +26,7 @@
 
 .pmcs 文件为多个 .pmc 文件的集合设置文件，用于批量执行 .pmc 文件，只记录了文件信息，不包含具体操作流程，需与 .pmc 文件配合使用。
 
-本项目打包工具为 maven javafx:jlink 插件 + jpackage ，使用 jdk 版本为 Amazon Corretto 25 。
+本项目打包工具为 maven javafx:jlink 插件 + jpackage ，使用 jdk 版本为 Amazon Corretto 26 。
 
 ## 项目背景
 
