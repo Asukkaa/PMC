@@ -420,14 +420,14 @@ public class i18nFinal {
     }
 
     /**
-     * @return 点击后可添加需要点击的图片，建议选择特征明显范围较小的图片
+     * @return 点击后可添加需目标图像，建议选择特征明显范围较小的图片
      */
     public static String tip_clickImgBtn() {
         return bundle.getString("tip.clickImgBtn");
     }
 
     /**
-     * @return 删除需要点击的图片
+     * @return 删除需目标图像
      */
     public static String tip_removeClickImgBtn() {
         return bundle.getString("tip.removeClickImgBtn");
@@ -441,14 +441,14 @@ public class i18nFinal {
     }
 
     /**
-     * @return 将当前步骤的步骤名称更改为要点击的图片名称
+     * @return 将当前步骤的步骤名称更改为目标图像名称
      */
     public static String tip_updateClickNameBtn() {
         return bundle.getString("tip.updateClickNameBtn");
     }
 
     /**
-     * @return 将当前步骤的步骤名称更改为要点击的图片名称
+     * @return 将当前步骤的步骤名称更改为目标图像名称
      */
     public static String tip_overtime() {
         return bundle.getString("tip.overtime");
@@ -678,7 +678,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return <p>要点击的图片识别没有匹配项后将会按照设置次数再次识别</p>
+     * @return <p>目标图像识别没有匹配项后将会按照设置次数再次识别</p>
      * 只能填自然数，不填默认为
      */
     public static String tip_clickRetryNum() {

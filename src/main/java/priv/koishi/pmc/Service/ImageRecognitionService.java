@@ -233,7 +233,7 @@ public class ImageRecognitionService {
             w = (int) (infoW * windowInfo.getRelativeWidth());
             h = (int) (infoH * windowInfo.getRelativeHeight());
         } else {
-            // 识别次数大于1且开启全屏重试
+            // 识别次数大于 1 且开启全屏重试
             if (findPositionConfig.getFindTime() > 1 && activation.equals(config.getAllRegion())) {
                 x = 0;
                 y = 0;
@@ -268,7 +268,7 @@ public class ImageRecognitionService {
             try (Mat screenGray = new Mat(); Mat templateGray = new Mat()) {
                 cvtColor(screenMat, screenGray, COLOR_BGR2GRAY);
                 cvtColor(templateMat, templateGray, COLOR_BGR2GRAY);
-                // DPI缩放补偿：根据系统缩放反向调整模板尺寸
+                // DPI 缩放补偿：根据系统缩放反向调整模板尺寸
                 try (Mat dpiAdjustedTemplate = new Mat()) {
                     resize(templateGray, dpiAdjustedTemplate,
                             new Size((int) (templateGray.cols() / dpiScale),
@@ -338,7 +338,7 @@ public class ImageRecognitionService {
         } finally {
             g.dispose();
         }
-        // 转换时数据类型为CV_8U
+        // 转换时数据类型为 CV_8U
         try (Java2DFrameConverter frameConverter = new Java2DFrameConverter();
              OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat()) {
             Frame frame = frameConverter.convert(converted);
