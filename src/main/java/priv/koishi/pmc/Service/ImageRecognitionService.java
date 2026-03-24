@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.bytedeco.opencv.global.opencv_core.minMaxLoc;
+import static org.bytedeco.opencv.global.opencv_core.*;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 import static org.bytedeco.tesseract.global.tesseract.PSM_AUTO;
 import static org.bytedeco.tesseract.global.tesseract.RIL_WORD;
@@ -269,12 +269,15 @@ public class ImageRecognitionService {
         int recognitionType = findPositionConfig.getRecognitionType();
         // 图像识别
         if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            System.out.println("图像识别");
             matchPointBean = getImgMatchPointBean(findPositionConfig, screenImg, x, y);
             // 颜色识别
         } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            System.out.println("颜色识别");
             matchPointBean = colorRecognition(screenImg, findPositionConfig, x, y);
             // 文字识别
         } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            System.out.println("文字识别");
             matchPointBean = textRecognition(screenImg, findPositionConfig, x, y);
         }
         return matchPointBean;
@@ -365,35 +368,80 @@ public class ImageRecognitionService {
      */
     private static MatchPointBean colorRecognition(BufferedImage screenImg, FindPositionConfig config,
                                                    int offsetX, int offsetY) {
-        // 解析目标颜色（假设 template 字段存储的是颜色值，例如 "#FF0000" 或 "255,0,0"）
+        // 解析目标颜色（保留硬编码用于测试）
         String colorStr = config.getTemplate();
         Color targetColor = parseColor(colorStr);
         int tolerance = config.getColorTolerance();
+        double matchThreshold = config.getMatchThreshold() / 100.0;
         int width = screenImg.getWidth();
         int height = screenImg.getHeight();
-        double bestSimilarity = 0.0;
-        int bestX = 0, bestY = 0;
-        // 遍历每个像素
+        // 记录最大相似度及其坐标
+        double maxSimilarity = 0.0;
+        int maxX = 0, maxY = 0;
+        // 1. 构建掩码数据，同时记录最大相似度
+        byte[] maskData = new byte[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int rgb = screenImg.getRGB(x, y);
                 Color pixelColor = new Color(rgb);
                 double similarity = colorSimilarity(pixelColor, targetColor, tolerance);
-                if (similarity > bestSimilarity) {
-                    bestSimilarity = similarity;
-                    bestX = x;
-                    bestY = y;
-                    // 完全匹配，提前退出
-                    if (bestSimilarity >= 0.99) {
-                        break;
-                    }
+                if (similarity > maxSimilarity) {
+                    maxSimilarity = similarity;
+                    maxX = x;
+                    maxY = y;
+                }
+                if (similarity >= matchThreshold) {
+                    maskData[y * width + x] = (byte) 255; // 白色（前景）
+                } else {
+                    maskData[y * width + x] = 0;          // 黑色（背景）
                 }
             }
-            if (bestSimilarity >= 0.99) break;
         }
+        // 如果没有达到阈值的像素，直接返回最高相似度点（兼容原行为）
+        if (maxSimilarity < matchThreshold) {
+            return new MatchPointBean()
+                    .setPoint(new Point(maxX + offsetX, maxY + offsetY))
+                    .setMatchThreshold((int) (maxSimilarity * 100));
+        }
+        // 2. 将 byte[] 转换为 BytePointer 并创建掩码 Mat（CV_8UC1）
+        BytePointer maskPtr = new BytePointer(maskData);
+        Mat mask = new Mat(height, width, CV_8UC1, maskPtr);
+        // 3. 连通组件分析
+        Mat labels = new Mat();
+        Mat stats = new Mat();
+        Mat centroids = new Mat();
+        int numLabels = connectedComponentsWithStats(mask, labels, stats, centroids, 8, CV_32S);
         MatchPointBean result = new MatchPointBean();
-        result.setPoint(new Point(bestX + offsetX, bestY + offsetY));
-        result.setMatchThreshold((int) (bestSimilarity * 100));
+        if (numLabels <= 1) {
+            // 没有找到匹配区域（只有背景），返回最高相似度点
+            result.setPoint(new Point(maxX + offsetX, maxY + offsetY))
+                    .setMatchThreshold((int) (maxSimilarity * 100));
+        } else {
+            // 4. 找出面积最大的连通区域（排除背景 label=0）
+            int maxArea = 0;
+            int maxLabel = 1;
+            for (int i = 1; i < numLabels; i++) {
+                int area = new IntPointer(stats.ptr(i)).get(CC_STAT_AREA);
+                if (area > maxArea) {
+                    maxArea = area;
+                    maxLabel = i;
+                }
+            }
+            // 5. 获取该区域的质心坐标
+            DoublePointer centroidPtr = new DoublePointer(centroids.ptr(maxLabel));
+            double centerX = centroidPtr.get(0);
+            double centerY = centroidPtr.get(1);
+            int finalX = (int) Math.round(centerX) + offsetX;
+            int finalY = (int) Math.round(centerY) + offsetY;
+            result.setPoint(new Point(finalX, finalY));
+            // 置信度：设为最大相似度（与原有行为一致）
+            result.setMatchThreshold((int) (maxSimilarity * 100));
+        }
+        // 6. 释放资源
+        mask.close();
+        labels.close();
+        stats.close();
+        centroids.close();
         return result;
     }
 
