@@ -446,6 +446,29 @@
                             </HBox>
                         </HBox>
 
+                        <HBox spacing="10">
+                            <HBox styleClass="hBox-270-5">
+                                <!--图像识别类型:-->
+                                <Label text="%clickDetail.recognitionType"/>
+                                <ChoiceBox fx:id="recognitionType_Det" prefWidth="150"
+                                           onAction="#recognitionTypeChange"/>
+                            </HBox>
+
+                            <HBox fx:id="colorHBox_Det" spacing="10">
+                                <!--目标颜色:-->
+                                <Label text="%clickDetail.targetColor"/>
+                                <ColorPicker fx:id="colorPicker_Det" prefWidth="120"/>
+                                <Button fx:id="getColor_Det" onAction="#getColor" prefHeight="20"
+                                        styleClass="img-button-style">
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@../icon/ColorGetter.png"/>
+                                        </ImageView>
+                                    </graphic>
+                                </Button>
+                            </HBox>
+                        </HBox>
+
                         <HBox spacing="20">
                             <VBox spacing="10">
                                 <HBox spacing="10">
@@ -481,7 +504,7 @@
                                 </TableView>
                             </VBox>
 
-                            <VBox spacing="10">
+                            <VBox fx:id="findImgVBox_Det" spacing="10">
                                 <HBox spacing="5">
                                     <!--选择要点击的图片-->
                                     <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath"

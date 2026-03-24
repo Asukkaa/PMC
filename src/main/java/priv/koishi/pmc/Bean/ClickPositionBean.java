@@ -9,10 +9,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.AbstractBean.BaseCopyBean;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
-import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
-import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
-import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
-import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.Finals.Enum.*;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Serializer.DoubleStringToIntSerializer;
 import tools.jackson.databind.annotation.JsonSerialize;
@@ -111,9 +108,9 @@ public class ClickPositionBean extends BaseCopyBean {
     int keyboardKeyEnum = noKeyboard;
 
     /**
-     * 要识别的图片路径
+     * 目标图像（根据图像识别类型可以是：图片路径/颜色/文字）
      */
-    String clickImgPath;
+    String clickImgTarget;
 
     /**
      * 终止操作的图片
@@ -292,6 +289,11 @@ public class ClickPositionBean extends BaseCopyBean {
      * 是否启用忽略图片识别坐标 0-不启用，1-启用
      */
     String ignoreImg = unActivation;
+
+    /**
+     * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
+     */
+    int recognitionType = RecognitionTypeEnum.IMAGE.ordinal();
 
     /**
      * 添加移动轨迹

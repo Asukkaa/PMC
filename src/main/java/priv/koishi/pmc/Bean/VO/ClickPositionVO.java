@@ -69,7 +69,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable, Img
      */
     @Override
     public Image loadThumb() {
-        if (StringUtils.isBlank(getClickImgPath())) {
+        if (StringUtils.isBlank(getClickImgTarget())) {
             return null;
         }
         if (thumb == null) {
@@ -84,7 +84,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable, Img
      */
     private void loadThumbnailAsync() {
         try {
-            String path = getClickImgPath();
+            String path = getClickImgTarget();
             if (isImgFile(new File(path))) {
                 // 终止进行中的服务
                 if (currentThumbThread != null && currentThumbThread.isAlive()) {
@@ -149,7 +149,7 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable, Img
      * 更新缩略图
      */
     public void updateThumb() {
-        if (StringUtils.isNotBlank(getClickImgPath())) {
+        if (StringUtils.isNotBlank(getClickImgTarget())) {
             // 异步加载缩略图（防止阻塞UI）
             loadThumbnailAsync();
         }

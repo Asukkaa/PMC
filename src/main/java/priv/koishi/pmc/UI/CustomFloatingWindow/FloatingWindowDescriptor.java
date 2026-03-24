@@ -252,6 +252,11 @@ public class FloatingWindowDescriptor {
     boolean showRelativeInfo;
 
     /**
+     * 追加的自定义内容
+     */
+    Node additionalContent;
+
+    /**
      * 销毁浮窗
      */
     public void dispose() {

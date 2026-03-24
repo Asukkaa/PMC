@@ -254,13 +254,13 @@ public class PMCFileService {
         int size = clickPositionBeans.size();
         for (int j = 0; j < size; j++) {
             ClickPositionVO clickPositionVO = clickPositionBeans.get(j);
-            String clickImgPath = clickPositionVO.getClickImgPath();
+            String clickImgPath = clickPositionVO.getClickImgTarget();
             if (StringUtils.isNotBlank(clickImgPath)) {
                 File file = new File(clickImgPath);
                 if (!file.exists()) {
                     String imgPath = getSameNameImgPath(imgMap, file);
                     if (StringUtils.isNotBlank(imgPath)) {
-                        clickPositionVO.setClickImgPath(imgPath);
+                        clickPositionVO.setClickImgTarget(imgPath);
                     }
                 }
             }

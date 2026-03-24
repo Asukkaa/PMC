@@ -2105,6 +2105,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 取色器浮窗
+     */
+    public static String text_colorPickerFloating() {
+        return bundle.getString("colorPickerFloating");
+    }
+
+    /**
+     * @return 当前颜色：
+     */
+    public static String text_nowColor() {
+        return bundle.getString("nowColor");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
@@ -3964,6 +3978,59 @@ public class i18nFinal {
     }
 
     /**
+     * @return 图片识别
+     */
+    public static String recognitionType_img() {
+        return bundle.getString("recognitionType.img");
+    }
+
+    /**
+     * @return 颜色识别
+     */
+    public static String recognitiontype_color() {
+        return bundle.getString("recognitionType.color");
+    }
+
+    /**
+     * @return 文本识别
+     */
+    public static String recognitiontype_text() {
+        return bundle.getString("recognitionType.text");
+    }
+
+    /**
+     * 图像识别类型下拉框选项
+     */
+    public static final List<String> recognitionTypeList = new ArrayList<>();
+
+    /**
+     * 更新图像识别类型选项
+     */
+    public static void updateRecognitionTypeList() {
+        List<String> newList = Arrays.asList(
+                recognitionType_img(),
+                recognitiontype_color(),
+                recognitiontype_text());
+        recognitionTypeList.clear();
+        recognitionTypeList.addAll(newList);
+    }
+
+    /**
+     * 图像识别类型映射
+     */
+    public static final BidiMap<Integer, String> recognitionTypeMap = new DualHashBidiMap<>();
+
+    /**
+     * 更新图像识别类型映射
+     */
+    public static void updateRecognitionTypeMap() {
+        recognitionTypeMap.clear();
+        recognitionTypeMap.put(RecognitionTypeEnum.IMAGE.ordinal(), recognitionType_img());
+        recognitionTypeMap.put(RecognitionTypeEnum.COLOR.ordinal(), recognitiontype_color());
+        recognitionTypeMap.put(RecognitionTypeEnum.TEXT.ordinal(), recognitiontype_text());
+    }
+
+    /**
      * 原生模式
      */
     public static String theme_javafx() {
@@ -4074,6 +4141,10 @@ public class i18nFinal {
         updateFindImgTypeList();
         // 更新图像识别区域类型选项映射
         updateFindImgTypeMap();
+        // 更新图像识别类型选项
+        updateRecognitionTypeList();
+        // 更新图像识别类型映射
+        updateRecognitionTypeMap();
         // 更新外观选项
         updateThemeList();
         // 更新外观选项映射

@@ -39,14 +39,12 @@ import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Callback.InputRecordCallback;
-import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
-import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
-import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
-import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.Finals.Enum.*;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.UI.CustomFloatingWindow.ColorPickerFloating;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -241,16 +239,21 @@ public class ClickDetailController extends RootController {
     public BorderPane borderPane_Det;
 
     @FXML
-    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det, commonVBox_Det;
+    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det, commonVBox_Det,
+            findImgVBox_Det;
 
     @FXML
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det, moveWindowHBox_Det;
+            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det, moveWindowHBox_Det,
+            colorHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
+
+    @FXML
+    public ColorPicker colorPicker_Det;
 
     @FXML
     public Slider clickOpacity_Det, stopOpacity_Det;
@@ -260,12 +263,12 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public ChoiceBox<String> clickType_Det, retryType_Det, matchedType_Det, clickKey_Det, clickFindImgType_Det,
-            stopFindImgType_Det;
+            stopFindImgType_Det, recognitionType_Det;
 
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
             updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
-            workDir_Det, removeWorkPath_Det, moveWindow_Det;
+            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
@@ -345,7 +348,7 @@ public class ClickDetailController extends RootController {
         // 初始终止操作图片列表
         initStopImg(item.getStopImgFiles());
         // 展示要点击的图片
-        showClickImg(item.getClickImgPath());
+        showClickImg(item.getClickImgTarget());
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
@@ -1001,6 +1004,8 @@ public class ClickDetailController extends RootController {
         initializeChoiceBoxItems(stopFindImgType_Det, findImgType_all(), findImgTypeList);
         // 要点击的图像识别区域设置
         initializeChoiceBoxItems(clickFindImgType_Det, findImgType_all(), findImgTypeList);
+        // 图像识别类型设置
+        initializeChoiceBoxItems(recognitionType_Det, recognitionType_img(), recognitionTypeList);
     }
 
     /**
@@ -1629,6 +1634,14 @@ public class ClickDetailController extends RootController {
                             .setRelativeY(relativelyY_Det.getText());
                 }
             }
+            String recognitionType = recognitionType_Det.getValue();
+            if (recognitionType_img().equals(recognitionType)) {
+                selectedItem.setRecognitionType(RecognitionTypeEnum.IMAGE.ordinal())
+                        .setClickImgTarget(clickImgPath_Det.getText());
+            } else if (recognitiontype_color().equals(recognitionType)) {
+                selectedItem.setRecognitionType(RecognitionTypeEnum.COLOR.ordinal())
+                        .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()));
+            }
         }
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
                 .setClickImgSelectPath(clickImgSelectPath)
@@ -1650,7 +1663,6 @@ public class ClickDetailController extends RootController {
                 .setParameter(parameter_Det.getText())
                 .setRandomTrajectory(randomTrajectory)
                 .setClickNum(String.valueOf(clickNum))
-                .setClickImgPath(clickImgPath_Det.getText())
                 .setRandomClickInterval(randomClickInterval)
                 .setStopImgFiles(new ArrayList<>(tableView_Det.getItems()))
                 .setStopMatchThreshold(String.valueOf(stopOpacity_Det.getValue()))
@@ -2259,6 +2271,29 @@ public class ClickDetailController extends RootController {
         }
         dragEvent.setDropCompleted(true);
         dragEvent.consume();
+    }
+
+    /**
+     * 图像识别类型下拉框
+     */
+    @FXML
+    private void recognitionTypeChange() {
+        String value = recognitionType_Det.getValue();
+        if (recognitionType_img().equals(value)) {
+            findImgVBox_Det.setVisible(true);
+            colorHBox_Det.setVisible(false);
+        } else if (recognitiontype_color().equals(value)) {
+            findImgVBox_Det.setVisible(false);
+            colorHBox_Det.setVisible(true);
+        }
+    }
+
+    /**
+     * 取色器
+     */
+    @FXML
+    private void getColor() {
+        new ColorPickerFloating(colorPicker_Det).start();
     }
 
 }

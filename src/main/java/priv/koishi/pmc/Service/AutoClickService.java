@@ -651,7 +651,7 @@ public class AutoClickService {
                             continue;
                         }
                     }
-                    // 处理相对路径
+                    // 处理相对坐标
                     String useRelative = clickPositionVO.getUseRelative();
                     if (clickWindowConfig != null &&
                             FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
@@ -672,7 +672,7 @@ public class AutoClickService {
                     }
                     String clickTime = clickPositionVO.getClickTime();
                     String interval = clickPositionVO.getClickInterval();
-                    String clickImgPath = clickPositionVO.getClickImgPath();
+                    String clickImgPath = clickPositionVO.getClickImgTarget();
                     int clickNum = Integer.parseInt(clickPositionVO.getClickNum()) - 1;
                     String clickText = text_taskInfo() + clickPositionVO.getClickType() + " ";
                     if (clickType == ClickTypeEnum.CLICK.ordinal() ||
@@ -997,7 +997,7 @@ public class AutoClickService {
         // 匹配终止操作图像
         matchStopImg(clickPositionVO, nowText, taskBean, clickResultBean);
         // 匹配要点击的图像
-        String clickPath = clickPositionVO.getClickImgPath();
+        String clickPath = clickPositionVO.getClickImgTarget();
         AtomicReference<String> fileName = new AtomicReference<>();
         if (StringUtils.isNotBlank(clickPath)) {
             fileName.set(getExistsFileName(new File(clickPath)));
@@ -1651,16 +1651,16 @@ public class AutoClickService {
             for (int i = 0; i < size; i++) {
                 ClickPositionVO newData = newDataList.get(i);
                 // 校验目标图像路径
-                String newClickImg = newData.getClickImgPath();
+                String newClickImg = newData.getClickImgTarget();
                 if (StringUtils.isNoneBlank(newClickImg)) {
                     File newClickFile = new File(newClickImg);
                     if (!newClickFile.exists()) {
-                        String oldClickImg = oldDataList.get(i).getClickImgPath();
+                        String oldClickImg = oldDataList.get(i).getClickImgTarget();
                         if (StringUtils.isNoneBlank(oldClickImg)) {
                             File oldClickFile = new File(oldClickImg);
                             if (oldClickFile.exists()) {
                                 if (getFileFullName(oldClickFile).equals(getFileFullName(newClickFile))) {
-                                    newData.setClickImgPath(oldClickImg);
+                                    newData.setClickImgTarget(oldClickImg);
                                 }
                             }
                         }

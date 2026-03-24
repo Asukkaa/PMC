@@ -285,7 +285,7 @@ public class TableViewUtils {
                 if (bean instanceof ImgFileVO imgFileVO) {
                     imgPath = imgFileVO.getPath();
                 } else if (bean instanceof ClickPositionVO clickPositionVO) {
-                    imgPath = clickPositionVO.getClickImgPath();
+                    imgPath = clickPositionVO.getClickImgTarget();
                 }
                 // 只有在有图片路径但图片不存在时，才让缩略图提示文字变红
                 if (StringUtils.isBlank(imgPath)) {
@@ -828,9 +828,9 @@ public class TableViewUtils {
                 ClickPositionVO selectedItem = selectedItems.getFirst();
                 Window window = tableView.getScene().getWindow();
                 AutoClickController.isSonOpening = true;
-                File file = creatImgFileChooser(window, selectedItem.getClickImgPath());
+                File file = creatImgFileChooser(window, selectedItem.getClickImgTarget());
                 if (file != null) {
-                    selectedItem.setClickImgPath(file.getAbsolutePath());
+                    selectedItem.setClickImgTarget(file.getAbsolutePath());
                     selectedItem.updateThumb();
                 }
                 AutoClickController.isSonOpening = false;
