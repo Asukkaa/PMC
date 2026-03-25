@@ -219,6 +219,8 @@ public class ClickDetailController extends RootController {
      */
     private Stage stage;
 
+    ColorPickerFloating colorPickerFloating;
+
     /**
      * 浮窗配置
      */
@@ -1031,6 +1033,10 @@ public class ClickDetailController extends RootController {
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
         }
+        if (colorPickerFloating != null) {
+            colorPickerFloating.close();
+            colorPickerFloating = null;
+        }
         if (stage != null) {
             stage.close();
             stage = null;
@@ -1518,6 +1524,8 @@ public class ClickDetailController extends RootController {
             tableViewDragRow(tableView_Det);
             // 构建右键菜单
             buildContextMenu();
+            // 绑定取色器
+            colorPickerFloating = new ColorPickerFloating();
         });
     }
 
@@ -2293,7 +2301,9 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void getColor() {
-        new ColorPickerFloating(colorPicker_Det).start();
+        if (colorPickerFloating != null && !colorPickerFloating.isShowing()) {
+            colorPickerFloating.start(colorPicker_Det);
+        }
     }
 
 }

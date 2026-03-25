@@ -65,7 +65,7 @@ public class ColorPickerFloating implements MousePositionUpdater {
     /**
      * 需要绑定的颜色选择器
      */
-    private final ColorPicker colorPicker;
+    private ColorPicker colorPicker;
 
     /**
      * 当前颜色
@@ -79,13 +79,9 @@ public class ColorPickerFloating implements MousePositionUpdater {
 
     /**
      * 构造函数
-     *
-     * @param colorPicker 需要绑定的颜色选择器
      */
-    public ColorPickerFloating(ColorPicker colorPicker) {
+    public ColorPickerFloating() {
         messageFloating = new FloatingWindowDescriptor();
-        this.colorPicker = colorPicker;
-        robot = new Robot();
         // 配置描述符
         configureDescriptor();
         // 创建浮窗
@@ -136,8 +132,15 @@ public class ColorPickerFloating implements MousePositionUpdater {
 
     /**
      * 启动取色器
+     *
+     * @param colorPicker 需要绑定的颜色选择器
      */
-    public void start() {
+    public void start(ColorPicker colorPicker) {
+        if (colorPicker != null) {
+            this.colorPicker = colorPicker;
+            colorPicker.getScene().getRoot().setDisable(true);
+        }
+        robot = new Robot();
         // 注册监听器
         registerListeners();
         // 显示浮窗
@@ -155,7 +158,11 @@ public class ColorPickerFloating implements MousePositionUpdater {
             @Override
             public void nativeMouseClicked(NativeMouseEvent e) {
                 if (color != null) {
-                    Platform.runLater(() -> colorPicker.setValue(color));
+                    Platform.runLater(() -> {
+                        if (colorPicker != null) {
+                            colorPicker.setValue(color);
+                        }
+                    });
                 }
             }
         };
@@ -229,6 +236,19 @@ public class ColorPickerFloating implements MousePositionUpdater {
         color = null;
         // 移除鼠标位置监听器
         MousePositionListener.getInstance().removeListener(this);
+        if (colorPicker != null) {
+            colorPicker.getScene().getRoot().setDisable(false);
+            colorPicker = null;
+        }
+    }
+
+    /**
+     * 判断是否显示
+     *
+     * @return true 已显示 false 未显示
+     */
+    public boolean isShowing() {
+        return messageFloating != null && messageFloating.getStage() != null && messageFloating.getStage().isShowing();
     }
 
 }
