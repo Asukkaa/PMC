@@ -28,6 +28,7 @@ import static priv.koishi.pmc.Finals.CommonFinals.defaultOffsetX;
 import static priv.koishi.pmc.Finals.CommonFinals.defaultOffsetY;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.setPositionText;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateFloatingWindow;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
@@ -143,15 +144,13 @@ public class ColorPickerFloating implements MousePositionUpdater {
         FloatingWindowConfig config = new FloatingWindowConfig()
                 .setWidth(200)
                 .setHeight(210);
-        // 获取浮窗的文本颜色设置
-        Color color = settingController.colorPicker_Set.getValue();
         messageFloating.setAdditionalContent(buildCustomContent())
                 .setName(text_colorPickerFloating())
+                .setTextFill(Color.WHITE)
                 .setEnableResize(false)
                 .setAddCloseKey(false)
                 .setTransparent(true)
                 .setEnableDrag(false)
-                .setTextFill(color)
                 .setShowName(true)
                 .setConfig(config)
                 .setOpacity(0.8)
@@ -172,6 +171,7 @@ public class ColorPickerFloating implements MousePositionUpdater {
             settingPreview.getParent().setVisible(true);
             colorPicker.getScene().getRoot().setDisable(true);
         }
+        updateTextFill();
         robot = new Robot();
         // 注册监听器
         registerListeners();
@@ -179,6 +179,19 @@ public class ColorPickerFloating implements MousePositionUpdater {
         FloatingWindow.showFloatingWindow(messageFloating);
         // 添加鼠标位置监听器
         MousePositionListener.getInstance().addListener(this);
+    }
+
+    /**
+     * 更新浮窗文本颜色
+     */
+    private void updateTextFill() {
+        if (settingController != null) {
+            // 获取浮窗的文本颜色设置
+            Color color = settingController.colorPicker_Set.getValue();
+            messageFloating.setTextFill(color);
+            nowColorLabel.setTextFill(color);
+            settingLabel.setTextFill(color);
+        }
     }
 
     /**
@@ -195,6 +208,11 @@ public class ColorPickerFloating implements MousePositionUpdater {
                             colorPicker.setValue(color);
                             settingPreview.setFill(color);
                             settingLabel.setText(text_settingColor() + "\n" + color);
+                            // 设置页浮窗颜色取色器修改颜色后立刻更新浮窗颜色
+                            if (settingController.colorPicker_Set == colorPicker) {
+                                updateTextFill();
+                                updateFloatingWindow(messageFloating);
+                            }
                         }
                     });
                 }

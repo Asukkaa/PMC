@@ -219,7 +219,10 @@ public class ClickDetailController extends RootController {
      */
     private Stage stage;
 
-    ColorPickerFloating colorPickerFloating;
+    /**
+     * 取色器浮窗
+     */
+    private ColorPickerFloating colorPickerFloating;
 
     /**
      * 浮窗配置
@@ -832,6 +835,12 @@ public class ClickDetailController extends RootController {
         // 要点击的图像识别准确度设置监听
         Runnable clickOpacityRemover = integerSliderValueListener(clickOpacity_Det, tip_clickOpacity());
         listenerRemovers.add(clickOpacityRemover);
+        // 限制窗口移动目标位置横(X)坐标文本输入框内容
+        Runnable windowXRemover = integerRangeTextField(windowX_Det, 0, null, tip_mouseStartX());
+        listenerRemovers.add(windowXRemover);
+        // 限制窗口移动目标位置纵(Y)坐标文本输入框内容
+        Runnable windowYRemover = integerRangeTextField(windowY_Det, 0, null, tip_mouseStartY());
+        listenerRemovers.add(windowYRemover);
         // 限制操作间隔文本输入框内容
         Runnable intervalRemover = integerRangeTextField(interval_Det, 0, null, tip_clickInterval());
         listenerRemovers.add(intervalRemover);
@@ -874,12 +883,6 @@ public class ClickDetailController extends RootController {
         // 限制要点击的图片识别失败重试次数文本输入框内容
         Runnable clickRetryNumRemover = integerRangeTextField(clickRetryNum_Det, 0, null, tip_clickRetryNum() + clickRetryNumDefault);
         listenerRemovers.add(clickRetryNumRemover);
-        // 限制窗口移动目标位置横(X)坐标文本输入框内容
-        Runnable windowXRemover = integerRangeTextField(windowX_Det, 0, null, tip_mouseStartX());
-        listenerRemovers.add(windowXRemover);
-        // 限制窗口移动目标位置纵(Y)坐标文本输入框内容
-        Runnable windowYRemover = integerRangeTextField(windowY_Det, 0, null, tip_mouseStartY());
-        listenerRemovers.add(windowYRemover);
         // 颜色容差文本输入框内容
         Runnable colorToleranceRemover = integerRangeTextField(colorTolerance_Det, 0, 255, tip_colorTolerance() + defaultColorTolerance);
         listenerRemovers.add(colorToleranceRemover);
@@ -914,6 +917,7 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_workDir(), workDir_Det);
         addToolTip(tip_testLink(), testLink_Det);
         addToolTip(tip_pathLink(), pathLink_Det);
+        addToolTip(tip_getColor(), getColor_Det);
         addToolTip(tip_minWindow(), minWindow_Det);
         addToolTip(tip_parameter(), parameter_Det);
         addToolTip(tip_clickName(), clickName_Det);
@@ -964,6 +968,8 @@ public class ClickDetailController extends RootController {
         addValueToolTip(colorTolerance_Det, tip_colorTolerance() + defaultColorTolerance);
         addValueToolTip(stopFindImgType_Det, tip_findImgType(), stopFindImgType_Det.getValue());
         addValueToolTip(clickFindImgType_Det, tip_findImgType(), clickFindImgType_Det.getValue());
+        addValueToolTip(recognitionType_Det, tip_recognitionType(), recognitionType_Det.getValue());
+        addValueToolTip(colorPicker_Det, tip_colorPicker_Det(), String.valueOf(colorPicker_Det.getValue()));
         addValueToolTip(stopOpacity_Det, tip_stopOpacity(), String.valueOf((int) stopOpacity_Det.getValue()));
         addValueToolTip(clickOpacity_Det, tip_clickOpacity(), String.valueOf((int) clickOpacity_Det.getValue()));
     }
@@ -2328,6 +2334,15 @@ public class ClickDetailController extends RootController {
         if (colorPickerFloating != null && !colorPickerFloating.isShowing()) {
             colorPickerFloating.start(colorPicker_Det);
         }
+    }
+
+    /**
+     * 颜色选择器
+     */
+    @FXML
+    private void colorAction() {
+        Color value = colorPicker_Det.getValue();
+        addValueToolTip(colorPicker_Det, tip_colorPicker_Det(), String.valueOf(value));
     }
 
 }

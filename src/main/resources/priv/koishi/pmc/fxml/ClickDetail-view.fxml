@@ -458,7 +458,7 @@
                                 <HBox styleClass="hBox-270-5">
                                     <!--目标颜色:-->
                                     <Label text="%clickDetail.targetColor"/>
-                                    <ColorPicker fx:id="colorPicker_Det" prefWidth="120"/>
+                                    <ColorPicker fx:id="colorPicker_Det" prefWidth="120" onAction="#colorAction"/>
                                     <Button fx:id="getColor_Det" onAction="#getColor" prefHeight="20"
                                             styleClass="img-button-style">
                                         <graphic>

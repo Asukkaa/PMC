@@ -1097,9 +1097,30 @@ public class i18nFinal {
     }
 
     /**
-     * @return <p>版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
+     * @return 点击后进入取色模式，点击屏幕任意位置将获取该位置的像素颜色
+     */
+    public static String tip_getColor() {
+        return bundle.getString("tip.getColor");
+    }
+
+    /**
+     * @return 用来设置目标颜色，可点击右侧取色器按钮进行取色
+     */
+    public static String tip_colorPicker_Det() {
+        return bundle.getString("tip.colorPicker_Det");
+    }
+
+    /**
+     * @return 用来设置图像识别类型，颜色识别与文字识别建议不要全屏识别
+     */
+    public static String tip_recognitionType() {
+        return bundle.getString("tip.recognitionType");
+    }
+
+    /**
+     * @return <p>程序版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
-     * JDK版本：Amazon.com Inc. 25.0.1+8-LTS
+     * JDK版本：Amazon.com Inc. 26.0.1+8-LTS
      */
     public static String tip_version() {
         return """
