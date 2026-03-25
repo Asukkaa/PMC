@@ -286,7 +286,7 @@ public class ClickDetailController extends RootController {
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
             randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det, url_Det,
-            parameter_Det, windowX_Det, windowY_Det;
+            parameter_Det, windowX_Det, windowY_Det, colorTolerance_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -349,8 +349,14 @@ public class ClickDetailController extends RootController {
         initFloatingWindowConfig(item);
         // 初始终止操作图片列表
         initStopImg(item.getStopImgFiles());
-        // 展示要点击的图片
-        showClickImg(item.getClickImgTarget());
+        int recognitionType = item.getRecognitionType();
+        if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            // 展示目标图像
+            showClickImg(item.getClickImgTarget());
+        } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            // 展示要目标颜色
+            showClickColor(item);
+        }
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
@@ -626,9 +632,9 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 展示要点击的图片
+     * 展示目标图像
      *
-     * @param clickImgPath 要点击的图片路径
+     * @param clickImgPath 目标图像路径
      */
     private void showClickImg(String clickImgPath) {
         File clickImgFile = setPathLabel(clickImgPath_Det, clickImgPath);
@@ -657,6 +663,17 @@ public class ClickDetailController extends RootController {
             clickImgType_Det.setText("");
             clickImgVBox_Det.setVisible(false);
         }
+    }
+
+    /**
+     * 展示要目标颜色
+     *
+     * @param item 列表选中的数据
+     */
+    private void showClickColor(ClickPositionVO item) {
+        recognitionType_Det.setValue(recognitionTypeMap.get(RecognitionTypeEnum.COLOR.ordinal()));
+        colorPicker_Det.setValue(Color.valueOf(item.getClickImgTarget()));
+        colorTolerance_Det.setText(item.getColorTolerance());
     }
 
     /**
@@ -863,6 +880,9 @@ public class ClickDetailController extends RootController {
         // 限制窗口移动目标位置纵(Y)坐标文本输入框内容
         Runnable windowYRemover = integerRangeTextField(windowY_Det, 0, null, tip_mouseStartY());
         listenerRemovers.add(windowYRemover);
+        // 颜色容差文本输入框内容
+        Runnable colorToleranceRemover = integerRangeTextField(colorTolerance_Det, 0, 255, tip_colorTolerance() + defaultColorTolerance);
+        listenerRemovers.add(colorToleranceRemover);
     }
 
     /**
@@ -871,16 +891,17 @@ public class ClickDetailController extends RootController {
     private void setPromptText() {
         wait_Det.setPromptText(selectedItem.getWaitTime());
         clickName_Det.setPromptText(selectedItem.getName());
-        randomClickX_Det.setPromptText(defaultRandomClickX);
-        randomClickY_Det.setPromptText(defaultRandomClickY);
-        stopRetryNum_Det.setPromptText(stopRetryNumDefault);
-        randomTimeOffset_Det.setPromptText(defaultRandomTime);
-        clickRetryNum_Det.setPromptText(clickRetryNumDefault);
         mouseStartX_Det.setPromptText(selectedItem.getStartX());
         mouseStartY_Det.setPromptText(selectedItem.getStartY());
         timeClick_Det.setPromptText(selectedItem.getClickTime());
+        randomClickX_Det.setPromptText(selectedItem.getRandomX());
+        randomClickY_Det.setPromptText(selectedItem.getRandomY());
         clickNumBer_Det.setPromptText(selectedItem.getClickNum());
         interval_Det.setPromptText(selectedItem.getClickInterval());
+        stopRetryNum_Det.setPromptText(selectedItem.getStopRetryTimes());
+        randomTimeOffset_Det.setPromptText(selectedItem.getRandomTime());
+        clickRetryNum_Det.setPromptText(selectedItem.getClickRetryTimes());
+        colorTolerance_Det.setPromptText(selectedItem.getColorTolerance());
     }
 
     /**
@@ -940,6 +961,7 @@ public class ClickDetailController extends RootController {
         addValueToolTip(randomClickY_Det, tip_randomClickY() + defaultRandomClickY);
         addValueToolTip(randomTimeOffset_Det, tip_randomTime() + defaultRandomTime);
         addToolTip(tip_tableViewSize() + tableViewSize_Det.getText(), tableViewSize_Det);
+        addValueToolTip(colorTolerance_Det, tip_colorTolerance() + defaultColorTolerance);
         addValueToolTip(stopFindImgType_Det, tip_findImgType(), stopFindImgType_Det.getValue());
         addValueToolTip(clickFindImgType_Det, tip_findImgType(), clickFindImgType_Det.getValue());
         addValueToolTip(stopOpacity_Det, tip_stopOpacity(), String.valueOf((int) stopOpacity_Det.getValue()));
@@ -1647,8 +1669,10 @@ public class ClickDetailController extends RootController {
                 selectedItem.setRecognitionType(RecognitionTypeEnum.IMAGE.ordinal())
                         .setClickImgTarget(clickImgPath_Det.getText());
             } else if (recognitiontype_color().equals(recognitionType)) {
+                String colorTolerance = String.valueOf(setDefaultIntValue(colorTolerance_Det, defaultColorTolerance, 0, 255));
                 selectedItem.setRecognitionType(RecognitionTypeEnum.COLOR.ordinal())
-                        .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()));
+                        .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()))
+                        .setColorTolerance(colorTolerance);
             }
         }
         selectedItem.setStopImgSelectPath(stopImgSelectPath)

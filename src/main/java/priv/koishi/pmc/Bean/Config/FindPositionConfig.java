@@ -3,6 +3,8 @@ package priv.koishi.pmc.Bean.Config;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import static priv.koishi.pmc.Finals.CommonFinals.defaultColorTolerance;
+
 /**
  * 图像识别设置类
  *
@@ -27,7 +29,7 @@ public class FindPositionConfig {
     /**
      * 颜色容差（0-255）
      */
-    int colorTolerance = 10;
+    int colorTolerance = defaultColorTolerance;
 
     /**
      * OCR 语言，默认简体中文

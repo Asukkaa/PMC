@@ -14,10 +14,7 @@ import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLogResult;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
-import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
-import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
-import priv.koishi.pmc.Finals.Enum.MatchedTypeEnum;
-import priv.koishi.pmc.Finals.Enum.RetryTypeEnum;
+import priv.koishi.pmc.Finals.Enum.*;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Queue.DynamicQueue;
@@ -682,8 +679,17 @@ public class AutoClickService {
                         clickText += clickPositionVO.getClickKey();
                     }
                     if (StringUtils.isNotBlank(clickImgPath)) {
-                        nowText += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
-                                text_afterMatch() + clickPositionVO.getMatchedType();
+                        int recognitionType = clickPositionVO.getRecognitionType();
+                        if (RecognitionTypeEnum.IMAGE.ordinal() == recognitionType) {
+                            nowText += text_picTarget() + "\n" + getExistsFileName(new File(clickImgPath)) +
+                                    text_afterMatch() + clickPositionVO.getMatchedType();
+                        } else if (RecognitionTypeEnum.COLOR.ordinal() == recognitionType) {
+                            nowText += text_colorTarget() + "\n" + clickImgPath +
+                                    text_afterMatch() + clickPositionVO.getMatchedType();
+                        } else if (RecognitionTypeEnum.TEXT.ordinal() == recognitionType) {
+                            nowText += text_textTarget() + "\n" + clickImgPath +
+                                    text_afterMatch() + clickPositionVO.getMatchedType();
+                        }
                     } else {
                         nowText += text_point() + " X：" + startX + " Y：" + startY + clickText +
                                 text_clickTime() + clickTime + " " + unit_ms() +
@@ -997,11 +1003,16 @@ public class AutoClickService {
         // 匹配终止操作图像
         matchStopImg(clickPositionVO, nowText, taskBean, clickResultBean);
         // 匹配要点击的图像
-        String clickPath = clickPositionVO.getClickImgTarget();
-        AtomicReference<String> fileName = new AtomicReference<>();
-        if (StringUtils.isNotBlank(clickPath)) {
-            fileName.set(getExistsFileName(new File(clickPath)));
-            String text = nowText + text_searchingClick() + fileName.get();
+        String imgTarget = clickPositionVO.getClickImgTarget();
+        AtomicReference<String> targetName = new AtomicReference<>();
+        if (StringUtils.isNotBlank(imgTarget)) {
+            int recognitionType = clickPositionVO.getRecognitionType();
+            if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+                targetName.set(getExistsFileName(new File(imgTarget)));
+            } else {
+                targetName.set(imgTarget);
+            }
+            String text = nowText + text_searchingClick(recognitionType) + targetName.get();
             // 更新操作信息
             updateFloatingMessage(text);
             long start = System.currentTimeMillis();
@@ -1020,9 +1031,10 @@ public class AutoClickService {
                     .setContinuously(RetryTypeEnum.CONTINUOUSLY.ordinal() == retryType)
                     .setFloatingWindowConfig(clickWindowConfig)
                     .setMatchThreshold(clickMatchThreshold)
+                    .setRecognitionType(recognitionType)
                     .setRetryWait(retrySecondValue)
                     .setOverTime(overTimeValue)
-                    .setTemplate(clickPath)
+                    .setTemplate(imgTarget)
                     .setName(name);
             MatchPointBean matchPointBean = findPosition(findPositionConfig, clickLog);
             try (Point position = matchPointBean.getPoint()) {
@@ -1074,7 +1086,7 @@ public class AutoClickService {
                     try {
                         throw new RuntimeException(text_index() + clickPositionVO.getIndex() + text_taskErr() +
                                 text_maxRetry() + clickPositionVO.getClickRetryTimes() + " " + unit_times() +
-                                text_notFound() + fileName.get() +
+                                text_notFound(recognitionType) + targetName.get() +
                                 text_closestMatchThreshold() + matchPointBean.getMatchThreshold() + percentage +
                                 "\n" + text_point() + " X：" + position.x() + " Y：" + position.y());
                     } catch (Exception e) {
@@ -1201,6 +1213,7 @@ public class AutoClickService {
                 }
                 if (ClickTypeEnum.CLICK.ordinal() == clickType && mouseButton != MouseButton.NONE) {
                     robot.mousePress(mouseButton);
+                    System.out.println("点击颜色：" + robot.getPixelColor(finalStartX, finalStartY));
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
                         pressLog.setX(String.valueOf((int) finalStartX))

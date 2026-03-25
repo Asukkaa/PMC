@@ -99,13 +99,25 @@ public class ImageRecognitionService {
         String templatePath = config.getTemplate();
         int overTime = config.getOverTime();
         String name = config.getName();
-        File file = new File(templatePath);
-        String fileName = getFileName(templatePath);
-        if (StringUtils.isBlank(templatePath)) {
-            throw new RuntimeException(text_image() + fileName + text_nullPath());
-        }
-        if (!file.exists()) {
-            throw new RuntimeException(text_image() + fileName + text_noExists());
+        int recognitionType = config.getRecognitionType();
+        String fileName = templatePath;
+        if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            fileName = getFileName(templatePath);
+            if (StringUtils.isBlank(templatePath)) {
+                throw new RuntimeException(text_image() + fileName + text_nullPath());
+            }
+            File file = new File(templatePath);
+            if (!file.exists()) {
+                throw new RuntimeException(text_image() + fileName + text_noExists());
+            }
+        } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            if (StringUtils.isBlank(templatePath)) {
+                throw new RuntimeException(text_noColor());
+            }
+        } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            if (StringUtils.isBlank(templatePath)) {
+                throw new RuntimeException(text_noText());
+            }
         }
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
             // 创建带名称的线程池（便于问题排查）
@@ -116,7 +128,7 @@ public class ImageRecognitionService {
                 return t;
             })) {
                 try {
-                    String timeOutErr = text_image() + fileName + text_timeOut();
+                    String timeOutErr = text_imgTarget(recognitionType) + fileName + text_timeOut();
                     if (config.isContinuously()) {
                         int findTime = 0;
                         // 重试直到匹配
@@ -269,15 +281,15 @@ public class ImageRecognitionService {
         int recognitionType = findPositionConfig.getRecognitionType();
         // 图像识别
         if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
-            System.out.println("图像识别");
+            System.out.println("图像识别:" + findPositionConfig.getTemplate());
             matchPointBean = getImgMatchPointBean(findPositionConfig, screenImg, x, y);
             // 颜色识别
         } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
-            System.out.println("颜色识别");
+            System.out.println("颜色识别:" + findPositionConfig.getTemplate());
             matchPointBean = colorRecognition(screenImg, findPositionConfig, x, y);
             // 文字识别
         } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
-            System.out.println("文字识别");
+            System.out.println("文字识别:" + findPositionConfig.getTemplate());
             matchPointBean = textRecognition(screenImg, findPositionConfig, x, y);
         }
         return matchPointBean;
@@ -368,9 +380,8 @@ public class ImageRecognitionService {
      */
     private static MatchPointBean colorRecognition(BufferedImage screenImg, FindPositionConfig config,
                                                    int offsetX, int offsetY) {
-        // 解析目标颜色（保留硬编码用于测试）
-        String colorStr = config.getTemplate();
-        Color targetColor = parseColor(colorStr);
+        // 解析目标颜色
+        Color targetColor = fxColorToAwt(javafx.scene.paint.Color.valueOf(config.getTemplate()));
         int tolerance = config.getColorTolerance();
         double matchThreshold = config.getMatchThreshold() / 100.0;
         int width = screenImg.getWidth();
@@ -446,20 +457,16 @@ public class ImageRecognitionService {
     }
 
     /**
-     * 解析颜色字符串，支持 "#RRGGBB" 或 "R,G,B" 格式
+     * 将 JavaFX 颜色转换为 AWT 颜色
+     *
+     * @param fxColor JavaFX 颜色
+     * @return AWT 颜色
      */
-    private static Color parseColor(String colorStr) {
-        if (colorStr.startsWith("#")) {
-            return Color.decode(colorStr);
-        } else if (colorStr.contains(",")) {
-            String[] parts = colorStr.split(",");
-            int r = Integer.parseInt(parts[0].trim());
-            int g = Integer.parseInt(parts[1].trim());
-            int b = Integer.parseInt(parts[2].trim());
-            return new Color(r, g, b);
-        } else {
-            throw new IllegalArgumentException("不支持的颜色格式: " + colorStr);
-        }
+    public static Color fxColorToAwt(javafx.scene.paint.Color fxColor) {
+        return new Color((int) Math.round(fxColor.getRed() * 255),
+                (int) Math.round(fxColor.getGreen() * 255),
+                (int) Math.round(fxColor.getBlue() * 255),
+                (int) Math.round(fxColor.getOpacity() * 255));
     }
 
     /**

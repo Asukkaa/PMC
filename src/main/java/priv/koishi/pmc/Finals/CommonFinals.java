@@ -735,6 +735,11 @@ public class CommonFinals {
     public static final String defaultFloatingHeight = "240";
 
     /**
+     * 默认颜色容差
+     */
+    public static final int defaultColorTolerance = 10;
+
+    /**
      * 默认信息浮窗高度
      */
     public static final int defaultFloatingHeightInt = Integer.parseInt(defaultFloatingHeight);

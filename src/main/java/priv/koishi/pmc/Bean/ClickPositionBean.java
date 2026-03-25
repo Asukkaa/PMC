@@ -296,6 +296,11 @@ public class ClickPositionBean extends BaseCopyBean {
     int recognitionType = RecognitionTypeEnum.IMAGE.ordinal();
 
     /**
+     * 颜色容差（0-255）
+     */
+    String colorTolerance = String.valueOf(defaultColorTolerance);
+
+    /**
      * 添加移动轨迹
      *
      * @param x                 横坐标

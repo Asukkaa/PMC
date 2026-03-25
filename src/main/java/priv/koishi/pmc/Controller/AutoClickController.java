@@ -1436,7 +1436,7 @@ public class AutoClickController extends RootController implements MousePosition
                     mainStage.setTitle(appName);
                 }
                 if (floatingStage != null && floatingStage.isShowing()) {
-                    setPositionText(messageFloating, autoClick_nowMousePos() + "\nX: " + x + " Y: " + y);
+                    setPositionText(messageFloating, autoClick_nowMousePos() + "\nX: " + x + "      Y: " + y);
                     if ((mouseFloatingRun.isSelected() && runClicking) || findingWindow
                             || (mouseFloatingRecord.isSelected() && recordClicking)) {
                         floatingMove(floatingStage, mousePoint, offsetX, offsetY);

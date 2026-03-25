@@ -1080,8 +1080,20 @@ public class i18nFinal {
         return bundle.getString("tip.ignoreFailure");
     }
 
+    /**
+     * @return macOS 的自动启动任务是由一个 .plist 文件控制的
+     * <p>点击可以查看当前任务文件所在位置
+     */
     public static String tip_showTaskFile() {
         return bundle.getString("tip.showTaskFile");
+    }
+
+    /**
+     * @return 用来设置颜色匹配的容差值，越小匹配越严格
+     * <p>只能填自然数，范围 0 - 255，不填默认为
+     */
+    public static String tip_colorTolerance() {
+        return bundle.getString("tip.colorTolerance");
     }
 
     /**
@@ -1254,6 +1266,14 @@ public class i18nFinal {
      */
     public static String text_saveFindImgConfig() {
         return bundle.getString("saveFindImgConfig") + text_saveFloatingCoordinate();
+    }
+
+    /**
+     * @return 鼠标点击即可保存颜色
+     * <p>关闭浮窗快捷键：
+     */
+    public static String text_saveColor() {
+        return bundle.getString("saveColor") + text_closeFloatingShortcut();
     }
 
     /**
@@ -1449,6 +1469,24 @@ public class i18nFinal {
      * @return 图片
      */
     public static String text_image() {
+        return bundle.getString("img");
+    }
+
+    /**
+     * @param recognitionType 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
+     * @return 根据图像识别类型枚举返回：
+     * <p>图片
+     * <p>颜色
+     * <p>文字
+     */
+    public static String text_imgTarget(int recognitionType) {
+        if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            return bundle.getString("img");
+        } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            return bundle.getString("color");
+        } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            return bundle.getString("text");
+        }
         return bundle.getString("img");
     }
 
@@ -1705,6 +1743,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 未设置目标颜色
+     */
+    public static String text_noColor() {
+        return bundle.getString("noColor");
+    }
+
+    /**
+     * @return 未设置目标文字
+     */
+    public static String text_noText() {
+        return bundle.getString("noText");
+    }
+
+    /**
      * @return 匹配超时
      */
     public static String text_timeOut() {
@@ -1761,6 +1813,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 识别目标颜色：
+     */
+    public static String text_colorTarget() {
+        return bundle.getString("colorTarget");
+    }
+
+    /**
+     * @return 识别目标文字：
+     */
+    public static String text_textTarget() {
+        return bundle.getString("textTarget");
+    }
+
+    /**
      * @return 图像匹配后：
      */
     public static String text_afterMatch() {
@@ -1796,10 +1862,21 @@ public class i18nFinal {
     }
 
     /**
-     * @return 正在识别目标图像：
+     * @param recognitionType 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
+     * @return 根据图像识别类型枚举返回：
+     * <p>正在识别目标图像：
+     * <p>正在识别目标颜色：
+     * <p>正在识别目标文字：
      */
-    public static String text_searchingClick() {
-        return bundle.getString("searchingClick");
+    public static String text_searchingClick(int recognitionType) {
+        if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            return bundle.getString("searchingImgClick");
+        } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            return bundle.getString("searchingColorClick");
+        } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            return bundle.getString("searchingTextClick");
+        }
+        return bundle.getString("searchingImgClick");
     }
 
     /**
@@ -1817,10 +1894,21 @@ public class i18nFinal {
     }
 
     /**
-     * @return 未找到匹配图像：
+     * @param recognitionType 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
+     * @return 根据图像识别类型枚举返回：
+     * <p>未找到匹配图像：
+     * <p>未找到匹配颜色：
+     * <p>未找到匹配文字：
      */
-    public static String text_notFound() {
-        return bundle.getString("notFound");
+    public static String text_notFound(int recognitionType) {
+        if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+            return bundle.getString("notFoundImg");
+        } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+            return bundle.getString("notFoundColor");
+        } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            return bundle.getString("notFoundText");
+        }
+        return bundle.getString("notFoundImg");
     }
 
     /**
@@ -2112,10 +2200,17 @@ public class i18nFinal {
     }
 
     /**
-     * @return 当前颜色：
+     * @return 取色器颜色:
      */
     public static String text_nowColor() {
         return bundle.getString("nowColor");
+    }
+
+    /**
+     * @return 已设置颜色:
+     */
+    public static String text_settingColor() {
+        return bundle.getString("settingColor");
     }
 
     /**
@@ -3992,7 +4087,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 文本识别
+     * @return 文字识别
      */
     public static String recognitiontype_text() {
         return bundle.getString("recognitionType.text");
