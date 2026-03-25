@@ -6,7 +6,9 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.HBox;
@@ -30,8 +32,7 @@ import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.ListenerUtils.addNativeListener;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
-import static priv.koishi.pmc.Utils.UiUtils.floatingMove;
-import static priv.koishi.pmc.Utils.UiUtils.setDefaultIntValue;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 自定义取色器浮窗
@@ -48,9 +49,24 @@ public class ColorPickerFloating implements MousePositionUpdater {
     private final FloatingWindowDescriptor messageFloating;
 
     /**
-     * 颜色预览区域
+     * 取色器颜色描述
      */
-    private Rectangle colorPreview;
+    private Label nowColorLabel;
+
+    /**
+     * 颜色选择器描述
+     */
+    private Label settingLabel;
+
+    /**
+     * 取色器颜色预览区域
+     */
+    private Rectangle nowColorPreview;
+
+    /**
+     * 颜色选择器预览区域
+     */
+    private Rectangle settingPreview;
 
     /**
      * 鼠标点击监听器
@@ -94,15 +110,27 @@ public class ColorPickerFloating implements MousePositionUpdater {
      * @return 自定义内容容器
      */
     private VBox buildCustomContent() {
-        VBox box = new VBox(8);
+        VBox box = new VBox(5);
         box.setEffect(new DropShadow(5, Color.BLACK));
         // 颜色预览区域
-        colorPreview = new Rectangle(40, 40);
-        colorPreview.setArcWidth(8);
-        colorPreview.setArcHeight(8);
-        colorPreview.setStroke(Color.WHITE);
-        colorPreview.setStrokeWidth(1);
-        HBox previewBox = new HBox(8, colorPreview);
+        nowColorPreview = new Rectangle(40, 40);
+        nowColorPreview.setArcWidth(8);
+        nowColorPreview.setArcHeight(8);
+        nowColorPreview.setStroke(Color.WHITE);
+        nowColorPreview.setStrokeWidth(1);
+        nowColorLabel = new Label();
+        nowColorLabel.setTextFill(Color.WHITE);
+        VBox nowBox = new VBox(5, nowColorLabel, nowColorPreview);
+        settingPreview = new Rectangle(40, 40);
+        settingPreview.setArcWidth(8);
+        settingPreview.setArcHeight(8);
+        settingPreview.setStroke(Color.WHITE);
+        settingPreview.setStrokeWidth(1);
+        settingLabel = new Label();
+        settingLabel.setTextFill(Color.WHITE);
+        VBox settingBox = new VBox(5, settingLabel, settingPreview);
+        settingBox.setVisible(false);
+        HBox previewBox = new HBox(15, nowBox, settingBox);
         previewBox.setAlignment(Pos.CENTER_LEFT);
         box.getChildren().addAll(previewBox);
         return box;
@@ -114,7 +142,7 @@ public class ColorPickerFloating implements MousePositionUpdater {
     private void configureDescriptor() {
         FloatingWindowConfig config = new FloatingWindowConfig()
                 .setWidth(200)
-                .setHeight(200);
+                .setHeight(210);
         // 获取浮窗的文本颜色设置
         Color color = settingController.colorPicker_Set.getValue();
         messageFloating.setAdditionalContent(buildCustomContent())
@@ -138,6 +166,10 @@ public class ColorPickerFloating implements MousePositionUpdater {
     public void start(ColorPicker colorPicker) {
         if (colorPicker != null) {
             this.colorPicker = colorPicker;
+            color = colorPicker.getValue();
+            settingPreview.setFill(colorPicker.getValue());
+            settingLabel.setText(text_settingColor() + "\n" + color);
+            settingPreview.getParent().setVisible(true);
             colorPicker.getScene().getRoot().setDisable(true);
         }
         robot = new Robot();
@@ -161,6 +193,8 @@ public class ColorPickerFloating implements MousePositionUpdater {
                     Platform.runLater(() -> {
                         if (colorPicker != null) {
                             colorPicker.setValue(color);
+                            settingPreview.setFill(color);
+                            settingLabel.setText(text_settingColor() + "\n" + color);
                         }
                     });
                 }
@@ -198,18 +232,16 @@ public class ColorPickerFloating implements MousePositionUpdater {
                     int offsetX = setDefaultIntValue(offsetXTextField, defaultOffsetX, 0, null);
                     TextField offsetYTextField = settingController.offsetY_Set;
                     int offsetY = setDefaultIntValue(offsetYTextField, defaultOffsetY, 0, null);
-                    String colorValue = "";
                     if (robot != null) {
                         color = robot.getPixelColor(x, y);
                         if (color != null) {
-                            colorPreview.setFill(color);
-                            colorValue = text_nowColor() + color;
+                            nowColorPreview.setFill(color);
+                            nowColorLabel.setText(text_nowColor() + "\n" + color);
                         }
                     }
                     String text = autoClick_nowMousePos() +
-                            "\nX: " + x + " Y: " + y +
-                            "\n" + text_closeFloatingShortcut() +
-                            "\n" + colorValue;
+                            "\nX: " + x + "      Y: " + y +
+                            "\n" + text_saveColor();
                     setPositionText(messageFloating, text);
                     floatingMove(floatingStage, mousePoint, offsetX, offsetY);
                 }
@@ -237,7 +269,9 @@ public class ColorPickerFloating implements MousePositionUpdater {
         // 移除鼠标位置监听器
         MousePositionListener.getInstance().removeListener(this);
         if (colorPicker != null) {
-            colorPicker.getScene().getRoot().setDisable(false);
+            Scene scene = colorPicker.getScene();
+            scene.getRoot().setDisable(false);
+            showStage((Stage) scene.getWindow());
             colorPicker = null;
         }
     }
