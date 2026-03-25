@@ -655,6 +655,7 @@ public class FloatingWindow {
             if (cancelKey == noKeyboard) {
                 throw new RuntimeException(text_noCancelKey());
             }
+            updateFloatingWindow(config);
             Stage floatingStage = config.getStage();
             Rectangle rectangle = config.getRectangle();
             FloatingWindowConfig windowConfig = config.getConfig();
