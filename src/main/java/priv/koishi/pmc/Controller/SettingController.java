@@ -52,6 +52,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.UI.CustomFloatingWindow.ColorPickerFloating;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
@@ -153,6 +154,11 @@ public class SettingController extends RootController implements MousePositionUp
     private String clickWindowPath, stopWindowPath;
 
     /**
+     * 取色器浮窗
+     */
+    private ColorPickerFloating colorPickerFloating;
+
+    /**
      * 浮窗设置
      */
     public static FloatingWindowDescriptor clickFloating, stopFloating, messageFloating, windowInfoFloating,
@@ -194,7 +200,7 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Button messageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
-            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det;
+            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det, getColor_Set;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
@@ -1637,6 +1643,8 @@ public class SettingController extends RootController implements MousePositionUp
             buildContextMenu();
             // 设置要防重复点击的组件
             setDisableNodes();
+            // 绑定取色器
+            colorPickerFloating = new ColorPickerFloating();
             // 标记页面加载完毕
             initializedFinished = true;
             // 加载完成后发布事件
@@ -2515,6 +2523,16 @@ public class SettingController extends RootController implements MousePositionUp
         String toolTip = tip_runClick() + "\n" + text_shortcut() + text_unSetKeyboard();
         addToolTip(toolTip, autoClickController.runClick_Click);
         removeRunKey_Det.setVisible(false);
+    }
+
+    /**
+     * 取色器
+     */
+    @FXML
+    private void getColor() {
+        if (colorPickerFloating != null && !colorPickerFloating.isShowing()) {
+            colorPickerFloating.start(colorPicker_Set);
+        }
     }
 
 }

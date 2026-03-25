@@ -2,8 +2,7 @@
 
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -454,6 +453,14 @@
                 <!--浮窗字体颜色:-->
                 <Label text="%setting.colorPicker"/>
                 <ColorPicker fx:id="colorPicker_Set" prefWidth="120" onAction="#colorAction"/>
+                <Button fx:id="getColor_Set" onAction="#getColor" prefHeight="20"
+                        styleClass="img-button-style">
+                    <graphic>
+                        <ImageView>
+                            <Image url="@../icon/ColorGetter.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
             </HBox>
 
             <HBox styleClass="hBox-290-5">
