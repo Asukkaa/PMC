@@ -10,7 +10,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,6 +24,8 @@ import priv.koishi.pmc.Bean.Interface.Indexable;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Controller.AutoClickController;
+import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
+import priv.koishi.pmc.Finals.Enum.RecognitionTypeEnum;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -260,7 +264,34 @@ public class TableViewUtils {
                     setGraphic(null);
                 } else if (image == null) {
                     TableRow<T> tableRow = getTableRow();
-                    if (isRedText(tableRow)) {
+                    T bean = tableRow.getItem();
+                    String imgPath = null;
+                    if (bean instanceof ImgFileVO imgFileVO) {
+                        imgPath = imgFileVO.getPath();
+                    } else if (bean instanceof ClickPositionVO clickPositionVO) {
+                        imgPath = clickPositionVO.getClickImgTarget();
+                        int recognitionType = clickPositionVO.getRecognitionType();
+                        if (RecognitionTypeEnum.COLOR.ordinal() == recognitionType) {
+                            Color color = Color.valueOf(imgPath);
+                            if (color != null) {
+                                // 颜色预览方块
+                                Rectangle colorRect = new Rectangle(30, 30, color);
+                                colorRect.setStroke(Color.valueOf("#1b2026"));
+                                colorRect.setStrokeWidth(1);
+                                // 颜色值文本
+                                Label colorLabel = new Label(imgPath);
+                                colorLabel.setTooltip(creatTooltip(imgPath));
+                                // 水平布局
+                                HBox hbox = new HBox(5, colorRect, colorLabel);
+                                hbox.setAlignment(Pos.CENTER_LEFT);
+                                setGraphic(hbox);
+                                setText(null);
+                                setTooltip(null);
+                                return;
+                            }
+                        }
+                    }
+                    if (imgPath != null && !new File(imgPath).exists()) {
                         setText(text_badImg());
                         textFillProperty().unbind();
                         setTextFill(Color.RED);
@@ -276,22 +307,6 @@ public class TableViewUtils {
                     setGraphic(imageView);
                     setTooltip(creatTooltip(image.getUrl().replace("file:", text_imgPath())));
                 }
-            }
-
-            // 判断字体是否变红，true 变红，false 不变红
-            private boolean isRedText(TableRow<? extends T> tableRow) {
-                T bean = tableRow.getItem();
-                String imgPath = null;
-                if (bean instanceof ImgFileVO imgFileVO) {
-                    imgPath = imgFileVO.getPath();
-                } else if (bean instanceof ClickPositionVO clickPositionVO) {
-                    imgPath = clickPositionVO.getClickImgTarget();
-                }
-                // 只有在有图片路径但图片不存在时，才让缩略图提示文字变红
-                if (StringUtils.isBlank(imgPath)) {
-                    return false;
-                }
-                return !new File(imgPath).exists();
             }
         });
     }
@@ -826,17 +841,36 @@ public class TableViewUtils {
             ObservableList<ClickPositionVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItems)) {
                 ClickPositionVO selectedItem = selectedItems.getFirst();
-                Window window = tableView.getScene().getWindow();
-                AutoClickController.isSonOpening = true;
-                File file = creatImgFileChooser(window, selectedItem.getClickImgTarget());
-                if (file != null) {
-                    selectedItem.setClickImgTarget(file.getAbsolutePath());
-                    selectedItem.updateThumb();
+                if (canChangeImg(selectedItem)) {
+                    Window window = tableView.getScene().getWindow();
+                    AutoClickController.isSonOpening = true;
+                    File file = creatImgFileChooser(window, selectedItem.getClickImgTarget());
+                    if (file != null) {
+                        selectedItem.setClickImgTarget(file.getAbsolutePath());
+                        selectedItem.updateThumb();
+                    }
+                    AutoClickController.isSonOpening = false;
                 }
-                AutoClickController.isSonOpening = false;
             }
         });
         contextMenu.getItems().add(upMoveDataMenuItem);
+    }
+
+    /**
+     * 判断是否可以修改图片地址
+     *
+     * @param vo 需要判断的数据
+     * @return true 可修改图片地址 false 不可修改图片地址
+     */
+    private static boolean canChangeImg(ClickPositionVO vo) {
+        int recognitionType = vo.getRecognitionType();
+        int clickType = vo.getClickTypeEnum();
+        return recognitionType == RecognitionTypeEnum.IMAGE.ordinal()
+                && clickType != ClickTypeEnum.OPEN_FILE.ordinal()
+                && clickType != ClickTypeEnum.OPEN_URL.ordinal()
+                && clickType != ClickTypeEnum.RUN_SCRIPT.ordinal()
+                && clickType != ClickTypeEnum.MOVE_TRAJECTORY.ordinal()
+                && clickType != ClickTypeEnum.MOVE_WINDOW.ordinal();
     }
 
     /**
