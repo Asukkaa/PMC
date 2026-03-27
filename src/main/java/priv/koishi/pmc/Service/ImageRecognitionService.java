@@ -389,12 +389,13 @@ public class ImageRecognitionService {
         // 记录最大相似度及其坐标
         double maxSimilarity = 0.0;
         int maxX = 0, maxY = 0;
-        // 1. 构建掩码数据，同时记录最大相似度
+        // 构建掩码数据，同时记录最大相似度
         byte[] maskData = new byte[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int rgb = screenImg.getRGB(x, y);
                 Color pixelColor = new Color(rgb);
+                // 计算两个颜色的相似度
                 double similarity = colorSimilarity(pixelColor, targetColor, tolerance);
                 if (similarity > maxSimilarity) {
                     maxSimilarity = similarity;
@@ -402,22 +403,24 @@ public class ImageRecognitionService {
                     maxY = y;
                 }
                 if (similarity >= matchThreshold) {
-                    maskData[y * width + x] = (byte) 255; // 白色（前景）
+                    // 白色（前景）
+                    maskData[y * width + x] = (byte) 255;
                 } else {
-                    maskData[y * width + x] = 0;          // 黑色（背景）
+                    // 黑色（背景）
+                    maskData[y * width + x] = 0;
                 }
             }
         }
-        // 如果没有达到阈值的像素，直接返回最高相似度点（兼容原行为）
+        // 如果没有达到阈值的像素，直接返回最高相似度点
         if (maxSimilarity < matchThreshold) {
             return new MatchPointBean()
                     .setPoint(new Point(maxX + offsetX, maxY + offsetY))
                     .setMatchThreshold((int) (maxSimilarity * 100));
         }
-        // 2. 将 byte[] 转换为 BytePointer 并创建掩码 Mat（CV_8UC1）
+        // 将 byte[] 转换为 BytePointer 并创建掩码 Mat（CV_8UC1）
         BytePointer maskPtr = new BytePointer(maskData);
         Mat mask = new Mat(height, width, CV_8UC1, maskPtr);
-        // 3. 连通组件分析
+        // 连通组件分析
         Mat labels = new Mat();
         Mat stats = new Mat();
         Mat centroids = new Mat();
@@ -428,7 +431,7 @@ public class ImageRecognitionService {
             result.setPoint(new Point(maxX + offsetX, maxY + offsetY))
                     .setMatchThreshold((int) (maxSimilarity * 100));
         } else {
-            // 4. 找出面积最大的连通区域（排除背景 label=0）
+            // 找出面积最大的连通区域（排除背景 label=0）
             int maxArea = 0;
             int maxLabel = 1;
             for (int i = 1; i < numLabels; i++) {
@@ -438,17 +441,17 @@ public class ImageRecognitionService {
                     maxLabel = i;
                 }
             }
-            // 5. 获取该区域的质心坐标
+            // 获取该区域的质心坐标
             DoublePointer centroidPtr = new DoublePointer(centroids.ptr(maxLabel));
             double centerX = centroidPtr.get(0);
             double centerY = centroidPtr.get(1);
             int finalX = (int) Math.round(centerX) + offsetX;
             int finalY = (int) Math.round(centerY) + offsetY;
             result.setPoint(new Point(finalX, finalY));
-            // 置信度：设为最大相似度（与原有行为一致）
+            // 置信度：设为最大相似度
             result.setMatchThreshold((int) (maxSimilarity * 100));
         }
-        // 6. 释放资源
+        // 释放资源
         mask.close();
         labels.close();
         stats.close();
@@ -472,12 +475,15 @@ public class ImageRecognitionService {
     /**
      * 计算两个颜色的相似度（基于 RGB 欧氏距离，带容差）
      *
+     * @param source    源像素颜色
+     * @param target    目标颜色
+     * @param tolerance 容差
      * @return 0~1 之间的相似度，1 表示完全相同（或在容差范围内）
      */
-    private static double colorSimilarity(Color c1, Color c2, int tolerance) {
-        double dr = c1.getRed() - c2.getRed();
-        double dg = c1.getGreen() - c2.getGreen();
-        double db = c1.getBlue() - c2.getBlue();
+    private static double colorSimilarity(Color source, Color target, int tolerance) {
+        double dr = source.getRed() - target.getRed();
+        double dg = source.getGreen() - target.getGreen();
+        double db = source.getBlue() - target.getBlue();
         double distance = Math.sqrt(dr * dr + dg * dg + db * db);
         // 最大可能距离 sqrt(3 * 255^2) ≈ 441.67
         if (distance <= tolerance) {
