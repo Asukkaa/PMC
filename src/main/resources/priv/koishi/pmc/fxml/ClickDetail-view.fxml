@@ -475,6 +475,12 @@
                                     <TextField fx:id="colorTolerance_Det" prefWidth="50"/>
                                 </HBox>
                             </HBox>
+
+                            <HBox fx:id="ocrHBox_Det" styleClass="hBox-270-5">
+                                <!--目标文字:-->
+                                <Label text="%clickDetail.ocrText"/>
+                                <TextField fx:id="ocrText_Det" prefWidth="150"/>
+                            </HBox>
                         </HBox>
 
                         <HBox spacing="20">

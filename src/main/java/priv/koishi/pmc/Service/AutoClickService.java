@@ -1213,7 +1213,6 @@ public class AutoClickService {
                 }
                 if (ClickTypeEnum.CLICK.ordinal() == clickType && mouseButton != MouseButton.NONE) {
                     robot.mousePress(mouseButton);
-                    System.out.println("点击颜色：" + robot.getPixelColor(finalStartX, finalStartY));
                     if (taskBean.isClickLog()) {
                         ClickLogBean pressLog = new ClickLogBean();
                         pressLog.setX(String.valueOf((int) finalStartX))

@@ -252,7 +252,7 @@ public class ClickDetailController extends RootController {
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
             parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det, moveWindowHBox_Det,
-            colorHBox_Det;
+            colorHBox_Det, ocrHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -289,7 +289,7 @@ public class ClickDetailController extends RootController {
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
             interval_Det, clickRetryNum_Det, stopRetryNum_Det, retryStep_Det, matchedStep_Det, randomClickX_Det,
             randomClickY_Det, randomTimeOffset_Det, imgX_Det, imgY_Det, relativelyX_Det, relativelyY_Det, url_Det,
-            parameter_Det, windowX_Det, windowY_Det, colorTolerance_Det;
+            parameter_Det, windowX_Det, windowY_Det, colorTolerance_Det, ocrText_Det;
 
     @FXML
     public TableView<ImgFileVO> tableView_Det;
@@ -359,6 +359,8 @@ public class ClickDetailController extends RootController {
         } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
             // 展示要目标颜色
             showClickColor(item);
+        } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+            ocrText_Det.setText(item.getTargetPath());
         }
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
@@ -1679,6 +1681,9 @@ public class ClickDetailController extends RootController {
                 selectedItem.setRecognitionType(RecognitionTypeEnum.COLOR.ordinal())
                         .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()))
                         .setColorTolerance(colorTolerance);
+            } else if (recognitiontype_text().equals(recognitionType)) {
+                selectedItem.setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
+                        .setClickImgTarget(ocrText_Det.getText());
             }
         }
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
@@ -2320,9 +2325,15 @@ public class ClickDetailController extends RootController {
         if (recognitionType_img().equals(value)) {
             findImgVBox_Det.setVisible(true);
             colorHBox_Det.setVisible(false);
+            ocrHBox_Det.setVisible(false);
         } else if (recognitiontype_color().equals(value)) {
             findImgVBox_Det.setVisible(false);
             colorHBox_Det.setVisible(true);
+            ocrHBox_Det.setVisible(false);
+        } else if (recognitiontype_text().equals(value)) {
+            findImgVBox_Det.setVisible(false);
+            colorHBox_Det.setVisible(false);
+            ocrHBox_Det.setVisible(true);
         }
     }
 

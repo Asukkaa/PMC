@@ -372,6 +372,16 @@ public class CommonFinals {
     public static final boolean isRunningFromIDEA = isRunningFromIDEA();
 
     /**
+     * 项目 appBuilder 路径
+     */
+    public static final String appBuilder = userDir + "/appBuilder";
+
+    /**
+     * tessdata 目录名称
+     */
+    public static final String tessdata = "tessdata";
+
+    /**
      * app 目录
      */
     public static final String appDirectory = "/app";

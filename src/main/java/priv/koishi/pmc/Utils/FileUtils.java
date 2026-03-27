@@ -997,7 +997,23 @@ public class FileUtils {
         if (!isRunningFromIDEA && isMac) {
             return macAppDirectory;
         }
-        return userDir + "/appBuilder/mac";
+        return appBuilder + File.separator + mac;
+    }
+
+    /**
+     * 获取 tessdata 路径
+     *
+     * @return 不同环境下 tessdata 路径
+     */
+    public static String getTessdataPath() {
+        if (isRunningFromIDEA()) {
+            if (isMac) {
+                return appBuilder + File.separator + mac + File.separator + tessdata;
+            } else if (isWin) {
+                return appBuilder + File.separator + win + File.separator + tessdata;
+            }
+        }
+        return appBuilder + File.separator + tessdata;
     }
 
 }

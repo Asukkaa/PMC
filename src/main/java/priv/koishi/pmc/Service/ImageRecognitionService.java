@@ -39,6 +39,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
+import static priv.koishi.pmc.Utils.FileUtils.getTessdataPath;
 
 /**
  * 图像识别工具类
@@ -513,29 +514,47 @@ public class ImageRecognitionService {
         cvtColor(imageMat, grayMat, COLOR_BGR2GRAY);
         // 2. 初始化 Tesseract
         try (TessBaseAPI api = new TessBaseAPI()) {
-            String dataPath = "tessdata/简体中文.traineddata";
-            String language = config.getOcrLanguage();
-            if (api.Init(dataPath, language) != 0) {
-                throw new RuntimeException("Tesseract 初始化失败，请检查 tessdata 路径: " + dataPath);
+            String tessdataPath = getTessdataPath();
+            String dataPath = tessdataPath + "/chi_sim.traineddata";
+            File dataFile = new File(dataPath);
+            if (!dataFile.exists()) {
+                throw new RuntimeException("traineddata 文件不存在");
+            }
+            String language = getFileName(dataPath);
+            System.out.println(language);
+            int init = api.Init(tessdataPath, language);
+            if (init != 0) {
+                throw new RuntimeException("Tesseract 初始化失败，请检查 tessdata 路径: " + tessdataPath +
+                        "\n" + "init: " + init + " language: " + language);
             }
             // 设置页面分割模式为自动
             api.SetPageSegMode(PSM_AUTO);
+            if (grayMat.empty()) {
+                System.err.println("灰度图像为空");
+            }
             // 将灰度图数据传递给 Tesseract
             api.SetImage(grayMat.data(), grayMat.cols(), grayMat.rows(),
                     (int) grayMat.elemSize(), (int) grayMat.step1());
+            // 触发识别（可选参数 null 表示使用默认参数）
+            api.Recognize(null);
             // 3. 获取结果迭代器
             ResultIterator ri = api.GetIterator();
+            System.out.println(ri);
             if (ri == null) {
                 return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
             }
             float bestConfidence = 0.0f;
             Point bestCenter = null;
+            System.out.println("开始匹配");
             // 4. 遍历所有单词
             do {
                 // 获取单词文本
                 BytePointer wordTextPtr = ri.GetUTF8Text(RIL_WORD);
-                if (wordTextPtr == null) continue;
+                if (wordTextPtr == null) {
+                    continue;
+                }
                 String word = wordTextPtr.getString().trim();
+                System.out.println("word： " + word);
                 wordTextPtr.deallocate();
                 if (word.equalsIgnoreCase(targetText)) {
                     // 获取单词边界框
