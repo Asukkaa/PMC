@@ -529,9 +529,6 @@ public class ImageRecognitionService {
             }
             // 设置页面分割模式为自动
             api.SetPageSegMode(PSM_AUTO);
-            if (grayMat.empty()) {
-                System.err.println("灰度图像为空");
-            }
             // 将灰度图数据传递给 Tesseract
             api.SetImage(grayMat.data(), grayMat.cols(), grayMat.rows(),
                     (int) grayMat.elemSize(), (int) grayMat.step1());
