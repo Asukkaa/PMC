@@ -2235,6 +2235,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 选择要添加的 .traineddata 模型文件
+     */
+    public static String text_addTessdataPath() {
+        return bundle.getString("addTessdataPath");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

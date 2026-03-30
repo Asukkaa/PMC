@@ -692,6 +692,35 @@
                     <TableColumn fx:id="type_Set" text="%stopImg.type" sortable="false"/>
                 </columns>
             </TableView>
+
+            <HBox spacing="10">
+                <!--添加 .traineddata 模型-->
+                <Button fx:id="tessdataBtn_set" onAction="#addTessdataPath" text="%tessdata.addTessdata"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+                <!--列表为空-->
+                <Label fx:id="tessdataNumber_set" text="%listText.null"/>
+            </HBox>
+
+            <TableView fx:id="tessdataTableView_set" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+                <placeholder>
+                    <!--拖拽 .traineddata 模型文件或点击添加 .traineddata 模型即可追加文字识别模型-->
+                    <Label text="%tessdata.tableView"/>
+                </placeholder>
+
+                <columns>
+                    <!--序号-->
+                    <TableColumn fx:id="index_set" text="%listText.index" sortable="false"/>
+                    <!--模型名称-->
+                    <TableColumn fx:id="name_set" text="%tessdata.name"/>
+                    <!--模型路径-->
+                    <TableColumn fx:id="path_set" text="%tessdata.path"/>
+                    <!--备注-->
+                    <TableColumn fx:id="remark_set" text="%tessdata.remark"/>
+                    <!--备注-->
+                    <TableColumn fx:id="state_set" text="%tessdata.state"/>
+                </columns>
+            </TableView>
         </VBox>
 
         <Separator/>

@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
@@ -36,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.TessdataBean;
 import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -79,7 +81,7 @@ import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomati
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
-import static priv.koishi.pmc.Service.PMCFileService.loadImg;
+import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
@@ -112,6 +114,11 @@ public class SettingController extends RootController implements MousePositionUp
      * 页面标识符
      */
     private final String tabId = "_Set";
+
+    /**
+     * tessdata 组件标识符
+     */
+    private final String tessdataId = "_set";
 
     /**
      * 页面加载完毕标志（true 加载完毕，false 未加载完毕）
@@ -200,12 +207,12 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Button messageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
-            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det, getColor_Set;
+            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det, getColor_Set, tessdataBtn_set;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
             gcType_Set, thisPath_Set, noPermission_Set, cancelKeyInput_Set, cancelKey_Set, recordKeyInput_Set, runKey_Set,
-            recordKey_Set, runKeyInput_Set;
+            recordKey_Set, runKeyInput_Set, tessdataNumber_set;
 
     @FXML
     public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
@@ -235,6 +242,15 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     public TableColumn<ImgFileVO, String> name_Set, type_Set, path_Set;
 
+    @FXML
+    public TableView<TessdataBean> tessdataTableView_set;
+
+    @FXML
+    public TableColumn<TessdataBean, Integer> index_set;
+
+    @FXML
+    public TableColumn<TessdataBean, String> name_set, path_set, remark_set, state_set;
+
     /**
      * 组件自适应宽高
      */
@@ -242,10 +258,13 @@ public class SettingController extends RootController implements MousePositionUp
         // 设置组件高度
         double stageHeight = mainStage.getHeight();
         tableView_Set.setPrefHeight(stageHeight * 0.3);
+        tessdataTableView_set.setPrefHeight(stageHeight * 0.3);
         // 设置组件宽度
         double tableWidth = mainStage.getWidth() * 0.9;
         tableView_Set.setMaxWidth(tableWidth);
         tableView_Set.setPrefWidth(tableWidth);
+        tessdataTableView_set.setMaxWidth(tableWidth);
+        tessdataTableView_set.setPrefWidth(tableWidth);
         bindPrefWidthProperty();
     }
 
@@ -253,11 +272,18 @@ public class SettingController extends RootController implements MousePositionUp
      * 设置 JavaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
+        // 终止操作图像列表自适应
         index_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
         thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
         name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
         path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.4));
         type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
+        // .traineddata 模型文件列表自适应
+        index_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.1));
+        name_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.2));
+        path_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.4));
+        remark_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.2));
+        state_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.1));
     }
 
     /**
@@ -968,15 +994,29 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 创建任务参数对象
+     * 创建终止操作图像相关任务参数对象
      *
-     * @return 任务参数对象
+     * @return 终止操作图像相关任务参数对象
      */
     private TaskBean<ImgFileVO> creatTaskBean() {
         TaskBean<ImgFileVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_Set)
                 .setMessageLabel(dataNumber_Set)
                 .setTableView(tableView_Set)
+                .setDisableNodes(windowInfoDisableNodes);
+        return taskBean;
+    }
+
+    /**
+     * 创建文字识别模型相关任务参数对象
+     *
+     * @return 文字识别模型相关任务参数对象
+     */
+    private TaskBean<TessdataBean> creatTessdatTaskBean() {
+        TaskBean<TessdataBean> taskBean = new TaskBean<>();
+        taskBean.setProgressBar(progressBar_Set)
+                .setMessageLabel(tessdataNumber_set)
+                .setTableView(tessdataTableView_set)
                 .setDisableNodes(windowInfoDisableNodes);
         return taskBean;
     }
@@ -998,6 +1038,32 @@ public class SettingController extends RootController implements MousePositionUp
         Thread.ofVirtual()
                 .name("loadImgTask-vThread" + tabId)
                 .start(loadImgTask);
+    }
+
+    /**
+     * 启动加载 .traineddata 模型任务
+     *
+     * @param files 要加载的文件
+     */
+    private void startLoadTessdataTask(List<? extends File> files) {
+        TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
+        Task<File> loadTessdataTask = loadTessdata(taskBean, files);
+        bindingTaskNode(loadTessdataTask, taskBean);
+        loadTessdataTask.setOnSucceeded(_ -> {
+            taskUnbind(taskBean);
+            startUpdateTessdataTask();
+            File selectedFile = loadTessdataTask.getValue();
+            if (selectedFile != null) {
+                try {
+                    tessdataPath = updatePathLabel(selectedFile.getPath(), tessdataPath, key_tessdataPath, null, configFile_Click);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        Thread.ofVirtual()
+                .name("loadTessdataTask-vThread" + tessdataId)
+                .start(loadTessdataTask);
     }
 
     /**
@@ -1341,6 +1407,24 @@ public class SettingController extends RootController implements MousePositionUp
             setNodeDisable(clickWindowInfo_Set, true, tip_NativeHookException());
             setNodeDisable(removeRecordKey_Det, true, tip_NativeHookException());
         }
+        startUpdateTessdataTask();
+    }
+
+    /**
+     * 启动更新 .traineddata 模型信息任务
+     */
+    private void startUpdateTessdataTask() {
+        TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
+        Task<Void> updateTessdata = updateTessdata(taskBean);
+        bindingTaskNode(updateTessdata, taskBean);
+        updateTessdata.setOnSucceeded(_ -> {
+            taskUnbind(taskBean);
+            updateTableViewSizeText(tessdataTableView_set, tessdataNumber_set, unit_files());
+            tessdataTableView_set.refresh();
+        });
+        Thread.ofVirtual()
+                .name("updateTessdataTask-vThread" + tessdataId)
+                .start(updateTessdata);
     }
 
     /**
@@ -1637,6 +1721,7 @@ public class SettingController extends RootController implements MousePositionUp
             MousePositionListener.getInstance().addListener(this);
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId, index_Set);
+            autoBuildTableViewData(tessdataTableView_set, TessdataBean.class, tessdataId, index_set);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
             // 构建右键菜单
@@ -2533,6 +2618,20 @@ public class SettingController extends RootController implements MousePositionUp
         if (colorPickerFloating != null && !colorPickerFloating.isShowing()) {
             colorPickerFloating.start(colorPicker_Set);
         }
+    }
+
+    /**
+     * 添加 .traineddata 模型
+     *
+     * @param actionEvent 点击事件
+     */
+    @FXML
+    private void addTessdataPath(ActionEvent actionEvent) {
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+        List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
+        extensionFilters.add(new FileChooser.ExtensionFilter(appName, traineddata, allTraineddata));
+        List<File> files = creatFilesChooser(window, tessdataPath, extensionFilters, text_addTessdataPath());
+        startLoadTessdataTask(files);
     }
 
 }

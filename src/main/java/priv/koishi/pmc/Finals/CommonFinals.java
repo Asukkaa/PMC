@@ -137,6 +137,11 @@ public class CommonFinals {
     public static final String plist = ".plist";
 
     /**
+     * 文件后缀名：traineddata
+     */
+    public static final String traineddata = ".traineddata";
+
+    /**
      * 文件后缀名：png
      */
     public static final String png = ".png";
@@ -220,6 +225,11 @@ public class CommonFinals {
      * 文件后缀名匹配符：class
      */
     public static final String allClass = "*.class";
+
+    /**
+     * 文件后缀名匹配符：traineddata
+     */
+    public static final String allTraineddata = "*.traineddata";
 
     /**
      * 文件大小单位：Byte

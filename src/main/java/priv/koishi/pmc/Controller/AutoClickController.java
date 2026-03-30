@@ -122,6 +122,11 @@ public class AutoClickController extends RootController implements MousePosition
     public static String stopImgSelectPath;
 
     /**
+     * 上次所选 .traineddata 模型地址
+     */
+    public static String tessdataPath;
+
+    /**
      * 默认要点击的图片识别重试次数
      */
     private String clickRetryNum;

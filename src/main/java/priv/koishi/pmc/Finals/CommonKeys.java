@@ -243,4 +243,6 @@ public class CommonKeys {
 
     public static final String key_runKey = "runKey";
 
+    public static final String key_tessdataPath = "tessdataPath";
+
 }

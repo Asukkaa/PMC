@@ -8,15 +8,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Bean.ClickPositionBean;
+import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FileConfig;
 import priv.koishi.pmc.Bean.DTO.PMCFileDTO;
 import priv.koishi.pmc.Bean.DTO.PMCSFileDTO;
-import priv.koishi.pmc.Bean.ImgFileBean;
-import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
-import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Service.TaskInterface.MessageUpdater;
@@ -27,6 +24,10 @@ import tools.jackson.databind.exc.MismatchedInputException;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class PMCFileService {
      *
      * @param taskBean 线程任务参数
      * @param files    文件列表
-     * @return PMC 文件列表
+     * @return 带有 PMC 文件列表的 task
      */
     public static Task<PMCSLoadResult> loadPMCSFils(TaskBean<PMCListBean> taskBean, List<? extends File> files) {
         return new Task<>() {
@@ -100,7 +101,7 @@ public class PMCFileService {
      *
      * @param taskBean 线程任务参数
      * @param files    文件列表
-     * @return PMC 操作列表
+     * @return 带有 PMC 操作列表的 task
      */
     public static Task<PMCLoadResult> loadPMCFils(TaskBean<ClickPositionVO> taskBean, List<? extends File> files) {
         return new Task<>() {
@@ -304,7 +305,7 @@ public class PMCFileService {
      *
      * @param taskBean 线程任务参数
      * @param file     要加载的文件
-     * @return PMC 文件列表
+     * @return 带有 PMC 文件列表的 task
      */
     public static Task<List<ClickPositionVO>> buildPMC(TaskBean<ClickPositionVO> taskBean, File file) {
         return new Task<>() {
@@ -322,7 +323,7 @@ public class PMCFileService {
      *
      * @param taskBean 线程任务参数
      * @param file     要加载的文件
-     * @return PMCS 文件列表
+     * @return 带有 PMCS 文件列表的 task
      */
     public static Task<List<PMCListBean>> buildPMCS(TaskBean<PMCListBean> taskBean, File file) {
         return new Task<>() {
@@ -341,7 +342,7 @@ public class PMCFileService {
      * @param taskBean    线程任务参数
      * @param fileName    要导出的文件名
      * @param outFilePath 导出文件夹路径
-     * @return 导出文件路径
+     * @return 带有导出文件路径的 task
      */
     public static Task<String> exportPMCS(TaskBean<PMCListBean> taskBean, String fileName,
                                           String outFilePath, boolean notOverwrite) {
@@ -384,7 +385,7 @@ public class PMCFileService {
      * @param taskBean    线程任务参数
      * @param fileName    要导出的文件名
      * @param outFilePath 导出文件夹路径
-     * @return 导出文件路径
+     * @return 带有导出文件路径的 task
      */
     public static Task<String> exportPMC(TaskBean<ClickPositionVO> taskBean, String fileName,
                                          String outFilePath, boolean notOverwrite) {
@@ -432,6 +433,7 @@ public class PMCFileService {
      *
      * @param taskBean 线程任务参数
      * @param files    图片文件列表
+     * @return 无返回值 task
      */
     public static Task<Void> loadImg(TaskBean<ImgFileVO> taskBean, List<? extends File> files) {
         return new Task<>() {
@@ -464,9 +466,85 @@ public class PMCFileService {
     }
 
     /**
+     * 批量加载 .traineddata 模型文件
+     *
+     * @param taskBean 线程任务参数
+     * @param files    .traineddata 模型文件列表
+     * @return 带有最后一个符合条件的文件的 task
+     */
+    public static Task<File> loadTessdata(TaskBean<TessdataBean> taskBean, List<? extends File> files) {
+        return new Task<>() {
+            @Override
+            protected File call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                File selectedFile = null;
+                // 过滤不符合的文件格式
+                List<File> selectedFiles = new ArrayList<>();
+                for (File file : files) {
+                    if (traineddata.equals(getExistsFileType(file))) {
+                        selectedFile = file;
+                        selectedFiles.add(file);
+                    }
+                }
+                int size = selectedFiles.size();
+                Platform.runLater(() -> {
+                    updateProgress(0, size);
+                    for (int i = 0; i < size; i++) {
+                        File file = selectedFiles.get(i);
+                        Path tessdataPath = Path.of(getTessdataPath() + File.separator + file.getName());
+                        try {
+                            // 将模型文件复制到 tessdata 目录
+                            Files.copy(file.toPath(), tessdataPath, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        updateProgress(i + 1, size);
+                    }
+                });
+                return selectedFile;
+            }
+        };
+    }
+
+    /**
+     * 更新 .traineddata 模型文件列表
+     *
+     * @param taskBean 线程任务参数
+     * @return 无返回值 task
+     */
+    public static Task<Void> updateTessdata(TaskBean<? super TessdataBean> taskBean) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                List<TessdataBean> list = new ArrayList<>();
+                File tessdataPathFile = new File(getTessdataPath());
+                File[] files = tessdataPathFile.listFiles();
+                Platform.runLater(() -> {
+                    if (files != null) {
+                        for (int i = 0; i < files.length; i++) {
+                            File file = files[i];
+                            if (traineddata.equals(getExistsFileType(file))) {
+                                list.add(new TessdataBean(file));
+                            }
+                            updateProgress(i + 1, files.length);
+                        }
+                    }
+                    taskBean.getTableView().getItems().clear();
+                    taskBean.getTableView().getItems().addAll(list);
+                });
+                return null;
+            }
+        };
+    }
+
+    /**
      * 导入自动操作流程文件
      *
      * @param jsonFile 要解析的文件
+     * @return 解析后的自动操作步骤列表
      */
     public static List<ClickPositionVO> loadPMCFile(File jsonFile) {
         // 配置忽略未知字段

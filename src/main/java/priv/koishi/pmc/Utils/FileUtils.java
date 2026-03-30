@@ -43,7 +43,7 @@ public class FileUtils {
      * 获取文件类型
      *
      * @param file 文件
-     * @return 文件类型
+     * @return 带点的文件类型
      */
     public static String getExistsFileType(File file) {
         if (!file.exists()) {
@@ -66,7 +66,7 @@ public class FileUtils {
      * 获取文件类型（文件不存在时可用）
      *
      * @param path 文件路径
-     * @return 文件类型
+     * @return 带点的文件类型
      */
     public static String getFileType(String path) {
         if (StringUtils.isBlank(path)) {
