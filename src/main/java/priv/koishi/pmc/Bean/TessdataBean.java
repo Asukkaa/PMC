@@ -81,6 +81,7 @@ public class TessdataBean implements Indexable, FilePath {
      *
      * @param active true 启用模型
      */
+    @SuppressWarnings("unused")
     public void setActive(boolean active) {
         this.active = active;
         state = active ? "启用" : "禁用";
@@ -91,6 +92,7 @@ public class TessdataBean implements Indexable, FilePath {
      *
      * @return 启用状态文本
      */
+    @SuppressWarnings("unused")
     public String getState() {
         state = active ? "启用" : "禁用";
         return state;
