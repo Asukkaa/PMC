@@ -357,10 +357,11 @@ public class ClickDetailController extends RootController {
             // 展示目标图像
             showClickImg(item.getClickImgTarget());
         } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
-            // 展示要目标颜色
+            // 展示目标颜色
             showClickColor(item);
         } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
-            ocrText_Det.setText(item.getTargetPath());
+            // 展示目标文字
+            showClickText(item);
         }
         imgX_Det.setText(item.getImgX());
         imgY_Det.setText(item.getImgY());
@@ -671,7 +672,7 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 展示要目标颜色
+     * 展示目标颜色
      *
      * @param item 列表选中的数据
      */
@@ -679,6 +680,16 @@ public class ClickDetailController extends RootController {
         recognitionType_Det.setValue(recognitionTypeMap.get(RecognitionTypeEnum.COLOR.ordinal()));
         colorPicker_Det.setValue(Color.valueOf(item.getClickImgTarget()));
         colorTolerance_Det.setText(item.getColorTolerance());
+    }
+
+    /**
+     * 展示目标文字
+     *
+     * @param item 列表选中的数据
+     */
+    private void showClickText(ClickPositionVO item) {
+        recognitionType_Det.setValue(recognitionTypeMap.get(RecognitionTypeEnum.TEXT.ordinal()));
+        ocrText_Det.setText(item.getClickImgTarget());
     }
 
     /**
@@ -1676,12 +1687,12 @@ public class ClickDetailController extends RootController {
             if (recognitionType_img().equals(recognitionType)) {
                 selectedItem.setRecognitionType(RecognitionTypeEnum.IMAGE.ordinal())
                         .setClickImgTarget(clickImgPath_Det.getText());
-            } else if (recognitiontype_color().equals(recognitionType)) {
+            } else if (recognitionType_color().equals(recognitionType)) {
                 String colorTolerance = String.valueOf(setDefaultIntValue(colorTolerance_Det, defaultColorTolerance, 0, 255));
                 selectedItem.setRecognitionType(RecognitionTypeEnum.COLOR.ordinal())
                         .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()))
                         .setColorTolerance(colorTolerance);
-            } else if (recognitiontype_text().equals(recognitionType)) {
+            } else if (recognitionType_text().equals(recognitionType)) {
                 selectedItem.setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
                         .setClickImgTarget(ocrText_Det.getText());
             }
@@ -2326,11 +2337,11 @@ public class ClickDetailController extends RootController {
             findImgVBox_Det.setVisible(true);
             colorHBox_Det.setVisible(false);
             ocrHBox_Det.setVisible(false);
-        } else if (recognitiontype_color().equals(value)) {
+        } else if (recognitionType_color().equals(value)) {
             findImgVBox_Det.setVisible(false);
             colorHBox_Det.setVisible(true);
             ocrHBox_Det.setVisible(false);
-        } else if (recognitiontype_text().equals(value)) {
+        } else if (recognitionType_text().equals(value)) {
             findImgVBox_Det.setVisible(false);
             colorHBox_Det.setVisible(false);
             ocrHBox_Det.setVisible(true);

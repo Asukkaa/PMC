@@ -536,13 +536,11 @@ public class ImageRecognitionService {
             api.Recognize(null);
             // 3. 获取结果迭代器
             ResultIterator ri = api.GetIterator();
-            System.out.println(ri);
             if (ri == null) {
                 return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
             }
             float bestConfidence = 0.0f;
             Point bestCenter = null;
-            System.out.println("开始匹配");
             // 4. 遍历所有单词
             do {
                 // 获取单词文本

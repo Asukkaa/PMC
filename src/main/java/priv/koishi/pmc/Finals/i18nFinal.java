@@ -4103,14 +4103,14 @@ public class i18nFinal {
     /**
      * @return 颜色识别
      */
-    public static String recognitiontype_color() {
+    public static String recognitionType_color() {
         return bundle.getString("recognitionType.color");
     }
 
     /**
      * @return 文字识别
      */
-    public static String recognitiontype_text() {
+    public static String recognitionType_text() {
         return bundle.getString("recognitionType.text");
     }
 
@@ -4125,8 +4125,8 @@ public class i18nFinal {
     public static void updateRecognitionTypeList() {
         List<String> newList = Arrays.asList(
                 recognitionType_img(),
-                recognitiontype_color(),
-                recognitiontype_text());
+                recognitionType_color(),
+                recognitionType_text());
         recognitionTypeList.clear();
         recognitionTypeList.addAll(newList);
     }
@@ -4142,8 +4142,8 @@ public class i18nFinal {
     public static void updateRecognitionTypeMap() {
         recognitionTypeMap.clear();
         recognitionTypeMap.put(RecognitionTypeEnum.IMAGE.ordinal(), recognitionType_img());
-        recognitionTypeMap.put(RecognitionTypeEnum.COLOR.ordinal(), recognitiontype_color());
-        recognitionTypeMap.put(RecognitionTypeEnum.TEXT.ordinal(), recognitiontype_text());
+        recognitionTypeMap.put(RecognitionTypeEnum.COLOR.ordinal(), recognitionType_color());
+        recognitionTypeMap.put(RecognitionTypeEnum.TEXT.ordinal(), recognitionType_text());
     }
 
     /**

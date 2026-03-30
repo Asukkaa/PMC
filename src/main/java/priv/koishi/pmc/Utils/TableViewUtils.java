@@ -265,22 +265,22 @@ public class TableViewUtils {
                 } else if (image == null) {
                     TableRow<T> tableRow = getTableRow();
                     T bean = tableRow.getItem();
-                    String imgPath = null;
+                    String target = null;
                     if (bean instanceof ImgFileVO imgFileVO) {
-                        imgPath = imgFileVO.getPath();
+                        target = imgFileVO.getPath();
                     } else if (bean instanceof ClickPositionVO clickPositionVO) {
-                        imgPath = clickPositionVO.getClickImgTarget();
+                        target = clickPositionVO.getClickImgTarget();
                         int recognitionType = clickPositionVO.getRecognitionType();
                         if (RecognitionTypeEnum.COLOR.ordinal() == recognitionType) {
-                            Color color = Color.valueOf(imgPath);
+                            Color color = Color.valueOf(target);
                             if (color != null) {
                                 // 颜色预览方块
                                 Rectangle colorRect = new Rectangle(30, 30, color);
                                 colorRect.setStroke(Color.valueOf("#1b2026"));
                                 colorRect.setStrokeWidth(1);
                                 // 颜色值文本
-                                Label colorLabel = new Label(imgPath);
-                                colorLabel.setTooltip(creatTooltip(imgPath));
+                                Label colorLabel = new Label(target);
+                                colorLabel.setTooltip(creatTooltip(target));
                                 // 水平布局
                                 HBox hbox = new HBox(5, colorRect, colorLabel);
                                 hbox.setAlignment(Pos.CENTER_LEFT);
@@ -289,9 +289,14 @@ public class TableViewUtils {
                                 setTooltip(null);
                                 return;
                             }
+                        } else if (RecognitionTypeEnum.TEXT.ordinal() == recognitionType) {
+                            String text = recognitionType_text() + "：" + target;
+                            setText(text);
+                            setTooltip(creatTooltip(text));
+                            return;
                         }
                     }
-                    if (imgPath != null && !new File(imgPath).exists()) {
+                    if (target != null && !new File(target).exists()) {
                         setText(text_badImg());
                         textFillProperty().unbind();
                         setTextFill(Color.RED);
