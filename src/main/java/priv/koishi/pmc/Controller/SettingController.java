@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -54,6 +55,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomFloatingWindow.ColorPickerFloating;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
@@ -65,6 +67,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
+import java.net.URI;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -124,6 +127,11 @@ public class SettingController extends RootController implements MousePositionUp
      * 页面加载完毕标志（true 加载完毕，false 未加载完毕）
      */
     private boolean initializedFinished;
+
+    /**
+     * tessdata 首次加载完毕标志（true 加载完毕，false 未加载完毕）
+     */
+    private boolean tessdataFinished;
 
     /**
      * 无自动化权限（true-无权限 false-有权限）
@@ -207,7 +215,8 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Button messageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
-            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det, getColor_Set, tessdataBtn_set;
+            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det, getColor_Set, tessdataBtn_set,
+            selectBtn_set, downloadBtn_set;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
@@ -406,7 +415,7 @@ public class SettingController extends RootController implements MousePositionUp
      *
      * @return 浮窗描初始配置
      */
-    private FloatingWindowDescriptor createFloatingWindowDescriptor() {
+    private FloatingWindowDescriptor creatFloatingWindowDescriptor() {
         return new FloatingWindowDescriptor()
                 .setDisableNodes(new ArrayList<>(baseDisableNodes))
                 .setShowButtonText(findImgSet_showRegion())
@@ -424,7 +433,7 @@ public class SettingController extends RootController implements MousePositionUp
      * @throws IOException 配置文件读取异常
      */
     private void initFloatingWindow() throws IOException {
-        clickFloating = createFloatingWindowDescriptor()
+        clickFloating = creatFloatingWindowDescriptor()
                 .setMinHeight(minFindImgHeight)
                 .setName(floatingName_click())
                 .setHeightKey(key_clickHeight)
@@ -434,7 +443,7 @@ public class SettingController extends RootController implements MousePositionUp
                 .setXKey(key_clickX)
                 .setYKey(key_clickY);
         clickFloating.getDisableNodes().add(clickFindImgType_Set);
-        stopFloating = createFloatingWindowDescriptor()
+        stopFloating = creatFloatingWindowDescriptor()
                 .setMinHeight(minFindImgHeight)
                 .setName(floatingName_stop())
                 .setMinWidth(minFindImgWidth)
@@ -447,7 +456,7 @@ public class SettingController extends RootController implements MousePositionUp
         int margin = setDefaultIntValue(floatingDistance_Set, 0, 0, null);
         String hideButtonText = mouseFloating_Set.isSelected() ? text_closeFloating() : text_saveCloseFloating();
         String hideButtonToolTip = mouseFloating_Set.isSelected() ? tip_closeFloating() : tip_saveFloating();
-        messageFloating = createFloatingWindowDescriptor()
+        messageFloating = creatFloatingWindowDescriptor()
                 .setShowButtonToolTip(tip_messageRegion())
                 .setHideButtonToolTip(hideButtonToolTip)
                 .setShowButtonText(text_showFloating())
@@ -1081,17 +1090,89 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 设置单元格可编辑
+     */
+    private void makeCellCanEdit() {
+        // 设置表格可编辑
+        tessdataTableView_set.setEditable(true);
+        // 设置 tessdata 文件备注可编辑
+        remark_set.setCellFactory((_) ->
+                new EditingCell<>(TessdataBean::setRemark, this::startSaveConfigTask));
+    }
+
+    /**
      * 构建右键菜单
      */
     private void buildContextMenu() {
         // 构建表格右键菜单
         buildTableViewContextMenu(tableView_Set, dataNumber_Set);
+        ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_set);
+        buildMoveToTrashMenu(contextMenu);
+        buildSetUnActiveMenu(contextMenu);
+        buildSetActiveMenu(contextMenu);
         List<Stage> stages = List.of(mainStage);
         // 构建窗口信息栏右键菜单
         ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildStopUpdateListMenu(stopContextMenu, stopWindowMonitor);
         ContextMenu clickContextMenu = buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, windowInfoDisableNodes, stages);
         buildClickUpdateListMenu(clickContextMenu, clickWindowMonitor);
+    }
+
+    /**
+     * 将所选文件移动到垃圾桶选项
+     *
+     * @param contextMenu 右键菜单
+     */
+    private void buildMoveToTrashMenu(ContextMenu contextMenu) {
+        MenuItem moveToTrashMenu = new MenuItem(menu_moveToTrashMenu());
+        moveToTrashMenu.setOnAction(_ -> {
+            // 要删除的选中项
+            ObservableList<TessdataBean> selectedItems = tessdataTableView_set.getSelectionModel().getSelectedItems();
+            // 将文件移动到垃圾桶
+            selectedItems.forEach(item -> {
+                String path = item.getPath();
+                Desktop desktop = Desktop.getDesktop();
+                File file = new File(path);
+                if (file.exists()) {
+                    desktop.moveToTrash(file);
+                }
+            });
+            // 刷新列表
+            startUpdateTessdataTask();
+        });
+        contextMenu.getItems().add(moveToTrashMenu);
+    }
+
+    /**
+     * 启用所选选项
+     *
+     * @param contextMenu 右键菜单
+     */
+    private void buildSetActiveMenu(ContextMenu contextMenu) {
+        MenuItem moveToTrashMenu = new MenuItem(menu_activeMenu());
+        moveToTrashMenu.setOnAction(_ -> {
+            ObservableList<TessdataBean> selectedItems = tessdataTableView_set.getSelectionModel().getSelectedItems();
+            selectedItems.forEach(item -> item.setActive(true));
+            // 保存更新
+            startSaveConfigTask();
+        });
+        contextMenu.getItems().addFirst(moveToTrashMenu);
+    }
+
+    /**
+     * 禁用所选选项
+     *
+     * @param contextMenu 右键菜单
+     */
+    private void buildSetUnActiveMenu(ContextMenu contextMenu) {
+        MenuItem moveToTrashMenu = new MenuItem(menu_unActiveMenu());
+        moveToTrashMenu.setOnAction(_ -> {
+            ObservableList<TessdataBean> selectedItems = tessdataTableView_set.getSelectionModel().getSelectedItems();
+            selectedItems.forEach(item -> item.setActive(false));
+            // 保存更新
+            startSaveConfigTask();
+        });
+        contextMenu.getItems().addFirst(moveToTrashMenu);
     }
 
     /**
@@ -1421,6 +1502,11 @@ public class SettingController extends RootController implements MousePositionUp
             taskUnbind(taskBean);
             updateTableViewSizeText(tessdataTableView_set, tessdataNumber_set, unit_files());
             tessdataTableView_set.refresh();
+            if (!tessdataFinished) {
+                tessdataTableView_set.getItems().addListener((ListChangeListener<TessdataBean>)
+                        _ -> startSaveConfigTask());
+                tessdataFinished = true;
+            }
         });
         Thread.ofVirtual()
                 .name("updateTessdataTask-vThread" + tessdataId)
@@ -1684,6 +1770,24 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 保存 tessdata 列表设置
+     */
+    private void startSaveConfigTask() {
+        TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
+        ObservableList<TessdataBean> items = tessdataTableView_set.getItems();
+        taskBean.setBeanList(items);
+        Task<Void> saveTessdataConfig = saveTessdataConfig(taskBean);
+        bindingTaskNode(saveTessdataConfig, taskBean);
+        saveTessdataConfig.setOnSucceeded(_ -> {
+            taskUnbind(taskBean);
+            Platform.runLater(() -> tessdataTableView_set.refresh());
+        });
+        Thread.ofVirtual()
+                .name("saveTessdataConfigTask-vThread" + tessdataId)
+                .start(saveTessdataConfig);
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException 配置文件读取异常、配置文件读取异常
@@ -1724,8 +1828,11 @@ public class SettingController extends RootController implements MousePositionUp
             autoBuildTableViewData(tessdataTableView_set, TessdataBean.class, tessdataId, index_set);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
+            tableViewDragRow(tessdataTableView_set);
             // 构建右键菜单
             buildContextMenu();
+            // 表格设置为可编辑
+            makeCellCanEdit();
             // 设置要防重复点击的组件
             setDisableNodes();
             // 绑定取色器
@@ -2354,7 +2461,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 拖拽释放行为
+     * 终止操作图像列表拖拽释放行为
      *
      * @param dragEvent 拖拽事件
      */
@@ -2367,7 +2474,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 拖拽中行为
+     * 终止操作图像列表拖拽中行为
      *
      * @param dragEvent 拖拽事件
      */
@@ -2621,7 +2728,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 添加 .traineddata 模型
+     * 添加 .traineddata 模型按钮
      *
      * @param actionEvent 点击事件
      */
@@ -2632,6 +2739,54 @@ public class SettingController extends RootController implements MousePositionUp
         extensionFilters.add(new FileChooser.ExtensionFilter(appName, traineddata, allTraineddata));
         List<File> files = creatFilesChooser(window, tessdataPath, extensionFilters, text_addTessdataPath());
         startLoadTessdataTask(files);
+    }
+
+    /**
+     * 刷新模型列表按钮
+     */
+    @FXML
+    private void selectTessdataPath() {
+        startUpdateTessdataTask();
+    }
+
+    /**
+     * 下载更多模型按钮
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void downloadTessdataPath() throws Exception {
+        Desktop.getDesktop().browse(new URI(tessdataLink));
+    }
+
+    /**
+     * 模型列表拖拽释放行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    private void tessdataHandleDrop(DragEvent dragEvent) {
+        List<File> files = dragEvent.getDragboard().getFiles();
+        startLoadTessdataTask(files);
+        dragEvent.setDropCompleted(true);
+        dragEvent.consume();
+    }
+
+    /**
+     * 模型列表拖拽中行为
+     *
+     * @param dragEvent 拖拽事件
+     */
+    @FXML
+    private void tessdataAcceptDrop(DragEvent dragEvent) {
+        List<File> files = dragEvent.getDragboard().getFiles();
+        files.forEach(file -> {
+            if (traineddata.equals(getExistsFileType(file))) {
+                // 接受拖放
+                dragEvent.acceptTransferModes(TransferMode.COPY);
+            }
+        });
+        dragEvent.consume();
     }
 
 }

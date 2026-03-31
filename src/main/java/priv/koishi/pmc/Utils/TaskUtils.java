@@ -81,6 +81,7 @@ public class TaskUtils {
      * @throws RuntimeException 线程的异常
      */
     public static void throwTaskException(Task<?> task, TaskBean<?> taskBean) {
+        task.setOnSucceeded(_ -> taskUnbind(taskBean));
         task.setOnFailed(_ -> {
             taskNotSuccess(taskBean, text_taskFailed());
             // 获取抛出的异常

@@ -1083,9 +1083,9 @@ public class AutoClickController extends RootController implements MousePosition
         // 复制数据选项
         buildCopyDataMenu(tableView_Click, tableMenu, dataNumber_Click, unit_process());
         // 取消选中选项
-        buildClearSelectedData(tableView_Click, tableMenu);
+        buildClearSelectedMenu(tableView_Click, tableMenu);
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView_Click, dataNumber_Click, tableMenu, unit_data());
+        buildDeleteDataMenu(tableView_Click, dataNumber_Click, tableMenu, unit_data());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(tableMenu, tableView_Click);
     }

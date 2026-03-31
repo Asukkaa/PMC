@@ -289,6 +289,18 @@ public class FileUtils {
     }
 
     /**
+     * 获取 tessdata 配置文件路径
+     *
+     * @return 根据不同运行环境返回不同的地址
+     */
+    public static String getTessdataConfigPath() {
+        if (isRunningFromIDEA) {
+            return resourcesPath + configFile_Tessdata;
+        }
+        return getAppResourcePath(configFile_Tessdata);
+    }
+
+    /**
      * 获取 logs 文件夹地址
      *
      * @return 不同操作系统下 logs 文件夹地址

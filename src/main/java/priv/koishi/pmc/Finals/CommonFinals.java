@@ -49,7 +49,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.03.30";
+    public static final String buildDate = "2026.03.31";
 
     /**
      * 文件后缀名：bat
@@ -322,6 +322,11 @@ public class CommonFinals {
     public static final String configFile_List = "config/listPMCConfig.properties";
 
     /**
+     * tessdata 设置配置文件路径
+     */
+    public static final String configFile_Tessdata = "config/tessdataConfig.json";
+
+    /**
      * 更新脚本名称
      */
     public static final String updateScript = "pmc_update";
@@ -523,6 +528,11 @@ public class CommonFinals {
      * 爱发电地址
      */
     public static final String afdianLink = "https://afdian.com/a/project_pmc";
+
+    /**
+     * tessdata 模型下载地址
+     */
+    public static final String tessdataLink = "https://github.com/tesseract-ocr/tessdata_best";
 
     /**
      * 存在的文件路径颜色

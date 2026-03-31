@@ -2879,6 +2879,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return 将所选文件移动到垃圾桶
+     */
+    public static String menu_moveToTrashMenu() {
+        return bundle.getString("menu.moveToTrash");
+    }
+
+    /**
+     * @return 启用所选选项
+     */
+    public static String menu_activeMenu() {
+        return bundle.getString("menu.active");
+    }
+
+    /**
+     * @return 禁用所选选项
+     */
+    public static String menu_unActiveMenu() {
+        return bundle.getString("menu.unActive");
+    }
+
+    /**
      * @return 按下
      */
     public static String log_press() {

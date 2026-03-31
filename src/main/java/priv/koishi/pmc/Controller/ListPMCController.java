@@ -304,13 +304,13 @@ public class ListPMCController extends RootController {
         // 移动数据选项
         buildMoveDataMenu(tableView_List, tableMenu);
         // 查看文件选项
-        buildFilePathItem(tableView_List, tableMenu);
+        buildFilePathMenu(tableView_List, tableMenu);
         // 复制数据选项
         buildCopyDataMenu(tableView_List, tableMenu, dataNumber_List, unit_files());
         // 取消选中选项
-        buildClearSelectedData(tableView_List, tableMenu);
+        buildClearSelectedMenu(tableView_List, tableMenu);
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView_List, dataNumber_List, tableMenu, unit_files());
+        buildDeleteDataMenu(tableView_List, dataNumber_List, tableMenu, unit_files());
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(tableMenu, tableView_List);
     }

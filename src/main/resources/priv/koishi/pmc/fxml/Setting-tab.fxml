@@ -696,13 +696,16 @@
             <HBox spacing="10">
                 <!--添加 .traineddata 模型-->
                 <Button fx:id="tessdataBtn_set" onAction="#addTessdataPath" text="%tessdata.addTessdata"/>
+                <Button fx:id="selectBtn_set" onAction="#selectTessdataPath" text="%tessdata.selectTessdata"/>
+                <Button fx:id="downloadBtn_set" onAction="#downloadTessdataPath" text="%tessdata.downloadTessdata"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
                 <!--列表为空-->
                 <Label fx:id="tessdataNumber_set" text="%listText.null"/>
             </HBox>
 
-            <TableView fx:id="tessdataTableView_set" onDragDropped="#handleDrop" onDragOver="#acceptDrop">
+            <TableView fx:id="tessdataTableView_set" onDragDropped="#tessdataHandleDrop"
+                       onDragOver="#tessdataAcceptDrop">
                 <placeholder>
                     <!--拖拽 .traineddata 模型文件或点击添加 .traineddata 模型即可追加文字识别模型-->
                     <Label text="%tessdata.tableView"/>
@@ -712,13 +715,13 @@
                     <!--序号-->
                     <TableColumn fx:id="index_set" text="%listText.index" sortable="false"/>
                     <!--模型名称-->
-                    <TableColumn fx:id="name_set" text="%tessdata.name"/>
+                    <TableColumn fx:id="name_set" text="%tessdata.name" sortable="false"/>
                     <!--模型路径-->
-                    <TableColumn fx:id="path_set" text="%tessdata.path"/>
+                    <TableColumn fx:id="path_set" text="%tessdata.path" sortable="false"/>
                     <!--备注-->
-                    <TableColumn fx:id="remark_set" text="%tessdata.remark"/>
-                    <!--备注-->
-                    <TableColumn fx:id="state_set" text="%tessdata.state"/>
+                    <TableColumn fx:id="remark_set" text="%tessdata.remark" sortable="false"/>
+                    <!--状态-->
+                    <TableColumn fx:id="state_set" text="%tessdata.state" sortable="false"/>
                 </columns>
             </TableView>
         </VBox>

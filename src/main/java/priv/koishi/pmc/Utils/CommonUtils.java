@@ -422,4 +422,25 @@ public class CommonUtils {
         return urlPattern.matcher(trimmedUrl).matches();
     }
 
+    /**
+     * 将指定元素移动到 List 首位
+     *
+     * @param list    需要处理的 List
+     * @param element 需要移动的元素
+     * @param <T>     需要处理的 List 数据类
+     */
+    public static <T> void moveAllToFirst(List<T> list, T element) {
+        // 先删除所有匹配元素
+        List<T> matches = new ArrayList<>();
+        list.removeIf(e -> {
+            if (e.equals(element)) {
+                matches.add(e);
+                return true;
+            }
+            return false;
+        });
+        // 将匹配元素插入到开头
+        list.addAll(0, matches);
+    }
+
 }

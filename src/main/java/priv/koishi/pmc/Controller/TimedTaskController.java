@@ -220,7 +220,7 @@ public class TimedTaskController extends RootController {
         // 移动所选行选项
         buildMoveDataMenu(tableView_Task, contextMenu);
         // 取消选中选项
-        buildClearSelectedData(tableView_Task, contextMenu);
+        buildClearSelectedMenu(tableView_Task, contextMenu);
         // 删除所选数据选项
         buildDeleteDataMenuItem(tableView_Task, contextMenu);
         // 为列表添加右键菜单并设置可选择多行

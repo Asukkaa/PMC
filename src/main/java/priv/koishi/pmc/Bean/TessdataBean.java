@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Interface.FilePath;
@@ -28,6 +29,7 @@ public class TessdataBean implements Indexable, FilePath {
     /**
      * tessdata 文件名称（不带拓展名）
      */
+    @JsonIgnore
     String name;
 
     /**
@@ -43,6 +45,7 @@ public class TessdataBean implements Indexable, FilePath {
     /**
      * 启用状态文本
      */
+    @JsonIgnore
     String state;
 
     /**
@@ -81,7 +84,6 @@ public class TessdataBean implements Indexable, FilePath {
      *
      * @param active true 启用模型
      */
-    @SuppressWarnings("unused")
     public void setActive(boolean active) {
         this.active = active;
         state = active ? "启用" : "禁用";

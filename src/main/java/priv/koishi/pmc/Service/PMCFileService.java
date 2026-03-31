@@ -18,6 +18,7 @@ import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Service.TaskInterface.MessageUpdater;
 import priv.koishi.pmc.Service.TaskInterface.ProgressUpdater;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.MismatchedInputException;
@@ -466,81 +467,6 @@ public class PMCFileService {
     }
 
     /**
-     * 批量加载 .traineddata 模型文件
-     *
-     * @param taskBean 线程任务参数
-     * @param files    .traineddata 模型文件列表
-     * @return 带有最后一个符合条件的文件的 task
-     */
-    public static Task<File> loadTessdata(TaskBean<TessdataBean> taskBean, List<? extends File> files) {
-        return new Task<>() {
-            @Override
-            protected File call() {
-                changeDisableNodes(taskBean, true);
-                updateMessage(text_readData());
-                File selectedFile = null;
-                // 过滤不符合的文件格式
-                List<File> selectedFiles = new ArrayList<>();
-                for (File file : files) {
-                    if (traineddata.equals(getExistsFileType(file))) {
-                        selectedFile = file;
-                        selectedFiles.add(file);
-                    }
-                }
-                int size = selectedFiles.size();
-                Platform.runLater(() -> {
-                    updateProgress(0, size);
-                    for (int i = 0; i < size; i++) {
-                        File file = selectedFiles.get(i);
-                        Path tessdataPath = Path.of(getTessdataPath() + File.separator + file.getName());
-                        try {
-                            // 将模型文件复制到 tessdata 目录
-                            Files.copy(file.toPath(), tessdataPath, StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        updateProgress(i + 1, size);
-                    }
-                });
-                return selectedFile;
-            }
-        };
-    }
-
-    /**
-     * 更新 .traineddata 模型文件列表
-     *
-     * @param taskBean 线程任务参数
-     * @return 无返回值 task
-     */
-    public static Task<Void> updateTessdata(TaskBean<? super TessdataBean> taskBean) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                changeDisableNodes(taskBean, true);
-                updateMessage(text_readData());
-                List<TessdataBean> list = new ArrayList<>();
-                File tessdataPathFile = new File(getTessdataPath());
-                File[] files = tessdataPathFile.listFiles();
-                Platform.runLater(() -> {
-                    if (files != null) {
-                        for (int i = 0; i < files.length; i++) {
-                            File file = files[i];
-                            if (traineddata.equals(getExistsFileType(file))) {
-                                list.add(new TessdataBean(file));
-                            }
-                            updateProgress(i + 1, files.length);
-                        }
-                    }
-                    taskBean.getTableView().getItems().clear();
-                    taskBean.getTableView().getItems().addAll(list);
-                });
-                return null;
-            }
-        };
-    }
-
-    /**
      * 导入自动操作流程文件
      *
      * @param jsonFile 要解析的文件
@@ -831,6 +757,162 @@ public class PMCFileService {
                     updateProgress(i + 1, size);
                 }
                 return copyList;
+            }
+        };
+    }
+
+    /**
+     * 批量加载 .traineddata 模型文件
+     *
+     * @param taskBean 线程任务参数
+     * @param files    .traineddata 模型文件列表
+     * @return 带有最后一个符合条件的文件的 task
+     */
+    public static Task<File> loadTessdata(TaskBean<TessdataBean> taskBean, List<? extends File> files) {
+        return new Task<>() {
+            @Override
+            protected File call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                File selectedFile = null;
+                // 过滤不符合的文件格式
+                List<File> selectedFiles = new ArrayList<>();
+                for (File file : files) {
+                    if (traineddata.equals(getExistsFileType(file))) {
+                        selectedFile = file;
+                        selectedFiles.add(file);
+                    }
+                }
+                int size = selectedFiles.size();
+                updateProgress(0, size);
+                for (int i = 0; i < size; i++) {
+                    File file = selectedFiles.get(i);
+                    Path tessdataPath = Path.of(getTessdataPath() + File.separator + file.getName());
+                    try {
+                        // 将模型文件复制到 tessdata 目录
+                        Files.copy(file.toPath(), tessdataPath, StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    updateProgress(i + 1, size);
+                }
+                return selectedFile;
+            }
+        };
+    }
+
+    /**
+     * 更新 .traineddata 模型文件列表
+     *
+     * @param taskBean 线程任务参数
+     * @return 无返回值 task
+     */
+    public static Task<Void> updateTessdata(TaskBean<? super TessdataBean> taskBean) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                changeDisableNodes(taskBean, true);
+                updateMessage(text_readData());
+                // 读取模型文件
+                List<TessdataBean> list = new ArrayList<>();
+                File tessdataPathFile = new File(getTessdataPath());
+                File[] files = tessdataPathFile.listFiles();
+                if (files != null) {
+                    int size = files.length;
+                    updateProgress(0, size);
+                    for (int i = 0; i < size; i++) {
+                        File file = files[i];
+                        if (traineddata.equals(getExistsFileType(file))) {
+                            list.add(new TessdataBean(file));
+                        }
+                        updateProgress(i + 1, size);
+                    }
+                    // 读取配置文件
+                    ObjectMapper objectMapper = JsonMapper.builder()
+                            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                            .build();
+                    String configPath = getTessdataConfigPath();
+                    List<TessdataBean> configList = objectMapper.readValue(new File(configPath), new TypeReference<>() {
+                    });
+                    int configListSize = configList.size();
+                    updateProgress(0, configListSize);
+                    // 构建配置文件数据与模型文件的映射
+                    Map<String, TessdataBean> configMap = new HashMap<>();
+                    for (int i = 0; i < configListSize; i++) {
+                        TessdataBean config = configList.get(i);
+                        String path = config.getPath();
+                        if (path != null) {
+                            configMap.put(path, config);
+                        }
+                        updateProgress(i + 1, configListSize);
+                    }
+                    // 根据配置文件排序
+                    list.sort((a, b) -> {
+                        String pathA = a.getPath();
+                        String pathB = b.getPath();
+                        boolean inConfigA = configMap.containsKey(pathA);
+                        boolean inConfigB = configMap.containsKey(pathB);
+                        if (inConfigA && inConfigB) {
+                            // 两个都在配置中，按 index 升序
+                            return Integer.compare(configMap.get(pathA).getIndex(),
+                                    configMap.get(pathB).getIndex());
+                        } else if (inConfigA) {
+                            // 只有 A 在配置中，A 排在前面
+                            return -1;
+                        } else if (inConfigB) {
+                            // 只有 B 在配置中，B 排在前面
+                            return 1;
+                        } else {
+                            // 都不在配置中，按文件名排序
+                            return a.getName().compareTo(b.getName());
+                        }
+                    });
+                    int listSize = list.size();
+                    updateProgress(0, listSize);
+                    // 填充备注
+                    for (int i = 0; i < listSize; i++) {
+                        TessdataBean bean = list.get(i);
+                        String path = bean.getPath();
+                        if (configMap.containsKey(path)) {
+                            TessdataBean tessdataBean = configMap.get(path);
+                            bean.setRemark(tessdataBean.getRemark())
+                                    .setActive(tessdataBean.isActive());
+                        }
+                        updateProgress(i + 1, listSize);
+                    }
+                    // 展示数据
+                    TableView<? super TessdataBean> tableView = taskBean.getTableView();
+                    Platform.runLater(() -> {
+                        tableView.getItems().clear();
+                        tableView.getItems().addAll(list);
+                    });
+                }
+                return null;
+            }
+        };
+    }
+
+    /**
+     * 保存 tessdata 设置任务
+     *
+     * @param taskBean 线程任务参数
+     * @return 无返回值 task
+     */
+    public static Task<Void> saveTessdataConfig(TaskBean<TessdataBean> taskBean) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                changeDisableNodes(taskBean, true);
+                List<TessdataBean> tessdataBeans = taskBean.getBeanList();
+                for (int i = 0; i < tessdataBeans.size(); i++) {
+                    TessdataBean tessdataBean = tessdataBeans.get(i);
+                    tessdataBean.setIndex(i + 1);
+                }
+                String configPath = getTessdataConfigPath();
+                // 序列化数据
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.writeValue(new File(configPath), tessdataBeans);
+                return null;
             }
         };
     }

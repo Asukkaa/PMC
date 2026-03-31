@@ -37,6 +37,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
+import static priv.koishi.pmc.Utils.CommonUtils.moveAllToFirst;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
@@ -669,7 +670,7 @@ public class TableViewUtils {
      * @param tableView   要添加右键菜单的列表
      * @param contextMenu 右键菜单集合
      */
-    public static void buildFilePathItem(TableView<? extends FilePath> tableView, ContextMenu contextMenu) {
+    public static void buildFilePathMenu(TableView<? extends FilePath> tableView, ContextMenu contextMenu) {
         Menu menu = new Menu(menu_viewFile());
         // 创建二级菜单项
         MenuItem openFile = new MenuItem(menuItem_openSelected());
@@ -791,8 +792,8 @@ public class TableViewUtils {
      * @param dataNumber  列表数据数量文本框
      * @param unit        列表数据数量单位
      */
-    public static void buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu,
-                                                Label dataNumber, String unit) {
+    public static MenuItem buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu,
+                                                    Label dataNumber, String unit) {
         MenuItem upMoveDataMenuItem = new MenuItem(menu_changeFirstImg());
         upMoveDataMenuItem.setOnAction(_ -> {
             ObservableList<ImgFileVO> selectedItems = tableView.getSelectionModel().getSelectedItems();
@@ -832,6 +833,7 @@ public class TableViewUtils {
             }
         });
         contextMenu.getItems().add(upMoveDataMenuItem);
+        return upMoveDataMenuItem;
     }
 
     /**
@@ -885,7 +887,7 @@ public class TableViewUtils {
      * @param contextMenu 右键菜单集合
      * @param <T>         列表数据类型
      */
-    public static <T> void buildClearSelectedData(TableView<T> tableView, ContextMenu contextMenu) {
+    public static <T> void buildClearSelectedMenu(TableView<T> tableView, ContextMenu contextMenu) {
         MenuItem clearSelectedDataMenuItem = new MenuItem(menu_cancelSelected());
         clearSelectedDataMenuItem.setOnAction(_ -> tableView.getSelectionModel().clearSelection());
         contextMenu.getItems().add(clearSelectedDataMenuItem);
@@ -900,7 +902,7 @@ public class TableViewUtils {
      * @param unit        统计信息展示栏数量单位
      * @param <T>         列表数据类型
      */
-    public static <T> void buildDeleteDataMenuItem(TableView<T> tableView, Label dataNumber, ContextMenu contextMenu, String unit) {
+    public static <T> void buildDeleteDataMenu(TableView<T> tableView, Label dataNumber, ContextMenu contextMenu, String unit) {
         MenuItem deleteDataMenuItem = new MenuItem(menu_deleteMenu());
         deleteDataMenuItem.setOnAction(_ -> {
             TableView.TableViewSelectionModel<T> selectionModel = tableView.getSelectionModel();
@@ -997,26 +999,39 @@ public class TableViewUtils {
     }
 
     /**
-     * 构建表格右键菜单
+     * 构建文件信息表格右键菜单
+     *
+     * @param tableView 要添加右键菜单的列表
+     */
+    public static ContextMenu buildFileTableViewContextMenu(TableView<? extends FilePath> tableView) {
+        // 添加右键菜单
+        ContextMenu contextMenu = new ContextMenu();
+        // 移动所选行选项
+        buildMoveDataMenu(tableView, contextMenu);
+        // 查看文件选项
+        buildFilePathMenu(tableView, contextMenu);
+        // 取消选中选项
+        buildClearSelectedMenu(tableView, contextMenu);
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(contextMenu, tableView);
+        return contextMenu;
+    }
+
+    /**
+     * 构建图片文件信息表格右键菜单
      *
      * @param tableView  要添加右键菜单的列表
      * @param dataNumber 数据数量信息栏
      */
     public static void buildTableViewContextMenu(TableView<ImgFileVO> tableView, Label dataNumber) {
         // 添加右键菜单
-        ContextMenu contextMenu = new ContextMenu();
+        ContextMenu contextMenu = buildFileTableViewContextMenu(tableView);
         // 修改图片路径选项
-        buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, unit_img());
-        // 移动所选行选项
-        buildMoveDataMenu(tableView, contextMenu);
-        // 查看文件选项
-        buildFilePathItem(tableView, contextMenu);
-        // 取消选中选项
-        buildClearSelectedData(tableView, contextMenu);
+        MenuItem menuItem = buildEditStopImgPathMenu(tableView, contextMenu, dataNumber, unit_img());
         // 删除所选数据选项
-        buildDeleteDataMenuItem(tableView, dataNumber, contextMenu, unit_img());
-        // 为列表添加右键菜单并设置可选择多行
-        setContextMenu(contextMenu, tableView);
+        buildDeleteDataMenu(tableView, dataNumber, contextMenu, unit_img());
+        ObservableList<MenuItem> items = contextMenu.getItems();
+        moveAllToFirst(items, menuItem);
     }
 
     /**

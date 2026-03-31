@@ -87,12 +87,28 @@ public class EditingCell<T> extends TableCell<T, String> {
     private String disabledValue;
 
     /**
+     * 编辑数据后的回调函数
+     */
+    private Runnable onCommitCallback;
+
+    /**
      * 构造 EditingCell 对象,并且明确将该 cell 的值保存进相应的 JavaBean 的属性值的方法
      *
      * @param itemConsumer 用于引入 lambda 表达式的对象
      */
     public EditingCell(ItemConsumer<? super T> itemConsumer) {
         this.itemConsumer = itemConsumer;
+    }
+
+    /**
+     * 构造 EditingCell 对象,并且明确将该 cell 的值保存进相应的 JavaBean 的属性值的方法
+     *
+     * @param itemConsumer     用于引入 lambda 表达式的对象
+     * @param onCommitCallback 编辑数据后的回调函数
+     */
+    public EditingCell(ItemConsumer<? super T> itemConsumer, Runnable onCommitCallback) {
+        this.itemConsumer = itemConsumer;
+        this.onCommitCallback = onCommitCallback;
     }
 
     /**
@@ -207,6 +223,10 @@ public class EditingCell<T> extends TableCell<T, String> {
         cancelEdit();
         // 移除监听器
         removeListeners();
+        // 运行回调函数
+        if (onCommitCallback != null) {
+            onCommitCallback.run();
+        }
     }
 
     /**

@@ -361,9 +361,9 @@ public class FileChooserController extends ManuallyChangeThemeController {
         // 查询所选文件选项
         buildSelectPathItem(tableView, contextMenu);
         // 查看文件选项
-        buildFilePathItem(tableView, contextMenu);
+        buildFilePathMenu(tableView, contextMenu);
         // 取消选中选项
-        buildClearSelectedData(tableView, contextMenu);
+        buildClearSelectedMenu(tableView, contextMenu);
         // 为列表添加右键菜单并设置可选择多行
         setContextMenu(contextMenu, tableView);
     }
