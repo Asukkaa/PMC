@@ -37,10 +37,10 @@ public class MacChecker {
             boolean hasAccess = CoreGraphics.INSTANCE.CGPreflightScreenCaptureAccess() == 1;
             // 没有权限时创建一个空的屏幕截图以便申请截屏权限
             if (!hasAccess) {
-                new java.awt.Robot().createScreenCapture(new java.awt.Rectangle(0, 0, 1, 1));
+                new Robot().createScreenCapture(new Rectangle(0, 0, 1, 1));
             }
             return hasAccess;
-            // 处理旧版本macOS（10.15以下）
+            // 处理旧版本 macOS（10.15 以下）
         } catch (UnsatisfiedLinkError e) {
             // 检查是否能正常截图
             return checkScreenCapturePermission();
@@ -63,11 +63,9 @@ public class MacChecker {
         if (!needCheckAutomationPermission) {
             return true;
         }
-        try {
-            String script = "tell application \"System Events\" to get name of every process";
-            Process process = Runtime.getRuntime().exec(new String[]{
-                    "osascript", "-e", script
-            });
+        String script = "tell application \"System Events\" to get name of every process";
+        try (Process process = Runtime.getRuntime().exec(new String[]{
+                "osascript", "-e", script})) {
             process.waitFor();
             return process.exitValue() == 0;
         } catch (Exception e) {
