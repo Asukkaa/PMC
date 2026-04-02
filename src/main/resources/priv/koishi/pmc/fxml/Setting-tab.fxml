@@ -696,8 +696,11 @@
             <HBox spacing="10">
                 <!--添加 .traineddata 模型-->
                 <Button fx:id="tessdataBtn_set" onAction="#addTessdataPath" text="%tessdata.addTessdata"/>
+                <!--刷新模型列表-->
                 <Button fx:id="selectBtn_set" onAction="#selectTessdataPath" text="%tessdata.selectTessdata"/>
+                <!--下载更多模型-->
                 <Button fx:id="downloadBtn_set" onAction="#downloadTessdataPath" text="%tessdata.downloadTessdata"/>
+                <ProgressBar fx:id="tessdataProgressBar_set" visible="false" progress="0.0"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
                 <!--列表为空-->
@@ -724,6 +727,8 @@
                     <TableColumn fx:id="state_set" text="%tessdata.state" sortable="false"/>
                 </columns>
             </TableView>
+
+            <Label text="%tessdata.tip" textFill="red" style="-fx-pref-height: -1"/>
         </VBox>
 
         <Separator/>

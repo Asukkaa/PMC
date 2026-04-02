@@ -202,10 +202,10 @@ public class SettingController extends RootController implements MousePositionUp
             stopRegionInfoHBox_Set, clickRegionInfoHBox_Set, noPermissionHBox_Set, cancelKeyHBox_Set, recordKeyHBox_Set;
 
     @FXML
-    public ProgressBar progressBar_Set;
+    public ColorPicker colorPicker_Set;
 
     @FXML
-    public ColorPicker colorPicker_Set;
+    public ProgressBar progressBar_Set, tessdataProgressBar_set;
 
     @FXML
     public Slider opacity_Set, clickOpacity_Set, stopOpacity_Set;
@@ -731,6 +731,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_firstClick(), firstClick_Set);
         addToolTip(tip_recordDrag(), recordDrag_Set);
         addToolTip(tip_recordMove(), recordMove_Set);
+        addToolTip(tip_selectBtn_set(), selectBtn_set);
         addToolTip(tip_randomClick(), randomClick_Set);
         addToolTip(tip_floatingRun(), floatingRun_Set);
         addToolTip(tip_margin(), floatingDistance_Set);
@@ -739,6 +740,8 @@ public class SettingController extends RootController implements MousePositionUp
         addValueToolTip(maxLogNum_Set, tip_maxLogNum());
         addToolTip(tip_remindSave(), remindClickSave_Set);
         addToolTip(tip_removeStopImgBtn(), removeAll_Set);
+        addToolTip(tip_tessdataBtn_set(), tessdataBtn_set);
+        addToolTip(tip_downloadBtn_set(), downloadBtn_set);
         addToolTip(tip_mouseFloating(), mouseFloating_Set);
         addToolTip(tip_hideWindowRun(), hideWindowRun_Set);
         addToolTip(tip_showWindowRun(), showWindowRun_Set);
@@ -916,17 +919,21 @@ public class SettingController extends RootController implements MousePositionUp
         baseDisableNodes.add(reLaunch_Set);
         baseDisableNodes.add(removeAll_Set);
         baseDisableNodes.add(tableView_Set);
+        baseDisableNodes.add(selectBtn_set);
         baseDisableNodes.add(nextGcType_Set);
         baseDisableNodes.add(stopImgBtn_Set);
         baseDisableNodes.add(stopWindow_Set);
         baseDisableNodes.add(runKeyHBox_Set);
         baseDisableNodes.add(clickWindow_Set);
+        baseDisableNodes.add(tessdataBtn_set);
+        baseDisableNodes.add(downloadBtn_set);
         baseDisableNodes.add(removeRunKey_Det);
         baseDisableNodes.add(recordKeyHBox_Set);
         baseDisableNodes.add(cancelKeyHBox_Set);
         baseDisableNodes.add(stopWindowInfo_Set);
         baseDisableNodes.add(removeRecordKey_Det);
         baseDisableNodes.add(clickWindowInfo_Set);
+        baseDisableNodes.add(tessdataTableView_set);
         Node aboutTab = mainScene.lookup("#aboutTab");
         baseDisableNodes.add(aboutTab);
         Node settingTab = mainScene.lookup("#settingTab");
@@ -1023,9 +1030,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private TaskBean<TessdataBean> creatTessdatTaskBean() {
         TaskBean<TessdataBean> taskBean = new TaskBean<>();
-        taskBean.setProgressBar(progressBar_Set)
-                .setMessageLabel(tessdataNumber_set)
+        taskBean.setMessageLabel(tessdataNumber_set)
                 .setTableView(tessdataTableView_set)
+                .setProgressBar(tessdataProgressBar_set)
                 .setDisableNodes(windowInfoDisableNodes);
         return taskBean;
     }

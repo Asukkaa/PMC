@@ -1118,6 +1118,27 @@ public class i18nFinal {
     }
 
     /**
+     * @return 点击即可导入本地 OCR 模型，同名文件将会直接替换
+     */
+    public static String tip_tessdataBtn_set() {
+        return bundle.getString("tip.tessdataBtn_set");
+    }
+
+    /**
+     * @return 点击即可刷新已导入的模型信息
+     */
+    public static String tip_selectBtn_set() {
+        return bundle.getString("tip.selectBtn_set");
+    }
+
+    /**
+     * @return 点击将会打开网址跳转 Github 上的模型下载地址
+     */
+    public static String tip_downloadBtn_set() {
+        return bundle.getString("tip.downloadBtn_set");
+    }
+
+    /**
      * @return <p>程序版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Amazon.com Inc. 26.0.1+8-LTS
