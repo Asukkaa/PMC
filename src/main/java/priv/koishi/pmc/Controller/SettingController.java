@@ -265,9 +265,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     public void adaption() {
         // 设置组件高度
-        double stageHeight = mainStage.getHeight();
-        tableView_Set.setPrefHeight(stageHeight * 0.3);
-        tessdataTableView_set.setPrefHeight(stageHeight * 0.3);
+        double tableHeight = mainStage.getHeight() * 0.3;
+        tableView_Set.setPrefHeight(tableHeight);
+        tessdataTableView_set.setPrefHeight(tableHeight);
         // 设置组件宽度
         double tableWidth = mainStage.getWidth() * 0.9;
         tableView_Set.setMaxWidth(tableWidth);
@@ -700,7 +700,7 @@ public class SettingController extends RootController implements MousePositionUp
         int clickY = Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY));
         FloatingWindowConfig clickConfig = new FloatingWindowConfig();
         clickConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType)))
-                .setAllRegion(prop.getProperty(key_clickAllRegion, unActivation))
+                .setAllRegion(activation.equals(prop.getProperty(key_clickAllRegion, unActivation)))
                 .setHeight(Math.max(1, Math.min(clickHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(clickWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(clickX, screenWidth)))
@@ -712,7 +712,7 @@ public class SettingController extends RootController implements MousePositionUp
         int stopY = Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY));
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
         stopConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType)))
-                .setAllRegion(prop.getProperty(key_stopAllRegion, unActivation))
+                .setAllRegion(activation.equals(prop.getProperty(key_stopAllRegion, unActivation)))
                 .setHeight(Math.max(1, Math.min(stopHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(stopWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(stopX, screenWidth)))
@@ -1115,10 +1115,10 @@ public class SettingController extends RootController implements MousePositionUp
         buildTableViewContextMenu(tableView_Set, dataNumber_Set);
         ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_set);
         buildMoveToTrashMenu(contextMenu);
-        buildSetUnActiveMenu(contextMenu);
-        buildSetActiveMenu(contextMenu);
-        List<Stage> stages = List.of(mainStage);
+        buildSetUnActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
+        buildSetActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
         // 构建窗口信息栏右键菜单
+        List<Stage> stages = List.of(mainStage);
         ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildStopUpdateListMenu(stopContextMenu, stopWindowMonitor);
         ContextMenu clickContextMenu = buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, windowInfoDisableNodes, stages);
@@ -1131,8 +1131,8 @@ public class SettingController extends RootController implements MousePositionUp
      * @param contextMenu 右键菜单
      */
     private void buildMoveToTrashMenu(ContextMenu contextMenu) {
-        MenuItem moveToTrashMenu = new MenuItem(menu_moveToTrashMenu());
-        moveToTrashMenu.setOnAction(_ -> {
+        MenuItem menuItem = new MenuItem(menu_moveToTrashMenu());
+        menuItem.setOnAction(_ -> {
             // 要删除的选中项
             ObservableList<TessdataBean> selectedItems = tessdataTableView_set.getSelectionModel().getSelectedItems();
             // 将文件移动到垃圾桶
@@ -1147,39 +1147,7 @@ public class SettingController extends RootController implements MousePositionUp
             // 刷新列表
             startUpdateTessdataTask();
         });
-        contextMenu.getItems().add(moveToTrashMenu);
-    }
-
-    /**
-     * 启用所选选项
-     *
-     * @param contextMenu 右键菜单
-     */
-    private void buildSetActiveMenu(ContextMenu contextMenu) {
-        MenuItem moveToTrashMenu = new MenuItem(menu_activeMenu());
-        moveToTrashMenu.setOnAction(_ -> {
-            ObservableList<TessdataBean> selectedItems = tessdataTableView_set.getSelectionModel().getSelectedItems();
-            selectedItems.forEach(item -> item.setActive(true));
-            // 保存更新
-            startSaveConfigTask();
-        });
-        contextMenu.getItems().addFirst(moveToTrashMenu);
-    }
-
-    /**
-     * 禁用所选选项
-     *
-     * @param contextMenu 右键菜单
-     */
-    private void buildSetUnActiveMenu(ContextMenu contextMenu) {
-        MenuItem moveToTrashMenu = new MenuItem(menu_unActiveMenu());
-        moveToTrashMenu.setOnAction(_ -> {
-            ObservableList<TessdataBean> selectedItems = tessdataTableView_set.getSelectionModel().getSelectedItems();
-            selectedItems.forEach(item -> item.setActive(false));
-            // 保存更新
-            startSaveConfigTask();
-        });
-        contextMenu.getItems().addFirst(moveToTrashMenu);
+        contextMenu.getItems().add(menuItem);
     }
 
     /**
@@ -2241,7 +2209,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void stopAllRegionAction() throws IOException {
-        String allRegion = stopAllRegion_Set.isSelected() ? activation : unActivation;
+        boolean allRegion = stopAllRegion_Set.isSelected();
         stopFloating.getConfig().setAllRegion(allRegion);
         setLoadLastConfigCheckBox(stopAllRegion_Set, configFile_Click, key_stopAllRegion);
     }
@@ -2253,7 +2221,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void clickAllRegionAction() throws IOException {
-        String allRegion = clickAllRegion_Set.isSelected() ? activation : unActivation;
+        boolean allRegion = clickAllRegion_Set.isSelected();
         clickFloating.getConfig().setAllRegion(allRegion);
         setLoadLastConfigCheckBox(clickAllRegion_Set, configFile_Click, key_clickAllRegion);
     }
@@ -2743,9 +2711,11 @@ public class SettingController extends RootController implements MousePositionUp
     private void addTessdataPath(ActionEvent actionEvent) {
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
-        extensionFilters.add(new FileChooser.ExtensionFilter(appName, traineddata, allTraineddata));
+        extensionFilters.add(new FileChooser.ExtensionFilter(allTraineddata, traineddata, allTraineddata));
         List<File> files = creatFilesChooser(window, tessdataPath, extensionFilters, text_addTessdataPath());
-        startLoadTessdataTask(files);
+        if (CollectionUtils.isNotEmpty(files)) {
+            startLoadTessdataTask(files);
+        }
     }
 
     /**

@@ -582,11 +582,6 @@ public class PMCFileService {
                         || !clickTypeMap.containsKey(bean.getClickTypeEnum())
                         || !matchedTypeMap.containsKey(bean.getMatchedTypeEnum())
                         || !recordClickTypeMap.containsKey(bean.getMouseKeyEnum())
-                        || !activationList.contains(bean.getRandomClick())
-                        || !activationList.contains(bean.getRandomWaitTime())
-                        || !activationList.contains(bean.getRandomClickTime())
-                        || !activationList.contains(bean.getRandomTrajectory())
-                        || !activationList.contains(bean.getRandomClickInterval())
                         || !isInIntegerRange(bean.getStartX(), 0, null)
                         || !isInIntegerRange(bean.getStartY(), 0, null)
                         || !isInIntegerRange(bean.getRandomX(), 0, null)
@@ -596,10 +591,10 @@ public class PMCFileService {
                         || !isInIntegerRange(bean.getWaitTime(), 0, null)
                         || !isInIntegerRange(bean.getClickNum(), 0, null)
                         || !isInIntegerRange(bean.getClickTime(), 0, null)
+                        || !isInIntegerRange(bean.getRandomTime(), 0, null)
                         || !isInIntegerRange(bean.getClickInterval(), 0, null)
                         || !isInIntegerRange(bean.getStopRetryTimes(), 0, null)
                         || !isInIntegerRange(bean.getClickRetryTimes(), 0, null)
-                        || !isInIntegerRange(bean.getRandomClickTime(), 0, null)
                         || !isInIntegerRange(bean.getStopMatchThreshold(), 0, 100)
                         || !isInIntegerRange(bean.getClickMatchThreshold(), 0, 100)) {
                     throw new RuntimeException(text_missingKeyData());
@@ -807,7 +802,7 @@ public class PMCFileService {
      * @param taskBean 线程任务参数
      * @return 无返回值 task
      */
-    public static Task<Void> updateTessdata(TaskBean<? super TessdataBean> taskBean) {
+    public static Task<Void> updateTessdata(TaskBean<TessdataBean> taskBean) {
         return new Task<>() {
             @Override
             protected Void call() {
@@ -817,6 +812,7 @@ public class PMCFileService {
                 List<TessdataBean> list = new ArrayList<>();
                 File tessdataPathFile = new File(getTessdataPath());
                 File[] files = tessdataPathFile.listFiles();
+                List<TessdataBean> configList = taskBean.getBeanList();
                 if (files != null) {
                     int size = files.length;
                     updateProgress(0, size);
@@ -827,16 +823,18 @@ public class PMCFileService {
                         }
                         updateProgress(i + 1, size);
                     }
-                    // 读取配置文件
-                    ObjectMapper objectMapper = JsonMapper.builder()
-                            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                            .build();
-                    String configPath = getTessdataConfigPath();
-                    List<TessdataBean> configList = objectMapper.readValue(new File(configPath), new TypeReference<>() {
-                    });
+                    // 如果没有传配置数据则读取配置文件
+                    if (CollectionUtils.isEmpty(configList)) {
+                        ObjectMapper objectMapper = JsonMapper.builder()
+                                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                                .build();
+                        String configPath = getTessdataConfigPath();
+                        configList = objectMapper.readValue(new File(configPath), new TypeReference<>() {
+                        });
+                    }
                     int configListSize = configList.size();
                     updateProgress(0, configListSize);
-                    // 构建配置文件数据与模型文件的映射
+                    // 构建配置数据与模型文件的映射
                     Map<String, TessdataBean> configMap = new HashMap<>();
                     for (int i = 0; i < configListSize; i++) {
                         TessdataBean config = configList.get(i);
@@ -846,7 +844,7 @@ public class PMCFileService {
                         }
                         updateProgress(i + 1, configListSize);
                     }
-                    // 根据配置文件排序
+                    // 根据配置排序
                     list.sort((a, b) -> {
                         String pathA = a.getPath();
                         String pathB = b.getPath();

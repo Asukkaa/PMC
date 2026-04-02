@@ -4,8 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 
-import static priv.koishi.pmc.Finals.CommonFinals.unActivation;
-
 /**
  * 浮窗配置类
  *
@@ -43,9 +41,9 @@ public class FloatingWindowConfig {
     int findImgTypeEnum;
 
     /**
-     * 第一次识别失败后改为识别整个屏幕（1 改变识别范围， 0 不改变识别范围）
+     * 第一次识别失败后改为识别整个屏幕（true 改变识别范围，默认禁用）
      */
-    String allRegion = unActivation;
+    boolean allRegion;
 
     /**
      * 目标窗口信息
@@ -53,8 +51,8 @@ public class FloatingWindowConfig {
     WindowInfo windowInfo;
 
     /**
-     * 窗口是否需要实时刷新（1 开启实时刷新 0 关闭实时刷新）
+     * 窗口是否需要实时刷新（true 开启实时刷新，默认禁用）
      */
-    String alwaysRefresh = unActivation;
+    boolean alwaysRefresh;
 
 }

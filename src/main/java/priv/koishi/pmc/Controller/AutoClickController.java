@@ -182,14 +182,14 @@ public class AutoClickController extends RootController implements MousePosition
     private String sampleInterval;
 
     /**
-     * 是否启用随机点击坐标 0-不启用，1-启用
+     * 是否启用随机点击坐标（true 启用）
      */
-    private String randomClick;
+    private boolean randomClick;
 
     /**
-     * 是否启用随机轨迹 0-不启用，1-启用
+     * 是否启用随机轨迹（true 启用）
      */
-    private String randomTrajectory;
+    private boolean randomTrajectory;
 
     /**
      * 横轴随机偏移量
@@ -202,9 +202,9 @@ public class AutoClickController extends RootController implements MousePosition
     private String randomClickY;
 
     /**
-     * 是否启用随机点击时长 0-不启用，1-启用
+     * 是否启用随机点击时长（true 启用）
      */
-    private String randomClickTime;
+    private boolean randomClickTime;
 
     /**
      * 默认点击时长（单位：毫秒）
@@ -217,37 +217,37 @@ public class AutoClickController extends RootController implements MousePosition
     private String randomTime;
 
     /**
-     * 是否启用随机点击间隔 0-不启用，1-启用
+     * 是否启用随机点击间隔（true 启用）
      */
-    private String randomClickInterval;
+    private boolean randomClickInterval;
 
     /**
-     * 是否启用随机等待时长 0-不启用，1-启用
+     * 是否启用随机等待时长（true 启用）
      */
-    private String randomWaitTime;
+    private boolean randomWaitTime;
 
     /**
-     * 记录鼠标移动轨迹
+     * 记录鼠标移动轨迹（true 启用）
      */
     private boolean recordMove;
 
     /**
-     * 记录鼠标拖拽轨迹
+     * 记录鼠标拖拽轨迹（true 启用）
      */
     private boolean recordDrag;
 
     /**
-     * 录制时记录鼠标滑轮事件
+     * 录制时记录鼠标滑轮事件（true 启用）
      */
     private boolean recordMouseWheel;
 
     /**
-     * 录制时记录键盘事件
+     * 录制时记录键盘事件（true 启用）
      */
     private boolean recordKeyboard;
 
     /**
-     * 录制时记录鼠标点击事件
+     * 录制时记录鼠标点击事件（true 启用）
      */
     private boolean recordMouseClick;
 
@@ -552,11 +552,11 @@ public class AutoClickController extends RootController implements MousePosition
         CheckBox recordDragCheckBox = settingController.recordDrag_Set;
         recordDrag = recordDragCheckBox.isSelected();
         CheckBox randomClickCheckBox = settingController.randomClick_Set;
-        randomClick = randomClickCheckBox.isSelected() ? activation : unActivation;
+        randomClick = randomClickCheckBox.isSelected();
         CheckBox randomTrajectoryCheckBox = settingController.randomTrajectory_Set;
-        randomTrajectory = randomTrajectoryCheckBox.isSelected() ? activation : unActivation;
+        randomTrajectory = randomTrajectoryCheckBox.isSelected();
         CheckBox randomClickTimeCheckBox = settingController.randomClickTime_Set;
-        randomClickTime = randomClickTimeCheckBox.isSelected() ? activation : unActivation;
+        randomClickTime = randomClickTimeCheckBox.isSelected();
         TextField randomTimeTextField = settingController.randomTimeOffset_Set;
         randomTime = StringUtils.isBlank(randomTimeTextField.getText()) ?
                 defaultRandomTime : randomTimeTextField.getText();
@@ -570,9 +570,9 @@ public class AutoClickController extends RootController implements MousePosition
         randomClickY = StringUtils.isBlank(randomClickYTextField.getText()) ?
                 defaultRandomClickY : randomClickYTextField.getText();
         CheckBox randomWaitTimeCheckBox = settingController.randomWaitTime_Set;
-        randomWaitTime = randomWaitTimeCheckBox.isSelected() ? activation : unActivation;
+        randomWaitTime = randomWaitTimeCheckBox.isSelected();
         CheckBox randomClickIntervalCheckBox = settingController.randomClickInterval_Set;
-        randomClickInterval = randomClickIntervalCheckBox.isSelected() ? activation : unActivation;
+        randomClickInterval = randomClickIntervalCheckBox.isSelected();
         CheckBox recordMouseWheelCheckBox = settingController.recordMouseWheel_Set;
         recordMouseWheel = recordMouseWheelCheckBox.isSelected();
         CheckBox recordKeyboardCheckBox = settingController.recordKeyboard_Set;
@@ -1287,7 +1287,7 @@ public class AutoClickController extends RootController implements MousePosition
                 if (clickWindowInfo != null) {
                     copyAllProperties(clickWindowInfo, windowInfo);
                 }
-                String refresh = settingController.updateClickWindow_Set.isSelected() ? activation : unActivation;
+                boolean refresh = settingController.updateClickWindow_Set.isSelected();
                 clickConfig.setAlwaysRefresh(refresh)
                         .setWindowInfo(windowInfo);
             }
@@ -1298,15 +1298,16 @@ public class AutoClickController extends RootController implements MousePosition
                 if (stopWindowInfo != null) {
                     copyAllProperties(stopWindowInfo, windowInfo);
                 }
-                String refresh = settingController.updateStopWindow_Set.isSelected() ? activation : unActivation;
+                boolean refresh = settingController.updateStopWindow_Set.isSelected();
                 stopConfig.setAlwaysRefresh(refresh)
                         .setWindowInfo(windowInfo);
             }
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        String useRelatively = settingController.useRelatively_Set.isSelected() ? activation : unActivation;
-        String noMove = settingController.noMove_Set.isSelected() ? activation : unActivation;
+        boolean useRelatively = settingController.useRelatively_Set.isSelected();
+        boolean noMove = settingController.noMove_Set.isSelected();
+        ObservableList<TessdataBean> tessdataBeans = settingController.tessdataTableView_set.getItems();
         ClickPositionVO clickPositionVO = new ClickPositionVO();
         clickPositionVO.setTableView(tableView_Click)
                 .setSampleInterval(Integer.parseInt(sampleInterval))
@@ -1324,6 +1325,7 @@ public class AutoClickController extends RootController implements MousePosition
                 .setClickTime(clickTimeOffset)
                 .setUseRelative(useRelatively)
                 .setRandomClick(randomClick)
+                .setTessdata(tessdataBeans)
                 .setRandomTime(randomTime)
                 .setRandomX(randomClickX)
                 .setRandomY(randomClickY)

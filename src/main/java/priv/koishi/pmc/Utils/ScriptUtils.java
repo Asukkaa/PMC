@@ -56,8 +56,9 @@ public class ScriptUtils {
         } else {
             runWithMacTerminal(minScriptWindow, command, fileType, path, parameter, pb);
         }
-        Process process = pb.start();
-        process.waitFor();
+        try (Process process = pb.start()) {
+            process.waitFor();
+        }
     }
 
     /**

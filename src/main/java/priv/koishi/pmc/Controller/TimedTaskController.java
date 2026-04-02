@@ -257,7 +257,7 @@ public class TimedTaskController extends RootController {
             ts.forEach(item -> {
                 try {
                     deleteTask(item.getTaskName());
-                } catch (IOException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });

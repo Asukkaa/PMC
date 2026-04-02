@@ -35,6 +35,7 @@ import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.TessdataBean;
 import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
@@ -76,6 +77,7 @@ import static priv.koishi.pmc.Service.AutoClickService.scriptRun;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
+import static priv.koishi.pmc.Service.PMCFileService.updateTessdata;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
@@ -215,6 +217,11 @@ public class ClickDetailController extends RootController {
     private final String tabId = "_Det";
 
     /**
+     * tessdata 组件标识符
+     */
+    private final String tessdataId = "_det";
+
+    /**
      * 详情页页面舞台
      */
     private Stage stage;
@@ -245,14 +252,14 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det, commonVBox_Det,
-            findImgVBox_Det;
+            findImgVBox_Det, imgVBox_Det, ocrVBox_det;
 
     @FXML
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
             stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
             parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det, moveWindowHBox_Det,
-            colorHBox_Det, ocrHBox_Det;
+            colorHBox_Det, ocrHBox_Det, recognitionHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
@@ -273,7 +280,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
             updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
-            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det;
+            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det, selectBtn_det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
@@ -283,7 +290,8 @@ public class ClickDetailController extends RootController {
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
             tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, clickTypeText_Det,
-            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det, moveWindowInfo_Det;
+            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det,
+            moveWindowInfo_Det, tessdataNumber_det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -303,14 +311,31 @@ public class ClickDetailController extends RootController {
     @FXML
     public TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
 
+    @FXML
+    public TableView<TessdataBean> tessdataTableView_det;
+
+    @FXML
+    public TableColumn<TessdataBean, Integer> index_det;
+
+    @FXML
+    public TableColumn<TessdataBean, String> name_det, path_det, remark_det, state_det;
+
+
     /**
      * 组件宽高自适应
      */
     public void adaption() {
-        double tableWidth = stage.getWidth() * 0.5;
+        // 设置表格组件高度
+        double tableHeight = stage.getHeight() * 0.5;
+        tableView_Det.setPrefHeight(tableHeight);
+        tessdataTableView_det.setPrefHeight(tableHeight);
+        // 设置表格组件宽度
+        double tableWidth = stage.getWidth() * 0.45;
         tableView_Det.setMaxWidth(tableWidth);
         tableView_Det.setPrefWidth(tableWidth);
-        tableView_Det.setPrefHeight(stage.getHeight() * 0.5);
+        tessdataTableView_det.setMaxWidth(tableWidth);
+        tessdataTableView_det.setPrefWidth(tableWidth);
+        // 设置进度条组件宽度
         progressBarVBox_Det.setPrefWidth(stage.getWidth() * 0.4);
         bindPrefWidthProperty();
     }
@@ -319,11 +344,18 @@ public class ClickDetailController extends RootController {
      * 设置 JavaFX 单元格宽度
      */
     private void bindPrefWidthProperty() {
+        // 终止操作图像列表自适应
         index_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.1));
         thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
         type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+        // .traineddata 模型文件列表自适应
+        index_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.1));
+        name_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.2));
+        path_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.4));
+        remark_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.2));
+        state_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.1));
     }
 
     /**
@@ -367,6 +399,7 @@ public class ClickDetailController extends RootController {
         imgY_Det.setText(item.getImgY());
         wait_Det.setText(item.getWaitTime());
         clickName_Det.setText(item.getName());
+        noMove_Det.setSelected(item.isNoMove());
         clickKey_Det.setValue(item.getMouseKey());
         timeClick_Det.setText(item.getClickTime());
         clickNumBer_Det.setText(item.getClickNum());
@@ -376,21 +409,20 @@ public class ClickDetailController extends RootController {
         relativelyX_Det.setText(item.getRelativeX());
         relativelyY_Det.setText(item.getRelativeY());
         interval_Det.setText(item.getClickInterval());
+        ignoreImg_Det.setSelected(item.isIgnoreImg());
         matchedType_Det.setValue(item.getMatchedType());
         stopImgSelectPath = item.getStopImgSelectPath();
         clickImgSelectPath = item.getClickImgSelectPath();
+        randomClick_Det.setSelected(item.isRandomClick());
         stopRetryNum_Det.setText(item.getStopRetryTimes());
         randomTimeOffset_Det.setText(item.getRandomTime());
         clickRetryNum_Det.setText(item.getClickRetryTimes());
-        noMove_Det.setSelected(activation.equals(item.getNoMove()));
-        ignoreImg_Det.setSelected(activation.equals(item.getIgnoreImg()));
-        randomClick_Det.setSelected(activation.equals(item.getRandomClick()));
+        randomWaitTime_Det.setSelected(item.isRandomWaitTime());
+        randomClickTime_Det.setSelected(item.isRandomClickTime());
+        randomTrajectory_Det.setSelected(item.isRandomTrajectory());
+        randomClickInterval_Det.setSelected(item.isRandomClickInterval());
         stopOpacity_Det.setValue(Double.parseDouble(item.getStopMatchThreshold()));
-        randomWaitTime_Det.setSelected(activation.equals(item.getRandomWaitTime()));
         clickOpacity_Det.setValue(Double.parseDouble(item.getClickMatchThreshold()));
-        randomClickTime_Det.setSelected(activation.equals(item.getRandomClickTime()));
-        randomTrajectory_Det.setSelected(activation.equals(item.getRandomTrajectory()));
-        randomClickInterval_Det.setSelected(activation.equals(item.getRandomClickInterval()));
         String retryStep = "0".equals(item.getRetryStep()) ? "" : item.getRetryStep();
         retryStep_Det.setText(retryStep);
         String matchedStep = "0".equals(item.getMatchedStep()) ? "" : item.getMatchedStep();
@@ -410,7 +442,7 @@ public class ClickDetailController extends RootController {
         if (clickType_moveWindow().equals(clickType)) {
             windowX_Det.setText(item.getStartX());
             windowY_Det.setText(item.getStartY());
-            ignoreFailure_Det.setSelected(item.getIgnoreFailure().equals(activation));
+            ignoreFailure_Det.setSelected(item.isIgnoreFailure());
             // 处理打开链接相关组件
         } else if (clickType_openFile().equals(clickType)) {
             setPathLabel(link_Det, targetPath);
@@ -418,7 +450,7 @@ public class ClickDetailController extends RootController {
             setPathLabel(link_Det, targetPath);
             setPathLabel(workPath_Det, item.getWorkPath());
             parameter_Det.setText(item.getParameter());
-            minWindow_Det.setSelected(item.getMinScriptWindow().equals(activation));
+            minWindow_Det.setSelected(item.isMinScriptWindow());
         } else if (clickType_openUrl().equals(clickType)) {
             url_Det.setText(targetPath);
         } else {
@@ -482,7 +514,7 @@ public class ClickDetailController extends RootController {
         FloatingWindowConfig stopWindowConfig = selectedItem.getStopWindowConfig();
         if (stopWindowConfig != null) {
             WindowInfo stopWindowInfo = stopWindowConfig.getWindowInfo();
-            updateStopWindow_Det.setSelected(activation.equals(stopWindowConfig.getAlwaysRefresh()));
+            updateStopWindow_Det.setSelected(stopWindowConfig.isAlwaysRefresh());
             stopWindowMonitor.setWindowInfo(stopWindowInfo);
         }
         stopWindowMonitor.updateWindowInfo();
@@ -491,7 +523,7 @@ public class ClickDetailController extends RootController {
         FloatingWindowConfig clickWindowConfig = selectedItem.getClickWindowConfig();
         if (clickWindowConfig != null) {
             WindowInfo clickWindowInfo = clickWindowConfig.getWindowInfo();
-            updateClickWindow_Det.setSelected(activation.equals(clickWindowConfig.getAlwaysRefresh()));
+            updateClickWindow_Det.setSelected(clickWindowConfig.isAlwaysRefresh());
             clickWindowMonitor.setWindowInfo(clickWindowInfo);
         }
         clickWindowMonitor.updateWindowInfo();
@@ -501,7 +533,7 @@ public class ClickDetailController extends RootController {
             useRelatively_Det.setSelected(false);
         } else {
             setNodeDisable(relativelyHBox_Det, false);
-            useRelatively_Det.setSelected(activation.equals(selectedItem.getUseRelative()));
+            useRelatively_Det.setSelected(selectedItem.isUseRelative());
         }
         useRelatively();
     }
@@ -592,7 +624,7 @@ public class ClickDetailController extends RootController {
             copyAllProperties(clickWindowConfig, copyClickWindowConfig);
             clickFloating.setConfig(copyClickWindowConfig);
             clickFindImgType_Det.setValue(findImgTypeMap.get(copyClickWindowConfig.getFindImgTypeEnum()));
-            clickAllRegion_Det.setSelected(activation.equals(copyClickWindowConfig.getAllRegion()));
+            clickAllRegion_Det.setSelected(copyClickWindowConfig.isAllRegion());
         } else {
             clickFloating.setConfig(new FloatingWindowConfig());
         }
@@ -608,7 +640,7 @@ public class ClickDetailController extends RootController {
             copyAllProperties(stopWindowConfig, copyStopWindowConfig);
             stopFloating.setConfig(copyStopWindowConfig);
             stopFindImgType_Det.setValue(findImgTypeMap.get(copyStopWindowConfig.getFindImgTypeEnum()));
-            stopAllRegion_Det.setSelected(activation.equals(copyStopWindowConfig.getAllRegion()));
+            stopAllRegion_Det.setSelected(copyStopWindowConfig.isAllRegion());
         } else {
             stopFloating.setConfig(new FloatingWindowConfig());
         }
@@ -690,6 +722,7 @@ public class ClickDetailController extends RootController {
     private void showClickText(ClickPositionVO item) {
         recognitionType_Det.setValue(recognitionTypeMap.get(RecognitionTypeEnum.TEXT.ordinal()));
         ocrText_Det.setText(item.getClickImgTarget());
+        startUpdateTessdataTask();
     }
 
     /**
@@ -1089,9 +1122,41 @@ public class ClickDetailController extends RootController {
     }
 
     /**
-     * 创建任务参数对象
+     * 创建文字识别模型相关任务参数对象
      *
-     * @return 任务参数对象
+     * @return 文字识别模型相关任务参数对象
+     */
+    private TaskBean<TessdataBean> creatTessdatTaskBean() {
+        TaskBean<TessdataBean> taskBean = new TaskBean<>();
+        taskBean.setBeanList(selectedItem.getTessdata())
+                .setMessageLabel(tessdataNumber_det)
+                .setTableView(tessdataTableView_det)
+                .setProgressBar(progressBar_Det)
+                .setDisableNodes(disableNodes);
+        return taskBean;
+    }
+
+    /**
+     * 启动更新 .traineddata 模型信息任务
+     */
+    private void startUpdateTessdataTask() {
+        TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
+        Task<Void> updateTessdata = updateTessdata(taskBean);
+        bindingTaskNode(updateTessdata, taskBean);
+        updateTessdata.setOnSucceeded(_ -> {
+            taskUnbind(taskBean);
+            updateTableViewSizeText(tessdataTableView_det, tessdataNumber_det, unit_files());
+            tessdataTableView_det.refresh();
+        });
+        Thread.ofVirtual()
+                .name("updateTessdataTask-vThread" + tessdataId)
+                .start(updateTessdata);
+    }
+
+    /**
+     * 创建终止操作图片相关任务参数对象
+     *
+     * @return 终止操作图片相关任务参数对象
      */
     private TaskBean<ImgFileVO> creatTaskBean() {
         TaskBean<ImgFileVO> taskBean = new TaskBean<>();
@@ -1155,8 +1220,11 @@ public class ClickDetailController extends RootController {
     private void buildContextMenu() {
         // 构建表格右键菜单
         buildTableViewContextMenu(tableView_Det, dataNumber_Det);
-        List<Stage> stages = List.of(stage, mainStage);
+        ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_det);
+        buildSetUnActiveMenu(contextMenu, tessdataTableView_det, null);
+        buildSetActiveMenu(contextMenu, tessdataTableView_det, null);
         // 构建窗口信息栏右键菜单
+        List<Stage> stages = List.of(stage, mainStage);
         buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildWindowInfoMenu(clickWindowInfo_Det, clickWindowMonitor, windowInfoDisableNodes, stages);
         buildWindowInfoMenu(moveWindowInfo_Det, clickWindowMonitor, false, windowInfoDisableNodes, stages);
@@ -1561,8 +1629,10 @@ public class ClickDetailController extends RootController {
             addModificationListeners();
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId, index_Det);
+            autoBuildTableViewData(tessdataTableView_det, TessdataBean.class, tessdataId, index_det);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
+            tableViewDragRow(tessdataTableView_det);
             // 构建右键菜单
             buildContextMenu();
             // 绑定取色器
@@ -1583,18 +1653,18 @@ public class ClickDetailController extends RootController {
         Integer retryType = retryTypeMap.getKey(retryType_Det.getValue());
         Integer clickKey = recordClickTypeMap.getKey(clickKey_Det.getValue());
         Integer matchedType = matchedTypeMap.getKey(matchedType_Det.getValue());
-        String ignoreImg = ignoreImg_Det.isSelected() ? activation : unActivation;
-        String minWindow = minWindow_Det.isSelected() ? activation : unActivation;
-        String randomClick = randomClick_Det.isSelected() ? activation : unActivation;
-        String useRelatively = useRelatively_Det.isSelected() ? activation : unActivation;
-        String stopAllRegion = stopAllRegion_Det.isSelected() ? activation : unActivation;
-        String clickAllRegion = clickAllRegion_Det.isSelected() ? activation : unActivation;
-        String randomWaitTime = randomWaitTime_Det.isSelected() ? activation : unActivation;
-        String randomClickTime = randomClickTime_Det.isSelected() ? activation : unActivation;
-        String randomTrajectory = randomTrajectory_Det.isSelected() ? activation : unActivation;
-        String stopWindowUpdate = updateStopWindow_Det.isSelected() ? activation : unActivation;
-        String clickWindowUpdate = updateClickWindow_Det.isSelected() ? activation : unActivation;
-        String randomClickInterval = randomClickInterval_Det.isSelected() ? activation : unActivation;
+        boolean ignoreImg = ignoreImg_Det.isSelected();
+        boolean minWindow = minWindow_Det.isSelected();
+        boolean randomClick = randomClick_Det.isSelected();
+        boolean useRelatively = useRelatively_Det.isSelected();
+        boolean stopAllRegion = stopAllRegion_Det.isSelected();
+        boolean clickAllRegion = clickAllRegion_Det.isSelected();
+        boolean randomWaitTime = randomWaitTime_Det.isSelected();
+        boolean randomClickTime = randomClickTime_Det.isSelected();
+        boolean randomTrajectory = randomTrajectory_Det.isSelected();
+        boolean stopWindowUpdate = updateStopWindow_Det.isSelected();
+        boolean clickWindowUpdate = updateClickWindow_Det.isSelected();
+        boolean randomClickInterval = randomClickInterval_Det.isSelected();
         String startX = String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth));
         String startY = String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight));
         FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
@@ -1607,7 +1677,7 @@ public class ClickDetailController extends RootController {
             clickKey = NativeMouseEvent.NOBUTTON;
             keyCode = noKeyboard;
             clickNum = 1;
-            useRelatively = unActivation;
+            useRelatively = false;
             if ((clickType == ClickTypeEnum.OPEN_FILE.ordinal() || clickType == ClickTypeEnum.RUN_SCRIPT.ordinal())
                     && StringUtils.isBlank(link)) {
                 throw new RuntimeException(text_pathNull());
@@ -1625,7 +1695,7 @@ public class ClickDetailController extends RootController {
                 }
                 startX = String.valueOf(setDefaultIntValue(windowX_Det, 0, 0, screenWidth));
                 startY = String.valueOf(setDefaultIntValue(windowY_Det, 0, 0, screenHeight));
-                String ignoreFailure = ignoreFailure_Det.isSelected() ? activation : unActivation;
+                boolean ignoreFailure = ignoreFailure_Det.isSelected();
                 clickWindowMonitor.updateWindowInfo();
                 clickFloatingConfig.setWindowInfo(clickWindowMonitor.getWindowInfo())
                         .setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
@@ -1661,7 +1731,7 @@ public class ClickDetailController extends RootController {
                 selectedItem.setMoveTrajectory(trajectory);
             }
             if (isClickList(clickType)) {
-                String noMove = noMove_Det.isSelected() ? activation : unActivation;
+                boolean noMove = noMove_Det.isSelected();
                 selectedItem.setNoMove(noMove);
             }
             updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
@@ -1693,8 +1763,10 @@ public class ClickDetailController extends RootController {
                         .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()))
                         .setColorTolerance(colorTolerance);
             } else if (recognitionType_text().equals(recognitionType)) {
+                ObservableList<TessdataBean> tessdataBeans = tessdataTableView_det.getItems();
                 selectedItem.setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
-                        .setClickImgTarget(ocrText_Det.getText());
+                        .setClickImgTarget(ocrText_Det.getText())
+                        .setTessdata(tessdataBeans);
             }
         }
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
@@ -2333,18 +2405,22 @@ public class ClickDetailController extends RootController {
     @FXML
     private void recognitionTypeChange() {
         String value = recognitionType_Det.getValue();
+        ObservableList<Node> hBoxChildren = recognitionHBox_Det.getChildren();
+        ObservableList<Node> vBoxChildren = findImgVBox_Det.getChildren();
         if (recognitionType_img().equals(value)) {
-            findImgVBox_Det.setVisible(true);
-            colorHBox_Det.setVisible(false);
-            ocrHBox_Det.setVisible(false);
+            vBoxChildren.clear();
+            vBoxChildren.addAll(imgVBox_Det);
+            hBoxChildren.removeAll(colorHBox_Det, ocrHBox_Det);
         } else if (recognitionType_color().equals(value)) {
-            findImgVBox_Det.setVisible(false);
-            colorHBox_Det.setVisible(true);
-            ocrHBox_Det.setVisible(false);
+            vBoxChildren.clear();
+            hBoxChildren.removeAll(colorHBox_Det, ocrHBox_Det);
+            hBoxChildren.addAll(colorHBox_Det);
         } else if (recognitionType_text().equals(value)) {
-            findImgVBox_Det.setVisible(false);
-            colorHBox_Det.setVisible(false);
-            ocrHBox_Det.setVisible(true);
+            vBoxChildren.clear();
+            vBoxChildren.addAll(ocrVBox_det);
+            hBoxChildren.removeAll(colorHBox_Det, ocrHBox_Det);
+            hBoxChildren.addAll(ocrHBox_Det);
+            startUpdateTessdataTask();
         }
     }
 
@@ -2365,6 +2441,14 @@ public class ClickDetailController extends RootController {
     private void colorAction() {
         Color value = colorPicker_Det.getValue();
         addValueToolTip(colorPicker_Det, tip_colorPicker_Det(), String.valueOf(value));
+    }
+
+    /**
+     * 刷新模型列表按钮
+     */
+    @FXML
+    public void selectTessdataPath() {
+        startUpdateTessdataTask();
     }
 
 }

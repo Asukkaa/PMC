@@ -32,12 +32,12 @@ public class FileConfig {
     String showDirectory;
 
     /**
-     * 递归查询设置（true-开启递归）
+     * 递归查询设置（true-开启递归，默认禁用）
      */
     boolean recursion;
 
     /**
-     * 展示文件拓展名设置（true-展示拓展名）
+     * 展示文件拓展名设置（true-展示拓展名，默认禁用）
      */
     boolean showFileType;
 
@@ -67,17 +67,17 @@ public class FileConfig {
     String fileNameFilter;
 
     /**
-     * 反向过滤文件名查询条件（true-反转查询）
+     * 反向过滤文件名查询条件（true-反转查询，默认禁用）
      */
     boolean reverseFileName;
 
     /**
-     * 反向过滤文件类型查询条件（true-反转查询）
+     * 反向过滤文件类型查询条件（true-反转查询，默认禁用）
      */
     boolean reverseFileType;
 
     /**
-     * 文件名称筛选字符串大小写敏感（true-不区分大小写）
+     * 文件名称筛选字符串大小写敏感（true-不区分大小写，默认禁用）
      */
     boolean filterNameCase;
 
@@ -87,12 +87,12 @@ public class FileConfig {
     String sortType;
 
     /**
-     * 反向排序（true-反转排序）
+     * 反向排序（true-反转排序，默认禁用）
      */
     boolean reverseSort;
 
     /**
-     * 不显示 .DS_Store 文件（true-不显示）
+     * 不显示 .DS_Store 文件（true-不显示，默认启用）
      */
     boolean noDS_Store = true;
 

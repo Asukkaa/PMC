@@ -382,7 +382,6 @@ public class AutoClickService {
                 updateProgress(0, maxIndex);
                 updateFloatingMessage(text_checkJumpSetting());
                 for (int i = 0; i < maxIndex; i++) {
-                    updateProgress(i + 1, maxIndex);
                     ClickPositionVO clickPositionVO = clickPositionVOS.get(i);
                     int index = clickPositionVO.getIndex();
                     String err = autoClick_index() + index + autoClick_name() + clickPositionVO.getName() + autoClick_settingErr();
@@ -409,6 +408,7 @@ public class AutoClickService {
                     if (isErr) {
                         errs.add(err);
                     }
+                    updateProgress(i + 1, maxIndex);
                 }
                 return errs;
             }
@@ -649,11 +649,10 @@ public class AutoClickService {
                         }
                     }
                     // 处理相对坐标
-                    String useRelative = clickPositionVO.getUseRelative();
                     if (clickWindowConfig != null &&
                             FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
                         WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
-                        if (windowInfo != null && activation.equals(useRelative)) {
+                        if (windowInfo != null && clickPositionVO.isUseRelative()) {
                             String relativeX = clickPositionVO.getRelativeX();
                             String relativeY = clickPositionVO.getRelativeY();
                             if (StringUtils.isNotBlank(relativeX) && StringUtils.isNotBlank(relativeY)) {
@@ -733,7 +732,7 @@ public class AutoClickService {
             private boolean waitAndLog(ClickPositionVO clickPositionVO) {
                 long wait = Long.parseLong(clickPositionVO.getWaitTime());
                 // 处理随机等待时间偏移
-                if (activation.equals(clickPositionVO.getRandomWaitTime())) {
+                if (clickPositionVO.isRandomWaitTime()) {
                     int randomTime = Integer.parseInt(clickPositionVO.getRandomTime());
                     wait = (long) Math.max(0, wait + (random.nextDouble() * 2 - 1) * randomTime);
                 }
@@ -798,7 +797,7 @@ public class AutoClickService {
                 logBean.setResult(log_fail());
                 clickLog.add(logBean);
             }
-            if (unActivation.equals(clickPositionVO.getIgnoreFailure())) {
+            if (clickPositionVO.isIgnoreFailure()) {
                 throw new RuntimeException(log_moveWindow() + log_fail());
             }
         }
@@ -877,7 +876,7 @@ public class AutoClickService {
         String workDir = clickPositionVO.getWorkPath();
         String param = clickPositionVO.getParameter();
         int clickType = clickPositionVO.getClickTypeEnum();
-        boolean minScriptWindow = clickPositionVO.getMinScriptWindow().equals(activation);
+        boolean minScriptWindow = clickPositionVO.isMinScriptWindow();
         String name = clickPositionVO.getName();
         if (StringUtils.isBlank(link)) {
             throw new RuntimeException(text_pathNull());
@@ -990,8 +989,8 @@ public class AutoClickService {
      * @param taskBean        线程任务参数
      * @return 执行结果
      */
-    private static ClickResultBean click(ClickPositionVO clickPositionVO, Robot robot,
-                                         String loopTimeText, AutoClickTaskBean taskBean) throws Exception {
+    private static ClickResultBean click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText,
+                                         AutoClickTaskBean taskBean) throws Exception {
         ClickResultBean clickResultBean = new ClickResultBean();
         clickResultBean.setStepIndex(0);
         int retrySecondValue = taskBean.getRetrySecondValue();
@@ -1022,13 +1021,15 @@ public class AutoClickService {
             // 实时刷新
             if (clickWindowConfig != null) {
                 WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
-                if (windowInfo != null && activation.equals(clickWindowConfig.getAlwaysRefresh())) {
+                if (windowInfo != null && clickWindowConfig.isAlwaysRefresh()) {
                     clickWindowConfig.setWindowInfo(getMainWindowInfo(windowInfo.getProcessPath()));
                 }
             }
             FindPositionConfig findPositionConfig = new FindPositionConfig()
+                    .setColorTolerance(Integer.parseInt(clickPositionVO.getColorTolerance()))
                     .setMaxRetry(Integer.parseInt(clickPositionVO.getClickRetryTimes()))
                     .setContinuously(RetryTypeEnum.CONTINUOUSLY.ordinal() == retryType)
+                    .setTessdata(clickPositionVO.getTessdata())
                     .setFloatingWindowConfig(clickWindowConfig)
                     .setMatchThreshold(clickMatchThreshold)
                     .setRecognitionType(recognitionType)
@@ -1041,7 +1042,7 @@ public class AutoClickService {
                 int matchedType = clickPositionVO.getMatchedTypeEnum();
                 long end = System.currentTimeMillis();
                 // 如果开启忽略图像识别坐标后则使用原始配置的坐标
-                if (unActivation.equals(clickPositionVO.getIgnoreImg()) &&
+                if (clickPositionVO.isIgnoreImg() &&
                         retryType != RetryTypeEnum.CLICK.ordinal()) {
                     startX = position.x() + Integer.parseInt(clickPositionVO.getImgX());
                     startY = position.y() + Integer.parseInt(clickPositionVO.getImgY());
@@ -1133,7 +1134,7 @@ public class AutoClickService {
             // 每次操作的间隔时间
             if (i > 0) {
                 // 处理随机间隔时间偏移
-                if (activation.equals(clickPositionVO.getRandomClickInterval())) {
+                if (clickPositionVO.isRandomClickInterval()) {
                     clickInterval = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
                 }
                 try {
@@ -1156,7 +1157,7 @@ public class AutoClickService {
             String clickKey = clickPositionVO.getMouseKey();
             String keyboard = clickPositionVO.getKeyboardKey();
             // 处理随机坐标偏移量
-            if (activation.equals(clickPositionVO.getRandomClick())) {
+            if (clickPositionVO.isRandomClick()) {
                 int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                 int randomY = Integer.parseInt(clickPositionVO.getRandomY());
                 startX = Math.min(Math.max(0, startX + (random.nextDouble() * 2 - 1) * randomX), screenWidth);
@@ -1166,7 +1167,7 @@ public class AutoClickService {
             double finalStartY = startY;
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
-                if (unActivation.equals(clickPositionVO.getNoMove())) {
+                if (clickPositionVO.isNoMove()) {
                     robot.mouseMove(finalStartX, finalStartY);
                     if (taskBean.isMoveLog()) {
                         ClickLogBean moveLog = new ClickLogBean();
@@ -1272,7 +1273,7 @@ public class AutoClickService {
                     ClickTypeEnum.MOVE_TRAJECTORY.ordinal() != clickType &&
                     ClickTypeEnum.COMBINATIONS.ordinal() != clickType) {
                 // 处理随机点击时长偏移
-                if (activation.equals(clickPositionVO.getRandomClickTime())) {
+                if (clickPositionVO.isRandomClickTime()) {
                     clickTime = (long) Math.max(0, clickTime + (random.nextDouble() * 2 - 1) * randomTime);
                 }
                 // 单次操作时间
@@ -1374,7 +1375,7 @@ public class AutoClickService {
                 // 实时刷新
                 if (stopWindowConfig != null) {
                     WindowInfo windowInfo = stopWindowConfig.getWindowInfo();
-                    if (windowInfo != null && activation.equals(stopWindowConfig.getAlwaysRefresh())) {
+                    if (windowInfo != null && stopWindowConfig.isAlwaysRefresh()) {
                         stopWindowConfig.setWindowInfo(getMainWindowInfo(windowInfo.getProcessPath()));
                     }
                 }
@@ -1491,12 +1492,11 @@ public class AutoClickService {
                 double y = point.getY();
                 int wheelRotation = point.getWheelRotation();
                 // 处理相对路径
-                String useRelative = clickPositionVO.getUseRelative();
                 FloatingWindowConfig clickWindowConfig = clickPositionVO.getClickWindowConfig();
                 if (clickWindowConfig != null &&
                         FindImgTypeEnum.WINDOW.ordinal() == clickWindowConfig.getFindImgTypeEnum()) {
                     WindowInfo windowInfo = clickWindowConfig.getWindowInfo();
-                    if (windowInfo != null && activation.equals(useRelative)) {
+                    if (windowInfo != null && clickPositionVO.isUseRelative()) {
                         String relativeX = point.getRelativeX();
                         String relativeY = point.getRelativeY();
                         if (StringUtils.isNotBlank(relativeX) && StringUtils.isNotBlank(relativeY)) {
@@ -1508,7 +1508,7 @@ public class AutoClickService {
                         }
                     }
                 }
-                if (activation.equals(clickPositionVO.getRandomTrajectory())) {
+                if (clickPositionVO.isRandomTrajectory()) {
                     int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                     int randomY = Integer.parseInt(clickPositionVO.getRandomY());
                     x = Math.min(Math.max(0, x + (random.nextDouble() * 2 - 1) * randomX), screenWidth);
@@ -1591,7 +1591,7 @@ public class AutoClickService {
                             }
                         });
                     }
-                    if (unActivation.equals(clickPositionVO.getNoMove())) {
+                    if (clickPositionVO.isNoMove()) {
                         robot.mouseMove(finalX, finalY);
                     }
                     robot.mouseWheel(wheelRotation);

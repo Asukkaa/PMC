@@ -2,6 +2,9 @@ package priv.koishi.pmc.Bean.Config;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.TessdataBean;
+
+import java.util.List;
 
 import static priv.koishi.pmc.Finals.CommonFinals.defaultColorTolerance;
 
@@ -32,9 +35,9 @@ public class FindPositionConfig {
     int colorTolerance = defaultColorTolerance;
 
     /**
-     * OCR 语言，默认简体中文
+     * 文字识别模型设置
      */
-    String ocrLanguage = "chi_sim";
+    List<TessdataBean> tessdata;
 
     /**
      * 最大重试次数

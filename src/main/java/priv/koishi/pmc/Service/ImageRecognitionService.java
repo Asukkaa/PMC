@@ -255,7 +255,7 @@ public class ImageRecognitionService {
             h = (int) (infoH * windowInfo.getRelativeHeight());
         } else {
             // 识别次数大于 1 且开启全屏重试
-            if (findPositionConfig.getFindTime() > 1 && activation.equals(config.getAllRegion())) {
+            if (findPositionConfig.getFindTime() > 1 && config.isAllRegion()) {
                 x = 0;
                 y = 0;
                 w = screenWidth;
@@ -508,11 +508,11 @@ public class ImageRecognitionService {
         if (StringUtils.isEmpty(targetText)) {
             throw new IllegalArgumentException("待识别的文字不能为空");
         }
-        // 1. 转换为 Mat 并灰度化
+        // 转换为 Mat 并灰度化
         Mat imageMat = bufferedImageToMat(screenImg);
         Mat grayMat = new Mat();
         cvtColor(imageMat, grayMat, COLOR_BGR2GRAY);
-        // 2. 初始化 Tesseract
+        // 初始化 Tesseract
         try (TessBaseAPI api = new TessBaseAPI()) {
             String tessdataPath = getTessdataPath();
             String dataPath = tessdataPath + "/chi_sim.traineddata";
@@ -534,14 +534,14 @@ public class ImageRecognitionService {
                     (int) grayMat.elemSize(), (int) grayMat.step1());
             // 触发识别（可选参数 null 表示使用默认参数）
             api.Recognize(null);
-            // 3. 获取结果迭代器
+            // 获取结果迭代器
             ResultIterator ri = api.GetIterator();
             if (ri == null) {
                 return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
             }
             float bestConfidence = 0.0f;
             Point bestCenter = null;
-            // 4. 遍历所有单词
+            // 遍历所有单词
             do {
                 // 获取单词文本
                 BytePointer wordTextPtr = ri.GetUTF8Text(RIL_WORD);
@@ -579,6 +579,25 @@ public class ImageRecognitionService {
             throw new RuntimeException("文字识别失败: " + e.getMessage(), e);
         }
         return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
+    }
+
+    /**
+     * 判断是否为 OSD 模型
+     *
+     * @param tessdataPath traineddata 模型文件夹目录
+     * @param modelName    模型名称
+     * @return true 为 OSD 模型
+     */
+    public static boolean isOSDModel(String tessdataPath, String modelName) {
+        try (TessBaseAPI api = new TessBaseAPI()) {
+            int initCode = api.Init(tessdataPath, modelName);
+            if (initCode != 0) {
+                return false;
+            }
+            return "osd".equals(modelName);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

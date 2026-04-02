@@ -66,7 +66,7 @@ public class ScheduledService {
     public static Task<Void> createTask(TimedTaskBean timedTaskBean) {
         return new Task<>() {
             @Override
-            protected Void call() throws IOException {
+            protected Void call() throws Exception {
                 updateMessage(text_saving());
                 if (isWin) {
                     // 创建 win 定时任务
@@ -85,22 +85,21 @@ public class ScheduledService {
      * 删除定时任务
      *
      * @param taskName 定时任务名称自定义部分
-     * @throws IOException 删除任务失败
+     * @throws Exception 删除任务失败
      */
-    public static void deleteTask(String taskName) throws IOException {
+    public static void deleteTask(String taskName) throws Exception {
         taskName = TASK_NAME + taskName;
         if (isWin) {
-            new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start();
+            try (Process process = new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start()) {
+                process.waitFor();
+            }
         } else if (isMac) {
             Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
             // 卸载定时任务
             ProcessBuilder bootoutPb = new ProcessBuilder("launchctl", "bootout",
                     "gui/" + getCurrentUserId(), plistFile.toString());
-            Process bootoutProcess = bootoutPb.start();
-            try {
+            try (Process bootoutProcess = bootoutPb.start()) {
                 bootoutProcess.waitFor();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
             Files.deleteIfExists(plistFile);
         }
@@ -476,9 +475,9 @@ public class ScheduledService {
      * 创建 mac 定时任务
      *
      * @param timedTaskBean 定时任务信息
-     * @throws IOException 创建失败
+     * @throws Exception 创建失败
      */
-    private static void createMacLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
+    private static void createMacLaunchdTask(TimedTaskBean timedTaskBean) throws Exception {
         String taskName = TASK_NAME + timedTaskBean.getTaskName();
         Path plistPath = getTaskFilePath(taskName);
         LocalDateTime triggerTime = timedTaskBean.getDateTime();
@@ -558,9 +557,13 @@ public class ScheduledService {
                 "</plist>";
         Files.write(plistPath, plistContent.getBytes());
         // 先卸载旧配置
-        new ProcessBuilder("launchctl", "unload", plistPath.toString()).start();
+        try (Process process = new ProcessBuilder("launchctl", "unload", plistPath.toString()).start()) {
+            process.waitFor();
+        }
         // 加载任务
-        new ProcessBuilder("launchctl", "load", plistPath.toString()).start();
+        try (Process process = new ProcessBuilder("launchctl", "load", plistPath.toString()).start()) {
+            process.waitFor();
+        }
     }
 
     /**

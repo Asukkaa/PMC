@@ -339,20 +339,23 @@ public class CheckUpdateService {
         );
         logger.info("-------------------------开始执行 Mac 更新脚本------------------------------");
         // 执行并捕获输出
-        Process process = new ProcessBuilder("osascript", "-e", scriptCommand)
+        StringBuilder output;
+        int exitCode;
+        try (Process process = new ProcessBuilder("osascript", "-e", scriptCommand)
                 .redirectErrorStream(true)
-                .start();
-        // 读取输出
-        StringBuilder output = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                logger.info("脚本输出: {}", line);
-                output.append(line).append("\n");
+                .start()) {
+            // 读取输出
+            output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info("脚本输出: {}", line);
+                    output.append(line).append("\n");
+                }
             }
+            // 等待完成
+            exitCode = process.waitFor();
         }
-        // 等待完成
-        int exitCode = process.waitFor();
         logger.info("脚本退出码: {}", exitCode);
         if (exitCode != 0) {
             logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
@@ -405,7 +408,9 @@ public class CheckUpdateService {
         ProcessBuilder builder = new ProcessBuilder(command);
         builder.directory(new File(targetDir));
         logger.info("-------------------------开始执行 Win 更新脚本------------------------------");
-        builder.start();
+        try (Process process = builder.start()) {
+            process.waitFor();
+        }
     }
 
 }

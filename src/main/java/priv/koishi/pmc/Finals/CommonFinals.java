@@ -570,11 +570,6 @@ public class CommonFinals {
     public static final String activatePMC = "activatePMC";
 
     /**
-     * 启用禁用标志
-     */
-    public static final List<String> activationList = Arrays.asList(activation, unActivation);
-
-    /**
      * 默认浮窗横轴偏移量
      */
     public static final int defaultOffsetX = 30;

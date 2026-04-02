@@ -67,9 +67,9 @@ public class ClickPositionBean extends BaseCopyBean {
     String relativeY;
 
     /**
-     * 是否启用相对坐标 0-不启用，1-启用
+     * 是否启用相对坐标（true 启用，默认禁用）
      */
-    String useRelative = unActivation;
+    boolean useRelative;
 
     /**
      * 操作时长（单位：毫秒）
@@ -206,14 +206,14 @@ public class ClickPositionBean extends BaseCopyBean {
     String randomY = defaultRandomClickY;
 
     /**
-     * 是否启用随机点击坐标 0-不启用，1-启用
+     * 是否启用随机点击坐标（默认禁用）
      */
-    String randomClick = unActivation;
+    boolean randomClick;
 
     /**
-     * 是否启用随机轨迹 0-不启用，1-启用
+     * 是否启用随机轨迹（默认禁用）
      */
-    String randomTrajectory = unActivation;
+    boolean randomTrajectory;
 
     /**
      * 随机偏移时长（单位：毫秒）
@@ -221,19 +221,19 @@ public class ClickPositionBean extends BaseCopyBean {
     String randomTime = defaultRandomTime;
 
     /**
-     * 是否启用随机点击时长 0-不启用，1-启用
+     * 是否启用随机点击时长（true 启用，默认禁用）
      */
-    String randomClickTime = unActivation;
+    boolean randomClickTime;
 
     /**
-     * 是否启用随机等待时长 0-不启用，1-启用
+     * 是否启用随机等待时长（true 启用，默认禁用）
      */
-    String randomWaitTime = unActivation;
+    boolean randomWaitTime;
 
     /**
-     * 是否启用随机点击间隔 0-不启用，1-启用
+     * 是否启用随机点击间隔（true 启用，默认禁用）
      */
-    String randomClickInterval = unActivation;
+    boolean randomClickInterval;
 
     /**
      * 匹配图像坐标横轴偏移量
@@ -271,24 +271,24 @@ public class ClickPositionBean extends BaseCopyBean {
     String parameter;
 
     /**
-     * 是否启用脚本窗口最小化执行 0-不启用，1-启用
+     * 是否启用脚本窗口最小化执行（true 启用，默认启用）
      */
-    String minScriptWindow = activation;
+    boolean minScriptWindow = true;
 
     /**
-     * 是否启用不移动鼠标 0-不启用，1-启用
+     * 是否启用不移动鼠标（true 启用，默认禁用）
      */
-    String noMove = unActivation;
+    boolean noMove;
 
     /**
-     * 是否启用忽略移动窗口失败 0-不启用，1-启用
+     * 是否启用忽略移动窗口失败（true 启用，默认启用）
      */
-    String ignoreFailure = activation;
+    boolean ignoreFailure = true;
 
     /**
-     * 是否启用忽略图片识别坐标 0-不启用，1-启用
+     * 是否启用忽略图片识别坐标（true 启用，默认禁用）
      */
-    String ignoreImg = unActivation;
+    boolean ignoreImg;
 
     /**
      * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
@@ -299,6 +299,12 @@ public class ClickPositionBean extends BaseCopyBean {
      * 颜色容差（0-255）
      */
     String colorTolerance = String.valueOf(defaultColorTolerance);
+
+    /**
+     * 文字识别模型设置
+     */
+    @JsonSerialize(contentAs = TessdataBean.class)
+    List<TessdataBean> tessdata;
 
     /**
      * 添加移动轨迹

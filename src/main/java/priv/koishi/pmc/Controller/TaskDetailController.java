@@ -444,10 +444,10 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     /**
      * 删除当前任务按钮
      *
-     * @throws IOException 删除任务失败
+     * @throws Exception 删除任务失败
      */
     @FXML
-    private void removeDetail() throws IOException {
+    private void removeDetail() throws Exception {
         String taskName = selectedItem.getTaskName();
         if (StringUtils.isNotBlank(taskName)) {
             deleteTask(taskName);

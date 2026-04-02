@@ -21,6 +21,7 @@ import priv.koishi.pmc.Bean.Interface.CopyBean;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
 import priv.koishi.pmc.Bean.Interface.Indexable;
+import priv.koishi.pmc.Bean.TessdataBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Controller.AutoClickController;
@@ -1070,6 +1071,50 @@ public class TableViewUtils {
     public static void fileNameComparator(TableColumn<?, String> nameColumn) {
         // 应用自定义比较器
         nameColumn.setComparator(NATURAL_SORT);
+    }
+
+    /**
+     * 启用所选选项
+     *
+     * @param contextMenu       右键菜单
+     * @param tessdataTableView 模型文件列表
+     * @param runnable          回调函数（可用来保存设置）
+     */
+    public static void buildSetActiveMenu(ContextMenu contextMenu, TableView<TessdataBean> tessdataTableView,
+                                          Runnable runnable) {
+        MenuItem menuItem = new MenuItem(menu_activeMenu());
+        menuItem.setOnAction(_ -> {
+            ObservableList<TessdataBean> selectedItems = tessdataTableView.getSelectionModel().getSelectedItems();
+            selectedItems.forEach(item -> item.setActive(true));
+            if (runnable != null) {
+                runnable.run();
+            } else {
+                tessdataTableView.refresh();
+            }
+        });
+        contextMenu.getItems().addFirst(menuItem);
+    }
+
+    /**
+     * 禁用所选选项
+     *
+     * @param contextMenu       右键菜单
+     * @param tessdataTableView 模型文件列表
+     * @param runnable          回调函数（可用来保存设置）
+     */
+    public static void buildSetUnActiveMenu(ContextMenu contextMenu, TableView<TessdataBean> tessdataTableView,
+                                            Runnable runnable) {
+        MenuItem menuItem = new MenuItem(menu_unActiveMenu());
+        menuItem.setOnAction(_ -> {
+            ObservableList<TessdataBean> selectedItems = tessdataTableView.getSelectionModel().getSelectedItems();
+            selectedItems.forEach(item -> item.setActive(false));
+            if (runnable != null) {
+                runnable.run();
+            } else {
+                tessdataTableView.refresh();
+            }
+        });
+        contextMenu.getItems().addFirst(menuItem);
     }
 
 }

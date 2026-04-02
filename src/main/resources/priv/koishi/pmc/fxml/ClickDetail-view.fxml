@@ -446,7 +446,7 @@
                             </HBox>
                         </HBox>
 
-                        <HBox spacing="10">
+                        <HBox fx:id="recognitionHBox_Det" spacing="10">
                             <HBox styleClass="hBox-270-5">
                                 <!--图像识别类型:-->
                                 <Label text="%clickDetail.recognitionType"/>
@@ -519,59 +519,96 @@
                             </VBox>
 
                             <VBox fx:id="findImgVBox_Det" spacing="10">
-                                <HBox spacing="5">
-                                    <!--选择要点击的图片-->
-                                    <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath"
-                                            onDragDropped="#clickImgHandleDrop" onDragOver="#clickImgAcceptDrop"
-                                            text="%clickDetail.clickImgBtn_Det"/>
-                                    <HBox prefWidth="300" spacing="5">
-                                        <Label fx:id="clickImgPath_Det" style="-fx-font-size: 15px;"/>
+                                <VBox fx:id="imgVBox_Det" spacing="10">
+                                    <HBox spacing="5">
+                                        <!--选择要点击的图片-->
+                                        <Button fx:id="clickImgBtn_Det" onAction="#addClickImgPath"
+                                                onDragDropped="#clickImgHandleDrop" onDragOver="#clickImgAcceptDrop"
+                                                text="%clickDetail.clickImgBtn_Det"/>
+                                        <HBox prefWidth="300" spacing="5">
+                                            <Label fx:id="clickImgPath_Det" style="-fx-font-size: 15px;"/>
 
-                                        <Button fx:id="removeClickImg_Det" onAction="#removeClickImg" prefHeight="20"
-                                                styleClass="img-button-style" visible="false">
-                                            <graphic>
-                                                <ImageView>
-                                                    <Image url="@../icon/Trash.png"/>
-                                                </ImageView>
-                                            </graphic>
-                                        </Button>
+                                            <Button fx:id="removeClickImg_Det" onAction="#removeClickImg"
+                                                    prefHeight="20"
+                                                    styleClass="img-button-style" visible="false">
+                                                <graphic>
+                                                    <ImageView>
+                                                        <Image url="@../icon/Trash.png"/>
+                                                    </ImageView>
+                                                </graphic>
+                                            </Button>
+                                        </HBox>
                                     </HBox>
-                                </HBox>
 
-                                <VBox fx:id="clickImgVBox_Det" visible="false" spacing="10">
-                                    <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200"
-                                               preserveRatio="true"/>
+                                    <VBox fx:id="clickImgVBox_Det" visible="false" spacing="10">
+                                        <ImageView fx:id="clickImg_Det" fitWidth="200" fitHeight="200"
+                                                   preserveRatio="true"/>
 
+                                        <HBox spacing="10">
+                                            <!--图片名称:-->
+                                            <Label maxHeight="25" text="%clickDetail.clickImgName"/>
+                                            <Label maxHeight="25" fx:id="clickImgName_Det"/>
+                                            <!--更新步骤名称-->
+                                            <Button fx:id="updateClickName_Det" onAction="#updateClickName"
+                                                    text="%clickDetail.updateClickName_Det"/>
+                                        </HBox>
+
+                                        <HBox spacing="10">
+                                            <!--图片类型:-->
+                                            <Label maxHeight="25" text="%clickDetail.clickImgType"/>
+                                            <Label maxHeight="25" fx:id="clickImgType_Det"/>
+                                        </HBox>
+
+                                        <HBox spacing="10">
+                                            <!--匹配图像坐标横(X)轴偏移量：-->
+                                            <Label maxHeight="25" text="%clickDetail.imgX"/>
+                                            <TextField fx:id="imgX_Det" prefWidth="60" promptText="0"/>
+                                            <!--像素-->
+                                            <Label maxHeight="25" text="%unit.px"/>
+                                        </HBox>
+
+                                        <HBox spacing="10">
+                                            <!--匹配图像坐标纵(Y)轴偏移量：-->
+                                            <Label maxHeight="25" text="%clickDetail.imgY"/>
+                                            <TextField fx:id="imgY_Det" prefWidth="60" promptText="0"/>
+                                            <!--像素-->
+                                            <Label maxHeight="25" text="%unit.px"/>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+
+                                <VBox fx:id="ocrVBox_det" spacing="10">
                                     <HBox spacing="10">
-                                        <!--图片名称:-->
-                                        <Label maxHeight="25" text="%clickDetail.clickImgName"/>
-                                        <Label maxHeight="25" fx:id="clickImgName_Det"/>
-                                        <!--更新步骤名称-->
-                                        <Button fx:id="updateClickName_Det" onAction="#updateClickName"
-                                                text="%clickDetail.updateClickName_Det"/>
+                                        <!--刷新模型列表-->
+                                        <Button fx:id="selectBtn_det" onAction="#selectTessdataPath"
+                                                text="%tessdata.selectTessdata"/>
+
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <!--列表为空-->
+                                        <Label fx:id="tessdataNumber_det" text="%listText.null"/>
                                     </HBox>
 
-                                    <HBox spacing="10">
-                                        <!--图片类型:-->
-                                        <Label maxHeight="25" text="%clickDetail.clickImgType"/>
-                                        <Label maxHeight="25" fx:id="clickImgType_Det"/>
-                                    </HBox>
+                                    <TableView fx:id="tessdataTableView_det">
+                                        <placeholder>
+                                            <!--未导入 .traineddata 模型文件，需要再在设置页导入文字识别模型后才可使用识别功能-->
+                                            <Label text="%tessdata.noData"/>
+                                        </placeholder>
 
-                                    <HBox spacing="10">
-                                        <!--匹配图像坐标横(X)轴偏移量：-->
-                                        <Label maxHeight="25" text="%clickDetail.imgX"/>
-                                        <TextField fx:id="imgX_Det" prefWidth="60" promptText="0"/>
-                                        <!--像素-->
-                                        <Label maxHeight="25" text="%unit.px"/>
-                                    </HBox>
+                                        <columns>
+                                            <!--序号-->
+                                            <TableColumn fx:id="index_det" text="%listText.index" sortable="false"/>
+                                            <!--模型名称-->
+                                            <TableColumn fx:id="name_det" text="%tessdata.name" sortable="false"/>
+                                            <!--模型路径-->
+                                            <TableColumn fx:id="path_det" text="%tessdata.path" sortable="false"/>
+                                            <!--备注-->
+                                            <TableColumn fx:id="remark_det" text="%tessdata.remark" sortable="false"/>
+                                            <!--状态-->
+                                            <TableColumn fx:id="state_det" text="%tessdata.state" sortable="false"/>
+                                        </columns>
+                                    </TableView>
 
-                                    <HBox spacing="10">
-                                        <!--匹配图像坐标纵(Y)轴偏移量：-->
-                                        <Label maxHeight="25" text="%clickDetail.imgY"/>
-                                        <TextField fx:id="imgY_Det" prefWidth="60" promptText="0"/>
-                                        <!--像素-->
-                                        <Label maxHeight="25" text="%unit.px"/>
-                                    </HBox>
+                                    <Label text="%tessdata.tip" textFill="red" style="-fx-pref-height: -1"/>
                                 </VBox>
                             </VBox>
                         </HBox>
