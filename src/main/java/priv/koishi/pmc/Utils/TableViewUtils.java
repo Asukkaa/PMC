@@ -89,7 +89,7 @@ public class TableViewUtils {
                             setTooltip(null);
                         } else if (!item.toString().isEmpty()) {
                             setText(item.toString());
-                            setTooltip(creatTooltip(item.toString()));
+                            setTooltip(creatTooltip(getTipText(column, (String) item)));
                         }
                     }
                 };
@@ -214,12 +214,29 @@ public class TableViewUtils {
                                 indexable.setIndex(rowIndex);
                             }
                             setText(String.valueOf(rowIndex));
-                            setTooltip(creatTooltip(String.valueOf(rowIndex)));
+                            setTooltip(creatTooltip(getTipText(column, String.valueOf(rowIndex))));
                         }
                     }
                 };
             }
         });
+    }
+
+    /**
+     * 处理单元格鼠标悬停提示文本
+     *
+     * @param column 要处理的列
+     * @param value  单元格名称
+     * @param <S>    表格单元格数据类型
+     * @param <T>    表格单元格类型
+     * @return 根据单元格是否为空返回不同提示文本
+     */
+    private static <S, T> String getTipText(TableColumn<S, T> column, String value) {
+        if (StringUtils.isEmpty(value)) {
+            return value;
+        }
+        Label label = (Label) column.getGraphic();
+        return label.getText() + "：" + value;
     }
 
     /**
@@ -281,13 +298,12 @@ public class TableViewUtils {
                                 colorRect.setStrokeWidth(1);
                                 // 颜色值文本
                                 Label colorLabel = new Label(target);
-                                colorLabel.setTooltip(creatTooltip(target));
-                                // 水平布局
                                 HBox hbox = new HBox(5, colorRect, colorLabel);
                                 hbox.setAlignment(Pos.CENTER_LEFT);
                                 setGraphic(hbox);
                                 setText(null);
-                                setTooltip(null);
+                                String text = recognitionType_color() + "：" + target;
+                                setTooltip(creatTooltip(text));
                                 return;
                             }
                         } else if (RecognitionTypeEnum.TEXT.ordinal() == recognitionType) {

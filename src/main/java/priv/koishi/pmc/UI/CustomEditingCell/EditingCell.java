@@ -186,7 +186,7 @@ public class EditingCell<T> extends TableCell<T, String> {
             }
             // 检查单元格是否可编辑
             updateEditableState();
-            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getDisplayText()));
+            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getTipText()));
             if (isEditing()) {
                 if (textField != null) {
                     textField.setText(getString());
@@ -300,15 +300,27 @@ public class EditingCell<T> extends TableCell<T, String> {
     }
 
     /**
+     * 获取鼠标悬浮提示文本
+     *
+     * @return 根据单元格是否为空返回不同提示
+     */
+    private String getTipText() {
+        if (StringUtils.isEmpty(getDisplayText())) {
+            return getDisplayText();
+        }
+        return tableColumnText + "：" + getDisplayText();
+    }
+
+    /**
      * 更新显示文本
      */
     private void updateDisplayText() {
         setText(getDisplayText());
         // 根据可编辑状态设置样式
         if (!editable) {
-            setTooltip(creatTooltip(tableColumnText + text_cantEdit() + "\n" + getDisplayText()));
+            setTooltip(creatTooltip(tableColumnText + text_cantEdit() + "\n" + getTipText()));
         } else {
-            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getDisplayText()));
+            setTooltip(creatTooltip(tip + tableColumnText + "\n" + getTipText()));
         }
     }
 
