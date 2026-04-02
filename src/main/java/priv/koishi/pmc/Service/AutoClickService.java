@@ -797,7 +797,7 @@ public class AutoClickService {
                 logBean.setResult(log_fail());
                 clickLog.add(logBean);
             }
-            if (clickPositionVO.isIgnoreFailure()) {
+            if (!clickPositionVO.isIgnoreFailure()) {
                 throw new RuntimeException(log_moveWindow() + log_fail());
             }
         }
@@ -1042,7 +1042,7 @@ public class AutoClickService {
                 int matchedType = clickPositionVO.getMatchedTypeEnum();
                 long end = System.currentTimeMillis();
                 // 如果开启忽略图像识别坐标后则使用原始配置的坐标
-                if (clickPositionVO.isIgnoreImg() &&
+                if (!clickPositionVO.isIgnoreImg() &&
                         retryType != RetryTypeEnum.CLICK.ordinal()) {
                     startX = position.x() + Integer.parseInt(clickPositionVO.getImgX());
                     startY = position.y() + Integer.parseInt(clickPositionVO.getImgY());
@@ -1167,7 +1167,7 @@ public class AutoClickService {
             double finalStartY = startY;
             CompletableFuture<Void> actionFuture = new CompletableFuture<>();
             Platform.runLater(() -> {
-                if (clickPositionVO.isNoMove()) {
+                if (!clickPositionVO.isNoMove()) {
                     robot.mouseMove(finalStartX, finalStartY);
                     if (taskBean.isMoveLog()) {
                         ClickLogBean moveLog = new ClickLogBean();
@@ -1591,7 +1591,7 @@ public class AutoClickService {
                             }
                         });
                     }
-                    if (clickPositionVO.isNoMove()) {
+                    if (!clickPositionVO.isNoMove()) {
                         robot.mouseMove(finalX, finalY);
                     }
                     robot.mouseWheel(wheelRotation);

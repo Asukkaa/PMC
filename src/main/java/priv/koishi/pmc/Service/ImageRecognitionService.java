@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Service;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.DoublePointer;
@@ -17,6 +18,7 @@ import priv.koishi.pmc.Bean.ClickLogBean;
 import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.MatchPointBean;
+import priv.koishi.pmc.Bean.TessdataBean;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RecognitionTypeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
@@ -27,7 +29,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -515,12 +519,16 @@ public class ImageRecognitionService {
         // 初始化 Tesseract
         try (TessBaseAPI api = new TessBaseAPI()) {
             String tessdataPath = getTessdataPath();
-            String dataPath = tessdataPath + "/chi_sim.traineddata";
-            File dataFile = new File(dataPath);
-            if (!dataFile.exists()) {
-                throw new RuntimeException("traineddata 文件不存在");
+            List<String> languages = new ArrayList<>();
+            for (TessdataBean tessdataBean : config.getTessdata()) {
+                if (tessdataBean.isActive()) {
+                    languages.add(tessdataBean.getName());
+                }
             }
-            String language = getFileName(dataPath);
+            if (CollectionUtils.isEmpty(languages)) {
+                throw new RuntimeException("未选择 .traineddata 模型文件");
+            }
+            String language = String.join("+", languages);
             System.out.println(language);
             int init = api.Init(tessdataPath, language);
             if (init != 0) {
@@ -549,9 +557,9 @@ public class ImageRecognitionService {
                     continue;
                 }
                 String word = wordTextPtr.getString().trim();
-                System.out.println("word： " + word);
+                System.out.println("word：" + word);
                 wordTextPtr.deallocate();
-                if (word.equalsIgnoreCase(targetText)) {
+                if (word.toLowerCase().contains(targetText.toLowerCase())) {
                     // 获取单词边界框
                     IntPointer x1 = new IntPointer(1);
                     IntPointer y1 = new IntPointer(1);
