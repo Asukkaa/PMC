@@ -582,25 +582,6 @@ public class ImageRecognitionService {
     }
 
     /**
-     * 判断是否为 OSD 模型
-     *
-     * @param tessdataPath traineddata 模型文件夹目录
-     * @param modelName    模型名称
-     * @return true 为 OSD 模型
-     */
-    public static boolean isOSDModel(String tessdataPath, String modelName) {
-        try (TessBaseAPI api = new TessBaseAPI()) {
-            int initCode = api.Init(tessdataPath, modelName);
-            if (initCode != 0) {
-                return false;
-            }
-            return "osd".equals(modelName);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
      * BufferedImage 转 Mat
      *
      * @param image 需要转换的图片
