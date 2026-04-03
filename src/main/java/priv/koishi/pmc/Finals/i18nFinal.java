@@ -1139,6 +1139,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 填写需要识别的文字，尽量简短且特征明显
+     */
+    public static String tip_ocrText_Det() {
+        return bundle.getString("tip.ocrText_Det");
+    }
+
+    /**
      * @return <p>程序版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Amazon.com Inc. 26.0.1+8-LTS
@@ -1782,6 +1789,27 @@ public class i18nFinal {
      */
     public static String text_noExists() {
         return bundle.getString("noExists");
+    }
+
+    /**
+     * @return 未选择 .traineddata 模型文件
+     */
+    public static String text_noTessdata() {
+        return bundle.getString("noTessdata");
+    }
+
+    /**
+     * @return 待识别的文字不能为空
+     */
+    public static String text_noOCRText() {
+        return bundle.getString("noOCRText");
+    }
+
+    /**
+     * @return Tesseract 初始化失败，请检查 tessdata 路径：
+     */
+    public static String text_tesseractInitErr() {
+        return bundle.getString("tesseractInitErr");
     }
 
     /**
@@ -2991,14 +3019,28 @@ public class i18nFinal {
     }
 
     /**
-     * @return 识别目标图像
+     * @return 识别目标图像：
      */
     public static String log_clickImg() {
         return bundle.getString("log.clickImg");
     }
 
     /**
-     * @return 识别终止操作图像
+     * @return 识别目标颜色：
+     */
+    public static String log_clickColor() {
+        return bundle.getString("log.clickColor");
+    }
+
+    /**
+     * @return 识别目标文字：
+     */
+    public static String log_clickText() {
+        return bundle.getString("log.clickText");
+    }
+
+    /**
+     * @return 识别终止操作图像：
      */
     public static String log_stopImg() {
         return bundle.getString("log.stopImg");

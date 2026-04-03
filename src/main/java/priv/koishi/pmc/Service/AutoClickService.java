@@ -1049,13 +1049,21 @@ public class AutoClickService {
                 }
                 int matchThreshold = matchPointBean.getMatchThreshold();
                 if (taskBean.isClickImgLog()) {
+                    String logType = log_clickImg();
+                    if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
+                        logType = log_clickImg() + targetName.get();
+                    } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
+                        logType = log_clickColor() + targetName.get();
+                    } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
+                        logType = log_clickText() + targetName.get();
+                    }
                     ClickLogBean clickLogBean = new ClickLogBean();
                     clickLogBean.setClickTime(String.valueOf(end - start))
                             .setResult(matchThreshold + percentage)
                             .setX(String.valueOf(position.x()))
                             .setY(String.valueOf(position.y()))
                             .setClickKey(mouseButton_none())
-                            .setType(log_clickImg())
+                            .setType(logType)
                             .setName(name);
                     clickLog.add(clickLogBean);
                 }
@@ -1404,10 +1412,10 @@ public class AutoClickService {
                         ClickLogBean clickLogBean = new ClickLogBean();
                         clickLogBean.setClickTime(String.valueOf(end - start))
                                 .setResult(matchThreshold + percentage)
+                                .setType(log_stopImg() + fileName.get())
                                 .setClickKey(mouseButton_none())
                                 .setX(String.valueOf(x))
                                 .setY(String.valueOf(y))
-                                .setType(log_stopImg())
                                 .setName(name);
                         clickLog.add(clickLogBean);
                     }
@@ -1741,6 +1749,16 @@ public class AutoClickService {
             return null;
         }
         return clickLog.getSnapshot();
+    }
+
+    public static Task<Void> OCRTest() {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                
+                return null;
+            }
+        };
     }
 
 }

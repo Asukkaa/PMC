@@ -582,6 +582,8 @@
                                         <!--刷新模型列表-->
                                         <Button fx:id="selectBtn_det" onAction="#selectTessdataPath"
                                                 text="%tessdata.selectTessdata"/>
+                                        <!--测试文字识别-->
+                                        <Button fx:id="testBtn_det" onAction="#testOCR" text="%tessdata.testOCR"/>
 
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <!--列表为空-->

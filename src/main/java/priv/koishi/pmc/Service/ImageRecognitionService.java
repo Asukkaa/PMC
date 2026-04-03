@@ -286,15 +286,12 @@ public class ImageRecognitionService {
         int recognitionType = findPositionConfig.getRecognitionType();
         // 图像识别
         if (recognitionType == RecognitionTypeEnum.IMAGE.ordinal()) {
-            System.out.println("图像识别:" + findPositionConfig.getTemplate());
-            matchPointBean = getImgMatchPointBean(findPositionConfig, screenImg, x, y);
+            matchPointBean = ImageRecognition(screenImg, findPositionConfig, x, y);
             // 颜色识别
         } else if (recognitionType == RecognitionTypeEnum.COLOR.ordinal()) {
-            System.out.println("颜色识别:" + findPositionConfig.getTemplate());
             matchPointBean = colorRecognition(screenImg, findPositionConfig, x, y);
             // 文字识别
         } else if (recognitionType == RecognitionTypeEnum.TEXT.ordinal()) {
-            System.out.println("文字识别:" + findPositionConfig.getTemplate());
             matchPointBean = textRecognition(screenImg, findPositionConfig, x, y);
         }
         return matchPointBean;
@@ -303,15 +300,15 @@ public class ImageRecognitionService {
     /**
      * 图像识别
      *
-     * @param findPositionConfig 配置信息
      * @param screenImg          截图图像
+     * @param findPositionConfig 配置信息
      * @param offsetX            截图在屏幕上的 X 偏移
      * @param offsetY            截图在屏幕上的 Y 偏移
      * @return 匹配点及相似度
      * @throws IOException 读取图片失败时抛出异常
      */
-    private static MatchPointBean getImgMatchPointBean(FindPositionConfig findPositionConfig, BufferedImage screenImg,
-                                                       int offsetX, int offsetY) throws IOException {
+    private static MatchPointBean ImageRecognition(BufferedImage screenImg, FindPositionConfig findPositionConfig,
+                                                   int offsetX, int offsetY) throws IOException {
         AtomicReference<Double> bestVal = new AtomicReference<>(0.0);
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
         // 读取图片为 byte 数组，防止中文路径乱码
@@ -510,7 +507,7 @@ public class ImageRecognitionService {
                                                   int offsetX, int offsetY) {
         String targetText = config.getTemplate();
         if (StringUtils.isEmpty(targetText)) {
-            throw new IllegalArgumentException("待识别的文字不能为空");
+            throw new RuntimeException(text_noOCRText());
         }
         // 转换为 Mat 并灰度化
         Mat imageMat = bufferedImageToMat(screenImg);
@@ -526,14 +523,13 @@ public class ImageRecognitionService {
                 }
             }
             if (CollectionUtils.isEmpty(languages)) {
-                throw new RuntimeException("未选择 .traineddata 模型文件");
+                throw new RuntimeException(text_noTessdata());
             }
             String language = String.join("+", languages);
-            System.out.println(language);
             int init = api.Init(tessdataPath, language);
             if (init != 0) {
-                throw new RuntimeException("Tesseract 初始化失败，请检查 tessdata 路径: " + tessdataPath +
-                        "\n" + "init: " + init + " language: " + language);
+                throw new RuntimeException(text_tesseractInitErr() + tessdataPath +
+                        "\n" + "initCode: " + init + " language: " + language);
             }
             // 设置页面分割模式为自动
             api.SetPageSegMode(PSM_AUTO);
@@ -557,7 +553,6 @@ public class ImageRecognitionService {
                     continue;
                 }
                 String word = wordTextPtr.getString().trim();
-                System.out.println("word：" + word);
                 wordTextPtr.deallocate();
                 if (word.toLowerCase().contains(targetText.toLowerCase())) {
                     // 获取单词边界框
@@ -584,7 +579,7 @@ public class ImageRecognitionService {
                         .setMatchThreshold(matchThreshold);
             }
         } catch (Exception e) {
-            throw new RuntimeException("文字识别失败: " + e.getMessage(), e);
+            throw new RuntimeException(e);
         }
         return new MatchPointBean().setPoint(new Point(0, 0)).setMatchThreshold(0);
     }

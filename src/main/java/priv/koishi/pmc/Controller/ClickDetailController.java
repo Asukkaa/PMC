@@ -280,7 +280,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
             updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
-            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det, selectBtn_det;
+            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det, selectBtn_det, testBtn_det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
@@ -759,6 +759,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(link_Det, link_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(windowX_Det, windowX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(windowY_Det, windowY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(ocrText_Det, ocrText_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(noMove_Det, noMove_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(workPath_Det, workPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(interval_Det, interval_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -773,6 +774,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(relativelyX_Det, relativelyX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(relativelyY_Det, relativelyY_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(minWindow_Det, minWindow_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(colorPicker_Det, colorPicker_Det.valueProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopRetryNum_Det, stopRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickImgPath_Det, clickImgPath_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(randomClickX_Det, randomClickX_Det.textProperty(), invalidationListener, weakInvalidationListeners);
@@ -780,6 +782,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(clickRetryNum_Det, clickRetryNum_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopWindowInfo_Det, stopWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(moveWindowInfo_Det, moveWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(colorTolerance_Det, colorTolerance_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickWindowInfo_Det, clickWindowInfo_Det.textProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(useRelatively_Det, useRelatively_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopAllRegion_Det, stopAllRegion_Det.selectedProperty(), invalidationListener, weakInvalidationListeners);
@@ -790,6 +793,7 @@ public class ClickDetailController extends RootController {
         registerWeakInvalidationListener(retryType_Det, retryType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(matchedType_Det, matchedType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(stopFindImgType_Det, stopFindImgType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
+        registerWeakInvalidationListener(recognitionType_Det, recognitionType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         registerWeakInvalidationListener(clickFindImgType_Det, clickFindImgType_Det.getSelectionModel().selectedItemProperty(), invalidationListener, weakInvalidationListeners);
         // 监听滑块改变
         ChangeListener<Number> clickOpacityListener = (_, _, newVal) ->
@@ -863,6 +867,9 @@ public class ClickDetailController extends RootController {
         // 目标网址文本输入框鼠标悬停提示
         Runnable urlRemover = textFieldValueListener(url_Det, tip_url());
         listenerRemovers.add(urlRemover);
+        // 目标文字文本输入框鼠标悬停提示
+        Runnable ocrRemover = textFieldValueListener(ocrText_Det, tip_ocrText_Det());
+        listenerRemovers.add(ocrRemover);
         // 操作名称文本输入框鼠标悬停提示
         Runnable clickNameRemover = textFieldValueListener(clickName_Det, tip_clickName());
         listenerRemovers.add(clickNameRemover);
@@ -977,6 +984,8 @@ public class ClickDetailController extends RootController {
         addToolTip(tip_mouseStartX(), mouseStartX_Det);
         addToolTip(tip_mouseStartY(), mouseStartY_Det);
         addToolTip(tip_randomClick(), randomClick_Det);
+        addToolTip(tip_selectBtn_set(), selectBtn_det);
+        addValueToolTip(ocrText_Det, tip_ocrText_Det());
         addToolTip(tip_updateKeyboard(), setKeyHBox_Det);
         addToolTip(tip_removeStopImgBtn(), removeAll_Det);
         addToolTip(tip_useRelatively(), useRelatively_Det);
@@ -1763,10 +1772,23 @@ public class ClickDetailController extends RootController {
                         .setClickImgTarget(String.valueOf(colorPicker_Det.getValue()))
                         .setColorTolerance(colorTolerance);
             } else if (recognitionType_text().equals(recognitionType)) {
+                String ocrText = ocrText_Det.getText();
+                if (StringUtils.isBlank(ocrText)) {
+                    throw new RuntimeException(text_noOCRText());
+                }
                 ObservableList<TessdataBean> tessdataBeans = tessdataTableView_det.getItems();
+                List<TessdataBean> languages = new ArrayList<>();
+                for (TessdataBean tessdataBean : tessdataBeans) {
+                    if (tessdataBean.isActive()) {
+                        languages.add(tessdataBean);
+                    }
+                }
+                if (CollectionUtils.isEmpty(languages)) {
+                    throw new RuntimeException(text_noTessdata());
+                }
                 selectedItem.setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
-                        .setClickImgTarget(ocrText_Det.getText())
-                        .setTessdata(tessdataBeans);
+                        .setTessdata(tessdataBeans)
+                        .setClickImgTarget(ocrText);
             }
         }
         selectedItem.setStopImgSelectPath(stopImgSelectPath)
@@ -2449,6 +2471,14 @@ public class ClickDetailController extends RootController {
     @FXML
     public void selectTessdataPath() {
         startUpdateTessdataTask();
+    }
+
+    /**
+     * 测试文字识别按钮
+     */
+    @FXML
+    public void testOCR() {
+
     }
 
 }
