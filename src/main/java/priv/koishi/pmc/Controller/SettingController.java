@@ -84,7 +84,8 @@ import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomati
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
-import static priv.koishi.pmc.Service.PMCFileService.*;
+import static priv.koishi.pmc.Service.PMCFileService.loadImg;
+import static priv.koishi.pmc.Service.TessdataService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;

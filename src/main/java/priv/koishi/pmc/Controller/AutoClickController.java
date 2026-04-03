@@ -349,7 +349,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 详情页、日志页舞台
      */
-    public Stage detailStage, logStage;
+    public static Stage detailStage, logStage, ocrTestStage;
 
     /**
      * 详情页窗口标题
@@ -1439,6 +1439,9 @@ public class AutoClickController extends RootController implements MousePosition
                     if (logStage != null && logStage.isShowing()) {
                         logStage.setTitle(clickLog_title() + " - " + text);
                     }
+                    if (ocrTestStage != null && ocrTestStage.isShowing()) {
+                        ocrTestStage.setTitle(tessdata_title() + " - " + text);
+                    }
                 } else {
                     mainStage.setTitle(appName);
                 }
@@ -2372,12 +2375,7 @@ public class AutoClickController extends RootController implements MousePosition
         Parent root = loader.load();
         ClickLogController controller = loader.getController();
         controller.initData(clickLogs);
-        controller.setRefreshCallback(() -> {
-            List<ClickLogBean> logs = controller.getClickLogs();
-            if (CollectionUtils.isEmpty(logs)) {
-                clickLogs.clear();
-            }
-        });
+        controller.setRefreshCallback(() -> clickLogs.clear());
         logStage = new Stage();
         Scene scene = new Scene(root, logWidth, logHeight);
         logStage.setScene(scene);

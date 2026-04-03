@@ -584,6 +584,8 @@
                                                 text="%tessdata.selectTessdata"/>
                                         <!--测试文字识别-->
                                         <Button fx:id="testBtn_det" onAction="#testOCR" text="%tessdata.testOCR"/>
+                                        <!--查看测试结果-->
+                                        <Button fx:id="showTestBtn_det" onAction="#showTest" text="%tessdata.showTest"/>
 
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <!--列表为空-->

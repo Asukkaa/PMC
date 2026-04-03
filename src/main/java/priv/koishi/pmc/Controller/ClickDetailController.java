@@ -3,6 +3,8 @@ package priv.koishi.pmc.Controller;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
@@ -12,8 +14,11 @@ import javafx.collections.WeakListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -26,17 +31,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
+import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
-import priv.koishi.pmc.Bean.ImgFileBean;
-import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.Bean.TessdataBean;
-import priv.koishi.pmc.Bean.TrajectoryPointBean;
+import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Callback.InputRecordCallback;
@@ -55,15 +60,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static priv.koishi.pmc.Controller.AutoClickController.isNativeHookException;
-import static priv.koishi.pmc.Controller.AutoClickController.messageFloating;
+import static priv.koishi.pmc.Controller.AutoClickController.*;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
-import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -72,13 +77,16 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.windowInfoShow;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMove.moveWindow;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.mainStage;
+import static priv.koishi.pmc.Service.AutoClickService.ocrTest;
 import static priv.koishi.pmc.Service.AutoClickService.scriptRun;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
-import static priv.koishi.pmc.Service.PMCFileService.updateTessdata;
+import static priv.koishi.pmc.Service.TessdataService.updateTessdata;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
+import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
@@ -160,6 +168,11 @@ public class ClickDetailController extends RootController {
      * 窗口信息设置防重复点击标志
      */
     private final List<Node> windowInfoDisableNodes = new ArrayList<>();
+
+    /**
+     * 文字识别测试结果数据
+     */
+    private List<OCRDataBean> ocrDataBeans = new ArrayList<>();
 
     /**
      * 加载图片任务
@@ -280,7 +293,7 @@ public class ClickDetailController extends RootController {
     @FXML
     public Button removeClickImg_Det, stopImgBtn_Det, clickImgBtn_Det, removeAll_Det, clickRegion_Det, stopRegion_Det,
             updateClickName_Det, clickWindow_Det, stopWindow_Det, updateCoordinate_Det, pathLink_Det, testLink_Det,
-            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det, selectBtn_det, testBtn_det;
+            workDir_Det, removeWorkPath_Det, moveWindow_Det, getColor_Det, selectBtn_det, testBtn_det, showTestBtn_det;
 
     @FXML
     public CheckBox randomClick_Det, randomTrajectory_Det, randomClickTime_Det, randomWaitTime_Det, clickAllRegion_Det,
@@ -1097,7 +1110,7 @@ public class ClickDetailController extends RootController {
      * 关闭页面
      */
     private void closeStage() {
-        autoClickController.detailStage = null;
+        detailStage = null;
         tableView_Det.getItems().stream().parallel().forEach(ImgFileVO::unbindTableView);
         hideFloatingWindow(clickFloating, stopFloating, messageFloating);
         removeAll();
@@ -2469,7 +2482,7 @@ public class ClickDetailController extends RootController {
      * 刷新模型列表按钮
      */
     @FXML
-    public void selectTessdataPath() {
+    private void selectTessdataPath() {
         startUpdateTessdataTask();
     }
 
@@ -2477,8 +2490,109 @@ public class ClickDetailController extends RootController {
      * 测试文字识别按钮
      */
     @FXML
-    public void testOCR() {
+    private void testOCR() {
+        ObservableList<TessdataBean> tessdataBeans = tessdataTableView_det.getItems();
+        FindPositionConfig config = new FindPositionConfig()
+                .setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
+                .setFloatingWindowConfig(clickFloating.getConfig())
+                .setTessdata(tessdataBeans);
+        Task<List<OCRDataBean>> ocrTest = ocrTest(config);
+        // 改变要防重复点击的组件状态
+        Parent root = stage.getScene().getRoot();
+        root.setDisable(true);
+        // 隐藏窗口
+        mainStage.setIconified(true);
+        stage.setIconified(true);
+        // 获取准备时间值
+        int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
+                Integer.parseInt(defaultPreparationRecord), 0, null);
+        String text = preparation + tessdata_preparation();
+        MessageBubble messageBubble = new MessageBubble(text, 0);
+        ocrTest.setOnSucceeded(_ -> {
+            messageBubble.updateBubble(tessdata_success(), 2);
+            root.setDisable(false);
+            ocrDataBeans = ocrTest.getValue();
+            try {
+                showTest();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        ocrTest.setOnFailed(_ -> {
+            root.setDisable(false);
+            ocrDataBeans.clear();
+        });
+        executeRunTimeLine(preparation, ocrTest, messageBubble);
+    }
 
+    /**
+     * 延时执行任务
+     *
+     * @param preparation   准备时间
+     * @param ocrTest       文字识别测试任务线程
+     * @param messageBubble 需要更新的消息气泡
+     */
+    private void executeRunTimeLine(int preparation, Task<List<OCRDataBean>> ocrTest, MessageBubble messageBubble) {
+        if (preparation == 0) {
+            if (!ocrTest.isRunning()) {
+                messageBubble.updateText(tessdata_testing());
+                // 使用新线程启动
+                new Thread(ocrTest).start();
+            }
+        }
+        Timeline runTimeline = new Timeline();
+        AtomicInteger preparationTime = new AtomicInteger(preparation);
+        // 创建 Timeline 来实现倒计时
+        Timeline finalTimeline = runTimeline;
+        runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
+            preparationTime.getAndDecrement();
+            if (preparationTime.get() > 0) {
+                String text = preparationTime + tessdata_preparation();
+                messageBubble.updateText(text);
+            } else {
+                // 停止 Timeline
+                finalTimeline.stop();
+                if (!ocrTest.isRunning()) {
+                    messageBubble.updateText(tessdata_testing());
+                    // 使用新线程启动
+                    new Thread(ocrTest).start();
+                }
+            }
+        }));
+        // 设置 Timeline 的循环次数
+        runTimeline.setCycleCount(preparation);
+        runTimeline.play();
+    }
+
+    /**
+     * 查看测试结果按钮
+     *
+     * @throws IOException 页面加载失败
+     */
+    @FXML
+    private void showTest() throws IOException {
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/OCRTest-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
+        Parent root = loader.load();
+        OCRTestController controller = loader.getController();
+        controller.initData(ocrDataBeans);
+        controller.setRefreshCallback(ocrDataBeans::clear);
+        ocrTestStage = new Stage();
+        Scene scene = new Scene(root, 1000, 500);
+        ocrTestStage.setScene(scene);
+        ocrTestStage.setTitle(tessdata_title());
+        ocrTestStage.initModality(Modality.APPLICATION_MODAL);
+        setWindowLogo(ocrTestStage, logoPath);
+        // 监听窗口面板宽度变化
+        ocrTestStage.widthProperty().addListener((_, _, _) ->
+                Platform.runLater(controller::adaption));
+        // 监听窗口面板高度变化
+        ocrTestStage.heightProperty().addListener((_, _, _) ->
+                Platform.runLater(controller::adaption));
+        // 设置 css 样式
+        setWindowCss(scene, stylesCss);
+        ocrTestStage.show();
+        isSonOpening = true;
     }
 
 }

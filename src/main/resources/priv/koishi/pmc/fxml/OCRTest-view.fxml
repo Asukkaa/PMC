@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/Styles.css"
+            fx:controller="priv.koishi.pmc.Controller.OCRTestController" fx:id="scrollPane_Tes">
+    <AnchorPane>
+        <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
+            <HBox spacing="10">
+                <!--清空列表-->
+                <Button fx:id="removeAll_Tes" onAction="#removeAll" style="-fx-cursor: hand"
+                        text="%listText.removeAll"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+                <!--列表为空-->
+                <Label fx:id="dataNumber_Tes" text="%listText.null"/>
+            </HBox>
+
+            <TableView fx:id="tableView_Tes">
+                <placeholder>
+                    <!--暂无测试数据-->
+                    <Label text="%tessdata.noTestData"/>
+                </placeholder>
+
+                <columns>
+                    <!--序号-->
+                    <TableColumn fx:id="index_Tes" text="%listText.index" sortable="false"/>
+                    <!--识别到的文本-->
+                    <TableColumn fx:id="text_Tes" text="%tessdata.text"/>
+                    <!--文本横 (X) 坐标-->
+                    <TableColumn fx:id="x_Tes" text="%tessdata.x"/>
+                    <!--文本纵 (Y) 坐标-->
+                    <TableColumn fx:id="y_Tes" text="%tessdata.y"/>
+                    <!--文本纵 (Y) 坐标-->
+                    <TableColumn fx:id="confidenceString_Tes" text="%tessdata.confidence"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </AnchorPane>
+</ScrollPane>

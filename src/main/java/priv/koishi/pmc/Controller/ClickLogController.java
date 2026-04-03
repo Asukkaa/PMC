@@ -3,16 +3,13 @@ package priv.koishi.pmc.Controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.ClickLogBean;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import static priv.koishi.pmc.Controller.MainController.autoClickController;
+import static priv.koishi.pmc.Controller.AutoClickController.logStage;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_removeAll_Log;
 import static priv.koishi.pmc.Finals.i18nFinal.unit_log;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
@@ -32,17 +29,6 @@ public class ClickLogController extends ManuallyChangeThemeController {
      * 页面标识符
      */
     private final String tabId = "_Log";
-
-    /**
-     * 操作记录页面舞台
-     */
-    private Stage stage;
-
-    /**
-     * 操作记录
-     */
-    @Getter
-    public List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
 
     /**
      * 更新数据用的回调函数
@@ -73,10 +59,10 @@ public class ClickLogController extends ManuallyChangeThemeController {
      * 组件宽高自适应
      */
     public void adaption() {
-        double tableWidth = stage.getWidth() * 0.95;
+        double tableWidth = logStage.getWidth() * 0.95;
         tableView_Log.setMaxWidth(tableWidth);
         tableView_Log.setPrefWidth(tableWidth);
-        tableView_Log.setPrefHeight(stage.getHeight() * 0.8);
+        tableView_Log.setPrefHeight(logStage.getHeight() * 0.8);
         bindPrefWidthProperty();
     }
 
@@ -100,8 +86,7 @@ public class ClickLogController extends ManuallyChangeThemeController {
      *
      * @param logs 操作记录
      */
-    public void initData(List<ClickLogBean> logs) {
-        clickLogs = logs;
+    public void initData(List<? extends ClickLogBean> logs) {
         if (CollectionUtils.isNotEmpty(logs)) {
             tableView_Log.getItems().addAll(logs);
             updateTableViewSizeText(tableView_Log, dataNumber_Log, unit_log());
@@ -125,12 +110,10 @@ public class ClickLogController extends ManuallyChangeThemeController {
         // 手动处理主题切换
         manuallyChangeTheme();
         Platform.runLater(() -> {
-            stage = (Stage) scrollPane_Log.getScene().getWindow();
             // 设置页面关闭事件处理逻辑
-            stage.setOnCloseRequest(_ -> {
-                autoClickController.logStage = null;
+            logStage.setOnCloseRequest(_ -> {
                 removeController();
-                stage = null;
+                logStage = null;
             });
             // 组件宽高自适应
             adaption();
@@ -147,7 +130,6 @@ public class ClickLogController extends ManuallyChangeThemeController {
     @FXML
     private void removeAll() {
         removeTableViewData(tableView_Log, dataNumber_Log);
-        clickLogs.clear();
         // 触发列表刷新（通过回调）
         if (refreshCallback != null) {
             refreshCallback.run();

@@ -101,7 +101,7 @@ public class AutoClickService {
     public static volatile boolean isRobotInput;
 
     /**
-     * 批量运行 PMC 文件
+     * 批量运行 PMC 文件任务线程
      *
      * @param robot        Robot 实例
      * @param pmcListBeans 需要批量运行的 PMC 文件列表
@@ -1751,12 +1751,17 @@ public class AutoClickService {
         return clickLog.getSnapshot();
     }
 
-    public static Task<Void> OCRTest() {
+    /**
+     * 测试文字识别任务线程
+     *
+     * @param config 识别设置
+     * @return 带有识别到的文字信息的 task
+     */
+    public static Task<List<OCRDataBean>> ocrTest(FindPositionConfig config) {
         return new Task<>() {
             @Override
-            protected Void call() {
-                
-                return null;
+            protected List<OCRDataBean> call() {
+                return getAllOCRData(config);
             }
         };
     }

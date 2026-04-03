@@ -2585,6 +2585,34 @@ public class i18nFinal {
     }
 
     /**
+     * @return 测试结果
+     */
+    public static String tessdata_title() {
+        return bundle.getString("tessdata.title");
+    }
+
+    /**
+     * @return 秒后将执行文字识别测试
+     */
+    public static String tessdata_preparation() {
+        return bundle.getString("tessdata.preparation");
+    }
+
+    /**
+     * @return 文字识别测试中
+     */
+    public static String tessdata_testing() {
+        return bundle.getString("tessdata.testing");
+    }
+
+    /**
+     * @return 文字识别测试成功
+     */
+    public static String tessdata_success() {
+        return bundle.getString("tessdata.success");
+    }
+
+    /**
      * @return 列表为空
      */
     public static String listText_dataListNull() {

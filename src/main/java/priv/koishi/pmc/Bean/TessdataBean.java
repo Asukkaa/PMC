@@ -49,9 +49,9 @@ public class TessdataBean implements Indexable, FilePath {
     String state;
 
     /**
-     * 启用状态(true 启用模型)
+     * 启用状态(true 启用模型，默认禁用)
      */
-    boolean active = true;
+    boolean active;
 
     /**
      * 为列表数据设置序号接口
