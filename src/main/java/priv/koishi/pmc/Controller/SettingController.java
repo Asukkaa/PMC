@@ -1117,11 +1117,14 @@ public class SettingController extends RootController implements MousePositionUp
      * 构建右键菜单
      */
     private void buildContextMenu() {
-        // 构建表格右键菜单
+        // 构建图片文件信息表格右键菜单
         buildTableViewContextMenu(tableView_Set, dataNumber_Set);
         ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_set);
+        // 将所选文件移动到垃圾桶选项
         buildMoveToTrashMenu(contextMenu);
+        // 禁用所选选项
         buildSetUnActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
+        // 启用所选选项
         buildSetActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
         // 构建窗口信息栏右键菜单
         List<Stage> stages = List.of(mainStage);
@@ -1761,7 +1764,10 @@ public class SettingController extends RootController implements MousePositionUp
         bindingTaskNode(saveTessdataConfig, taskBean);
         saveTessdataConfig.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
-            Platform.runLater(() -> tessdataTableView_set.refresh());
+            Platform.runLater(() -> {
+                tessdataTableView_set.refresh();
+                updateTableViewSizeText(tessdataTableView_set, tessdataNumber_set, unit_files());
+            });
         });
         Thread.ofVirtual()
                 .name("saveTessdataConfigTask-vThread" + tessdataId)

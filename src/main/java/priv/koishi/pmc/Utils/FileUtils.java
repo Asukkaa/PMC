@@ -1025,7 +1025,7 @@ public class FileUtils {
                 return appBuilder + File.separator + win + File.separator + tessdata;
             }
         }
-        return appBuilder + File.separator + tessdata;
+        return getAppResourcePath(tessdata);
     }
 
 }

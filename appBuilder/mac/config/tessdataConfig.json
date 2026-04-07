@@ -1,0 +1,50 @@
+[
+  {
+    "active": true,
+    "index": 1,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/chi_sim.traineddata",
+    "remark": "简体中文(横向)"
+  },
+  {
+    "active": false,
+    "index": 2,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/eng.traineddata",
+    "remark": "英文"
+  },
+  {
+    "active": false,
+    "index": 3,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/chi_tra.traineddata",
+    "remark": "繁体中文(横向)"
+  },
+  {
+    "active": false,
+    "index": 4,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/chi_sim_vert.traineddata",
+    "remark": "简体中文(纵向)"
+  },
+  {
+    "active": false,
+    "index": 5,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/jpn.traineddata",
+    "remark": "日语(横向)"
+  },
+  {
+    "active": false,
+    "index": 6,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/jpn_vert.traineddata",
+    "remark": "日语(纵向)"
+  },
+  {
+    "active": false,
+    "index": 7,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/chi_tra_vert.traineddata",
+    "remark": "繁体中文(纵向)"
+  },
+  {
+    "active": true,
+    "index": 8,
+    "path": "/Users/applesaucepenguin/IdeaProjects/pmc/appBuilder/mac/tessdata/osd.traineddata",
+    "remark": "文字方向检测器"
+  }
+]
