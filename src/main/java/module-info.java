@@ -51,4 +51,5 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.Bean.DTO;
     exports priv.koishi.pmc.Listener;
     exports priv.koishi.pmc.Callback;
+    exports priv.koishi.pmc.UI.CustomMessageBubble;
 }

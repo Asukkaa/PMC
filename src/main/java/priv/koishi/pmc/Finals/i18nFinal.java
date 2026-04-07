@@ -1245,6 +1245,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 已复制：
+     */
+    public static String text_copied() {
+        return bundle.getString("copied");
+    }
+
+    /**
      * @return 保存成功
      */
     public static String text_successSave() {
@@ -2613,6 +2620,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 复制选中文本
+     */
+    public static String tessdata_copyText() {
+        return bundle.getString("tessdata.copyText");
+    }
+
+    /**
+     * @return 移动鼠标到选中坐标
+     */
+    public static String tessdata_moveMouse() {
+        return bundle.getString("tessdata.moveMouse");
+    }
+
+    /**
      * @return 列表为空
      */
     public static String listText_dataListNull() {
@@ -3313,7 +3334,7 @@ public class i18nFinal {
     }
 
     /**
-     * @return 下下载更新失败，HTTP代码:
+     * @return 下载更新失败，HTTP代码:
      */
     public static String update_downloadError() {
         return bundle.getString("update.downloadError");

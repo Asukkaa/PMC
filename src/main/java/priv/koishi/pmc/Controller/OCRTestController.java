@@ -1,8 +1,10 @@
 package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.robot.Robot;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.OCRDataBean;
@@ -10,10 +12,10 @@ import priv.koishi.pmc.Bean.OCRDataBean;
 import java.util.List;
 
 import static priv.koishi.pmc.Controller.AutoClickController.ocrTestStage;
-import static priv.koishi.pmc.Finals.i18nFinal.tip_removeAll_Log;
-import static priv.koishi.pmc.Finals.i18nFinal.unit_data;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.Utils.UiUtils.copyText;
 import static priv.koishi.pmc.Utils.UiUtils.manuallyChangeThemePane;
 
 /**
@@ -89,6 +91,57 @@ public class OCRTestController extends ManuallyChangeThemeController {
     }
 
     /**
+     * 构建右键菜单
+     */
+    private void buildContextMenu() {
+        // 添加列表右键菜单
+        ContextMenu tableMenu = new ContextMenu();
+        // 复制选择文本选项
+        buildCopyTextMenu(tableMenu);
+        // 移动鼠标到选中坐标选项
+        buildMoveMouseMenu(tableMenu);
+        // 移动所选行选项
+        buildMoveDataMenu(tableView_Tes, tableMenu);
+        // 取消选中选项
+        buildClearSelectedMenu(tableView_Tes, tableMenu);
+        // 为列表添加右键菜单并设置可选择多行
+        setContextMenu(tableMenu, tableView_Tes);
+    }
+
+    /**
+     * 复制选择文本选项
+     *
+     * @param contextMenu 右键菜单
+     */
+    private void buildCopyTextMenu(ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem(tessdata_copyText());
+        menuItem.setOnAction(_ -> {
+            ObservableList<OCRDataBean> selectedItems = tableView_Tes.getSelectionModel().getSelectedItems();
+            String text = selectedItems.getFirst().getText();
+            copyText(text, text_copied() + text);
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
+     * 移动鼠标到选中坐标选项
+     *
+     * @param contextMenu 右键菜单
+     */
+    private void buildMoveMouseMenu(ContextMenu contextMenu) {
+        MenuItem menuItem = new MenuItem(tessdata_moveMouse());
+        menuItem.setOnAction(_ -> {
+            ObservableList<OCRDataBean> selectedItems = tableView_Tes.getSelectionModel().getSelectedItems();
+            OCRDataBean first = selectedItems.getFirst();
+            int x = Integer.parseInt(first.getX());
+            int y = Integer.parseInt(first.getY());
+            Robot robot = new Robot();
+            Platform.runLater(() -> robot.mouseMove(x, y));
+        });
+        contextMenu.getItems().add(menuItem);
+    }
+
+    /**
      * 手动处理主题切换
      */
     @Override
@@ -115,6 +168,10 @@ public class OCRTestController extends ManuallyChangeThemeController {
             addToolTip(tip_removeAll_Log(), removeAll_Tes);
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Tes, OCRDataBean.class, tabId, index_Tes);
+            // 设置列表通过拖拽排序行
+            tableViewDragRow(tableView_Tes);
+            // 构建右键菜单
+            buildContextMenu();
         });
     }
 

@@ -180,6 +180,16 @@ public class ClickDetailController extends RootController {
     private Task<Void> loadImgTask;
 
     /**
+     * 文字识别测试任务
+     */
+    private Task<List<OCRDataBean>> ocrTest;
+
+    /**
+     * 消息气泡
+     */
+    private MessageBubble messageBubble;
+
+    /**
      * 修改内容变化标志监听器（滑块组件专用）
      */
     private final Map<Object, WeakReference<ChangeListener<?>>> weakChangeListeners = new WeakHashMap<>();
@@ -213,6 +223,11 @@ public class ClickDetailController extends RootController {
      * 正在录制标识
      */
     public boolean recordClicking;
+
+    /**
+     * 正在测试文字识别标识
+     */
+    public boolean ocrTesting;
 
     /**
      * 组合键轨迹
@@ -1128,10 +1143,19 @@ public class ClickDetailController extends RootController {
         }
         if (loadImgTask != null && loadImgTask.isRunning()) {
             loadImgTask.cancel();
+            loadImgTask = null;
+        }
+        if (ocrTest != null && ocrTest.isRunning()) {
+            ocrTest.cancel();
+            ocrTest = null;
         }
         if (colorPickerFloating != null) {
             colorPickerFloating.close();
             colorPickerFloating = null;
+        }
+        if (messageBubble != null) {
+            messageBubble.closeBubble();
+            messageBubble = null;
         }
         if (stage != null) {
             stage.close();
@@ -1375,9 +1399,6 @@ public class ClickDetailController extends RootController {
      * 开启全局组合键监听
      */
     private void startNativeCombinationsListener() {
-        // 移除之前的监听器
-        removeNativeListener(listener);
-        removeNativeListener(nativeKeyListener);
         startNativeKeyListener();
         listener = initUnifiedInputRecordListener();
         // 启动录制
@@ -1423,7 +1444,7 @@ public class ClickDetailController extends RootController {
             @Override
             public void nativeKeyPressed(NativeKeyEvent e) {
                 Platform.runLater(() -> {
-                    // 仅在录制情况下才监听键盘
+                    // 处理键盘输入录制
                     if (recordClicking) {
                         keyCode = e.getKeyCode();
                         // 处理右 shift
@@ -1437,6 +1458,16 @@ public class ClickDetailController extends RootController {
                                 recordClicking = false;
                                 removeNativeListener(nativeKeyListener);
                             }
+                        }
+                        // 终止文字识别测试
+                    } else if (ocrTesting) {
+                        int k = e.getKeyCode();
+                        k = (k == R_SHIFT) ? NativeKeyEvent.VC_SHIFT : k;
+                        if (k == cancelKey) {
+                            ocrTest.cancel();
+                            messageBubble.closeBubble();
+                            ocrTesting = false;
+                            removeNativeListener(nativeKeyListener);
                         }
                     }
                 });
@@ -2491,12 +2522,8 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void testOCR() {
-        ObservableList<TessdataBean> tessdataBeans = tessdataTableView_det.getItems();
-        FindPositionConfig config = new FindPositionConfig()
-                .setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
-                .setFloatingWindowConfig(clickFloating.getConfig())
-                .setTessdata(tessdataBeans);
-        Task<List<OCRDataBean>> ocrTest = ocrTest(config);
+        startNativeKeyListener();
+        ocrTesting = true;
         // 改变要防重复点击的组件状态
         Parent root = stage.getScene().getRoot();
         root.setDisable(true);
@@ -2506,8 +2533,16 @@ public class ClickDetailController extends RootController {
         // 获取准备时间值
         int preparation = setDefaultIntValue(settingController.findWindowWait_Set,
                 Integer.parseInt(defaultPreparationRecord), 0, null);
-        String text = preparation + tessdata_preparation();
-        MessageBubble messageBubble = new MessageBubble(text, 0);
+        String text = preparation + tessdata_preparation() + "\n" + text_cancelTask();
+        messageBubble = new MessageBubble(text, 0);
+        ObservableList<TessdataBean> tessdataBeans = tessdataTableView_det.getItems();
+        updateFloatingWindowConfig(clickFindImgType_Det, clickRegionInfoHBox_Det, clickRegionHBox_Det,
+                clickWindowInfoHBox_Det, clickFloating, clickWindowMonitor, true);
+        FindPositionConfig config = new FindPositionConfig()
+                .setRecognitionType(RecognitionTypeEnum.TEXT.ordinal())
+                .setFloatingWindowConfig(clickFloating.getConfig())
+                .setTessdata(tessdataBeans);
+        ocrTest = ocrTest(config);
         ocrTest.setOnSucceeded(_ -> {
             messageBubble.updateBubble(tessdata_success(), 2);
             root.setDisable(false);
@@ -2516,11 +2551,34 @@ public class ClickDetailController extends RootController {
                 showTest();
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } finally {
+                ocrTest = null;
+                removeNativeListener(nativeKeyListener);
+                ocrTesting = false;
             }
         });
-        ocrTest.setOnFailed(_ -> {
+        ocrTest.setOnFailed(event -> {
             root.setDisable(false);
+            messageBubble.updateBubble(text_taskFailed(), 2);
+            removeNativeListener(nativeKeyListener);
             ocrDataBeans.clear();
+            ocrTest = null;
+            ocrTesting = false;
+            if (stage.isIconified()) {
+                showStage(stage);
+            }
+            throw new RuntimeException(event.getSource().getException());
+        });
+        ocrTest.setOnCancelled(_ -> {
+            messageBubble.updateBubble(text_taskCancelled(), 2);
+            removeNativeListener(nativeKeyListener);
+            ocrDataBeans.clear();
+            root.setDisable(false);
+            ocrTest = null;
+            ocrTesting = false;
+            if (stage.isIconified()) {
+                showStage(stage);
+            }
         });
         executeRunTimeLine(preparation, ocrTest, messageBubble);
     }
@@ -2535,7 +2593,7 @@ public class ClickDetailController extends RootController {
     private void executeRunTimeLine(int preparation, Task<List<OCRDataBean>> ocrTest, MessageBubble messageBubble) {
         if (preparation == 0) {
             if (!ocrTest.isRunning()) {
-                messageBubble.updateText(tessdata_testing());
+                messageBubble.updateText(tessdata_testing() + "\n" + text_cancelTask());
                 // 使用新线程启动
                 new Thread(ocrTest).start();
             }
@@ -2547,13 +2605,13 @@ public class ClickDetailController extends RootController {
         runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
             preparationTime.getAndDecrement();
             if (preparationTime.get() > 0) {
-                String text = preparationTime + tessdata_preparation();
+                String text = preparationTime + tessdata_preparation() + "\n" + text_cancelTask();
                 messageBubble.updateText(text);
             } else {
                 // 停止 Timeline
                 finalTimeline.stop();
                 if (!ocrTest.isRunning()) {
-                    messageBubble.updateText(tessdata_testing());
+                    messageBubble.updateText(tessdata_testing() + "\n" + text_cancelTask());
                     // 使用新线程启动
                     new Thread(ocrTest).start();
                 }

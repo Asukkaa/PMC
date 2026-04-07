@@ -165,6 +165,11 @@ public class SettingController extends RootController implements MousePositionUp
     private final List<Node> shortcutDisableNodes = new ArrayList<>();
 
     /**
+     * 执行 tessdata 相关任务时要防重复点击的组件
+     */
+    private final List<Node> tessdataDisableNodes = new ArrayList<>();
+
+    /**
      * 窗口进程地址
      */
     private String clickWindowPath, stopWindowPath;
@@ -216,7 +221,7 @@ public class SettingController extends RootController implements MousePositionUp
 
     @FXML
     public Button messageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
-            clickWindow_Set, stopWindow_Set, removeRecordKey_Det, removeRunKey_Det, getColor_Set, tessdataBtn_set,
+            clickWindow_Set, stopWindow_Set, removeRecordKey_Set, removeRunKey_Set, getColor_Set, tessdataBtn_set,
             selectBtn_set, downloadBtn_set;
 
     @FXML
@@ -537,7 +542,7 @@ public class SettingController extends RootController implements MousePositionUp
                 record.append(getKeyText(key)).append(" ");
             }
             updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, record.toString(), true);
-            removeRecordKey_Det.setVisible(true);
+            removeRecordKey_Set.setVisible(true);
         } else {
             updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_unSetKeyboard(), false);
         }
@@ -552,7 +557,7 @@ public class SettingController extends RootController implements MousePositionUp
                 run.append(getKeyText(key)).append(" ");
             }
             updateKeyboardLabel(runKey_Set, runKeyHBox_Set, run.toString(), true);
-            removeRunKey_Det.setVisible(true);
+            removeRunKey_Set.setVisible(true);
         } else {
             updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_unSetKeyboard(), false);
         }
@@ -770,7 +775,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(titleCoordinate_Set.getText(), titleCoordinate_Set);
         addToolTip(tip_autoSave() + autoSavePMCFileName(), autoSavePMC_Set);
         addToolTip(tip_allRegion(), clickAllRegion_Set, stopAllRegion_Set);
-        addToolTip(text_deleteKey(), removeRecordKey_Det, removeRunKey_Det);
+        addToolTip(text_deleteKey(), removeRecordKey_Set, removeRunKey_Set);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
@@ -920,21 +925,21 @@ public class SettingController extends RootController implements MousePositionUp
         baseDisableNodes.add(reLaunch_Set);
         baseDisableNodes.add(removeAll_Set);
         baseDisableNodes.add(tableView_Set);
-        baseDisableNodes.add(selectBtn_set);
         baseDisableNodes.add(nextGcType_Set);
         baseDisableNodes.add(stopImgBtn_Set);
         baseDisableNodes.add(stopWindow_Set);
         baseDisableNodes.add(runKeyHBox_Set);
         baseDisableNodes.add(clickWindow_Set);
-        baseDisableNodes.add(tessdataBtn_set);
-        baseDisableNodes.add(downloadBtn_set);
-        baseDisableNodes.add(removeRunKey_Det);
+        baseDisableNodes.add(removeRunKey_Set);
         baseDisableNodes.add(recordKeyHBox_Set);
         baseDisableNodes.add(cancelKeyHBox_Set);
+        tessdataDisableNodes.add(selectBtn_set);
         baseDisableNodes.add(stopWindowInfo_Set);
-        baseDisableNodes.add(removeRecordKey_Det);
+        baseDisableNodes.add(removeRecordKey_Set);
         baseDisableNodes.add(clickWindowInfo_Set);
-        baseDisableNodes.add(tessdataTableView_set);
+        tessdataDisableNodes.add(tessdataBtn_set);
+        tessdataDisableNodes.add(downloadBtn_set);
+        tessdataDisableNodes.add(tessdataTableView_set);
         Node aboutTab = mainScene.lookup("#aboutTab");
         baseDisableNodes.add(aboutTab);
         Node settingTab = mainScene.lookup("#settingTab");
@@ -1031,10 +1036,10 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private TaskBean<TessdataBean> creatTessdatTaskBean() {
         TaskBean<TessdataBean> taskBean = new TaskBean<>();
-        taskBean.setMessageLabel(tessdataNumber_set)
-                .setTableView(tessdataTableView_set)
-                .setProgressBar(tessdataProgressBar_set)
-                .setDisableNodes(windowInfoDisableNodes);
+        taskBean.setProgressBar(tessdataProgressBar_set)
+                .setDisableNodes(tessdataDisableNodes)
+                .setMessageLabel(tessdataNumber_set)
+                .setTableView(tessdataTableView_set);
         return taskBean;
     }
 
@@ -1457,12 +1462,12 @@ public class SettingController extends RootController implements MousePositionUp
             setNodeDisable(stopWindow_Set, true, tip_NativeHookException());
             setNodeDisable(clickWindow_Set, true, tip_NativeHookException());
             setNodeDisable(clickRegion_Set, true, tip_NativeHookException());
-            setNodeDisable(removeRunKey_Det, true, tip_NativeHookException());
+            setNodeDisable(removeRunKey_Set, true, tip_NativeHookException());
             setNodeDisable(recordKeyHBox_Set, true, tip_NativeHookException());
             setNodeDisable(cancelKeyHBox_Set, true, tip_NativeHookException());
             setNodeDisable(stopWindowInfo_Set, true, tip_NativeHookException());
             setNodeDisable(clickWindowInfo_Set, true, tip_NativeHookException());
-            setNodeDisable(removeRecordKey_Det, true, tip_NativeHookException());
+            setNodeDisable(removeRecordKey_Set, true, tip_NativeHookException());
         }
         startUpdateTessdataTask();
     }
@@ -1697,9 +1702,9 @@ public class SettingController extends RootController implements MousePositionUp
                             updateKeyboardLabel(keyLabel, keyHBox, text_unSetKeyboard(), false);
                         } else {
                             if (keyLabel == recordKey_Set) {
-                                removeRecordKey_Det.setVisible(true);
+                                removeRecordKey_Set.setVisible(true);
                             } else if (keyLabel == runKey_Set) {
-                                removeRunKey_Det.setVisible(true);
+                                removeRunKey_Set.setVisible(true);
                             }
                             updateKeyboardLabel(keyLabel, keyHBox, keys, true);
                         }
@@ -2639,7 +2644,7 @@ public class SettingController extends RootController implements MousePositionUp
             updateKeyboardLabel(recordKey_Set, recordKeyHBox_Set, text_setKeyboard(), false);
             addToolTip(null, recordKeyHBox_Set);
             startNativeCombinationsListener(recordKey_Set, recordKeyHBox_Set, key_recordKey);
-            removeRecordKey_Det.setVisible(false);
+            removeRecordKey_Set.setVisible(false);
         }
     }
 
@@ -2659,7 +2664,7 @@ public class SettingController extends RootController implements MousePositionUp
             updateKeyboardLabel(runKey_Set, runKeyHBox_Set, text_setKeyboard(), false);
             addToolTip(null, runKeyHBox_Set);
             startNativeCombinationsListener(runKey_Set, runKeyHBox_Set, key_runKey);
-            removeRunKey_Det.setVisible(false);
+            removeRunKey_Set.setVisible(false);
         }
     }
 
@@ -2675,7 +2680,7 @@ public class SettingController extends RootController implements MousePositionUp
         updateProperties(configFile, key_recordKey, "");
         String toolTip = tip_recordClick() + "\n" + text_shortcut() + text_unSetKeyboard();
         addToolTip(toolTip, autoClickController.recordClick_Click);
-        removeRecordKey_Det.setVisible(false);
+        removeRecordKey_Set.setVisible(false);
     }
 
     /**
@@ -2690,7 +2695,7 @@ public class SettingController extends RootController implements MousePositionUp
         updateProperties(configFile, key_runKey, "");
         String toolTip = tip_runClick() + "\n" + text_shortcut() + text_unSetKeyboard();
         addToolTip(toolTip, autoClickController.runClick_Click);
-        removeRunKey_Det.setVisible(false);
+        removeRunKey_Set.setVisible(false);
     }
 
     /**

@@ -758,7 +758,7 @@
                             <Label fx:id="recordKey_Set" textFill="red" text="%unSetKeyboard"/>
                         </HBox>
 
-                        <Button fx:id="removeRecordKey_Det" onAction="#removeRecordKey" prefHeight="20"
+                        <Button fx:id="removeRecordKey_Set" onAction="#removeRecordKey" prefHeight="20"
                                 styleClass="img-button-style" visible="false">
                             <graphic>
                                 <ImageView>
@@ -777,7 +777,7 @@
                             <Label fx:id="runKey_Set" textFill="red" text="%unSetKeyboard"/>
                         </HBox>
 
-                        <Button fx:id="removeRunKey_Det" onAction="#removeRunKey" prefHeight="20"
+                        <Button fx:id="removeRunKey_Set" onAction="#removeRunKey" prefHeight="20"
                                 styleClass="img-button-style" visible="false">
                             <graphic>
                                 <ImageView>

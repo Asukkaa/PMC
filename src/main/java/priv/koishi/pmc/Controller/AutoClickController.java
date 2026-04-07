@@ -1458,6 +1458,8 @@ public class AutoClickController extends RootController implements MousePosition
 
     /**
      * 开启全局键盘监听
+     *
+     * @param taskBean 任务参数
      */
     private void startNativeKeyListener(AutoClickTaskBean taskBean) {
         removeNativeListener(nativeKeyListener);

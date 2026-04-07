@@ -703,6 +703,16 @@ public class UiUtils {
      * @param value 要复制的文本
      */
     public static void copyText(String value) {
+        copyText(value, text_copySuccess());
+    }
+
+    /**
+     * 复制文本
+     *
+     * @param value   要复制的文本
+     * @param message 复制成功后到提示信息
+     */
+    public static void copyText(String value, String message) {
         // 获取当前系统剪贴板
         Clipboard clipboard = Clipboard.getSystemClipboard();
         // 创建剪贴板内容对象
@@ -712,7 +722,7 @@ public class UiUtils {
         // 设置剪贴板内容
         clipboard.setContent(content);
         // 复制成功消息气泡
-        new MessageBubble(text_copySuccess(), 2);
+        new MessageBubble(message, 2);
     }
 
     /**
