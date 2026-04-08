@@ -28,39 +28,39 @@ public class PMCListBean extends BaseCopyBean implements Indexable, FilePath {
      * 唯一标识符
      */
     @JsonIgnore
-    String uuid = UUID.randomUUID().toString();
+    private String uuid = UUID.randomUUID().toString();
 
     /**
      * 序号
      */
     @JsonIgnore
-    Integer index;
+    private Integer index;
 
     /**
      * PMC 文件名称
      */
-    String name;
+    private String name;
 
     /**
      * PMC 文件地址
      */
-    String path;
+    private String path;
 
     /**
      * 运行次数
      */
-    String runNum = "1";
+    private String runNum = "1";
 
     /**
      * 文件执行前等待时间（单位毫秒）
      */
-    String waitTime = "0";
+    private String waitTime = "0";
 
     /**
      * PMC 文件解析后的数据
      */
     @JsonIgnore
-    List<ClickPositionVO> clickPositionVOS;
+    private List<ClickPositionVO> clickPositionVOS;
 
     /**
      * 为列表数据设置序号接口

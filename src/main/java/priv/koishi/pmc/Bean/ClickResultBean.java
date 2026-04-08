@@ -19,11 +19,11 @@ public class ClickResultBean {
     /**
      * 要跳转的步骤索引，0 为不跳转，-1 为再次执行，-2 按设置操作直到图像出现
      */
-    int stepIndex;
+    private int stepIndex;
 
     /**
      * 操作日志
      */
-    List<ClickLogBean> clickLogs;
+    private List<ClickLogBean> clickLogs;
 
 }

@@ -15,31 +15,31 @@ public class CheckUpdateBean {
     /**
      * 版本号
      */
-    String version;
+    private String version;
 
     /**
      * 构建日期
      */
-    String buildDate;
+    private String buildDate;
 
     /**
      * 更新内容
      */
-    String whatsNew;
+    private String whatsNew;
 
     /**
      * 阿里云下载链接
      */
-    String aliyunFileLink;
+    private String aliyunFileLink;
 
     /**
      * 支付宝云下载链接
      */
-    String alipayFileLink;
+    private String alipayFileLink;
 
     /**
      * 是否全量更新（true-全量更新 false-增量更新）
      */
-    boolean fullUpdate;
+    private boolean fullUpdate;
 
 }

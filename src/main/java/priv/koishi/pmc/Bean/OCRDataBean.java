@@ -20,33 +20,33 @@ public class OCRDataBean implements Indexable {
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * 识别到的文本
      */
-    String text;
+    private String text;
 
     /**
      * 文本 X 坐标
      */
-    String x;
+    private String x;
 
     /**
      * 文本 Y 坐标
      */
-    String y;
+    private String y;
 
     /**
      * 文字识别置信度
      */
-    float confidence;
+    private float confidence;
 
     /**
      * 文字识别置信度百分比
      */
     @Setter(AccessLevel.NONE)
-    String confidenceString;
+    private String confidenceString;
 
     /**
      * 获取文字识别置信度百分比

@@ -21,21 +21,21 @@ public class FileChooserConfig extends FileConfig {
     /**
      * 要更新的路径配置 key
      */
-    String pathKey;
+    private String pathKey;
 
     /**
      * 要更新的路径配置配置文件地址
      */
-    String configPath;
+    private String configPath;
 
     /**
      * 文件选择器窗口标题
      */
-    String title;
+    private String title;
 
     /**
      * 可选文件类型列表
      */
-    List<String> extensionFilter;
+    private List<String> extensionFilter;
 
 }

@@ -19,81 +19,81 @@ public class FileConfig {
     /**
      * 文件路径
      */
-    String path;
+    private String path;
 
     /**
      * 查询隐藏文件设置
      */
-    String showHideFile;
+    private String showHideFile;
 
     /**
      * 查询文件夹设置
      */
-    String showDirectory;
+    private String showDirectory;
 
     /**
      * 递归查询设置（true-开启递归，默认禁用）
      */
-    boolean recursion;
+    private boolean recursion;
 
     /**
      * 展示文件拓展名设置（true-展示拓展名，默认禁用）
      */
-    boolean showFileType;
+    private boolean showFileType;
 
     /**
      * 文件类型过滤
      */
-    List<String> filterExtensionList;
+    private List<String> filterExtensionList;
 
     /**
      * 最大图片匹配数
      */
-    int maxImgNum;
+    private int maxImgNum;
 
     /**
      * 文件名称分割符
      */
-    String subCode;
+    private String subCode;
 
     /**
      * 文件名称筛选类型
      */
-    String fileNameType;
+    private String fileNameType;
 
     /**
      * 文件名称筛选字符串
      */
-    String fileNameFilter;
+    private String fileNameFilter;
 
     /**
      * 反向过滤文件名查询条件（true-反转查询，默认禁用）
      */
-    boolean reverseFileName;
+    private boolean reverseFileName;
 
     /**
      * 反向过滤文件类型查询条件（true-反转查询，默认禁用）
      */
-    boolean reverseFileType;
+    private boolean reverseFileType;
 
     /**
      * 文件名称筛选字符串大小写敏感（true-不区分大小写，默认禁用）
      */
-    boolean filterNameCase;
+    private boolean filterNameCase;
 
     /**
      * 文件排序方式
      */
-    String sortType;
+    private String sortType;
 
     /**
      * 反向排序（true-反转排序，默认禁用）
      */
-    boolean reverseSort;
+    private boolean reverseSort;
 
     /**
      * 不显示 .DS_Store 文件（true-不显示，默认启用）
      */
-    boolean noDS_Store = true;
+    private boolean noDS_Store = true;
 
 }

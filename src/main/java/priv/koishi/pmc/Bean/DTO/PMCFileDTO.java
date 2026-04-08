@@ -22,22 +22,22 @@ public class PMCFileDTO {
     /**
      * 文件拓展名
      */
-    String ext = CommonFinals.PMC;
+    private String ext = CommonFinals.PMC;
 
     /**
      * PMC 文件版本
      */
-    String version = CommonFinals.PMCFileVersion;
+    private String version = CommonFinals.PMCFileVersion;
 
     /**
      * 程序名称
      */
-    String appName = CommonFinals.appName;
+    private String appName = CommonFinals.appName;
 
     /**
      * 脚本内容
      */
     @JsonSerialize(contentAs = ClickPositionBean.class)
-    List<ClickPositionBean> pmcList;
+    private List<ClickPositionBean> pmcList;
 
 }

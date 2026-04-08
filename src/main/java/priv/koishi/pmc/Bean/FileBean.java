@@ -16,36 +16,36 @@ public class FileBean implements FilePath {
     /**
      * 文件列表展示名称
      */
-    String name;
+    private String name;
 
     /**
      * 文件列表展示路径
      */
-    String path;
+    private String path;
 
     /**
      * 文件列表展示文件拓展名
      */
-    String fileType;
+    private String fileType;
 
     /**
      * 文件列表展示文件大小
      */
-    String size;
+    private String size;
 
     /**
      * 文件创建时间
      */
-    String creatDate;
+    private String creatDate;
 
     /**
      * 文件修改时间
      */
-    String updateDate;
+    private String updateDate;
 
     /**
      * 文件是否隐藏
      */
-    String showStatus;
+    private String showStatus;
 
 }

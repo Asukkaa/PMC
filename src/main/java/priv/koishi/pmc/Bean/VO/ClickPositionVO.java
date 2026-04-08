@@ -30,32 +30,32 @@ public class ClickPositionVO extends ClickPositionBean implements Indexable, Img
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * 上次所选要点击的图片路径
      */
-    String clickImgSelectPath;
+    private String clickImgSelectPath;
 
     /**
      * 上次所选终止操作的图片路径
      */
-    String stopImgSelectPath;
+    private String stopImgSelectPath;
 
     /**
      * 详情页删除标志
      */
-    boolean remove;
+    private boolean remove;
 
     /**
      * 缩略图
      */
-    Image thumb;
+    private Image thumb;
 
     /**
      * 要显示缩略图的列表
      */
-    TableView<ClickPositionVO> tableView;
+    private TableView<ClickPositionVO> tableView;
 
     /**
      * 加载缩略图线程

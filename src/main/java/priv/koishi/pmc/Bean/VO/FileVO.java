@@ -30,17 +30,17 @@ public class FileVO extends FileBean implements Indexable, ImgBean {
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * 缩略图
      */
-    Image thumb;
+    private Image thumb;
 
     /**
      * 要显示缩略图的列表
      */
-    TableView<FileVO> tableView;
+    private TableView<FileVO> tableView;
 
     /**
      * 加载缩略图线程

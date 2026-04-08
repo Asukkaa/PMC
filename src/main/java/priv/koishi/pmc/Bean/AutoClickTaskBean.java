@@ -22,96 +22,96 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
     /**
      * 自动点击任务循环次数
      */
-    int loopTimes;
+    private int loopTimes;
 
     /**
      * 执行自动流程前点击第一个起始坐标
      */
-    boolean firstClick;
+    private boolean firstClick;
 
     /**
      * 执行自动操作时的信息输出栏
      */
-    FloatingWindowDescriptor messageFloating;
+    private FloatingWindowDescriptor messageFloating;
 
     /**
      * 运行时间线
      */
-    Timeline runTimeline;
+    private Timeline runTimeline;
 
     /**
      * 匹配失败后重试时间间隔
      */
-    int retrySecondValue;
+    private int retrySecondValue;
 
     /**
      * 单次匹配最大时间
      */
-    int overTimeValue;
+    private int overTimeValue;
 
     /**
      * 运行自动流程时记录点击信息
      */
-    boolean clickLog;
+    private boolean clickLog;
 
     /**
      * 运行自动流程时记录移动轨迹
      */
-    boolean moveLog;
+    private boolean moveLog;
 
     /**
      * 运行自动流程时记录拖拽轨迹
      */
-    boolean dragLog;
+    private boolean dragLog;
 
     /**
      * 运行自动流程时记目标图像识别
      */
-    boolean clickImgLog;
+    private boolean clickImgLog;
 
     /**
      * 运行自动流程时记终止图像识别
      */
-    boolean stopImgLog;
+    private boolean stopImgLog;
 
     /**
      * 运行自动流程时记录等待信息
      */
-    boolean waitLog;
+    private boolean waitLog;
 
     /**
      * 运行自动流程时记录打开文件事件
      */
-    boolean openFileLog;
+    private boolean openFileLog;
 
     /**
      * 运行自动流程时记录运行脚本事件
      */
-    boolean runScriptLog;
+    private boolean runScriptLog;
 
     /**
      * 运行自动流程时记录打开网址事件
      */
-    boolean openUrlLog;
+    private boolean openUrlLog;
 
     /**
      * 运行自动流程时记录鼠标滚轮滚动
      */
-    boolean mouseWheelLog;
+    private boolean mouseWheelLog;
 
     /**
      * 运行自动流程时记录键盘事件
      */
-    boolean keyboardLog;
+    private boolean keyboardLog;
 
     /**
      * 运行自动流程时记录窗口移动事件
      */
-    boolean moveWindowLog;
+    private boolean moveWindowLog;
 
     /**
      * 最大记录数量
      */
-    int maxLogNum;
+    private int maxLogNum;
 
 }

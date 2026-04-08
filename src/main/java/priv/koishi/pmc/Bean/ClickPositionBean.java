@@ -39,272 +39,272 @@ public class ClickPositionBean extends BaseCopyBean {
      * 唯一标识符
      */
     @JsonIgnore
-    String uuid = UUID.randomUUID().toString();
+    private String uuid = UUID.randomUUID().toString();
 
     /**
      * 操作名称
      */
-    String name;
+    private String name;
 
     /**
      * 起始横（X）坐标
      */
-    String startX = "0";
+    private String startX = "0";
 
     /**
      * 起始纵（Y）坐标
      */
-    String startY = "0";
+    private String startY = "0";
 
     /**
      * 相对横（X）坐标
      */
-    String relativeX;
+    private String relativeX;
 
     /**
      * 相对纵（Y）坐标
      */
-    String relativeY;
+    private String relativeY;
 
     /**
      * 是否启用相对坐标（true 启用，默认禁用）
      */
-    boolean useRelative;
+    private boolean useRelative;
 
     /**
      * 操作时长（单位：毫秒）
      */
-    String clickTime;
+    private String clickTime;
 
     /**
      * 操作次数
      */
-    String clickNum = "1";
+    private String clickNum = "1";
 
     /**
      * 操作间隔时间（单位：毫秒）
      */
-    String clickInterval = "0";
+    private String clickInterval = "0";
 
     /**
      * 操作执行前等待时间（单位：毫秒）
      */
-    String waitTime = "0";
+    private String waitTime = "0";
 
     /**
      * 操作按键
      */
     @JsonIgnore
-    String clickKey;
+    private String clickKey;
 
     /**
      * 鼠标按键枚举值
      */
-    int mouseKeyEnum = NativeMouseEvent.BUTTON1;
+    private int mouseKeyEnum = NativeMouseEvent.BUTTON1;
 
     /**
      * 键盘按键枚举值
      */
-    int keyboardKeyEnum = noKeyboard;
+    private int keyboardKeyEnum = noKeyboard;
 
     /**
      * 目标图像（根据图像识别类型可以是：图片路径/颜色/文字）
      */
-    String clickImgTarget;
+    private String clickImgTarget;
 
     /**
      * 终止操作的图片
      */
     @JsonSerialize(contentAs = ImgFileBean.class)
-    List<ImgFileBean> stopImgFiles;
+    private List<ImgFileBean> stopImgFiles;
 
     /**
      * 要识别的图片识别匹配阈值
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
-    String clickMatchThreshold = defaultClickOpacity;
+    private String clickMatchThreshold = defaultClickOpacity;
 
     /**
      * 终止操作的图片识别匹配阈值
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
-    String stopMatchThreshold = defaultStopOpacity;
+    private String stopMatchThreshold = defaultStopOpacity;
 
     /**
      * 要识别的图片识别重试次数
      */
-    String clickRetryTimes = defaultClickRetryNum;
+    private String clickRetryTimes = defaultClickRetryNum;
 
     /**
      * 终止操作的图片识别重试次数
      */
-    String stopRetryTimes = defaultStopRetryNum;
+    private String stopRetryTimes = defaultStopRetryNum;
 
     /**
      * 要识别的图像识别重试设置
      */
     @JsonIgnore
-    String retryType;
+    private String retryType;
 
     /**
      * 要识别的图像识别重试设置枚举值
      */
-    int retryTypeEnum = RetryTypeEnum.STOP.ordinal();
+    private int retryTypeEnum = RetryTypeEnum.STOP.ordinal();
 
     /**
      * 要识别的图像识别失败后要跳转的步骤序号
      */
-    String retryStep;
+    private String retryStep;
 
     /**
      * 图像识别匹配逻辑
      */
     @JsonIgnore
-    String matchedType;
+    private String matchedType;
 
     /**
      * 图像识别匹配逻辑枚举值
      */
-    int matchedTypeEnum = MatchedTypeEnum.CLICK.ordinal();
+    private int matchedTypeEnum = MatchedTypeEnum.CLICK.ordinal();
 
     /**
      * 要识别的图像匹配成功后要跳转的步骤序号
      */
-    String matchedStep;
+    private String matchedStep;
 
     /**
      * 移动轨迹
      */
     @JsonSerialize(contentAs = TrajectoryPointBean.class)
-    List<TrajectoryPointBean> moveTrajectory = new CopyOnWriteArrayList<>();
+    private List<TrajectoryPointBean> moveTrajectory = new CopyOnWriteArrayList<>();
 
     /**
      * 轨迹采样间隔配置（单位：毫秒）
      */
     @JsonIgnore
-    int sampleInterval = Integer.parseInt(defaultSampleInterval);
+    private int sampleInterval = Integer.parseInt(defaultSampleInterval);
 
     /**
      * 操作类型
      */
     @JsonIgnore
-    String clickType;
+    private String clickType;
 
     /**
      * 操作类型枚举值
      */
-    int clickTypeEnum = ClickTypeEnum.CLICK.ordinal();
+    private int clickTypeEnum = ClickTypeEnum.CLICK.ordinal();
 
     /**
      * 横轴随机偏移量
      */
-    String randomX = defaultRandomClickX;
+    private String randomX = defaultRandomClickX;
 
     /**
      * 纵轴随机偏移量
      */
-    String randomY = defaultRandomClickY;
+    private String randomY = defaultRandomClickY;
 
     /**
      * 是否启用随机点击坐标（默认禁用）
      */
-    boolean randomClick;
+    private boolean randomClick;
 
     /**
      * 是否启用随机轨迹（默认禁用）
      */
-    boolean randomTrajectory;
+    private boolean randomTrajectory;
 
     /**
      * 随机偏移时长（单位：毫秒）
      */
-    String randomTime = defaultRandomTime;
+    private String randomTime = defaultRandomTime;
 
     /**
      * 是否启用随机点击时长（true 启用，默认禁用）
      */
-    boolean randomClickTime;
+    private boolean randomClickTime;
 
     /**
      * 是否启用随机等待时长（true 启用，默认禁用）
      */
-    boolean randomWaitTime;
+    private boolean randomWaitTime;
 
     /**
      * 是否启用随机点击间隔（true 启用，默认禁用）
      */
-    boolean randomClickInterval;
+    private boolean randomClickInterval;
 
     /**
      * 匹配图像坐标横轴偏移量
      */
-    String imgX = "0";
+    private String imgX = "0";
 
     /**
      * 匹配图像坐标纵轴偏移量
      */
-    String imgY = "0";
+    private String imgY = "0";
 
     /**
      * 要识别的图像区域设置
      */
-    FloatingWindowConfig clickWindowConfig;
+    private FloatingWindowConfig clickWindowConfig;
 
     /**
      * 终止操作图像区域设置
      */
-    FloatingWindowConfig stopWindowConfig;
+    private FloatingWindowConfig stopWindowConfig;
 
     /**
      * 要打开的路径
      */
-    String targetPath;
+    private String targetPath;
 
     /**
      * 脚本工作路径
      */
-    String workPath;
+    private String workPath;
 
     /**
      * 脚本参数
      */
-    String parameter;
+    private String parameter;
 
     /**
      * 是否启用脚本窗口最小化执行（true 启用，默认启用）
      */
-    boolean minScriptWindow = true;
+    private boolean minScriptWindow = true;
 
     /**
      * 是否启用不移动鼠标（true 启用，默认禁用）
      */
-    boolean noMove;
+    private boolean noMove;
 
     /**
      * 是否启用忽略移动窗口失败（true 启用，默认启用）
      */
-    boolean ignoreFailure = true;
+    private boolean ignoreFailure = true;
 
     /**
      * 是否启用忽略图片识别坐标（true 启用，默认禁用）
      */
-    boolean ignoreImg;
+    private boolean ignoreImg;
 
     /**
      * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
      */
-    int recognitionType = RecognitionTypeEnum.IMAGE.ordinal();
+    private int recognitionType = RecognitionTypeEnum.IMAGE.ordinal();
 
     /**
      * 颜色容差（0-255）
      */
-    String colorTolerance = String.valueOf(defaultColorTolerance);
+    private String colorTolerance = String.valueOf(defaultColorTolerance);
 
     /**
      * 文字识别模型设置
      */
     @JsonSerialize(contentAs = TessdataBean.class)
-    List<TessdataBean> tessdata;
+    private List<TessdataBean> tessdata;
 
     /**
      * 添加移动轨迹

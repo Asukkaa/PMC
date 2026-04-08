@@ -25,42 +25,42 @@ public class TrajectoryPointBean {
     /**
      * 轨迹点时间戳
      */
-    long timestamp;
+    private long timestamp;
 
     /**
      * 轨迹点横坐标
      */
-    int x;
+    private int x;
 
     /**
      * 轨迹点纵坐标
      */
-    int y;
+    private int y;
 
     /**
      * 轨迹点相对横（X）坐标
      */
-    String relativeX;
+    private String relativeX;
 
     /**
      * 轨迹点相对纵（Y）坐标
      */
-    String relativeY;
+    private String relativeY;
 
     /**
      * 按下的鼠标按键
      */
-    List<Integer> pressMouseKeys;
+    private List<Integer> pressMouseKeys;
 
     /**
      * 按下的键盘按键
      */
-    List<Integer> pressKeyboardKeys;
+    private List<Integer> pressKeyboardKeys;
 
     /**
      * 滑轮状态（负数上滑，正数下滑，0 为无滑动状态）
      */
-    int wheelRotation;
+    private int wheelRotation;
 
     /**
      * 换算绝对和相对坐标

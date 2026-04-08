@@ -22,32 +22,32 @@ public class PMCLogBean implements Indexable {
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * 操作时间
      */
-    String date = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+    private String date = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
     /**
      * 文件名称
      */
-    String name;
+    private String name;
 
     /**
      * 文件路径
      */
-    String path;
+    private String path;
 
     /**
      * 操作结果
      */
-    String result;
+    private String result;
 
     /**
      * 操作时长（单位毫秒）
      */
-    String time;
+    private String time;
 
     /**
      * 为列表数据设置序号接口

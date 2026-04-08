@@ -20,17 +20,17 @@ public class ImgFileBean implements FilePath {
     /**
      * 文件名称
      */
-    String name;
+    private String name;
 
     /**
      * 文件类型
      */
-    String type;
+    private String type;
 
     /**
      * 文件地址
      */
-    StringProperty path = new SimpleStringProperty();
+    private StringProperty path = new SimpleStringProperty();
 
     /**
      * 获取图片地址绑定

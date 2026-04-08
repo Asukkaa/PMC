@@ -18,11 +18,11 @@ public class MatchPointBean {
     /**
      * 图像识别匹配的坐标
      */
-    Point point;
+    private Point point;
 
     /**
      * 图像识别匹配值
      */
-    int matchThreshold;
+    private int matchThreshold;
 
 }

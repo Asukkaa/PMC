@@ -24,34 +24,34 @@ public class TessdataBean implements Indexable, FilePath {
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * tessdata 文件名称（不带拓展名）
      */
     @JsonIgnore
-    String name;
+    private String name;
 
     /**
      * tessdata 文件地址
      */
-    String path;
+    private String path;
 
     /**
      * tessdata 文件备注
      */
-    String remark;
+    private String remark;
 
     /**
      * 启用状态文本
      */
     @JsonIgnore
-    String state;
+    private String state;
 
     /**
      * 启用状态(true 启用模型，默认禁用)
      */
-    boolean active;
+    private boolean active;
 
     /**
      * 为列表数据设置序号接口

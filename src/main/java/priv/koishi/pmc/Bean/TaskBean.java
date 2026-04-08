@@ -23,36 +23,36 @@ public class TaskBean<T> {
     /**
      * 要处理的数据
      */
-    List<T> beanList;
+    private List<T> beanList;
 
     /**
      * 用来更新数据的列表
      */
-    TableView<T> tableView;
+    private TableView<T> tableView;
 
     /**
      * 线程进度条
      */
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
 
     /**
      * 线程信息栏
      */
-    Label messageLabel;
+    private Label messageLabel;
 
     /**
      * 页面标识符
      */
-    String tabId;
+    private String tabId;
 
     /**
      * 要防重复点击的组件
      */
-    List<Node> disableNodes;
+    private List<Node> disableNodes;
 
     /**
      * 是否绑定线程信息栏（true 绑定，false 不绑定）
      */
-    boolean bindingMessageLabel = true;
+    private boolean bindingMessageLabel = true;
 
 }

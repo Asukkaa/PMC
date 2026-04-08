@@ -22,61 +22,61 @@ public class FindPositionConfig {
     /**
      * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
      */
-    int recognitionType;
+    private int recognitionType;
 
     /**
      * 根据识别类型匹配要识别的图像路径/要识别的颜色/要识别的文字
      */
-    String template;
+    private String template;
 
     /**
      * 颜色容差（0-255）
      */
-    int colorTolerance = defaultColorTolerance;
+    private int colorTolerance = defaultColorTolerance;
 
     /**
      * 文字识别模型设置
      */
-    List<TessdataBean> tessdata;
+    private List<TessdataBean> tessdata;
 
     /**
      * 最大重试次数
      */
-    int maxRetry;
+    private int maxRetry;
 
     /**
      * 最低通过匹配度
      */
-    double matchThreshold;
+    private double matchThreshold;
 
     /**
      * 是否持续匹配
      */
-    boolean continuously;
+    private boolean continuously;
 
     /**
      * 匹配失败后重试时间间隔
      */
-    int retryWait;
+    private int retryWait;
 
     /**
      * 单次匹配最大时间
      */
-    int overTime;
+    private int overTime;
 
     /**
      * 操作名称
      */
-    String name;
+    private String name;
 
     /**
      * 图像识别设置
      */
-    FloatingWindowConfig floatingWindowConfig;
+    private FloatingWindowConfig floatingWindowConfig;
 
     /**
      * 当前识别次数
      */
-    int findTime;
+    private int findTime;
 
 }

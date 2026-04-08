@@ -15,16 +15,16 @@ public class UniCloudResponse {
     /**
      * 状态码
      */
-    int code;
+    private int code;
 
     /**
      * 检查更新数据类
      */
-    CheckUpdateBean data;
+    private CheckUpdateBean data;
 
     /**
      * 状态信息
      */
-    String message;
+    private String message;
 
 }

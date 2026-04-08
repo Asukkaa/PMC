@@ -19,72 +19,72 @@ public class WindowInfo {
     /**
      * 窗口唯一标识（Windows 为 HWND 的数值，macOS 为 CGWindowID）
      */
-    long windowId;
+    private long windowId;
 
     /**
      * 窗口横坐标
      */
-    int x;
+    private int x;
 
     /**
      * 窗口纵坐标
      */
-    int y;
+    private int y;
 
     /**
      * 窗口宽度
      */
-    int width;
+    private int width;
 
     /**
      * 窗口高度
      */
-    int height;
+    private int height;
 
     /**
      * 窗口进程 ID（-1 表示应用未启动）
      */
-    int pid = -1;
+    private int pid = -1;
 
     /**
      * 窗口层级
      */
-    int layer;
+    private int layer;
 
     /**
      * 窗口进程名称
      */
-    String processName;
+    private String processName;
 
     /**
      * 窗口进程路径
      */
-    String processPath;
+    private String processPath;
 
     /**
      * 窗口标题
      */
-    String title;
+    private String title;
 
     /**
      * 识别范围相对高度
      */
-    double relativeHeight = 1;
+    private double relativeHeight = 1;
 
     /**
      * 识别范围相对宽度
      */
-    double relativeWidth = 1;
+    private double relativeWidth = 1;
 
     /**
      * 识别范围相对纵坐标
      */
-    double relativeY;
+    private double relativeY;
 
     /**
      * 识别范围相对横坐标
      */
-    double relativeX;
+    private double relativeX;
 
     /**
      * 更新识别范围相对横坐标

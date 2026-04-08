@@ -22,47 +22,47 @@ public class ClickLogBean implements Indexable {
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * 操作时间
      */
-    String date = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+    private String date = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
     /**
      * 操作名称
      */
-    String name;
+    private String name;
 
     /**
      * 操作类型
      */
-    String type;
+    private String type;
 
     /**
      * 横坐标
      */
-    String X;
+    private String X;
 
     /**
      * 纵坐标
      */
-    String Y;
+    private String Y;
 
     /**
      * 操作时长
      */
-    String clickTime;
+    private String clickTime;
 
     /**
      * 操作按键
      */
-    String clickKey;
+    private String clickKey;
 
     /**
      * 操作结果
      */
-    String result;
+    private String result;
 
     /**
      * 为列表数据设置序号接口

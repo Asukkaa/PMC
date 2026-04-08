@@ -25,52 +25,52 @@ public class TimedTaskBean implements Indexable {
     /**
      * 序号
      */
-    Integer index;
+    private Integer index;
 
     /**
      * 任务名称
      */
-    String taskName;
+    private String taskName;
 
     /**
      * 起始日期
      */
-    String date;
+    private String date;
 
     /**
      * 触发时间
      */
-    String time;
+    private String time;
 
     /**
      * 重复类型
      */
-    String repeat;
+    private String repeat;
 
     /**
      * 重复日
      */
-    String days;
+    private String days;
 
     /**
      * 执行流程
      */
-    String name;
+    private String name;
 
     /**
      * 文件地址
      */
-    String path;
+    private String path;
 
     /**
      * 完整的时间信息
      */
-    LocalDateTime dateTime;
+    private LocalDateTime dateTime;
 
     /**
      * 设置的星期信息
      */
-    List<Integer> dayList;
+    private List<Integer> dayList;
 
     /**
      * 为列表数据设置序号接口
