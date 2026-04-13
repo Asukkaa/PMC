@@ -49,7 +49,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.04.08";
+    public static final String buildDate = "2026.04.13";
 
     /**
      * 文件后缀名：bat
@@ -287,7 +287,7 @@ public class CommonFinals {
     public static final String resourcesPath = "src/main/resources" + resourcePath;
 
     /**
-     * jpackage 打包后的资源文件路径
+     * Jpackage 打包后的资源文件路径
      */
     public static final String packagePath = "/bin/";
 
