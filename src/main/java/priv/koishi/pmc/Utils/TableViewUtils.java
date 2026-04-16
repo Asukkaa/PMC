@@ -720,7 +720,7 @@ public class TableViewUtils {
     private static void openDirectorMenuItem(TableView<? extends FilePath> tableView) {
         List<? extends FilePath> fileBeans = tableView.getSelectionModel().getSelectedItems();
         List<String> pathList = fileBeans.stream().map(FilePath::getPath).distinct().toList();
-        pathList.forEach(FileUtils::openDirectory);
+        pathList.forEach(FileUtils::openParentDirectory);
     }
 
     /**

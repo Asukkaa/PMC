@@ -188,7 +188,7 @@ public class FileUtils {
             if (isWin) {
                 processBuilder = new ProcessBuilder("explorer.exe", "/select,", openPath);
             } else {
-                processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
+                processBuilder = new ProcessBuilder("open", "-R", openPath);
             }
             try (Process process = processBuilder.start()) {
                 process.waitFor();
