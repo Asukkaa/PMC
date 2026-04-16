@@ -49,7 +49,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.04.14";
+    public static final String buildDate = "2026.04.16";
 
     /**
      * 文件后缀名：bat

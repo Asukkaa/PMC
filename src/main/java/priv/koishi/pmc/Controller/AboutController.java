@@ -407,7 +407,7 @@ public class AboutController extends RootController {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Appreciate-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root = loader.load();
-        Stage detailStage = new Stage();
+        Stage appreciateStage = new Stage();
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
@@ -415,12 +415,12 @@ public class AboutController extends RootController {
         double height = Double.parseDouble(prop.getProperty(key_appreciateHeight, "500"));
         input.close();
         Scene scene = new Scene(root, with, height);
-        detailStage.setScene(scene);
-        detailStage.setTitle(tip_appreciate());
-        detailStage.initModality(Modality.APPLICATION_MODAL);
-        detailStage.setResizable(false);
-        setWindowLogo(detailStage, logoPath);
-        detailStage.show();
+        appreciateStage.setScene(scene);
+        appreciateStage.setTitle(tip_appreciate());
+        appreciateStage.initModality(Modality.APPLICATION_MODAL);
+        appreciateStage.setResizable(false);
+        setWindowLogo(appreciateStage, logoPath);
+        appreciateStage.show();
         AutoClickController.isSonOpening = true;
     }
 

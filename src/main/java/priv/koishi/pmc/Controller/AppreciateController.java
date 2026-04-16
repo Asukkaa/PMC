@@ -35,7 +35,10 @@ public class AppreciateController extends ManuallyChangeThemeController {
         manuallyChangeTheme();
         Platform.runLater(() -> {
             Stage stage = (Stage) scrollPane_Ap.getScene().getWindow();
-            stage.setOnCloseRequest(_ -> AutoClickController.isSonOpening = false);
+            stage.setOnCloseRequest(_ -> {
+                removeController();
+                AutoClickController.isSonOpening = false;
+            });
         });
     }
 
