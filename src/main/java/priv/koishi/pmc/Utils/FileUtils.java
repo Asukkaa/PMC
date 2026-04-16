@@ -183,9 +183,10 @@ public class FileUtils {
             if (!file.exists()) {
                 throw new RuntimeException(text_fileNotExists());
             }
+            openPath = file.getAbsolutePath();
             ProcessBuilder processBuilder;
             if (isWin) {
-                processBuilder = new ProcessBuilder("cmd.exe", "/C", "explorer /select, " + openPath);
+                processBuilder = new ProcessBuilder("explorer.exe", "/select,", openPath);
             } else {
                 processBuilder = new ProcessBuilder("bash", "-c", "open -R " + "'" + openPath + "'");
             }
