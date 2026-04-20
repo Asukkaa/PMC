@@ -353,7 +353,7 @@ public class FileUtils {
      * 获取文件带拓展名的名称或文件夹的名称（文件可不存在，拓展名为小写）
      *
      * @param file 要获取文件名的文件
-     * @return 文件夹或不带拓展名的文件名称
+     * @return 文件夹或带拓展名的文件名称
      */
     public static String getFileFullName(File file) {
         String fileName = file.getName();
