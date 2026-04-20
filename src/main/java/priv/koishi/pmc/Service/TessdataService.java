@@ -117,22 +117,25 @@ public class TessdataService {
                     Map<String, TessdataBean> configMap = new HashMap<>();
                     for (int i = 0; i < configListSize; i++) {
                         TessdataBean config = configList.get(i);
-                        String path = config.getPath();
-                        if (path != null) {
-                            configMap.put(path, config);
+                        String name = config.getName();
+                        if (name != null) {
+                            configMap.put(name, config);
                         }
                         updateProgress(i + 1, configListSize);
                     }
                     // 根据配置排序
                     list.sort((a, b) -> {
-                        String pathA = a.getPath();
-                        String pathB = b.getPath();
-                        boolean inConfigA = configMap.containsKey(pathA);
-                        boolean inConfigB = configMap.containsKey(pathB);
+                        String nameA = a.getName();
+                        String nameB = b.getName();
+                        boolean inConfigA = configMap.containsKey(nameA);
+                        boolean inConfigB = configMap.containsKey(nameB);
                         if (inConfigA && inConfigB) {
                             // 两个都在配置中，按 index 升序
-                            return Integer.compare(configMap.get(pathA).getIndex(),
-                                    configMap.get(pathB).getIndex());
+                            int cmp = Integer.compare(configMap.get(nameA).getIndex(), configMap.get(nameB).getIndex());
+                            if (cmp != 0) {
+                                return cmp;
+                            }
+                            return nameA.compareTo(nameB);
                         } else if (inConfigA) {
                             // 只有 A 在配置中，A 排在前面
                             return -1;
@@ -149,9 +152,9 @@ public class TessdataService {
                     // 填充备注
                     for (int i = 0; i < listSize; i++) {
                         TessdataBean bean = list.get(i);
-                        String path = bean.getPath();
-                        if (configMap.containsKey(path)) {
-                            TessdataBean tessdataBean = configMap.get(path);
+                        String name = bean.getName();
+                        if (configMap.containsKey(name)) {
+                            TessdataBean tessdataBean = configMap.get(name);
                             bean.setRemark(tessdataBean.getRemark())
                                     .setActive(tessdataBean.isActive());
                         }

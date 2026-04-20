@@ -29,12 +29,12 @@ public class TessdataBean implements Indexable, FilePath {
     /**
      * tessdata 文件名称（不带拓展名）
      */
-    @JsonIgnore
     private String name;
 
     /**
      * tessdata 文件地址
      */
+    @JsonIgnore
     private String path;
 
     /**
