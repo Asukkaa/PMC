@@ -38,9 +38,9 @@ public class SingleInstanceGuard {
     /**
      * 单例应用实例锁文件名
      *
-     * <p>用于通过文件锁机制保证应用单实例运行的锁定文件名， 默认使用隐藏文件 .app_instance.lock</p>
+     * <p>用于通过文件锁机制保证应用单实例运行的锁定文件名</p>
      */
-    private static final String LOCK_FILE_NAME = ".app_instance.lock";
+    private static final String LOCK_FILE_NAME = ".PMC_instance.lock";
 
     /**
      * 心跳间隔时间（单位：毫秒）
