@@ -1310,10 +1310,10 @@ public class ClickDetailController extends RootController {
                                             WindowMonitor windowMonitor, boolean checkWindowInfo) {
         String value = findImgType.getValue();
         addValueToolTip(findImgType, tip_findImgType(), value);
+        hideNodes(true, regionHBox, windowInfoHBox);
         if (findImgType_region().equals(value)) {
             regionInfoHBox.setVisible(true);
-            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
-            regionInfoHBox.getChildren().add(regionHBox);
+            hideNodes(false, regionHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
@@ -1321,8 +1321,7 @@ public class ClickDetailController extends RootController {
             }
         } else if (findImgType_window().equals(value)) {
             regionInfoHBox.setVisible(true);
-            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
-            regionInfoHBox.getChildren().add(windowInfoHBox);
+            hideNodes(false, windowInfoHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
@@ -1337,7 +1336,6 @@ public class ClickDetailController extends RootController {
             }
         } else if (findImgType_all().equals(value)) {
             regionInfoHBox.setVisible(false);
-            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());
@@ -2019,40 +2017,31 @@ public class ClickDetailController extends RootController {
         addValueToolTip(clickType_Det, tip_clickType(), value);
         addValueToolTip(clickTypeText_Det, tip_clickType(), value);
         setPathLabel(link_Det, null);
-        vBox_Det.getChildren().clear();
-        vBox_Det.getChildren().add(commonVBox_Det);
-        typeHBox_Det.getChildren().removeAll(noMove_Det, testLink_Det);
+        hideNodes(true, noMove_Det, testLink_Det, pathLinkVBox_Det, clickVBox_Det);
         if (linkList.contains(value) || clickType_moveWindow().equals(value)) {
-            vBox_Det.getChildren().add(pathLinkVBox_Det);
-            typeHBox_Det.getChildren().add(testLink_Det);
-            testLink_Det.setVisible(true);
+            hideNodes(false, pathLinkVBox_Det, testLink_Det);
             resolution_Det.setVisible(false);
             randomClickInterval_Det.setVisible(false);
-            pathLinkVBox_Det.getChildren().removeAll(parameterHBox_Det, pathTip_Det, moveWindowHBox_Det);
-            pathLinkHBox_Det.getChildren().clear();
+            hideNodes(true, parameterHBox_Det, moveWindowHBox_Det, pathHBox_Det, urlHBox_Det);
             if (clickType_openFile().equals(value)) {
-                pathLinkVBox_Det.getChildren().add(pathTip_Det);
-                pathLinkHBox_Det.getChildren().add(pathHBox_Det);
+                hideNodes(false, pathHBox_Det);
                 workDirHBox_Det.setVisible(false);
                 pathTip_Det.setText(pathTip_openFile());
             } else if (clickType_runScript().equals(value)) {
-                pathLinkVBox_Det.getChildren().addAll(parameterHBox_Det, pathTip_Det);
-                pathLinkHBox_Det.getChildren().add(pathHBox_Det);
+                hideNodes(false, parameterHBox_Det, pathHBox_Det);
                 workDirHBox_Det.setVisible(true);
                 pathTip_Det.setText(pathTip_runScript());
             } else if (clickType_openUrl().equals(value)) {
-                pathLinkVBox_Det.getChildren().add(pathTip_Det);
-                pathLinkHBox_Det.getChildren().add(urlHBox_Det);
+                hideNodes(false, urlHBox_Det);
                 pathTip_Det.setText(pathTip_openUrl());
             } else if (clickType_moveWindow().equals(value)) {
-                pathLinkVBox_Det.getChildren().add(pathTip_Det);
-                pathLinkHBox_Det.getChildren().add(moveWindowHBox_Det);
+                hideNodes(false, moveWindowHBox_Det);
                 workDirHBox_Det.setVisible(false);
                 pathTip_Det.setText(pathTip_moveWindow());
             }
         } else {
             if (isClickList(clickTypeMap.getKey(value))) {
-                typeHBox_Det.getChildren().add(noMove_Det);
+                hideNodes(false, noMove_Det);
                 noMove_Det.setVisible(true);
             } else {
                 noMove_Det.setVisible(false);
@@ -2062,7 +2051,7 @@ public class ClickDetailController extends RootController {
                     && !clickType_moveTrajectory().equals(value)
                     && !clickType_wheelUp().equals(value)
                     && !clickType_wheelDown().equals(value));
-            vBox_Det.getChildren().add(clickVBox_Det);
+            hideNodes(false, clickVBox_Det);
             testLink_Det.setVisible(false);
             randomClickInterval_Det.setVisible(true);
             pathTip_Det.setText("");
@@ -2470,21 +2459,13 @@ public class ClickDetailController extends RootController {
     @FXML
     private void recognitionTypeChange() {
         String value = recognitionType_Det.getValue();
-        ObservableList<Node> hBoxChildren = recognitionHBox_Det.getChildren();
-        ObservableList<Node> vBoxChildren = findImgVBox_Det.getChildren();
+        hideNodes(true, imgVBox_Det, ocrVBox_det, colorHBox_Det, ocrHBox_Det);
         if (recognitionType_img().equals(value)) {
-            vBoxChildren.clear();
-            vBoxChildren.addAll(imgVBox_Det);
-            hBoxChildren.removeAll(colorHBox_Det, ocrHBox_Det);
+            hideNodes(false, imgVBox_Det);
         } else if (recognitionType_color().equals(value)) {
-            vBoxChildren.clear();
-            hBoxChildren.removeAll(colorHBox_Det, ocrHBox_Det);
-            hBoxChildren.addAll(colorHBox_Det);
+            hideNodes(false, colorHBox_Det);
         } else if (recognitionType_text().equals(value)) {
-            vBoxChildren.clear();
-            vBoxChildren.addAll(ocrVBox_det);
-            hBoxChildren.removeAll(colorHBox_Det, ocrHBox_Det);
-            hBoxChildren.addAll(ocrHBox_Det);
+            hideNodes(false, ocrVBox_det, ocrHBox_Det);
             startUpdateTessdataTask();
         }
     }

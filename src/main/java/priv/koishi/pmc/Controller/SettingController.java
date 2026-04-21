@@ -1261,10 +1261,10 @@ public class SettingController extends RootController implements MousePositionUp
                                    HBox windowInfoHBox, FloatingWindowDescriptor floating) {
         String value = findImgType.getValue();
         addValueToolTip(findImgType, tip_findImgType(), value);
+        hideNodes(true, regionHBox, windowInfoHBox);
         if (findImgType_region().equals(value)) {
             regionInfoHBox.setVisible(true);
-            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
-            regionInfoHBox.getChildren().add(regionHBox);
+            hideNodes(false, regionHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.REGION.ordinal());
@@ -1272,8 +1272,7 @@ public class SettingController extends RootController implements MousePositionUp
             }
         } else if (findImgType_window().equals(value)) {
             regionInfoHBox.setVisible(true);
-            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
-            regionInfoHBox.getChildren().add(windowInfoHBox);
+            hideNodes(false, windowInfoHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
@@ -1281,7 +1280,6 @@ public class SettingController extends RootController implements MousePositionUp
             }
         } else if (findImgType_all().equals(value)) {
             regionInfoHBox.setVisible(false);
-            regionInfoHBox.getChildren().removeAll(regionHBox, windowInfoHBox);
             if (floating != null) {
                 FloatingWindowConfig config = floating.getConfig();
                 config.setFindImgTypeEnum(FindImgTypeEnum.ALL.ordinal());

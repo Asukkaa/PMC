@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -120,9 +119,6 @@ public class ListPMCController extends RootController {
 
     @FXML
     public AnchorPane anchorPane_List;
-
-    @FXML
-    public HBox logHBox_List;
 
     @FXML
     public ProgressBar progressBar_List;
@@ -616,7 +612,7 @@ public class ListPMCController extends RootController {
             adaption();
         }
         if (StringUtils.isBlank(err_List.getText())) {
-            logHBox_List.getChildren().remove(err_List);
+            hideNodes(true, err_List);
         }
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCSPath)) {

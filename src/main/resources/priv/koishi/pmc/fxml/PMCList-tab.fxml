@@ -100,7 +100,7 @@
                 <Label fx:id="tip_List" prefHeight="20" textFill="red" text="%autoClick.tip_Click"/>
             </HBox>
 
-            <HBox fx:id="logHBox_List" spacing="10">
+            <HBox spacing="10">
                 <Label fx:id="log_List" style="-fx-pref-height: -1"/>
 
                 <Region HBox.hgrow="ALWAYS"/>

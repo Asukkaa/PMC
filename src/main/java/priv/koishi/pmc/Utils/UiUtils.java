@@ -1193,4 +1193,17 @@ public class UiUtils {
         }
     }
 
+    /**
+     * 设置组件是否完全隐藏（隐藏 + 不占用界面空间）
+     *
+     * @param isHide 是否隐藏（true 隐藏）
+     * @param nodes  需要修改隐藏状态的组件
+     */
+    public static void hideNodes(boolean isHide, Node... nodes) {
+        for (Node node : nodes) {
+            node.setVisible(!isHide);
+            node.setManaged(!isHide);
+        }
+    }
+
 }

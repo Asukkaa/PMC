@@ -28,7 +28,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
@@ -358,9 +357,6 @@ public class AutoClickController extends RootController implements MousePosition
 
     @FXML
     public AnchorPane anchorPane_Click;
-
-    @FXML
-    public HBox logHBox_Click;
 
     @FXML
     public ProgressBar progressBar_Click;
@@ -2173,7 +2169,7 @@ public class AutoClickController extends RootController implements MousePosition
                 setNativeHookExceptionLog();
             }
             if (StringUtils.isBlank(err_Click.getText())) {
-                logHBox_Click.getChildren().remove(err_Click);
+                hideNodes(true, err_Click);
             }
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
