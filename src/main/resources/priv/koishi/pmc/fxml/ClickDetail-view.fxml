@@ -8,9 +8,9 @@
     <center>
         <ScrollPane>
             <AnchorPane>
-                <VBox fx:id="vBox_Det" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
-                    <VBox fx:id="commonVBox_Det" spacing="10">
-                        <HBox fx:id="typeHBox_Det" spacing="10">
+                <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
+                    <VBox spacing="10">
+                        <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
                                 <!--步骤序号:-->
                                 <Label text="%clickDetail.clickIndex"/>
@@ -74,7 +74,7 @@
                     </VBox>
 
                     <VBox fx:id="pathLinkVBox_Det" spacing="10">
-                        <HBox fx:id="pathLinkHBox_Det" spacing="10">
+                        <HBox spacing="10">
                             <HBox fx:id="pathHBox_Det" spacing="10">
                                 <!--选择目标路径-->
                                 <Button fx:id="pathLink_Det" text="%clickDetail.pathLink_Det"
@@ -446,7 +446,7 @@
                             </HBox>
                         </HBox>
 
-                        <HBox fx:id="recognitionHBox_Det" spacing="10">
+                        <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
                                 <!--图像识别类型:-->
                                 <Label text="%clickDetail.recognitionType"/>
@@ -518,7 +518,7 @@
                                 </TableView>
                             </VBox>
 
-                            <VBox fx:id="findImgVBox_Det" spacing="10">
+                            <VBox spacing="10">
                                 <VBox fx:id="imgVBox_Det" spacing="10">
                                     <HBox spacing="5">
                                         <!--选择要点击的图片-->

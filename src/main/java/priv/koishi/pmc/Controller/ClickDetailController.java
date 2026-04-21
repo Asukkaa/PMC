@@ -279,15 +279,13 @@ public class ClickDetailController extends RootController {
     public BorderPane borderPane_Det;
 
     @FXML
-    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, vBox_Det, pathLinkVBox_Det, commonVBox_Det,
-            findImgVBox_Det, imgVBox_Det, ocrVBox_det;
+    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, pathLinkVBox_Det, imgVBox_Det, ocrVBox_det;
 
     @FXML
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
             clickRegionInfoHBox_Det, clickWindowInfoHBox_Det, stopRegionInfoHBox_Det, pathHBox_Det, workDirHBox_Det,
-            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, pathLinkHBox_Det,
-            parameterHBox_Det, clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, typeHBox_Det, moveWindowHBox_Det,
-            colorHBox_Det, ocrHBox_Det, recognitionHBox_Det;
+            stopWindowInfoHBox_Det, noPermissionHBox_Det, relativelyHBox_Det, urlHBox_Det, colorHBox_Det, ocrHBox_Det,
+            clickKeyHBox_Det, keyboardHBox_Det, setKeyHBox_Det, moveWindowHBox_Det, parameterHBox_Det;
 
     @FXML
     public ProgressBar progressBar_Det;
