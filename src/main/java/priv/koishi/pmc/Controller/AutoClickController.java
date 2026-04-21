@@ -2353,8 +2353,8 @@ public class AutoClickController extends RootController implements MousePosition
         if (isFree()) {
             // 接受拖放
             dragEvent.acceptTransferModes(TransferMode.COPY);
-            dragEvent.consume();
         }
+        dragEvent.consume();
     }
 
     /**
