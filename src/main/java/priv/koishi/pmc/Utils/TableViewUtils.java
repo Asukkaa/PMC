@@ -90,7 +90,7 @@ public class TableViewUtils {
                             setTooltip(null);
                         } else if (!item.toString().isEmpty()) {
                             setText(item.toString());
-                            setTooltip(creatTooltip(getTipText(column, (String) item)));
+                            setTooltip(creatTooltip(getTipText(column, item.toString())));
                         }
                     }
                 };
@@ -1074,40 +1074,37 @@ public class TableViewUtils {
     }
 
     /**
+     * 修改模型启用状态选项
+     *
+     * @param tableMenu         右键菜单
+     * @param tessdataTableView 模型文件列表
+     * @param runnable          回调函数（可用来保存设置）
+     */
+    public static void buildTessdataActiveMenu(ContextMenu tableMenu, TableView<TessdataBean> tessdataTableView,
+                                               Runnable runnable) {
+        Menu menu = new Menu(menu_status());
+        MenuItem activeItem = new MenuItem(menu_activeMenu());
+        MenuItem unactiveItem = new MenuItem(menu_unActiveMenu());
+        activeItem.setOnAction(_ -> buildSetActiveMenu(tableMenu, tessdataTableView, runnable, true));
+        unactiveItem.setOnAction(_ -> buildSetActiveMenu(tableMenu, tessdataTableView, runnable, false));
+        menu.getItems().addAll(activeItem, unactiveItem);
+        tableMenu.getItems().add(menu);
+    }
+
+    /**
      * 启用所选选项
      *
      * @param contextMenu       右键菜单
      * @param tessdataTableView 模型文件列表
      * @param runnable          回调函数（可用来保存设置）
+     * @param active            启用状态（true 启用）
      */
     public static void buildSetActiveMenu(ContextMenu contextMenu, TableView<TessdataBean> tessdataTableView,
-                                          Runnable runnable) {
+                                          Runnable runnable, boolean active) {
         MenuItem menuItem = new MenuItem(menu_activeMenu());
         menuItem.setOnAction(_ -> {
             ObservableList<TessdataBean> selectedItems = tessdataTableView.getSelectionModel().getSelectedItems();
-            selectedItems.forEach(item -> item.setActive(true));
-            if (runnable != null) {
-                runnable.run();
-            } else {
-                tessdataTableView.refresh();
-            }
-        });
-        contextMenu.getItems().addFirst(menuItem);
-    }
-
-    /**
-     * 禁用所选选项
-     *
-     * @param contextMenu       右键菜单
-     * @param tessdataTableView 模型文件列表
-     * @param runnable          回调函数（可用来保存设置）
-     */
-    public static void buildSetUnActiveMenu(ContextMenu contextMenu, TableView<TessdataBean> tessdataTableView,
-                                            Runnable runnable) {
-        MenuItem menuItem = new MenuItem(menu_unActiveMenu());
-        menuItem.setOnAction(_ -> {
-            ObservableList<TessdataBean> selectedItems = tessdataTableView.getSelectionModel().getSelectedItems();
-            selectedItems.forEach(item -> item.setActive(false));
+            selectedItems.forEach(item -> item.setActive(active));
             if (runnable != null) {
                 runnable.run();
             } else {

@@ -2998,6 +2998,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 修改状态
+     */
+    public static String menu_status() {
+        return bundle.getString("menu.status");
+    }
+
+    /**
      * @return 按下
      */
     public static String log_press() {

@@ -1122,10 +1122,8 @@ public class SettingController extends RootController implements MousePositionUp
         ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_set);
         // 将所选文件移动到垃圾桶选项
         buildMoveToTrashMenu(contextMenu);
-        // 禁用所选选项
-        buildSetUnActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
-        // 启用所选选项
-        buildSetActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
+        // 修改模型启用状态选项
+        buildTessdataActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
         // 构建窗口信息栏右键菜单
         List<Stage> stages = List.of(mainStage);
         ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, windowInfoDisableNodes, stages);

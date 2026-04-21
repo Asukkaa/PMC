@@ -1267,8 +1267,7 @@ public class ClickDetailController extends RootController {
         // 构建表格右键菜单
         buildTableViewContextMenu(tableView_Det, dataNumber_Det);
         ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_det);
-        buildSetUnActiveMenu(contextMenu, tessdataTableView_det, null);
-        buildSetActiveMenu(contextMenu, tessdataTableView_det, null);
+        buildTessdataActiveMenu(contextMenu, tessdataTableView_det, null);
         // 构建窗口信息栏右键菜单
         List<Stage> stages = List.of(stage, mainStage);
         buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
