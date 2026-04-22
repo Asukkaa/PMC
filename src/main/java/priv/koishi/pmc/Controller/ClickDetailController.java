@@ -344,8 +344,10 @@ public class ClickDetailController extends RootController {
     public TableColumn<TessdataBean, Integer> index_det;
 
     @FXML
-    public TableColumn<TessdataBean, String> name_det, path_det, remark_det, state_det;
+    public TableColumn<TessdataBean, String> name_det, path_det, remark_det;
 
+    @FXML
+    public TableColumn<TessdataBean, Boolean> active_det;
 
     /**
      * 组件宽高自适应
@@ -377,11 +379,11 @@ public class ClickDetailController extends RootController {
         path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
         type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         // .traineddata 模型文件列表自适应
-        index_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.1));
+        index_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.07));
         name_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.2));
         path_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.4));
         remark_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.2));
-        state_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.1));
+        active_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.13));
     }
 
     /**

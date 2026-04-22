@@ -3,6 +3,7 @@ package priv.koishi.pmc.Bean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Annotation.CheckBoxColumn;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 
@@ -43,14 +44,9 @@ public class TessdataBean implements Indexable, FilePath {
     private String remark;
 
     /**
-     * 启用状态文本
-     */
-    @JsonIgnore
-    private String state;
-
-    /**
      * 启用状态(true 启用模型，默认禁用)
      */
+    @CheckBoxColumn
     private boolean active;
 
     /**
@@ -77,27 +73,6 @@ public class TessdataBean implements Indexable, FilePath {
      * 无参构造
      */
     public TessdataBean() {
-    }
-
-    /**
-     * 设置启用状态
-     *
-     * @param active true 启用模型
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-        state = active ? "启用" : "禁用";
-    }
-
-    /**
-     * 查询启用状态
-     *
-     * @return 启用状态文本
-     */
-    @SuppressWarnings("unused")
-    public String getState() {
-        state = active ? "启用" : "禁用";
-        return state;
     }
 
 }

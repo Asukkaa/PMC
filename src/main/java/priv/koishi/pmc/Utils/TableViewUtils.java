@@ -1,5 +1,7 @@
 package priv.koishi.pmc.Utils;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +19,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Annotation.CheckBoxColumn;
 import priv.koishi.pmc.Bean.Interface.CopyBean;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
@@ -31,12 +34,14 @@ import priv.koishi.pmc.Finals.Enum.RecognitionTypeEnum;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
 import static priv.koishi.pmc.Utils.CommonUtils.moveAllToFirst;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -57,6 +62,8 @@ public class TableViewUtils {
      * 拖拽数据格式
      */
     public static final DataFormat dragDataFormat = new DataFormat("application/x-java-serialized-object");
+
+    private static final Map<Class<?>, Map<String, Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 为 JavaFX 单元格赋值并添加鼠标悬停提示
@@ -144,8 +151,24 @@ public class TableViewUtils {
      * @param indexColumn 序号列
      * @param <T>         要处理的 JavaFX 表格的数据 bean 类
      */
+    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId,
+                                                  TableColumn<T, Integer> indexColumn) {
+        autoBuildTableViewData(tableView, beanClass, tabId, indexColumn, null);
+    }
+
+    /**
+     * 根据 bean 属性名自动填充 JavaFX 表格
+     *
+     * @param tableView        要处理的 JavaFX 表格
+     * @param beanClass        要处理的 JavaFX 表格的数据 bean 类
+     * @param tabId            用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 JavaFX 列表的列对应的 id
+     * @param indexColumn      序号列
+     * @param checkBoxCallback 开关单元格回调函数
+     * @param <T>              要处理的 JavaFX 表格的数据 bean 类
+     */
     @SuppressWarnings("unchecked")
-    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId, TableColumn<T, Integer> indexColumn) {
+    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId,
+                                                  TableColumn<T, Integer> indexColumn, Runnable checkBoxCallback) {
         // 递归获取类及其父类的所有字段
         List<Field> fields = getAllFields(beanClass);
         ObservableList<? extends TableColumn<?, ?>> columns = tableView.getColumns();
@@ -162,7 +185,25 @@ public class TableViewUtils {
             matched.ifPresent(m -> {
                 // 添加列名 Tooltip
                 addTableColumnToolTip(m);
-                if (f.getType() == Image.class) {
+                if (f.isAnnotationPresent(CheckBoxColumn.class)) {
+                    tableView.setEditable(true);
+                    CheckBoxColumn annotation = f.getAnnotation(CheckBoxColumn.class);
+                    String textKey = annotation.textKey();
+                    String labelText = bundle.getString(textKey);
+                    if (StringUtils.isEmpty(labelText)) {
+                        // 若未指定文本使用字段名
+                        labelText = fieldName;
+                    }
+                    Class<?> fieldType = f.getType();
+                    boolean isBooleanType = fieldType == boolean.class
+                            || fieldType == Boolean.class
+                            || fieldType == BooleanProperty.class;
+                    if (isBooleanType) {
+                        @SuppressWarnings("unchecked")
+                        TableColumn<T, Boolean> boolColumn = (TableColumn<T, Boolean>) m;
+                        buildCheckBoxCell(boolColumn, labelText, fieldName, checkBoxCallback);
+                    }
+                } else if (f.getType() == Image.class) {
                     // 直接使用类型安全的函数式调用
                     Function<T, Image> supplier = bean -> {
                         if (bean instanceof ImgBean imgBean) {
@@ -189,6 +230,100 @@ public class TableViewUtils {
                 }
             });
         });
+    }
+
+    /**
+     * 创建 CheckBox 列
+     *
+     * @param column           目标列
+     * @param labelText        CheckBox 显示的文本
+     * @param fieldName        字段名，用于反射访问
+     * @param checkBoxCallback 开关单元格回调函数
+     * @param <T>              表格数据类型
+     */
+    public static <T> void buildCheckBoxCell(TableColumn<T, Boolean> column, String labelText, String fieldName,
+                                             Runnable checkBoxCallback) {
+        // 设置 CellValueFactory，通过反射读取字段当前值
+        column.setCellValueFactory(cellData -> {
+            T bean = cellData.getValue();
+            if (bean == null) return new SimpleBooleanProperty(false);
+            try {
+                Field field = getCachedField(bean.getClass(), fieldName);
+                return new SimpleBooleanProperty(field.getBoolean(bean));
+            } catch (Exception e) {
+                return new SimpleBooleanProperty(false);
+            }
+        });
+
+        column.setCellFactory(_ -> new TableCell<>() {
+            private final CheckBox checkBox = new CheckBox(labelText);
+            private T currentBean;
+
+            {
+                checkBox.setAlignment(Pos.CENTER);
+                // 当 CheckBox 被点击时，提交编辑
+                checkBox.setOnAction(_ -> {
+                    if (currentBean != null) {
+                        commitEdit(checkBox.isSelected());
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    setText(null);
+                    currentBean = null;
+                } else {
+                    currentBean = getTableRow().getItem();
+                    checkBox.setSelected(item != null && item);
+                    setGraphic(checkBox);
+                    setText(null);
+                    setTooltip(creatTooltip(labelText + "：" + (item != null && item)));
+                }
+            }
+
+            @Override
+            public void commitEdit(Boolean newValue) {
+                super.commitEdit(newValue);
+                if (currentBean != null) {
+                    try {
+                        Field field = getCachedField(currentBean.getClass(), fieldName);
+                        field.setBoolean(currentBean, newValue);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (checkBoxCallback != null) {
+                    checkBoxCallback.run();
+                }
+            }
+        });
+
+        column.setEditable(true);
+    }
+
+    /**
+     * 从缓存获取字段对象
+     */
+    private static Field getCachedField(Class<?> clazz, String fieldName) {
+        return FIELD_CACHE
+                .computeIfAbsent(clazz, _ -> new ConcurrentHashMap<>())
+                .computeIfAbsent(fieldName, name -> {
+                    Class<?> current = clazz;
+                    while (current != null && current != Object.class) {
+                        try {
+                            Field field = current.getDeclaredField(name);
+                            field.setAccessible(true);
+                            return field;
+                        } catch (NoSuchFieldException e) {
+                            current = current.getSuperclass();
+                        }
+                    }
+                    throw new RuntimeException(new NoSuchFieldException(name));
+                });
     }
 
     /**

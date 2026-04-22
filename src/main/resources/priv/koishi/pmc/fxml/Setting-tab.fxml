@@ -724,7 +724,7 @@
                     <!--备注-->
                     <TableColumn fx:id="remark_set" text="%tessdata.remark" sortable="false"/>
                     <!--状态-->
-                    <TableColumn fx:id="state_set" text="%tessdata.state" sortable="false"/>
+                    <TableColumn fx:id="active_set" text="%tessdata.state" sortable="false"/>
                 </columns>
             </TableView>
 

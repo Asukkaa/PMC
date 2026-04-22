@@ -264,7 +264,10 @@ public class SettingController extends RootController implements MousePositionUp
     public TableColumn<TessdataBean, Integer> index_set;
 
     @FXML
-    public TableColumn<TessdataBean, String> name_set, path_set, remark_set, state_set;
+    public TableColumn<TessdataBean, String> name_set, path_set, remark_set;
+
+    @FXML
+    public TableColumn<TessdataBean, Boolean> active_set;
 
     /**
      * 组件自适应宽高
@@ -298,7 +301,7 @@ public class SettingController extends RootController implements MousePositionUp
         name_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.2));
         path_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.4));
         remark_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.2));
-        state_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.1));
+        active_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.1));
     }
 
     /**
@@ -1808,7 +1811,8 @@ public class SettingController extends RootController implements MousePositionUp
             MousePositionListener.getInstance().addListener(this);
             // 自动填充 JavaFX 表格
             autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId, index_Set);
-            autoBuildTableViewData(tessdataTableView_set, TessdataBean.class, tessdataId, index_set);
+            autoBuildTableViewData(tessdataTableView_set, TessdataBean.class, tessdataId, index_set,
+                    this::startSaveConfigTask);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
             tableViewDragRow(tessdataTableView_set);
