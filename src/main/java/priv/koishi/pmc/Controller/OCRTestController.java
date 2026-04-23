@@ -167,7 +167,7 @@ public class OCRTestController extends ManuallyChangeThemeController {
             // 添加鼠标悬停提示
             addToolTip(tip_removeAll_Log(), removeAll_Tes);
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_Tes, OCRDataBean.class, tabId, index_Tes);
+            autoBuildTableViewData(tableView_Tes, OCRDataBean.class, tabId);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Tes);
             // 构建右键菜单

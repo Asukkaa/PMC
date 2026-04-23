@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.AbstractBean.BaseCopyBean;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
@@ -34,6 +35,7 @@ public class PMCListBean extends BaseCopyBean implements Indexable, FilePath {
      * 序号
      */
     @JsonIgnore
+    @IndexColumn
     private Integer index;
 
     /**

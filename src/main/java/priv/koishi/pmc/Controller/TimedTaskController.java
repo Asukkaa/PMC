@@ -284,7 +284,7 @@ public class TimedTaskController extends RootController {
         setDisableNodes();
         Platform.runLater(() -> {
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId, index_Task);
+            autoBuildTableViewData(tableView_Task, TimedTaskBean.class, tabId);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Task);
             // 构建右键菜单

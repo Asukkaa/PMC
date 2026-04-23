@@ -589,7 +589,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
             // 设置要防重复点击的组件
             setDisableNodes();
             // 绑定表格数据
-            autoBuildTableViewData(tableView_FC, FileVO.class, tabId, index_FC);
+            autoBuildTableViewData(tableView_FC, FileVO.class, tabId);
             // 设置列排序
             columnComparator();
             // 构建右键菜单

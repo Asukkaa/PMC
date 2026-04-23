@@ -3,6 +3,7 @@ package priv.koishi.pmc.Bean;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class TimedTaskBean implements Indexable {
     /**
      * 序号
      */
+    @IndexColumn
     private Integer index;
 
     /**

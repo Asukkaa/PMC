@@ -672,7 +672,7 @@ public class ListPMCController extends RootController {
                 throw new RuntimeException(e);
             }
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_List, PMCListBean.class, tabId, index_List);
+            autoBuildTableViewData(tableView_List, PMCListBean.class, tabId);
             // 监听列表数据变化
             tableView_List.getItems().addListener((ListChangeListener<PMCListBean>) _ ->
                     updateLabel(log_List, ""));

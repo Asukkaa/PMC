@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Annotation.PathColumn;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 
 /**
@@ -30,6 +31,7 @@ public class ImgFileBean implements FilePath {
     /**
      * 文件地址
      */
+    @PathColumn
     private StringProperty path = new SimpleStringProperty();
 
     /**

@@ -2,6 +2,7 @@ package priv.koishi.pmc.Bean;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class PMCLogBean implements Indexable {
     /**
      * 序号
      */
+    @IndexColumn
     private Integer index;
 
     /**

@@ -1810,9 +1810,8 @@ public class SettingController extends RootController implements MousePositionUp
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId, index_Set);
-            autoBuildTableViewData(tessdataTableView_set, TessdataBean.class, tessdataId, index_set,
-                    this::startSaveConfigTask);
+            autoBuildTableViewData(tableView_Set, ImgFileVO.class, tabId);
+            autoBuildTableViewData(tessdataTableView_set, TessdataBean.class, tessdataId, this::startSaveConfigTask);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Set);
             tableViewDragRow(tessdataTableView_set);

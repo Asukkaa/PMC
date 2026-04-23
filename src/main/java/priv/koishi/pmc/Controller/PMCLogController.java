@@ -131,7 +131,7 @@ public class PMCLogController extends ManuallyChangeThemeController {
             // 添加鼠标悬停提示
             addToolTip(tip_removeAll_Log(), removeAll_PLog);
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_PLog, PMCLogBean.class, tabId, index_PLog);
+            autoBuildTableViewData(tableView_PLog, PMCLogBean.class, tabId);
         });
     }
 

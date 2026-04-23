@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
 import priv.koishi.pmc.Bean.Interface.Indexable;
@@ -30,6 +31,7 @@ public class ImgFileVO extends ImgFileBean implements Indexable, ImgBean {
     /**
      * 序号
      */
+    @IndexColumn
     private Integer index;
 
     /**

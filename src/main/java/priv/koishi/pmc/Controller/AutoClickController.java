@@ -2174,7 +2174,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 获取鼠标坐标监听器
             MousePositionListener.getInstance().addListener(this);
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId, index_Click);
+            autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId);
             // 监听列表数据变化
             tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) _ ->
                     updateLabel(log_Click, ""));

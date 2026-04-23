@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 
 /**
@@ -20,6 +21,7 @@ public class OCRDataBean implements Indexable {
     /**
      * 序号
      */
+    @IndexColumn
     private Integer index;
 
     /**

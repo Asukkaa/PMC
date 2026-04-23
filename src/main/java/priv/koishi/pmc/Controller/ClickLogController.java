@@ -120,7 +120,7 @@ public class ClickLogController extends ManuallyChangeThemeController {
             // 添加鼠标悬停提示
             addToolTip(tip_removeAll_Log(), removeAll_Log);
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_Log, ClickLogBean.class, tabId, index_Log);
+            autoBuildTableViewData(tableView_Log, ClickLogBean.class, tabId);
         });
     }
 

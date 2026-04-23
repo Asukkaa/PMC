@@ -20,6 +20,8 @@ import javafx.util.Callback;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Annotation.CheckBoxColumn;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
+import priv.koishi.pmc.Bean.Annotation.PathColumn;
 import priv.koishi.pmc.Bean.Interface.CopyBean;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
@@ -145,15 +147,13 @@ public class TableViewUtils {
     /**
      * 根据 bean 属性名自动填充 JavaFX 表格
      *
-     * @param tableView   要处理的 JavaFX 表格
-     * @param beanClass   要处理的 JavaFX 表格的数据 bean 类
-     * @param tabId       用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 JavaFX 列表的列对应的 id
-     * @param indexColumn 序号列
-     * @param <T>         要处理的 JavaFX 表格的数据 bean 类
+     * @param tableView 要处理的 JavaFX 表格
+     * @param beanClass 要处理的 JavaFX 表格的数据 bean 类
+     * @param tabId     用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 JavaFX 列表的列对应的 id
+     * @param <T>       要处理的 JavaFX 表格的数据 bean 类
      */
-    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId,
-                                                  TableColumn<T, Integer> indexColumn) {
-        autoBuildTableViewData(tableView, beanClass, tabId, indexColumn, null);
+    public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId) {
+        autoBuildTableViewData(tableView, beanClass, tabId, null);
     }
 
     /**
@@ -162,13 +162,12 @@ public class TableViewUtils {
      * @param tableView        要处理的 JavaFX 表格
      * @param beanClass        要处理的 JavaFX 表格的数据 bean 类
      * @param tabId            用于区分不同列表的 id，要展示的数据 bean 属性名加上 tabId 即为 JavaFX 列表的列对应的 id
-     * @param indexColumn      序号列
      * @param checkBoxCallback 开关单元格回调函数
      * @param <T>              要处理的 JavaFX 表格的数据 bean 类
      */
     @SuppressWarnings("unchecked")
     public static <T> void autoBuildTableViewData(TableView<T> tableView, Class<?> beanClass, String tabId,
-                                                  TableColumn<T, Integer> indexColumn, Runnable checkBoxCallback) {
+                                                  Runnable checkBoxCallback) {
         // 递归获取类及其父类的所有字段
         List<Field> fields = getAllFields(beanClass);
         ObservableList<? extends TableColumn<?, ?>> columns = tableView.getColumns();
@@ -204,29 +203,25 @@ public class TableViewUtils {
                         buildCheckBoxCell(boolColumn, labelText, fieldName, checkBoxCallback);
                     }
                 } else if (f.getType() == Image.class) {
-                    // 直接使用类型安全的函数式调用
-                    Function<T, Image> supplier = bean -> {
+                    // 创建图片表格
+                    buildThumbnailCell((TableColumn<T, Image>) m, bean -> {
                         if (bean instanceof ImgBean imgBean) {
                             return imgBean.loadThumb();
                         }
                         return null;
-                    };
-                    // 创建图片表格
-                    buildThumbnailCell((TableColumn<T, Image>) m, supplier);
+                    });
+                } else if (f.isAnnotationPresent(IndexColumn.class)) {
+                    // 设置列为序号列
+                    buildIndexCellValue((TableColumn<T, Integer>) m);
+                } else if (beanClass == ImgFileVO.class && f.isAnnotationPresent(PathColumn.class)) {
+                    TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
+                    pathColumn.setCellValueFactory(cellData ->
+                            cellData.getValue().pathProperty());
+                    // 为 JavaFX 单元格和表头添加鼠标悬停提示
+                    addTableCellToolTip(pathColumn);
                 } else {
-                    if (indexColumn != null && m.getId().equals(indexColumn.getId())) {
-                        // 设置列为序号列
-                        buildIndexCellValue(indexColumn);
-                    } else if (beanClass == ImgFileVO.class && "path".equals(fieldName)) {
-                        TableColumn<ImgFileVO, String> pathColumn = (TableColumn<ImgFileVO, String>) m;
-                        pathColumn.setCellValueFactory(cellData ->
-                                cellData.getValue().pathProperty());
-                        // 为 JavaFX 单元格和表头添加鼠标悬停提示
-                        addTableCellToolTip(pathColumn);
-                    } else {
-                        // 为 JavaFX 单元格赋值并添加鼠标悬停提示
-                        buildCellValue(m, fieldName);
-                    }
+                    // 为 JavaFX 单元格赋值并添加鼠标悬停提示
+                    buildCellValue(m, fieldName);
                 }
             });
         });

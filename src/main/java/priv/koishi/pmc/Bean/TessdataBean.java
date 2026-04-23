@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Annotation.CheckBoxColumn;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.Indexable;
 
@@ -25,6 +26,7 @@ public class TessdataBean implements Indexable, FilePath {
     /**
      * 序号
      */
+    @IndexColumn
     private Integer index;
 
     /**

@@ -1678,8 +1678,8 @@ public class ClickDetailController extends RootController {
             // 添加控件监听
             addModificationListeners();
             // 自动填充 JavaFX 表格
-            autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId, index_Det);
-            autoBuildTableViewData(tessdataTableView_det, TessdataBean.class, tessdataId, index_det);
+            autoBuildTableViewData(tableView_Det, ImgFileVO.class, tabId);
+            autoBuildTableViewData(tessdataTableView_det, TessdataBean.class, tessdataId);
             // 设置列表通过拖拽排序行
             tableViewDragRow(tableView_Det);
             tableViewDragRow(tessdataTableView_det);
