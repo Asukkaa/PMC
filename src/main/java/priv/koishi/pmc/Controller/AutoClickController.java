@@ -429,11 +429,11 @@ public class AutoClickController extends RootController implements MousePosition
             prop.load(input);
             prop.put(key_lastLoopTime, loopTime_Click.getText());
             prop.put(key_lastOutFileName, outFileName_Click.getText());
-            String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? activation : unActivation;
+            String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? enable : disable;
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
-            String lastNotOverwriteValue = notOverwrite_Click.isSelected() ? activation : unActivation;
+            String lastNotOverwriteValue = notOverwrite_Click.isSelected() ? enable : disable;
             prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
-            String loadFolderValue = loadFolder_Click.isSelected() ? activation : unActivation;
+            String loadFolderValue = loadFolder_Click.isSelected() ? enable : disable;
             prop.put(key_loadFolder, loadFolderValue);
             prop.put(key_lastPreparationRecordTime, preparationRecordTime_Click.getText());
             prop.put(key_lastPreparationRunTime, preparationRunTime_Click.getText());
@@ -489,12 +489,12 @@ public class AutoClickController extends RootController implements MousePosition
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile_Click);
         prop.load(input);
-        if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
+        if (enable.equals(prop.getProperty(key_loadLastConfig, enable))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
-            setControlLastConfig(loadFolder_Click, prop, key_loadFolder, unActivation);
+            setControlLastConfig(loadFolder_Click, prop, key_loadFolder, disable);
             setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
-            setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, activation);
-            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, activation);
+            setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, enable);
+            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, enable);
             setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultPMCFileName());
             setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRun);
             setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, defaultPreparationRecord);

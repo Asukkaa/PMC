@@ -153,11 +153,11 @@ public class MainApplication extends Application {
         if (appHeight >= screenHeight) {
             appHeight = screenHeight * 0.9;
         }
-        if (activation.equals(prop.getProperty(key_lastMaxWindow, unActivation))
-                && activation.equals(prop.getProperty(key_loadLastMaxWindow, unActivation))) {
+        if (enable.equals(prop.getProperty(key_lastMaxWindow, disable))
+                && enable.equals(prop.getProperty(key_loadLastMaxWindow, disable))) {
             stage.setMaximized(true);
-        } else if (activation.equals(prop.getProperty(key_lastFullWindow, unActivation))
-                && activation.equals(prop.getProperty(key_loadLastFullWindow, unActivation))) {
+        } else if (enable.equals(prop.getProperty(key_lastFullWindow, disable))
+                && enable.equals(prop.getProperty(key_loadLastFullWindow, disable))) {
             stage.setFullScreen(true);
         }
         mainScene = new Scene(fxmlLoader.load(), appWidth, appHeight);
@@ -173,7 +173,7 @@ public class MainApplication extends Application {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
         } else if (loadPMCS) {
             tabPane.getSelectionModel().select(mainController.listPMCTab);
-        } else if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
+        } else if (enable.equals(prop.getProperty(key_loadLastConfig, enable))) {
             for (Tab tab : tabPane.getTabs()) {
                 if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
                     tabPane.getSelectionModel().select(tab);
@@ -565,7 +565,7 @@ public class MainApplication extends Application {
         int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
         String firstRunValue = prop.getProperty(key_firstRun);
         // 首次运行时如果有对应语言包则使用操作系统设置的语言
-        if (activation.equals(firstRunValue)) {
+        if (enable.equals(firstRunValue)) {
             if (languageMap.containsKey(Locale.getDefault())) {
                 Locale locale = languageMap.getKey(prop.getProperty(key_language));
                 Locale.setDefault(locale);
@@ -578,7 +578,7 @@ public class MainApplication extends Application {
                 Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
                 bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
             }
-            updateProperties(configFile, key_firstRun, unActivation);
+            updateProperties(configFile, key_firstRun, disable);
         } else {
             Locale locale = languageMap.getKey(prop.getProperty(key_language));
             Locale.setDefault(locale);

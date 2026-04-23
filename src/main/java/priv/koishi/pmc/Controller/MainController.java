@@ -288,9 +288,9 @@ public class MainController extends RootController {
         prop.load(input);
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         prop.put(key_lastTab, selectedTab.getId());
-        String fullWindow = mainStage.isFullScreen() ? activation : unActivation;
+        String fullWindow = mainStage.isFullScreen() ? enable : disable;
         prop.put(key_lastFullWindow, fullWindow);
-        String maximize = mainStage.isMaximized() ? activation : unActivation;
+        String maximize = mainStage.isMaximized() ? enable : disable;
         prop.put(key_lastMaxWindow, maximize);
         OutputStream output = checkRunningOutputStream(configFile);
         prop.store(output, null);

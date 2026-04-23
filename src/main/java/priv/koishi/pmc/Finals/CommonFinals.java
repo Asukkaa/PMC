@@ -557,12 +557,12 @@ public class CommonFinals {
     /**
      * 启用
      */
-    public static final String activation = "1";
+    public static final String enable = "1";
 
     /**
      * 禁用
      */
-    public static final String unActivation = "0";
+    public static final String disable = "0";
 
     /**
      * 端口被占用时激活窗口信号

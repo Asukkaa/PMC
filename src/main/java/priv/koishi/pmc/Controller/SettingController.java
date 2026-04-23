@@ -576,62 +576,62 @@ public class SettingController extends RootController implements MousePositionUp
         InputStream clickFileInput = checkRunningInputStream(configFile_Click);
         prop.load(clickFileInput);
         setControlLastConfig(overtime_Set, prop, key_overtime);
-        setControlLastConfig(imgLog_Set, prop, key_imgLog, activation);
-        setControlLastConfig(moveLog_Set, prop, key_moveLog, activation);
-        setControlLastConfig(dragLog_Set, prop, key_dragLog, activation);
-        setControlLastConfig(waitLog_Set, prop, key_waitLog, activation);
-        setControlLastConfig(noMove_Set, prop, key_noMove, unActivation);
-        setControlLastConfig(clickLog_Set, prop, key_clickLog, activation);
+        setControlLastConfig(imgLog_Set, prop, key_imgLog, enable);
+        setControlLastConfig(moveLog_Set, prop, key_moveLog, enable);
+        setControlLastConfig(dragLog_Set, prop, key_dragLog, enable);
+        setControlLastConfig(waitLog_Set, prop, key_waitLog, enable);
+        setControlLastConfig(noMove_Set, prop, key_noMove, disable);
+        setControlLastConfig(clickLog_Set, prop, key_clickLog, enable);
         setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
-        setControlLastConfig(clickImgLog_Set, prop, key_clickLog, activation);
-        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, activation);
-        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, activation);
-        setControlLastConfig(recordDrag_Set, prop, key_recordDrag, activation);
-        setControlLastConfig(recordMove_Set, prop, key_recordMove, activation);
-        setControlLastConfig(openUrlLog_Set, prop, key_openUrlLog, activation);
+        setControlLastConfig(clickImgLog_Set, prop, key_clickLog, enable);
+        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, enable);
+        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, enable);
+        setControlLastConfig(recordDrag_Set, prop, key_recordDrag, enable);
+        setControlLastConfig(recordMove_Set, prop, key_recordMove, enable);
+        setControlLastConfig(openUrlLog_Set, prop, key_openUrlLog, enable);
         setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
-        setControlLastConfig(openFileLog_Set, prop, key_openFileLog, activation);
-        setControlLastConfig(keyboardLog_Set, prop, key_keyboardLog, activation);
-        setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, activation);
-        setControlLastConfig(randomClick_Set, prop, key_randomClick, unActivation);
+        setControlLastConfig(openFileLog_Set, prop, key_openFileLog, enable);
+        setControlLastConfig(keyboardLog_Set, prop, key_keyboardLog, enable);
+        setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, enable);
+        setControlLastConfig(randomClick_Set, prop, key_randomClick, disable);
         setControlLastConfig(floatingDistance_Set, prop, key_margin, defaultMargin);
-        setControlLastConfig(moveWindowLog_Set, prop, key_moveWindowLog, activation);
-        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, unActivation);
-        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, activation);
-        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, activation);
-        setControlLastConfig(mouseWheelLog_Set, prop, key_mouseWheelLog, activation);
-        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, activation);
+        setControlLastConfig(moveWindowLog_Set, prop, key_moveWindowLog, enable);
+        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, disable);
+        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, enable);
+        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, enable);
+        setControlLastConfig(mouseWheelLog_Set, prop, key_mouseWheelLog, enable);
+        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, enable);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
-        setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, unActivation);
-        setControlLastConfig(useRelatively_Set, prop, key_useRelatively, unActivation);
-        setControlLastConfig(recordKeyboard_Set, prop, key_recordKeyboard, activation);
-        setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, unActivation);
-        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, activation);
+        setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, disable);
+        setControlLastConfig(useRelatively_Set, prop, key_useRelatively, disable);
+        setControlLastConfig(recordKeyboard_Set, prop, key_recordKeyboard, enable);
+        setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, disable);
+        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, enable);
         setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
         setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, defaultStopOpacity);
-        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, unActivation);
-        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, activation);
-        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, activation);
-        setControlLastConfig(titleCoordinate_Set, prop, key_titleCoordinate, activation);
-        setControlLastConfig(recordMouseWheel_Set, prop, key_recordMouseWheel, activation);
-        setControlLastConfig(recordMouseClick_Set, prop, key_recordMouseClick, activation);
-        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, unActivation);
-        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, activation);
-        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, activation);
+        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, disable);
+        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, enable);
+        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, enable);
+        setControlLastConfig(titleCoordinate_Set, prop, key_titleCoordinate, enable);
+        setControlLastConfig(recordMouseWheel_Set, prop, key_recordMouseWheel, enable);
+        setControlLastConfig(recordMouseClick_Set, prop, key_recordMouseClick, enable);
+        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, disable);
+        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, enable);
+        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, enable);
         setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity, defaultClickOpacity);
         setControlLastConfig(randomClickX_Set, prop, key_randomClickX, defaultRandomClickX);
         setControlLastConfig(randomClickY_Set, prop, key_randomClickY, defaultRandomClickY);
-        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory, unActivation);
+        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory, disable);
         setControlLastConfig(offsetX_Set, prop, key_offsetX, String.valueOf(defaultOffsetX));
         setControlLastConfig(offsetY_Set, prop, key_offsetY, String.valueOf(defaultOffsetY));
-        setControlLastConfig(updateStopWindow_Set, prop, key_updateStopWindow, unActivation);
-        setControlLastConfig(updateClickWindow_Set, prop, key_updateClickWindow, unActivation);
-        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, activation);
-        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, activation);
-        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, activation);
+        setControlLastConfig(updateStopWindow_Set, prop, key_updateStopWindow, disable);
+        setControlLastConfig(updateClickWindow_Set, prop, key_updateClickWindow, disable);
+        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, enable);
+        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, enable);
+        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, enable);
         setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval, defaultSampleInterval);
         setControlLastConfig(findWindowWait_Set, prop, key_findWindowWait, defaultFindWindowWait);
-        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, unActivation);
+        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, disable);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, defaultStopRetryNum);
         setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
         setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, defaultClickTimeOffset);
@@ -642,8 +642,8 @@ public class SettingController extends RootController implements MousePositionUp
         clickFileInput.close();
         InputStream listConfigInput = checkRunningInputStream(configFile_List);
         prop.load(listConfigInput);
-        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, activation);
-        setControlLastConfig(loadPMCS_Set, prop, key_loadLastConfig, activation);
+        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, enable);
+        setControlLastConfig(loadPMCS_Set, prop, key_loadLastConfig, enable);
         listConfigInput.close();
     }
 
@@ -670,9 +670,9 @@ public class SettingController extends RootController implements MousePositionUp
     private void loadMainConfig(Properties prop) throws IOException {
         InputStream configFileInput = checkRunningInputStream(configFile);
         prop.load(configFileInput);
-        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, activation);
-        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, unActivation);
-        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, unActivation);
+        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, enable);
+        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, disable);
+        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, disable);
         int them = Integer.parseInt(prop.getProperty(key_theme, String.valueOf(ThemeEnum.Auto.ordinal())));
         theme_Set.setValue(themeMap.get(them));
         // 加载快捷键设置
@@ -709,7 +709,7 @@ public class SettingController extends RootController implements MousePositionUp
         int clickY = Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY));
         FloatingWindowConfig clickConfig = new FloatingWindowConfig();
         clickConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType)))
-                .setAllRegion(activation.equals(prop.getProperty(key_clickAllRegion, unActivation)))
+                .setAllRegion(enable.equals(prop.getProperty(key_clickAllRegion, disable)))
                 .setHeight(Math.max(1, Math.min(clickHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(clickWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(clickX, screenWidth)))
@@ -721,7 +721,7 @@ public class SettingController extends RootController implements MousePositionUp
         int stopY = Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY));
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
         stopConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType)))
-                .setAllRegion(activation.equals(prop.getProperty(key_stopAllRegion, unActivation)))
+                .setAllRegion(enable.equals(prop.getProperty(key_stopAllRegion, disable)))
                 .setHeight(Math.max(1, Math.min(stopHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(stopWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(stopX, screenWidth)))

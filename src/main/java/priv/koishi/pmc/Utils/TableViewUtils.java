@@ -65,6 +65,9 @@ public class TableViewUtils {
      */
     public static final DataFormat dragDataFormat = new DataFormat("application/x-java-serialized-object");
 
+    /**
+     * 反射获取的字段缓存
+     */
     private static final Map<Class<?>, Map<String, Field>> FIELD_CACHE = new ConcurrentHashMap<>();
 
     /**
@@ -305,6 +308,9 @@ public class TableViewUtils {
 
     /**
      * 从缓存获取字段对象
+     *
+     * @param clazz     要获取字段的类
+     * @param fieldName 要获取的属性名
      */
     private static Field getCachedField(Class<?> clazz, String fieldName) {
         return FIELD_CACHE

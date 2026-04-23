@@ -182,11 +182,11 @@ public class ListPMCController extends RootController {
             prop.load(input);
             prop.put(key_lastLoopTime, loopTime_List.getText());
             prop.put(key_lastOutFileName, outFileName_List.getText());
-            String lastOpenDirectoryValue = openDirectory_List.isSelected() ? activation : unActivation;
+            String lastOpenDirectoryValue = openDirectory_List.isSelected() ? enable : disable;
             prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
-            String lastNotOverwriteValue = notOverwrite_List.isSelected() ? activation : unActivation;
+            String lastNotOverwriteValue = notOverwrite_List.isSelected() ? enable : disable;
             prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
-            String loadFolderValue = loadFolder_List.isSelected() ? activation : unActivation;
+            String loadFolderValue = loadFolder_List.isSelected() ? enable : disable;
             prop.put(key_loadFolder, loadFolderValue);
             prop.put(key_lastPreparationRunTime, preparationRunTime_List.getText());
             String outPathValue = outPath_List.getText();
@@ -241,12 +241,12 @@ public class ListPMCController extends RootController {
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile_List);
         prop.load(input);
-        if (activation.equals(prop.getProperty(key_loadLastConfig, activation))) {
+        if (enable.equals(prop.getProperty(key_loadLastConfig, enable))) {
             setControlLastConfig(outPath_List, prop, key_outFilePath);
-            setControlLastConfig(loadFolder_List, prop, key_loadFolder, unActivation);
+            setControlLastConfig(loadFolder_List, prop, key_loadFolder, disable);
             setControlLastConfig(loopTime_List, prop, key_lastLoopTime, defaultLoopTime);
-            setControlLastConfig(notOverwrite_List, prop, key_lastNotOverwrite, activation);
-            setControlLastConfig(openDirectory_List, prop, key_lastOpenDirectory, activation);
+            setControlLastConfig(notOverwrite_List, prop, key_lastNotOverwrite, enable);
+            setControlLastConfig(openDirectory_List, prop, key_lastOpenDirectory, enable);
             setControlLastConfig(outFileName_List, prop, key_lastOutFileName, defaultPMCSFileName());
             setControlLastConfig(preparationRunTime_List, prop, key_lastPreparationRunTime, defaultPreparationRun);
         }

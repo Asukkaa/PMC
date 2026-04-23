@@ -499,7 +499,7 @@ public class UiUtils {
                 ChoiceBox<String> choiceBox = (ChoiceBox<String>) control;
                 choiceBox.setValue(lastValue);
             } else if (control instanceof CheckBox checkBox) {
-                checkBox.setSelected(activation.equals(lastValue));
+                checkBox.setSelected(enable.equals(lastValue));
             } else if (control instanceof Label label) {
                 label.setText(lastValue);
             } else if (control instanceof TextField textField) {
@@ -520,9 +520,9 @@ public class UiUtils {
      */
     public static void setLoadLastConfigCheckBox(CheckBox checkBox, String configFile, String key) throws IOException {
         if (checkBox.isSelected()) {
-            updateProperties(configFile, key, activation);
+            updateProperties(configFile, key, enable);
         } else {
-            updateProperties(configFile, key, unActivation);
+            updateProperties(configFile, key, disable);
         }
     }
 
