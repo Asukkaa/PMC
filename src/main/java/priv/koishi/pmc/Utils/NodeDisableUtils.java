@@ -13,8 +13,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.MainApplication;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static priv.koishi.pmc.Finals.CommonFinals.disableCursor;
 import static priv.koishi.pmc.Finals.CommonFinals.isMac;
@@ -332,7 +332,7 @@ public class NodeDisableUtils {
      * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
      */
     public static void changeNodesDisable(TaskBean<?> taskBean, boolean disable) {
-        List<Node> disableNodes = taskBean.getDisableNodes();
+        Set<Node> disableNodes = taskBean.getDisableNodes();
         changeNodesDisable(disableNodes, disable);
     }
 
@@ -342,7 +342,7 @@ public class NodeDisableUtils {
      * @param disableNodes 防重复点击组件列表
      * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
      */
-    public static void changeNodesDisable(List<? extends Node> disableNodes, boolean disable) {
+    public static void changeNodesDisable(Set<? extends Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
             disableNodes.forEach(dc -> {
                 if (dc != null) {
@@ -362,7 +362,7 @@ public class NodeDisableUtils {
      * @param disable  可点击状态，true 设置为不可点击，false 设置为可点击
      */
     public static void changeDisableNodes(TaskBean<?> taskBean, boolean disable) {
-        List<Node> disableNodes = taskBean.getDisableNodes();
+        Set<Node> disableNodes = taskBean.getDisableNodes();
         changeDisableNodes(disableNodes, disable);
     }
 
@@ -372,7 +372,7 @@ public class NodeDisableUtils {
      * @param disableNodes 防重复点击组件列表
      * @param disable      可点击状态，true 设置为不可点击，false 设置为可点击
      */
-    public static void changeDisableNodes(List<? extends Node> disableNodes, boolean disable) {
+    public static void changeDisableNodes(Set<? extends Node> disableNodes, boolean disable) {
         if (CollectionUtils.isNotEmpty(disableNodes)) {
             disableNodes.forEach(dc -> {
                 if (dc != null) {

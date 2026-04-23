@@ -799,7 +799,7 @@ public class UiUtils {
      * @return 右键菜单
      */
     public static ContextMenu buildWindowInfoMenu(Label label, WindowMonitor windowMonitor,
-                                                  List<? extends Node> disableNodes, List<? extends Stage> stages) {
+                                                  Set<? extends Node> disableNodes, Set<? extends Stage> stages) {
         return buildWindowInfoMenu(label, windowMonitor, true, disableNodes, stages);
     }
 
@@ -814,7 +814,7 @@ public class UiUtils {
      * @return 右键菜单
      */
     public static ContextMenu buildWindowInfoMenu(Label label, WindowMonitor windowMonitor, boolean showRelative,
-                                                  List<? extends Node> disableNodes, List<? extends Stage> stages) {
+                                                  Set<? extends Node> disableNodes, Set<? extends Stage> stages) {
         // 添加窗口信息右键菜单
         ContextMenu windowInfoMenu = new ContextMenu();
         // 更新窗口信息选项
@@ -878,7 +878,7 @@ public class UiUtils {
      * @param stages        需要隐藏的窗口
      */
     private static void buildShowDataMenu(ContextMenu contextMenu, WindowMonitor windowMonitor,
-                                          List<? extends Node> disableNodes, List<? extends Stage> stages) {
+                                          Set<? extends Node> disableNodes, Set<? extends Stage> stages) {
         MenuItem menuItem = new MenuItem(findImgSet_showWindow());
         menuItem.setOnAction(_ -> {
             windowMonitor.updateWindowInfo();
@@ -926,7 +926,7 @@ public class UiUtils {
      * @param stages        需要隐藏的窗口
      */
     private static void buildRelativeWindowMenu(ContextMenu contextMenu, WindowMonitor windowMonitor,
-                                                List<? extends Node> disableNodes, List<? extends Stage> stages) {
+                                                Set<? extends Node> disableNodes, Set<? extends Stage> stages) {
         MenuItem menuItem = new MenuItem(findImgSet_showRelativeWindow());
         menuItem.setOnAction(_ -> {
             // 获取窗口区域相对位置设置

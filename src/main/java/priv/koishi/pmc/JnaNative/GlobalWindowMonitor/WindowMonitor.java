@@ -22,10 +22,7 @@ import priv.koishi.pmc.JnaNative.NativeInterface.MacWindowManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -85,7 +82,7 @@ public class WindowMonitor {
     /**
      * 要防重复点击的组件
      */
-    private final List<? extends Node> disableNodes;
+    private final Set<? extends Node> disableNodes;
 
     /**
      * 窗口信息
@@ -105,7 +102,7 @@ public class WindowMonitor {
      * @param disableNodes 要防重复点击的组件
      * @param stage        需要弹出的窗口
      */
-    public WindowMonitor(List<? extends Node> disableNodes, Stage stage) {
+    public WindowMonitor(Set<? extends Node> disableNodes, Stage stage) {
         this.disableNodes = disableNodes;
         this.stage = stage;
     }

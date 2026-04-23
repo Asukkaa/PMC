@@ -253,7 +253,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 要防重复点击的组件
      */
-    public final List<Node> disableNodes = new ArrayList<>();
+    public final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 自动点击任务

@@ -34,10 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.key_fileChooserHeight;
@@ -86,7 +83,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
     /**
      * 要防重复点击的组件
      */
-    private final List<Node> disableNodes = new ArrayList<>();
+    private final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 回调函数

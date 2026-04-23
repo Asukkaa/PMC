@@ -152,22 +152,22 @@ public class ClickDetailController extends RootController {
     /**
      * 要防重复点击的组件
      */
-    private final List<Node> disableNodes = new ArrayList<>();
+    private final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 终止操作识别区域设置要防重复点击的组件
      */
-    private final List<Node> stopDisableNodes = new ArrayList<>();
+    private final Set<Node> stopDisableNodes = new HashSet<>();
 
     /**
      * 目标图像识别区域设置要防重复点击的组件
      */
-    private final List<Node> clickDisableNodes = new ArrayList<>();
+    private final Set<Node> clickDisableNodes = new HashSet<>();
 
     /**
      * 窗口信息设置防重复点击标志
      */
-    private final List<Node> windowInfoDisableNodes = new ArrayList<>();
+    private final Set<Node> windowInfoDisableNodes = new HashSet<>();
 
     /**
      * 文字识别测试结果数据
@@ -1269,7 +1269,7 @@ public class ClickDetailController extends RootController {
         ContextMenu contextMenu = buildFileTableViewContextMenu(tessdataTableView_det);
         buildTessdataActiveMenu(contextMenu, tessdataTableView_det, null);
         // 构建窗口信息栏右键菜单
-        List<Stage> stages = List.of(stage, mainStage);
+        Set<Stage> stages = Set.of(stage, mainStage);
         buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildWindowInfoMenu(clickWindowInfo_Det, clickWindowMonitor, windowInfoDisableNodes, stages);
         buildWindowInfoMenu(moveWindowInfo_Det, clickWindowMonitor, false, windowInfoDisableNodes, stages);

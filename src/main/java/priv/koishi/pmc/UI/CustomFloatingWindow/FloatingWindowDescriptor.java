@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
-import java.util.List;
+import java.util.Set;
 
 import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingHeightInt;
 import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingWidthInt;
@@ -79,7 +79,7 @@ public class FloatingWindowDescriptor {
     /**
      * 要防重复点击的组件
      */
-    private List<Node> disableNodes;
+    private Set<Node> disableNodes;
 
     /**
      * 信窗信息展示栏文本

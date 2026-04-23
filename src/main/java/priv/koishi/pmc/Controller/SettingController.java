@@ -142,32 +142,32 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 基础要防重复点击的组件
      */
-    private final List<Node> baseDisableNodes = new ArrayList<>();
+    private final Set<Node> baseDisableNodes = new HashSet<>();
 
     /**
      * 终止操作识别区域设置要防重复点击的组件
      */
-    private final List<Node> stopDisableNodes = new ArrayList<>();
+    private final Set<Node> stopDisableNodes = new HashSet<>();
 
     /**
      * 目标图像识别区域设置要防重复点击的组件
      */
-    private final List<Node> clickDisableNodes = new ArrayList<>();
+    private final Set<Node> clickDisableNodes = new HashSet<>();
 
     /**
      * 窗口信息设置要防重复点击的组件
      */
-    private final List<Node> windowInfoDisableNodes = new ArrayList<>();
+    private final Set<Node> windowInfoDisableNodes = new HashSet<>();
 
     /**
      * 快捷键设置时要防重复点击的组件
      */
-    private final List<Node> shortcutDisableNodes = new ArrayList<>();
+    private final Set<Node> shortcutDisableNodes = new HashSet<>();
 
     /**
      * 执行 tessdata 相关任务时要防重复点击的组件
      */
-    private final List<Node> tessdataDisableNodes = new ArrayList<>();
+    private final Set<Node> tessdataDisableNodes = new HashSet<>();
 
     /**
      * 窗口进程地址
@@ -426,7 +426,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private FloatingWindowDescriptor creatFloatingWindowDescriptor() {
         return new FloatingWindowDescriptor()
-                .setDisableNodes(new ArrayList<>(baseDisableNodes))
+                .setDisableNodes(new HashSet<>(baseDisableNodes))
                 .setShowButtonText(findImgSet_showRegion())
                 .setHideButtonText(findImgSet_saveRegion())
                 .setHideButtonToolTip(tip_saveFloating())
@@ -1128,7 +1128,7 @@ public class SettingController extends RootController implements MousePositionUp
         // 修改模型启用状态选项
         buildTessdataActiveMenu(contextMenu, tessdataTableView_set, this::startSaveConfigTask);
         // 构建窗口信息栏右键菜单
-        List<Stage> stages = List.of(mainStage);
+        Set<Stage> stages = Set.of(mainStage);
         ContextMenu stopContextMenu = buildWindowInfoMenu(stopWindowInfo_Set, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildStopUpdateListMenu(stopContextMenu, stopWindowMonitor);
         ContextMenu clickContextMenu = buildWindowInfoMenu(clickWindowInfo_Set, clickWindowMonitor, windowInfoDisableNodes, stages);

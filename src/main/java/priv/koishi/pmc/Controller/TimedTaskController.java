@@ -16,9 +16,10 @@ import priv.koishi.pmc.Bean.TimedTaskBean;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -64,7 +65,7 @@ public class TimedTaskController extends RootController {
     /**
      * 要防重复点击的组件
      */
-    private final List<Node> disableNodes = new ArrayList<>();
+    private final Set<Node> disableNodes = new HashSet<>();
 
     @FXML
     public ProgressBar progressBar_Task;

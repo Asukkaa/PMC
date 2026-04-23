@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 多线程任务所需设置类
@@ -48,7 +49,7 @@ public class TaskBean<T> {
     /**
      * 要防重复点击的组件
      */
-    private List<Node> disableNodes;
+    private Set<Node> disableNodes;
 
     /**
      * 是否绑定线程信息栏（true 绑定，false 不绑定）

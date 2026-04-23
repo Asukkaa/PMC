@@ -27,9 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -93,7 +91,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     /**
      * 要防重复点击的组件
      */
-    private final List<Node> disableNodes = new ArrayList<>();
+    private final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 更新数据用的回调函数

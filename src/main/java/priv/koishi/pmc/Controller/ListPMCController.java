@@ -36,10 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Controller.AutoClickController.isNativeHookException;
@@ -95,7 +92,7 @@ public class ListPMCController extends RootController {
     /**
      * 要防重复点击的组件
      */
-    public final List<Node> disableNodes = new ArrayList<>();
+    public final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 批量导入 PMC 文件任务

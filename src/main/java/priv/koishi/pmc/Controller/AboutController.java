@@ -36,10 +36,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -82,7 +80,7 @@ public class AboutController extends RootController {
     /**
      * 要防重复点击的组件
      */
-    private final List<Node> disableNodes = new ArrayList<>();
+    private final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 下载更新任务
