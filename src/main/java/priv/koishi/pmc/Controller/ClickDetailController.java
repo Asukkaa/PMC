@@ -202,7 +202,7 @@ public class ClickDetailController extends RootController {
     /**
      * 带鼠标悬停提示的内容变化监听器删除器
      */
-    private final List<Runnable> listenerRemovers = new ArrayList<>();
+    private final Set<Runnable> listenerRemovers = new HashSet<>();
 
     /**
      * 表格结构变化监听器

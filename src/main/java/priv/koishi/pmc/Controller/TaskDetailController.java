@@ -81,7 +81,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
     /**
      * 带鼠标悬停提示的内容变化删除器
      */
-    private final List<Runnable> listenerRemovers = new ArrayList<>();
+    private final Set<Runnable> listenerRemovers = new HashSet<>();
 
     /**
      * 星期复选框集合

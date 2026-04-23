@@ -73,7 +73,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
     /**
      * 带鼠标悬停提示的内容变化删除器
      */
-    private final List<Runnable> listenerRemovers = new ArrayList<>();
+    private final Set<Runnable> listenerRemovers = new HashSet<>();
 
     /**
      * 文件查询任务
