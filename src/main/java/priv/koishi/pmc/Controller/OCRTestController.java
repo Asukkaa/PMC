@@ -84,7 +84,7 @@ public class OCRTestController extends ManuallyChangeThemeController {
      */
     public void initData(List<? extends OCRDataBean> data) {
         if (CollectionUtils.isNotEmpty(data)) {
-            tableView_Tes.getItems().addAll(data);
+            tableView_Tes.getItems().setAll(data);
             updateTableViewSizeText(tableView_Tes, dataNumber_Tes, unit_data());
             tableView_Tes.refresh();
         }

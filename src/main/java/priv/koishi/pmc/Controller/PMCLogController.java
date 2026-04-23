@@ -98,7 +98,7 @@ public class PMCLogController extends ManuallyChangeThemeController {
     public void initData(List<PMCLogBean> logs) {
         clickLogs = logs;
         if (CollectionUtils.isNotEmpty(logs)) {
-            tableView_PLog.getItems().addAll(logs);
+            tableView_PLog.getItems().setAll(logs);
             updateTableViewSizeText(tableView_PLog, dataNumber_PLog, unit_log());
             tableView_PLog.refresh();
         }

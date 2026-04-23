@@ -1145,7 +1145,7 @@ public class AutoClickController extends RootController implements MousePosition
         insertTop.setOnAction(_ -> insertDataMenuItem(menuItem_insertTop()));
         recordTop.setOnAction(_ -> insertDataMenuItem(menuItem_recordTop()));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(insertUp, insertDown, recordUp, recordDown, insertTop, recordTop);
+        menu.getItems().setAll(insertUp, insertDown, recordUp, recordDown, insertTop, recordTop);
         contextMenu.getItems().add(menu);
     }
 
@@ -1194,7 +1194,7 @@ public class AutoClickController extends RootController implements MousePosition
         forward.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_forward()));
         back.setOnAction(_ -> updateClickKeyMenuItem(tableView, mouseButton_back()));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(primary, secondary, middle, forward, back);
+        menu.getItems().setAll(primary, secondary, middle, forward, back);
         contextMenu.getItems().add(menu);
     }
 
@@ -1235,7 +1235,7 @@ public class AutoClickController extends RootController implements MousePosition
         middle.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_stop()));
         forward.setOnAction(_ -> updateRetryTypeMenuItem(tableView, retryType_break()));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(primary, secondary, middle, forward);
+        menu.getItems().setAll(primary, secondary, middle, forward);
         contextMenu.getItems().add(menu);
     }
 

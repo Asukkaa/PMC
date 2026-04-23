@@ -133,7 +133,7 @@ public class ColorPickerFloating implements MousePositionUpdater {
         settingBox.setVisible(false);
         HBox previewBox = new HBox(15, nowBox, settingBox);
         previewBox.setAlignment(Pos.CENTER_LEFT);
-        box.getChildren().addAll(previewBox);
+        box.getChildren().setAll(previewBox);
         return box;
     }
 

@@ -88,7 +88,7 @@ public class ClickLogController extends ManuallyChangeThemeController {
      */
     public void initData(List<? extends ClickLogBean> logs) {
         if (CollectionUtils.isNotEmpty(logs)) {
-            tableView_Log.getItems().addAll(logs);
+            tableView_Log.getItems().setAll(logs);
             updateTableViewSizeText(tableView_Log, dataNumber_Log, unit_log());
             tableView_Log.refresh();
         }

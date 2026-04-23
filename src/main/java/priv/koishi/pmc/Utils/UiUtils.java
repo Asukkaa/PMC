@@ -106,7 +106,7 @@ public class UiUtils {
         }
         // 设置过滤条件
         if (CollectionUtils.isNotEmpty(extensionFilters)) {
-            fileChooser.getExtensionFilters().addAll(extensionFilters);
+            fileChooser.getExtensionFilters().setAll(extensionFilters);
         }
         return fileChooser;
     }
@@ -340,7 +340,7 @@ public class UiUtils {
         setWindowLogo(stage, logoPath);
         ButtonType okButton = new ButtonType(ok, ButtonBar.ButtonData.APPLY);
         ButtonType cancelButton = new ButtonType(cancel, ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
+        dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
         return dialog.showAndWait().orElse(cancelButton);
     }
 
@@ -1056,8 +1056,7 @@ public class UiUtils {
      * @param <T>          可选值类型
      */
     public static <T> void initializeChoiceBoxItems(ChoiceBox<? super T> choiceBox, T defaultValue, List<? extends T> values) {
-        choiceBox.getItems().clear();
-        choiceBox.getItems().addAll(values);
+        choiceBox.getItems().setAll(values);
         choiceBox.setValue(defaultValue);
     }
 

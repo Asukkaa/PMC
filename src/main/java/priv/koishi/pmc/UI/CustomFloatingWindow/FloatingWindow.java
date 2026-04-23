@@ -114,12 +114,12 @@ public class FloatingWindow {
         config.setNameeLabel(nameLabel);
         VBox vBox = new VBox();
         vBox.setAlignment(config.getPos());
-        vBox.getChildren().addAll(nameLabel, floatingPosition, messageLabel);
+        vBox.getChildren().setAll(nameLabel, floatingPosition, messageLabel);
         Node node = config.getAdditionalContent();
         if (node != null) {
             vBox.getChildren().add(node);
         }
-        root.getChildren().addAll(rectangle, vBox);
+        root.getChildren().setAll(rectangle, vBox);
         StackPane.setMargin(vBox, new Insets(15, 0, 0, 15));
         // 创建浮窗舞台
         Stage stage = new Stage();

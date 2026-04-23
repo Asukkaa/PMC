@@ -299,7 +299,7 @@ public class MainApplication extends Application {
         MenuItem quit = MenuToolkit.toolkit(Locale.getDefault()).createQuitMenuItem(appName);
         quit.setText(macMenu_quit() + appName);
         Menu menu = new Menu();
-        menu.getItems().addAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(),
+        menu.getItems().setAll(about, new SeparatorMenuItem(), setting, new SeparatorMenuItem(),
                 hide, hideOthers, new SeparatorMenuItem(), quit);
         MenuToolkit.toolkit(Locale.getDefault()).setApplicationMenu(menu);
     }
@@ -396,7 +396,7 @@ public class MainApplication extends Application {
                 ButtonType appendButton = new ButtonType(import_append(), ButtonBar.ButtonData.APPLY);
                 ButtonType clearButton = new ButtonType(import_clear(), ButtonBar.ButtonData.OTHER);
                 ButtonType cancelButton = new ButtonType(import_cancel(), ButtonBar.ButtonData.CANCEL_CLOSE);
-                dialog.getDialogPane().getButtonTypes().addAll(appendButton, clearButton, cancelButton);
+                dialog.getDialogPane().getButtonTypes().setAll(appendButton, clearButton, cancelButton);
                 Button appendBtn = (Button) dialog.getDialogPane().lookupButton(appendButton);
                 Button clearBtn = (Button) dialog.getDialogPane().lookupButton(clearButton);
                 Button cancelBtn = (Button) dialog.getDialogPane().lookupButton(cancelButton);

@@ -162,10 +162,7 @@ public class TessdataService {
                     }
                     // 展示数据
                     TableView<? super TessdataBean> tableView = taskBean.getTableView();
-                    Platform.runLater(() -> {
-                        tableView.getItems().clear();
-                        tableView.getItems().addAll(list);
-                    });
+                    Platform.runLater(() -> tableView.getItems().setAll(list));
                 }
                 return null;
             }

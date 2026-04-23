@@ -719,7 +719,7 @@ public class TableViewUtils {
         top.setOnAction(_ -> topMoveDataMenuItem(tableView));
         bottom.setOnAction(_ -> bottomMoveDataMenuItem(tableView));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(up, down, top, bottom);
+        menu.getItems().setAll(up, down, top, bottom);
         contextMenu.getItems().add(menu);
     }
 
@@ -839,7 +839,7 @@ public class TableViewUtils {
         openDirector.setOnAction(_ -> openDirectorMenuItem(tableView));
         copyFilePath.setOnAction(_ -> copyFilePathItem(tableView));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(openFile, openDirector, copyFilePath);
+        menu.getItems().setAll(openFile, openDirector, copyFilePath);
         contextMenu.getItems().add(menu);
     }
 
@@ -896,7 +896,7 @@ public class TableViewUtils {
         appendCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_appendCopy(), dataNumber, dataNumberUnit));
         topCopy.setOnAction(_ -> copyDataMenuItem(tableView, menuItem_topCopy(), dataNumber, dataNumberUnit));
         // 将菜单添加到菜单列表
-        menu.getItems().addAll(upCopy, downCopy, appendCopy, topCopy);
+        menu.getItems().setAll(upCopy, downCopy, appendCopy, topCopy);
         contextMenu.getItems().add(menu);
     }
 
@@ -1228,7 +1228,7 @@ public class TableViewUtils {
         MenuItem unactiveItem = new MenuItem(menu_unActiveMenu());
         activeItem.setOnAction(_ -> buildSetActiveMenu(tableMenu, tessdataTableView, runnable, true));
         unactiveItem.setOnAction(_ -> buildSetActiveMenu(tableMenu, tessdataTableView, runnable, false));
-        menu.getItems().addAll(activeItem, unactiveItem);
+        menu.getItems().setAll(activeItem, unactiveItem);
         tableMenu.getItems().add(menu);
     }
 
