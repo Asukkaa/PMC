@@ -244,7 +244,9 @@ public class TableViewUtils {
         // 设置 CellValueFactory，通过反射读取字段当前值
         column.setCellValueFactory(cellData -> {
             T bean = cellData.getValue();
-            if (bean == null) return new SimpleBooleanProperty(false);
+            if (bean == null) {
+                return new SimpleBooleanProperty(false);
+            }
             try {
                 Field field = getCachedField(bean.getClass(), fieldName);
                 return new SimpleBooleanProperty(field.getBoolean(bean));
