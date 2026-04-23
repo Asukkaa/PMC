@@ -281,7 +281,10 @@ public class TableViewUtils {
                     checkBox.setSelected(item != null && item);
                     setGraphic(checkBox);
                     setText(null);
-                    setTooltip(creatTooltip(labelText + "：" + (item != null && item)));
+                    String value = ((item != null && item) ? text_enable() : text_disable());
+                    String tipText = getTipText(column, value);
+                    setTooltip(creatTooltip(tipText));
+                    addToolTip(tipText, checkBox);
                 }
             }
 

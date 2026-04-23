@@ -19,6 +19,6 @@ public @interface CheckBoxColumn {
     /**
      * CheckBox 显示的文本对应的 key
      */
-    String textKey() default "active";
+    String textKey() default "enable";
 
 }

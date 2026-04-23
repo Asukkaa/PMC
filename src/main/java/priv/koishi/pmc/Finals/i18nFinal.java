@@ -2298,6 +2298,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 启用
+     */
+    public static String text_enable() {
+        return bundle.getString("enable");
+    }
+
+    /**
+     * @return 禁用
+     */
+    public static String text_disable() {
+        return bundle.getString("disable");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
