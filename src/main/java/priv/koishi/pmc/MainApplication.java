@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -36,6 +37,7 @@ import java.util.*;
 import static priv.koishi.pmc.Controller.AutoClickController.recordTextColorProperty;
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.listPMCController;
+import static priv.koishi.pmc.Controller.RootController.loadFXML;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
@@ -160,7 +162,8 @@ public class MainApplication extends Application {
                 && enable.equals(prop.getProperty(key_loadLastFullWindow, disable))) {
             stage.setFullScreen(true);
         }
-        mainScene = new Scene(fxmlLoader.load(), appWidth, appHeight);
+        Parent root = loadFXML(fxmlLoader);
+        mainScene = new Scene(root, appWidth, appHeight);
         stage.setTitle(appName);
         stage.setScene(mainScene);
         setWindowLogo(stage, logoPath);

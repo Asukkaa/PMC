@@ -146,7 +146,7 @@ public class TimedTaskController extends RootController {
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root;
         try {
-            root = loader.load();
+            root = loadFXML(loader);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

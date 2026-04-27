@@ -87,7 +87,6 @@
 }
 
 .choice-box {
-    -fx-cursor: hand;
     -fx-font-size: 12;
     -fx-pref-height: 25;
 }
@@ -99,13 +98,11 @@
 }
 
 .button {
-    -fx-cursor: hand;
     -fx-font-size: 12;
     -fx-pref-height: 25;
 }
 
 .check-box {
-    -fx-cursor: hand;
     -fx-font-size: 12;
     -fx-pref-height: 35;
 }
@@ -124,7 +121,6 @@
 }
 
 .tab {
-    -fx-cursor: hand;
     -fx-fit-to-width: true;
     -fx-fit-to-height: true;
     -fx-pref-height: 35;

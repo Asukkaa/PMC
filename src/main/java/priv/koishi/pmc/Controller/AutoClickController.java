@@ -717,7 +717,7 @@ public class AutoClickController extends RootController implements MousePosition
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent root;
         try {
-            root = loader.load();
+            root = loadFXML(loader);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -2370,7 +2370,7 @@ public class AutoClickController extends RootController implements MousePosition
     private void clickLog() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickLog-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loader.load();
+        Parent root = loadFXML(loader);
         ClickLogController controller = loader.getController();
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> clickLogs.clear());

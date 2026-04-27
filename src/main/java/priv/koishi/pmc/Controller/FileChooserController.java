@@ -487,7 +487,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
     public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
         URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loader.load();
+        Parent root = loadFXML(loader);
         FileChooserController controller = loader.getController();
         controller.initData(fileChooserConfig);
         Stage detailStage = new Stage();

@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -261,6 +262,7 @@ public class TableViewUtils {
 
             {
                 checkBox.setAlignment(Pos.CENTER);
+                checkBox.setCursor(Cursor.HAND);
                 // 当 CheckBox 被点击时，提交编辑
                 checkBox.setOnAction(_ -> {
                     if (currentBean != null) {

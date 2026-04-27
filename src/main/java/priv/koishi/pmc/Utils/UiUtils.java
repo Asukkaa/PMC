@@ -4,9 +4,11 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -336,11 +338,22 @@ public class UiUtils {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(confirm);
-        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        DialogPane dialogPane = dialog.getDialogPane();
+        Stage stage = (Stage) dialogPane.getScene().getWindow();
         setWindowLogo(stage, logoPath);
         ButtonType okButton = new ButtonType(ok, ButtonBar.ButtonData.APPLY);
         ButtonType cancelButton = new ButtonType(cancel, ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().setAll(okButton, cancelButton);
+        dialogPane.getButtonTypes().setAll(okButton, cancelButton);
+        dialog.setOnShown(_ -> {
+            Button okBtnNode = (Button) dialogPane.lookupButton(okButton);
+            if (okBtnNode != null) {
+                okBtnNode.setCursor(Cursor.HAND);
+            }
+            Button cancelBtnNode = (Button) dialogPane.lookupButton(cancelButton);
+            if (cancelBtnNode != null) {
+                cancelBtnNode.setCursor(Cursor.HAND);
+            }
+        });
         return dialog.showAndWait().orElse(cancelButton);
     }
 

@@ -404,7 +404,7 @@ public class AboutController extends RootController {
     private void appreciate() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Appreciate-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loader.load();
+        Parent root = loadFXML(loader);
         Stage appreciateStage = new Stage();
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);

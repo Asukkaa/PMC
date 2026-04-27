@@ -836,7 +836,7 @@ public class ListPMCController extends RootController {
     private void clickLog() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/PMCLog-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loader.load();
+        Parent root = loadFXML(loader);
         PMCLogController controller = loader.getController();
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> {
