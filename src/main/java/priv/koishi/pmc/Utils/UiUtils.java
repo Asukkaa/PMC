@@ -52,6 +52,7 @@ import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFlo
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
+import static priv.koishi.pmc.MainApplication.mainScene;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
@@ -1222,6 +1223,16 @@ public class UiUtils {
             node.setVisible(!isHide);
             node.setManaged(!isHide);
         }
+    }
+
+    /**
+     * 获取 Tab 所在的节点
+     *
+     * @param tab 目标 Tab
+     * @return 目标 Tab 所在节点
+     */
+    public static Node getTabNode(Tab tab) {
+        return mainScene.lookup("#" + tab.getId());
     }
 
 }

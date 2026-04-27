@@ -6,7 +6,7 @@
       fx:controller="priv.koishi.pmc.Controller.MainController">
     <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
         <!--自动操作工具-->
-        <Tab style="-fx-cursor: hand" fx:id="autoClickTab" text="%main.autoClickTab">
+        <Tab fx:id="autoClickTab" text="%main.autoClickTab">
             <ScrollPane>
                 <AnchorPane>
                     <fx:include source="AutoClick-tab.fxml"/>
@@ -15,7 +15,7 @@
         </Tab>
 
         <!--批量执行 PMC 文件-->
-        <Tab style="-fx-cursor: hand" fx:id="listPMCTab" text="%main.PMCListTab">
+        <Tab fx:id="listPMCTab" text="%main.PMCListTab">
             <ScrollPane>
                 <AnchorPane>
                     <fx:include source="PMCList-tab.fxml"/>
@@ -24,7 +24,7 @@
         </Tab>
 
         <!--定时启动任务-->
-        <Tab style="-fx-cursor: hand" fx:id="timedStartTab" text="%main.timedStartTab">
+        <Tab fx:id="timedStartTab" text="%main.timedStartTab">
             <ScrollPane>
                 <AnchorPane>
                     <fx:include source="TimedTask-tab.fxml"/>
@@ -33,7 +33,7 @@
         </Tab>
 
         <!--设置-->
-        <Tab style="-fx-cursor: hand" fx:id="settingTab" text="%main.settingTab">
+        <Tab fx:id="settingTab" text="%main.settingTab">
             <ScrollPane>
                 <AnchorPane>
                     <fx:include source="Setting-tab.fxml"/>
@@ -42,7 +42,7 @@
         </Tab>
 
         <!--关于-->
-        <Tab style="-fx-cursor: hand" fx:id="aboutTab" text="%main.aboutTab">
+        <Tab fx:id="aboutTab" text="%main.aboutTab">
             <ScrollPane>
                 <AnchorPane>
                     <fx:include source="About-tab.fxml"/>

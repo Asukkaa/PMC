@@ -550,15 +550,15 @@ public class ListPMCController extends RootController {
         disableNodes.add(clearButton_List);
         disableNodes.add(loadAutoClick_List);
         disableNodes.add(exportAutoClick_List);
-        Node aboutTab = mainScene.lookup("#aboutTab");
+        Node aboutTab = getTabNode(mainController.aboutTab);
         disableNodes.add(aboutTab);
-        Node listPMCTab = mainScene.lookup("#listPMCTab");
+        Node listPMCTab = getTabNode(mainController.listPMCTab);
         disableNodes.add(listPMCTab);
-        Node settingTab = mainScene.lookup("#settingTab");
+        Node settingTab = getTabNode(mainController.settingTab);
         disableNodes.add(settingTab);
-        Node autoClickTab = mainScene.lookup("#autoClickTab");
+        Node autoClickTab = getTabNode(mainController.autoClickTab);
         disableNodes.add(autoClickTab);
-        Node timedStartTab = mainScene.lookup("#timedStartTab");
+        Node timedStartTab = getTabNode(mainController.timedStartTab);
         disableNodes.add(timedStartTab);
     }
 

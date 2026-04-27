@@ -93,29 +93,26 @@ public class RootController extends CommonProperties {
                         setHandCursorRecursively((Parent) content);
                     }
                 }
-                return;
-            }
-            // 处理 ScrollPane（parent 本身）
-            if (parent instanceof ScrollPane scrollPane) {
+                // 处理 ScrollPane（parent 本身）
+            } else if (parent instanceof ScrollPane scrollPane) {
                 Node content = scrollPane.getContent();
                 if (content instanceof Parent) {
                     setHandCursorRecursively((Parent) content);
                 }
-                return;
-            }
-            // 遍历普通子节点
-            for (Node node : parent.getChildrenUnmodifiable()) {
-                // 可点击控件直接设置光标
-                if (node instanceof ButtonBase
-                        || node instanceof ComboBoxBase
-                        || node instanceof ChoiceBox
-                        || node instanceof Slider
-                        || node instanceof MenuBar) {
-                    node.setCursor(Cursor.HAND);
-                }
-                // 递归进入普通容器（不再需要特殊处理，因为 parent 入口已处理）
-                if (node instanceof Parent) {
-                    setHandCursorRecursively((Parent) node);
+            } else {
+                // 遍历普通子节点
+                for (Node node : parent.getChildrenUnmodifiable()) {
+                    // 可点击控件直接设置光标
+                    if (node instanceof ButtonBase
+                            || node instanceof ComboBoxBase
+                            || node instanceof ChoiceBox
+                            || node instanceof Slider
+                            || node instanceof MenuBar) {
+                        node.setCursor(Cursor.HAND);
+                        // 递归进入普通容器（不再需要特殊处理，因为 parent 入口已处理）
+                    } else if (node instanceof Parent) {
+                        setHandCursorRecursively((Parent) node);
+                    }
                 }
             }
         }

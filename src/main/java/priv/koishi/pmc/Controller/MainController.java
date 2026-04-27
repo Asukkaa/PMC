@@ -2,6 +2,8 @@ package priv.koishi.pmc.Controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -22,6 +24,7 @@ import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
 import static priv.koishi.pmc.Utils.TableViewUtils.dragDataFormat;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 import static priv.koishi.pmc.Utils.UiUtils.findTabById;
+import static priv.koishi.pmc.Utils.UiUtils.getTabNode;
 
 /**
  * 全局页面控制器
@@ -102,6 +105,8 @@ public class MainController extends RootController {
     private void setupTabDragging() {
         // 为每个 Tab 添加拖拽图标
         for (Tab tab : tabPane.getTabs()) {
+            Node tabNode = getTabNode(tab);
+            tabNode.setCursor(Cursor.HAND);
             Label dragHandle = new Label(tab.getText());
             tab.setText("");
             tab.setGraphic(dragHandle);
