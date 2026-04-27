@@ -50,7 +50,7 @@ public class NodeDisableUtils {
                 // 不可编辑时使用默认光标
                 node.setCursor(disableCursor);
                 // 为所有子节点也设置相同的光标
-                setCursorForChildren(node, disableCursor);
+                setCursorForChildren(node, disableCursor, false);
                 // 单独处理带有 Graphic 的按钮
                 if (node instanceof ButtonBase button) {
                     Node graphic = button.getGraphic();
@@ -62,7 +62,7 @@ public class NodeDisableUtils {
                 node.setOpacity(1.0);
                 // 恢复可编辑时的默认光标
                 node.setCursor(getDefaultCursor(node));
-                setCursorForChildren(node, null);
+                setCursorForChildren(node, null, true);
             }
             if (tooltipText != null) {
                 addToolTip(tooltipText, node);
@@ -77,19 +77,29 @@ public class NodeDisableUtils {
     /**
      * 为所有子节点设置光标
      *
-     * @param node   需要修改样式的组件
-     * @param cursor 鼠标光标
+     * @param node    需要修改样式的组件
+     * @param cursor  鼠标光标
+     * @param restore 恢复可交互状态标志（true 恢复到默认样式， false 强制使用同一样式）
      */
-    private static void setCursorForChildren(Node node, Cursor cursor) {
-        if (node instanceof Parent) {
-            String originalCursor = "originalCursor";
-            for (Node child : ((Parent) node).getChildrenUnmodifiable()) {
-                if (!child.getProperties().containsKey(originalCursor)) {
-                    child.getProperties().put(originalCursor, child.getCursor());
+    private static void setCursorForChildren(Node node, Cursor cursor, boolean restore) {
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                if (restore) {
+                    // 对需要特殊光标的节点设置正确光标
+                    if (child instanceof ButtonBase
+                            || child instanceof ChoiceBox<?>) {
+                        child.setCursor(Cursor.HAND);
+                    } else if (child instanceof TextInputControl) {
+                        child.setCursor(Cursor.TEXT);
+                    } else {
+                        // 普通容器/节点设为 null，继承父节点光标
+                        child.setCursor(null);
+                    }
+                } else {
+                    child.setCursor(cursor);
                 }
-                child.setCursor(null);
-                child.setCursor(cursor);
-                setCursorForChildren(child, cursor);
+                // 递归处理子容器
+                setCursorForChildren(child, cursor, restore);
             }
         }
     }
@@ -304,7 +314,7 @@ public class NodeDisableUtils {
                 return Cursor.TEXT;
             }
             default -> {
-                return Cursor.DEFAULT;
+                return null;
             }
         }
     }
