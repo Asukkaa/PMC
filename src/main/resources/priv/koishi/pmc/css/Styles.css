@@ -12,16 +12,6 @@
     -fx-font-size: 12px;
 }
 
-.checkBox-medium {
-    -fx-cursor: hand;
-    -fx-pref-height: 25;
-}
-
-.checkBox-short {
-    -fx-cursor: hand;
-    -fx-pref-height: 25;
-}
-
 .hBox-270-5 {
     -fx-spacing: 5;
     -fx-pref-width: 270;
@@ -53,7 +43,6 @@
 }
 
 .img-button-style {
-    -fx-cursor: hand;
     -fx-border-color: transparent;
     -fx-background-color: transparent;
     -fx-background-radius: 0;
@@ -66,7 +55,6 @@
 .cadetblue-button {
     -fx-background-color: cadetblue;
     -fx-text-fill: white;
-    -fx-cursor: hand;
 }
 
 .cadetblue-button:focused {
@@ -84,7 +72,6 @@
 .cornflowerblue-button {
     -fx-background-color: cornflowerblue;
     -fx-text-fill: white;
-    -fx-cursor: hand;
 }
 
 .cornflowerblue-button:hover {

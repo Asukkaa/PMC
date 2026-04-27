@@ -36,8 +36,7 @@
                             </HBox>
 
                             <!--不移动鼠标-->
-                            <CheckBox fx:id="noMove_Det" styleClass="checkBox-short" visible="false"
-                                      text="%clickDetail.noMove_Det"/>
+                            <CheckBox fx:id="noMove_Det" visible="false" text="%clickDetail.noMove_Det"/>
                             <!--测试当前设置-->
                             <Button fx:id="testLink_Det" text="%clickDetail.testLink_Det" onAction="#testAction"/>
                         </HBox>
@@ -61,14 +60,12 @@
 
                             <HBox styleClass="hBox-270-5">
                                 <!--运行时启用随机执行前等待时间偏移-->
-                                <CheckBox fx:id="randomWaitTime_Det" styleClass="checkBox-short"
-                                          text="%randomWaitTime"/>
+                                <CheckBox fx:id="randomWaitTime_Det" text="%randomWaitTime"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
                                 <!--运行时启用随机操作间隔时间偏移-->
-                                <CheckBox fx:id="randomClickInterval_Det" styleClass="checkBox-short"
-                                          text="%randomClickInterval"/>
+                                <CheckBox fx:id="randomClickInterval_Det" text="%randomClickInterval"/>
                             </HBox>
                         </HBox>
                     </VBox>
@@ -118,8 +115,7 @@
 
                             <HBox styleClass="hBox-270-5">
                                 <!--运行时最小化终端窗口-->
-                                <CheckBox fx:id="minWindow_Det" styleClass="checkBox-short" selected="true"
-                                          text="%clickDetail.minWindow_Det"/>
+                                <CheckBox fx:id="minWindow_Det" selected="true" text="%clickDetail.minWindow_Det"/>
                             </HBox>
                         </HBox>
 
@@ -150,8 +146,7 @@
                             </HBox>
 
                             <!--忽略移动失败-->
-                            <CheckBox fx:id="ignoreFailure_Det" styleClass="checkBox-short" selected="true"
-                                      text="%clickDetail.ignoreFailure_Det"/>
+                            <CheckBox fx:id="ignoreFailure_Det" selected="true" text="%clickDetail.ignoreFailure_Det"/>
                         </HBox>
 
                         <Label fx:id="pathTip_Det" style="-fx-pref-height: -1" textFill="red"/>
@@ -213,8 +208,7 @@
 
                             <HBox styleClass="hBox-270-5">
                                 <!--使用相对坐标-->
-                                <CheckBox fx:id="useRelatively_Det" onAction="#useRelatively"
-                                          styleClass="checkBox-short" text="%useRelatively"/>
+                                <CheckBox fx:id="useRelatively_Det" onAction="#useRelatively" text="%useRelatively"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
@@ -227,13 +221,12 @@
                         <HBox spacing="10">
                             <HBox styleClass="hBox-270-5">
                                 <!--运行时启用随机点击坐标偏移-->
-                                <CheckBox fx:id="randomClick_Det" styleClass="checkBox-short" text="%randomClick"/>
+                                <CheckBox fx:id="randomClick_Det" text="%randomClick"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
                                 <!--运行时启用随机轨迹坐标偏移-->
-                                <CheckBox fx:id="randomTrajectory_Det" styleClass="checkBox-short"
-                                          text="%randomTrajectory"/>
+                                <CheckBox fx:id="randomTrajectory_Det" text="%randomTrajectory"/>
                             </HBox>
 
                             <HBox styleClass="hBox-270-5">
@@ -280,8 +273,7 @@
 
                             <HBox styleClass="hBox-270-5">
                                 <!--运行时启用随机点击时长偏移-->
-                                <CheckBox fx:id="randomClickTime_Det" styleClass="checkBox-short"
-                                          text="%randomClickTime"/>
+                                <CheckBox fx:id="randomClickTime_Det" text="%randomClickTime"/>
                             </HBox>
                         </HBox>
 
@@ -326,16 +318,14 @@
 
                                     <HBox styleClass="hBox-270-5">
                                         <!--第一次识别失败后改为识别整个屏幕-->
-                                        <CheckBox fx:id="clickAllRegion_Det" styleClass="checkBox-short"
-                                                  text="%findImgSet.allRegion"/>
+                                        <CheckBox fx:id="clickAllRegion_Det" text="%findImgSet.allRegion"/>
                                     </HBox>
                                 </HBox>
 
                                 <HBox fx:id="clickWindowInfoHBox_Det" spacing="10">
                                     <HBox styleClass="hBox-270-5">
                                         <!--操作前更新窗口信息-->
-                                        <CheckBox fx:id="updateClickWindow_Det" styleClass="checkBox-short"
-                                                  text="%findImgSet.updateWindowInfo"/>
+                                        <CheckBox fx:id="updateClickWindow_Det" text="%findImgSet.updateWindowInfo"/>
                                     </HBox>
 
                                     <!--记录窗口信息-->
@@ -423,16 +413,14 @@
 
                                     <HBox styleClass="hBox-270-5">
                                         <!--第一次识别失败后改为识别整个屏幕-->
-                                        <CheckBox fx:id="stopAllRegion_Det" styleClass="checkBox-short"
-                                                  text="%findImgSet.allRegion"/>
+                                        <CheckBox fx:id="stopAllRegion_Det" text="%findImgSet.allRegion"/>
                                     </HBox>
                                 </HBox>
 
                                 <HBox fx:id="stopWindowInfoHBox_Det" spacing="10">
                                     <HBox styleClass="hBox-270-5">
                                         <!--操作前更新窗口信息-->
-                                        <CheckBox fx:id="updateStopWindow_Det" styleClass="checkBox-short"
-                                                  text="%findImgSet.updateWindowInfo"/>
+                                        <CheckBox fx:id="updateStopWindow_Det" text="%findImgSet.updateWindowInfo"/>
                                     </HBox>
 
                                     <!--记录窗口信息-->
