@@ -3,14 +3,15 @@ package priv.koishi.pmc.Finals;
 import com.sun.jna.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.paint.Color;
+import priv.koishi.pmc.MainApplication;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static priv.koishi.pmc.Utils.CommonUtils.getCurrentGCType;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.getDisableCursor;
 
 /**
  * 通用常量类
@@ -842,6 +843,7 @@ public class CommonFinals {
     /**
      * 鼠标禁用图标
      */
-    public static final Cursor disableCursor = getDisableCursor();
+    public static final Cursor disableCursor = Cursor.cursor(Objects.requireNonNull(
+            MainApplication.class.getResource("icon/Disable.png")).toString());
 
 }

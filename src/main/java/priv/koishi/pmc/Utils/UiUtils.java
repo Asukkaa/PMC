@@ -322,6 +322,12 @@ public class UiUtils {
         textArea.setMaxHeight(Double.MAX_VALUE);
         details.getChildren().add(textArea);
         dialogPane.setExpandableContent(details);
+        alert.setOnShown(_ -> {
+            Button okBtnNode = (Button) dialogPane.lookupButton(ButtonType.OK);
+            if (okBtnNode != null) {
+                okBtnNode.setCursor(Cursor.HAND);
+            }
+        });
         return alert;
     }
 

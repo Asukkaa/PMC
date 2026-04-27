@@ -11,13 +11,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import priv.koishi.pmc.Bean.TaskBean;
-import priv.koishi.pmc.MainApplication;
 
-import java.util.Objects;
 import java.util.Set;
 
 import static priv.koishi.pmc.Finals.CommonFinals.disableCursor;
-import static priv.koishi.pmc.Finals.CommonFinals.isMac;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 
 /**
@@ -28,19 +25,6 @@ import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
  * Time:15:08
  */
 public class NodeDisableUtils {
-
-    /**
-     * 获取禁止交互鼠标图标
-     *
-     * @return win 返回自定义禁用图标，macOS 返回默认图标
-     */
-    public static Cursor getDisableCursor() {
-        if (isMac) {
-            return Cursor.DEFAULT;
-        }
-        return Cursor.cursor(Objects.requireNonNull(
-                MainApplication.class.getResource("icon/Disable.png")).toString());
-    }
 
     /**
      * 设置节点的编辑状态
