@@ -953,7 +953,7 @@ public class SettingController extends RootController implements MousePositionUp
         baseDisableNodes.add(autoClickTab);
         Node timedStartTab = getTabNode(mainController.timedStartTab);
         baseDisableNodes.add(timedStartTab);
-        Node tabPane = mainScene.lookup("#tabPane");
+        Node tabPane = mainScene.lookup("#" + mainController.tabPane.getId());
         windowInfoDisableNodes.add(tabPane);
         stopDisableNodes.addAll(baseDisableNodes);
         stopDisableNodes.add(stopFindImgType_Set);
@@ -2428,8 +2428,10 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {
+        isSonOpening = true;
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         List<File> imgFiles = creatImgFilesChooser(window, stopImgSelectPath);
+        isSonOpening = false;
         if (CollectionUtils.isNotEmpty(imgFiles)) {
             File selectedFile = imgFiles.getFirst();
             stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
@@ -2720,10 +2722,12 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void addTessdataPath(ActionEvent actionEvent) {
+        isSonOpening = true;
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         extensionFilters.add(new FileChooser.ExtensionFilter(allTraineddata, traineddata, allTraineddata));
         List<File> files = creatFilesChooser(window, tessdataPath, extensionFilters, text_addTessdataPath());
+        isSonOpening = false;
         if (CollectionUtils.isNotEmpty(files)) {
             startLoadTessdataTask(files);
         }

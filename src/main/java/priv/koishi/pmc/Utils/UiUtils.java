@@ -328,7 +328,9 @@ public class UiUtils {
             if (okBtnNode != null) {
                 okBtnNode.setCursor(Cursor.HAND);
             }
+            AutoClickController.isSonOpening = true;
         });
+        alert.setOnCloseRequest(_ -> AutoClickController.isSonOpening = false);
         return alert;
     }
 
@@ -360,7 +362,9 @@ public class UiUtils {
             if (cancelBtnNode != null) {
                 cancelBtnNode.setCursor(Cursor.HAND);
             }
+            AutoClickController.isSonOpening = true;
         });
+        dialog.setOnCloseRequest(_ -> AutoClickController.isSonOpening = false);
         return dialog.showAndWait().orElse(cancelButton);
     }
 
