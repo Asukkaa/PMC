@@ -789,8 +789,6 @@ public class ListPMCController extends RootController {
      */
     @FXML
     private void addOutPath(ActionEvent actionEvent) throws IOException {
-        // 读取配置文件
-        getProperties();
         AutoClickController.isSonOpening = true;
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         String outFilePath = outPath_List.getText();

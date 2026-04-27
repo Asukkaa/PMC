@@ -2236,8 +2236,6 @@ public class AutoClickController extends RootController implements MousePosition
     @FXML
     public void loadAutoClick(ActionEvent actionEvent) throws IOException {
         if (isFree()) {
-            // 读取配置文件
-            getProperties();
             if (loadFolder_Click.isSelected()) {
                 List<String> extensionFilter = new ArrayList<>();
                 extensionFilter.add(PMC);
@@ -2313,8 +2311,6 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     private void addOutPath(ActionEvent actionEvent) throws IOException {
-        // 读取配置文件
-        getProperties();
         isSonOpening = true;
         Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
         String outFilePath = outPath_Click.getText();
