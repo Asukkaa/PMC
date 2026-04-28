@@ -117,6 +117,7 @@
 }
 
 .menu-item {
+    -fx-cursor: hand;
     -fx-pref-height: 35;
 }
 
