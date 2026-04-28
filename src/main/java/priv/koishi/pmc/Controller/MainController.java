@@ -105,8 +105,10 @@ public class MainController extends RootController {
     private void setupTabDragging() {
         // 为每个 Tab 添加拖拽图标
         for (Tab tab : tabPane.getTabs()) {
-            Node tabNode = getTabNode(tab);
-            tabNode.setCursor(Cursor.HAND);
+            Platform.runLater(() -> {
+                Node tabNode = getTabNode(tab);
+                tabNode.setCursor(Cursor.HAND);
+            });
             Label dragHandle = new Label(tab.getText());
             tab.setText("");
             tab.setGraphic(dragHandle);

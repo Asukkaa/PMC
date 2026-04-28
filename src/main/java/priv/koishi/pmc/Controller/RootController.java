@@ -64,6 +64,11 @@ public class RootController extends CommonProperties {
         }
     }
 
+    /**
+     * 设置当前页面的根节点
+     *
+     * @param root 当前页面的根节点
+     */
     void setRoot(Parent root) {
         this.root = root;
     }
