@@ -8,8 +8,7 @@
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
             <HBox spacing="10">
                 <!--清空列表-->
-                <Button fx:id="removeAll_PLog" onAction="#removeAll" style="-fx-cursor: hand"
-                        text="%listText.removeAll"/>
+                <Button fx:id="removeAll_PLog" onAction="#removeAll" text="%listText.removeAll"/>
 
                 <Region HBox.hgrow="ALWAYS"/>
                 <!--列表为空-->
