@@ -124,22 +124,25 @@ public class MainController extends RootController {
         // 拖拽越过 - 检测边界
         tabPane.setOnDragOver(event -> {
             Dragboard db = event.getDragboard();
-            if (db.hasString() && findTabById(db.getString(), tabPane) != null) {
-                event.acceptTransferModes(TransferMode.MOVE);
-                // 边界检测：如果拖拽到最左或最右侧，提供视觉反馈
-                double x = event.getX();
-                double paneWidth = tabPane.getWidth();
-                // 边界阈值
-                double threshold = 50;
-                if (x < threshold) {
-                    // 左侧边界反馈
-                    tabPane.setStyle("-fx-border-color: #0078d4; -fx-border-width: 2 0 0 0;");
-                } else if (x > paneWidth - threshold) {
-                    // 右侧边界反馈
-                    tabPane.setStyle("-fx-border-color: #0078d4; -fx-border-width: 0 0 0 2;");
-                } else {
-                    // 恢复正常样式
-                    tabPane.setStyle("");
+            if (db.hasContent(dragDataFormat)) {
+                String draggedTabId = (String) db.getContent(dragDataFormat);
+                if (findTabById(draggedTabId, tabPane) != null) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                    // 边界检测：如果拖拽到最左或最右侧，提供视觉反馈
+                    double x = event.getX();
+                    double paneWidth = tabPane.getWidth();
+                    // 边界阈值
+                    double threshold = 50;
+                    if (x < threshold) {
+                        // 左侧边界反馈
+                        tabPane.setStyle("-fx-border-color: #0078d4; -fx-border-width: 2 0 0 0;");
+                    } else if (x > paneWidth - threshold) {
+                        // 右侧边界反馈
+                        tabPane.setStyle("-fx-border-color: #0078d4; -fx-border-width: 0 0 0 2;");
+                    } else {
+                        // 恢复正常样式
+                        tabPane.setStyle("");
+                    }
                 }
             }
             event.consume();
@@ -148,8 +151,8 @@ public class MainController extends RootController {
         tabPane.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
-            if (db.hasString()) {
-                String draggedTabId = db.getString();
+            if (db.hasContent(dragDataFormat)) {
+                String draggedTabId = (String) db.getContent(dragDataFormat);
                 Tab draggedTab = findTabById(draggedTabId, tabPane);
                 if (draggedTab != null) {
                     double x = event.getX();
