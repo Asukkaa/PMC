@@ -178,6 +178,8 @@ public class MainController extends RootController {
                         tabPane.getSelectionModel().select(draggedTab);
                         success = true;
                     }
+                    Node tabNode = getTabNode(draggedTab);
+                    tabNode.setCursor(Cursor.HAND);
                 }
             }
             // 恢复正常样式
@@ -247,6 +249,8 @@ public class MainController extends RootController {
                                 tabPane.getSelectionModel().select(draggedTab);
                                 success = true;
                             }
+                            Node tabNode = getTabNode(draggedTab);
+                            tabNode.setCursor(Cursor.HAND);
                         }
                     }
                     event.setDropCompleted(success);
