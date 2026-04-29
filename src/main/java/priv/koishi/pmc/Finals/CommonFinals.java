@@ -748,7 +748,7 @@ public class CommonFinals {
     /**
      * 默认定时任务详情窗口高度
      */
-    public static final String defaultTaskDetailHeight = "400";
+    public static final String defaultTaskDetailHeight = "450";
 
     /**
      * 默认信息浮窗宽度

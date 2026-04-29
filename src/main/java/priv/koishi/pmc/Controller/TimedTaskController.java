@@ -8,8 +8,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HeaderBar;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
@@ -35,8 +38,7 @@ import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.setWindowCss;
-import static priv.koishi.pmc.Utils.UiUtils.setWindowLogo;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 定时任务控制器
@@ -144,9 +146,9 @@ public class TimedTaskController extends RootController {
     private void showDetail(TimedTaskBean item, boolean isEdit) {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/TaskDetail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root;
+        Parent fxmlRoot;
         try {
-            root = loadFXML(loader);
+            fxmlRoot = loadFXML(loader);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -155,10 +157,15 @@ public class TimedTaskController extends RootController {
         // 查询定时任务
         controller.setRefreshCallback(this::getScheduleTask);
         Stage detailStage = new Stage();
+        String title = item.getTaskName() + taskDetail_title();
+        HeaderBar headerBar = createHeaderBar(title);
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        detailStage.initStyle(StageStyle.EXTENDED);
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
-        String title = item.getTaskName();
-        detailStage.setTitle(title + taskDetail_title());
+        detailStage.setTitle(title);
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化

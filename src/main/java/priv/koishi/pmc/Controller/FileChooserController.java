@@ -13,11 +13,14 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.HeaderBar;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -487,10 +490,16 @@ public class FileChooserController extends ManuallyChangeThemeController {
     public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
         URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loadFXML(loader);
+        Parent fxmlRoot = loadFXML(loader);
         FileChooserController controller = loader.getController();
         controller.initData(fileChooserConfig);
         Stage detailStage = new Stage();
+        String title = fileChooserConfig.getTitle();
+        HeaderBar headerBar = createHeaderBar(title);
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        detailStage.initStyle(StageStyle.EXTENDED);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
@@ -499,7 +508,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         input.close();
         Scene scene = new Scene(root, with, height);
         detailStage.setScene(scene);
-        detailStage.setTitle(fileChooserConfig.getTitle());
+        detailStage.setTitle(title);
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
         // 监听窗口面板宽度变化

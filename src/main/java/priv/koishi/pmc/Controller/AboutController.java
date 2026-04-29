@@ -15,10 +15,13 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -404,8 +407,13 @@ public class AboutController extends RootController {
     private void appreciate() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Appreciate-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loadFXML(loader);
+        Parent fxmlRoot = loadFXML(loader);
         Stage appreciateStage = new Stage();
+        HeaderBar headerBar = createHeaderBar(tip_appreciate());
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        appreciateStage.initStyle(StageStyle.EXTENDED);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);

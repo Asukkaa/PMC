@@ -14,11 +14,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.stage.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
@@ -834,7 +833,7 @@ public class ListPMCController extends RootController {
     private void clickLog() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/PMCLog-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loadFXML(loader);
+        Parent fxmlRoot = loadFXML(loader);
         PMCLogController controller = loader.getController();
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> {
@@ -844,6 +843,11 @@ public class ListPMCController extends RootController {
             }
         });
         Stage detailStage = new Stage();
+        HeaderBar headerBar = createHeaderBar(clickLog_title());
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        detailStage.initStyle(StageStyle.EXTENDED);
         Scene scene = new Scene(root, logWidth, logHeight);
         detailStage.setScene(scene);
         detailStage.setTitle(clickLog_title());
