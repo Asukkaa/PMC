@@ -18,9 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.SignStyle;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -54,9 +51,24 @@ public class ScheduledService {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
+     * 读取定时任务日期格式
+     */
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    /**
      * 创建定时任务时间格式
      */
     private static final DateTimeFormatter FULL_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    /**
+     * Windows 日期格式设置
+     */
+    private static String windowsDatePattern;
+
+    /**
+     * Windows 时间格式设置
+     */
+    private static String windowsTimePattern;
 
     /**
      * 创建定时任务
@@ -174,6 +186,14 @@ public class ScheduledService {
              * @throws IOException 获取任务详情失败
              */
             private void getWinTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
+                // 获取 Windows 日期格式设置
+                if (StringUtils.isBlank(windowsDatePattern)) {
+                    windowsDatePattern = getWindowsDatePattern();
+                }
+                // 获取 Windows 时间格式设置
+                if (StringUtils.isBlank(windowsTimePattern)) {
+                    windowsTimePattern = getWindowsTimePattern();
+                }
                 // 改为查询全部任务
                 Process process = new ProcessBuilder("cmd", "/c", "chcp 65001 >nul && schtasks /query /fo LIST /v").start();
                 String output = readProcessOutput(process);
@@ -211,7 +231,7 @@ public class ScheduledService {
             Pattern taskNamePattern = Pattern.compile("TaskName:\\s+(.*?)\\n");
             // 提取各字段值
             String startDate = extractValue(startDatePattern, taskBlocks);
-            startDate = startDate.substring(0, startDate.lastIndexOf(" "));
+            startDate = formatDate(startDate);
             String startTime = extractValue(startTimePattern, taskBlocks);
             String scheduleType = extractValue(scheduleTypePattern, taskBlocks).toUpperCase().trim();
             String taskToRun = extractValue(taskToRunPattern, taskBlocks);
@@ -228,20 +248,17 @@ public class ScheduledService {
                     .sorted(Comparator.comparingInt(day ->
                             dayOfWeekReverseMap().getOrDefault(day, 8)))
                     .collect(Collectors.joining(dayOfWeekRegex));
-            DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
-                    .appendValue(ChronoField.HOUR_OF_DAY, 1, 2, SignStyle.NEVER)
-                    .appendPattern(":mm:ss")
-                    .toFormatter();
-            LocalTime time = LocalTime.parse(startTime, inputFormatter);
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/M/d");
-            LocalDate parsedDate = LocalDate.parse(startDate, dateFormatter);
+            LocalTime time = parseTime(startTime);
+            LocalDate date = parseDate(startDate);
+            if (date != null && time != null) {
+                timedTaskBean.setDateTime(LocalDateTime.of(date, time))
+                        .setTime(time.format(TIME_FORMATTER))
+                        .setDate(date.format(DATE_FORMATTER));
+            }
             timedTaskBean.setTaskName(taskName.substring(taskName.indexOf(TASK_NAME) + TASK_NAME.length()))
-                    .setDateTime(LocalDateTime.of(parsedDate, time))
-                    .setTime(time.format(TIME_FORMATTER))
                     .setPath(text_onlyLaunch())
                     .setName(text_onlyLaunch())
                     .setRepeat(repeatType)
-                    .setDate(startDate)
                     .setDays(daysCN);
             if (taskToRun.contains(PMC)) {
                 // 处理文件路径中的空格
@@ -394,8 +411,7 @@ public class ScheduledService {
             timedTaskBean.setDate(startDate);
             String startTime = timedTaskBean.getTime();
             if (StringUtils.isNotBlank(startTime)) {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate parsedDate = LocalDate.parse(startDate, dateFormatter);
+                LocalDate parsedDate = LocalDate.parse(startDate, DATE_FORMATTER);
                 DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("HH:mm");
                 LocalTime time = LocalTime.parse(startTime, inputFormatter);
                 timedTaskBean.setDateTime(LocalDateTime.of(parsedDate, time));
@@ -577,6 +593,102 @@ public class ScheduledService {
             taskName = TASK_NAME + taskName;
         }
         return Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
+    }
+
+    /**
+     * 尝试用多个格式解析日期
+     *
+     * @param dateStr 日期字符串
+     * @return 日期对象，解析失败则返回 null
+     */
+    private static LocalDate parseDate(String dateStr) {
+        if (StringUtils.isNotBlank(dateStr)) {
+            // 移除尾部常见的干扰字符：逗号、中文逗号、空格、星期英文缩写等
+            String cleaned = dateStr.replaceAll("[，, ]+$", "").trim();
+            if (windowsDatePattern != null) {
+                return LocalDate.parse(cleaned, DateTimeFormatter.ofPattern(windowsDatePattern));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 尝试用多个格式解析时间
+     *
+     * @param timeStr 时间字符串
+     * @return 时间对象，解析失败则返回 null
+     */
+    private static LocalTime parseTime(String timeStr) {
+        if (StringUtils.isNotBlank(timeStr)) {
+            String cleaned = timeStr.trim();
+            if (windowsTimePattern != null) {
+                return LocalTime.parse(cleaned, DateTimeFormatter.ofPattern(windowsTimePattern));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 通过 PowerShell 获取 Windows 短日期格式
+     *
+     * @return 获取到的日期格式
+     */
+    private static String getWindowsDatePattern() {
+        ProcessBuilder pb = new ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-Command",
+                // 先设置输出编码为 UTF-8
+                "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; " +
+                        "(Get-Culture).DateTimeFormat.ShortDatePattern");
+        try (Process process = pb.start()) {
+            String output = readProcessOutput(process);
+            process.waitFor();
+            if (process.exitValue() == 0 && !output.isEmpty()) {
+                String pattern = output.trim();
+                pattern = formatDate(pattern);
+                // 清理输出，去掉换行符和首尾空格
+                return pattern;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    /**
+     * 通过 PowerShell 获取 Windows 短时间格式
+     *
+     * @return 获取到的时间格式
+     */
+    private static String getWindowsTimePattern() {
+        ProcessBuilder pb = new ProcessBuilder(
+                "powershell.exe", "-NoProfile", "-Command",
+                // 强制 UTF-8 输出，避免中文乱码（虽然时间格式通常纯英文，但安全起见）
+                "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; " +
+                        "(Get-Culture).DateTimeFormat.ShortTimePattern");
+        try (Process process = pb.start()) {
+            String output = readProcessOutput(process);
+            process.waitFor();
+            String pattern = output.trim();
+            return pattern.replace("\uFEFF", "");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 只保留 Windows 的主要日期格式
+     *
+     * @param date 原始日期字符串
+     * @return 处理后的日期字符串
+     */
+    private static String formatDate(String date) {
+        if (date.contains(",")) {
+            date = date.substring(0, date.lastIndexOf(","));
+        }
+        if (date.contains(" ")) {
+            date = date.substring(0, date.lastIndexOf(" "));
+        }
+        return date;
     }
 
 }
