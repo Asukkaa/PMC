@@ -360,9 +360,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
             // 编辑模式添加确认关闭确认框
             if (isEdit) {
                 addCloseConfirm();
-                if (isMac) {
-                    showFile_TD.setVisible(true);
-                }
+                showFile_TD.setVisible(true);
             }
         });
     }
@@ -494,6 +492,9 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         weekCheckBoxMap.get(dayOfWeek).setSelected(true);
     }
 
+    /**
+     * 打开自动任务文件目录
+     */
     @FXML
     private void showTaskFile() {
         String taskName = TASK_NAME + selectedItem.getTaskName();

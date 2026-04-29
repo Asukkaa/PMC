@@ -571,19 +571,21 @@ public class ScheduledService {
                 calendarInterval + "\n" +
                 "</dict>\n" +
                 "</plist>";
-        Files.write(plistPath, plistContent.getBytes());
-        // 先卸载旧配置
-        try (Process process = new ProcessBuilder("launchctl", "unload", plistPath.toString()).start()) {
-            process.waitFor();
-        }
-        // 加载任务
-        try (Process process = new ProcessBuilder("launchctl", "load", plistPath.toString()).start()) {
-            process.waitFor();
+        if (plistPath != null) {
+            Files.write(plistPath, plistContent.getBytes());
+            // 先卸载旧配置
+            try (Process process = new ProcessBuilder("launchctl", "unload", plistPath.toString()).start()) {
+                process.waitFor();
+            }
+            // 加载任务
+            try (Process process = new ProcessBuilder("launchctl", "load", plistPath.toString()).start()) {
+                process.waitFor();
+            }
         }
     }
 
     /**
-     * 获取 macOS 定时任务文件路径
+     * 获取定时任务文件路径
      *
      * @param taskName 任务名（可不带 PMC 前缀，会自动判断并添加）
      * @return 任务文件路径
@@ -592,7 +594,12 @@ public class ScheduledService {
         if (!taskName.startsWith(TASK_NAME)) {
             taskName = TASK_NAME + taskName;
         }
-        return Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
+        if (isMac) {
+            return Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
+        } else if (isWin) {
+            return Paths.get(System.getenv("SystemRoot"), "System32", "Tasks", taskName);
+        }
+        return null;
     }
 
     /**
