@@ -1428,7 +1428,9 @@ public class AutoClickController extends RootController implements MousePosition
                 CheckBox titleCoordinateSet = settingController.titleCoordinate_Set;
                 mousePosition_Click.setText(text);
                 if (titleCoordinateSet != null && titleCoordinateSet.isSelected()) {
-                    mainStage.setTitle(appName + " - " + text);
+                    if (mainCoordinateTitle != null) {
+                        mainCoordinateTitle.setText(" - " + text);
+                    }
                     if (detailStage != null && detailStage.isShowing()) {
                         detailStage.setTitle(detailTitle + " - " + text);
                     }

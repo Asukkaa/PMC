@@ -8,14 +8,22 @@ import javafx.application.Application;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -130,6 +138,8 @@ public class MainApplication extends Application {
      */
     public static boolean isDarkTheme;
 
+    public static Label mainCoordinateTitle;
+
     /**
      * 加载 fxml 页面
      *
@@ -139,6 +149,7 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         mainStage = stage;
+        mainStage.initStyle(StageStyle.EXTENDED);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
@@ -162,7 +173,11 @@ public class MainApplication extends Application {
                 && enable.equals(prop.getProperty(key_loadLastFullWindow, disable))) {
             stage.setFullScreen(true);
         }
-        Parent root = loadFXML(fxmlLoader);
+        Parent fxmlRoot = loadFXML(fxmlLoader);
+        HeaderBar headerBar = createHeaderBar();
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
         mainScene = new Scene(root, appWidth, appHeight);
         stage.setTitle(appName);
         stage.setScene(mainScene);
@@ -240,6 +255,27 @@ public class MainApplication extends Application {
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);
+    }
+
+    /**
+     * 创建拓展标题栏
+     *
+     * @return 拓展标题栏
+     */
+    private static HeaderBar createHeaderBar() {
+        HeaderBar headerBar = new HeaderBar();
+        Label title = new Label(appName);
+        ImageView icon = new ImageView(new Image(Objects.requireNonNull(MainApplication.class.getResource(logoPath)).toString()));
+        icon.setFitHeight(16);
+        icon.setFitWidth(16);
+        mainCoordinateTitle = new Label();
+        HBox leftBox = new HBox(icon, title, mainCoordinateTitle);
+        leftBox.setMouseTransparent(true);
+        leftBox.setSpacing(8);
+        leftBox.setAlignment(Pos.CENTER_LEFT);
+        HeaderBar.setMargin(leftBox, new Insets(0, 0, 0, 12));
+        headerBar.setLeft(leftBox);
+        return headerBar;
     }
 
     /**
