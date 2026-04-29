@@ -138,6 +138,9 @@ public class MainApplication extends Application {
      */
     public static boolean isDarkTheme;
 
+    /**
+     * 主页面标题栏显示鼠标坐标的文本栏
+     */
     public static Label mainCoordinateTitle;
 
     /**
@@ -265,16 +268,23 @@ public class MainApplication extends Application {
     private static HeaderBar createHeaderBar() {
         HeaderBar headerBar = new HeaderBar();
         Label title = new Label(appName);
+        title.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
         ImageView icon = new ImageView(new Image(Objects.requireNonNull(MainApplication.class.getResource(logoPath)).toString()));
         icon.setFitHeight(16);
         icon.setFitWidth(16);
         mainCoordinateTitle = new Label();
-        HBox leftBox = new HBox(icon, title, mainCoordinateTitle);
-        leftBox.setMouseTransparent(true);
-        leftBox.setSpacing(8);
-        leftBox.setAlignment(Pos.CENTER_LEFT);
-        HeaderBar.setMargin(leftBox, new Insets(0, 0, 0, 12));
-        headerBar.setLeft(leftBox);
+        mainCoordinateTitle.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+        HBox titleHBox = new HBox(icon, title, mainCoordinateTitle);
+        titleHBox.setMouseTransparent(true);
+        titleHBox.setSpacing(8);
+        if (isWin) {
+            titleHBox.setAlignment(Pos.CENTER_LEFT);
+            headerBar.setLeft(titleHBox);
+        } else if (isMac) {
+            titleHBox.setAlignment(Pos.CENTER);
+            headerBar.setCenter(titleHBox);
+        }
+        HeaderBar.setMargin(titleHBox, new Insets(0, 0, 0, 12));
         return headerBar;
     }
 
