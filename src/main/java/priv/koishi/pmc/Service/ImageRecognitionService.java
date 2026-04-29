@@ -327,6 +327,7 @@ public class ImageRecognitionService {
         AtomicReference<Point> bestLocRef = new AtomicReference<>(new Point(0, 0));
         // 读取图片为 byte 数组，防止中文路径乱码
         byte[] bytes = Files.readAllBytes(new File(findPositionConfig.getTemplate()).toPath());
+        MatchPointBean matchPointBean = new MatchPointBean();
         try (Mat screenMat = bufferedImageToMat(screenImg);
              Mat templateMat = opencv_imgcodecs.imdecode(new Mat(bytes), opencv_imgcodecs.IMREAD_UNCHANGED)) {
             // 转换为灰度图提升处理效率
@@ -374,7 +375,6 @@ public class ImageRecognitionService {
                     });
                 }
             }
-            MatchPointBean matchPointBean = new MatchPointBean();
             matchPointBean.setPoint(bestLocRef.get())
                     .setMatchThreshold((int) (bestVal.get() * 100));
             // 匹配成功返回匹配坐标和匹配度，否则只返回匹配度
@@ -382,7 +382,7 @@ public class ImageRecognitionService {
                 return matchPointBean;
             }
         }
-        return null;
+        return matchPointBean;
     }
 
     /**
