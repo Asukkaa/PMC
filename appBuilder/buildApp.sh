@@ -72,7 +72,7 @@ fi
 --java-options "-Djavafx.enablePreview=true" \
 --java-options "-Djavafx.suppressPreviewWarning=true" \
 --java-options "--enable-final-field-mutation=com.sun.jna" \
---java-options "--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv")
+--java-options "--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv,org.bytedeco.leptonica,org.bytedeco.tesseract")
 echo "已完成 jpackage 打包"
 
 # 移动动态库文件
