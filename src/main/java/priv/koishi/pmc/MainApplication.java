@@ -14,11 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -139,6 +137,11 @@ public class MainApplication extends Application {
     public static Label mainCoordinateTitle = new Label();
 
     /**
+     * 开启拓展标题栏标志（true 开启）
+     */
+    public static boolean extendedStage;
+
+    /**
      * 加载 fxml 页面
      *
      * @param stage 程序主舞台
@@ -147,7 +150,6 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         mainStage = stage;
-        mainStage.initStyle(StageStyle.EXTENDED);
         Properties prop = new Properties();
         InputStream input = checkRunningInputStream(configFile);
         prop.load(input);
@@ -171,11 +173,10 @@ public class MainApplication extends Application {
                 && enable.equals(prop.getProperty(key_loadLastFullWindow, disable))) {
             stage.setFullScreen(true);
         }
+        extendedStage = enable.equals(prop.getProperty(key_extendedStage, enable));
         Parent fxmlRoot = loadFXML(fxmlLoader);
         HeaderBar headerBar = createHeaderBar(appName, mainCoordinateTitle);
-        BorderPane root = new BorderPane();
-        root.setTop(headerBar);
-        root.setCenter(fxmlRoot);
+        Parent root = creatParent(fxmlRoot, mainStage, headerBar);
         mainScene = new Scene(root, appWidth, appHeight);
         stage.setTitle(appName);
         stage.setScene(mainScene);

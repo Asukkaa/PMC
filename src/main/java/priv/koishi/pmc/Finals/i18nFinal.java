@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.Enum.ClickTypeEnum.*;
 import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.MainApplication.extendedStage;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 
 /**
@@ -1136,6 +1137,16 @@ public class i18nFinal {
      */
     public static String tip_downloadBtn_set() {
         return bundle.getString("tip.downloadBtn_set");
+    }
+
+    /**
+     * @return 设置是否开启拓展标题栏，修改需要重启后才能生效
+     * <p>启后应用标题栏将与程序主界面颜色一致，关闭则使用操作系统默认标题栏
+     * <p>当前拓展标题栏状态：
+     */
+    public static String tip_extendedStage_Set() {
+        String status = extendedStage ? text_enable() : text_disable();
+        return bundle.getString("tip.extendedStage_Set") + status;
     }
 
     /**

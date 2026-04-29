@@ -8,11 +8,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HeaderBar;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
@@ -159,10 +157,7 @@ public class TimedTaskController extends RootController {
         Stage detailStage = new Stage();
         String title = item.getTaskName() + taskDetail_title();
         HeaderBar headerBar = createHeaderBar(title);
-        BorderPane root = new BorderPane();
-        root.setTop(headerBar);
-        root.setCenter(fxmlRoot);
-        detailStage.initStyle(StageStyle.EXTENDED);
+        Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         detailStage.setTitle(title);

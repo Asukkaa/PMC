@@ -243,7 +243,7 @@ public class SettingController extends RootController implements MousePositionUp
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
             openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set, noMove_Set,
-            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set;
+            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set, extendedStage_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -645,6 +645,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, enable);
         setControlLastConfig(loadPMCS_Set, prop, key_loadLastConfig, enable);
         listConfigInput.close();
+        extendedStage_Set.setSelected(extendedStage);
     }
 
     /**
@@ -763,6 +764,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(fullWindow_Set.getText(), fullWindow_Set);
         addToolTip(tip_floatingRecord(), floatingRecord_Set);
         addToolTip(tip_randomClickTime(), randomClickTime_Set);
+        addToolTip(tip_extendedStage_Set(), extendedStage_Set);
         addValueToolTip(nextRunMemory_Set, tip_nextRunMemory());
         addToolTip(tip_randomTrajectory(), randomTrajectory_Set);
         addToolTip(tip_hideWindowRecord(), hideWindowRecord_Set);
@@ -776,10 +778,10 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_randomClickInterval(), randomClickInterval_Set);
         addToolTip(tip_mouseFloatingRecord(), mouseFloatingRecord_Set);
         addToolTip(titleCoordinate_Set.getText(), titleCoordinate_Set);
-        addToolTip(tip_autoSave() + autoSavePMCFileName(), autoSavePMC_Set);
         addToolTip(tip_allRegion(), clickAllRegion_Set, stopAllRegion_Set);
         addToolTip(text_deleteKey(), removeRecordKey_Set, removeRunKey_Set);
         addValueToolTip(language_Set, tip_language(), language_Set.getValue());
+        addToolTip(tip_autoSave() + autoSavePMCFileName(), autoSavePMC_Set);
         addToolTip(tip_stopRetryNum() + defaultStopRetryNum, stopRetryNum_Set);
         addValueToolTip(nextGcType_Set, tip_nextGcType(), nextGcType_Set.getValue());
         addToolTip(tip_alwaysRefresh(), updateStopWindow_Set, updateClickWindow_Set);
@@ -2779,6 +2781,18 @@ public class SettingController extends RootController implements MousePositionUp
             }
         });
         dragEvent.consume();
+    }
+
+    /**
+     * 开启拓展标题栏
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void extendedStageAction() throws IOException {
+        setLoadLastConfigCheckBox(extendedStage_Set, configFile, key_extendedStage);
+        // 创建重启确认框
+        creatReLaunchConfirm();
     }
 
 }

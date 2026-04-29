@@ -38,6 +38,14 @@
             </HBox>
         </HBox>
 
+        <HBox spacing="10">
+            <HBox styleClass="hBox-290-5">
+                <!--开启拓展标题栏-->
+                <CheckBox fx:id="extendedStage_Set" onAction="#extendedStageAction" selected="true"
+                          text="%setting.extendedStage_Set"/>
+            </HBox>
+        </HBox>
+
         <Separator/>
 
         <!--基础设置：-->

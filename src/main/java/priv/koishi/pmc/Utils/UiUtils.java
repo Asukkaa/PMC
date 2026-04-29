@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -51,8 +52,7 @@ import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.isDarkTheme;
-import static priv.koishi.pmc.MainApplication.mainScene;
+import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
@@ -1281,6 +1281,26 @@ public class UiUtils {
         }
         HeaderBar.setMargin(titleHBox, new Insets(0, 0, 0, 12));
         return headerBar;
+    }
+
+    /**
+     * 创建页面根节点
+     *
+     * @param fxmlRoot  读取到的 fxml 页面根节点
+     * @param stage     页面所在舞台
+     * @param headerBar 拓展标题栏
+     * @return 根据设置返回拓展标题栏页面根节点或普通页面根节点
+     */
+    public static Parent creatParent(Parent fxmlRoot, Stage stage, HeaderBar headerBar) {
+        if (extendedStage) {
+            stage.initStyle(StageStyle.EXTENDED);
+            BorderPane root = new BorderPane();
+            root.setTop(headerBar);
+            root.setCenter(fxmlRoot);
+            return root;
+        } else {
+            return fxmlRoot;
+        }
     }
 
 }

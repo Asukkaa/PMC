@@ -28,11 +28,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
@@ -764,10 +765,7 @@ public class AutoClickController extends RootController implements MousePosition
         String title = (item.getName() == null) ? "" : item.getName();
         detailTitle = title + clickDetail_title();
         HeaderBar headerBar = createHeaderBar(title, detailCoordinateTitle);
-        BorderPane root = new BorderPane();
-        root.setTop(headerBar);
-        root.setCenter(fxmlRoot);
-        detailStage.initStyle(StageStyle.EXTENDED);
+        Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
         detailStage.setTitle(detailTitle);
@@ -1444,17 +1442,32 @@ public class AutoClickController extends RootController implements MousePosition
                 CheckBox titleCoordinateSet = settingController.titleCoordinate_Set;
                 mousePosition_Click.setText(text);
                 if (titleCoordinateSet != null && titleCoordinateSet.isSelected()) {
-                    if (mainCoordinateTitle != null) {
-                        mainCoordinateTitle.setText(" - " + text);
+                    String titleText = " - " + text;
+                    if (extendedStage) {
+                        mainCoordinateTitle.setText(titleText);
+                    } else {
+                        mainStage.setTitle(appName + titleText);
                     }
-                    if (detailStage != null && detailStage.isShowing() && detailCoordinateTitle != null) {
-                        detailCoordinateTitle.setText(" - " + text);
+                    if (detailStage != null && detailStage.isShowing()) {
+                        if (extendedStage) {
+                            detailCoordinateTitle.setText(titleText);
+                        } else {
+                            detailStage.setTitle(detailTitle + titleText);
+                        }
                     }
-                    if (logStage != null && logStage.isShowing() && logCoordinateTitle != null) {
-                        logCoordinateTitle.setText(" - " + text);
+                    if (logStage != null && logStage.isShowing()) {
+                        if (extendedStage) {
+                            logCoordinateTitle.setText(titleText);
+                        } else {
+                            logStage.setTitle(clickLog_title() + titleText);
+                        }
                     }
-                    if (ocrTestStage != null && ocrTestStage.isShowing() && ocrCoordinateTitle != null) {
-                        ocrCoordinateTitle.setText(" - " + text);
+                    if (ocrTestStage != null && ocrTestStage.isShowing()) {
+                        if (extendedStage) {
+                            ocrCoordinateTitle.setText(titleText);
+                        } else {
+                            ocrTestStage.setTitle(tessdata_title() + titleText);
+                        }
                     }
                 } else {
                     mainStage.setTitle(appName);
@@ -2390,10 +2403,7 @@ public class AutoClickController extends RootController implements MousePosition
         controller.setRefreshCallback(() -> clickLogs.clear());
         logStage = new Stage();
         HeaderBar headerBar = createHeaderBar(clickLog_title(), logCoordinateTitle);
-        BorderPane root = new BorderPane();
-        root.setTop(headerBar);
-        root.setCenter(fxmlRoot);
-        logStage.initStyle(StageStyle.EXTENDED);
+        Parent root = creatParent(fxmlRoot, logStage, headerBar);
         Scene scene = new Scene(root, logWidth, logHeight);
         logStage.setScene(scene);
         logStage.setTitle(clickLog_title());
