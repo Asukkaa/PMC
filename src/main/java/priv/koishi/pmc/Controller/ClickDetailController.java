@@ -28,11 +28,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.HeaderBar;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import lombok.Setter;
@@ -268,6 +267,11 @@ public class ClickDetailController extends RootController {
      * 窗口信息获取器
      */
     public static WindowMonitor clickWindowMonitor, stopWindowMonitor;
+
+    /**
+     * 文字识别结果页标题栏显示鼠标坐标的文本栏
+     */
+    public static Label ocrCoordinateTitle = new Label();
 
     /**
      * 更新数据用的回调函数
@@ -2611,11 +2615,16 @@ public class ClickDetailController extends RootController {
     private void showTest() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/OCRTest-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loadFXML(loader);
+        Parent fxmlRoot = loadFXML(loader);
         OCRTestController controller = loader.getController();
         controller.initData(ocrDataBeans);
         controller.setRefreshCallback(ocrDataBeans::clear);
         ocrTestStage = new Stage();
+        HeaderBar headerBar = createHeaderBar(clickLog_title(), ocrCoordinateTitle);
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        ocrTestStage.initStyle(StageStyle.EXTENDED);
         Scene scene = new Scene(root, 1000, 500);
         ocrTestStage.setScene(scene);
         ocrTestStage.setTitle(tessdata_title());

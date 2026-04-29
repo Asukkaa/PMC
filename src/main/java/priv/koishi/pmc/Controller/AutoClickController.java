@@ -28,11 +28,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import org.apache.commons.collections4.CollectionUtils;
@@ -73,6 +73,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static priv.koishi.pmc.Controller.ClickDetailController.ocrCoordinateTitle;
 import static priv.koishi.pmc.Controller.FileChooserController.chooserFiles;
 import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
@@ -349,6 +350,16 @@ public class AutoClickController extends RootController implements MousePosition
      * 详情页、日志页舞台
      */
     public static Stage detailStage, logStage, ocrTestStage;
+
+    /**
+     * 详情页标题栏显示鼠标坐标的文本栏
+     */
+    public static Label detailCoordinateTitle = new Label();
+
+    /**
+     * 操作记录页标题栏显示鼠标坐标的文本栏
+     */
+    public static Label logCoordinateTitle = new Label();
 
     /**
      * 详情页窗口标题
@@ -715,9 +726,9 @@ public class AutoClickController extends RootController implements MousePosition
     private void showDetail(ClickPositionVO item) {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickDetail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root;
+        Parent fxmlRoot;
         try {
-            root = loadFXML(loader);
+            fxmlRoot = loadFXML(loader);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -750,10 +761,15 @@ public class AutoClickController extends RootController implements MousePosition
             updateTableViewSizeText(tableView_Click, dataNumber_Click, unit_process());
         });
         detailStage = new Stage();
+        String title = (item.getName() == null) ? "" : item.getName();
+        detailTitle = title + clickDetail_title();
+        HeaderBar headerBar = createHeaderBar(title, detailCoordinateTitle);
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        detailStage.initStyle(StageStyle.EXTENDED);
         Scene scene = new Scene(root, detailWidth, detailHeight);
         detailStage.setScene(scene);
-        String title = item.getName() == null ? "" : item.getName();
-        detailTitle = title + clickDetail_title();
         detailStage.setTitle(detailTitle);
         detailStage.initModality(Modality.APPLICATION_MODAL);
         setWindowLogo(detailStage, logoPath);
@@ -1431,14 +1447,14 @@ public class AutoClickController extends RootController implements MousePosition
                     if (mainCoordinateTitle != null) {
                         mainCoordinateTitle.setText(" - " + text);
                     }
-                    if (detailStage != null && detailStage.isShowing()) {
-                        detailStage.setTitle(detailTitle + " - " + text);
+                    if (detailStage != null && detailStage.isShowing() && detailCoordinateTitle != null) {
+                        detailCoordinateTitle.setText(" - " + text);
                     }
-                    if (logStage != null && logStage.isShowing()) {
-                        logStage.setTitle(clickLog_title() + " - " + text);
+                    if (logStage != null && logStage.isShowing() && logCoordinateTitle != null) {
+                        logCoordinateTitle.setText(" - " + text);
                     }
-                    if (ocrTestStage != null && ocrTestStage.isShowing()) {
-                        ocrTestStage.setTitle(tessdata_title() + " - " + text);
+                    if (ocrTestStage != null && ocrTestStage.isShowing() && ocrCoordinateTitle != null) {
+                        ocrCoordinateTitle.setText(" - " + text);
                     }
                 } else {
                     mainStage.setTitle(appName);
@@ -2368,11 +2384,16 @@ public class AutoClickController extends RootController implements MousePosition
     private void clickLog() throws IOException {
         URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickLog-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
-        Parent root = loadFXML(loader);
+        Parent fxmlRoot = loadFXML(loader);
         ClickLogController controller = loader.getController();
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> clickLogs.clear());
         logStage = new Stage();
+        HeaderBar headerBar = createHeaderBar(clickLog_title(), logCoordinateTitle);
+        BorderPane root = new BorderPane();
+        root.setTop(headerBar);
+        root.setCenter(fxmlRoot);
+        logStage.initStyle(StageStyle.EXTENDED);
         Scene scene = new Scene(root, logWidth, logHeight);
         logStage.setScene(scene);
         logStage.setTitle(clickLog_title());

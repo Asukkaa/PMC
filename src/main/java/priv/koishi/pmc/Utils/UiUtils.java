@@ -3,6 +3,8 @@ package priv.koishi.pmc.Utils;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -15,13 +17,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.stage.Window;
@@ -1237,6 +1237,50 @@ public class UiUtils {
      */
     public static Node getTabNode(Tab tab) {
         return mainScene.lookup("#" + tab.getId());
+    }
+
+    /**
+     * 创建拓展标题栏
+     *
+     * @param titleText 标题文本
+     * @return 拓展标题栏
+     */
+    public static HeaderBar createHeaderBar(String titleText) {
+        return createHeaderBar(titleText, null);
+    }
+
+    /**
+     * 创建拓展标题栏
+     *
+     * @param titleText       标题文本
+     * @param coordinateTitle 坐标文本栏
+     * @return 拓展标题栏
+     */
+    public static HeaderBar createHeaderBar(String titleText, Label coordinateTitle) {
+        HeaderBar headerBar = new HeaderBar();
+        Label title = new Label(titleText);
+        ImageView icon = new ImageView(new Image(Objects.requireNonNull(MainApplication.class.getResource(logoPath)).toString()));
+        icon.setFitHeight(16);
+        icon.setFitWidth(16);
+        HBox titleHBox = new HBox(icon, title);
+        if (coordinateTitle != null) {
+            titleHBox.getChildren().add(coordinateTitle);
+        }
+        titleHBox.setMouseTransparent(true);
+        titleHBox.setSpacing(8);
+        if (isWin) {
+            titleHBox.setAlignment(Pos.CENTER_LEFT);
+            headerBar.setLeft(titleHBox);
+        } else if (isMac) {
+            title.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+            if (coordinateTitle != null) {
+                coordinateTitle.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+            }
+            titleHBox.setAlignment(Pos.CENTER);
+            headerBar.setCenter(titleHBox);
+        }
+        HeaderBar.setMargin(titleHBox, new Insets(0, 0, 0, 12));
+        return headerBar;
     }
 
 }
