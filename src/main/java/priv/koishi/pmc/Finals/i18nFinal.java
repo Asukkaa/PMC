@@ -470,6 +470,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 点击将会重启本应用并重置所有设置项
+     */
+    public static String tip_reSetAll() {
+        return bundle.getString("tip.reSetAll");
+    }
+
+    /**
      * @return 勾选后如果修改过操作步骤详情页的设置后直接点窗口上的关闭按钮将会弹出是否保存的确认框
      */
     public static String tip_remindSave() {

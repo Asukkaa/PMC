@@ -743,8 +743,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setToolTip() {
         addToolTip(tip_noMove(), noMove_Set);
-        addToolTip(tip_reLaunch(), reLaunch_Set);
         addToolTip(tip_overtime(), overtime_Set);
+        addToolTip(tip_reLaunch(), reLaunch_Set);
+        addToolTip(tip_reSetAll(), reSetAll_Set);
         addToolTip(tip_firstClick(), firstClick_Set);
         addToolTip(tip_recordDrag(), recordDrag_Set);
         addToolTip(tip_recordMove(), recordMove_Set);
