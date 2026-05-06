@@ -15,23 +15,20 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonKeys.key_taskDetailHeight;
-import static priv.koishi.pmc.Finals.CommonKeys.key_taskDetailWidth;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.mainStage;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
 import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
@@ -51,16 +48,6 @@ public class TimedTaskController extends RootController {
      * 页面标识符
      */
     private final String tabId = "_Task";
-
-    /**
-     * 详情页高度
-     */
-    private int detailHeight;
-
-    /**
-     * 详情页宽度
-     */
-    private int detailWidth;
 
     /**
      * 要防重复点击的组件
@@ -115,20 +102,6 @@ public class TimedTaskController extends RootController {
     }
 
     /**
-     * 加载默认设置
-     *
-     * @throws IOException 配置文件读取异常
-     */
-    private void getConfig() throws IOException {
-        Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
-        prop.load(input);
-        detailWidth = Integer.parseInt(prop.getProperty(key_taskDetailWidth, defaultTaskDetailWidth));
-        detailHeight = Integer.parseInt(prop.getProperty(key_taskDetailHeight, defaultTaskDetailHeight));
-        input.close();
-    }
-
-    /**
      * 清空 JavaFX 列表按钮
      */
     public void removeAll() {
@@ -158,7 +131,9 @@ public class TimedTaskController extends RootController {
         String title = item.getTaskName() + taskDetail_title();
         HeaderBar headerBar = createHeaderBar(title);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
-        Scene scene = new Scene(root, detailWidth, detailHeight);
+        double width = getSafeAttributes(900, screenWidth);
+        double height = getSafeAttributes(450, screenHeight);
+        Scene scene = new Scene(root, width, height);
         detailStage.setScene(scene);
         detailStage.setTitle(title);
         detailStage.initModality(Modality.APPLICATION_MODAL);
@@ -294,16 +269,10 @@ public class TimedTaskController extends RootController {
             buildContextMenu();
             // 设置鼠标悬停提示
             setToolTip();
-            try {
-                // 组件自适应宽高
-                adaption();
-                // 查询定时任务
-                getScheduleTask();
-                // 加载默认设置
-                getConfig();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            // 组件自适应宽高
+            adaption();
+            // 查询定时任务
+            getScheduleTask();
         });
     }
 

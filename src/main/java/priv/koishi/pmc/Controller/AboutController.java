@@ -28,10 +28,7 @@ import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.UI.CustomProgressDialog.ProgressDialog;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
@@ -42,11 +39,14 @@ import java.util.List;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.CommonKeys.key_autoCheck;
+import static priv.koishi.pmc.Finals.CommonKeys.key_logsNum;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
-import static priv.koishi.pmc.MainApplication.runPMCFile;
+import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.CheckUpdateService.*;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -111,7 +111,7 @@ public class AboutController extends RootController {
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         prop.load(input);
         // 获取日志储存数量配置
         setControlLastConfig(logsNum_Abt, prop, key_logsNum);
@@ -134,12 +134,12 @@ public class AboutController extends RootController {
      * @throws IOException 配置文件保存异常
      */
     public void saveLastConfig() throws IOException {
-        InputStream input = checkRunningInputStream(configFile);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         Properties prop = new Properties();
         prop.load(input);
         String logsNumValue = logsNum_Abt.getText();
         prop.setProperty(key_logsNum, logsNumValue);
-        OutputStream output = checkRunningOutputStream(configFile);
+        OutputStream output = new FileOutputStream(getRunningResourcePath(configFile));
         prop.store(output, null);
         input.close();
         output.close();
@@ -409,13 +409,9 @@ public class AboutController extends RootController {
         Stage appreciateStage = new Stage();
         HeaderBar headerBar = createHeaderBar(tip_appreciate());
         Parent root = creatParent(fxmlRoot, appreciateStage, headerBar);
-        Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
-        prop.load(input);
-        double with = Double.parseDouble(prop.getProperty(key_appreciateWidth, "500"));
-        double height = Double.parseDouble(prop.getProperty(key_appreciateHeight, "500"));
-        input.close();
-        Scene scene = new Scene(root, with, height);
+        double width = getSafeAttributes(500, screenWidth);
+        double height = getSafeAttributes(500, screenHeight);
+        Scene scene = new Scene(root, width, height);
         appreciateStage.setScene(scene);
         appreciateStage.setTitle(tip_appreciate());
         appreciateStage.initModality(Modality.APPLICATION_MODAL);

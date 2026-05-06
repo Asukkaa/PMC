@@ -20,17 +20,17 @@ import java.util.List;
 public class PMCSFileDTO {
 
     /**
-     * 文件拓展名
+     * 文件拓展名（默认 {@value priv.koishi.pmc.Finals.CommonFinals#PMCS}）
      */
     private String ext = CommonFinals.PMCS;
 
     /**
-     * PMC 文件版本
+     * PMCS 文件版本（默认 {@value priv.koishi.pmc.Finals.CommonFinals#PMCSFileVersion}）
      */
     private String version = CommonFinals.PMCSFileVersion;
 
     /**
-     * 程序名称
+     * 程序名称（默认 {@value priv.koishi.pmc.Finals.CommonFinals#appName}）
      */
     private String appName = CommonFinals.appName;
 

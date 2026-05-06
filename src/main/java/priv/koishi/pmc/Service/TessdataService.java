@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static priv.koishi.pmc.Finals.CommonFinals.configFile_Tessdata;
 import static priv.koishi.pmc.Finals.CommonFinals.traineddata;
 import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -107,7 +108,7 @@ public class TessdataService {
                         ObjectMapper objectMapper = JsonMapper.builder()
                                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                                 .build();
-                        String configPath = getTessdataConfigPath();
+                        String configPath = getRunningResourcePath(configFile_Tessdata);
                         configList = objectMapper.readValue(new File(configPath), new TypeReference<>() {
                         });
                     }
@@ -185,7 +186,7 @@ public class TessdataService {
                     TessdataBean tessdataBean = tessdataBeans.get(i);
                     tessdataBean.setIndex(i + 1);
                 }
-                String configPath = getTessdataConfigPath();
+                String configPath = getRunningResourcePath(configFile_Tessdata);
                 // 序列化数据
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.writeValue(new File(configPath), tessdataBeans);

@@ -15,8 +15,8 @@ import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
 import java.util.Set;
 
-import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingHeightInt;
-import static priv.koishi.pmc.Finals.CommonFinals.defaultFloatingWidthInt;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultFloatingHeightInt;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultFloatingWidthInt;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 
@@ -197,12 +197,12 @@ public class FloatingWindowDescriptor {
     private boolean closeSave = true;
 
     /**
-     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingWidth}）
+     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault#defaultFloatingWidth}）
      */
     private int minWidth = defaultFloatingWidthInt;
 
     /**
-     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.CommonFinals#defaultFloatingHeight}）
+     * 浮窗最小高度（默认 {@value priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault#defaultFloatingHeight}）
      */
     private int minHeight = defaultFloatingHeightInt;
 

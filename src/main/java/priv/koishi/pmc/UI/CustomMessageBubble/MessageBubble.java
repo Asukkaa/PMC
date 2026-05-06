@@ -34,7 +34,7 @@ public class MessageBubble extends Label implements MousePositionUpdater {
     /**
      * 消息气泡所在舞台
      */
-    private final Stage bubbleStage;
+    private Stage bubbleStage;
 
     /**
      * 消息气泡位置横轴偏移量（正数右移负数左移）
@@ -50,6 +50,15 @@ public class MessageBubble extends Label implements MousePositionUpdater {
      * 自动关闭的计时器
      */
     private Timeline autoCloseTimeline;
+
+    /**
+     * 消息气泡（默认显示 1.5 秒）
+     *
+     * @param text 消息气泡要展示的消息
+     */
+    public MessageBubble(String text) {
+        new MessageBubble(text, 1.5);
+    }
 
     /**
      * 消息气泡
@@ -180,8 +189,10 @@ public class MessageBubble extends Label implements MousePositionUpdater {
      */
     @Override
     public void onMousePositionUpdate(Point mousePoint) {
-        bubbleStage.setX(mousePoint.getX() + offsetX);
-        bubbleStage.setY(mousePoint.getY() + offsetY);
+        if (bubbleStage != null && bubbleStage.isShowing()) {
+            bubbleStage.setX(mousePoint.getX() + offsetX);
+            bubbleStage.setY(mousePoint.getY() + offsetY);
+        }
     }
 
 }

@@ -51,6 +51,7 @@ import java.util.List;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.clickProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
@@ -510,6 +511,18 @@ public class UiUtils {
     /**
      * 为配置组件设置上次配置值
      *
+     * @param control           需要处理的组件
+     * @param prop              配置文件
+     * @param key               要读取的 key
+     * @param defaultProperties 默认配置
+     */
+    public static void setControlLastConfig(Control control, Properties prop, String key, Properties defaultProperties) {
+        setControlLastConfig(control, prop, key, defaultProperties.getProperty(key));
+    }
+
+    /**
+     * 为配置组件设置上次配置值
+     *
      * @param control      需要处理的组件
      * @param prop         配置文件
      * @param key          要读取的 key
@@ -600,7 +613,7 @@ public class UiUtils {
      * @param colorCustomKey 保存的自定义颜色 key
      */
     public static void setColorPickerConfig(ColorPicker colorPicker, Properties prop, String colorKey, String colorCustomKey) {
-        String selectColor = prop.getProperty(colorKey, defaultColor);
+        String selectColor = getPropertyWithDefault(prop, colorKey, clickProperties);
         if (StringUtils.isNotBlank(selectColor)) {
             colorPicker.setValue(Color.web(selectColor));
         }
@@ -746,7 +759,7 @@ public class UiUtils {
         // 设置剪贴板内容
         clipboard.setContent(content);
         // 复制成功消息气泡
-        new MessageBubble(message, 2);
+        new MessageBubble(message);
     }
 
     /**
@@ -888,7 +901,7 @@ public class UiUtils {
         MenuItem menuItem = new MenuItem(findImgSet_updateWindow());
         menuItem.setOnAction(_ -> {
             windowMonitor.updateWindowInfo();
-            new MessageBubble(text_updateSuccess(), 2);
+            new MessageBubble(text_updateSuccess());
         });
         contextMenu.getItems().add(menuItem);
     }
@@ -913,7 +926,7 @@ public class UiUtils {
                 int w = windowInfo.getWidth();
                 int h = windowInfo.getHeight();
                 if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
-                    new MessageBubble(text_windowHidden(), 2);
+                    new MessageBubble(text_windowHidden());
                 } else {
                     Platform.runLater(() -> stages.forEach(stage -> stage.setIconified(true)));
                     String info = text_closeFloatingShortcut() + "\n" +
@@ -935,7 +948,7 @@ public class UiUtils {
                     windowMonitor.startNativeKeyListener();
                 }
             } else {
-                new MessageBubble(text_noWindowInfo(), 2);
+                new MessageBubble(text_noWindowInfo());
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -974,7 +987,7 @@ public class UiUtils {
                 int w = windowInfo.getWidth();
                 int h = windowInfo.getHeight();
                 if (x < 0 && y < 0 && Math.abs(x) > w && Math.abs(y) > h) {
-                    new MessageBubble(text_windowHidden(), 2);
+                    new MessageBubble(text_windowHidden());
                 } else {
                     Platform.runLater(() -> stages.forEach(stage -> stage.setIconified(true)));
                     String info = text_closeFloatingShortcut() + "\n" +
@@ -1026,7 +1039,7 @@ public class UiUtils {
                     windowMonitor.startNativeKeyListener();
                 }
             } else {
-                new MessageBubble(text_noWindowInfo(), 2);
+                new MessageBubble(text_noWindowInfo());
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1300,6 +1313,21 @@ public class UiUtils {
             return root;
         } else {
             return fxmlRoot;
+        }
+    }
+
+    /**
+     * 获取在屏幕内的宽高属性
+     *
+     * @param attributes 目标宽高属性
+     * @param screen     屏幕宽高属性
+     * @return 如果目标宽高不超过屏幕宽高则返回目标宽高，否则返回屏幕宽高的 90%
+     */
+    public static double getSafeAttributes(double attributes, double screen) {
+        if (attributes >= screen) {
+            return screen * 0.9;
+        } else {
+            return attributes;
         }
     }
 

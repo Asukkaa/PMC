@@ -539,7 +539,7 @@
 
         <HBox>
             <HBox styleClass="hBox-600-5">
-                <!--要点击的图片默认识别匹配匹配度:-->
+                <!--目标图像默认识别匹配度:-->
                 <Label text="%setting.clickOpacity"/>
                 <Slider fx:id="clickOpacity_Set" prefWidth="220" value="80" showTickLabels="true" showTickMarks="true"
                         snapToTicks="true" majorTickUnit="10"/>
@@ -547,7 +547,7 @@
             </HBox>
 
             <HBox spacing="5">
-                <!--要点击的图片默认识别失败重试次数:-->
+                <!--目标图像默认识别失败重试次数:-->
                 <Label text="%setting.clickRetryNum"/>
                 <TextField fx:id="clickRetryNum_Set" prefWidth="80"/>
                 <!--次-->
@@ -594,7 +594,7 @@
 
         <HBox>
             <HBox styleClass="hBox-600-5">
-                <!--终止操作图片默认识别匹配匹配度:-->
+                <!--终止操作图片默认识别匹配度:-->
                 <Label text="%setting.stopOpacity"/>
                 <Slider fx:id="stopOpacity_Set" prefWidth="220" value="80" showTickLabels="true" showTickMarks="true"
                         snapToTicks="true" majorTickUnit="10"/>

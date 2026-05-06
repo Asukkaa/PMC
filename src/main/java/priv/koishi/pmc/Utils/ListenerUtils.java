@@ -85,7 +85,7 @@ public class ListenerUtils {
                 String newValue = textField.getText();
                 if (!isInIntegerRange(newValue, min, max, zeroStart) && StringUtils.isNotBlank(newValue)) {
                     textField.setText("");
-                    new MessageBubble(text_errRange(), 1);
+                    new MessageBubble(text_errRange());
                 } else if (zeroStart && newValue.startsWith("0") && newValue.length() > 1) {
                     textField.setText(newValue.substring(1));
                 }
@@ -118,7 +118,7 @@ public class ListenerUtils {
                 if (StringUtils.isNotBlank(newValue)) {
                     if (!isInDecimalRange(newValue, min, max)) {
                         textField.setText("");
-                        new MessageBubble(text_errRange(), 1);
+                        new MessageBubble(text_errRange());
                     } else if (newValue.contains(".")) {
                         textField.setText(newValue.substring(0, newValue.lastIndexOf(".") + decimalDigits + 1));
                     }

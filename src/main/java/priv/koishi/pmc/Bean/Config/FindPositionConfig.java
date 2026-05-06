@@ -6,7 +6,7 @@ import priv.koishi.pmc.Bean.TessdataBean;
 
 import java.util.List;
 
-import static priv.koishi.pmc.Finals.CommonFinals.defaultColorTolerance;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultColorTolerance;
 
 /**
  * 图像识别设置类
@@ -30,7 +30,7 @@ public class FindPositionConfig {
     private String template;
 
     /**
-     * 颜色容差（0-255）
+     * 颜色容差（0-255，默认 {@value priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault#defaultColorTolerance}）
      */
     private int colorTolerance = defaultColorTolerance;
 

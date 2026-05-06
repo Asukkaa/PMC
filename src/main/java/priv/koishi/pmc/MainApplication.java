@@ -42,6 +42,11 @@ import static priv.koishi.pmc.Controller.RootController.loadFXML;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.clickProperties;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.configFile_Click;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.configFile_List;
+import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.listPMCProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.buildPMC;
@@ -151,26 +156,20 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws IOException {
         mainStage = stage;
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         prop.load(input);
         // 设置外观
         int theme = Integer.parseInt(prop.getProperty(key_theme));
         changeTheme(theme);
         // 读取 fxml 页面
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
-        double appWidth = Double.parseDouble(prop.getProperty(key_appWidth, defaultAppWidth));
-        if (appWidth >= screenWidth) {
-            appWidth = screenWidth * 0.9;
-        }
-        double appHeight = Double.parseDouble(prop.getProperty(key_appHeight, defaultAppHeight));
-        if (appHeight >= screenHeight) {
-            appHeight = screenHeight * 0.9;
-        }
-        if (enable.equals(prop.getProperty(key_lastMaxWindow, disable))
-                && enable.equals(prop.getProperty(key_loadLastMaxWindow, disable))) {
+        double appWidth = getSafeAttributes(1350, screenWidth);
+        double appHeight = getSafeAttributes(760, screenHeight);
+        if (enable.equals(prop.getProperty(key_maxWindow, disable))
+                && enable.equals(prop.getProperty(key_loadMaxWindow, disable))) {
             stage.setMaximized(true);
-        } else if (enable.equals(prop.getProperty(key_lastFullWindow, disable))
-                && enable.equals(prop.getProperty(key_loadLastFullWindow, disable))) {
+        } else if (enable.equals(prop.getProperty(key_fullWindow, disable))
+                && enable.equals(prop.getProperty(key_loadFullWindow, disable))) {
             stage.setFullScreen(true);
         }
         extendedStage = enable.equals(prop.getProperty(key_extendedStage, enable));
@@ -190,7 +189,7 @@ public class MainApplication extends Application {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
         } else if (loadPMCS) {
             tabPane.getSelectionModel().select(mainController.listPMCTab);
-        } else if (enable.equals(prop.getProperty(key_loadLastConfig, enable))) {
+        } else if (enable.equals(prop.getProperty(key_loadConfig, enable))) {
             for (Tab tab : tabPane.getTabs()) {
                 if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
                     tabPane.getSelectionModel().select(tab);
@@ -534,6 +533,15 @@ public class MainApplication extends Application {
         args = null;
     }
 
+    private static void checkConfigFile() throws IOException {
+        String mainConfigPath = getRunningResourcePath(configFile);
+        syncPropertiesFile(mainConfigPath, configProperties);
+        String autoClickConfigPath = getRunningResourcePath(configFile_Click);
+        syncPropertiesFile(autoClickConfigPath, clickProperties);
+        String listPMCConfigPath = getRunningResourcePath(configFile_List);
+        syncPropertiesFile(listPMCConfigPath, listPMCProperties);
+    }
+
     /**
      * 启动程序
      *
@@ -541,9 +549,6 @@ public class MainApplication extends Application {
      * @throws IOException log4j 日志配置文件读取异常、应用配置文件读取异常
      */
     public static void main(String[] args) throws IOException {
-        MainApplication.args = args;
-        String languagePath = "priv.koishi.pmc.language";
-        bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
         System.setProperty("log.dir", getLogsPath());
         // 打包后需要手动指定日志配置文件位置
         if (!isRunningFromIDEA) {
@@ -553,6 +558,9 @@ public class MainApplication extends Application {
         logger = LogManager.getLogger(MainApplication.class);
         logger.info("==============程序启动中====================");
         logger.info("启动参数数量: {}", args.length);
+        MainApplication.args = args;
+        String languagePath = "priv.koishi.pmc.language";
+        bundle = ResourceBundle.getBundle(languagePath, Locale.getDefault());
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             // windows --r pmcFilePath 算两个参数，macOS 算一个；使用 * 替代路径中的空格
@@ -576,8 +584,9 @@ public class MainApplication extends Application {
             }
             logger.info("参数 {}: {}", i, arg);
         }
+        checkConfigFile();
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         prop.load(input);
         int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
         String firstRunValue = prop.getProperty(key_firstRun);

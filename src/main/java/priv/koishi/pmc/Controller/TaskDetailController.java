@@ -32,6 +32,7 @@ import java.util.*;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.key_inFilePath;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.configFile_Click;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ScheduledService.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -424,7 +425,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
                 Platform.runLater(() -> {
                     taskUnbind(taskBean);
                     // 复制成功消息气泡
-                    new MessageBubble(text_successSave(), 2);
+                    new MessageBubble(text_successSave());
                     removeAllListeners();
                     closeStage(stage, this::closeRequest);
                     // 触发列表刷新（通过回调）

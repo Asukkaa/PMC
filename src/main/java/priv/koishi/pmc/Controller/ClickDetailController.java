@@ -57,6 +57,7 @@ import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -74,6 +75,7 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.noAutomationPermission;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.windowInfoShow;
@@ -1070,12 +1072,12 @@ public class ClickDetailController extends RootController {
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile_Click);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
         prop.load(input);
         stopRetryNumDefault = prop.getProperty(key_defaultStopRetryNum, defaultStopRetryNum);
-        stopRetryNumDefault = StringUtils.isEmpty(stopRetryNumDefault) ? defaultStopRetryNum : stopRetryNumDefault;
+        stopRetryNumDefault = StringUtils.isBlank(stopRetryNumDefault) ? defaultStopRetryNum : stopRetryNumDefault;
         clickRetryNumDefault = prop.getProperty(key_defaultClickRetryNum, defaultClickRetryNum);
-        clickRetryNumDefault = StringUtils.isEmpty(clickRetryNumDefault) ? defaultClickRetryNum : clickRetryNumDefault;
+        clickRetryNumDefault = StringUtils.isBlank(clickRetryNumDefault) ? defaultClickRetryNum : clickRetryNumDefault;
         input.close();
     }
 
@@ -2288,26 +2290,25 @@ public class ClickDetailController extends RootController {
     @FXML
     private void testAction() throws Exception {
         String value = clickType_Det.getValue();
-        int time = 2;
         if (clickType_openFile().equals(value)) {
             String path = link_Det.getText();
             if (StringUtils.isNotBlank(path)) {
                 File file = new File(path);
                 if (!file.exists()) {
-                    new MessageBubble(text_fileNotExists(), time);
+                    new MessageBubble(text_fileNotExists());
                 } else {
                     openFile(path);
-                    new MessageBubble(text_testSuccess(), time);
+                    new MessageBubble(text_testSuccess());
                 }
             } else {
-                new MessageBubble(text_pathNull(), time);
+                new MessageBubble(text_pathNull());
             }
         } else if (clickType_runScript().equals(value)) {
             String path = link_Det.getText();
             if (StringUtils.isNotBlank(path)) {
                 File file = new File(path);
                 if (!file.exists()) {
-                    new MessageBubble(text_fileNotExists(), time);
+                    new MessageBubble(text_fileNotExists());
                 } else {
                     String workDir = workPath_Det.getText();
                     String parameter = parameter_Det.getText();
@@ -2317,14 +2318,14 @@ public class ClickDetailController extends RootController {
                     bindingTaskNode(scriptTask, taskBean);
                     scriptTask.setOnSucceeded(_ -> {
                         taskUnbind(taskBean);
-                        new MessageBubble(text_testSuccess(), time);
+                        new MessageBubble(text_testSuccess());
                     });
                     Thread.ofVirtual()
                             .name("scriptTask-vThread" + tabId)
                             .start(scriptTask);
                 }
             } else {
-                new MessageBubble(text_pathNull(), time);
+                new MessageBubble(text_pathNull());
             }
         } else if (clickType_openUrl().equals(value)) {
             String url = url_Det.getText();
@@ -2332,15 +2333,15 @@ public class ClickDetailController extends RootController {
                 if (isValidUrl(url)) {
                     try {
                         Desktop.getDesktop().browse(new URI(url));
-                        new MessageBubble(text_testSuccess(), time);
+                        new MessageBubble(text_testSuccess());
                     } catch (IOException e) {
-                        new MessageBubble(text_urlErr(), time);
+                        new MessageBubble(text_urlErr());
                     }
                 } else {
-                    new MessageBubble(text_urlErr(), time);
+                    new MessageBubble(text_urlErr());
                 }
             } else {
-                new MessageBubble(text_pathNull(), time);
+                new MessageBubble(text_pathNull());
             }
         } else if (clickType_moveWindow().equals(value)) {
             clickWindowMonitor.updateWindowInfo();
@@ -2354,10 +2355,10 @@ public class ClickDetailController extends RootController {
             String log = log_moveWindow();
             if (moved) {
                 log += log_success();
-                new MessageBubble(log, time);
+                new MessageBubble(log);
             } else {
                 log += log_fail();
-                new MessageBubble(log, time);
+                new MessageBubble(log);
                 if (!ignoreFailure_Det.isSelected()) {
                     throw new RuntimeException(log);
                 }
@@ -2624,7 +2625,9 @@ public class ClickDetailController extends RootController {
         ocrTestStage = new Stage();
         HeaderBar headerBar = createHeaderBar(clickLog_title(), ocrCoordinateTitle);
         Parent root = creatParent(fxmlRoot, ocrTestStage, headerBar);
-        Scene scene = new Scene(root, 1000, 500);
+        double width = getSafeAttributes(500, screenWidth);
+        double height = getSafeAttributes(500, screenHeight);
+        Scene scene = new Scene(root, width, height);
         ocrTestStage.setScene(scene);
         ocrTestStage.setTitle(tessdata_title());
         ocrTestStage.initModality(Modality.APPLICATION_MODAL);

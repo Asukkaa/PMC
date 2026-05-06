@@ -108,11 +108,11 @@ public class FileUtils {
      * @throws IOException 配置文件保存异常
      */
     public static void updateProperties(String properties, String key, String value) throws IOException {
-        InputStream input = checkRunningInputStream(properties);
+        InputStream input = new FileInputStream(getRunningResourcePath(properties));
         Properties prop = new Properties();
         prop.load(input);
         prop.put(key, value);
-        OutputStream output = checkRunningOutputStream(properties);
+        OutputStream output = new FileOutputStream(getRunningResourcePath(properties));
         prop.store(output, null);
         input.close();
         output.close();
@@ -246,37 +246,29 @@ public class FileUtils {
     }
 
     /**
-     * 根据不同运行环境来创建输入流
+     * 根据不同运行环境获取资源文件路径
      *
-     * @param path 输入流路径
-     * @return 根据不同运行环境创建的输入流
-     * @throws IOException 文件读取异常
+     * @param path 资源文件相对路径
+     * @return 根据不同运行环境获取到的资源文件路径
      */
-    public static InputStream checkRunningInputStream(String path) throws IOException {
-        InputStream input;
+    public static String getRunningResourcePath(String path) {
         if (isRunningFromIDEA) {
-            input = new FileInputStream(resourcesPath + path);
+            return resourcesPath + path;
         } else {
-            input = new FileInputStream(getAppResourcePath(path));
+            return getAppResourcePath(path);
         }
-        return input;
     }
 
     /**
-     * 根据不同运行环境来创建输出流
+     * 读取配置值，并从默认配置文件中获取默认值
      *
-     * @param path 输出流路径
-     * @return 根据不同运行环境创建的输出流
-     * @throws IOException 文件保存异常
+     * @param prop              要读取的配置
+     * @param key               要读取的 key
+     * @param defaultProperties 默认配置
+     * @return 读取到的配置，为空返回默认配置
      */
-    public static OutputStream checkRunningOutputStream(String path) throws IOException {
-        OutputStream output;
-        if (isRunningFromIDEA) {
-            output = new FileOutputStream(resourcesPath + path);
-        } else {
-            output = new FileOutputStream(getAppResourcePath(path));
-        }
-        return output;
+    public static String getPropertyWithDefault(Properties prop, String key, Properties defaultProperties) {
+        return prop.getProperty(key, defaultProperties.getProperty(key));
     }
 
     /**
@@ -287,18 +279,6 @@ public class FileUtils {
      */
     public static String getAppResourcePath(String path) {
         return javaHome + packagePath + path;
-    }
-
-    /**
-     * 获取 tessdata 配置文件路径
-     *
-     * @return 根据不同运行环境返回不同的地址
-     */
-    public static String getTessdataConfigPath() {
-        if (isRunningFromIDEA) {
-            return resourcesPath + configFile_Tessdata;
-        }
-        return getAppResourcePath(configFile_Tessdata);
     }
 
     /**
@@ -1027,6 +1007,48 @@ public class FileUtils {
             }
         }
         return getAppResourcePath(tessdata);
+    }
+
+    /**
+     * 同步配置文件，使其键集合与默认配置一致，值优先保留已有文件中的定义。
+     *
+     * @param filePath     配置文件路径
+     * @param defaultProps 默认配置（键值对全集）
+     * @throws IOException 文件读写异常
+     */
+    public static void syncPropertiesFile(String filePath, Properties defaultProps) throws IOException {
+        File file = new File(filePath);
+        // 文件不存在直接写入默认配置
+        if (!file.exists()) {
+            storeProperties(defaultProps, file);
+        } else {
+            //文件存在载入已有配置
+            Properties existingProps = new Properties();
+            try (FileInputStream fis = new FileInputStream(file)) {
+                existingProps.load(fis);
+            }
+            // 构建最终配置，键集等于默认键集，值优先取已有配置中的值
+            Properties finalProps = new Properties();
+            for (String key : defaultProps.stringPropertyNames()) {
+                String value = existingProps.getProperty(key, defaultProps.getProperty(key));
+                finalProps.setProperty(key, value);
+            }
+            // 写回文件（覆盖）
+            storeProperties(finalProps, file);
+        }
+    }
+
+    private static void storeProperties(Properties props, File file) throws IOException {
+        // 确保父目录存在
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            if (!parentDir.mkdirs()) {
+                throw new RuntimeException(text_configFileErr());
+            }
+        }
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            props.store(fos, null);
+        }
     }
 
 }

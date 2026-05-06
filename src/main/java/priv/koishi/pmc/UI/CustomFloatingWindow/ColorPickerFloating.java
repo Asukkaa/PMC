@@ -24,8 +24,8 @@ import priv.koishi.pmc.Listener.MousePositionUpdater;
 import java.awt.*;
 
 import static priv.koishi.pmc.Controller.MainController.settingController;
-import static priv.koishi.pmc.Finals.CommonFinals.defaultOffsetX;
-import static priv.koishi.pmc.Finals.CommonFinals.defaultOffsetY;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultOffsetX;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultOffsetY;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.setPositionText;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.updateFloatingWindow;

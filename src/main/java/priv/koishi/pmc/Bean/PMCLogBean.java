@@ -27,7 +27,7 @@ public class PMCLogBean implements Indexable {
     private Integer index;
 
     /**
-     * 操作时间
+     * 操作时间（默认当前时间）
      */
     private String date = LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 

@@ -50,7 +50,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.04.29";
+    public static final String buildDate = "2026.05.06";
 
     /**
      * 文件后缀名：bat
@@ -308,24 +308,9 @@ public class CommonFinals {
     public static final String log4j2 = "log4j2.xml";
 
     /**
-     * app 配置文件路径
-     */
-    public static final String configFile = "config/config.properties";
-
-    /**
-     * 读取自动操作工具页面配置文件路径
-     */
-    public static final String configFile_Click = "config/autoClickConfig.properties";
-
-    /**
-     * 批量执行 PMC 文件页面配置文件路径
-     */
-    public static final String configFile_List = "config/listPMCConfig.properties";
-
-    /**
      * tessdata 设置配置文件路径
      */
-    public static final String configFile_Tessdata = "config/tessdataConfig.json";
+    public static final String configFile_Tessdata = "config/TessdataConfig.json";
 
     /**
      * 更新脚本名称
@@ -571,26 +556,6 @@ public class CommonFinals {
     public static final String activatePMC = "activatePMC";
 
     /**
-     * 默认浮窗横轴偏移量
-     */
-    public static final int defaultOffsetX = 30;
-
-    /**
-     * 默认浮纵轴窗偏移量
-     */
-    public static final int defaultOffsetY = 30;
-
-    /**
-     * 默认图像识别范围窗口宽度
-     */
-    public static final int minFindImgWidth = 50;
-
-    /**
-     * 默认图像识别范围窗口高度
-     */
-    public static final int minFindImgHeight = 50;
-
-    /**
      * 在列表所选行第一行上方插入
      */
     public static final int upAdd = 1;
@@ -616,11 +581,6 @@ public class CommonFinals {
     public static final int noAdd = -99;
 
     /**
-     * 更新窗口信息消息气泡显示事件（单位：秒）
-     */
-    public static final int updateListMessageTime = 2;
-
-    /**
      * 无键盘按键
      */
     public static final int noKeyboard = -1;
@@ -644,196 +604,6 @@ public class CommonFinals {
      * 相对纵坐标标识
      */
     public static final String RelativeY = "relativeY";
-
-    /**
-     * 默认循环次数
-     */
-    public static final String defaultLoopTime = "1";
-
-    /**
-     * 默认随机偏移时长
-     */
-    public static final String defaultRandomTime = "50";
-
-    /**
-     * 默认点击时长
-     */
-    public static final String defaultClickTimeOffset = "120";
-
-    /**
-     * 默认横轴随机偏移量
-     */
-    public static final String defaultRandomClickX = "5";
-
-    /**
-     * 默认纵轴随机偏移量
-     */
-    public static final String defaultRandomClickY = "5";
-
-    /**
-     * 默认鼠标轨迹采样间隔
-     */
-    public static final String defaultSampleInterval = "10";
-
-    /**
-     * 默认要点击的图片识别重试次数
-     */
-    public static final String defaultClickRetryNum = "3";
-
-    /**
-     * 默认终止操作图片识别重试次数
-     */
-    public static final String defaultStopRetryNum = "0";
-
-    /**
-     * 默认设置目标窗口准备时间
-     */
-    public static final String defaultFindWindowWait = "3";
-
-    /**
-     * 默认录制准备时间
-     */
-    public static final String defaultPreparationRecord = "3";
-
-    /**
-     * 默认运行准备时间
-     */
-    public static final String defaultPreparationRun = "3";
-
-    /**
-     * 默认悬信息浮窗位置横坐标
-     */
-    public static final String defaultFloatingX = "0";
-
-    /**
-     * 默认悬信息浮窗位置纵坐标
-     */
-    public static final String defaultFloatingY = "0";
-
-    /**
-     * 默认要点击的图像识别类型枚举
-     */
-    public static final String defaultClickFindImgType = "0";
-
-    /**
-     * 默认终止操作图像识别类型枚举
-     */
-    public static final String defaultStopFindImgType = "0";
-
-    /**
-     * 默认日志窗口宽度
-     */
-    public static final String defaultLogWidth = "1300";
-
-    /**
-     * 默认日志窗口高度
-     */
-    public static final String defaultLogHeight = "600";
-
-    /**
-     * 默认操作步骤详情窗口宽度
-     */
-    public static final String defaultClickDetailWidth = "1350";
-
-    /**
-     * 默认操作步骤详情窗口高度
-     */
-    public static final String defaultClickDetailHeight = "720";
-
-    /**
-     * 默认定时任务详情窗口宽度
-     */
-    public static final String defaultTaskDetailWidth = "900";
-
-    /**
-     * 默认定时任务详情窗口高度
-     */
-    public static final String defaultTaskDetailHeight = "450";
-
-    /**
-     * 默认信息浮窗宽度
-     */
-    public static final String defaultFloatingWidth = "250";
-
-    /**
-     * 默认信息浮窗高度
-     */
-    public static final String defaultFloatingHeight = "240";
-
-    /**
-     * 默认颜色容差
-     */
-    public static final int defaultColorTolerance = 10;
-
-    /**
-     * 默认信息浮窗高度
-     */
-    public static final int defaultFloatingHeightInt = Integer.parseInt(defaultFloatingHeight);
-
-    /**
-     * 默认信息浮窗宽度
-     */
-    public static final int defaultFloatingWidthInt = Integer.parseInt(defaultFloatingWidth);
-
-    /**
-     * 默认应用窗口宽度
-     */
-    public static final String defaultAppWidth = "1350";
-
-    /**
-     * 默认应用窗口高度
-     */
-    public static final String defaultAppHeight = "760";
-
-    /**
-     * 默认打开的页面
-     */
-    public static final String defaultLastTab = "autoClickTab";
-
-    /**
-     * 默认应用端口
-     */
-    public static final String defaultAppPort = "52514";
-
-    /**
-     * 默认浮窗背景透明度
-     */
-    public static final String defaultOpacity = "0.5";
-
-    /**
-     * 默认操作记录最大条数
-     */
-    public static final String defaultMaxLog = "1000";
-
-    /**
-     * 默认图像识别重试间隔时长
-     */
-    public static final String defaultRetrySecond = "1";
-
-    /**
-     * 默认终止操作图片默认识别匹配匹配度
-     */
-    public static final String defaultStopOpacity = "80.0";
-
-    /**
-     * 默认信息浮窗边距
-     */
-    public static final String defaultMargin = "0";
-
-    /**
-     * 默认要点击的图片默认识别匹配匹配度
-     */
-    public static final String defaultClickOpacity = "80.0";
-
-    /**
-     * 默认时长随机偏移量
-     */
-    public static final String defaultRandomTimeOffset = "50";
-
-    /**
-     * 颜色选择器默认选中颜色
-     */
-    public static final String defaultColor = "0xffffffff";
 
     /**
      * macOS .DS_Store 文件名称

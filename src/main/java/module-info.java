@@ -52,4 +52,6 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.Listener;
     exports priv.koishi.pmc.Callback;
     exports priv.koishi.pmc.UI.CustomMessageBubble;
+    exports priv.koishi.pmc.Finals.DefaultConfig;
+    opens priv.koishi.pmc.Finals.DefaultConfig to javafx.fxml;
 }

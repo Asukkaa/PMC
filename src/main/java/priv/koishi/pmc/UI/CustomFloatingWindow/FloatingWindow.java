@@ -25,21 +25,23 @@ import javafx.stage.StageStyle;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.logoPath;
+import static priv.koishi.pmc.Finals.CommonFinals.noKeyboard;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.clickProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.text_noCancelKey;
 import static priv.koishi.pmc.Finals.i18nFinal.tip_messageRegion;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.updateRelativeInfo;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.R_SHIFT;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
+import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
@@ -888,12 +890,12 @@ public class FloatingWindow {
             FloatingWindowConfig config = messageFloating.getConfig();
             if (config != null) {
                 Properties prop = new Properties();
-                InputStream input = checkRunningInputStream(configPath);
+                InputStream input = new FileInputStream(getRunningResourcePath(configPath));
                 prop.load(input);
-                config.setHeight(Integer.parseInt(prop.getProperty(key_messageHeight, defaultFloatingHeight)))
-                        .setWidth(Integer.parseInt(prop.getProperty(key_messageWidth, defaultFloatingWidth)))
-                        .setX(Integer.parseInt(prop.getProperty(key_messageX, defaultFloatingX)))
-                        .setY(Integer.parseInt(prop.getProperty(key_messageY, defaultFloatingY)));
+                config.setHeight(Integer.parseInt(getPropertyWithDefault(prop, key_messageHeight, clickProperties)))
+                        .setWidth(Integer.parseInt(getPropertyWithDefault(prop, key_messageWidth, clickProperties)))
+                        .setX(Integer.parseInt(getPropertyWithDefault(prop, key_messageX, clickProperties)))
+                        .setY(Integer.parseInt(getPropertyWithDefault(prop, key_messageY, clickProperties)));
                 input.close();
                 messageFloating.setConfig(config);
             }

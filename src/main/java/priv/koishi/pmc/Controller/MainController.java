@@ -11,16 +11,15 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Properties;
 
-import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.disable;
+import static priv.koishi.pmc.Finals.CommonFinals.enable;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
 import static priv.koishi.pmc.MainApplication.mainStage;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningInputStream;
-import static priv.koishi.pmc.Utils.FileUtils.checkRunningOutputStream;
+import static priv.koishi.pmc.Utils.FileUtils.getRunningResourcePath;
 import static priv.koishi.pmc.Utils.TableViewUtils.dragDataFormat;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 import static priv.koishi.pmc.Utils.UiUtils.findTabById;
@@ -297,16 +296,16 @@ public class MainController extends RootController {
      * @throws IOException 配置文件保存异常
      */
     private void saveLastConfig() throws IOException {
-        InputStream input = checkRunningInputStream(configFile);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         Properties prop = new Properties();
         prop.load(input);
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         prop.put(key_lastTab, selectedTab.getId());
         String fullWindow = mainStage.isFullScreen() ? enable : disable;
-        prop.put(key_lastFullWindow, fullWindow);
+        prop.put(key_fullWindow, fullWindow);
         String maximize = mainStage.isMaximized() ? enable : disable;
-        prop.put(key_lastMaxWindow, maximize);
-        OutputStream output = checkRunningOutputStream(configFile);
+        prop.put(key_maxWindow, maximize);
+        OutputStream output = new FileOutputStream(getRunningResourcePath(configFile));
         prop.store(output, null);
         input.close();
         output.close();

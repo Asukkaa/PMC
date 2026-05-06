@@ -2323,6 +2323,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 创建配置文件目录失败
+     */
+    public static String text_configFileErr() {
+        return bundle.getString("configFileErr");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {

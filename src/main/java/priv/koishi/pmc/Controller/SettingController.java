@@ -49,7 +49,6 @@ import priv.koishi.pmc.Event.SettingsLoadedEvent;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.FindImgTypeEnum;
 import priv.koishi.pmc.Finals.Enum.LanguageEnum;
-import priv.koishi.pmc.Finals.Enum.ThemeEnum;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
@@ -61,10 +60,7 @@ import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.URI;
@@ -78,6 +74,11 @@ import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configProperties;
+import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.configFile_List;
+import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.listPMCProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomationPermission;
@@ -311,7 +312,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_Set != null) {
-            InputStream input = checkRunningInputStream(configFile_Click);
+            InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
             Properties prop = new Properties();
             prop.load(input);
             // 保存功能设置
@@ -320,7 +321,7 @@ public class SettingController extends RootController implements MousePositionUp
             saveStopImg(prop);
             // 保存绑定的窗口路径
             saveWindowPath(prop);
-            OutputStream output = checkRunningOutputStream(configFile_Click);
+            OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_Click));
             prop.store(output, null);
             input.close();
             output.close();
@@ -514,11 +515,10 @@ public class SettingController extends RootController implements MousePositionUp
      * @throws IOException 配置文件读取异常
      */
     private void loadControlLastConfig() throws IOException {
-        Properties prop = new Properties();
         // 加载主配置文件
-        loadMainConfig(prop);
+        loadMainConfig();
         // 加载功能配置文件
-        loadFunctionConfig(prop);
+        loadFunctionConfig();
     }
 
     /**
@@ -569,81 +569,82 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 加载应用功能配置
      *
-     * @param prop 配置文件
      * @throws IOException 配置文件读取异常
      */
-    private void loadFunctionConfig(Properties prop) throws IOException {
-        InputStream clickFileInput = checkRunningInputStream(configFile_Click);
+    private void loadFunctionConfig() throws IOException {
+        Properties prop = new Properties();
+        InputStream clickFileInput = new FileInputStream(getRunningResourcePath(configFile_Click));
         prop.load(clickFileInput);
         setControlLastConfig(overtime_Set, prop, key_overtime);
-        setControlLastConfig(imgLog_Set, prop, key_imgLog, enable);
-        setControlLastConfig(moveLog_Set, prop, key_moveLog, enable);
-        setControlLastConfig(dragLog_Set, prop, key_dragLog, enable);
-        setControlLastConfig(waitLog_Set, prop, key_waitLog, enable);
-        setControlLastConfig(noMove_Set, prop, key_noMove, disable);
-        setControlLastConfig(clickLog_Set, prop, key_clickLog, enable);
-        setControlLastConfig(opacity_Set, prop, key_opacity, defaultOpacity);
-        setControlLastConfig(clickImgLog_Set, prop, key_clickLog, enable);
-        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, enable);
-        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, enable);
-        setControlLastConfig(recordDrag_Set, prop, key_recordDrag, enable);
-        setControlLastConfig(recordMove_Set, prop, key_recordMove, enable);
-        setControlLastConfig(openUrlLog_Set, prop, key_openUrlLog, enable);
-        setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, defaultMaxLog);
-        setControlLastConfig(openFileLog_Set, prop, key_openFileLog, enable);
-        setControlLastConfig(keyboardLog_Set, prop, key_keyboardLog, enable);
-        setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, enable);
-        setControlLastConfig(randomClick_Set, prop, key_randomClick, disable);
-        setControlLastConfig(floatingDistance_Set, prop, key_margin, defaultMargin);
-        setControlLastConfig(moveWindowLog_Set, prop, key_moveWindowLog, enable);
-        setControlLastConfig(firstClick_Set, prop, key_lastFirstClick, disable);
-        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, enable);
-        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, enable);
-        setControlLastConfig(mouseWheelLog_Set, prop, key_mouseWheelLog, enable);
-        setControlLastConfig(loadAutoClick_Set, prop, key_loadLastConfig, enable);
+        setControlLastConfig(imgLog_Set, prop, key_imgLog, clickProperties);
+        setControlLastConfig(moveLog_Set, prop, key_moveLog, clickProperties);
+        setControlLastConfig(dragLog_Set, prop, key_dragLog, clickProperties);
+        setControlLastConfig(waitLog_Set, prop, key_waitLog, clickProperties);
+        setControlLastConfig(noMove_Set, prop, key_noMove, clickProperties);
+        setControlLastConfig(clickLog_Set, prop, key_clickLog, clickProperties);
+        setControlLastConfig(opacity_Set, prop, key_opacity, clickProperties);
+        setControlLastConfig(clickImgLog_Set, prop, key_clickImgLog, clickProperties);
+        setControlLastConfig(autoSavePMC_Set, prop, key_autoSave, clickProperties);
+        setControlLastConfig(stopImgLog_Set, prop, key_stopImgLog, clickProperties);
+        setControlLastConfig(recordDrag_Set, prop, key_recordDrag, clickProperties);
+        setControlLastConfig(recordMove_Set, prop, key_recordMove, clickProperties);
+        setControlLastConfig(openUrlLog_Set, prop, key_openUrlLog, clickProperties);
+        setControlLastConfig(maxLogNum_Set, prop, key_maxLogNum, clickProperties);
+        setControlLastConfig(openFileLog_Set, prop, key_openFileLog, clickProperties);
+        setControlLastConfig(keyboardLog_Set, prop, key_keyboardLog, clickProperties);
+        setControlLastConfig(runScriptLog_Set, prop, key_runScriptLog, clickProperties);
+        setControlLastConfig(randomClick_Set, prop, key_randomClick, clickProperties);
+        setControlLastConfig(floatingDistance_Set, prop, key_margin, clickProperties);
+        setControlLastConfig(moveWindowLog_Set, prop, key_moveWindowLog, clickProperties);
+        setControlLastConfig(firstClick_Set, prop, key_firstClick, clickProperties);
+        setControlLastConfig(floatingRun_Set, prop, key_loadFloatingRun, clickProperties);
+        setControlLastConfig(mouseFloating_Set, prop, key_mouseFloating, clickProperties);
+        setControlLastConfig(mouseWheelLog_Set, prop, key_mouseWheelLog, clickProperties);
+        setControlLastConfig(loadAutoClick_Set, prop, key_loadConfig, clickProperties);
         setControlLastConfig(tableView_Set, prop, key_defaultStopImg, dataNumber_Set);
-        setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, disable);
-        setControlLastConfig(useRelatively_Set, prop, key_useRelatively, disable);
-        setControlLastConfig(recordKeyboard_Set, prop, key_recordKeyboard, enable);
-        setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, disable);
-        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, enable);
-        setControlLastConfig(retrySecond_Set, prop, key_retrySecond, defaultRetrySecond);
-        setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, defaultStopOpacity);
-        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, disable);
-        setControlLastConfig(hideWindowRun_Set, prop, key_lastHideWindowRun, enable);
-        setControlLastConfig(showWindowRun_Set, prop, key_lastShowWindowRun, enable);
-        setControlLastConfig(titleCoordinate_Set, prop, key_titleCoordinate, enable);
-        setControlLastConfig(recordMouseWheel_Set, prop, key_recordMouseWheel, enable);
-        setControlLastConfig(recordMouseClick_Set, prop, key_recordMouseClick, enable);
-        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, disable);
-        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, enable);
-        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, enable);
-        setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity, defaultClickOpacity);
-        setControlLastConfig(randomClickX_Set, prop, key_randomClickX, defaultRandomClickX);
-        setControlLastConfig(randomClickY_Set, prop, key_randomClickY, defaultRandomClickY);
-        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory, disable);
-        setControlLastConfig(offsetX_Set, prop, key_offsetX, String.valueOf(defaultOffsetX));
-        setControlLastConfig(offsetY_Set, prop, key_offsetY, String.valueOf(defaultOffsetY));
-        setControlLastConfig(updateStopWindow_Set, prop, key_updateStopWindow, disable);
-        setControlLastConfig(updateClickWindow_Set, prop, key_updateClickWindow, disable);
-        setControlLastConfig(hideWindowRecord_Set, prop, key_lastHideWindowRecord, enable);
-        setControlLastConfig(showWindowRecord_Set, prop, key_lastShowWindowRecord, enable);
-        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, enable);
-        setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval, defaultSampleInterval);
-        setControlLastConfig(findWindowWait_Set, prop, key_findWindowWait, defaultFindWindowWait);
-        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, disable);
-        setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, defaultStopRetryNum);
-        setColorPickerConfig(colorPicker_Set, prop, key_lastFloatingTextColor, key_lastColorCustom);
-        setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, defaultClickTimeOffset);
-        setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, defaultClickRetryNum);
-        setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, defaultRandomTimeOffset);
+        setControlLastConfig(stopAllRegion_Set, prop, key_stopAllRegion, clickProperties);
+        setControlLastConfig(useRelatively_Set, prop, key_useRelatively, clickProperties);
+        setControlLastConfig(recordKeyboard_Set, prop, key_recordKeyboard, clickProperties);
+        setControlLastConfig(clickAllRegion_Set, prop, key_clickAllRegion, clickProperties);
+        setControlLastConfig(remindClickSave_Set, prop, key_remindClickSave, clickProperties);
+        setControlLastConfig(retrySecond_Set, prop, key_retrySecond, clickProperties);
+        setControlLastConfig(stopOpacity_Set, prop, key_stopOpacity, clickProperties);
+        setControlLastConfig(randomWaitTime_Set, prop, key_randomWaitTime, clickProperties);
+        setControlLastConfig(hideWindowRun_Set, prop, key_hideWindowRun, clickProperties);
+        setControlLastConfig(showWindowRun_Set, prop, key_showWindowRun, clickProperties);
+        setControlLastConfig(titleCoordinate_Set, prop, key_titleCoordinate, clickProperties);
+        setControlLastConfig(recordMouseWheel_Set, prop, key_recordMouseWheel, clickProperties);
+        setControlLastConfig(recordMouseClick_Set, prop, key_recordMouseClick, clickProperties);
+        setControlLastConfig(randomClickTime_Set, prop, key_randomClickTime, clickProperties);
+        setControlLastConfig(floatingRecord_Set, prop, key_loadFloatingRecord, clickProperties);
+        setControlLastConfig(mouseFloatingRun_Set, prop, key_mouseFloatingRun, clickProperties);
+        setControlLastConfig(clickOpacity_Set, prop, key_clickOpacity, clickProperties);
+        setControlLastConfig(randomClickX_Set, prop, key_randomClickX, clickProperties);
+        setControlLastConfig(randomClickY_Set, prop, key_randomClickY, clickProperties);
+        setControlLastConfig(randomTrajectory_Set, prop, key_randomTrajectory, clickProperties);
+        setControlLastConfig(offsetX_Set, prop, key_offsetX, String.valueOf(clickProperties));
+        setControlLastConfig(offsetY_Set, prop, key_offsetY, String.valueOf(clickProperties));
+        setControlLastConfig(updateStopWindow_Set, prop, key_updateStopWindow, clickProperties);
+        setControlLastConfig(updateClickWindow_Set, prop, key_updateClickWindow, clickProperties);
+        setControlLastConfig(hideWindowRecord_Set, prop, key_hideWindowRecord, clickProperties);
+        setControlLastConfig(showWindowRecord_Set, prop, key_showWindowRecord, clickProperties);
+        setControlLastConfig(mouseFloatingRecord_Set, prop, key_mouseFloatingRecord, clickProperties);
+        setControlLastConfig(sampleInterval_Set, prop, key_sampleInterval, clickProperties);
+        setControlLastConfig(findWindowWait_Set, prop, key_findWindowWait, clickProperties);
+        setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, clickProperties);
+        setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, clickProperties);
+        setColorPickerConfig(colorPicker_Set, prop, key_floatingTextColor, key_colorCustom);
+        setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, clickProperties);
+        setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, clickProperties);
+        setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, clickProperties);
         // 加载应用图像识别配置
         loadFindImgConfig(prop);
         clickFileInput.close();
-        InputStream listConfigInput = checkRunningInputStream(configFile_List);
+        prop = new Properties();
+        InputStream listConfigInput = new FileInputStream(getRunningResourcePath(configFile_List));
         prop.load(listConfigInput);
-        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, enable);
-        setControlLastConfig(loadPMCS_Set, prop, key_loadLastConfig, enable);
+        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, listPMCProperties);
+        setControlLastConfig(loadPMCS_Set, prop, key_loadConfig, listPMCProperties);
         listConfigInput.close();
         extendedStage_Set.setSelected(extendedStage);
     }
@@ -654,9 +655,9 @@ public class SettingController extends RootController implements MousePositionUp
      * @param prop 配置文件
      */
     private void loadFindImgConfig(Properties prop) {
-        int stopFindImgType = Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType));
+        int stopFindImgType = Integer.parseInt(getPropertyWithDefault(prop, key_stopFindImgType, clickProperties));
         stopFindImgType_Set.setValue(findImgTypeMap.get(stopFindImgType));
-        int clickFindImgType = Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType));
+        int clickFindImgType = Integer.parseInt(getPropertyWithDefault(prop, key_clickFindImgType, clickProperties));
         clickFindImgType_Set.setValue(findImgTypeMap.get(clickFindImgType));
         clickWindowPath = prop.getProperty(key_clickWindowPath);
         stopWindowPath = prop.getProperty(key_stopWindowPath);
@@ -665,16 +666,16 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 加载应用基础配置
      *
-     * @param prop 配置文件
      * @throws IOException 配置文件读取异常
      */
-    private void loadMainConfig(Properties prop) throws IOException {
-        InputStream configFileInput = checkRunningInputStream(configFile);
+    private void loadMainConfig() throws IOException {
+        Properties prop = new Properties();
+        InputStream configFileInput = new FileInputStream(getRunningResourcePath(configFile));
         prop.load(configFileInput);
-        setControlLastConfig(lastTab_Set, prop, key_loadLastConfig, enable);
-        setControlLastConfig(maxWindow_Set, prop, key_loadLastMaxWindow, disable);
-        setControlLastConfig(fullWindow_Set, prop, key_loadLastFullWindow, disable);
-        int them = Integer.parseInt(prop.getProperty(key_theme, String.valueOf(ThemeEnum.Auto.ordinal())));
+        setControlLastConfig(lastTab_Set, prop, key_loadConfig, configProperties);
+        setControlLastConfig(maxWindow_Set, prop, key_loadMaxWindow, configProperties);
+        setControlLastConfig(fullWindow_Set, prop, key_loadFullWindow, configProperties);
+        int them = Integer.parseInt(getPropertyWithDefault(prop, key_theme, configProperties));
         theme_Set.setValue(themeMap.get(them));
         // 加载快捷键设置
         loadKeyConfig(prop);
@@ -692,37 +693,37 @@ public class SettingController extends RootController implements MousePositionUp
      */
     public static void loadFloatingWindowConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream clickFileInput = checkRunningInputStream(configFile_Click);
+        InputStream clickFileInput = new FileInputStream(getRunningResourcePath(configFile_Click));
         prop.load(clickFileInput);
-        int messageX = Integer.parseInt(prop.getProperty(key_messageX, defaultFloatingX));
-        int messageY = Integer.parseInt(prop.getProperty(key_messageY, defaultFloatingY));
-        int messageWidth = Integer.parseInt(prop.getProperty(key_messageWidth, defaultFloatingWidth));
-        int messageHeight = Integer.parseInt(prop.getProperty(key_messageHeight, defaultFloatingHeight));
+        int messageX = Integer.parseInt(getPropertyWithDefault(prop, key_messageX, clickProperties));
+        int messageY = Integer.parseInt(getPropertyWithDefault(prop, key_messageY, clickProperties));
+        int messageWidth = Integer.parseInt(getPropertyWithDefault(prop, key_messageWidth, clickProperties));
+        int messageHeight = Integer.parseInt(getPropertyWithDefault(prop, key_messageHeight, clickProperties));
         FloatingWindowConfig messageConfig = new FloatingWindowConfig();
         messageConfig.setHeight(Math.max(1, Math.min(messageHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(messageWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(messageX, screenWidth)))
                 .setY(Math.max(0, Math.min(messageY, screenHeight)));
         messageFloating.setConfig(messageConfig);
-        int clickHeight = Integer.parseInt(prop.getProperty(key_clickHeight, defaultFloatingHeight));
-        int clickWidth = Integer.parseInt(prop.getProperty(key_clickWidth, defaultFloatingWidth));
-        int clickX = Integer.parseInt(prop.getProperty(key_clickX, defaultFloatingX));
-        int clickY = Integer.parseInt(prop.getProperty(key_clickY, defaultFloatingY));
+        int clickHeight = Integer.parseInt(getPropertyWithDefault(prop, key_clickHeight, clickProperties));
+        int clickWidth = Integer.parseInt(getPropertyWithDefault(prop, key_clickWidth, clickProperties));
+        int clickX = Integer.parseInt(getPropertyWithDefault(prop, key_clickX, clickProperties));
+        int clickY = Integer.parseInt(getPropertyWithDefault(prop, key_clickY, clickProperties));
         FloatingWindowConfig clickConfig = new FloatingWindowConfig();
-        clickConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_clickFindImgType, defaultClickFindImgType)))
-                .setAllRegion(enable.equals(prop.getProperty(key_clickAllRegion, disable)))
+        clickConfig.setFindImgTypeEnum(Integer.parseInt(getPropertyWithDefault(prop, key_clickFindImgType, clickProperties)))
+                .setAllRegion(enable.equals(getPropertyWithDefault(prop, key_clickAllRegion, clickProperties)))
                 .setHeight(Math.max(1, Math.min(clickHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(clickWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(clickX, screenWidth)))
                 .setY(Math.max(0, Math.min(clickY, screenHeight)));
         clickFloating.setConfig(clickConfig);
-        int stopHeight = Integer.parseInt(prop.getProperty(key_stopHeight, defaultFloatingHeight));
-        int stopWidth = Integer.parseInt(prop.getProperty(key_stopWidth, defaultFloatingWidth));
-        int stopX = Integer.parseInt(prop.getProperty(key_stopX, defaultFloatingX));
-        int stopY = Integer.parseInt(prop.getProperty(key_stopY, defaultFloatingY));
+        int stopHeight = Integer.parseInt(getPropertyWithDefault(prop, key_stopHeight, clickProperties));
+        int stopWidth = Integer.parseInt(getPropertyWithDefault(prop, key_stopWidth, clickProperties));
+        int stopX = Integer.parseInt(getPropertyWithDefault(prop, key_stopX, clickProperties));
+        int stopY = Integer.parseInt(getPropertyWithDefault(prop, key_stopY, clickProperties));
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
-        stopConfig.setFindImgTypeEnum(Integer.parseInt(prop.getProperty(key_stopFindImgType, defaultStopFindImgType)))
-                .setAllRegion(enable.equals(prop.getProperty(key_stopAllRegion, disable)))
+        stopConfig.setFindImgTypeEnum(Integer.parseInt(getPropertyWithDefault(prop, key_stopFindImgType, clickProperties)))
+                .setAllRegion(enable.equals(getPropertyWithDefault(prop, key_stopAllRegion, clickProperties)))
                 .setHeight(Math.max(1, Math.min(stopHeight, screenHeight)))
                 .setWidth(Math.max(1, Math.min(stopWidth, screenHeight)))
                 .setX(Math.max(0, Math.min(stopX, screenWidth)))
@@ -833,7 +834,7 @@ public class SettingController extends RootController implements MousePositionUp
                     customColors.forEach(color -> colorsString.append(color.toString()).append(" "));
                     String result = colorsString.toString().trim();
                     try {
-                        updateProperties(configFile_Click, key_lastColorCustom, result);
+                        updateProperties(configFile_Click, key_colorCustom, result);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -1185,9 +1186,9 @@ public class SettingController extends RootController implements MousePositionUp
                         }
                     }
                 }
-                new MessageBubble(text_updateNum() + update, updateListMessageTime);
+                new MessageBubble(text_updateNum() + update);
             } else {
-                new MessageBubble(text_noDateNum(), updateListMessageTime);
+                new MessageBubble(text_noDateNum());
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1216,9 +1217,9 @@ public class SettingController extends RootController implements MousePositionUp
                         }
                     }
                 }
-                new MessageBubble(text_updateNum() + update, updateListMessageTime);
+                new MessageBubble(text_updateNum() + update);
             } else {
-                new MessageBubble(text_noDateNum(), updateListMessageTime);
+                new MessageBubble(text_noDateNum());
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -1841,7 +1842,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadAutoClickAction() throws IOException {
-        setLoadLastConfigCheckBox(loadAutoClick_Set, configFile_Click, key_loadLastConfig);
+        setLoadLastConfigCheckBox(loadAutoClick_Set, configFile_Click, key_loadConfig);
     }
 
     /**
@@ -1851,7 +1852,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadPMMCSAction() throws IOException {
-        setLoadLastConfigCheckBox(loadPMCS_Set, configFile_List, key_loadLastConfig);
+        setLoadLastConfigCheckBox(loadPMCS_Set, configFile_List, key_loadConfig);
     }
 
     /**
@@ -1901,7 +1902,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadLastTabAction() throws IOException {
-        setLoadLastConfigCheckBox(lastTab_Set, configFile, key_loadLastConfig);
+        setLoadLastConfigCheckBox(lastTab_Set, configFile, key_loadConfig);
     }
 
     /**
@@ -1911,7 +1912,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadFullWindowAction() throws IOException {
-        setLoadLastConfigCheckBox(fullWindow_Set, configFile, key_loadLastFullWindow);
+        setLoadLastConfigCheckBox(fullWindow_Set, configFile, key_loadFullWindow);
     }
 
     /**
@@ -1921,7 +1922,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadMaxWindowAction() throws IOException {
-        setLoadLastConfigCheckBox(maxWindow_Set, configFile, key_loadLastMaxWindow);
+        setLoadLastConfigCheckBox(maxWindow_Set, configFile, key_loadMaxWindow);
     }
 
     /**
@@ -1931,7 +1932,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadHideWindowRunAction() throws IOException {
-        setLoadLastConfigCheckBox(hideWindowRun_Set, configFile_Click, key_lastHideWindowRun);
+        setLoadLastConfigCheckBox(hideWindowRun_Set, configFile_Click, key_hideWindowRun);
     }
 
     /**
@@ -1941,7 +1942,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadShowWindowRunAction() throws IOException {
-        setLoadLastConfigCheckBox(showWindowRun_Set, configFile_Click, key_lastShowWindowRun);
+        setLoadLastConfigCheckBox(showWindowRun_Set, configFile_Click, key_showWindowRun);
     }
 
     /**
@@ -1951,7 +1952,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadHideWindowRecordAction() throws IOException {
-        setLoadLastConfigCheckBox(hideWindowRecord_Set, configFile_Click, key_lastHideWindowRecord);
+        setLoadLastConfigCheckBox(hideWindowRecord_Set, configFile_Click, key_hideWindowRecord);
     }
 
     /**
@@ -1961,7 +1962,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadShowWindowRecordAction() throws IOException {
-        setLoadLastConfigCheckBox(showWindowRecord_Set, configFile_Click, key_lastShowWindowRecord);
+        setLoadLastConfigCheckBox(showWindowRecord_Set, configFile_Click, key_showWindowRecord);
     }
 
     /**
@@ -1971,7 +1972,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void loadFirstClickAction() throws IOException {
-        setLoadLastConfigCheckBox(firstClick_Set, configFile_Click, key_lastFirstClick);
+        setLoadLastConfigCheckBox(firstClick_Set, configFile_Click, key_firstClick);
     }
 
     /**
@@ -2001,7 +2002,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void colorAction() throws IOException {
-        updateProperties(configFile_Click, key_lastFloatingTextColor, String.valueOf(colorPicker_Set.getValue()));
+        updateProperties(configFile_Click, key_floatingTextColor, String.valueOf(colorPicker_Set.getValue()));
     }
 
     /**
@@ -2025,7 +2026,7 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
-     * 应用主界面标题栏展示鼠标位置
+     * 应用标题栏展示鼠标位置
      *
      * @throws IOException 配置文件保存异常
      */

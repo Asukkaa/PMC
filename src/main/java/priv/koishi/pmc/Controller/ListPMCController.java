@@ -32,10 +32,7 @@ import priv.koishi.pmc.Event.AutoClickLoadedEvent;
 import priv.koishi.pmc.Event.EventBus;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -47,8 +44,14 @@ import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultLoopTime;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.defaultPreparationRun;
+import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.configFile_List;
+import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.listPMCProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.cancelKey;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -79,16 +82,6 @@ public class ListPMCController extends RootController {
      * 操作记录
      */
     public List<PMCLogBean> clickLogs = new CopyOnWriteArrayList<>();
-
-    /**
-     * 记录页高度
-     */
-    private int logHeight;
-
-    /**
-     * 记录页宽度
-     */
-    private int logWidth;
 
     /**
      * 要防重复点击的组件
@@ -175,21 +168,21 @@ public class ListPMCController extends RootController {
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_List != null) {
-            InputStream input = checkRunningInputStream(configFile_List);
+            InputStream input = new FileInputStream(getRunningResourcePath(configFile_List));
             Properties prop = new Properties();
             prop.load(input);
-            prop.put(key_lastLoopTime, loopTime_List.getText());
-            prop.put(key_lastOutFileName, outFileName_List.getText());
+            prop.put(key_loopTime, loopTime_List.getText());
+            prop.put(key_outFileName, outFileName_List.getText());
             String lastOpenDirectoryValue = openDirectory_List.isSelected() ? enable : disable;
-            prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
+            prop.put(key_openDirectory, lastOpenDirectoryValue);
             String lastNotOverwriteValue = notOverwrite_List.isSelected() ? enable : disable;
-            prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
+            prop.put(key_notOverwrite, lastNotOverwriteValue);
             String loadFolderValue = loadFolder_List.isSelected() ? enable : disable;
             prop.put(key_loadFolder, loadFolderValue);
-            prop.put(key_lastPreparationRunTime, preparationRunTime_List.getText());
+            prop.put(key_preparationRunTime, preparationRunTime_List.getText());
             String outPathValue = outPath_List.getText();
             prop.put(key_outFilePath, outPathValue);
-            OutputStream output = checkRunningOutputStream(configFile_List);
+            OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_List));
             prop.store(output, null);
             input.close();
             output.close();
@@ -237,35 +230,21 @@ public class ListPMCController extends RootController {
      */
     private void setLastConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile_List);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile_List));
         prop.load(input);
-        if (enable.equals(prop.getProperty(key_loadLastConfig, enable))) {
+        if (enable.equals(prop.getProperty(key_loadConfig, enable))) {
             setControlLastConfig(outPath_List, prop, key_outFilePath);
-            setControlLastConfig(loadFolder_List, prop, key_loadFolder, disable);
-            setControlLastConfig(loopTime_List, prop, key_lastLoopTime, defaultLoopTime);
-            setControlLastConfig(notOverwrite_List, prop, key_lastNotOverwrite, enable);
-            setControlLastConfig(openDirectory_List, prop, key_lastOpenDirectory, enable);
-            setControlLastConfig(outFileName_List, prop, key_lastOutFileName, defaultPMCSFileName());
-            setControlLastConfig(preparationRunTime_List, prop, key_lastPreparationRunTime, defaultPreparationRun);
+            setControlLastConfig(loadFolder_List, prop, key_loadFolder, listPMCProperties);
+            setControlLastConfig(loopTime_List, prop, key_loopTime, defaultLoopTime);
+            setControlLastConfig(notOverwrite_List, prop, key_notOverwrite, listPMCProperties);
+            setControlLastConfig(openDirectory_List, prop, key_openDirectory, listPMCProperties);
+            setControlLastConfig(outFileName_List, prop, key_outFileName, defaultPMCSFileName());
+            setControlLastConfig(preparationRunTime_List, prop, key_preparationRunTime, defaultPreparationRun);
         }
         if (StringUtils.isBlank(outPath_List.getText())) {
             setPathLabel(outPath_List, defaultFileChooserPath);
         }
-        input.close();
-    }
-
-    /**
-     * 读取配置文件
-     *
-     * @throws IOException 配置文件读取异常
-     */
-    private void getProperties() throws IOException {
-        Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile_List);
-        prop.load(input);
         inFilePath = prop.getProperty(key_inFilePath);
-        logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
-        logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
         input.close();
     }
 
@@ -647,9 +626,7 @@ public class ListPMCController extends RootController {
      * 页面初始化
      */
     @FXML
-    private void initialize() throws IOException {
-        // 读取配置文件
-        getProperties();
+    private void initialize() {
         Platform.runLater(() -> {
             // 组件自适应宽高
             adaption();
@@ -847,7 +824,9 @@ public class ListPMCController extends RootController {
         Stage detailStage = new Stage();
         HeaderBar headerBar = createHeaderBar(clickLog_title());
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
-        Scene scene = new Scene(root, logWidth, logHeight);
+        double width = getSafeAttributes(1300, screenWidth);
+        double height = getSafeAttributes(600, screenHeight);
+        Scene scene = new Scene(root, width, height);
         detailStage.setScene(scene);
         detailStage.setTitle(clickLog_title());
         detailStage.initModality(Modality.APPLICATION_MODAL);

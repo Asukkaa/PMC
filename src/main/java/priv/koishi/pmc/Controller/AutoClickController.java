@@ -63,10 +63,7 @@ import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -81,11 +78,12 @@ import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
 import static priv.koishi.pmc.Service.AutoClickService.*;
-import static priv.koishi.pmc.Service.ImageRecognitionService.refreshScreenParameters;
+import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
@@ -156,26 +154,6 @@ public class AutoClickController extends RootController implements MousePosition
      * 操作记录
      */
     private List<ClickLogBean> clickLogs = new CopyOnWriteArrayList<>();
-
-    /**
-     * 详情页高度
-     */
-    private int detailHeight;
-
-    /**
-     * 详情页宽度
-     */
-    private int detailWidth;
-
-    /**
-     * 记录页高度
-     */
-    private int logHeight;
-
-    /**
-     * 记录页宽度
-     */
-    private int logWidth;
 
     /**
      * 鼠标轨迹采样间隔
@@ -436,22 +414,22 @@ public class AutoClickController extends RootController implements MousePosition
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_Click != null) {
-            InputStream input = checkRunningInputStream(configFile_Click);
+            InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
             Properties prop = new Properties();
             prop.load(input);
-            prop.put(key_lastLoopTime, loopTime_Click.getText());
-            prop.put(key_lastOutFileName, outFileName_Click.getText());
+            prop.put(key_loopTime, loopTime_Click.getText());
+            prop.put(key_outFileName, outFileName_Click.getText());
             String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? enable : disable;
-            prop.put(key_lastOpenDirectory, lastOpenDirectoryValue);
+            prop.put(key_openDirectory, lastOpenDirectoryValue);
             String lastNotOverwriteValue = notOverwrite_Click.isSelected() ? enable : disable;
-            prop.put(key_lastNotOverwrite, lastNotOverwriteValue);
+            prop.put(key_notOverwrite, lastNotOverwriteValue);
             String loadFolderValue = loadFolder_Click.isSelected() ? enable : disable;
             prop.put(key_loadFolder, loadFolderValue);
-            prop.put(key_lastPreparationRecordTime, preparationRecordTime_Click.getText());
-            prop.put(key_lastPreparationRunTime, preparationRunTime_Click.getText());
+            prop.put(key_preparationRecordTime, preparationRecordTime_Click.getText());
+            prop.put(key_preparationRunTime, preparationRunTime_Click.getText());
             String outPathValue = outPath_Click.getText();
             prop.put(key_outFilePath, outPathValue);
-            OutputStream output = checkRunningOutputStream(configFile_Click);
+            OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_Click));
             prop.store(output, null);
             input.close();
             output.close();
@@ -499,40 +477,24 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setLastConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile_Click);
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
         prop.load(input);
-        if (enable.equals(prop.getProperty(key_loadLastConfig, enable))) {
+        if (enable.equals(prop.getProperty(key_loadConfig, enable))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
-            setControlLastConfig(loadFolder_Click, prop, key_loadFolder, disable);
-            setControlLastConfig(loopTime_Click, prop, key_lastLoopTime, defaultLoopTime);
-            setControlLastConfig(notOverwrite_Click, prop, key_lastNotOverwrite, enable);
-            setControlLastConfig(openDirectory_Click, prop, key_lastOpenDirectory, enable);
-            setControlLastConfig(outFileName_Click, prop, key_lastOutFileName, defaultPMCFileName());
-            setControlLastConfig(preparationRunTime_Click, prop, key_lastPreparationRunTime, defaultPreparationRun);
-            setControlLastConfig(preparationRecordTime_Click, prop, key_lastPreparationRecordTime, defaultPreparationRecord);
+            setControlLastConfig(loadFolder_Click, prop, key_loadFolder, clickProperties);
+            setControlLastConfig(loopTime_Click, prop, key_loopTime, defaultLoopTime);
+            setControlLastConfig(notOverwrite_Click, prop, key_notOverwrite, clickProperties);
+            setControlLastConfig(openDirectory_Click, prop, key_openDirectory, clickProperties);
+            setControlLastConfig(outFileName_Click, prop, key_outFileName, defaultPMCFileName());
+            setControlLastConfig(preparationRunTime_Click, prop, key_preparationRunTime, defaultPreparationRun);
+            setControlLastConfig(preparationRecordTime_Click, prop, key_preparationRecordTime, defaultPreparationRecord);
         }
         if (StringUtils.isBlank(outPath_Click.getText())) {
             setPathLabel(outPath_Click, defaultFileChooserPath);
         }
-        input.close();
-    }
-
-    /**
-     * 读取配置文件
-     *
-     * @throws IOException 配置文件读取异常
-     */
-    private void getProperties() throws IOException {
-        Properties prop = new Properties();
-        InputStream input = checkRunningInputStream(configFile_Click);
-        prop.load(input);
         inFilePath = prop.getProperty(key_inFilePath);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath, desktopPath);
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath, desktopPath);
-        logWidth = Integer.parseInt(prop.getProperty(key_logWidth, defaultLogWidth));
-        logHeight = Integer.parseInt(prop.getProperty(key_logHeight, defaultLogHeight));
-        detailWidth = Integer.parseInt(prop.getProperty(key_clickDetailWidth, defaultClickDetailWidth));
-        detailHeight = Integer.parseInt(prop.getProperty(key_clickDetailHeight, defaultClickDetailHeight));
         input.close();
     }
 
@@ -766,7 +728,9 @@ public class AutoClickController extends RootController implements MousePosition
         detailTitle = title + clickDetail_title();
         HeaderBar headerBar = createHeaderBar(title, detailCoordinateTitle);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
-        Scene scene = new Scene(root, detailWidth, detailHeight);
+        double width = getSafeAttributes(1350, screenWidth);
+        double height = getSafeAttributes(720, screenHeight);
+        Scene scene = new Scene(root, width, height);
         detailStage.setScene(scene);
         detailStage.setTitle(detailTitle);
         detailStage.initModality(Modality.APPLICATION_MODAL);
@@ -1866,9 +1830,9 @@ public class AutoClickController extends RootController implements MousePosition
                         if (CollectionUtils.isNotEmpty(recordKeys)) {
                             if (recordKeys.toString().equals(keySet.toString())) {
                                 if (isSonOpening) {
-                                    new MessageBubble(text_sonOpenRecordErr(), 1);
+                                    new MessageBubble(text_sonOpenRecordErr());
                                 } else if (settingController.isFloatingOpen()) {
-                                    new MessageBubble(text_floatingOpenRecordErr(), 1);
+                                    new MessageBubble(text_floatingOpenRecordErr());
                                 } else {
                                     recordClick();
                                     mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
@@ -1879,9 +1843,9 @@ public class AutoClickController extends RootController implements MousePosition
                         if (CollectionUtils.isNotEmpty(runKeys)) {
                             if (runKeys.toString().equals(keySet.toString())) {
                                 if (isSonOpening) {
-                                    new MessageBubble(text_sonOpenRunErr(), 1);
+                                    new MessageBubble(text_sonOpenRunErr());
                                 } else if (settingController.isFloatingOpen()) {
-                                    new MessageBubble(text_floatingOpenRunErr(), 1);
+                                    new MessageBubble(text_floatingOpenRunErr());
                                 } else {
                                     ObservableList<ClickPositionVO> items = tableView_Click.getItems();
                                     if (CollectionUtils.isNotEmpty(items)) {
@@ -1892,7 +1856,7 @@ public class AutoClickController extends RootController implements MousePosition
                                             throw new RuntimeException(e);
                                         }
                                     } else {
-                                        new MessageBubble(text_noDateNum(), 1);
+                                        new MessageBubble(text_noDateNum());
                                     }
                                 }
                             }
@@ -2170,9 +2134,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 页面初始化
      */
     @FXML
-    private void initialize() throws IOException {
-        // 读取配置文件
-        getProperties();
+    private void initialize() {
         Platform.runLater(() -> {
             try {
                 // 组件自适应宽高
@@ -2404,7 +2366,9 @@ public class AutoClickController extends RootController implements MousePosition
         logStage = new Stage();
         HeaderBar headerBar = createHeaderBar(clickLog_title(), logCoordinateTitle);
         Parent root = creatParent(fxmlRoot, logStage, headerBar);
-        Scene scene = new Scene(root, logWidth, logHeight);
+        double width = getSafeAttributes(1300, screenWidth);
+        double height = getSafeAttributes(600, screenHeight);
+        Scene scene = new Scene(root, width, height);
         logStage.setScene(scene);
         logStage.setTitle(clickLog_title());
         logStage.initModality(Modality.APPLICATION_MODAL);

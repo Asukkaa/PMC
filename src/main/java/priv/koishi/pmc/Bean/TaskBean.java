@@ -52,7 +52,7 @@ public class TaskBean<T> {
     private Set<Node> disableNodes;
 
     /**
-     * 是否绑定线程信息栏（true 绑定，false 不绑定）
+     * 是否绑定线程信息栏（true 绑定，false 不绑定，默认绑定）
      */
     private boolean bindingMessageLabel = true;
 

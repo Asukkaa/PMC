@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.calculateRelativePosition;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.getKeyText;
@@ -47,12 +48,12 @@ public class ClickPositionBean extends BaseCopyBean {
     private String name;
 
     /**
-     * 起始横（X）坐标
+     * 起始横（X）坐标（默认 0）
      */
     private String startX = "0";
 
     /**
-     * 起始纵（Y）坐标
+     * 起始纵（Y）坐标（默认 0）
      */
     private String startY = "0";
 
@@ -77,12 +78,12 @@ public class ClickPositionBean extends BaseCopyBean {
     private String clickTime;
 
     /**
-     * 操作次数
+     * 操作次数（默认 1）
      */
     private String clickNum = "1";
 
     /**
-     * 操作间隔时间（单位：毫秒）
+     * 操作间隔时间（单位：毫秒，默认 0）
      */
     private String clickInterval = "0";
 
@@ -98,12 +99,12 @@ public class ClickPositionBean extends BaseCopyBean {
     private String clickKey;
 
     /**
-     * 鼠标按键枚举值
+     * 鼠标按键枚举值（默认 鼠标左键）
      */
     private int mouseKeyEnum = NativeMouseEvent.BUTTON1;
 
     /**
-     * 键盘按键枚举值
+     * 键盘按键枚举值（默认 无键盘按键）
      */
     private int keyboardKeyEnum = noKeyboard;
 
@@ -119,24 +120,24 @@ public class ClickPositionBean extends BaseCopyBean {
     private List<ImgFileBean> stopImgFiles;
 
     /**
-     * 要识别的图片识别匹配阈值
+     * 要识别的图片识别匹配阈值（默认 80.0）
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
     private String clickMatchThreshold = defaultClickOpacity;
 
     /**
-     * 终止操作的图片识别匹配阈值
+     * 终止操作的图片识别匹配阈值（默认 80.0）
      */
     @JsonSerialize(using = DoubleStringToIntSerializer.class)
     private String stopMatchThreshold = defaultStopOpacity;
 
     /**
-     * 要识别的图片识别重试次数
+     * 要识别的图片识别重试次数（默认 3）
      */
     private String clickRetryTimes = defaultClickRetryNum;
 
     /**
-     * 终止操作的图片识别重试次数
+     * 终止操作的图片识别重试次数（默认 0）
      */
     private String stopRetryTimes = defaultStopRetryNum;
 
@@ -147,7 +148,7 @@ public class ClickPositionBean extends BaseCopyBean {
     private String retryType;
 
     /**
-     * 要识别的图像识别重试设置枚举值
+     * 要识别的图像识别重试设置枚举值（默认 按设置次数重试后终止操作）
      */
     private int retryTypeEnum = RetryTypeEnum.STOP.ordinal();
 
@@ -163,7 +164,7 @@ public class ClickPositionBean extends BaseCopyBean {
     private String matchedType;
 
     /**
-     * 图像识别匹配逻辑枚举值
+     * 图像识别匹配逻辑枚举值（默认 按操作类型设置处理匹配的图像）
      */
     private int matchedTypeEnum = MatchedTypeEnum.CLICK.ordinal();
 
@@ -179,7 +180,7 @@ public class ClickPositionBean extends BaseCopyBean {
     private List<TrajectoryPointBean> moveTrajectory = new CopyOnWriteArrayList<>();
 
     /**
-     * 轨迹采样间隔配置（单位：毫秒）
+     * 轨迹采样间隔配置（单位：毫秒，默认 10）
      */
     @JsonIgnore
     private int sampleInterval = Integer.parseInt(defaultSampleInterval);
@@ -196,12 +197,12 @@ public class ClickPositionBean extends BaseCopyBean {
     private int clickTypeEnum = ClickTypeEnum.CLICK.ordinal();
 
     /**
-     * 横轴随机偏移量
+     * 横轴随机偏移量（默认 5）
      */
     private String randomX = defaultRandomClickX;
 
     /**
-     * 纵轴随机偏移量
+     * 纵轴随机偏移量（默认 5）
      */
     private String randomY = defaultRandomClickY;
 
@@ -216,7 +217,7 @@ public class ClickPositionBean extends BaseCopyBean {
     private boolean randomTrajectory;
 
     /**
-     * 随机偏移时长（单位：毫秒）
+     * 随机偏移时长（单位：毫秒，默认 50）
      */
     private String randomTime = defaultRandomTime;
 
@@ -236,12 +237,12 @@ public class ClickPositionBean extends BaseCopyBean {
     private boolean randomClickInterval;
 
     /**
-     * 匹配图像坐标横轴偏移量
+     * 匹配图像坐标横轴偏移量（默认 0）
      */
     private String imgX = "0";
 
     /**
-     * 匹配图像坐标纵轴偏移量
+     * 匹配图像坐标纵轴偏移量（默认 0）
      */
     private String imgY = "0";
 
@@ -291,12 +292,12 @@ public class ClickPositionBean extends BaseCopyBean {
     private boolean ignoreImg;
 
     /**
-     * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别）
+     * 图像识别类型枚举（0-图像识别 1-颜色识别 2-文字识别，默认 基于模板的图像匹配）
      */
     private int recognitionType = RecognitionTypeEnum.IMAGE.ordinal();
 
     /**
-     * 颜色容差（0-255）
+     * 颜色容差（0-255，默认 {@value priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault#defaultColorTolerance}）
      */
     private String colorTolerance = String.valueOf(defaultColorTolerance);
 

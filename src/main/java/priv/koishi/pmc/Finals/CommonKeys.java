@@ -19,27 +19,7 @@ public class CommonKeys {
 
     public static final String key_stopImgSelectPath = "stopImgSelectPath";
 
-    public static final String key_appWidth = "appWidth";
-
-    public static final String key_appHeight = "appHeight";
-
-    public static final String key_appreciateWidth = "appreciateWidth";
-
-    public static final String key_appreciateHeight = "appreciateHeight";
-
     public static final String key_appPort = "appPort";
-
-    public static final String key_clickDetailWidth = "clickDetailWidth";
-
-    public static final String key_clickDetailHeight = "clickDetailHeight";
-
-    public static final String key_taskDetailWidth = "taskDetailWidth";
-
-    public static final String key_taskDetailHeight = "taskDetailHeight";
-
-    public static final String key_logWidth = "logWidth";
-
-    public static final String key_logHeight = "logHeight";
 
     public static final String key_messageX = "messageX";
 
@@ -137,43 +117,43 @@ public class CommonKeys {
 
     public static final String key_maxLogNum = "maxLogNum";
 
-    public static final String key_loadLastConfig = "loadLastConfig";
+    public static final String key_loadConfig = "loadConfig";
 
-    public static final String key_loadLastFullWindow = "loadLastFullWindow";
+    public static final String key_loadFullWindow = "loadFullWindow";
 
-    public static final String key_loadLastMaxWindow = "loadLastMaxWindow";
+    public static final String key_loadMaxWindow = "loadMaxWindow";
 
-    public static final String key_lastMaxWindow = "lastMaxWindow";
+    public static final String key_maxWindow = "maxWindow";
 
-    public static final String key_lastOpenDirectory = "lastOpenDirectory";
+    public static final String key_openDirectory = "openDirectory";
 
-    public static final String key_lastNotOverwrite = "lastNotOverwrite";
+    public static final String key_notOverwrite = "notOverwrite";
 
     public static final String key_lastTab = "lastTab";
 
-    public static final String key_lastFullWindow = "lastFullWindow";
+    public static final String key_fullWindow = "fullWindow";
 
-    public static final String key_lastLoopTime = "lastLoopTime";
+    public static final String key_loopTime = "loopTime";
 
-    public static final String key_lastFirstClick = "lastFirstClick";
+    public static final String key_firstClick = "firstClick";
 
-    public static final String key_lastOutFileName = "lastOutFileName";
+    public static final String key_outFileName = "outFileName";
 
-    public static final String key_lastHideWindowRun = "lastHideWindowRun";
+    public static final String key_hideWindowRun = "hideWindowRun";
 
-    public static final String key_lastShowWindowRun = "lastShowWindowRun";
+    public static final String key_showWindowRun = "showWindowRun";
 
-    public static final String key_lastHideWindowRecord = "lastHideWindowRecord";
+    public static final String key_hideWindowRecord = "hideWindowRecord";
 
-    public static final String key_lastShowWindowRecord = "lastShowWindowRecord";
+    public static final String key_showWindowRecord = "showWindowRecord";
 
-    public static final String key_loadFloatingRun = "lastFloatingRun";
+    public static final String key_loadFloatingRun = "loadFloatingRun";
 
-    public static final String key_loadFloatingRecord = "lastFloatingRecord";
+    public static final String key_loadFloatingRecord = "loadFloatingRecord";
 
-    public static final String key_lastPreparationRecordTime = "lastPreparationRecordTime";
+    public static final String key_preparationRecordTime = "preparationRecordTime";
 
-    public static final String key_lastPreparationRunTime = "lastPreparationRunTime";
+    public static final String key_preparationRunTime = "preparationRunTime";
 
     public static final String key_defaultClickRetryNum = "defaultClickRetryNum";
 
@@ -181,17 +161,13 @@ public class CommonKeys {
 
     public static final String key_defaultStopImg = "defaultStopImg";
 
-    public static final String key_lastFloatingTextColor = "lastFloatingTextColor";
+    public static final String key_floatingTextColor = "floatingTextColor";
 
-    public static final String key_lastColorCustom = "lastColorCustom";
+    public static final String key_colorCustom = "colorCustom";
 
     public static final String key_language = "language";
 
     public static final String key_firstRun = "firstRun";
-
-    public static final String key_fileChooserWidth = "fileChooserWidth";
-
-    public static final String key_fileChooserHeight = "fileChooserHeight";
 
     public static final String key_autoCheck = "autoCheck";
 
