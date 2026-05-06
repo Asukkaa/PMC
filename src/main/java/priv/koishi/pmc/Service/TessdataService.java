@@ -109,57 +109,62 @@ public class TessdataService {
                                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                                 .build();
                         String configPath = getRunningResourcePath(configFile_Tessdata);
-                        configList = objectMapper.readValue(new File(configPath), new TypeReference<>() {
-                        });
-                    }
-                    int configListSize = configList.size();
-                    updateProgress(0, configListSize);
-                    // 构建配置数据与模型文件的映射
-                    Map<String, TessdataBean> configMap = new HashMap<>();
-                    for (int i = 0; i < configListSize; i++) {
-                        TessdataBean config = configList.get(i);
-                        String name = config.getName();
-                        if (name != null) {
-                            configMap.put(name, config);
+                        File file = new File(configPath);
+                        if (file.exists()) {
+                            configList = objectMapper.readValue(file, new TypeReference<>() {
+                            });
                         }
-                        updateProgress(i + 1, configListSize);
                     }
-                    // 根据配置排序
-                    list.sort((a, b) -> {
-                        String nameA = a.getName();
-                        String nameB = b.getName();
-                        boolean inConfigA = configMap.containsKey(nameA);
-                        boolean inConfigB = configMap.containsKey(nameB);
-                        if (inConfigA && inConfigB) {
-                            // 两个都在配置中，按 index 升序
-                            int cmp = Integer.compare(configMap.get(nameA).getIndex(), configMap.get(nameB).getIndex());
-                            if (cmp != 0) {
-                                return cmp;
+                    if (CollectionUtils.isNotEmpty(configList)) {
+                        int configListSize = configList.size();
+                        updateProgress(0, configListSize);
+                        // 构建配置数据与模型文件的映射
+                        Map<String, TessdataBean> configMap = new HashMap<>();
+                        for (int i = 0; i < configListSize; i++) {
+                            TessdataBean config = configList.get(i);
+                            String name = config.getName();
+                            if (name != null) {
+                                configMap.put(name, config);
                             }
-                            return nameA.compareTo(nameB);
-                        } else if (inConfigA) {
-                            // 只有 A 在配置中，A 排在前面
-                            return -1;
-                        } else if (inConfigB) {
-                            // 只有 B 在配置中，B 排在前面
-                            return 1;
-                        } else {
-                            // 都不在配置中，按文件名排序
-                            return a.getName().compareTo(b.getName());
+                            updateProgress(i + 1, configListSize);
                         }
-                    });
-                    int listSize = list.size();
-                    updateProgress(0, listSize);
-                    // 填充备注
-                    for (int i = 0; i < listSize; i++) {
-                        TessdataBean bean = list.get(i);
-                        String name = bean.getName();
-                        if (configMap.containsKey(name)) {
-                            TessdataBean tessdataBean = configMap.get(name);
-                            bean.setRemark(tessdataBean.getRemark())
-                                    .setActive(tessdataBean.isActive());
+                        // 根据配置排序
+                        list.sort((a, b) -> {
+                            String nameA = a.getName();
+                            String nameB = b.getName();
+                            boolean inConfigA = configMap.containsKey(nameA);
+                            boolean inConfigB = configMap.containsKey(nameB);
+                            if (inConfigA && inConfigB) {
+                                // 两个都在配置中，按 index 升序
+                                int cmp = Integer.compare(configMap.get(nameA).getIndex(), configMap.get(nameB).getIndex());
+                                if (cmp != 0) {
+                                    return cmp;
+                                }
+                                return nameA.compareTo(nameB);
+                            } else if (inConfigA) {
+                                // 只有 A 在配置中，A 排在前面
+                                return -1;
+                            } else if (inConfigB) {
+                                // 只有 B 在配置中，B 排在前面
+                                return 1;
+                            } else {
+                                // 都不在配置中，按文件名排序
+                                return a.getName().compareTo(b.getName());
+                            }
+                        });
+                        int listSize = list.size();
+                        updateProgress(0, listSize);
+                        // 填充备注
+                        for (int i = 0; i < listSize; i++) {
+                            TessdataBean bean = list.get(i);
+                            String name = bean.getName();
+                            if (configMap.containsKey(name)) {
+                                TessdataBean tessdataBean = configMap.get(name);
+                                bean.setRemark(tessdataBean.getRemark())
+                                        .setActive(tessdataBean.isActive());
+                            }
+                            updateProgress(i + 1, listSize);
                         }
-                        updateProgress(i + 1, listSize);
                     }
                     // 展示数据
                     TableView<? super TessdataBean> tableView = taskBean.getTableView();
