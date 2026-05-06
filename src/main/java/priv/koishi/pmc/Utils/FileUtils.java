@@ -562,9 +562,11 @@ public class FileUtils {
                         } else {
                             // 处理删除参数
                             lines.remove(i);
+                            i--;
                         }
                         iterator.remove();
                         modified = true;
+                        break;
                     }
                 }
             }
@@ -1038,7 +1040,14 @@ public class FileUtils {
         }
     }
 
-    private static void storeProperties(Properties props, File file) throws IOException {
+    /**
+     * 写入配置文件
+     *
+     * @param props 要写入的配置
+     * @param file  配置文件
+     * @throws IOException 配置文件写入异常
+     */
+    public static void storeProperties(Properties props, File file) throws IOException {
         // 确保父目录存在
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {

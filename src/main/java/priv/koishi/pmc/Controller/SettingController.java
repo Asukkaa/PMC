@@ -141,6 +141,11 @@ public class SettingController extends RootController implements MousePositionUp
     public static boolean noAutomationPermission;
 
     /**
+     * 重置所有设置标志（true 重置设置并重启，false 仅重启）
+     */
+    public static boolean reSetAll;
+
+    /**
      * 基础要防重复点击的组件
      */
     private final Set<Node> baseDisableNodes = new HashSet<>();
@@ -223,7 +228,7 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     public Button messageRegion_Set, stopImgBtn_Set, removeAll_Set, reLaunch_Set, clickRegion_Set, stopRegion_Set,
             clickWindow_Set, stopWindow_Set, removeRecordKey_Set, removeRunKey_Set, getColor_Set, tessdataBtn_set,
-            selectBtn_set, downloadBtn_set;
+            selectBtn_set, downloadBtn_set, reSetAll_Set;
 
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
@@ -1014,7 +1019,7 @@ public class SettingController extends RootController implements MousePositionUp
                 // 重启应用
                 try {
                     reLaunch();
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
             }
@@ -2406,8 +2411,6 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void reLaunch() throws IOException {
-        // 重启前需要保存设置，如果只使用关闭方法中的保存功能可能无法及时更新 jvm 配置参数
-        mainController.saveAllLastConfig();
         Platform.exit();
         if (!isRunningFromIDEA) {
             ProcessBuilder processBuilder = null;
@@ -2794,6 +2797,28 @@ public class SettingController extends RootController implements MousePositionUp
         setLoadLastConfigCheckBox(extendedStage_Set, configFile, key_extendedStage);
         // 创建重启确认框
         creatReLaunchConfirm();
+    }
+
+    /**
+     * 恢复所有设置并重启按钮
+     *
+     * @throws IOException 配置文件保存异常、重启执行失败
+     */
+    @FXML
+    private void reSetAllAction() throws IOException {
+        reSetAll = true;
+        String mainConfigPath = getRunningResourcePath(configFile);
+        storeProperties(configProperties, new File(mainConfigPath));
+        String autoClickConfigPath = getRunningResourcePath(configFile_Click);
+        storeProperties(clickProperties, new File(autoClickConfigPath));
+        String listPMCConfigPath = getRunningResourcePath(configFile_List);
+        storeProperties(listPMCProperties, new File(listPMCConfigPath));
+        Map<String, String> options = new HashMap<>();
+        options.put(Xmx, "");
+        options.put(XX, "ZGC");
+        // 更新 cfg 文件中 jvm 参数设置
+        setJavaOptionValue(options);
+        reLaunch();
     }
 
 }

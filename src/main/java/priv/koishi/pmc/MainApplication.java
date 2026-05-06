@@ -39,6 +39,7 @@ import static priv.koishi.pmc.Controller.AutoClickController.recordTextColorProp
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Controller.RootController.loadFXML;
+import static priv.koishi.pmc.Controller.SettingController.reSetAll;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
@@ -242,7 +243,7 @@ public class MainApplication extends Application {
         // 卸载全局输入监听钩子
         GlobalScreen.unregisterNativeHook();
         // 保存设置
-        if (mainController != null) {
+        if (mainController != null && !reSetAll) {
             mainController.saveAllLastConfig();
         }
         // 关闭 Socket 服务
@@ -533,6 +534,11 @@ public class MainApplication extends Application {
         args = null;
     }
 
+    /**
+     * 校验配置文件
+     *
+     * @throws IOException 配置文件读写异常
+     */
     private static void checkConfigFile() throws IOException {
         String mainConfigPath = getRunningResourcePath(configFile);
         syncPropertiesFile(mainConfigPath, configProperties);
@@ -584,6 +590,7 @@ public class MainApplication extends Application {
             }
             logger.info("参数 {}: {}", i, arg);
         }
+        // 校验配置文件
         checkConfigFile();
         Properties prop = new Properties();
         InputStream input = new FileInputStream(getRunningResourcePath(configFile));

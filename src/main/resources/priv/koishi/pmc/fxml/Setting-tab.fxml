@@ -103,6 +103,11 @@
             </HBox>
         </HBox>
 
+        <HBox spacing="10">
+            <!--恢复所有设置并重启-->
+            <Button fx:id="reSetAll_Set" text="%setting.reSetAll_Set" onAction="#reSetAllAction"/>
+        </HBox>
+
         <Separator/>
 
         <!--内存设置：-->
