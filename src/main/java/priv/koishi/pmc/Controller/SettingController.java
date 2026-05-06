@@ -87,6 +87,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
 import static priv.koishi.pmc.Service.TessdataService.*;
+import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.releaseLock;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
@@ -2411,8 +2412,12 @@ public class SettingController extends RootController implements MousePositionUp
      */
     @FXML
     private void reLaunch() throws IOException {
-        Platform.exit();
         if (!isRunningFromIDEA) {
+            // 释放单实例锁，停止心跳
+            releaseLock();
+            // 关闭激活服务端口
+            closeServerSocket();
+            // 执行重启命令
             ProcessBuilder processBuilder = null;
             if (isWin) {
                 processBuilder = new ProcessBuilder(appLaunchPath);
@@ -2420,11 +2425,11 @@ public class SettingController extends RootController implements MousePositionUp
                 processBuilder = new ProcessBuilder("open", "-n", appLaunchPath);
             }
             if (processBuilder != null) {
-                try (Process _ = processBuilder.start()) {
-                    logger.info("==============程序重启中====================");
-                }
+                logger.info("==============程序重启中====================");
+                processBuilder.start();
             }
         }
+        Platform.exit();
     }
 
     /**

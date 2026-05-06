@@ -202,28 +202,33 @@ public class SingleInstanceGuard {
      * 注册 JVM 关闭钩子
      */
     private static void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        Runtime.getRuntime().addShutdownHook(new Thread(SingleInstanceGuard::cleanupLockResources));
+    }
+
+    /**
+     * 清理锁相关资源（停止心跳、释放文件锁、删除锁文件）
+     */
+    private static void cleanupLockResources() {
+        // 停止心跳线程
+        if (scheduler != null) {
+            scheduler.shutdownNow();
             try {
-                Path lockPath = getLockFilePath();
-                if (Files.exists(lockPath)) {
-                    Files.deleteIfExists(lockPath);
+                if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                    logger.info("心跳线程强制终止");
                 }
-            } catch (IOException e) {
-                logger.error("锁文件删除失败", e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-            // 释放文件锁资源
-            releaseResources();
-            if (scheduler != null) {
-                scheduler.shutdownNow();
-                try {
-                    if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
-                        logger.info("心跳线程强制终止");
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }));
+        }
+        // 释放文件锁和通道
+        releaseResources();
+        // 删除锁文件，确保下次启动不被残留锁影响
+        Path lockPath = getLockFilePath();
+        try {
+            Files.deleteIfExists(lockPath);
+        } catch (IOException e) {
+            logger.error("锁文件删除失败", e);
+        }
     }
 
     /**
@@ -261,6 +266,13 @@ public class SingleInstanceGuard {
         } catch (IOException e) {
             logger.error("激活信号发送失败，可能主程序未启动完成", e);
         }
+    }
+
+    /**
+     * 释放锁资源，用于应用重启时主动放弃控制权
+     */
+    public static void releaseLock() {
+        cleanupLockResources();
     }
 
 }

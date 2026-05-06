@@ -464,6 +464,19 @@ public class MainApplication extends Application {
     }
 
     /**
+     * 关闭激活监听端口，防止重启时端口冲突
+     */
+    public static void closeServerSocket() {
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                logger.error("关闭激活服务失败", e);
+            }
+        }
+    }
+
+    /**
      * 创建加载 PMC 文件任务
      *
      * @param file         要加载的文件
