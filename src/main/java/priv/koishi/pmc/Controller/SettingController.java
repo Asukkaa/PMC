@@ -935,6 +935,7 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void setDisableNodes() {
         baseDisableNodes.add(language_Set);
+        baseDisableNodes.add(reSetAll_Set);
         baseDisableNodes.add(reLaunch_Set);
         baseDisableNodes.add(removeAll_Set);
         baseDisableNodes.add(tableView_Set);

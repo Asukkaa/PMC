@@ -45,7 +45,8 @@ import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.clickProperties;
 import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.configFile_Click;
-import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.*;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
+import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configProperties;
 import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.configFile_List;
 import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.listPMCProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -166,14 +167,14 @@ public class MainApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
         double appWidth = getSafeAttributes(1350, screenWidth);
         double appHeight = getSafeAttributes(760, screenHeight);
-        if (enable.equals(prop.getProperty(key_maxWindow, disable))
-                && enable.equals(prop.getProperty(key_loadMaxWindow, disable))) {
+        if (enable.equals(getPropertyWithDefault(prop, key_maxWindow, configProperties))
+                && enable.equals(getPropertyWithDefault(prop, key_loadMaxWindow, configProperties))) {
             stage.setMaximized(true);
-        } else if (enable.equals(prop.getProperty(key_fullWindow, disable))
-                && enable.equals(prop.getProperty(key_loadFullWindow, disable))) {
+        } else if (enable.equals(getPropertyWithDefault(prop, key_fullWindow, configProperties))
+                && enable.equals(getPropertyWithDefault(prop, key_loadFullWindow, configProperties))) {
             stage.setFullScreen(true);
         }
-        extendedStage = enable.equals(prop.getProperty(key_extendedStage, enable));
+        extendedStage = enable.equals(getPropertyWithDefault(prop, key_extendedStage, configProperties));
         Parent fxmlRoot = loadFXML(fxmlLoader);
         HeaderBar headerBar = createHeaderBar(appName, mainCoordinateTitle);
         Parent root = creatParent(fxmlRoot, mainStage, headerBar);
@@ -190,9 +191,9 @@ public class MainApplication extends Application {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
         } else if (loadPMCS) {
             tabPane.getSelectionModel().select(mainController.listPMCTab);
-        } else if (enable.equals(prop.getProperty(key_loadConfig, enable))) {
+        } else if (enable.equals(getPropertyWithDefault(prop, key_loadConfig, configProperties))) {
             for (Tab tab : tabPane.getTabs()) {
-                if (tab.getId().equals(prop.getProperty(key_lastTab, defaultLastTab))) {
+                if (tab.getId().equals(getPropertyWithDefault(prop, key_lastTab, configProperties))) {
                     tabPane.getSelectionModel().select(tab);
                     break;
                 }
@@ -608,7 +609,7 @@ public class MainApplication extends Application {
         Properties prop = new Properties();
         InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         prop.load(input);
-        int port = Integer.parseInt(prop.getProperty(key_appPort, defaultAppPort));
+        int port = Integer.parseInt(getPropertyWithDefault(prop, key_appPort, configProperties));
         String firstRunValue = prop.getProperty(key_firstRun);
         // 首次运行时如果有对应语言包则使用操作系统设置的语言
         if (enable.equals(firstRunValue)) {

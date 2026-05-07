@@ -62,14 +62,4 @@ public class ConfigDefault {
         configProperties.put(key_lastTab, "autoClickTab");
     }
 
-    /**
-     * 默认打开的页面（autoClickTab）
-     */
-    public static final String defaultLastTab = configProperties.getProperty(key_lastTab);
-
-    /**
-     * 默认应用端口（52514）
-     */
-    public static final String defaultAppPort = configProperties.getProperty(key_appPort);
-
 }
