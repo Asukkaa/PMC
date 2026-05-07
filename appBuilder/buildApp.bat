@@ -94,5 +94,3 @@ if not exist "%target%\app.done" goto :WaitLoop
 del "%target%\lib.done" "%target%\app.done"
 echo 压缩完成，正在打开目录: %appPath%
 explorer /select,"%appPath%"
-
-pause
