@@ -729,7 +729,7 @@ public class AutoClickController extends RootController implements MousePosition
         HeaderBar headerBar = createHeaderBar(title, detailCoordinateTitle);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         double width = getSafeAttributes(1350, screenWidth);
-        double height = getSafeAttributes(720, screenHeight);
+        double height = getSafeAttributes(750, screenHeight);
         Scene scene = new Scene(root, width, height);
         detailStage.setScene(scene);
         detailStage.setTitle(detailTitle);
@@ -2367,7 +2367,7 @@ public class AutoClickController extends RootController implements MousePosition
         HeaderBar headerBar = createHeaderBar(clickLog_title(), logCoordinateTitle);
         Parent root = creatParent(fxmlRoot, logStage, headerBar);
         double width = getSafeAttributes(1300, screenWidth);
-        double height = getSafeAttributes(600, screenHeight);
+        double height = getSafeAttributes(650, screenHeight);
         Scene scene = new Scene(root, width, height);
         logStage.setScene(scene);
         logStage.setTitle(clickLog_title());

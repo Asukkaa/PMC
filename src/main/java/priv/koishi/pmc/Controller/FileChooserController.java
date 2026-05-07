@@ -496,7 +496,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         HeaderBar headerBar = createHeaderBar(title);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         double width = getSafeAttributes(1300, screenWidth);
-        double height = getSafeAttributes(700, screenHeight);
+        double height = getSafeAttributes(750, screenHeight);
         Scene scene = new Scene(root, width, height);
         detailStage.setScene(scene);
         detailStage.setTitle(title);

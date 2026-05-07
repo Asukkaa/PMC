@@ -2625,8 +2625,8 @@ public class ClickDetailController extends RootController {
         ocrTestStage = new Stage();
         HeaderBar headerBar = createHeaderBar(clickLog_title(), ocrCoordinateTitle);
         Parent root = creatParent(fxmlRoot, ocrTestStage, headerBar);
-        double width = getSafeAttributes(500, screenWidth);
-        double height = getSafeAttributes(500, screenHeight);
+        double width = getSafeAttributes(1000, screenWidth);
+        double height = getSafeAttributes(600, screenHeight);
         Scene scene = new Scene(root, width, height);
         ocrTestStage.setScene(scene);
         ocrTestStage.setTitle(tessdata_title());
