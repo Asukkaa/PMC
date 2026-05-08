@@ -140,7 +140,7 @@ public class MainApplication extends Application {
     /**
      * 主页面标题栏显示鼠标坐标的文本栏
      */
-    public static Label mainCoordinateTitle = new Label();
+    public static final Label mainCoordinateTitle = new Label();
 
     /**
      * 开启拓展标题栏标志（true 开启）

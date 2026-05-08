@@ -275,7 +275,7 @@ public class ClickDetailController extends RootController {
     /**
      * 文字识别结果页标题栏显示鼠标坐标的文本栏
      */
-    public static Label ocrCoordinateTitle = new Label();
+    public static final Label ocrCoordinateTitle = new Label();
 
     /**
      * 更新数据用的回调函数

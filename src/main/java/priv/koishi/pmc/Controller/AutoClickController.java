@@ -333,12 +333,12 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 详情页标题栏显示鼠标坐标的文本栏
      */
-    public static Label detailCoordinateTitle = new Label();
+    public static final Label detailCoordinateTitle = new Label();
 
     /**
      * 操作记录页标题栏显示鼠标坐标的文本栏
      */
-    public static Label logCoordinateTitle = new Label();
+    public static final Label logCoordinateTitle = new Label();
 
     /**
      * 详情页窗口标题
