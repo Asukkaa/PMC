@@ -28,7 +28,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.HeaderBar;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -2623,7 +2622,7 @@ public class ClickDetailController extends RootController {
         controller.initData(ocrDataBeans);
         controller.setRefreshCallback(ocrDataBeans::clear);
         ocrTestStage = new Stage();
-        HeaderBar headerBar = createHeaderBar(clickLog_title(), ocrCoordinateTitle);
+        var headerBar = createHeaderBar(clickLog_title(), ocrCoordinateTitle);
         Parent root = creatParent(fxmlRoot, ocrTestStage, headerBar);
         double width = getSafeAttributes(1000, screenWidth);
         double height = getSafeAttributes(600, screenHeight);

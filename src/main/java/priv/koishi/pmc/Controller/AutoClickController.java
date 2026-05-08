@@ -28,7 +28,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
@@ -726,7 +725,7 @@ public class AutoClickController extends RootController implements MousePosition
         detailStage = new Stage();
         String title = (item.getName() == null) ? "" : item.getName();
         detailTitle = title + clickDetail_title();
-        HeaderBar headerBar = createHeaderBar(title, detailCoordinateTitle);
+        var headerBar = createHeaderBar(title, detailCoordinateTitle);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         double width = getSafeAttributes(1350, screenWidth);
         double height = getSafeAttributes(750, screenHeight);
@@ -2364,7 +2363,7 @@ public class AutoClickController extends RootController implements MousePosition
         controller.initData(clickLogs);
         controller.setRefreshCallback(() -> clickLogs.clear());
         logStage = new Stage();
-        HeaderBar headerBar = createHeaderBar(clickLog_title(), logCoordinateTitle);
+        var headerBar = createHeaderBar(clickLog_title(), logCoordinateTitle);
         Parent root = creatParent(fxmlRoot, logStage, headerBar);
         double width = getSafeAttributes(1300, screenWidth);
         double height = getSafeAttributes(650, screenHeight);
