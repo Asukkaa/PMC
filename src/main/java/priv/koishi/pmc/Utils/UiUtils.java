@@ -1145,15 +1145,16 @@ public class UiUtils {
      */
     public static FileVO creatFileVo(TableView<FileVO> tableView, File file) throws IOException {
         String showStatus = file.isHidden() ? text_hidden() : text_unhidden();
+        String filePath = file.getPath();
         FileVO fileBean = new FileVO();
         fileBean.setTableView(tableView)
                 .setUpdateDate(getFileUpdateTime(file))
                 .setCreatDate(getFileCreatTime(file))
                 .setFileType(getExistsFileType(file))
-                .setName(getExistsFileName(file))
+                .setName(getFileName(filePath))
                 .setSize(getFileUnitSize(file))
                 .setShowStatus(showStatus)
-                .setPath(file.getPath());
+                .setPath(filePath);
         return fileBean;
     }
 
