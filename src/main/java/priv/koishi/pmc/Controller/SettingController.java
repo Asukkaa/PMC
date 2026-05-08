@@ -2822,7 +2822,11 @@ public class SettingController extends RootController implements MousePositionUp
         storeProperties(listPMCProperties, new File(listPMCConfigPath));
         Map<String, String> options = new HashMap<>();
         options.put(Xmx, "");
-        options.put(XX, "ZGC");
+        if (isWin) {
+            options.put(XX, "ZGC");
+        } else if (isMac) {
+            options.put(XX, "");
+        }
         // 更新 cfg 文件中 jvm 参数设置
         setJavaOptionValue(options);
         reLaunch();
