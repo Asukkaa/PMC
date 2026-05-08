@@ -323,9 +323,15 @@ public class FileUtils {
             throw new RuntimeException(text_fileNotExists());
         }
         String fileName = file.getName();
-        if (!file.isDirectory() && fileName.contains(".")) {
-            return fileName.substring(0, fileName.lastIndexOf("."));
+        if (file.isDirectory()) {
+            return fileName;
         }
+        int lastDot = fileName.lastIndexOf('.');
+        // 只有当点不在开头（即不是隐藏文件）时才去掉扩展名
+        if (lastDot > 0) {
+            return fileName.substring(0, lastDot);
+        }
+        // 无扩展名或隐藏文件（如 .DS_Store）
         return fileName;
     }
 
@@ -337,11 +343,14 @@ public class FileUtils {
      */
     public static String getFileFullName(File file) {
         String fileName = file.getName();
-        if (fileName.contains(".")) {
-            String name = fileName.substring(0, fileName.lastIndexOf("."));
-            String type = fileName.substring(fileName.lastIndexOf(".") + 1);
-            return name + "." + type.toLowerCase();
+        int lastDot = fileName.lastIndexOf('.');
+        // 对普通文件（点不在开头）才切分并按小写扩展名重组
+        if (lastDot > 0) {
+            String name = fileName.substring(0, lastDot);
+            String type = fileName.substring(lastDot + 1).toLowerCase();
+            return name + "." + type;
         }
+        // 无扩展名、隐藏文件（.gitignore）、或传入的是目录 → 原样返回
         return fileName;
     }
 
@@ -355,14 +364,11 @@ public class FileUtils {
         if (StringUtils.isBlank(path)) {
             throw new RuntimeException(text_pathNull());
         }
-        if (FilenameUtils.getPrefixLength(path) != -1) {
-            if (path.lastIndexOf(".") != -1) {
-                return path.substring(path.lastIndexOf(File.separator) + 1, path.lastIndexOf("."));
-            } else {
-                return path.substring(path.lastIndexOf(File.separator) + 1);
-            }
+        // 校验路径前缀合法性（Unix: '/' 开头；Windows: 盘符）
+        if (FilenameUtils.getPrefixLength(path) == -1) {
+            throw new RuntimeException(text_errPathFormat());
         }
-        throw new RuntimeException(text_errPathFormat());
+        return FilenameUtils.getBaseName(path);
     }
 
     /**
