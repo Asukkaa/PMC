@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.commons.io.FilenameUtils;
@@ -176,7 +175,7 @@ public class MainApplication extends Application {
         }
         extendedStage = enable.equals(getPropertyWithDefault(prop, key_extendedStage, configProperties));
         Parent fxmlRoot = loadFXML(fxmlLoader);
-        HeaderBar headerBar = createHeaderBar(appName, mainCoordinateTitle);
+        var headerBar = createHeaderBar(appName, mainCoordinateTitle);
         Parent root = creatParent(fxmlRoot, mainStage, headerBar);
         mainScene = new Scene(root, appWidth, appHeight);
         stage.setTitle(appName);

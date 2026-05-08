@@ -1253,22 +1253,24 @@ public class UiUtils {
     }
 
     /**
-     * 创建拓展标题栏
+     * 创建拓展标题栏（使用 JavaFX 25 预览特性，需要抑制警告）
      *
      * @param titleText 标题文本
      * @return 拓展标题栏
      */
+    @SuppressWarnings("deprecation")
     public static HeaderBar createHeaderBar(String titleText) {
         return createHeaderBar(titleText, null);
     }
 
     /**
-     * 创建拓展标题栏
+     * 创建拓展标题栏（使用 JavaFX 25 预览特性，需要抑制警告）
      *
      * @param titleText       标题文本
      * @param coordinateTitle 坐标文本栏
      * @return 拓展标题栏
      */
+    @SuppressWarnings("deprecation")
     public static HeaderBar createHeaderBar(String titleText, Label coordinateTitle) {
         HeaderBar headerBar = new HeaderBar();
         Label title = new Label(titleText);
@@ -1297,13 +1299,14 @@ public class UiUtils {
     }
 
     /**
-     * 创建页面根节点
+     * 创建页面根节点（使用 JavaFX 25 预览特性，需要抑制警告）
      *
      * @param fxmlRoot  读取到的 fxml 页面根节点
      * @param stage     页面所在舞台
      * @param headerBar 拓展标题栏
      * @return 根据设置返回拓展标题栏页面根节点或普通页面根节点
      */
+    @SuppressWarnings("deprecation")
     public static Parent creatParent(Parent fxmlRoot, Stage stage, HeaderBar headerBar) {
         if (extendedStage) {
             stage.initStyle(StageStyle.EXTENDED);

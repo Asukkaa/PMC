@@ -14,7 +14,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.HeaderBar;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -493,7 +492,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         controller.initData(fileChooserConfig);
         Stage detailStage = new Stage();
         String title = fileChooserConfig.getTitle();
-        HeaderBar headerBar = createHeaderBar(title);
+        var headerBar = createHeaderBar(title);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         double width = getSafeAttributes(1300, screenWidth);
         double height = getSafeAttributes(750, screenHeight);

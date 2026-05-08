@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HeaderBar;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -822,7 +821,7 @@ public class ListPMCController extends RootController {
             }
         });
         Stage detailStage = new Stage();
-        HeaderBar headerBar = createHeaderBar(clickLog_title());
+        var headerBar = createHeaderBar(clickLog_title());
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         double width = getSafeAttributes(1300, screenWidth);
         double height = getSafeAttributes(600, screenHeight);

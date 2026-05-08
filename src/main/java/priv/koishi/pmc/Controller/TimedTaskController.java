@@ -8,7 +8,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HeaderBar;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import priv.koishi.pmc.Bean.TaskBean;
@@ -129,7 +128,7 @@ public class TimedTaskController extends RootController {
         controller.setRefreshCallback(this::getScheduleTask);
         Stage detailStage = new Stage();
         String title = item.getTaskName() + taskDetail_title();
-        HeaderBar headerBar = createHeaderBar(title);
+        var headerBar = createHeaderBar(title);
         Parent root = creatParent(fxmlRoot, detailStage, headerBar);
         double width = getSafeAttributes(900, screenWidth);
         double height = getSafeAttributes(450, screenHeight);
