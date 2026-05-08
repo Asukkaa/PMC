@@ -368,7 +368,18 @@ public class FileUtils {
         if (FilenameUtils.getPrefixLength(path) == -1) {
             throw new RuntimeException(text_errPathFormat());
         }
-        return FilenameUtils.getBaseName(path);
+        // 获取路径的最后一级名称（文件名或文件夹名）
+        String name = FilenameUtils.getName(path);
+        if (name.isEmpty()) {
+            return "";
+        }
+        // 如果最后一个点的位置大于0，说明点不是首字符，有真实的扩展名
+        int lastDot = name.lastIndexOf('.');
+        if (lastDot > 0) {
+            return name.substring(0, lastDot);
+        }
+        // 否则是纯文件名、以点开头的隐藏文件/文件夹，或 "." / ".."
+        return name;
     }
 
     /**
