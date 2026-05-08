@@ -33,6 +33,7 @@ import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Controller.AutoClickController;
 import priv.koishi.pmc.Finals.Enum.ClickTypeEnum;
 import priv.koishi.pmc.Finals.Enum.RecognitionTypeEnum;
+import priv.koishi.pmc.UI.Sizing.ScrollThumbSizing;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -229,6 +230,7 @@ public class TableViewUtils {
                 }
             });
         });
+        ScrollThumbSizing.enable(tableView, 30);
     }
 
     /**
