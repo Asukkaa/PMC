@@ -1019,11 +1019,7 @@ public class FileUtils {
      */
     public static String getTessdataPath() {
         if (isRunningFromIDEA()) {
-            if (isMac) {
-                return appBuilder + File.separator + mac + File.separator + tessdata;
-            } else if (isWin) {
-                return appBuilder + File.separator + win + File.separator + tessdata;
-            }
+            return appBuilder + File.separator + File.separator + tessdata;
         }
         return getAppResourcePath(tessdata);
     }
