@@ -63,9 +63,9 @@ import static priv.koishi.pmc.Utils.UiUtils.*;
 public class TableViewUtils {
 
     /**
-     * 拖拽数据格式
+     * TableView 拖拽数据格式
      */
-    public static final DataFormat dragDataFormat = new DataFormat("application/x-java-serialized-object");
+    public static final DataFormat tableViewDragDataFormat = new DataFormat("application/x-java-serialized-object");
 
     /**
      * 反射获取的字段缓存
@@ -605,7 +605,7 @@ public class TableViewUtils {
                         db.setDragView(row.snapshot(null, null));
                         // 使用自定义数据格式存储多个索引
                         ClipboardContent cc = new ClipboardContent();
-                        cc.put(dragDataFormat, new ArrayList<>(draggedIndices));
+                        cc.put(tableViewDragDataFormat, new ArrayList<>(draggedIndices));
                         db.setContent(cc);
                         e.consume();
                     }
@@ -614,9 +614,9 @@ public class TableViewUtils {
             // 拖拽悬停验证
             row.setOnDragOver(e -> {
                 Dragboard db = e.getDragboard();
-                if (db.hasContent(dragDataFormat)) {
+                if (db.hasContent(tableViewDragDataFormat)) {
                     // 禁止拖拽到选中行内部
-                    List<?> indices = (List<?>) db.getContent(dragDataFormat);
+                    List<?> indices = (List<?>) db.getContent(tableViewDragDataFormat);
                     int dropIndex = row.isEmpty() ? tableView.getItems().size() : row.getIndex();
                     if (!indices.contains(dropIndex)) {
                         e.acceptTransferModes(TransferMode.MOVE);
@@ -627,8 +627,8 @@ public class TableViewUtils {
             // 拖拽释放处理
             row.setOnDragDropped(e -> {
                 Dragboard db = e.getDragboard();
-                if (db.hasContent(dragDataFormat)) {
-                    List<Integer> indices = (List<Integer>) db.getContent(dragDataFormat);
+                if (db.hasContent(tableViewDragDataFormat)) {
+                    List<Integer> indices = (List<Integer>) db.getContent(tableViewDragDataFormat);
                     int maxIndex = tableView.getItems().size();
                     int dropIndex = row.isEmpty() ? maxIndex : row.getIndex();
                     // 计算有效插入位置

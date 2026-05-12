@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
@@ -20,7 +21,6 @@ import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
 import static priv.koishi.pmc.MainApplication.mainStage;
 import static priv.koishi.pmc.Utils.FileUtils.getRunningResourcePath;
-import static priv.koishi.pmc.Utils.TableViewUtils.dragDataFormat;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 import static priv.koishi.pmc.Utils.UiUtils.findTabById;
 import static priv.koishi.pmc.Utils.UiUtils.getTabNode;
@@ -32,6 +32,11 @@ import static priv.koishi.pmc.Utils.UiUtils.getTabNode;
  * Time:下午1:08
  */
 public class MainController extends RootController {
+
+    /**
+     * Tab 拖拽数据格式
+     */
+    public static final DataFormat tabDragFormat = new DataFormat("application/x-java-tab-drag");
 
     /**
      * 关于页面控制器
@@ -125,8 +130,8 @@ public class MainController extends RootController {
         // 拖拽越过 - 检测边界
         tabPane.setOnDragOver(event -> {
             Dragboard db = event.getDragboard();
-            if (db.hasContent(dragDataFormat)) {
-                String draggedTabId = (String) db.getContent(dragDataFormat);
+            if (db.hasContent(tabDragFormat)) {
+                String draggedTabId = (String) db.getContent(tabDragFormat);
                 if (findTabById(draggedTabId, tabPane) != null) {
                     event.acceptTransferModes(TransferMode.MOVE);
                     // 边界检测：如果拖拽到最左或最右侧，提供视觉反馈
@@ -152,8 +157,8 @@ public class MainController extends RootController {
         tabPane.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
-            if (db.hasContent(dragDataFormat)) {
-                String draggedTabId = (String) db.getContent(dragDataFormat);
+            if (db.hasContent(tabDragFormat)) {
+                String draggedTabId = (String) db.getContent(tabDragFormat);
                 Tab draggedTab = findTabById(draggedTabId, tabPane);
                 if (draggedTab != null) {
                     double x = event.getX();
@@ -210,7 +215,7 @@ public class MainController extends RootController {
             Dragboard db = dragHandle.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
             // 使用自定义数据格式，而不是普通字符串， 这样其他应用无法识别这个格式
-            content.put(dragDataFormat, tab.getId());
+            content.put(tabDragFormat, tab.getId());
             db.setContent(content);
             // 设置拖拽图标
             db.setDragView(dragHandle.snapshot(null, null));
@@ -228,8 +233,8 @@ public class MainController extends RootController {
                 otherTab.getGraphic().setOnDragOver(event -> {
                     Dragboard db = event.getDragboard();
                     // 只接受自定义格式的拖拽数据
-                    if (db.hasContent(dragDataFormat)) {
-                        String draggedTabId = (String) db.getContent(dragDataFormat);
+                    if (db.hasContent(tabDragFormat)) {
+                        String draggedTabId = (String) db.getContent(tabDragFormat);
                         if (!draggedTabId.equals(otherTab.getId())) {
                             event.acceptTransferModes(TransferMode.MOVE);
                         }
@@ -240,8 +245,8 @@ public class MainController extends RootController {
                 otherTab.getGraphic().setOnDragDropped(event -> {
                     Dragboard db = event.getDragboard();
                     boolean success = false;
-                    if (db.hasContent(dragDataFormat)) {
-                        String draggedTabId = (String) db.getContent(dragDataFormat);
+                    if (db.hasContent(tabDragFormat)) {
+                        String draggedTabId = (String) db.getContent(tabDragFormat);
                         Tab draggedTab = findTabById(draggedTabId, tabPane);
                         if (draggedTab != null && !draggedTab.equals(otherTab)) {
                             int draggedIndex = tabPane.getTabs().indexOf(draggedTab);
