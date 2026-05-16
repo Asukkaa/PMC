@@ -2189,7 +2189,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @throws Exception 列表中没有要执行的操作
      */
     @FXML
-    public void runClick() throws Exception {
+    private void runClick() throws Exception {
         ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new RuntimeException(text_noAutoClickToRun());
@@ -2226,7 +2226,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @throws IOException 配置文件读取异常、配置文件保存异常、页面加载失败
      */
     @FXML
-    public void loadAutoClick(ActionEvent actionEvent) throws IOException {
+    private void loadAutoClick(ActionEvent actionEvent) throws IOException {
         if (isFree()) {
             if (loadFolder_Click.isSelected()) {
                 List<String> extensionFilter = new ArrayList<>();
@@ -2259,7 +2259,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 导出操作流程按钮
      */
     @FXML
-    public void exportAutoClick() {
+    private void exportAutoClick() {
         if (isFree()) {
             List<ClickPositionVO> tableViewItems = new ArrayList<>(tableView_Click.getItems());
             if (CollectionUtils.isEmpty(tableViewItems)) {

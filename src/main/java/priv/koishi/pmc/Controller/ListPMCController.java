@@ -666,7 +666,7 @@ public class ListPMCController extends RootController {
      *
      */
     @FXML
-    public void runClick() throws IOException {
+    private void runClick() throws IOException {
         ObservableList<PMCListBean> tableViewItems = tableView_List.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new RuntimeException(text_noAutoClickToRun());
@@ -679,7 +679,7 @@ public class ListPMCController extends RootController {
      * 清空操作列表按钮
      */
     @FXML
-    public void removeAll() {
+    private void removeAll() {
         removeTableViewData(tableView_List, dataNumber_List);
     }
 
@@ -690,7 +690,7 @@ public class ListPMCController extends RootController {
      * @throws IOException 配置文件读取异常、配置文件保存异常、页面加载失败
      */
     @FXML
-    public void loadAutoClick(ActionEvent actionEvent) throws IOException {
+    private void loadAutoClick(ActionEvent actionEvent) throws IOException {
         if (loadFolder_List.isSelected()) {
             List<String> extensionFilter = new ArrayList<>();
             extensionFilter.add(PMC);
@@ -724,7 +724,7 @@ public class ListPMCController extends RootController {
      * 导出操作流程按钮
      */
     @FXML
-    public void exportAutoClick() {
+    private void exportAutoClick() {
         List<PMCListBean> tableViewItems = new ArrayList<>(tableView_List.getItems());
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new RuntimeException(text_noAutoClickList());

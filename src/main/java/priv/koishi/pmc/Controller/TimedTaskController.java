@@ -287,7 +287,7 @@ public class TimedTaskController extends RootController {
      * 添加定时任务
      */
     @FXML
-    public void addTimedTask() {
+    private void addTimedTask() {
         executeGetScheduleTask(_ -> Platform.runLater(() -> {
             int dataSize = tableView_Task.getItems().size() + 1;
             TimedTaskBean newTask = new TimedTaskBean()
