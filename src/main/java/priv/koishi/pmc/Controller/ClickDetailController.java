@@ -1943,7 +1943,7 @@ public class ClickDetailController extends RootController {
      * 删除要点击的图片
      */
     @FXML
-    public void removeClickImg() {
+    private void removeClickImg() {
         showClickImg(null);
         setNodeDisable(clickType_Det, false);
     }
@@ -1954,7 +1954,7 @@ public class ClickDetailController extends RootController {
      * @param dragEvent 拖拽事件
      */
     @FXML
-    public void handleDrop(DragEvent dragEvent) {
+    private void handleDrop(DragEvent dragEvent) {
         List<File> files = dragEvent.getDragboard().getFiles();
         startLoadImgTask(files);
         dragEvent.setDropCompleted(true);
@@ -1967,7 +1967,7 @@ public class ClickDetailController extends RootController {
      * @param dragEvent 拖拽事件
      */
     @FXML
-    public void acceptDrop(DragEvent dragEvent) {
+    private void acceptDrop(DragEvent dragEvent) {
         acceptDropImg(dragEvent);
     }
 

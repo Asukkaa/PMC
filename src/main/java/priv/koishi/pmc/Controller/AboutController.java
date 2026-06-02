@@ -425,7 +425,7 @@ public class AboutController extends RootController {
      * 检查更新
      */
     @FXML
-    public void checkUpdate() {
+    private void checkUpdate() {
         checkDate_Abt.setText("");
         TaskBean<?> taskBean = new TaskBean<>();
         taskBean.setMessageLabel(checkMessage_Abt)
@@ -493,7 +493,7 @@ public class AboutController extends RootController {
      * @throws IOException 配置文件打开失败
      */
     @FXML
-    public void autoCheckAction() throws IOException {
+    private void autoCheckAction() throws IOException {
         setLoadLastConfigCheckBox(autoCheck_Abt, configFile, key_autoCheck);
     }
 
