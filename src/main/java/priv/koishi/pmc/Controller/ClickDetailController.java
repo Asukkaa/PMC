@@ -50,6 +50,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfoHandler;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.Service.FileWatchService;
 import priv.koishi.pmc.UI.CustomFloatingWindow.ColorPickerFloating;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
@@ -62,6 +63,7 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -150,6 +152,11 @@ public class ClickDetailController extends RootController {
      * 页面是否修改标志
      */
     private boolean isModified;
+
+    /**
+     * 文件系统监听器
+     */
+    private FileWatchService fileWatchService;
 
     /**
      * 要防重复点击的组件
@@ -1156,6 +1163,14 @@ public class ClickDetailController extends RootController {
             ocrTest.cancel();
             ocrTest = null;
         }
+        if (fileWatchService != null) {
+            try {
+                fileWatchService.stop();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            fileWatchService = null;
+        }
         if (colorPickerFloating != null) {
             colorPickerFloating.close();
             colorPickerFloating = null;
@@ -1660,6 +1675,21 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 初始化文件系统监听服务
+     */
+    private void startFileWatchService() {
+        FileWatchService fileWatchService = new FileWatchService();
+        fileWatchService.setRecursive(true);
+        fileWatchService.setOnFileChanged(this::selectTessdataPath);
+        fileWatchService.setRootPath(Path.of(getTessdataPath()));
+        try {
+            fileWatchService.restart();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -1692,6 +1722,8 @@ public class ClickDetailController extends RootController {
             tableViewDragRow(tessdataTableView_det);
             // 构建右键菜单
             buildContextMenu();
+            // 初始化文件系统监听服务
+            startFileWatchService();
             // 绑定取色器
             colorPickerFloating = new ColorPickerFloating();
         });

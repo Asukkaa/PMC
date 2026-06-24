@@ -54,6 +54,7 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.Service.FileWatchService;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomFloatingWindow.ColorPickerFloating;
 import priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindowDescriptor;
@@ -64,6 +65,7 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -1785,6 +1787,21 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 初始化文件系统监听服务
+     */
+    private void startFileWatchService() {
+        FileWatchService fileWatchService = new FileWatchService();
+        fileWatchService.setRecursive(true);
+        fileWatchService.setOnFileChanged(this::selectTessdataPath);
+        fileWatchService.setRootPath(Path.of(getTessdataPath()));
+        try {
+            fileWatchService.restart();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException 配置文件读取异常、配置文件读取异常
@@ -1834,6 +1851,8 @@ public class SettingController extends RootController implements MousePositionUp
             setDisableNodes();
             // 绑定取色器
             colorPickerFloating = new ColorPickerFloating();
+            // 初始化文件系统监听服务
+            startFileWatchService();
             // 标记页面加载完毕
             initializedFinished = true;
             // 加载完成后发布事件
