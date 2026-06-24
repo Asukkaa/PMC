@@ -28,11 +28,13 @@ import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Callback.FileChooserCallback;
+import priv.koishi.pmc.Service.FileWatchService;
 import priv.koishi.pmc.Utils.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -90,6 +92,11 @@ public class FileChooserController extends ManuallyChangeThemeController {
      */
     @Setter
     private FileChooserCallback fileChooserCallback;
+
+    /**
+     * 文件系统监听器
+     */
+    private FileWatchService fileWatchService;
 
     /**
      * 文件选择页面舞台
@@ -401,6 +408,14 @@ public class FileChooserController extends ManuallyChangeThemeController {
             tableView_FC.setContextMenu(null);
         }
         removeController();
+        if (fileWatchService != null) {
+            try {
+                fileWatchService.stop();
+                fileWatchService = null;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         disableNodes.clear();
         stage = null;
     }
@@ -568,6 +583,23 @@ public class FileChooserController extends ManuallyChangeThemeController {
     }
 
     /**
+     * 初始化文件系统监听服务
+     */
+    private void startFileWatchService() {
+        fileWatchService = new FileWatchService();
+        fileWatchService.setRecursive(true);
+        fileWatchService.setOnFileChanged(this::refreshTable);
+        filePath_FC.textProperty().addListener((_, _, newValue) -> {
+            fileWatchService.setRootPath(Path.of(newValue));
+            try {
+                fileWatchService.restart();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
@@ -592,6 +624,8 @@ public class FileChooserController extends ManuallyChangeThemeController {
             tableViewContextMenu(tableView_FC);
             // 给输入框添加内容变化监听
             textFieldChangeListener();
+            // 初始化文件系统监听服务
+            startFileWatchService();
         });
     }
 
