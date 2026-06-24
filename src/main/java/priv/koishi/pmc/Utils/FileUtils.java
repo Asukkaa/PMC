@@ -205,24 +205,67 @@ public class FileUtils {
      * @return 如果文件名有效，返回 true 否则返回 false
      */
     public static boolean isValidFileName(String fileName) {
-        // 文件名可为空字符串
-        if (StringUtils.isEmpty(fileName)) {
+        // 基本空值检查
+        if (fileName == null || fileName.isEmpty()) {
             return false;
         }
-        // 文件名中不能包含以下字符
-        String illegalChars = "<>:\"/\\|?*";
-        if (fileName.contains("//") || fileName.contains("\\\\")) {
+        // 禁止控制字符（\x00-\x1f）和路径分隔符 / 以及 null
+        if (fileName.matches(".*[\\x00-\\x1f/].*")) {
             return false;
         }
-        // 检查文件名是否包含非法字符
-        for (int i = 0; i < fileName.length(); i++) {
-            if (illegalChars.indexOf(fileName.charAt(i)) >= 0) {
+        // 长度上限（各文件系统普遍限制 255 个字符/字节，取较小值）
+        if (fileName.length() > 255) {
+            return false;
+        }
+        // 所有系统都禁止使用 "." 和 ".." 作为文件名
+        if (".".equals(fileName) || "..".equals(fileName)) {
+            return false;
+        }
+        // 所有系统都禁止文件名中出现路径分隔符 / 和 null 字符
+        if (fileName.indexOf('/') >= 0 || fileName.indexOf('\0') >= 0) {
+            return false;
+        }
+        if (isWin) {
+            // 禁止字符 <>:"\|?*
+            String winIllegal = "<>:\"\\|?*";
+            for (char c : fileName.toCharArray()) {
+                if (winIllegal.indexOf(c) >= 0) {
+                    return false;
+                }
+            }
+            // 禁止以空格或点结尾（Win32 会自动截断，但此处严格拒绝）
+            if (fileName.endsWith(" ") || fileName.endsWith(".")) {
                 return false;
             }
+            // 禁止以空格开头（虽然系统可能允许，但通常不推荐，保留原有检查）
+            if (Character.isSpaceChar(fileName.charAt(0))) {
+                return false;
+            }
+            // 检查 Windows 保留名称（不区分大小写，忽略扩展名后比较）
+            String[] reservedNames = {
+                    "CON", "PRN", "AUX", "NUL",
+                    "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+                    "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+            };
+            String upperName = fileName.toUpperCase();
+            // 提取文件名主体（忽略最后一个点之后的扩展名）
+            String baseName = upperName;
+            int dotIndex = upperName.lastIndexOf('.');
+            // 点不在开头（避免误判隐藏文件）
+            if (dotIndex > 0) {
+                baseName = upperName.substring(0, dotIndex);
+            }
+            for (String reserved : reservedNames) {
+                if (baseName.equals(reserved)) {
+                    return false;
+                }
+            }
+            // 禁止纯空格文件名（如 "   "）
+            return !fileName.trim().isEmpty();
+        } else {
+            // macOS 的 HFS+ 曾禁止冒号 ':'，APFS 已放宽，但为兼容 Finder 建议禁止冒号
+            return fileName.indexOf(':') < 0;
         }
-        // 检查是否以空格或特殊字符开头
-        char firstChar = fileName.charAt(0);
-        return !Character.isSpaceChar(firstChar) && illegalChars.indexOf(firstChar) < 0;
     }
 
     /**
