@@ -171,6 +171,8 @@ public class CommonKeys {
 
     public static final String key_autoCheck = "autoCheck";
 
+    public static final String key_lastCheck = "lastCheck";
+
     public static final String key_loadFolder = "loadFolder";
 
     public static final String key_clickAllRegion = "clickAllRegion";

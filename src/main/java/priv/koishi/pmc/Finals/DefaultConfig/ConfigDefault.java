@@ -1,5 +1,8 @@
 package priv.koishi.pmc.Finals.DefaultConfig;
 
+import priv.koishi.pmc.Finals.Enum.RepeatTypeEnum;
+
+import java.time.LocalDate;
 import java.util.Properties;
 
 import static priv.koishi.pmc.Finals.CommonFinals.disable;
@@ -38,8 +41,6 @@ public class ConfigDefault {
         configProperties.put(key_appPort, "52514");
         // 第一次打开应用
         configProperties.put(key_firstRun, enable);
-        // 自动检测更新
-        configProperties.put(key_autoCheck, enable);
         // 取消快捷键
         configProperties.put(key_cancelKey, enable);
         // 应用界面语言
@@ -60,6 +61,10 @@ public class ConfigDefault {
         configProperties.put(key_loadFullWindow, enable);
         // 程序关闭时的页面
         configProperties.put(key_lastTab, "autoClickTab");
+        // 最后检查更新日期
+        configProperties.put(key_lastCheck, String.valueOf(LocalDate.now()));
+        // 自动检测更新
+        configProperties.put(key_autoCheck, RepeatTypeEnum.MONTHLY.getRepeatType());
     }
 
 }

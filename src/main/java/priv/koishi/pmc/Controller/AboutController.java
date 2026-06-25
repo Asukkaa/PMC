@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
 import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Finals.Enum.RepeatTypeEnum;
 import priv.koishi.pmc.UI.CustomProgressDialog.ProgressDialog;
 
 import java.awt.*;
@@ -31,15 +32,16 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 
 import static priv.koishi.pmc.Controller.MainController.autoClickController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonKeys.key_autoCheck;
-import static priv.koishi.pmc.Finals.CommonKeys.key_logsNum;
+import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.MainApplication.bundle;
@@ -95,7 +97,7 @@ public class AboutController extends RootController {
     public TextField logsNum_Abt;
 
     @FXML
-    public CheckBox autoCheck_Abt;
+    public ChoiceBox<String> autoCheck_Abt;
 
     @FXML
     public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMessage_Abt, checkDate_Abt;
@@ -179,8 +181,6 @@ public class AboutController extends RootController {
      * 设置鼠标悬停提示
      */
     private void setToolTip() {
-        // 自动检查更新开关添加鼠标悬停提示
-        addToolTip(autoCheck_Abt);
         // 版本号鼠标悬停提示
         addToolTip(tip_version(), version_Abt);
         // 日志文件数量输入框添加鼠标悬停提示
@@ -191,8 +191,10 @@ public class AboutController extends RootController {
         addToolTip(tip_thanks(), logo_Abt, title_Abt);
         // 检查更新按钮添加鼠标悬停提示
         addToolTip(tip_checkUpdate_Abt(), checkUpdate_Abt);
-        // 给github、gitee跳转按钮添加鼠标悬停提示
+        // 给 github、gitee 跳转按钮添加鼠标悬停提示
         addToolTip(tip_openGitLink(), openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
+        // 自动检查更新添加鼠标悬停提示
+        addValueToolTip(autoCheck_Abt, tip_autoCheck_Abt(), autoCheck_Abt.getValue());
         // 给网盘跳转按钮添加鼠标悬停提示
         addToolTip(tip_openLink(), openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
     }
@@ -304,6 +306,42 @@ public class AboutController extends RootController {
     }
 
     /**
+     * 检测更新
+     *
+     * @throws IOException 配置文件读取异常
+     */
+    private void autoCheck() throws IOException {
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(getAppResourcePath(configFile));
+        prop.load(input);
+        String autocheck = prop.getProperty(key_autoCheck);
+        String lastCheck = prop.getProperty(key_lastCheck);
+        input.close();
+        LocalDate lastCheckDate = LocalDate.now();
+        if (StringUtils.isNotBlank(lastCheck)) {
+            lastCheckDate = LocalDate.parse(lastCheck);
+        }
+        LocalDate today = LocalDate.now();
+        if (RepeatTypeEnum.LAUNCH.getRepeatType().equals(autocheck)) {
+            checkUpdate();
+        } else if (RepeatTypeEnum.DAILY.getRepeatType().equals(autocheck)) {
+            if (!today.equals(lastCheckDate)) {
+                checkUpdate();
+            }
+        } else if (RepeatTypeEnum.WEEKLY.getRepeatType().equals(autocheck)) {
+            if (ChronoUnit.DAYS.between(lastCheckDate, today) >= 7) {
+                checkUpdate();
+            }
+        } else if (RepeatTypeEnum.MONTHLY.getRepeatType().equals(autocheck)) {
+            if (today.getMonthValue() != lastCheckDate.getMonthValue()
+                    || today.getYear() != lastCheckDate.getYear()) {
+                checkUpdate();
+            }
+        }
+    }
+
+
+    /**
      * 界面初始化
      *
      * @throws IOException 日志文件配置读取异常
@@ -330,8 +368,12 @@ public class AboutController extends RootController {
         deleteLogs();
         // 检查更新
         Platform.runLater(() -> {
-            if (autoCheck_Abt.isSelected()) {
-                checkUpdate();
+            initializeChoiceBoxItems(autoCheck_Abt, repeatType_monthly(), checkRepeatTypeList);
+            try {
+                // 检测更新
+                autoCheck();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }
@@ -436,6 +478,12 @@ public class AboutController extends RootController {
         task.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             CheckUpdateBean updateInfo = task.getValue();
+            try {
+                // 更新最后检测时间
+                updateProperties(configFile, key_lastCheck, String.valueOf(LocalDate.now()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             // 检查是否有新版本
             if (isNewVersionAvailable(updateInfo)) {
                 checkMessage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
@@ -488,13 +536,11 @@ public class AboutController extends RootController {
     }
 
     /**
-     * 自动检测更新开关
-     *
-     * @throws IOException 配置文件打开失败
+     * 自动检测更新下拉框
      */
     @FXML
-    private void autoCheckAction() throws IOException {
-        setLoadLastConfigCheckBox(autoCheck_Abt, configFile, key_autoCheck);
+    public void autoCheckAction() {
+        addValueToolTip(autoCheck_Abt, tip_autoCheck_Abt(), autoCheck_Abt.getValue());
     }
 
 }

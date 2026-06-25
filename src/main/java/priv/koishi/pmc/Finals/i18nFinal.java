@@ -1112,6 +1112,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 用来设置应用自动检测更新的频率
+     */
+    public static String tip_autoCheck_Abt() {
+        return bundle.getString("tip.autoCheck_Abt");
+    }
+
+    /**
      * @return 用来设置目标颜色，可点击右侧取色器按钮进行取色
      */
     public static String tip_colorPicker_Det() {
@@ -4151,35 +4158,78 @@ public class i18nFinal {
     }
 
     /**
-     * 重复类型下拉框选项
+     * @return 每月
      */
-    public static final List<String> repeatTypeList = new ArrayList<>();
+    public static String repeatType_monthly() {
+        return bundle.getString("repeatType.monthly");
+    }
 
     /**
-     * 更新重复类型下拉框选项
+     * @return 应用启动时
      */
-    public static void updateRepeatTypeList() {
+    public static String repeatType_launch() {
+        return bundle.getString("repeatType.launch");
+    }
+
+    /**
+     * @return 从不
+     */
+    public static String repeatType_never() {
+        return bundle.getString("repeatType.never");
+    }
+
+    /**
+     * 定时任务重复类型下拉框选项
+     */
+    public static final List<String> taskRepeatTypeList = new ArrayList<>();
+
+    /**
+     * 更新定时任务重复类型下拉框选项
+     */
+    public static void updateTaskRepeatTypeList() {
         List<String> newList = Arrays.asList(
                 repeatType_daily(),
                 repeatType_weekly(),
                 repeatType_once());
-        repeatTypeList.clear();
-        repeatTypeList.addAll(newList);
+        taskRepeatTypeList.clear();
+        taskRepeatTypeList.addAll(newList);
     }
 
     /**
-     * 定时任务重复类型映射
+     * 重复类型映射
      */
     public static final BidiMap<String, String> repeatTypeMap = new DualHashBidiMap<>();
 
     /**
-     * 更新定时任务重复类型映射
+     * 更新重复类型映射
      */
     public static void updateRepeatTypeMap() {
         repeatTypeMap.clear();
         repeatTypeMap.put(RepeatTypeEnum.DAILY.getRepeatType(), repeatType_daily());
         repeatTypeMap.put(RepeatTypeEnum.WEEKLY.getRepeatType(), repeatType_weekly());
+        repeatTypeMap.put(RepeatTypeEnum.MONTHLY.getRepeatType(), repeatType_monthly());
         repeatTypeMap.put(RepeatTypeEnum.ONCE.getRepeatType(), repeatType_once());
+        repeatTypeMap.put(RepeatTypeEnum.NEVER.getRepeatType(), repeatType_never());
+        repeatTypeMap.put(RepeatTypeEnum.LAUNCH.getRepeatType(), repeatType_launch());
+    }
+
+    /**
+     * 检测更新下拉框选项
+     */
+    public static final List<String> checkRepeatTypeList = new ArrayList<>();
+
+    /**
+     * 更新检测更新下拉框选项
+     */
+    public static void updateCheckRepeatTypeList() {
+        List<String> newList = Arrays.asList(
+                repeatType_launch(),
+                repeatType_daily(),
+                repeatType_weekly(),
+                repeatType_monthly(),
+                repeatType_never());
+        checkRepeatTypeList.clear();
+        checkRepeatTypeList.addAll(newList);
     }
 
     /**
@@ -4422,12 +4472,14 @@ public class i18nFinal {
         // 更新自动操作的操作类型选项
         updateClickTypeList();
         // 更新重复类型下拉框选项
-        updateRepeatTypeList();
+        updateTaskRepeatTypeList();
+        // 更新检测更新下拉框选项
+        updateCheckRepeatTypeList();
         // 更新自动操作的操作类型选项对应的鼠标行为（操作用）
         updateRunClickTypeMap();
         // 更新自动操作的操作类型选项对应的鼠标行为（录制用）
         updateRecordClickTypeMap();
-        // 更新定时任务重复类型映射
+        // 更新重复类型映射
         updateRepeatTypeMap();
         // 更新定时任务星期名称与数字映射
         updateDayOfWeekName();

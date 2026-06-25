@@ -317,7 +317,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
      */
     private void setChoiceBoxItems() {
         // 重复类型
-        initializeChoiceBoxItems(repeatType_TD, repeatType_daily(), repeatTypeList);
+        initializeChoiceBoxItems(repeatType_TD, repeatType_daily(), taskRepeatTypeList);
     }
 
     /**

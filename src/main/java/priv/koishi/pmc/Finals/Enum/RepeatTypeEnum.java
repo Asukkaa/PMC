@@ -23,9 +23,24 @@ public enum RepeatTypeEnum {
     WEEKLY("WEEKLY"),
 
     /**
+     * 每月
+     */
+    MONTHLY("MONTHLY"),
+
+    /**
      * 仅一次
      */
-    ONCE("ONCE");
+    ONCE("ONCE"),
+
+    /**
+     * 应用启动时
+     */
+    LAUNCH("LAUNCH"),
+
+    /**
+     * 从不
+     */
+    NEVER("NEVER");
 
     /**
      * 定时任务重复类型

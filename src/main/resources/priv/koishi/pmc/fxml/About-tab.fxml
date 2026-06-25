@@ -141,7 +141,8 @@
 
                 <HBox styleClass="hBox-400-5">
                     <!--应用启动后自动检测更新-->
-                    <CheckBox fx:id="autoCheck_Abt" onAction="#autoCheckAction" text="%update.autoCheck_Abt"/>
+                    <Label text="%update.autoCheck_Abt"/>
+                    <ChoiceBox fx:id="autoCheck_Abt" prefWidth="150" onAction="#autoCheckAction"/>
                 </HBox>
 
                 <!--自动更新功能因为每月流量有限，可能无法更新成功。-->
