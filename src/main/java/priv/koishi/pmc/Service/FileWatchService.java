@@ -2,6 +2,8 @@ package priv.koishi.pmc.Service;
 
 import javafx.application.Platform;
 import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -41,6 +43,11 @@ import static java.nio.file.StandardWatchEventKinds.*;
  * Time:18:50
  */
 public class FileWatchService {
+
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(FileWatchService.class);
 
     /**
      * 要监听的根目录路径
@@ -119,7 +126,7 @@ public class FileWatchService {
         try {
             watchService = FileSystems.getDefault().newWatchService();
         } catch (IOException e) {
-            throw new RuntimeException("无法创建 WatchService", e);
+            logger.error("无法创建 WatchService", e);
         }
         // 注册目录
         try {
@@ -133,7 +140,7 @@ public class FileWatchService {
                 watchService.close();
             } catch (IOException ignored) {
             }
-            throw new RuntimeException("无法注册监听目录: " + rootPath, e);
+            logger.error("无法注册监听目录: {}", rootPath, e);
         }
         running.set(true);
         // 允许 JVM 退出时自动终止
