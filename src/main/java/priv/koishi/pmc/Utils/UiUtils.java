@@ -109,9 +109,7 @@ public class UiUtils {
             fileChooser.setInitialDirectory(file);
         }
         // 设置过滤条件
-        if (CollectionUtils.isNotEmpty(extensionFilters)) {
-            fileChooser.getExtensionFilters().setAll(extensionFilters);
-        }
+        setAllSafely(fileChooser.getExtensionFilters(), extensionFilters);
         return fileChooser;
     }
 
@@ -1093,7 +1091,7 @@ public class UiUtils {
      * @param <T>          可选值类型
      */
     public static <T> void initializeChoiceBoxItems(ChoiceBox<? super T> choiceBox, T defaultValue, List<? extends T> values) {
-        choiceBox.getItems().setAll(values);
+        setAllSafely(choiceBox.getItems(), values);
         choiceBox.setValue(defaultValue);
     }
 

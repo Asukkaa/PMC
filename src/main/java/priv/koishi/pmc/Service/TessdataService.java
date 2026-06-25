@@ -24,6 +24,7 @@ import java.util.Map;
 import static priv.koishi.pmc.Finals.CommonFinals.configFile_Tessdata;
 import static priv.koishi.pmc.Finals.CommonFinals.traineddata;
 import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
+import static priv.koishi.pmc.Utils.CommonUtils.setAllSafely;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 
@@ -168,7 +169,7 @@ public class TessdataService {
                     }
                     // 展示数据
                     TableView<? super TessdataBean> tableView = taskBean.getTableView();
-                    Platform.runLater(() -> tableView.getItems().setAll(list));
+                    Platform.runLater(() -> setAllSafely(tableView.getItems(), list));
                 }
                 return null;
             }

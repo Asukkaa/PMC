@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Utils;
 
+import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintWriter;
@@ -7,10 +8,7 @@ import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -441,6 +439,33 @@ public class CommonUtils {
         });
         // 将匹配元素插入到开头
         list.addAll(0, matches);
+    }
+
+
+    /**
+     * 安全地替换 {@link ObservableList} 的全部内容，允许 {@code newData} 为 {@code null}。
+     * <p>
+     * 如果 {@code newData} 为 {@code null}，则清空列表（等效于 {@link ObservableList#clear()}）。
+     * 否则，调用 {@link ObservableList#setAll(java.util.Collection)} 用给定集合的全部元素替换当前列表内容。
+     * </p>
+     *
+     * <p><b>变更事件触发说明：</b></p>
+     * <ul>
+     *   <li>{@code newData} 不为 {@code null} 时，{@code setAll} 会触发一次列表变更事件（原子操作）。</li>
+     *   <li>{@code newData} 为 {@code null} 时，{@code clear()} 会触发一次列表变更事件。</li>
+     * </ul>
+     *
+     * @param <E>     列表元素的类型
+     * @param list    目标 {@code ObservableList}，不能为 {@code null}
+     * @param newData 新的数据集合，可以为 {@code null}（此时等价于清空列表）
+     * @throws NullPointerException 如果 {@code list} 为 {@code null}
+     */
+    public static <E> void setAllSafely(ObservableList<E> list, Collection<? extends E> newData) {
+        if (newData == null) {
+            list.clear();
+        } else {
+            list.setAll(newData);
+        }
     }
 
 }
