@@ -8,6 +8,10 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -77,6 +81,29 @@ public class FileWatchService {
     private Runnable onFileChanged;
 
     /**
+     * 防抖延迟时间（毫秒）
+     */
+    @Setter
+    private long debounceDelay = 300;
+
+    /**
+     * 当前待执行的防抖刷新任务（可能为 {@code null}）。
+     * 当有新的文件事件到达时，会取消此任务并重新调度，从而实现事件合并。
+     */
+    private ScheduledFuture<?> pendingRefresh;
+
+    /**
+     * 用于防抖调度的单线程调度器（守护线程）。
+     * 所有刷新任务都通过此调度器延迟执行，延迟时间由 {@link #debounceDelay} 指定。
+     * 该调度器在服务停止时会被关闭，以避免资源泄露。
+     */
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1, r -> {
+        Thread t = new Thread(r, "FileWatchService-Debounce");
+        t.setDaemon(true);
+        return t;
+    });
+
+    /**
      * 启动文件监听服务。
      * <p>
      * 该方法会创建一个守护线程，初始化 {@link WatchService} 并开始阻塞等待文件事件。
@@ -136,6 +163,7 @@ public class FileWatchService {
         if (watcherThread != null && watcherThread.isAlive()) {
             watcherThread.interrupt();
         }
+        scheduler.shutdownNow();
         keyMap.clear();
     }
 
@@ -181,7 +209,7 @@ public class FileWatchService {
                     continue;
                 }
                 // 只要发生任何感兴趣的事件，就触发刷新
-                Platform.runLater(this::refresh);
+                scheduleRefresh();
             }
             // 重置 WatchKey，若目录不可访问则从 map 中移除
             if (!key.reset()) {
@@ -191,6 +219,19 @@ public class FileWatchService {
                 }
             }
         }
+    }
+
+    /**
+     * 防抖调度：取消旧任务，延迟后执行刷新
+     */
+    private void scheduleRefresh() {
+        // 取消之前的待执行任务
+        if (pendingRefresh != null && !pendingRefresh.isDone()) {
+            pendingRefresh.cancel(false);
+        }
+        // 提交新任务，延迟 debounceDelay 毫秒后执行
+        pendingRefresh = scheduler.schedule(() ->
+                Platform.runLater(this::refresh), debounceDelay, TimeUnit.MILLISECONDS);
     }
 
     /**
