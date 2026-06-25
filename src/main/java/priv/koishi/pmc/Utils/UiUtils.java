@@ -48,6 +48,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.Controller.SettingController.windowRelativeInfoFloating;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
@@ -1145,12 +1146,13 @@ public class UiUtils {
         String showStatus = file.isHidden() ? text_hidden() : text_unhidden();
         String filePath = file.getPath();
         FileVO fileBean = new FileVO();
+        boolean checkDirectory = settingController.checkDirectory_Set.isSelected();
         fileBean.setTableView(tableView)
+                .setSize(getFileUnitSize(file, checkDirectory))
                 .setUpdateDate(getFileUpdateTime(file))
                 .setCreatDate(getFileCreatTime(file))
                 .setFileType(getExistsFileType(file))
                 .setName(getFileName(filePath))
-                .setSize(getFileUnitSize(file))
                 .setShowStatus(showStatus)
                 .setPath(filePath);
         return fileBean;

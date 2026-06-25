@@ -59,6 +59,8 @@ public class ConfigDefault {
         configProperties.put(key_extendedStage, enable);
         // 记录窗口全屏设置
         configProperties.put(key_loadFullWindow, enable);
+        // 文件列表计算文件夹大小
+        configProperties.put(key_checkDirectory, enable);
         // 程序关闭时的页面
         configProperties.put(key_lastTab, "autoClickTab");
         // 最后检查更新日期

@@ -104,8 +104,10 @@
         </HBox>
 
         <HBox spacing="10">
-            <!--恢复所有设置并重启-->
-            <Button fx:id="reSetAll_Set" text="%setting.reSetAll_Set" onAction="#reSetAllAction"/>
+            <HBox styleClass="hBox-290-5">
+                <CheckBox fx:id="checkDirectory_Set" onAction="#checkDirectory" selected="true"
+                          text="%setting.checkDirectory_Set"/>
+            </HBox>
         </HBox>
 
         <Separator/>
@@ -137,6 +139,8 @@
 
             <!--立刻重启应用-->
             <Button fx:id="reLaunch_Set" onAction="#reLaunch" text="%setting.reLaunch_Set"/>
+            <!--恢复所有设置并重启-->
+            <Button fx:id="reSetAll_Set" text="%setting.reSetAll_Set" onAction="#reSetAllAction"/>
         </HBox>
 
         <HBox spacing="20">

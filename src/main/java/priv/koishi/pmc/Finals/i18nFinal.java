@@ -1154,6 +1154,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 如果觉得文件列表卡顿可取消勾选此项
+     */
+    public static String tip_checkDirectory_Set() {
+        return bundle.getString("tip.checkDirectory_Set");
+    }
+
+    /**
      * @return 设置是否开启拓展标题栏，修改需要重启后才能生效
      * <p>启后应用标题栏将与程序主界面颜色一致，关闭则使用操作系统默认标题栏
      * <p>当前拓展标题栏状态：

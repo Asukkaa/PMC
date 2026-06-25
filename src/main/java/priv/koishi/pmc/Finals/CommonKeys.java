@@ -225,4 +225,6 @@ public class CommonKeys {
 
     public static final String key_extendedStage = "extendedStage";
 
+    public static final String key_checkDirectory = "checkDirectory";
+
 }

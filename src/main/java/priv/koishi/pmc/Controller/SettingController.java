@@ -252,7 +252,7 @@ public class SettingController extends RootController implements MousePositionUp
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
             openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set, noMove_Set,
-            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set, extendedStage_Set;
+            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set, extendedStage_Set, checkDirectory_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -642,6 +642,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, clickProperties);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, clickProperties);
         setColorPickerConfig(colorPicker_Set, prop, key_floatingTextColor, key_colorCustom);
+        setControlLastConfig(checkDirectory_Set, prop, key_checkDirectory, clickProperties);
         setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, clickProperties);
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, clickProperties);
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, clickProperties);
@@ -780,6 +781,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_hideWindowRecord(), hideWindowRecord_Set);
         addToolTip(tip_showWindowRecord(), showWindowRecord_Set);
         addToolTip(tip_mouseFloatingRun(), mouseFloatingRun_Set);
+        addToolTip(tip_checkDirectory_Set(), checkDirectory_Set);
         addToolTip(tip_lastAutoClickSetting(), loadAutoClick_Set);
         addToolTip(tip_offsetX() + defaultOffsetX, offsetX_Set);
         addToolTip(tip_offsetY() + defaultOffsetY, offsetY_Set);
@@ -2242,6 +2244,15 @@ public class SettingController extends RootController implements MousePositionUp
         setLoadLastConfigCheckBox(mouseWheelLog_Set, configFile_Click, key_mouseWheelLog);
     }
 
+    /**
+     * 文件列表计算文件夹大小
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void checkDirectory() throws IOException {
+        setLoadLastConfigCheckBox(checkDirectory_Set, configFile, key_checkDirectory);
+    }
 
     /**
      * 终止操作图像第一次识别失败后改为识别整个屏幕

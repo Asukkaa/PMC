@@ -501,15 +501,20 @@ public class FileUtils {
     /**
      * 根据操作系统计算文件大小
      *
-     * @param file 要计算的文件
+     * @param file           要计算的文件
+     * @param checkDirectory 计算文件夹大小
      * @return 带单位的文件大小
      */
-    public static String getFileUnitSize(File file) {
+    public static String getFileUnitSize(File file, boolean checkDirectory) {
         long size = 0;
         if (file.isFile()) {
             size = file.length();
-        } else if (file.isDirectory()) {
-            size = org.apache.commons.io.FileUtils.sizeOfDirectory(file);
+        } else if (file.isDirectory() && checkDirectory) {
+            try {
+                size = org.apache.commons.io.FileUtils.sizeOfDirectory(file);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
         }
         return getUnitSize(size);
     }
