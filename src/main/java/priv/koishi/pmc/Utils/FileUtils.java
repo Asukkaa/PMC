@@ -505,7 +505,13 @@ public class FileUtils {
      * @return 带单位的文件大小
      */
     public static String getFileUnitSize(File file) {
-        return getUnitSize(file.length());
+        long size = 0;
+        if (file.isFile()) {
+            size = file.length();
+        } else if (file.isDirectory()) {
+            size = org.apache.commons.io.FileUtils.sizeOfDirectory(file);
+        }
+        return getUnitSize(size);
     }
 
     /**
