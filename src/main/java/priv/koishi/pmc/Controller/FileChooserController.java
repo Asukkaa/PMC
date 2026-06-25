@@ -685,6 +685,9 @@ public class FileChooserController extends ManuallyChangeThemeController {
     private void gotoParent() {
         File file = new File(filePath_FC.getText());
         File parentFile = file.getParentFile();
+        if (parentFile == null) {
+            throw new RuntimeException(text_topParentFile());
+        }
         selectFile(parentFile);
     }
 

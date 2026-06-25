@@ -2351,6 +2351,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 无法查看更上层目录
+     */
+    public static String text_topParentFile() {
+        return bundle.getString("topParentFile");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
