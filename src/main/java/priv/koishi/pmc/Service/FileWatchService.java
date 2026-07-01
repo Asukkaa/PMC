@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.nio.file.StandardWatchEventKinds.*;
+import static priv.koishi.pmc.Utils.FileUtils.isFileSystemRoot;
 
 /**
  * 基于 {@link WatchService} 的文件系统监听器，可手动控制启停。
@@ -120,7 +121,7 @@ public class FileWatchService {
      * @throws IllegalStateException 如果监听根目录无效或无法访问
      */
     public synchronized void start() {
-        if (running.get()) {
+        if (running.get() || !isWatchable(rootPath)) {
             return;
         }
         try {
@@ -285,6 +286,38 @@ public class FileWatchService {
         if (onFileChanged != null) {
             onFileChanged.run();
         }
+    }
+
+    /**
+     * 判断目录是否为可监听目录
+     *
+     * @param dir 要校验的目录
+     * @return true 可监听目录
+     */
+    private static boolean isWatchable(Path dir) {
+        // 存在且为目录
+        if (!Files.isDirectory(dir)) {
+            return false;
+        }
+        // 顶层目录
+        if (isFileSystemRoot(dir)) {
+            return false;
+        }
+        // 可读 (部分平台需执行权限，可同时检查)
+        if (!Files.isReadable(dir)) {
+            return false;
+        }
+        // 非符号链接（或跟随链接后检查目标）
+        if (Files.isSymbolicLink(dir)) {
+            return false;
+        }
+        // 尽量排除明显的虚拟文件系统
+        String fsType = null;
+        try {
+            fsType = Files.getFileStore(dir).type();
+        } catch (IOException ignored) {
+        }
+        return fsType == null || (!"nfs".equals(fsType) && !fsType.startsWith("fuse.") && !"cifs".equals(fsType));
     }
 
 }

@@ -1127,4 +1127,16 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 判断目录是否为磁盘最顶层目录
+     *
+     * @param path 要判断的目录
+     * @return true 最顶层目录
+     */
+    public static boolean isFileSystemRoot(Path path) {
+        // 归一化后，检查是否为绝对路径且没有名称元素
+        Path normalized = path.normalize();
+        return normalized.isAbsolute() && normalized.getNameCount() == 0;
+    }
+
 }
