@@ -70,7 +70,7 @@ public class ToolTipUtils {
         tooltip.setShowDuration(duration);
         tooltip.setShowDelay(Duration.ZERO);
         tooltip.setHideDelay(Duration.ZERO);
-        tooltip.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT);
+        tooltip.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_TOP_LEFT);
         tooltip.getStyleClass().add("tooltip-font-size");
         tooltip.setMaxWidth(500);
         return tooltip;
