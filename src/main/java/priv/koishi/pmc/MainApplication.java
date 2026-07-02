@@ -7,6 +7,7 @@ import de.jangassen.MenuToolkit;
 import javafx.application.Application;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -52,6 +53,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.buildPMC;
 import static priv.koishi.pmc.Service.PMCFileService.buildPMCS;
+import static priv.koishi.pmc.Service.SaveConfigService.saveAllConfig;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
@@ -242,15 +244,30 @@ public class MainApplication extends Application {
     public void stop() throws Exception {
         // 卸载全局输入监听钩子
         GlobalScreen.unregisterNativeHook();
-        // 保存设置
-        if (mainController != null && !reSetAll) {
-            mainController.saveAllLastConfig();
-        }
         // 关闭 Socket 服务
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
         }
-        // 停止 JavaFX ui 线程
+        // 保存设置
+        if (mainController != null && !reSetAll) {
+            Task<Void> saveAllConfigTask = saveAllConfig();
+            saveAllConfigTask.setOnSucceeded(_ -> exitApp());
+            saveAllConfigTask.setOnFailed(_ -> exitApp());
+            if (!saveAllConfigTask.isRunning()) {
+                Thread.ofVirtual()
+                        .name("saveAllConfigTask-vThread")
+                        .start(saveAllConfigTask);
+            }
+        } else {
+            exitApp();
+        }
+    }
+
+    /**
+     * 终止应用进程
+     */
+    private static void exitApp() {
+        // 停止 JavaFX UI 线程
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);

@@ -270,37 +270,11 @@ public class MainController extends RootController {
     }
 
     /**
-     * 保存各个功能最后一次设置值
-     *
-     * @throws IOException 配置文件保存异常
-     */
-    public void saveAllLastConfig() throws IOException {
-        // 保存自动操作工具功能最后设置
-        if (autoClickController != null) {
-            autoClickController.saveLastConfig();
-        }
-        // 保存设置功能最后设置
-        if (settingController != null) {
-            settingController.saveLastConfig();
-        }
-        // 保存日志文件数量设置
-        if (aboutController != null) {
-            aboutController.saveLastConfig();
-        }
-        // 保存批量执行 PMC 文件页面设置
-        if (listPMCController != null) {
-            listPMCController.saveLastConfig();
-        }
-        // 保存关程序闭前页面状态设置
-        saveLastConfig();
-    }
-
-    /**
      * 保存关程序闭前页面状态
      *
      * @throws IOException 配置文件保存异常
      */
-    private void saveLastConfig() throws IOException {
+    public void saveLastConfig() throws IOException {
         InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         Properties prop = new Properties();
         prop.load(input);
