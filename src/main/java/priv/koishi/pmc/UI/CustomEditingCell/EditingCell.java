@@ -135,6 +135,8 @@ public class EditingCell<T> extends TableCell<T, String> {
             super.startEdit();
             if (Objects.isNull(textField)) {
                 createTextField();
+            } else {
+                textField.setText(getString());
             }
             // 绑定监听器
             bindListeners();
@@ -188,6 +190,8 @@ public class EditingCell<T> extends TableCell<T, String> {
             updateEditableState();
             setTooltip(creatTooltip(tip + tableColumnText + "\n" + getTipText()));
             if (isEditing()) {
+                setText(null);
+                setGraphic(textField);
                 if (textField != null) {
                     textField.setText(getString());
                 }
