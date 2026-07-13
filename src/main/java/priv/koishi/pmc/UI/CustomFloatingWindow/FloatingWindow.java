@@ -45,8 +45,7 @@ import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.removeNativeListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.getCurrentScreen;
-import static priv.koishi.pmc.Utils.UiUtils.setWindowLogo;
+import static priv.koishi.pmc.Utils.UiUtils.*;
 
 /**
  * 浮窗组件
@@ -122,7 +121,7 @@ public class FloatingWindow {
             vBox.getChildren().add(node);
         }
         root.getChildren().setAll(rectangle, vBox);
-        StackPane.setMargin(vBox, new Insets(15, 0, 0, 15));
+        StackPane.setMargin(vBox, new Insets(5, 0, 0, 5));
         // 创建浮窗舞台
         Stage stage = new Stage();
         Scene scene = new Scene(root, Color.TRANSPARENT);
@@ -674,7 +673,7 @@ public class FloatingWindow {
                 button.setText(config.getHideButtonText());
                 addToolTip(config.getHideButtonToolTip(), button);
             }
-            config.getNameeLabel().setVisible(config.isShowName());
+            hideNodes(config.isShowName(), config.getNameeLabel());
             floatingStage.show();
             rectangle.setX(x);
             rectangle.setY(y);
