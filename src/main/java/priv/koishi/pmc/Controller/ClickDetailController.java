@@ -1724,7 +1724,7 @@ public class ClickDetailController extends RootController {
         if (StringUtils.isBlank(pythonVersion)) {
             pyTip_Det.setText(pathTip_runPy() + pathTip_noVersion());
             pyTip_Det.setTextFill(Color.RED);
-        } else if (envInfo.isJavaVersionValid()) {
+        } else if (envInfo.isPythonVersionValid()) {
             pyTip_Det.setText(pathTip_runPy() + pathTip_runVersion(pythonVersion));
             pyTip_Det.setTextFill(Color.GREEN);
         } else {
