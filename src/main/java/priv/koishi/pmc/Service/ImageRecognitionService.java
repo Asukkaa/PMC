@@ -448,15 +448,23 @@ public class ImageRecognitionService {
                 result.setPoint(new Point(maxX + offsetX, maxY + offsetY))
                         .setMatchThreshold((int) (maxSimilarity * 100));
             } else {
-                // 找出面积最大的连通区域（排除背景 label=0）
+                // 找出面积最大的连通区域（排除背景 label = 0）
                 int maxArea = 0;
-                int maxLabel = 1;
+                int maxLabel = -1;
+                int minArea = (int) (900 * dpiScale * dpiScale);
+                minArea = Math.max(50, minArea);
                 for (int i = 1; i < numLabels; i++) {
                     int area = new IntPointer(stats.ptr(i)).get(CC_STAT_AREA);
-                    if (area > maxArea) {
+                    if (area > maxArea && area >= minArea) {
                         maxArea = area;
                         maxLabel = i;
                     }
+                }
+                if (maxLabel == -1) {
+                    // 没有找到满足面积条件的区域，返回最高相似度点或视为未匹配
+                    return new MatchPointBean()
+                            .setPoint(new Point(maxX + offsetX, maxY + offsetY))
+                            .setMatchThreshold((int) (maxSimilarity * 100));
                 }
                 // 获取该区域的质心坐标
                 DoublePointer centroidPtr = new DoublePointer(centroids.ptr(maxLabel));
