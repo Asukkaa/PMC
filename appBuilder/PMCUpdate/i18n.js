@@ -2,33 +2,30 @@ module.exports = {
     "zh-CN": {
         versionPrefix: "版本",
         whatsNewItems: `
-        新增颜色识别功能，可使用拾色器进行拾色后设置目标颜色
-        新增文字识别功能，可以使用自定义 traineddata 模型进行文字识别
-        新增拓展标题栏相关功能，开启后可使应用标题栏与应用主界面保持一致
-        重构了很多界面 UI 逻辑
-        修复了很多 BUG`,
+        修复列表单元格编辑时数据可能填充异常的问题
+        优化应用关闭时配置文件保存逻辑
+        修复鼠标悬停提示在窗口右边缘显示不下时不停闪烁的问题
+        部分文件相关页面新增文件变化自动刷新功能`,
         invalidJson: "无效的 JSON 请求体",
         invalidOS: "无效的操作系统参数"
     },
     "zh-TW": {
         versionPrefix: "版本",
         whatsNewItems: `
-        新增顏色識別功能，可使用拾色器進行拾色後設定目標顏色
-        新增文字識別功能，可以使用自定義traineddata模型進行文字識別
-        新增拓展標題列相關功能，開啟後可使應用標題列與應用主介面保持一致
-        重構了很多介面 UI 邏輯
-        修復了很多 BUG`,
+        修復清單儲存格編輯時資料可能填入異常的問題
+        最佳化應用程式關閉時設定檔儲存邏輯
+        修復滑鼠懸停提示在視窗右邊緣顯示不完全時不停閃爍的問題
+        部分檔案相關頁面新增檔案變更自動重新整理功能`,
         invalidJson: "無效的 JSON 請求體",
         invalidOS: "無效的作業系統參數"
     },
     "en": {
         versionPrefix: "Version",
         whatsNewItems: `
-        Added color recognition function, allowing users to use a color picker to pick up colors and set the target color
-        Added text recognition function, allowing for the use of custom traineddata models for text recognition
-        New features related to expanding the title bar have been added, which can make the application title bar consistent with the main interface of the application when enabled
-        Refactored a lot of interface UI logic
-        Fixed many bugs`,
+        Fixed an issue where data might be incorrectly filled when editing list cells
+        Optimized the configuration file saving logic when the application is closed
+        Fixed an issue where tooltips on mouse hover would flicker when they couldn't be fully displayed at the right edge of the window
+        Added auto-refresh functionality for file changes on some file-related pages`,
         invalidJson: "Invalid JSON request body",
         invalidOS: "Invalid OS parameter"
     }
