@@ -531,17 +531,17 @@ public class UiUtils {
     public static void setControlLastConfig(Control control, Properties prop, String key, String defaultValue) {
         String lastValue = prop.getProperty(key, defaultValue);
         if (StringUtils.isNotBlank(lastValue)) {
-            if (control instanceof ChoiceBox) {
-                ChoiceBox<String> choiceBox = (ChoiceBox<String>) control;
-                choiceBox.setValue(lastValue);
-            } else if (control instanceof CheckBox checkBox) {
-                checkBox.setSelected(enable.equals(lastValue));
-            } else if (control instanceof Label label) {
-                label.setText(lastValue);
-            } else if (control instanceof TextField textField) {
-                textField.setText(lastValue);
-            } else if (control instanceof Slider slider) {
-                slider.setValue(Double.parseDouble(lastValue));
+            switch (control) {
+                case ChoiceBox<?> _ -> {
+                    ChoiceBox<String> choiceBox = (ChoiceBox<String>) control;
+                    choiceBox.setValue(lastValue);
+                }
+                case CheckBox checkBox -> checkBox.setSelected(enable.equals(lastValue));
+                case Label label -> label.setText(lastValue);
+                case TextField textField -> textField.setText(lastValue);
+                case Slider slider -> slider.setValue(Double.parseDouble(lastValue));
+                default -> {
+                }
             }
         }
     }
