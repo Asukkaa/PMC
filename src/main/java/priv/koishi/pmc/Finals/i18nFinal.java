@@ -3602,14 +3602,60 @@ public class i18nFinal {
 
     /**
      * @return <p>将会打开终端运行脚本，脚本执行结束后自动关闭终端窗口进行后续操作</p>
-     * <p>执行脚本需要安装对应的脚本运行环境</p>
-     * <p>运行 .py 文件需要 Python 3.0 以上的环境</p>
-     * <p>运行 .ps1 文件需要 PowerShell 环境</p>
-     * <p>运行 .java 文件需要 Java 11 以上的环境</p>
-     * 运行 .jar 和 .class 文件需要 Java 环境
+     * 执行脚本需要安装对应的脚本运行环境
      */
     public static String pathTip_runScript() {
         return bundle.getString("pathTip.runScript");
+    }
+
+    /**
+     * @return 运行 .py 文件需要 Python 3.0 以上的环境
+     */
+    public static String pathTip_runPy() {
+        return bundle.getString("pathTip.runPy");
+    }
+
+    /**
+     * @return 运行 .ps1 文件需要 PowerShell 环境
+     */
+    public static String pathTip_runPs() {
+        return bundle.getString("pathTip.runPs");
+    }
+
+    /**
+     * @return 运行 .java 文件需要 Java 11 以上的环境
+     */
+    public static String pathTip_runJava() {
+        return bundle.getString("pathTip.runJava");
+    }
+
+    /**
+     * @return 运行 .jar 和 .class 文件需要 Java 环境
+     */
+    public static String pathTip_runJar() {
+        return bundle.getString("pathTip.runJar");
+    }
+
+    /**
+     * @param version 当前版本
+     * @return （当前版本：{0}）
+     */
+    public static String pathTip_runVersion(String version) {
+        return MessageFormat.format(bundle.getString("pathTip.runVersion"), version);
+    }
+
+    /**
+     * @return （操作系统未检测到相关环境配置）
+     */
+    public static String pathTip_noVersion() {
+        return bundle.getString("pathTip.noVersion");
+    }
+
+    /**
+     * @return （正在查询当前版本）
+     */
+    public static String pathTip_checkVersion() {
+        return bundle.getString("pathTip.checkVersion");
     }
 
     /**

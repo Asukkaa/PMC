@@ -90,6 +90,7 @@ import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.*;
+import static priv.koishi.pmc.Utils.ScriptUtils.startEnvInfoTask;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
@@ -2065,35 +2066,38 @@ public class AutoClickController extends RootController implements MousePosition
         setDisableNodes();
         shortcutsListener = initShortcutListener();
         shortcutsListener.startRecording();
-        // 运行定时任务
-        if (StringUtils.isNotBlank(loadPMCPath)) {
-            TaskBean<ClickPositionVO> taskBean = creatTaskBean();
-            loadedPMCTask = buildPMC(taskBean, new File(loadPMCPath));
-            loadedPMCTask.setOnSucceeded(_ -> {
-                taskUnbind(taskBean);
-                List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
-                addAutoClickPositions(clickPositionVOS, loadPMCPath);
-                loadedPMCTask = null;
-                try {
-                    // 运行自动操作
-                    if (runPMCFile) {
-                        runClick();
+        // 获取当前操作系统环境配置
+        startEnvInfoTask(tabId, () -> {
+            // 运行定时任务
+            if (StringUtils.isNotBlank(loadPMCPath)) {
+                TaskBean<ClickPositionVO> taskBean = creatTaskBean();
+                loadedPMCTask = buildPMC(taskBean, new File(loadPMCPath));
+                loadedPMCTask.setOnSucceeded(_ -> {
+                    taskUnbind(taskBean);
+                    List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
+                    addAutoClickPositions(clickPositionVOS, loadPMCPath);
+                    loadedPMCTask = null;
+                    try {
+                        // 运行自动操作
+                        if (runPMCFile) {
+                            runClick();
+                        }
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
                     }
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-                // 清空启动参数
-                clearArgs();
-            });
-            loadedPMCTask.setOnFailed(e -> {
-                taskNotSuccess(taskBean, text_taskFailed());
-                loadedPMCTask = null;
-                throw new RuntimeException(e.getSource().getException());
-            });
-            Thread.ofVirtual()
-                    .name("loadedPMCTask-vThread" + tabId)
-                    .start(loadedPMCTask);
-        }
+                    // 清空启动参数
+                    clearArgs();
+                });
+                loadedPMCTask.setOnFailed(e -> {
+                    taskNotSuccess(taskBean, text_taskFailed());
+                    loadedPMCTask = null;
+                    throw new RuntimeException(e.getSource().getException());
+                });
+                Thread.ofVirtual()
+                        .name("loadedPMCTask-vThread" + tabId)
+                        .start(loadedPMCTask);
+            }
+        });
         // 禁用需要辅助控制权限的组件
         if (isNativeHookException) {
             Button saveButton = settingController.messageRegion_Set;

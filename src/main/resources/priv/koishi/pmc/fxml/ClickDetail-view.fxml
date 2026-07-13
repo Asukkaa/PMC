@@ -150,6 +150,14 @@
                         </HBox>
 
                         <Label fx:id="pathTip_Det" style="-fx-pref-height: -1" textFill="red"/>
+                        <VBox fx:id="scriptVBox_Det">
+                            <Label fx:id="pyTip_Det" text="%pathTip.runPy" style="-fx-pref-height: -1" textFill="red"/>
+                            <Label fx:id="psTip_Det" text="%pathTip.runPs" style="-fx-pref-height: -1" textFill="red"/>
+                            <Label fx:id="javaTip_Det" text="%pathTip.runJava" style="-fx-pref-height: -1"
+                                   textFill="red"/>
+                            <Label fx:id="jarTip_Det" text="%pathTip.runJar" style="-fx-pref-height: -1"
+                                   textFill="red"/>
+                        </VBox>
                     </VBox>
 
                     <VBox fx:id="clickVBox_Det" spacing="10">

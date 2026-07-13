@@ -98,6 +98,7 @@ import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
+import static priv.koishi.pmc.Utils.ScriptUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
@@ -293,7 +294,8 @@ public class ClickDetailController extends RootController {
     public BorderPane borderPane_Det;
 
     @FXML
-    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, pathLinkVBox_Det, imgVBox_Det, ocrVBox_det;
+    public VBox clickImgVBox_Det, progressBarVBox_Det, clickVBox_Det, pathLinkVBox_Det, imgVBox_Det, ocrVBox_det,
+            scriptVBox_Det;
 
     @FXML
     public HBox retryStepHBox_Det, matchedStepHBox_Det, clickTypeHBox_Det, clickRegionHBox_Det, stopRegionHBox_Det,
@@ -329,9 +331,9 @@ public class ClickDetailController extends RootController {
 
     @FXML
     public Label clickImgPath_Det, dataNumber_Det, clickImgName_Det, clickImgType_Det, clickIndex_Det, link_Det,
-            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, clickTypeText_Det,
-            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det,
-            moveWindowInfo_Det, tessdataNumber_det;
+            tableViewSize_Det, clickWindowInfo_Det, stopWindowInfo_Det, noPermission_Det, clickTypeText_Det, pyTip_Det,
+            openUrl_Det, workPath_Det, log_Det, pathTip_Det, resolution_Det, keyboard_Det, inputKey_Det, psTip_Det,
+            moveWindowInfo_Det, tessdataNumber_det, javaTip_Det, jarTip_Det;
 
     @FXML
     public TextField clickName_Det, mouseStartX_Det, mouseStartY_Det, wait_Det, clickNumBer_Det, timeClick_Det,
@@ -1163,6 +1165,10 @@ public class ClickDetailController extends RootController {
             ocrTest.cancel();
             ocrTest = null;
         }
+        if (envInfoTask != null && envInfoTask.isRunning()) {
+            envInfoTask.cancel();
+            envInfoTask = null;
+        }
         if (fileWatchService != null) {
             try {
                 fileWatchService.stop();
@@ -1690,6 +1696,71 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 初始化环境配置文本
+     */
+    private void initEnvInfoText() {
+        initEnvInfoText(pyTip_Det);
+        initEnvInfoText(psTip_Det);
+        initEnvInfoText(javaTip_Det);
+        initEnvInfoText(jarTip_Det);
+    }
+
+    /**
+     * 初始化环境配置文本
+     *
+     * @param label 需要初始化文本的信息栏
+     */
+    private void initEnvInfoText(Label label) {
+        label.setText(label.getText() + pathTip_checkVersion());
+        label.setTextFill(Color.RED);
+    }
+
+    /**
+     * 展示操作系统环境配置
+     */
+    private void showEnvInfo() {
+        // Python 环境
+        String pythonVersion = envInfo.getPythonVersion();
+        if (StringUtils.isBlank(pythonVersion)) {
+            pyTip_Det.setText(pathTip_runPy() + pathTip_noVersion());
+            pyTip_Det.setTextFill(Color.RED);
+        } else if (envInfo.isJavaVersionValid()) {
+            pyTip_Det.setText(pathTip_runPy() + pathTip_runVersion(pythonVersion));
+            pyTip_Det.setTextFill(Color.GREEN);
+        } else {
+            pyTip_Det.setText(pathTip_runPy() + pathTip_runVersion(pythonVersion));
+            pyTip_Det.setTextFill(Color.RED);
+        }
+        // Java 环境
+        String javaVersion = envInfo.getJavaVersion();
+        if (StringUtils.isBlank(javaVersion)) {
+            javaTip_Det.setText(pathTip_runJava() + pathTip_noVersion());
+            javaTip_Det.setTextFill(Color.RED);
+            jarTip_Det.setText(pathTip_runJar() + pathTip_noVersion());
+            jarTip_Det.setTextFill(Color.RED);
+        } else if (envInfo.isJavaVersionValid()) {
+            javaTip_Det.setText(pathTip_runJava() + pathTip_runVersion(javaVersion));
+            javaTip_Det.setTextFill(Color.GREEN);
+            jarTip_Det.setText(pathTip_runJar() + pathTip_runVersion(javaVersion));
+            jarTip_Det.setTextFill(Color.GREEN);
+        } else {
+            javaTip_Det.setText(pathTip_runJava() + pathTip_runVersion(javaVersion));
+            javaTip_Det.setTextFill(Color.RED);
+            jarTip_Det.setText(pathTip_runJar() + pathTip_runVersion(javaVersion));
+            jarTip_Det.setTextFill(Color.GREEN);
+        }
+        // PowerShell 版本
+        String powershellVersion = envInfo.getPowershellVersion();
+        if (StringUtils.isBlank(powershellVersion)) {
+            psTip_Det.setText(pathTip_runPs() + pathTip_noVersion());
+            psTip_Det.setTextFill(Color.RED);
+        } else {
+            psTip_Det.setText(pathTip_runPs() + pathTip_runVersion(powershellVersion));
+            psTip_Det.setTextFill(Color.GREEN);
+        }
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
@@ -1726,6 +1797,10 @@ public class ClickDetailController extends RootController {
             startFileWatchService();
             // 绑定取色器
             colorPickerFloating = new ColorPickerFloating();
+            // 初始化环境配置文本
+            initEnvInfoText();
+            // 获取当前操作系统环境配置
+            startEnvInfoTask(tabId, this::showEnvInfo);
         });
     }
 
@@ -2061,13 +2136,13 @@ public class ClickDetailController extends RootController {
             hideNodes(false, pathLinkVBox_Det, testLink_Det);
             resolution_Det.setVisible(false);
             randomClickInterval_Det.setVisible(false);
-            hideNodes(true, parameterHBox_Det, moveWindowHBox_Det, pathHBox_Det, urlHBox_Det);
+            hideNodes(true, parameterHBox_Det, moveWindowHBox_Det, pathHBox_Det, urlHBox_Det, scriptVBox_Det);
             if (clickType_openFile().equals(value)) {
                 hideNodes(false, pathHBox_Det);
                 workDirHBox_Det.setVisible(false);
                 pathTip_Det.setText(pathTip_openFile());
             } else if (clickType_runScript().equals(value)) {
-                hideNodes(false, parameterHBox_Det, pathHBox_Det);
+                hideNodes(false, parameterHBox_Det, pathHBox_Det, scriptVBox_Det);
                 workDirHBox_Det.setVisible(true);
                 pathTip_Det.setText(pathTip_runScript());
             } else if (clickType_openUrl().equals(value)) {

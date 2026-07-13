@@ -43,7 +43,7 @@ import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
-import static priv.koishi.pmc.Utils.ScriptUtils.runScript;
+import static priv.koishi.pmc.Utils.ScriptUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.showStageAlert;
 
 /**
@@ -106,6 +106,7 @@ public class AutoClickService {
      * @param robot        Robot 实例
      * @param pmcListBeans 需要批量运行的 PMC 文件列表
      * @param baseTaskBean 任务参数
+     * @return 带有执行结果的 Task
      */
     public static Task<PMCLogResult> autoClicks(Robot robot, List<? extends PMCListBean> pmcListBeans,
                                                 AutoClickTaskBean baseTaskBean) {
@@ -1755,13 +1756,33 @@ public class AutoClickService {
      * 测试文字识别任务线程
      *
      * @param config 识别设置
-     * @return 带有识别到的文字信息的 task
+     * @return 带有识别到的文字信息的 Task
      */
     public static Task<List<OCRDataBean>> ocrTest(FindPositionConfig config) {
         return new Task<>() {
             @Override
             protected List<OCRDataBean> call() {
                 return getAllOCRData(config);
+            }
+        };
+    }
+
+    /**
+     * 获取系统环境设置任务线程
+     *
+     * @return 无返回值的 Task
+     */
+    public static Task<Void> getEnvInfo() {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                // 查询 Java 版本
+                detectJavaEnvironment();
+                // 查询 Python 版本
+                detectPythonEnvironment();
+                // 查询 PowerShell 版本
+                detectPowerShellEnvironment();
+                return null;
             }
         };
     }

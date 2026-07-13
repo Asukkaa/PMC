@@ -1,6 +1,7 @@
 package priv.koishi.pmc.Bean;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 检查更新数据类
@@ -10,6 +11,7 @@ import lombok.Data;
  * Time:15:25
  */
 @Data
+@Accessors(chain = true)
 public class CheckUpdateBean {
 
     /**
