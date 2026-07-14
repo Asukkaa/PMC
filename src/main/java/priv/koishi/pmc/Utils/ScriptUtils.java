@@ -240,6 +240,10 @@ public class ScriptUtils {
             }
         }
         String fileType = getFileType(path);
+        // 运行 Java 相关文件前检测是否有相关环境，如果没有则使用应用自身环境
+        if (java.equals(fileType) || jar.equals(fileType) || clazz.equals(fileType)) {
+            detectJavaEnvironment();
+        }
         List<String> command = new ArrayList<>();
         if (isWin) {
             runWithWinTerminal(minScriptWindow, command, fileType, path, parameter, pb);
