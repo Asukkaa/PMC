@@ -4,7 +4,7 @@ import time
 
 
 def show_progress(seconds):
-    """显示进度条"""
+    """显示进度条（保持不变）"""
     for i in range(seconds):
         progress = (i + 1) / seconds * 100
         bar_length = 30
@@ -13,24 +13,33 @@ def show_progress(seconds):
         sys.stdout.write(f'\r等待中: [{bar}] {progress:.0f}% ({i + 1}/{seconds}秒)')
         sys.stdout.flush()
         time.sleep(1)
-    print()  # 换行
+    print()
 
 
 def main():
-    print("Python 脚本开始执行")
+    # ========== 版本信息 ==========
+    print("=== Python 脚本测试 ===")
+    python_version = sys.version
+    platform = sys.platform
+    print(f"Python 版本: {python_version} ({platform})")
 
-    # 获取所有参数
-    args = sys.argv[1:]
-    print(f"接收到的参数: {args}")
-
-    # 添加工作目录信息
+    # ========== 工作目录 ==========
     current_dir = os.getcwd()
-    print(f"当前工作目录: {current_dir}")
+    print(f"工作目录: {current_dir}")
 
-    # 列出工作目录下的文件
+    # ========== 参数 ==========
+    args = sys.argv[1:]
+    print("接收到的参数:")
+    if not args:
+        print("  无参数")
+    else:
+        for i, arg in enumerate(args, 1):
+            print(f"  参数{i}: '{arg}'")
+
+    # ========== 当前目录文件列表 ==========
+    print("\n当前目录文件列表:")
     try:
         files = os.listdir(current_dir)
-        print("\n工作目录下的文件和文件夹:")
         for file in sorted(files):
             file_path = os.path.join(current_dir, file)
             if os.path.isdir(file_path):
@@ -38,18 +47,14 @@ def main():
             else:
                 print(f"  [文件] {file}")
     except Exception as e:
-        print(f"无法列出目录内容: {e}")
+        print(f"  无法列出目录内容: {e}")
 
-    print("等待3秒...")
+    # ========== 3 秒倒计时 ==========
+    print("\n开始 3 秒倒计时...")
     show_progress(3)
+    print("倒计时结束!")
 
-    # 输出参数详情
-    print("\n参数详情:")
-    for i, arg in enumerate(args, 1):
-        print(f"  参数{i}: '{arg}'")
-
-    print(f"\n所有参数: {args}")
-    print("脚本执行完成")
+    print("\n脚本执行完成!")
 
 
 if __name__ == "__main__":

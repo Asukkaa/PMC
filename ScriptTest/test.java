@@ -4,12 +4,13 @@ import java.util.concurrent.TimeUnit;
 public class test {
 
     void main(String[] args) {
-        IO.println("=== Java 文件测试 ===");
-
+        IO.println("=== Jar 文件测试 ===");
+        // Java 版本
+        String jdkVersion = System.getProperty("java.vendor") + " " + System.getProperty("java.vm.version");
+        IO.println("当前 Java 版本：" + jdkVersion);
         // 输出工作路径
         String workingDir = System.getProperty("user.dir");
         IO.println("工作路径: " + workingDir);
-
         // 输出运行参数
         IO.println("接收到的参数:");
         if (args.length == 0) {
@@ -19,7 +20,6 @@ public class test {
                 IO.println("  参数" + (i + 1) + ": " + args[i]);
             }
         }
-
         // 显示当前目录的文件列表
         IO.println("\n当前目录文件列表:");
         File currentDir = new File(workingDir);
@@ -30,8 +30,7 @@ public class test {
                 IO.println("  " + type + " " + file.getName());
             }
         }
-
-        // 3秒倒计时
+        // 3 秒倒计时
         IO.println("\n开始 3 秒倒计时...");
         try {
             for (int i = 3; i > 0; i--) {
