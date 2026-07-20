@@ -27,6 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
+import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -510,6 +511,25 @@ public class UiUtils {
     /**
      * 为配置组件设置上次配置值
      *
+     * @param choiceBox 需要处理的下拉框
+     * @param prop      配置文件
+     * @param key       要读取的 key
+     * @param i18nMap   国际化文本映射
+     */
+    public static void setControlLastConfig(ChoiceBox<? super String> choiceBox, Properties prop,
+                                            String key, BidiMap<String, String> i18nMap) {
+        String lastValue = prop.getProperty(key);
+        String value = i18nMap.get(lastValue);
+        if (choiceBox.getItems().contains(value)) {
+            choiceBox.setValue(value);
+        } else {
+            choiceBox.getSelectionModel().select(0);
+        }
+    }
+
+    /**
+     * 为配置组件设置上次配置值
+     *
      * @param control           需要处理的组件
      * @param prop              配置文件
      * @param key               要读取的 key
@@ -534,7 +554,11 @@ public class UiUtils {
             switch (control) {
                 case ChoiceBox<?> _ -> {
                     ChoiceBox<String> choiceBox = (ChoiceBox<String>) control;
-                    choiceBox.setValue(lastValue);
+                    if (choiceBox.getItems().contains(lastValue)) {
+                        choiceBox.setValue(lastValue);
+                    } else {
+                        choiceBox.getSelectionModel().select(0);
+                    }
                 }
                 case CheckBox checkBox -> checkBox.setSelected(enable.equals(lastValue));
                 case Label label -> label.setText(lastValue);

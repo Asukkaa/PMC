@@ -118,7 +118,7 @@ public class AboutController extends RootController {
         // 获取日志储存数量配置
         setControlLastConfig(logsNum_Abt, prop, key_logsNum);
         // 获取自动检查更新配置
-        setControlLastConfig(autoCheck_Abt, prop, key_autoCheck);
+        setControlLastConfig(autoCheck_Abt, prop, key_autoCheck, repeatTypeMap);
         input.close();
     }
 
@@ -141,6 +141,8 @@ public class AboutController extends RootController {
         prop.load(input);
         String logsNumValue = logsNum_Abt.getText();
         prop.setProperty(key_logsNum, logsNumValue);
+        String autoCheckValue = autoCheck_Abt.getValue();
+        prop.setProperty(key_autoCheck, repeatTypeMap.getKey(autoCheckValue));
         OutputStream output = new FileOutputStream(getRunningResourcePath(configFile));
         prop.store(output, null);
         input.close();
@@ -343,11 +345,9 @@ public class AboutController extends RootController {
 
     /**
      * 界面初始化
-     *
-     * @throws IOException 日志文件配置读取异常
      */
     @FXML
-    private void initialize() throws IOException {
+    private void initialize() {
         // 设置应用名称
         title_Abt.setText(appName);
         // 设置版本号
@@ -360,15 +360,19 @@ public class AboutController extends RootController {
         setDisableNodes();
         // log 文件保留数量输入监听
         integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum());
-        // 读取配置文件
-        getConfig();
-        // 获取 logs 文件夹路径并展示
-        setLogsPath();
-        // 清理多余 log 文件
-        deleteLogs();
         // 检查更新
         Platform.runLater(() -> {
             initializeChoiceBoxItems(autoCheck_Abt, repeatType_monthly(), checkRepeatTypeList);
+            // 读取配置文件
+            try {
+                getConfig();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            // 获取 logs 文件夹路径并展示
+            setLogsPath();
+            // 清理多余 log 文件
+            deleteLogs();
             try {
                 // 检测更新
                 autoCheck();

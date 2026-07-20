@@ -6,7 +6,7 @@
 
     <groupId>priv.Koishi</groupId>
     <artifactId>PMC</artifactId>
-    <version>4.4.1</version>
+    <version>4.4.2</version>
     <name>PMC</name>
 
     <properties>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
             <scope>compile</scope>
         </dependency>
 
