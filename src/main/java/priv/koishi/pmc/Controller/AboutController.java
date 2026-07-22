@@ -314,7 +314,7 @@ public class AboutController extends RootController {
      */
     private void autoCheck() throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getAppResourcePath(configFile));
+        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         prop.load(input);
         String autocheck = prop.getProperty(key_autoCheck);
         String lastCheck = prop.getProperty(key_lastCheck);

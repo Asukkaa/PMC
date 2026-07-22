@@ -2,12 +2,14 @@ package priv.koishi.pmc.Utils;
 
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Annotation.IgnoreCopy;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -303,6 +305,18 @@ public class CommonUtils {
         for (Class<?> clazz = sourceClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (Field sourceField : clazz.getDeclaredFields()) {
                 try {
+                    // 跳过静态字段
+                    if (Modifier.isStatic(sourceField.getModifiers())) {
+                        continue;
+                    }
+                    // 跳过常量字段
+                    if (Modifier.isFinal(sourceField.getModifiers())) {
+                        continue;
+                    }
+                    // 跳过标记字段
+                    if (sourceField.isAnnotationPresent(IgnoreCopy.class)) {
+                        continue;
+                    }
                     // 遍历目标对象继承链查找同名字段
                     Field targetField = findFieldInHierarchy(targetClass, sourceField.getName());
                     copyFieldValue(source, target, sourceField, targetField);
