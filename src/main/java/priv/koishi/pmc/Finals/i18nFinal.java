@@ -1161,6 +1161,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 开启后能显著提高文件列表中的缩略图的加载速度，但可能会占用更多内存
+     */
+    public static String tip_quickThumb() {
+        return bundle.getString("tip.quickThumb");
+    }
+
+    /**
      * @return 设置是否开启拓展标题栏，修改需要重启后才能生效
      * <p>启后应用标题栏将与程序主界面颜色一致，关闭则使用操作系统默认标题栏
      * <p>当前拓展标题栏状态：

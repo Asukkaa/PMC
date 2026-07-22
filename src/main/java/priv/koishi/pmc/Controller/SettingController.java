@@ -252,7 +252,8 @@ public class SettingController extends RootController implements MousePositionUp
             stopImgLog_Set, imgLog_Set, waitLog_Set, remindTaskSave_Set, stopAllRegion_Set, titleCoordinate_Set,
             updateStopWindow_Set, updateClickWindow_Set, useRelatively_Set, openFileLog_Set, runScriptLog_Set,
             openUrlLog_Set, mouseWheelLog_Set, keyboardLog_Set, recordMouseWheel_Set, recordKeyboard_Set, noMove_Set,
-            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set, extendedStage_Set, checkDirectory_Set;
+            recordMouseClick_Set, loadPMCS_Set, autoSavePMCS_Set, moveWindowLog_Set, extendedStage_Set, quickThumb_Set,
+            checkDirectory_Set;
 
     @FXML
     public TableView<ImgFileVO> tableView_Set;
@@ -642,7 +643,6 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(randomClickInterval_Set, prop, key_randomClickInterval, clickProperties);
         setControlLastConfig(stopRetryNum_Set, prop, key_defaultStopRetryNum, clickProperties);
         setColorPickerConfig(colorPicker_Set, prop, key_floatingTextColor, key_colorCustom);
-        setControlLastConfig(checkDirectory_Set, prop, key_checkDirectory, clickProperties);
         setControlLastConfig(clickTimeOffset_Set, prop, key_clickTimeOffset, clickProperties);
         setControlLastConfig(clickRetryNum_Set, prop, key_defaultClickRetryNum, clickProperties);
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, clickProperties);
@@ -652,8 +652,8 @@ public class SettingController extends RootController implements MousePositionUp
         prop = new Properties();
         InputStream listConfigInput = new FileInputStream(getRunningResourcePath(configFile_List));
         prop.load(listConfigInput);
-        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, listPMCProperties);
         setControlLastConfig(loadPMCS_Set, prop, key_loadConfig, listPMCProperties);
+        setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, listPMCProperties);
         listConfigInput.close();
         extendedStage_Set.setSelected(extendedStage);
     }
@@ -684,6 +684,7 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(lastTab_Set, prop, key_loadConfig, configProperties);
         setControlLastConfig(maxWindow_Set, prop, key_loadMaxWindow, configProperties);
         setControlLastConfig(fullWindow_Set, prop, key_loadFullWindow, configProperties);
+        setControlLastConfig(checkDirectory_Set, prop, key_checkDirectory, configProperties);
         int them = Integer.parseInt(getPropertyWithDefault(prop, key_theme, configProperties));
         theme_Set.setValue(themeMap.get(them));
         // 加载快捷键设置
@@ -752,6 +753,7 @@ public class SettingController extends RootController implements MousePositionUp
         addToolTip(tip_firstClick(), firstClick_Set);
         addToolTip(tip_recordDrag(), recordDrag_Set);
         addToolTip(tip_recordMove(), recordMove_Set);
+        addToolTip(tip_quickThumb(), quickThumb_Set);
         addToolTip(tip_selectBtn_set(), selectBtn_set);
         addToolTip(tip_randomClick(), randomClick_Set);
         addToolTip(tip_floatingRun(), floatingRun_Set);
@@ -1922,6 +1924,16 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void autoSavePMCSAction() throws IOException {
         setLoadLastConfigCheckBox(autoSavePMCS_Set, configFile_List, key_autoSave);
+    }
+
+    /**
+     * 快速加载缩略图设置
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    @FXML
+    private void quickThumbAction() throws IOException {
+        setLoadLastConfigCheckBox(quickThumb_Set, configFile, key_quickThumb);
     }
 
     /**

@@ -227,4 +227,6 @@ public class CommonKeys {
 
     public static final String key_checkDirectory = "checkDirectory";
 
+    public static final String key_quickThumb = "quickThumb";
+
 }

@@ -51,6 +51,8 @@ public class ConfigDefault {
         configProperties.put(key_loadConfig, enable);
         // 最大化窗口
         configProperties.put(key_maxWindow, disable);
+        // 快速加载缩略图
+        configProperties.put(key_quickThumb, enable);
         // 全屏窗口
         configProperties.put(key_fullWindow, disable);
         // 记录窗口最大化设置

@@ -105,8 +105,15 @@
 
         <HBox spacing="10">
             <HBox styleClass="hBox-290-5">
+                <!--文件列表计算文件夹大小-->
                 <CheckBox fx:id="checkDirectory_Set" onAction="#checkDirectory" selected="true"
                           text="%setting.checkDirectory_Set"/>
+            </HBox>
+
+            <HBox styleClass="hBox-290-5">
+                <!--快速加载缩略图-->
+                <CheckBox fx:id="quickThumb_Set" onAction="#quickThumbAction" selected="true"
+                          text="%setting.quickThumb_Set"/>
             </HBox>
         </HBox>
 
