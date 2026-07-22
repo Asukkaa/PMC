@@ -3,17 +3,15 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
-                新增应用自动检测更新频率设置功能，可在【关于】页面选择应用自动检测更新频率
-                修复列表单元格编辑时数据可能填充异常的问题
-                优化应用关闭时配置文件保存逻辑
-                修复鼠标悬停提示在窗口右边缘显示不下时不停闪烁的问题
-                部分文件相关页面新增文件变化自动刷新功能
-                自动流程运行脚本功能新增环境检测相关逻辑，可在流程详情页查看相关环境是否符合运行条件`,
+                修复版本检测更新频率下拉框设置失效的问题
+                优化缩略图显示速度
+                升级 Java 与 JavaFx 版本有 26.0.1 至 26.0.2`,
             mac: `
-                修复列表单元格编辑时数据可能填充异常的问题
-                优化应用关闭时配置文件保存逻辑
-                修复鼠标悬停提示在窗口右边缘显示不下时不停闪烁的问题
-                部分文件相关页面新增文件变化自动刷新功能`
+                新增颜色识别功能，可使用拾色器进行拾色后设置目标颜色
+                新增文字识别功能，可以使用自定义 traineddata 模型进行文字识别
+                新增拓展标题栏相关功能，开启后可使应用标题栏与应用主界面保持一致
+                重构了很多界面 UI 逻辑
+                修复了很多 BUG`
         },
         invalidJson: "无效的 JSON 请求体",
         invalidOS: "无效的操作系统参数"
@@ -22,17 +20,15 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
-               新增應用程式自動檢查更新頻率的設定功能，可在【關於】頁面中選擇自動檢查更新的頻率
-               修復清單儲存格編輯時資料可能填入異常的問題
-               最佳化應用程式關閉時設定檔儲存邏輯
-               修復滑鼠懸停提示在視窗右邊緣顯示不完全時不停閃爍的問題
-               部分檔案相關頁面新增檔案變更自動重新整理功能
-               自動流程執行指令碼功能新增環境檢測相關邏輯，可在流程詳細頁面檢視相關環境是否符合執行條件`,
+               修復版本檢測更新頻率下拉選單設定失效的問題
+               優化縮圖顯示速度
+               將 Java 與 JavaFX 版本由 26.0.1 升級至 26.0.2`,
             mac: `
-               修復清單儲存格編輯時資料可能填入異常的問題
-               最佳化應用程式關閉時設定檔儲存邏輯
-               修復滑鼠懸停提示在視窗右邊緣顯示不完全時不停閃爍的問題
-               部分檔案相關頁面新增檔案變更自動重新整理功能`
+               新增顏色識別功能，可使用拾色器進行拾色後設定目標顏色
+                新增文字識別功能，可以使用自定義traineddata模型進行文字識別
+                新增拓展標題列相關功能，開啟後可使應用標題列與應用主介面保持一致
+                重構了很多介面 UI 邏輯
+                修復了很多 BUG`
         },
         invalidJson: "無效的 JSON 請求體",
         invalidOS: "無效的作業系統參數"
@@ -41,17 +37,15 @@ module.exports = {
         versionPrefix: "Version",
         whatsNew: {
             win: `
-                Added a feature to set the frequency of automatic update checks. You can select the update check frequency on the 【About】 page
-                Fixed an issue where data might be incorrectly filled when editing list cells
-                Optimized the configuration file saving logic when the application is closed
-                Fixed an issue where tooltips on mouse hover would flicker when they couldn't be fully displayed at the right edge of the window
-                Added auto-refresh functionality for file changes on some file-related pages
-                The script execution feature in automation workflows now includes environment detection logic. You can check whether the relevant environment meets the execution conditions on the workflow details page`,
+                Fixed the issue where the drop-down menu for version update check frequency settings was not working
+                Optimized thumbnail display speed
+                Upgraded Java and JavaFX versions from 26.0.1 to 26.0.2`,
             mac: `
-               Fixed an issue where data might be incorrectly filled when editing list cells
-               Optimized the configuration file saving logic when the application is closed
-               Fixed an issue where tooltips on mouse hover would flicker when they couldn't be fully displayed at the right edge of the window
-               Added auto-refresh functionality for file changes on some file-related pages`
+               Added color recognition function, allowing users to use a color picker to pick up colors and set the target color
+               Added text recognition function, allowing for the use of custom traineddata models for text recognition
+               New features related to expanding the title bar have been added, which can make the application title bar consistent with the main interface of the application when enabled
+               Refactored a lot of interface UI logic
+               Fixed many bugs`
         },
         invalidJson: "Invalid JSON request body",
         invalidOS: "Invalid OS parameter"
