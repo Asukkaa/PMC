@@ -46,7 +46,7 @@
 
             <HBox fx:id="fileTypeHBox_FC" visible="false" spacing="10">
                 <HBox styleClass="hBox-500-5">
-                    <!--需要识别的文件拓展名:-->
+                    <!--需要识别的文件扩展名:-->
                     <Label text="%fileChooser.filterFileType"/>
                     <TextField fx:id="filterFileType_FC" prefWidth="300"/>
                 </HBox>

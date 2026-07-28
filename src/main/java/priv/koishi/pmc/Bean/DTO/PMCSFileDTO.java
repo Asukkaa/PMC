@@ -20,7 +20,7 @@ import java.util.List;
 public class PMCSFileDTO {
 
     /**
-     * 文件拓展名（默认 {@value priv.koishi.pmc.Finals.CommonFinals#PMCS}）
+     * 文件扩展名（默认 {@value priv.koishi.pmc.Finals.CommonFinals#PMCS}）
      */
     private String ext = CommonFinals.PMCS;
 

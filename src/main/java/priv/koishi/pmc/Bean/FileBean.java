@@ -24,7 +24,7 @@ public class FileBean implements FilePath {
     private String path;
 
     /**
-     * 文件列表展示文件拓展名
+     * 文件列表展示文件扩展名
      */
     private String fileType;
 

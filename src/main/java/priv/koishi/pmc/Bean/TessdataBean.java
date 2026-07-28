@@ -30,7 +30,7 @@ public class TessdataBean implements Indexable, FilePath {
     private Integer index;
 
     /**
-     * tessdata 文件名称（不带拓展名）
+     * tessdata 文件名称（不带扩展名）
      */
     private String name;
 

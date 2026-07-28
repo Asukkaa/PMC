@@ -37,7 +37,7 @@ public class FileConfig {
     private boolean recursion;
 
     /**
-     * 展示文件拓展名设置（true-展示拓展名，默认禁用）
+     * 展示文件扩展名设置（true-展示扩展名，默认禁用）
      */
     private boolean showFileType;
 

@@ -20,7 +20,7 @@
 
 本项目图像识别功能基于 JavaCV 实现的，可在自动操作流程中设置要识别的图片和终止操作图片。
 
-自动流程文件为 .pmc 与 .pmcs 文件，本质为 json 文件，更改文件拓展名只为方便过滤可导入的文件。
+自动流程文件为 .pmc 与 .pmcs 文件，本质为 json 文件，更改文件扩展名只为方便过滤可导入的文件。
 
 .pmc 文件为包含操作流程步骤信息的文件，可直接解析并执行。
 
@@ -49,7 +49,7 @@
 
 在注入模块化后即可使用 maven javafx:jlink 插件进行打包，打包后的程序文件在 [target/app](target/app)
 中，其中启动文件为 [bin](target/app/bin)目录下的 app 脚本， win 系统为 [app.bat](appBuilder/win/app.bat) 脚本， macOS
-为不带拓展名的可执行文件 [app](appBuilder/mac/app) 。
+为不带扩展名的可执行文件 [app](appBuilder/mac/app) 。
 因为程序启动需要读取配置文件，需要将 [config](src/main/resources/priv/koishi/pmc/config)
 文件夹和 [log4j2.xml](src/main/resources/log4j2.xml) 文件复制到程序启动文件 [target/app](target/app) 所在目录下。
 
