@@ -524,7 +524,7 @@ public class TableViewUtils {
         List<T> selectedItem = selectionModel.getSelectedItems();
         switch (addType) {
             // 在列表所选行第一行上方插入
-            case upAdd: {
+            case upAdd -> {
                 // 获取首个选中行的索引
                 int selectedIndex = tableViewItems.indexOf(selectedItem.getFirst());
                 // 在选中行上方插入数据
@@ -535,10 +535,9 @@ public class TableViewUtils {
                 if (selected) {
                     selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
                 }
-                break;
             }
             // 在列表所选行最后一行下方插入
-            case downAdd: {
+            case downAdd -> {
                 // 获取最后一个选中行的索引
                 int selectedIndex = tableViewItems.indexOf(selectedItem.getLast()) + 1;
                 // 在选中行下方插入数据
@@ -549,10 +548,9 @@ public class TableViewUtils {
                 if (selected) {
                     selectionModel.selectRange(selectedIndex, selectedIndex + data.size());
                 }
-                break;
             }
             // 向列表第一行上方插入
-            case topAdd: {
+            case topAdd -> {
                 // 向列表第一行追加数据
                 tableView.getItems().addAll(0, data);
                 // 滚动到插入位置
@@ -561,10 +559,9 @@ public class TableViewUtils {
                 if (selected) {
                     selectionModel.selectRange(0, data.size());
                 }
-                break;
             }
             // 向列表最后一行追加
-            case append: {
+            case append -> {
                 int lastIndex = tableViewItems.size();
                 // 向列表最后一行追加数据
                 tableViewItems.addAll(data);
@@ -574,7 +571,6 @@ public class TableViewUtils {
                 if (selected) {
                     selectionModel.selectRange(lastIndex, lastIndex + data.size());
                 }
-                break;
             }
         }
         // 同步表格数据量

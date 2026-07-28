@@ -1027,29 +1027,12 @@ public class FileUtils {
         double gb = mb * kb;
         double tb = gb * kb;
         switch (unit) {
-            case Byte: {
-                compareValue = Double.parseDouble(size);
-                break;
-            }
-            case KB: {
-                compareValue = Double.parseDouble(size) * kb;
-                break;
-            }
-            case MB: {
-                compareValue = Double.parseDouble(size) * mb;
-                break;
-            }
-            case GB: {
-                compareValue = Double.parseDouble(size) * gb;
-                break;
-            }
-            case TB: {
-                compareValue = Double.parseDouble(size) * tb;
-                break;
-            }
-            default: {
-                compareValue = Double.parseDouble(size) * tb * kb;
-            }
+            case Byte -> compareValue = Double.parseDouble(size);
+            case KB -> compareValue = Double.parseDouble(size) * kb;
+            case MB -> compareValue = Double.parseDouble(size) * mb;
+            case GB -> compareValue = Double.parseDouble(size) * gb;
+            case TB -> compareValue = Double.parseDouble(size) * tb;
+            default -> compareValue = Double.parseDouble(size) * tb * kb;
         }
         return compareValue;
     }
