@@ -1122,4 +1122,17 @@ public class FileUtils {
         return normalized.isAbsolute() && normalized.getNameCount() == 0;
     }
 
+    /**
+     * 校验输出文件夹是否存在，不存在就创建一个
+     *
+     * @param path 要校验的路径
+     */
+    public static void checkDirectory(String path) {
+        if (!new File(path).exists()) {
+            if (!new File(path).mkdirs()) {
+                throw new RuntimeException("创建文件夹 " + path + " 失败");
+            }
+        }
+    }
+
 }

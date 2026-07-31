@@ -4,6 +4,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.TableView;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.TaskBean;
 import priv.koishi.pmc.Bean.TessdataBean;
 import tools.jackson.core.type.TypeReference;
@@ -38,6 +40,11 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 public class TessdataService {
 
     /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(TessdataService.class);
+
+    /**
      * 批量加载 .traineddata 模型文件任务线程
      *
      * @param taskBean 线程任务参数
@@ -63,10 +70,14 @@ public class TessdataService {
                 updateProgress(0, size);
                 for (int i = 0; i < size; i++) {
                     File file = selectedFiles.get(i);
-                    Path tessdataPath = Path.of(getTessdataPath() + File.separator + file.getName());
+                    String path = getTessdataPath();
+                    // 校验模型目录是否存在，不存在则创建
+                    checkDirectory(path);
+                    Path tessdataPath = Path.of(path + File.separator + file.getName());
                     try {
                         // 将模型文件复制到 tessdata 目录
                         Files.copy(file.toPath(), tessdataPath, StandardCopyOption.REPLACE_EXISTING);
+                        logger.info("已复制模型文件到：{}", tessdataPath);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
