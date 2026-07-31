@@ -196,8 +196,9 @@ public class UiUtils {
         List<FileChooser.ExtensionFilter> extensionFilters = new ArrayList<>();
         extensionFilters.add(new FileChooser.ExtensionFilter(text_image(), allImageType));
         extensionFilters.add(new FileChooser.ExtensionFilter(png, allPng));
-        extensionFilters.add(new FileChooser.ExtensionFilter(jpg, allJpg));
-        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpeg));
+        extensionFilters.add(new FileChooser.ExtensionFilter(jpeg, allJpg, allJpeg, allJpe, allJfif, allJif));
+        extensionFilters.add(new FileChooser.ExtensionFilter(bmp, allBmp));
+        extensionFilters.add(new FileChooser.ExtensionFilter(gif, allGif));
         return extensionFilters;
     }
 

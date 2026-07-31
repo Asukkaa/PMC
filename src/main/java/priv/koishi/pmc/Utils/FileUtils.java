@@ -1130,7 +1130,7 @@ public class FileUtils {
     public static void checkDirectory(String path) {
         if (!new File(path).exists()) {
             if (!new File(path).mkdirs()) {
-                throw new RuntimeException("创建文件夹 " + path + " 失败");
+                throw new RuntimeException(text_mkdirsErr() + path);
             }
         }
     }

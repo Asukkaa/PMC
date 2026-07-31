@@ -158,9 +158,34 @@ public class CommonFinals {
     public static final String jpeg = ".jpeg";
 
     /**
+     * 文件后缀名：jpe
+     */
+    public static final String jpe = ".jpe";
+
+    /**
+     * 文件后缀名：jfif
+     */
+    public static final String jfif = ".jfif";
+
+    /**
+     * 文件后缀名：jif
+     */
+    public static final String jif = ".jif";
+
+    /**
+     * 文件后缀名：bmp
+     */
+    public static final String bmp = ".bmp";
+
+    /**
+     * 文件后缀名：gif
+     */
+    public static final String gif = ".gif";
+
+    /**
      * 图片格式后缀名列表
      */
-    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg);
+    public static final List<String> imageType = Arrays.asList(png, jpg, jpeg, jpe, jfif, jif, bmp, gif);
 
     /**
      * 文件后缀名匹配符：png
@@ -178,9 +203,34 @@ public class CommonFinals {
     public static final String allJpeg = "*.jpeg";
 
     /**
+     * 文件后缀名匹配符：jpe
+     */
+    public static final String allJpe = "*.jpe";
+
+    /**
+     * 文件后缀名匹配符：jfif
+     */
+    public static final String allJfif = ".jfif";
+
+    /**
+     * 文件后缀名匹配符：jif
+     */
+    public static final String allJif = ".jif";
+
+    /**
+     * 文件后缀名匹配符：bmp
+     */
+    public static final String allBmp = "*.bmp";
+
+    /**
+     * 文件后缀名匹配符：gif
+     */
+    public static final String allGif = "*.gif";
+
+    /**
      * 图片格式后缀名匹配符列表
      */
-    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg);
+    public static final List<String> allImageType = Arrays.asList(allPng, allJpg, allJpeg, allJpe, allJfif, allJif, allBmp, allGif);
 
     /**
      * 文件后缀名匹配符：bat

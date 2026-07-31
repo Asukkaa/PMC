@@ -332,8 +332,20 @@ public class ImageRecognitionService {
              Mat templateMat = opencv_imgcodecs.imdecode(new Mat(bytes), opencv_imgcodecs.IMREAD_UNCHANGED)) {
             // 转换为灰度图提升处理效率
             try (Mat screenGray = new Mat(); Mat templateGray = new Mat()) {
-                cvtColor(screenMat, screenGray, COLOR_BGR2GRAY);
-                cvtColor(templateMat, templateGray, COLOR_BGR2GRAY);
+                // 处理屏幕截图（来自 Robot，通常为 3 通道或 4 通道，统一转 BGR）
+                if (screenMat.channels() == 4) {
+                    cvtColor(screenMat, screenGray, COLOR_BGRA2GRAY);
+                } else {
+                    cvtColor(screenMat, screenGray, COLOR_BGR2GRAY);
+                }
+                // 处理模板图片
+                if (templateMat.channels() == 4) {
+                    // 带透明通道的 PNG/WebP，用 BGRA2GRAY
+                    cvtColor(templateMat, templateGray, COLOR_BGRA2GRAY);
+                } else {
+                    // 普通的 JPEG/BMP（3通道 BGR）
+                    cvtColor(templateMat, templateGray, COLOR_BGR2GRAY);
+                }
                 // DPI 缩放补偿：根据系统缩放反向调整模板尺寸
                 try (Mat dpiAdjustedTemplate = new Mat()) {
                     resize(templateGray, dpiAdjustedTemplate,
