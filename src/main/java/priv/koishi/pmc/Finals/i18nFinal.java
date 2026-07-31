@@ -2365,6 +2365,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 创建文件夹失败：
+     */
+    public static String text_mkdirsErr() {
+        return bundle.getString("mkdirsErr");
+    }
+
+    /**
      * @return 步骤详情
      */
     public static String clickDetail_title() {
