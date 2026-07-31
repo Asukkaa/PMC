@@ -4,6 +4,7 @@ module.exports = {
         whatsNew: {
             win: `
                  修复版本检测更新频率下拉框设置失效的问题
+                 修复导入 tessdata 模型文件可能会报错的问题
                  优化缩略图显示速度
                  升级 Java 与 JavaFx 版本有 26.0.1 至 26.0.2`,
             mac: `
@@ -21,6 +22,7 @@ module.exports = {
         whatsNew: {
             win: `
                 修復版本檢測更新頻率下拉選單設定失效的問題
+                修復導入 tessdata 模型文件可能報錯的問題
                 優化縮圖顯示速度
                 將 Java 與 JavaFX 版本由 26.0.1 升級至 26.0.2`,
             mac: `
@@ -38,6 +40,7 @@ module.exports = {
         whatsNew: {
             win: `
                 Fixed the issue where the drop-down menu for version update check frequency settings was not working
+                Fix the issue where importing tessdata model files may cause errors
                 Optimized thumbnail display speed
                 Upgraded Java and JavaFX versions from 26.0.1 to 26.0.2`,
             mac: `
