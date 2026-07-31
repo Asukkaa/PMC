@@ -692,7 +692,7 @@
                     <!--图片地址-->
                     <TableColumn fx:id="path_Set" text="%stopImg.path" sortable="false"/>
                     <!--图片类型-->
-                    <TableColumn fx:id="type_Set" text="%stopImg.type" sortable="false"/>
+                    <TableColumn fx:id="fileType_Set" text="%stopImg.type" sortable="false"/>
                 </columns>
             </TableView>
 

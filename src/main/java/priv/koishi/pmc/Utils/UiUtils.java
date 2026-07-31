@@ -605,7 +605,7 @@ public class UiUtils {
             ImgFileVO bean = new ImgFileVO();
             bean.setTableView(tableView)
                     .setName(getFileName(path))
-                    .setType(getExistsFileType(file))
+                    .setFileType(getExistsFileType(file))
                     .setPath(path);
             tableView.getItems().add(bean);
             index++;

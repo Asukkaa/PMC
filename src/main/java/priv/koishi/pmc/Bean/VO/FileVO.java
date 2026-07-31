@@ -1,19 +1,20 @@
 package priv.koishi.pmc.Bean.VO;
 
-import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.FileBean;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
 import priv.koishi.pmc.Bean.Interface.Indexable;
+import priv.koishi.pmc.Thumb.ThumbnailSupport;
 
-import java.io.File;
-
-import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
+import static priv.koishi.pmc.Thumb.ThumbnailLoader.clearCache;
+import static priv.koishi.pmc.Thumb.ThumbnailLoader.loadThumbnail;
 
 /**
  * JavaFX 列表展示文件信息类
@@ -25,11 +26,12 @@ import static priv.koishi.pmc.Utils.FileUtils.isImgFile;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class FileVO extends FileBean implements Indexable, ImgBean {
+public class FileVO extends FileBean implements Indexable, ImgBean, ThumbnailSupport {
 
     /**
      * 序号
      */
+    @IndexColumn
     private Integer index;
 
     /**
@@ -43,11 +45,6 @@ public class FileVO extends FileBean implements Indexable, ImgBean {
     private TableView<FileVO> tableView;
 
     /**
-     * 加载缩略图线程
-     */
-    private transient Thread currentThumbThread;
-
-    /**
      * 获取缩略图
      *
      * @return 当前图片表格的缩略图
@@ -58,55 +55,39 @@ public class FileVO extends FileBean implements Indexable, ImgBean {
             return null;
         }
         if (thumb == null) {
-            // 异步加载缩略图（防止阻塞UI）
-            loadThumbnailAsync();
+            // 异步加载缩略图
+            loadThumbnail(this);
         }
         return thumb;
     }
 
     /**
-     * 异步加载并更新缩略图
+     * 刷新表格中当前行（使用替换自身的方式，只影响一行）
      */
-    private void loadThumbnailAsync() {
-        try {
-            String path = getPath();
-            if (isImgFile(new File(path))) {
-                // 终止进行中的线程
-                if (currentThumbThread != null && currentThumbThread.isAlive()) {
-                    currentThumbThread.interrupt();
+    @Override
+    public void refreshTableRow() {
+        if (tableView != null) {
+            try {
+                ObservableList<FileVO> items = tableView.getItems();
+                int idx = items.indexOf(this);
+                if (idx >= 0) {
+                    // 通过 set 操作触发该行单元格重绘，性能远优于全表 refresh()
+                    items.set(idx, this);
                 }
-                // 创建新的虚拟线程
-                currentThumbThread = Thread.ofVirtual()
-                        .name("thumbnail-loader-")
-                        .unstarted(() -> {
-                            try {
-                                if (StringUtils.isNotBlank(path)) {
-                                    Image image = new Image("file:" + path,
-                                            100,
-                                            100,
-                                            true,
-                                            true,
-                                            true);
-                                    Platform.runLater(() -> {
-                                        thumb = image;
-                                        if (tableView != null) {
-                                            tableView.refresh();
-                                        }
-                                    });
-                                }
-                            } catch (Exception e) {
-                                if (!Thread.currentThread().isInterrupted()) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                        });
-                currentThumbThread.start();
-            } else {
-                thumb = null;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 设置缩略图
+     *
+     * @param thumb 缩略图
+     */
+    @Override
+    public void setThumb(Image thumb) {
+        this.thumb = thumb;
     }
 
     /**
@@ -114,14 +95,10 @@ public class FileVO extends FileBean implements Indexable, ImgBean {
      */
     @Override
     public void clearResources() {
-        if (currentThumbThread != null) {
-            currentThumbThread.interrupt();
-            currentThumbThread = null;
-        }
-        if (thumb != null) {
-            thumb.cancel();
-        }
         thumb = null;
+        tableView = null;
+        // 清理所有缓存
+        clearCache();
     }
 
     /**

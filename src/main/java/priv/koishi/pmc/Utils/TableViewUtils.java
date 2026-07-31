@@ -252,7 +252,17 @@ public class TableViewUtils {
             }
             try {
                 Field field = getCachedField(bean.getClass(), fieldName);
-                return new SimpleBooleanProperty(field.getBoolean(bean));
+                Class<?> fieldType = field.getType();
+                if (fieldType == boolean.class || fieldType == Boolean.class) {
+                    // 原生 boolean 或 Boolean 包装类
+                    return new SimpleBooleanProperty(field.getBoolean(bean));
+                } else if (fieldType == BooleanProperty.class) {
+                    // BooleanProperty 类型（直接返回，因为本身已是 ObservableValue）
+                    return (BooleanProperty) field.get(bean);
+                } else {
+                    // 其他类型降级处理
+                    return new SimpleBooleanProperty(false);
+                }
             } catch (Exception e) {
                 return new SimpleBooleanProperty(false);
             }
@@ -298,7 +308,15 @@ public class TableViewUtils {
                 if (currentBean != null) {
                     try {
                         Field field = getCachedField(currentBean.getClass(), fieldName);
-                        field.setBoolean(currentBean, newValue);
+                        Class<?> fieldType = field.getType();
+                        if (fieldType == boolean.class || fieldType == Boolean.class) {
+                            // 原生 boolean 或 Boolean 包装类
+                            field.setBoolean(currentBean, newValue);
+                        } else if (fieldType == BooleanProperty.class) {
+                            // BooleanProperty 类型（调用 set 方法）
+                            BooleanProperty prop = (BooleanProperty) field.get(currentBean);
+                            prop.set(newValue);
+                        }
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -979,7 +997,7 @@ public class TableViewUtils {
                         }
                     } else {
                         selectedItem.setPath(file.getPath());
-                        selectedItem.setType(getExistsFileType(file));
+                        selectedItem.setFileType(getExistsFileType(file));
                         selectedItem.setName(getExistsFileName(file));
                     }
                     selectedItem.updateThumb();

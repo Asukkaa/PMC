@@ -5,6 +5,8 @@ import lombok.experimental.Accessors;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 
 /**
+ * 文件属性类
+ *
  * @author KOISHI
  * Date:2025-08-26
  * Time:18:25

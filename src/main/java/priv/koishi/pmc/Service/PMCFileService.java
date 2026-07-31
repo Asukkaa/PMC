@@ -451,7 +451,7 @@ public class PMCFileService {
                         if (!isExist) {
                             ImgFileVO imgFileVO = new ImgFileVO();
                             imgFileVO.setTableView(tableView)
-                                    .setType(getExistsFileType(file))
+                                    .setFileType(getExistsFileType(file))
                                     .setName(file.getName())
                                     .setPath(file.getPath());
                             items.add(imgFileVO);

@@ -26,7 +26,7 @@ public class ImgFileBean implements FilePath {
     /**
      * 文件类型
      */
-    private String type;
+    private String fileType;
 
     /**
      * 文件地址

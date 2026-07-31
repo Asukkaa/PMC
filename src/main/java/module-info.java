@@ -54,4 +54,6 @@ module priv.koishi.pmc {
     exports priv.koishi.pmc.UI.CustomMessageBubble;
     exports priv.koishi.pmc.Finals.DefaultConfig;
     opens priv.koishi.pmc.Finals.DefaultConfig to javafx.fxml;
+    exports priv.koishi.pmc.Thumb;
+    opens priv.koishi.pmc.Thumb to javafx.fxml;
 }

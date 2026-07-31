@@ -140,8 +140,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
     public TableColumn<FileVO, ImageView> thumb_FC;
 
     @FXML
-    public TableColumn<FileVO, String> name_FC, path_FC, size_FC, fileType_FC,
-            creatDate_FC, updateDate_FC, showStatus_FC;
+    public TableColumn<FileVO, String> name_FC, path_FC, size_FC, fileType_FC, creatDate_FC, updateDate_FC, showStatus_FC;
 
     /**
      * 初始化数据

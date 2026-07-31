@@ -351,7 +351,7 @@ public class ClickDetailController extends RootController {
     public TableColumn<ImgFileVO, ImageView> thumb_Det;
 
     @FXML
-    public TableColumn<ImgFileVO, String> name_Det, path_Det, type_Det;
+    public TableColumn<ImgFileVO, String> name_Det, path_Det, fileType_Det;
 
     @FXML
     public TableView<TessdataBean> tessdataTableView_det;
@@ -393,7 +393,7 @@ public class ClickDetailController extends RootController {
         thumb_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         name_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         path_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.3));
-        type_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
+        fileType_Det.prefWidthProperty().bind(tableView_Det.widthProperty().multiply(0.2));
         // .traineddata 模型文件列表自适应
         index_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.07));
         name_det.prefWidthProperty().bind(tessdataTableView_det.widthProperty().multiply(0.2));
@@ -539,7 +539,7 @@ public class ClickDetailController extends RootController {
                 // 必须重新创建对象才能正确刷新列表图片
                 ImgFileVO imgFileVO = new ImgFileVO();
                 imgFileVO.setTableView(tableView_Det)
-                        .setType(b.getType())
+                        .setFileType(b.getFileType())
                         .setName(b.getName())
                         .setPath(b.getPath());
                 items.add(imgFileVO);

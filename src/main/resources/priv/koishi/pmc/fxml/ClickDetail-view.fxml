@@ -509,7 +509,7 @@
                                         <!--图片地址-->
                                         <TableColumn fx:id="path_Det" text="%stopImg.path" sortable="false"/>
                                         <!--图片类型-->
-                                        <TableColumn fx:id="type_Det" text="%stopImg.type" sortable="false"/>
+                                        <TableColumn fx:id="fileType_Det" text="%stopImg.type" sortable="false"/>
                                     </columns>
                                 </TableView>
                             </VBox>

@@ -265,7 +265,7 @@ public class SettingController extends RootController implements MousePositionUp
     public TableColumn<ImgFileVO, ImageView> thumb_Set;
 
     @FXML
-    public TableColumn<ImgFileVO, String> name_Set, type_Set, path_Set;
+    public TableColumn<ImgFileVO, String> name_Set, fileType_Set, path_Set;
 
     @FXML
     public TableView<TessdataBean> tessdataTableView_set;
@@ -305,7 +305,7 @@ public class SettingController extends RootController implements MousePositionUp
         thumb_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
         name_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.2));
         path_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.4));
-        type_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
+        fileType_Set.prefWidthProperty().bind(tableView_Set.widthProperty().multiply(0.1));
         // .traineddata 模型文件列表自适应
         index_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.1));
         name_set.prefWidthProperty().bind(tessdataTableView_set.widthProperty().multiply(0.2));
