@@ -73,7 +73,7 @@ public class TessdataService {
                     String path = getTessdataPath();
                     // 校验模型目录是否存在，不存在则创建
                     checkDirectory(path);
-                    Path tessdataPath = Path.of(path + File.separator + file.getName());
+                    Path tessdataPath = Path.of(path, file.getName());
                     try {
                         // 将模型文件复制到 tessdata 目录
                         Files.copy(file.toPath(), tessdataPath, StandardCopyOption.REPLACE_EXISTING);
