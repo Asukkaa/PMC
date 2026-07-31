@@ -53,15 +53,15 @@
 
         <HBox spacing="10">
             <HBox styleClass="hBox-290-5">
-                <!--自动操作工具页面加载上次设置-->
-                <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction" selected="true"
-                          text="%setting.loadAutoClick_Set"/>
+                <!--关闭应用时自动保存 PMC 文件-->
+                <CheckBox fx:id="autoSavePMC_Set" onAction="#autoSavePMCAction" selected="true"
+                          text="%setting.autoSavePMC_Set"/>
             </HBox>
 
             <HBox styleClass="hBox-290-5">
-                <!--批量执行 PMC 文件页面加载上次设置-->
-                <CheckBox fx:id="loadPMCS_Set" onAction="#loadPMMCSAction" selected="true"
-                          text="%setting.loadPMCS_Set"/>
+                <!--关闭应用时自动保存 PMCS 文件-->
+                <CheckBox fx:id="autoSavePMCS_Set" onAction="#autoSavePMCSAction" selected="true"
+                          text="%setting.autoSavePMCS_Set"/>
             </HBox>
 
             <HBox styleClass="hBox-290-5">
@@ -79,31 +79,17 @@
 
         <HBox spacing="10">
             <HBox styleClass="hBox-290-5">
-                <!--关闭应用时自动保存 PMC 文件-->
-                <CheckBox fx:id="autoSavePMC_Set" onAction="#autoSavePMCAction" selected="true"
-                          text="%setting.autoSavePMC_Set"/>
+                <!--自动操作工具页面加载上次设置-->
+                <CheckBox fx:id="loadAutoClick_Set" onAction="#loadAutoClickAction" selected="true"
+                          text="%setting.loadAutoClick_Set"/>
             </HBox>
 
             <HBox styleClass="hBox-290-5">
-                <!--关闭应用时自动保存 PMCS 文件-->
-                <CheckBox fx:id="autoSavePMCS_Set" onAction="#autoSavePMCSAction" selected="true"
-                          text="%setting.autoSavePMCS_Set"/>
+                <!--批量执行 PMC 文件页面加载上次设置-->
+                <CheckBox fx:id="loadPMCS_Set" onAction="#loadPMMCSAction" selected="true"
+                          text="%setting.loadPMCS_Set"/>
             </HBox>
 
-            <HBox styleClass="hBox-290-5">
-                <!--语言设置（重启后生效）：-->
-                <Label text="%setting.language"/>
-                <ChoiceBox fx:id="language_Set" prefWidth="100" onAction="#languageAction"/>
-            </HBox>
-
-            <HBox styleClass="hBox-290-5">
-                <!--外观设置：-->
-                <Label text="%setting.theme"/>
-                <ChoiceBox fx:id="theme_Set" prefWidth="150" onAction="#themeAction"/>
-            </HBox>
-        </HBox>
-
-        <HBox spacing="10">
             <HBox styleClass="hBox-290-5">
                 <!--文件列表计算文件夹大小-->
                 <CheckBox fx:id="checkDirectory_Set" onAction="#checkDirectory" selected="true"
@@ -114,6 +100,20 @@
                 <!--快速加载缩略图-->
                 <CheckBox fx:id="quickThumb_Set" onAction="#quickThumbAction" selected="true"
                           text="%setting.quickThumb_Set"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <HBox styleClass="hBox-290-5">
+                <!--语言设置（重启后生效）：-->
+                <Label text="%setting.language"/>
+                <ChoiceBox fx:id="language_Set" prefWidth="100" onAction="#languageAction"/>
+            </HBox>
+
+            <HBox styleClass="hBox-290-5">
+                <!--外观设置：-->
+                <Label text="%setting.theme"/>
+                <ChoiceBox fx:id="theme_Set" prefWidth="150" onAction="#themeAction"/>
             </HBox>
         </HBox>
 
