@@ -3,6 +3,7 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
+                 图像识别新增更多可选图片格式
                  修复版本检测更新频率下拉框设置失效的问题
                  修复导入 tessdata 模型文件可能会报错的问题
                  优化缩略图显示速度
@@ -21,6 +22,7 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
+                圖像識別新增更多可選圖片格式
                 修復版本檢測更新頻率下拉選單設定失效的問題
                 修復導入 tessdata 模型文件可能報錯的問題
                 優化縮圖顯示速度
@@ -39,6 +41,7 @@ module.exports = {
         versionPrefix: "Version",
         whatsNew: {
             win: `
+                Image recognition adds more optional image formats
                 Fixed the issue where the drop-down menu for version update check frequency settings was not working
                 Fix the issue where importing tessdata model files may cause errors
                 Optimized thumbnail display speed
