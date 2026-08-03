@@ -1055,8 +1055,8 @@ public class FileUtils {
      * @return 不同环境下 tessdata 路径
      */
     public static String getTessdataPath() {
-        if (isRunningFromIDEA()) {
-            return appBuilder + File.separator + File.separator + tessdata;
+        if (isRunningFromIDEA) {
+            return appBuilder + File.separator + tessdata;
         }
         return getAppResourcePath(tessdata);
     }
