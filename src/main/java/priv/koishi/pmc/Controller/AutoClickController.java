@@ -2055,10 +2055,8 @@ public class AutoClickController extends RootController implements MousePosition
 
     /**
      * 页面加载完毕后的执行逻辑
-     *
-     * @param event 设置页加载完成事件
      */
-    private void settingsLoaded(SettingsLoadedEvent event) {
+    private void settingsLoaded() {
         // 设置快捷键提示
         setShortcutText();
         // 设置要防重复点击的组件
@@ -2177,7 +2175,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 构建右键菜单
             buildContextMenu();
             // 等待设置加载完毕
-            EventBus.subscribe(SettingsLoadedEvent.class, this::settingsLoaded);
+            EventBus.subscribe(SettingsLoadedEvent.class, _ -> settingsLoaded());
             // 加载完成后发布事件
             EventBus.publish(new AutoClickLoadedEvent());
         });

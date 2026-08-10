@@ -567,10 +567,8 @@ public class ListPMCController extends RootController {
 
     /**
      * 页面加载完毕后的执行逻辑
-     *
-     * @param event 设置页加载完成事件
      */
-    private void autoClickLoaded(AutoClickLoadedEvent event) {
+    private void autoClickLoaded() {
         if (noScreenCapturePermission) {
             setNodeDisable(runClick_List, true, autoClick_noPermissions());
             err_List.setText(tip_noScreenCapturePermission());
@@ -657,7 +655,7 @@ public class ListPMCController extends RootController {
             // 构建右键菜单
             buildContextMenu();
             // 等待设置加载完毕
-            EventBus.subscribe(AutoClickLoadedEvent.class, this::autoClickLoaded);
+            EventBus.subscribe(AutoClickLoadedEvent.class, _ -> autoClickLoaded());
         });
     }
 
