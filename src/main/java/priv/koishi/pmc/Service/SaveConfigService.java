@@ -2,9 +2,9 @@ package priv.koishi.pmc.Service;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
-
-import java.io.IOException;
 
 import static priv.koishi.pmc.Controller.MainController.*;
 import static priv.koishi.pmc.MainApplication.mainController;
@@ -19,6 +19,11 @@ import static priv.koishi.pmc.MainApplication.mainController;
 public class SaveConfigService {
 
     /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(SaveConfigService.class);
+
+    /**
      * 保存应用配置任务
      *
      * @return 无返回值的 Task
@@ -26,27 +31,47 @@ public class SaveConfigService {
     public static Task<Void> saveAllConfig() {
         return new Task<>() {
             @Override
-            protected Void call() throws IOException {
+            protected Void call() {
                 Platform.runLater(() -> new MessageBubble("保存配置并关闭应用中", 0));
+                // 保存关程序闭前页面状态设置
+                if (mainController != null) {
+                    try {
+                        mainController.saveLastConfig();
+                    } catch (Exception e) {
+                        logger.error(e, e);
+                    }
+                }
                 // 保存自动操作工具功能最后设置
                 if (autoClickController != null) {
-                    autoClickController.saveLastConfig();
+                    try {
+                        autoClickController.saveLastConfig();
+                    } catch (Exception e) {
+                        logger.error(e, e);
+                    }
                 }
                 // 保存设置功能最后设置
                 if (settingController != null) {
-                    settingController.saveLastConfig();
+                    try {
+                        settingController.saveLastConfig();
+                    } catch (Exception e) {
+                        logger.error(e, e);
+                    }
                 }
                 // 保存日志文件数量设置
                 if (aboutController != null) {
-                    aboutController.saveLastConfig();
+                    try {
+                        aboutController.saveLastConfig();
+                    } catch (Exception e) {
+                        logger.error(e, e);
+                    }
                 }
                 // 保存批量执行 PMC 文件页面设置
                 if (listPMCController != null) {
-                    listPMCController.saveLastConfig();
-                }
-                // 保存关程序闭前页面状态设置
-                if (mainController != null) {
-                    mainController.saveLastConfig();
+                    try {
+                        listPMCController.saveLastConfig();
+                    } catch (Exception e) {
+                        logger.error(e, e);
+                    }
                 }
                 return null;
             }
