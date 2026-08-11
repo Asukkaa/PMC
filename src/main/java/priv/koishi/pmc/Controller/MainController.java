@@ -275,19 +275,19 @@ public class MainController extends RootController {
      * @throws IOException 配置文件保存异常
      */
     public void saveLastConfig() throws IOException {
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         Properties prop = new Properties();
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
         Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
         prop.put(key_lastTab, selectedTab.getId());
         String fullWindow = mainStage.isFullScreen() ? enable : disable;
         prop.put(key_fullWindow, fullWindow);
         String maximize = mainStage.isMaximized() ? enable : disable;
         prop.put(key_maxWindow, maximize);
-        OutputStream output = new FileOutputStream(getRunningResourcePath(configFile));
-        prop.store(output, null);
-        input.close();
-        output.close();
+        try (OutputStream output = new FileOutputStream(getRunningResourcePath(configFile))) {
+            prop.store(output, null);
+        }
     }
 
 }

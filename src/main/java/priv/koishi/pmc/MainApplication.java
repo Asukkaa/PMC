@@ -159,8 +159,10 @@ public class MainApplication extends Application {
     public void start(Stage stage) throws IOException {
         mainStage = stage;
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
-        prop.load(input);
+        TabPane tabPane;
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
         // 设置外观
         int theme = Integer.parseInt(prop.getProperty(key_theme));
         changeTheme(theme);
@@ -186,7 +188,7 @@ public class MainApplication extends Application {
         // 设置 css 样式
         setWindowCss(mainScene, stylesCss);
         mainController = fxmlLoader.getController();
-        TabPane tabPane = mainController.tabPane;
+        tabPane = mainController.tabPane;
         // 设置默认选中的 Tab
         if (loadPMC) {
             tabPane.getSelectionModel().select(mainController.autoClickTab);
@@ -200,7 +202,6 @@ public class MainApplication extends Application {
                 }
             }
         }
-        input.close();
         // 初始化 macOS 系统应用菜单
         if (isMac) {
             initMenu(tabPane);
@@ -348,18 +349,18 @@ public class MainApplication extends Application {
             try {
                 serverSocket = new ServerSocket(port);
                 while (!serverSocket.isClosed()) {
-                    Socket socket = serverSocket.accept();
-                    InputStream in = socket.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    // 读取第一行为激活标记
-                    String signal = reader.readLine();
-                    if (activatePMC.equals(signal)) {
-                        // 只有在程序空闲时才弹出程序窗口
-                        if (autoClickController.isFree()) {
-                            showWindow(reader);
+                    try (Socket socket = serverSocket.accept()) {
+                        InputStream in = socket.getInputStream();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        // 读取第一行为激活标记
+                        String signal = reader.readLine();
+                        if (activatePMC.equals(signal)) {
+                            // 只有在程序空闲时才弹出程序窗口
+                            if (autoClickController.isFree()) {
+                                showWindow(reader);
+                            }
                         }
                     }
-                    socket.close();
                 }
             } catch (BindException e) {
                 // 发送激活正在运行的程序窗口信号
@@ -623,9 +624,11 @@ public class MainApplication extends Application {
         // 校验配置文件
         checkConfigFile();
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
-        prop.load(input);
-        int port = Integer.parseInt(getPropertyWithDefault(prop, key_appPort, configProperties));
+        int port;
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
+        port = Integer.parseInt(getPropertyWithDefault(prop, key_appPort, configProperties));
         String firstRunValue = prop.getProperty(key_firstRun);
         // 首次运行时如果有对应语言包则使用操作系统设置的语言
         if (enable.equals(firstRunValue)) {
@@ -649,7 +652,6 @@ public class MainApplication extends Application {
         }
         // 更新映射文本
         updateAllDynamicTexts();
-        input.close();
         // 启动时检查是否已经启动
         if (checkRunning(port, args)) {
             System.exit(0);

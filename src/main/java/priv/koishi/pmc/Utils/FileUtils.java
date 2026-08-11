@@ -108,14 +108,14 @@ public class FileUtils {
      * @throws IOException 配置文件保存异常
      */
     public static void updateProperties(String properties, String key, String value) throws IOException {
-        InputStream input = new FileInputStream(getRunningResourcePath(properties));
         Properties prop = new Properties();
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(properties))) {
+            prop.load(input);
+        }
         prop.put(key, value);
-        OutputStream output = new FileOutputStream(getRunningResourcePath(properties));
-        prop.store(output, null);
-        input.close();
-        output.close();
+        try (OutputStream output = new FileOutputStream(getRunningResourcePath(properties))) {
+            prop.store(output, null);
+        }
     }
 
     /**

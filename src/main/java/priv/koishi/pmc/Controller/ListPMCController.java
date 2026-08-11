@@ -167,9 +167,11 @@ public class ListPMCController extends RootController {
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_List != null) {
-            InputStream input = new FileInputStream(getRunningResourcePath(configFile_List));
+            String outPathValue;
             Properties prop = new Properties();
-            prop.load(input);
+            try (InputStream input = new FileInputStream(getRunningResourcePath(configFile_List))) {
+                prop.load(input);
+            }
             prop.put(key_loopTime, loopTime_List.getText());
             prop.put(key_outFileName, outFileName_List.getText());
             String lastOpenDirectoryValue = openDirectory_List.isSelected() ? enable : disable;
@@ -179,12 +181,11 @@ public class ListPMCController extends RootController {
             String loadFolderValue = loadFolder_List.isSelected() ? enable : disable;
             prop.put(key_loadFolder, loadFolderValue);
             prop.put(key_preparationRunTime, preparationRunTime_List.getText());
-            String outPathValue = outPath_List.getText();
+            outPathValue = outPath_List.getText();
             prop.put(key_outFilePath, outPathValue);
-            OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_List));
-            prop.store(output, null);
-            input.close();
-            output.close();
+            try (OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_List))) {
+                prop.store(output, null);
+            }
             CheckBox autoSave = settingController.autoSavePMCS_Set;
             // 自动保存
             autoSave(autoSave, outPathValue);
@@ -229,8 +230,9 @@ public class ListPMCController extends RootController {
      */
     private void setLastConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile_List));
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile_List))) {
+            prop.load(input);
+        }
         if (enable.equals(prop.getProperty(key_loadConfig, enable))) {
             setControlLastConfig(outPath_List, prop, key_outFilePath);
             setControlLastConfig(loadFolder_List, prop, key_loadFolder, listPMCProperties);
@@ -244,7 +246,6 @@ public class ListPMCController extends RootController {
             setPathLabel(outPath_List, defaultFileChooserPath);
         }
         inFilePath = prop.getProperty(key_inFilePath);
-        input.close();
     }
 
     /**

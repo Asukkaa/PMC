@@ -1080,13 +1080,13 @@ public class ClickDetailController extends RootController {
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click))) {
+            prop.load(input);
+        }
         stopRetryNumDefault = prop.getProperty(key_defaultStopRetryNum, defaultStopRetryNum);
         stopRetryNumDefault = StringUtils.isBlank(stopRetryNumDefault) ? defaultStopRetryNum : stopRetryNumDefault;
         clickRetryNumDefault = prop.getProperty(key_defaultClickRetryNum, defaultClickRetryNum);
         clickRetryNumDefault = StringUtils.isBlank(clickRetryNumDefault) ? defaultClickRetryNum : clickRetryNumDefault;
-        input.close();
     }
 
     /**

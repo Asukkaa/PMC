@@ -321,19 +321,19 @@ public class SettingController extends RootController implements MousePositionUp
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_Set != null) {
-            InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
             Properties prop = new Properties();
-            prop.load(input);
+            try (InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click))) {
+                prop.load(input);
+            }
             // 保存功能设置
             saveFunctionConfig(prop);
             // 保存终止操作图像设置
             saveStopImg(prop);
             // 保存绑定的窗口路径
             saveWindowPath(prop);
-            OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_Click));
-            prop.store(output, null);
-            input.close();
-            output.close();
+            try (OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_Click))) {
+                prop.store(output, null);
+            }
             // 保存 JVM 参数设置
             saveJVMConfig();
             // 保存语言设置
@@ -582,8 +582,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void loadFunctionConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream clickFileInput = new FileInputStream(getRunningResourcePath(configFile_Click));
-        prop.load(clickFileInput);
+        try (InputStream clickFileInput = new FileInputStream(getRunningResourcePath(configFile_Click))) {
+            prop.load(clickFileInput);
+        }
         setControlLastConfig(overtime_Set, prop, key_overtime);
         setControlLastConfig(imgLog_Set, prop, key_imgLog, clickProperties);
         setControlLastConfig(moveLog_Set, prop, key_moveLog, clickProperties);
@@ -648,13 +649,12 @@ public class SettingController extends RootController implements MousePositionUp
         setControlLastConfig(randomTimeOffset_Set, prop, key_randomTimeOffset, clickProperties);
         // 加载应用图像识别配置
         loadFindImgConfig(prop);
-        clickFileInput.close();
         prop = new Properties();
-        InputStream listConfigInput = new FileInputStream(getRunningResourcePath(configFile_List));
-        prop.load(listConfigInput);
+        try (InputStream listConfigInput = new FileInputStream(getRunningResourcePath(configFile_List))) {
+            prop.load(listConfigInput);
+        }
         setControlLastConfig(loadPMCS_Set, prop, key_loadConfig, listPMCProperties);
         setControlLastConfig(autoSavePMCS_Set, prop, key_autoSave, listPMCProperties);
-        listConfigInput.close();
         extendedStage_Set.setSelected(extendedStage);
     }
 
@@ -679,8 +679,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void loadMainConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream configFileInput = new FileInputStream(getRunningResourcePath(configFile));
-        prop.load(configFileInput);
+        try (InputStream configFileInput = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(configFileInput);
+        }
         setControlLastConfig(lastTab_Set, prop, key_loadConfig, configProperties);
         setControlLastConfig(maxWindow_Set, prop, key_loadMaxWindow, configProperties);
         setControlLastConfig(fullWindow_Set, prop, key_loadFullWindow, configProperties);
@@ -689,7 +690,6 @@ public class SettingController extends RootController implements MousePositionUp
         theme_Set.setValue(themeMap.get(them));
         // 加载快捷键设置
         loadKeyConfig(prop);
-        configFileInput.close();
         String language = languageMap.get(bundle.getLocale());
         if (language != null) {
             language_Set.setValue(language);
@@ -703,8 +703,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     public static void loadFloatingWindowConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream clickFileInput = new FileInputStream(getRunningResourcePath(configFile_Click));
-        prop.load(clickFileInput);
+        try (InputStream clickFileInput = new FileInputStream(getRunningResourcePath(configFile_Click))) {
+            prop.load(clickFileInput);
+        }
         int messageX = Integer.parseInt(getPropertyWithDefault(prop, key_messageX, clickProperties));
         int messageY = Integer.parseInt(getPropertyWithDefault(prop, key_messageY, clickProperties));
         int messageWidth = Integer.parseInt(getPropertyWithDefault(prop, key_messageWidth, clickProperties));
@@ -739,7 +740,6 @@ public class SettingController extends RootController implements MousePositionUp
                 .setX(Math.max(0, Math.min(stopX, screenWidth)))
                 .setY(Math.max(0, Math.min(stopY, screenHeight)));
         stopFloating.setConfig(stopConfig);
-        clickFileInput.close();
     }
 
     /**

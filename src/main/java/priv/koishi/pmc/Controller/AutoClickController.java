@@ -413,9 +413,11 @@ public class AutoClickController extends RootController implements MousePosition
      */
     public void saveLastConfig() throws IOException {
         if (anchorPane_Click != null) {
-            InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
+            String outPathValue;
             Properties prop = new Properties();
-            prop.load(input);
+            try (InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click))) {
+                prop.load(input);
+            }
             prop.put(key_loopTime, loopTime_Click.getText());
             prop.put(key_outFileName, outFileName_Click.getText());
             String lastOpenDirectoryValue = openDirectory_Click.isSelected() ? enable : disable;
@@ -426,12 +428,11 @@ public class AutoClickController extends RootController implements MousePosition
             prop.put(key_loadFolder, loadFolderValue);
             prop.put(key_preparationRecordTime, preparationRecordTime_Click.getText());
             prop.put(key_preparationRunTime, preparationRunTime_Click.getText());
-            String outPathValue = outPath_Click.getText();
+            outPathValue = outPath_Click.getText();
             prop.put(key_outFilePath, outPathValue);
-            OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_Click));
-            prop.store(output, null);
-            input.close();
-            output.close();
+            try (OutputStream output = new FileOutputStream(getRunningResourcePath(configFile_Click))) {
+                prop.store(output, null);
+            }
             CheckBox autoSave = settingController.autoSavePMC_Set;
             // 自动保存
             autoSave(autoSave, outPathValue);
@@ -476,8 +477,9 @@ public class AutoClickController extends RootController implements MousePosition
      */
     private void setLastConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click));
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile_Click))) {
+            prop.load(input);
+        }
         if (enable.equals(prop.getProperty(key_loadConfig, enable))) {
             setControlLastConfig(outPath_Click, prop, key_outFilePath);
             setControlLastConfig(loadFolder_Click, prop, key_loadFolder, clickProperties);
@@ -494,7 +496,6 @@ public class AutoClickController extends RootController implements MousePosition
         inFilePath = prop.getProperty(key_inFilePath);
         stopImgSelectPath = prop.getProperty(key_stopImgSelectPath, desktopPath);
         clickImgSelectPath = prop.getProperty(key_clickImgSelectPath, desktopPath);
-        input.close();
     }
 
     /**

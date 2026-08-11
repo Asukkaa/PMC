@@ -113,13 +113,13 @@ public class AboutController extends RootController {
      */
     private void getConfig() throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
         // 获取日志储存数量配置
         setControlLastConfig(logsNum_Abt, prop, key_logsNum);
         // 获取自动检查更新配置
         setControlLastConfig(autoCheck_Abt, prop, key_autoCheck, repeatTypeMap);
-        input.close();
     }
 
     /**
@@ -136,17 +136,17 @@ public class AboutController extends RootController {
      * @throws IOException 配置文件保存异常
      */
     public void saveLastConfig() throws IOException {
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
         Properties prop = new Properties();
-        prop.load(input);
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
         String logsNumValue = logsNum_Abt.getText();
         prop.setProperty(key_logsNum, logsNumValue);
         String autoCheckValue = autoCheck_Abt.getValue();
         prop.setProperty(key_autoCheck, repeatTypeMap.getKey(autoCheckValue));
-        OutputStream output = new FileOutputStream(getRunningResourcePath(configFile));
-        prop.store(output, null);
-        input.close();
-        output.close();
+        try (OutputStream output = new FileOutputStream(getRunningResourcePath(configFile))) {
+            prop.store(output, null);
+        }
     }
 
     /**
@@ -314,11 +314,13 @@ public class AboutController extends RootController {
      */
     private void autoCheck() throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(getRunningResourcePath(configFile));
-        prop.load(input);
-        String autocheck = prop.getProperty(key_autoCheck);
-        String lastCheck = prop.getProperty(key_lastCheck);
-        input.close();
+        String autocheck;
+        String lastCheck;
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
+        autocheck = prop.getProperty(key_autoCheck);
+        lastCheck = prop.getProperty(key_lastCheck);
         LocalDate lastCheckDate = LocalDate.now();
         if (StringUtils.isNotBlank(lastCheck)) {
             lastCheckDate = LocalDate.parse(lastCheck);

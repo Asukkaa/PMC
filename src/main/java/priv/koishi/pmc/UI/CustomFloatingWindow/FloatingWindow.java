@@ -889,13 +889,13 @@ public class FloatingWindow {
             FloatingWindowConfig config = messageFloating.getConfig();
             if (config != null) {
                 Properties prop = new Properties();
-                InputStream input = new FileInputStream(getRunningResourcePath(configPath));
-                prop.load(input);
+                try (InputStream input = new FileInputStream(getRunningResourcePath(configPath))) {
+                    prop.load(input);
+                }
                 config.setHeight(Integer.parseInt(getPropertyWithDefault(prop, key_messageHeight, clickProperties)))
                         .setWidth(Integer.parseInt(getPropertyWithDefault(prop, key_messageWidth, clickProperties)))
                         .setX(Integer.parseInt(getPropertyWithDefault(prop, key_messageX, clickProperties)))
                         .setY(Integer.parseInt(getPropertyWithDefault(prop, key_messageY, clickProperties)));
-                input.close();
                 messageFloating.setConfig(config);
             }
         }
