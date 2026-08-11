@@ -658,8 +658,9 @@ public class UiUtils {
      * @return 要展示路径的文件
      */
     public static File setPathLabel(Label pathLabel, String path) {
-        pathLabel.setText(path);
-        if (StringUtils.isBlank(path)) {
+        String finalPath = path.replace("/", File.separator);
+        pathLabel.setText(finalPath);
+        if (StringUtils.isBlank(finalPath)) {
             pathLabel.getStyleClass().removeAll("label-button-style", "label-err-style");
             pathLabel.setOnMouseClicked(null);
             pathLabel.setContextMenu(null);
@@ -667,7 +668,7 @@ public class UiUtils {
             Tooltip.uninstall(pathLabel, pathLabel.getTooltip());
             return null;
         }
-        File file = new File(path);
+        File file = new File(finalPath);
         String openText = text_mouseClickOpen();
         if (!file.exists()) {
             pathLabel.getStyleClass().remove("label-button-style");
@@ -686,7 +687,7 @@ public class UiUtils {
                 openParentDirectory = true;
             } else {
                 openParentDirectory = false;
-                openPath = path;
+                openPath = finalPath;
             }
         } else {
             openParentDirectory = true;
@@ -697,9 +698,9 @@ public class UiUtils {
             if (event.getButton() == MouseButton.PRIMARY) {
                 // 判断是否打开文件
                 if (openParentDirectory) {
-                    openParentDirectory(path);
+                    openParentDirectory(finalPath);
                 } else {
-                    openDirectory(path);
+                    openDirectory(finalPath);
                 }
             }
         });
@@ -707,7 +708,7 @@ public class UiUtils {
             openPath = "";
             openText = text_mouseClickNull();
         }
-        addToolTip(path + openText + openPath, pathLabel);
+        addToolTip(finalPath + openText + openPath, pathLabel);
         // 设置右键菜单
         setPathLabelContextMenu(pathLabel);
         return file;
