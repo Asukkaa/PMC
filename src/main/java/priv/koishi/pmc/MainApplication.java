@@ -350,8 +350,10 @@ public class MainApplication extends Application {
                 serverSocket = new ServerSocket(port);
                 while (!serverSocket.isClosed()) {
                     try (Socket socket = serverSocket.accept()) {
-                        InputStream in = socket.getInputStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        BufferedReader reader;
+                        try (InputStream in = socket.getInputStream()) {
+                            reader = new BufferedReader(new InputStreamReader(in));
+                        }
                         // 读取第一行为激活标记
                         String signal = reader.readLine();
                         if (activatePMC.equals(signal)) {
