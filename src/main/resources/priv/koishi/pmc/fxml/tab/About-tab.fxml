@@ -5,14 +5,14 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AboutController">
+            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.AboutController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <!--关于：-->
         <Label styleClass="label-low" text="%about.aboutLabel0"/>
 
         <HBox spacing="10">
             <ImageView fx:id="logo_Abt" fitWidth="150" fitHeight="150" preserveRatio="true">
-                <Image url="@../icon/PMC.png"/>
+                <Image url="@../../icon/PMC.png"/>
             </ImageView>
 
             <VBox spacing="10">
@@ -63,7 +63,7 @@
                 <Button fx:id="appreciate_Abt" onAction="#appreciate" styleClass="img-button-style">
                     <graphic>
                         <ImageView>
-                            <Image url="@../icon/Gift.png"/>
+                            <Image url="@../../icon/Gift.png"/>
                         </ImageView>
                     </graphic>
                 </Button>

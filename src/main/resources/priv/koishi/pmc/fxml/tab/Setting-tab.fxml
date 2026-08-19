@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
+            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
 
         <!--窗口设置：-->
@@ -461,7 +461,7 @@
                         styleClass="img-button-style">
                     <graphic>
                         <ImageView>
-                            <Image url="@../icon/ColorGetter.png"/>
+                            <Image url="@../../icon/ColorGetter.png"/>
                         </ImageView>
                     </graphic>
                 </Button>
@@ -765,7 +765,7 @@
                                 styleClass="img-button-style" visible="false">
                             <graphic>
                                 <ImageView>
-                                    <Image url="@../icon/Trash.png"/>
+                                    <Image url="@../../icon/Trash.png"/>
                                 </ImageView>
                             </graphic>
                         </Button>
@@ -784,7 +784,7 @@
                                 styleClass="img-button-style" visible="false">
                             <graphic>
                                 <ImageView>
-                                    <Image url="@../icon/Trash.png"/>
+                                    <Image url="@../../icon/Trash.png"/>
                                 </ImageView>
                             </graphic>
                         </Button>

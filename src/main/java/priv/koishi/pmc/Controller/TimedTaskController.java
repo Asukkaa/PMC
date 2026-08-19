@@ -114,7 +114,7 @@ public class TimedTaskController extends RootController {
      * @param isEdit 是否为编辑模式
      */
     private void showDetail(TimedTaskBean item, boolean isEdit) {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/TaskDetail-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/view/TaskDetail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent fxmlRoot;
         try {

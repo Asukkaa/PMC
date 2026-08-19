@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane_List" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.ListPMCController">
+            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.ListPMCController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
         <HBox spacing="10">
             <!--提示：1 秒 = 1000 毫秒  列表中每条数据为一步，每步可操作多次-->

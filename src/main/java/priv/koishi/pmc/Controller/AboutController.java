@@ -451,7 +451,7 @@ public class AboutController extends RootController {
      */
     @FXML
     private void appreciate() throws IOException {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/Appreciate-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/view/Appreciate-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent fxmlRoot = loadFXML(loader);
         Stage appreciateStage = new Stage();

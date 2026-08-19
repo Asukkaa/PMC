@@ -167,7 +167,7 @@ public class MainApplication extends Application {
         int theme = Integer.parseInt(prop.getProperty(key_theme));
         changeTheme(theme);
         // 读取 fxml 页面
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main-view.fxml"), bundle);
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("fxml/Main.fxml"), bundle);
         double appWidth = getSafeAttributes(1350, screenWidth);
         double appHeight = getSafeAttributes(760, screenHeight);
         if (enable.equals(getPropertyWithDefault(prop, key_maxWindow, configProperties))

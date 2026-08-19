@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/Styles.css"
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../../css/Styles.css"
             fx:controller="priv.koishi.pmc.Controller.ClickDetailController" fx:id="borderPane_Det">
     <center>
         <ScrollPane>
@@ -91,7 +91,7 @@
                                                 styleClass="img-button-style" visible="false">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@../icon/Trash.png"/>
+                                                    <Image url="@../../icon/Trash.png"/>
                                                 </ImageView>
                                             </graphic>
                                         </Button>
@@ -361,7 +361,7 @@
                                     <TextField fx:id="matchedStep_Det" prefWidth="60"/>
                                     <ImageView fx:id="matchedStepWarning_Det" fitWidth="25" fitHeight="25"
                                                visible="false">
-                                        <Image url="@../icon/Warning.png"/>
+                                        <Image url="@../../icon/Warning.png"/>
                                     </ImageView>
                                 </HBox>
                             </HBox>
@@ -379,7 +379,7 @@
                                     <TextField fx:id="retryStep_Det" prefWidth="60"/>
                                     <ImageView fx:id="retryStepWarning_Det" fitWidth="25" fitHeight="25"
                                                visible="false">
-                                        <Image url="@../icon/Warning.png"/>
+                                        <Image url="@../../icon/Warning.png"/>
                                     </ImageView>
                                 </HBox>
                             </HBox>
@@ -459,7 +459,7 @@
                                             styleClass="img-button-style">
                                         <graphic>
                                             <ImageView>
-                                                <Image url="@../icon/ColorGetter.png"/>
+                                                <Image url="@../../icon/ColorGetter.png"/>
                                             </ImageView>
                                         </graphic>
                                     </Button>
@@ -529,7 +529,7 @@
                                                     styleClass="img-button-style" visible="false">
                                                 <graphic>
                                                     <ImageView>
-                                                        <Image url="@../icon/Trash.png"/>
+                                                        <Image url="@../../icon/Trash.png"/>
                                                     </ImageView>
                                                 </graphic>
                                             </Button>

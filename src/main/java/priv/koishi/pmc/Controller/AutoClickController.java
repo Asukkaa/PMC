@@ -688,7 +688,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param item 要显示详情的操作流程设置
      */
     private void showDetail(ClickPositionVO item) {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickDetail-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/view/ClickDetail-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent fxmlRoot;
         try {
@@ -2361,7 +2361,7 @@ public class AutoClickController extends RootController implements MousePosition
      */
     @FXML
     private void clickLog() throws IOException {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/ClickLog-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/view/ClickLog-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent fxmlRoot = loadFXML(loader);
         ClickLogController controller = loader.getController();

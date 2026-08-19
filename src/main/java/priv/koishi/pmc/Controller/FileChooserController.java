@@ -500,7 +500,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
      * @throws IOException 页面加载失败、配置文件读取异常
      */
     public static FileChooserController chooserFiles(FileChooserConfig fileChooserConfig) throws IOException {
-        URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/FileChooser-view.fxml");
+        URL fxmlLocation = UiUtils.class.getResource(resourcePath + "fxml/view/FileChooser-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent fxmlRoot = loadFXML(loader);
         FileChooserController controller = loader.getController();

@@ -2737,7 +2737,7 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void showTest() throws IOException {
-        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/OCRTest-view.fxml");
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/view/OCRTest-view.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
         Parent fxmlRoot = loadFXML(loader);
         OCRTestController controller = loader.getController();

@@ -9,7 +9,7 @@
         <Tab fx:id="autoClickTab" text="%main.autoClickTab">
             <ScrollPane>
                 <AnchorPane>
-                    <fx:include source="AutoClick-tab.fxml"/>
+                    <fx:include source="tab/AutoClick-tab.fxml"/>
                 </AnchorPane>
             </ScrollPane>
         </Tab>
@@ -18,7 +18,7 @@
         <Tab fx:id="listPMCTab" text="%main.PMCListTab">
             <ScrollPane>
                 <AnchorPane>
-                    <fx:include source="PMCList-tab.fxml"/>
+                    <fx:include source="tab/PMCList-tab.fxml"/>
                 </AnchorPane>
             </ScrollPane>
         </Tab>
@@ -27,7 +27,7 @@
         <Tab fx:id="timedStartTab" text="%main.timedStartTab">
             <ScrollPane>
                 <AnchorPane>
-                    <fx:include source="TimedTask-tab.fxml"/>
+                    <fx:include source="tab/TimedTask-tab.fxml"/>
                 </AnchorPane>
             </ScrollPane>
         </Tab>
@@ -36,7 +36,7 @@
         <Tab fx:id="settingTab" text="%main.settingTab">
             <ScrollPane>
                 <AnchorPane>
-                    <fx:include source="Setting-tab.fxml"/>
+                    <fx:include source="tab/Setting-tab.fxml"/>
                 </AnchorPane>
             </ScrollPane>
         </Tab>
@@ -45,7 +45,7 @@
         <Tab fx:id="aboutTab" text="%main.aboutTab">
             <ScrollPane>
                 <AnchorPane>
-                    <fx:include source="About-tab.fxml"/>
+                    <fx:include source="tab/About-tab.fxml"/>
                 </AnchorPane>
             </ScrollPane>
         </Tab>
