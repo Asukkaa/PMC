@@ -452,7 +452,8 @@ public class AutoClickController extends RootController implements MousePosition
                 taskBean.setMessageLabel(log_Click)
                         .setBeanList(tableViewItems);
                 exportPMCTask = exportPMC(taskBean, autoSavePMCFileName(), outPath, notOverwrite_Click.isSelected());
-                bindingTaskNode(exportPMCTask, taskBean);
+                taskBean.setWorkingTask(exportPMCTask);
+                bindingTaskNode(taskBean);
                 exportPMCTask.setOnSucceeded(_ -> {
                     taskUnbind(taskBean);
                     log_Click.setTextFill(Color.GREEN);
@@ -837,8 +838,9 @@ public class AutoClickController extends RootController implements MousePosition
             } else {
                 autoClickTask = autoClick(taskBean, new Robot(), new DynamicQueue<>());
             }
+            taskBean.setWorkingTask(autoClickTask);
             // 绑定带进度条的线程
-            bindingTaskNode(autoClickTask, taskBean, true);
+            bindingTaskNode(taskBean, true);
             setTaskEvent(taskBean);
             if (runTimeline == null) {
                 TextField preparationRunTime = isBatch ?
@@ -1986,7 +1988,8 @@ public class AutoClickController extends RootController implements MousePosition
     public void startLoadPMCTask(List<? extends File> files) {
         TaskBean<ClickPositionVO> taskBean = creatTaskBean();
         loadPMCFilsTask = loadPMCFils(taskBean, files);
-        bindingTaskNode(loadPMCFilsTask, taskBean);
+        taskBean.setWorkingTask(loadPMCFilsTask);
+        bindingTaskNode(taskBean);
         loadPMCFilsTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             PMCLoadResult value = loadPMCFilsTask.getValue();
@@ -2067,7 +2070,9 @@ public class AutoClickController extends RootController implements MousePosition
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
-            loadedPMCTask = buildPMC(taskBean, new File(loadPMCPath));
+            loadedPMCTask = buildPMC(new File(loadPMCPath));
+            taskBean.setWorkingTask(loadedPMCTask);
+            bindingTaskNode(taskBean);
             loadedPMCTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
@@ -2273,7 +2278,8 @@ public class AutoClickController extends RootController implements MousePosition
                     .setBeanList(tableViewItems);
             String fileName = setDefaultFileName(outFileName_Click, defaultPMCFileName());
             exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_Click.isSelected());
-            bindingTaskNode(exportPMCTask, taskBean);
+            taskBean.setWorkingTask(exportPMCTask);
+            bindingTaskNode(taskBean);
             exportPMCTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 String path = exportPMCTask.getValue();

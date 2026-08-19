@@ -2,7 +2,6 @@ package priv.koishi.pmc.Service;
 
 import javafx.concurrent.Task;
 import priv.koishi.pmc.Bean.Config.FileConfig;
-import priv.koishi.pmc.Bean.TaskBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.CommonUtils.NATURAL_SORT;
 import static priv.koishi.pmc.Utils.FileUtils.getExistsFileType;
 import static priv.koishi.pmc.Utils.FileUtils.readAllFiles;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 
 /**
  * 读取文件服务类
@@ -32,11 +30,10 @@ public class ReadDataService {
      * @param fileConfig 文件读取设置
      * @return 文件列表
      */
-    public static Task<List<File>> readAllFilesTask(TaskBean<?> taskBean, FileConfig fileConfig) {
+    public static Task<List<File>> readAllFilesTask(FileConfig fileConfig) {
         return new Task<>() {
             @Override
             protected List<File> call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 List<File> fileList = readAllFiles(fileConfig);
                 comparingData(fileConfig, fileList);

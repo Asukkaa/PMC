@@ -658,6 +658,7 @@ public class UiUtils {
      * @return 要展示路径的文件
      */
     public static File setPathLabel(Label pathLabel, String path) {
+        path = path == null ? "" : path;
         String finalPath = path.replace("/", File.separator);
         pathLabel.setText(finalPath);
         if (StringUtils.isBlank(finalPath)) {

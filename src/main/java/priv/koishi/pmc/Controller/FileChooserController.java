@@ -212,8 +212,9 @@ public class FileChooserController extends ManuallyChangeThemeController {
                     .setMessageLabel(fileNumber_FC)
                     .setDisableNodes(disableNodes)
                     .setTableView(tableView_FC);
-            readAllFilesTask = readAllFilesTask(taskBean, fileConfig);
-            bindingTaskNode(readAllFilesTask, taskBean);
+            readAllFilesTask = readAllFilesTask(fileConfig);
+            taskBean.setWorkingTask(readAllFilesTask);
+            bindingTaskNode(taskBean);
             readAllFilesTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 try {

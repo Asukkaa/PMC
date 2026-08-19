@@ -504,13 +504,14 @@ public class MainApplication extends Application {
      * @param autoClickTab 自动点击页面
      */
     private static void creatLoadedPMCTask(File file, TabPane tabPane, Tab autoClickTab) {
+        autoClickController.loadedPMCTask = buildPMC(file);
         TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(autoClickController.progressBar_Click)
                 .setMessageLabel(autoClickController.dataNumber_Click)
                 .setTableView(autoClickController.tableView_Click)
-                .setDisableNodes(autoClickController.disableNodes);
-        autoClickController.loadedPMCTask = buildPMC(taskBean, file);
-        bindingTaskNode(autoClickController.loadedPMCTask, taskBean);
+                .setDisableNodes(autoClickController.disableNodes)
+                .setWorkingTask(autoClickController.loadedPMCTask);
+        bindingTaskNode(taskBean);
         autoClickController.loadedPMCTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             List<ClickPositionVO> clickPositionVOS = autoClickController.loadedPMCTask.getValue();
@@ -533,13 +534,14 @@ public class MainApplication extends Application {
      * @param listPMCTab 批量执行 PMC 文件页面
      */
     private static void creatLoadedPMCSTask(File file, TabPane tabPane, Tab listPMCTab) {
+        listPMCController.loadedPMCSTask = buildPMCS(file);
         TaskBean<PMCListBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(listPMCController.progressBar_List)
                 .setMessageLabel(listPMCController.dataNumber_List)
                 .setTableView(listPMCController.tableView_List)
-                .setDisableNodes(listPMCController.disableNodes);
-        listPMCController.loadedPMCSTask = buildPMCS(taskBean, file);
-        bindingTaskNode(listPMCController.loadedPMCSTask, taskBean);
+                .setDisableNodes(listPMCController.disableNodes)
+                .setWorkingTask(listPMCController.loadedPMCSTask);
+        bindingTaskNode(taskBean);
         listPMCController.loadedPMCSTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             List<PMCListBean> clickPositionVOS = listPMCController.loadedPMCSTask.getValue();

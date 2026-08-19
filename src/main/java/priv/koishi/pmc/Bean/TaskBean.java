@@ -1,5 +1,6 @@
 package priv.koishi.pmc.Bean;
 
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -55,5 +56,22 @@ public class TaskBean<T> {
      * 是否绑定线程信息栏（true 绑定，false 不绑定，默认绑定）
      */
     private boolean bindingMessageLabel = true;
+
+    /**
+     * 任务线程
+     */
+    private Task<?> workingTask;
+
+    /**
+     * 解除 Task 引用
+     */
+    public void clearTask() {
+        beanList = null;
+        tableView = null;
+        progressBar = null;
+        messageLabel = null;
+        workingTask = null;
+        disableNodes = null;
+    }
 
 }

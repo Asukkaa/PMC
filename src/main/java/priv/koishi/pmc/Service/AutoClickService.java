@@ -42,7 +42,6 @@ import static priv.koishi.pmc.Utils.ButtonMappingUtils.*;
 import static priv.koishi.pmc.Utils.CommonUtils.copyAllProperties;
 import static priv.koishi.pmc.Utils.CommonUtils.isValidUrl;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.ScriptUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.showStageAlert;
 
@@ -927,19 +926,16 @@ public class AutoClickService {
     /**
      * 运行脚本任务
      *
-     * @param taskBean        任务参数
      * @param script          要运行的脚本文件
      * @param workDir         运行脚本的目录
      * @param parameter       运行脚本的参数
      * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
      * @return 运行脚本任务对象
      */
-    public static Task<Void> scriptRun(TaskBean<?> taskBean, File script, String workDir,
-                                       String parameter, boolean minScriptWindow) {
+    public static Task<Void> scriptRun(File script, String workDir, String parameter, boolean minScriptWindow) {
         return new Task<>() {
             @Override
             protected Void call() throws Exception {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_testing());
                 runScript(script, workDir, parameter, minScriptWindow);
                 updateMessage("");

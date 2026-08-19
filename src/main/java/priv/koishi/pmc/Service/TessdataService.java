@@ -28,7 +28,6 @@ import static priv.koishi.pmc.Finals.CommonFinals.traineddata;
 import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
 import static priv.koishi.pmc.Utils.CommonUtils.setAllSafely;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 
 /**
  * 文字识别相关文件服务类
@@ -47,15 +46,13 @@ public class TessdataService {
     /**
      * 批量加载 .traineddata 模型文件任务线程
      *
-     * @param taskBean 线程任务参数
-     * @param files    .traineddata 模型文件列表
+     * @param files .traineddata 模型文件列表
      * @return 带有最后一个符合条件的文件的 task
      */
-    public static Task<File> loadTessdata(TaskBean<TessdataBean> taskBean, List<? extends File> files) {
+    public static Task<File> loadTessdata(List<? extends File> files) {
         return new Task<>() {
             @Override
             protected File call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 File selectedFile = null;
                 // 过滤不符合的文件格式
@@ -98,7 +95,6 @@ public class TessdataService {
         return new Task<>() {
             @Override
             protected Void call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 // 读取模型文件
                 List<TessdataBean> list = new ArrayList<>();
@@ -197,7 +193,6 @@ public class TessdataService {
         return new Task<>() {
             @Override
             protected Void call() {
-                changeDisableNodes(taskBean, true);
                 List<TessdataBean> tessdataBeans = taskBean.getBeanList();
                 for (int i = 0; i < tessdataBeans.size(); i++) {
                     TessdataBean tessdataBean = tessdataBeans.get(i);

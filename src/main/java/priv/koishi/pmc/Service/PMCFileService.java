@@ -44,7 +44,6 @@ import static priv.koishi.pmc.MainApplication.runPMCSFile;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.UiUtils.creatConfirmDialog;
 
 /**
@@ -59,15 +58,13 @@ public class PMCFileService {
     /**
      * 批量加载 PMC 文件（批量运行多个文件）任务线程
      *
-     * @param taskBean 线程任务参数
-     * @param files    文件列表
+     * @param files 文件列表
      * @return 带有 PMC 文件列表的 task
      */
-    public static Task<PMCSLoadResult> loadPMCSFils(TaskBean<PMCListBean> taskBean, List<? extends File> files) {
+    public static Task<PMCSLoadResult> loadPMCSFils(List<? extends File> files) {
         return new Task<>() {
             @Override
             protected PMCSLoadResult call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 List<PMCListBean> pmcListBeans = new ArrayList<>();
                 Map<String, String> imgMap = new HashMap<>();
@@ -106,7 +103,6 @@ public class PMCFileService {
         return new Task<>() {
             @Override
             protected PMCLoadResult call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 List<ClickPositionVO> allClickPositions = new ArrayList<>();
                 Map<String, String> imgMap = new HashMap<>();
@@ -302,15 +298,13 @@ public class PMCFileService {
     /**
      * 加载 PMC 文件任务线程
      *
-     * @param taskBean 线程任务参数
-     * @param file     要加载的文件
+     * @param file 要加载的文件
      * @return 带有 PMC 文件列表的 task
      */
-    public static Task<List<ClickPositionVO>> buildPMC(TaskBean<ClickPositionVO> taskBean, File file) {
+    public static Task<List<ClickPositionVO>> buildPMC(File file) {
         return new Task<>() {
             @Override
             protected List<ClickPositionVO> call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 return loadPMCFile(file);
             }
@@ -320,15 +314,13 @@ public class PMCFileService {
     /**
      * 加载 PMCS 文件任务线程
      *
-     * @param taskBean 线程任务参数
-     * @param file     要加载的文件
+     * @param file 要加载的文件
      * @return 带有 PMCS 文件列表的 task
      */
-    public static Task<List<PMCListBean>> buildPMCS(TaskBean<PMCListBean> taskBean, File file) {
+    public static Task<List<PMCListBean>> buildPMCS(File file) {
         return new Task<>() {
             @Override
             protected List<PMCListBean> call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 return loadPMCSFile(file);
             }
@@ -348,7 +340,6 @@ public class PMCFileService {
         return new Task<>() {
             @Override
             protected String call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_exportData());
                 List<PMCListBean> tableViewItems = taskBean.getBeanList();
                 String path = outFilePath + File.separator + fileName + PMCS;
@@ -391,7 +382,6 @@ public class PMCFileService {
         return new Task<>() {
             @Override
             protected String call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_exportData());
                 List<ClickPositionVO> tableViewItems = taskBean.getBeanList();
                 String path = outFilePath + File.separator + fileName + PMC;
@@ -438,7 +428,6 @@ public class PMCFileService {
         return new Task<>() {
             @Override
             protected Void call() {
-                changeDisableNodes(taskBean, true);
                 updateMessage(text_readData());
                 TableView<ImgFileVO> tableView = taskBean.getTableView();
                 ObservableList<ImgFileVO> items = tableView.getItems();

@@ -205,7 +205,8 @@ public class ListPMCController extends RootController {
                 taskBean.setMessageLabel(log_List)
                         .setBeanList(tableViewItems);
                 exportPMCTask = exportPMCS(taskBean, autoSavePMCSFileName(), outPath, notOverwrite_List.isSelected());
-                bindingTaskNode(exportPMCTask, taskBean);
+                taskBean.setWorkingTask(exportPMCTask);
+                bindingTaskNode(taskBean);
                 exportPMCTask.setOnSucceeded(_ -> {
                     taskUnbind(taskBean);
                     log_List.setTextFill(Color.GREEN);
@@ -333,7 +334,8 @@ public class ListPMCController extends RootController {
                         mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
                         TaskBean<ClickPositionVO> taskBean = autoClickController.creatTaskBean();
                         Task<List<ClickPositionVO>> copyPMCTask = copyPMC(clickPositionVOS, taskBean);
-                        bindingTaskNode(copyPMCTask, taskBean);
+                        taskBean.setWorkingTask(copyPMCTask);
+                        bindingTaskNode(taskBean);
                         copyPMCTask.setOnSucceeded(_ -> {
                             taskUnbind(taskBean);
                             List<ClickPositionVO> copy = copyPMCTask.getValue();
@@ -391,8 +393,9 @@ public class ListPMCController extends RootController {
                 File file = creatFileChooser(window, inFilePath, extensionFilters, text_selectAutoFile());
                 if (file != null) {
                     TaskBean<PMCListBean> taskBean = creatTaskBean();
-                    loadPMCFilsTask = loadPMCSFils(taskBean, Collections.singletonList(file));
-                    bindingTaskNode(loadPMCFilsTask, taskBean);
+                    loadPMCFilsTask = loadPMCSFils(Collections.singletonList(file));
+                    taskBean.setWorkingTask(loadPMCFilsTask);
+                    bindingTaskNode(taskBean);
                     loadPMCFilsTask.setOnSucceeded(_ -> {
                         taskUnbind(taskBean);
                         PMCSLoadResult value = loadPMCFilsTask.getValue();
@@ -498,8 +501,9 @@ public class ListPMCController extends RootController {
      */
     private void startLoadPMCTask(List<? extends File> files) {
         TaskBean<PMCListBean> taskBean = creatTaskBean();
-        loadPMCFilsTask = loadPMCSFils(taskBean, files);
-        bindingTaskNode(loadPMCFilsTask, taskBean);
+        loadPMCFilsTask = loadPMCSFils(files);
+        taskBean.setWorkingTask(loadPMCFilsTask);
+        bindingTaskNode(taskBean);
         loadPMCFilsTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             PMCSLoadResult value = loadPMCFilsTask.getValue();
@@ -592,7 +596,7 @@ public class ListPMCController extends RootController {
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCSPath)) {
             TaskBean<PMCListBean> taskBean = creatTaskBean();
-            loadedPMCSTask = buildPMCS(taskBean, new File(loadPMCSPath));
+            loadedPMCSTask = buildPMCS(new File(loadPMCSPath));
             loadedPMCSTask.setOnSucceeded(_ -> {
                 taskUnbind(taskBean);
                 List<PMCListBean> beans = loadedPMCSTask.getValue();
@@ -737,7 +741,8 @@ public class ListPMCController extends RootController {
                 .setBeanList(tableViewItems);
         String fileName = setDefaultFileName(outFileName_List, defaultPMCSFileName());
         exportPMCTask = exportPMCS(taskBean, fileName, outFilePath, notOverwrite_List.isSelected());
-        bindingTaskNode(exportPMCTask, taskBean);
+        taskBean.setWorkingTask(exportPMCTask);
+        bindingTaskNode(taskBean);
         exportPMCTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             String path = exportPMCTask.getValue();

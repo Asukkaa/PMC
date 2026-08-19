@@ -480,7 +480,8 @@ public class AboutController extends RootController {
                 .setDisableNodes(disableNodes)
                 .setBindingMessageLabel(true);
         Task<CheckUpdateBean> task = checkLatestVersion();
-        bindingTaskNode(task, taskBean);
+        taskBean.setWorkingTask(task);
+        bindingTaskNode(taskBean);
         task.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             CheckUpdateBean updateInfo = task.getValue();

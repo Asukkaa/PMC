@@ -1216,7 +1216,8 @@ public class ClickDetailController extends RootController {
     private void startUpdateTessdataTask() {
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
         Task<Void> updateTessdata = updateTessdata(taskBean);
-        bindingTaskNode(updateTessdata, taskBean);
+        taskBean.setWorkingTask(updateTessdata);
+        bindingTaskNode(taskBean);
         updateTessdata.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tessdataTableView_det, tessdataNumber_det, unit_files());
@@ -1249,7 +1250,8 @@ public class ClickDetailController extends RootController {
     private void startLoadImgTask(List<? extends File> files) {
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         loadImgTask = loadImg(taskBean, files);
-        bindingTaskNode(loadImgTask, taskBean);
+        taskBean.setWorkingTask(loadImgTask);
+        bindingTaskNode(taskBean);
         loadImgTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tableView_Det, dataNumber_Det, unit_img());
@@ -2051,7 +2053,7 @@ public class ClickDetailController extends RootController {
      */
     @FXML
     private void removeClickImg() {
-        showClickImg(null);
+        showClickImg("");
         setNodeDisable(clickType_Det, false);
     }
 
@@ -2130,7 +2132,7 @@ public class ClickDetailController extends RootController {
         String value = clickType_Det.getValue();
         addValueToolTip(clickType_Det, tip_clickType(), value);
         addValueToolTip(clickTypeText_Det, tip_clickType(), value);
-        setPathLabel(link_Det, null);
+        setPathLabel(link_Det, "");
         hideNodes(true, noMove_Det, testLink_Det, pathLinkVBox_Det, clickVBox_Det);
         if (linkList.contains(value) || clickType_moveWindow().equals(value)) {
             hideNodes(false, pathLinkVBox_Det, testLink_Det);
@@ -2420,8 +2422,9 @@ public class ClickDetailController extends RootController {
                     String parameter = parameter_Det.getText();
                     TaskBean<?> taskBean = creatTaskBean()
                             .setMessageLabel(log_Det);
-                    Task<Void> scriptTask = scriptRun(taskBean, file, workDir, parameter, minWindow_Det.isSelected());
-                    bindingTaskNode(scriptTask, taskBean);
+                    Task<Void> scriptTask = scriptRun(file, workDir, parameter, minWindow_Det.isSelected());
+                    taskBean.setWorkingTask(scriptTask);
+                    bindingTaskNode(taskBean);
                     scriptTask.setOnSucceeded(_ -> {
                         taskUnbind(taskBean);
                         new MessageBubble(text_testSuccess());

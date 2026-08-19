@@ -420,7 +420,8 @@ public class TaskDetailController extends ManuallyChangeThemeController {
                 .setMessageLabel(log_TD);
         // 创建定时任务
         Task<Void> task = createTask(timedTaskBean);
-        bindingTaskNode(task, taskBean);
+        taskBean.setWorkingTask(task);
+        bindingTaskNode(taskBean);
         task.setOnSucceeded(_ ->
                 Platform.runLater(() -> {
                     taskUnbind(taskBean);

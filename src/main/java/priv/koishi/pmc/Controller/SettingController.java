@@ -1071,7 +1071,8 @@ public class SettingController extends RootController implements MousePositionUp
     private void startLoadImgTask(List<? extends File> files) {
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         Task<Void> loadImgTask = loadImg(taskBean, files);
-        bindingTaskNode(loadImgTask, taskBean);
+        taskBean.setWorkingTask(loadImgTask);
+        bindingTaskNode(taskBean);
         loadImgTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tableView_Set, dataNumber_Set, unit_img());
@@ -1089,8 +1090,9 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private void startLoadTessdataTask(List<? extends File> files) {
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
-        Task<File> loadTessdataTask = loadTessdata(taskBean, files);
-        bindingTaskNode(loadTessdataTask, taskBean);
+        Task<File> loadTessdataTask = loadTessdata(files);
+        taskBean.setWorkingTask(loadTessdataTask);
+        bindingTaskNode(taskBean);
         loadTessdataTask.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             startUpdateTessdataTask();
@@ -1495,7 +1497,8 @@ public class SettingController extends RootController implements MousePositionUp
     private void startUpdateTessdataTask() {
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
         Task<Void> updateTessdata = updateTessdata(taskBean);
-        bindingTaskNode(updateTessdata, taskBean);
+        taskBean.setWorkingTask(updateTessdata);
+        bindingTaskNode(taskBean);
         updateTessdata.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             updateTableViewSizeText(tessdataTableView_set, tessdataNumber_set, unit_files());
@@ -1775,7 +1778,8 @@ public class SettingController extends RootController implements MousePositionUp
         ObservableList<TessdataBean> items = tessdataTableView_set.getItems();
         taskBean.setBeanList(items);
         Task<Void> saveTessdataConfig = saveTessdataConfig(taskBean);
-        bindingTaskNode(saveTessdataConfig, taskBean);
+        taskBean.setWorkingTask(saveTessdataConfig);
+        bindingTaskNode(taskBean);
         saveTessdataConfig.setOnSucceeded(_ -> {
             taskUnbind(taskBean);
             Platform.runLater(() -> {

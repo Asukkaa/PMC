@@ -170,7 +170,8 @@ public class TimedTaskController extends RootController {
                 .setBindingMessageLabel(true)
                 .setMessageLabel(log_Task);
         Task<List<TimedTaskBean>> task = getTaskDetailsTask();
-        bindingTaskNode(task, taskBean);
+        taskBean.setWorkingTask(task);
+        bindingTaskNode(taskBean);
         task.setOnSucceeded(_ -> {
             List<TimedTaskBean> result = task.getValue();
             Platform.runLater(() -> {
