@@ -1,7 +1,12 @@
 package priv.koishi.pmc.Utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.Bean.Annotation.IgnoreCopy;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 
@@ -9,6 +14,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,10 +40,26 @@ public class CommonUtils {
     /**
      * 深度复制序列化配置
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper()
+    private static final ObjectMapper COPY_MAPPER = new ObjectMapper()
             .rebuild()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
+
+    /**
+     * 标准类型的封装类型
+     */
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = new HashMap<>();
+
+    static {
+        PRIMITIVE_TO_WRAPPER.put(boolean.class, Boolean.class);
+        PRIMITIVE_TO_WRAPPER.put(byte.class, Byte.class);
+        PRIMITIVE_TO_WRAPPER.put(char.class, Character.class);
+        PRIMITIVE_TO_WRAPPER.put(double.class, Double.class);
+        PRIMITIVE_TO_WRAPPER.put(float.class, Float.class);
+        PRIMITIVE_TO_WRAPPER.put(int.class, Integer.class);
+        PRIMITIVE_TO_WRAPPER.put(long.class, Long.class);
+        PRIMITIVE_TO_WRAPPER.put(short.class, Short.class);
+    }
 
     /**
      * 自然排序的核心比较方法
@@ -309,11 +332,94 @@ public class CommonUtils {
         if (source == null || target == null) {
             return;
         }
-        try {
-            MAPPER.updateValue(target, source);
-        } catch (Exception e) {
-            throw new IllegalAccessException("深度复制失败: " + e.getMessage());
+        // 获取源对象所有字段（包括父类）
+        Map<String, Field> sourceFields = new LinkedHashMap<>();
+        Class<?> currentSource = source.getClass();
+        while (currentSource != null && currentSource != Object.class) {
+            for (Field field : currentSource.getDeclaredFields()) {
+                sourceFields.putIfAbsent(field.getName(), field);
+            }
+            currentSource = currentSource.getSuperclass();
         }
+        // 获取目标对象所有字段（包括父类）
+        Map<String, Field> targetFields = new LinkedHashMap<>();
+        Class<?> currentTarget = target.getClass();
+        while (currentTarget != null && currentTarget != Object.class) {
+            for (Field field : currentTarget.getDeclaredFields()) {
+                targetFields.putIfAbsent(field.getName(), field);
+            }
+            currentTarget = currentTarget.getSuperclass();
+        }
+        // 遍历源字段，匹配目标同名字段
+        for (Field sourceField : sourceFields.values()) {
+            if (isNotCopyField(sourceField)) {
+                continue;
+            }
+            // 查找目标同名字段
+            Field targetField = targetFields.get(sourceField.getName());
+            // 目标字段也要跳过静态、final、@IgnoreCopy
+            if (targetField == null || isNotCopyField(targetField)) {
+                continue;
+            }
+            sourceField.setAccessible(true);
+            Object srcVal = sourceField.get(source);
+            if (srcVal == null) {
+                continue;
+            }
+            // 检查类型兼容性：目标字段类型必须能接受源值
+            Class<?> targetType = targetField.getType();
+            Class<?> sourceType = srcVal.getClass();
+            boolean compatible = targetType.isAssignableFrom(sourceType);
+            // 如果目标类型是基本类型，且源类型是其对应的包装类，则视为兼容
+            if (!compatible && targetType.isPrimitive()) {
+                compatible = PRIMITIVE_TO_WRAPPER.get(targetType) == sourceType;
+            }
+            if (!compatible) {
+                continue;
+            }
+            try {
+                targetField.setAccessible(true);
+                // 判断是否需要深拷贝
+                if (sourceField.isAnnotationPresent(JsonIgnore.class) || isReferenceOnlyType(sourceField.getType())) {
+                    targetField.set(target, srcVal);
+                } else {
+                    // 其余字段使用 COPY_MAPPER 深拷贝（COPY_MAPPER 保留所有注解，确保 @JsonSerialize 生效）
+                    Object copied = COPY_MAPPER.convertValue(srcVal, srcVal.getClass());
+                    targetField.set(target, copied);
+                }
+            } catch (Exception e) {
+                // 降级：引用复制
+                targetField.set(target, srcVal);
+            }
+        }
+    }
+
+    /**
+     * 校验字段是为不可复制字段
+     *
+     * @param field 要校验的字段
+     * @return true 不可复制字段
+     */
+    private static boolean isNotCopyField(Field field) {
+        // 跳过静态字段
+        return Modifier.isStatic(field.getModifiers())
+                // 跳过常量字段
+                || Modifier.isFinal(field.getModifiers())
+                // 跳过标记字段
+                || field.isAnnotationPresent(IgnoreCopy.class);
+    }
+
+    /**
+     * 判断属性是否为仅复制引用的属性类型
+     *
+     * @param clazz 当前属性类型
+     * @return true 当前属性为仅复制引用的属性类型
+     */
+    private static boolean isReferenceOnlyType(Class<?> clazz) {
+        return clazz == TableView.class
+                || clazz == Image.class
+                || Thread.class.isAssignableFrom(clazz)
+                || Node.class.isAssignableFrom(clazz);
     }
 
     /**

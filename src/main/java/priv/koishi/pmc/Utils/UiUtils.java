@@ -263,8 +263,10 @@ public class UiUtils {
      */
     public static void showErrLabelText(Label messageLabel, String log) {
         Platform.runLater(() -> {
-            messageLabel.setTextFill(Color.RED);
-            messageLabel.setText(log);
+            if (messageLabel != null) {
+                messageLabel.setTextFill(Color.RED);
+                messageLabel.setText(log);
+            }
         });
     }
 
