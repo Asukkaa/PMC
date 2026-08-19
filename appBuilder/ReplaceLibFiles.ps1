@@ -1,6 +1,10 @@
-﻿$sourceJarPath = "C:\Users\asus\.m2\repository\org\bytedeco"
+﻿# 复制 jar 包内的动态库文件，用来升级部分平台特定依赖包
+
+# jar 包目录，如果填写具体 jar 包则只匹配填写的 jar 包，否则递归查询所有 jar 包
+$sourceJarPath = "C:\Users\asus\.m2\repository\org\bytedeco"
+# jar 包内部目录，用来精确匹配 jar 包内指定目录下的文件，为空则递归整个 jar 包
 $internalPath = ""
-$destinationDir = Join-Path $PSScriptRoot "mac_arm"
+$destinationDir = Join-Path $PSScriptRoot "win"
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
@@ -484,6 +488,7 @@ foreach ($jar in $extractedByJar.Keys)
     try
     {
         $zip = [System.IO.Compression.ZipFile]::OpenRead($jar)
+        $index = 1
         foreach ($sel in $list)
         {
             $entry = $zip.GetEntry($sel.EntryFullName)
@@ -504,15 +509,16 @@ foreach ($jar in $extractedByJar.Keys)
                 $destFileObj.CreationTime = $dt
             }
 
-            # ---------- 输出格式 ----------
+            # ---------- 输出格式（带序号） ----------
             if ($sel.IsRenamed)
             {
-                Write-Host "    $( $sel.OldFileName ) -> $( $sel.RenameFrom ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
+                Write-Host "    $index. $( $sel.OldFileName ) -> $( $sel.RenameFrom ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
             }
             else
             {
-                Write-Host "    $( $sel.OldFileName ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
+                Write-Host "    $index. $( $sel.OldFileName ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
             }
+            $index++
             $totalExtracted++
         }
         $zip.Dispose()
