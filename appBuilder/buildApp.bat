@@ -69,6 +69,7 @@ if exist "%lib%" (
     start "" /B powershell -Command "Compress-Archive -Path '%lib%' -DestinationPath '%target%\%libZipName%' -Force; Set-Content -Path '%target%\lib.done' -Value 1"
 ) else (
     echo 错误：生成的 lib 目录不存在
+    exit /b 1
 )
 
 :: 生成 app zip
@@ -82,6 +83,7 @@ if exist "%appPath%" (
     start "" /B powershell -Command "Compress-Archive -Path '%appPath%\*' -DestinationPath '%target%\%appZipName%' -Force; Set-Content -Path '%target%\app.done' -Value 1"
 ) else (
     echo 错误：生成的应用程序目录不存在
+    exit /b 1
 )
 
 :: 等待压缩完成
