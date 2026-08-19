@@ -1,13 +1,14 @@
 package priv.koishi.pmc.Utils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Annotation.IgnoreCopy;
+import priv.koishi.pmc.Bean.Annotation.ShallowCopy;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.PrintWriter;
@@ -16,6 +17,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -379,12 +381,19 @@ public class CommonUtils {
             }
             try {
                 targetField.setAccessible(true);
-                // 判断是否需要深拷贝
-                if (sourceField.isAnnotationPresent(JsonIgnore.class) || isReferenceOnlyType(sourceField.getType())) {
+                // 判断是否需要浅拷贝（直接引用），标记了 @ShallowCopy 或属于特殊引用类型
+                if (sourceField.isAnnotationPresent(ShallowCopy.class) || isReferenceOnlyType(sourceField.getType())) {
                     targetField.set(target, srcVal);
                 } else {
-                    // 其余字段使用 COPY_MAPPER 深拷贝（COPY_MAPPER 保留所有注解，确保 @JsonSerialize 生效）
-                    Object copied = COPY_MAPPER.convertValue(srcVal, srcVal.getClass());
+                    // 其余字段深拷贝
+                    Object copied;
+                    Type genericType = sourceField.getGenericType();
+                    if (srcVal instanceof Collection || srcVal instanceof Map) {
+                        JavaType javaType = COPY_MAPPER.getTypeFactory().constructType(genericType);
+                        copied = COPY_MAPPER.convertValue(srcVal, javaType);
+                    } else {
+                        copied = COPY_MAPPER.convertValue(srcVal, srcVal.getClass());
+                    }
                     targetField.set(target, copied);
                 }
             } catch (Exception e) {
