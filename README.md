@@ -108,6 +108,35 @@ macOS [x86_64](appBuilder/mac) 版本全部整理完毕， [arm](appBuilder/mac_
 macOS 依赖文件中的 [libopenblas_nolapack.0.dylib](appBuilder/mac/libopenblas_nolapack.0.dylib.zip)
 因文件太大所以进行了压缩，打包时需要在对应目录放入解压后的文件。
 
+leptonica-1.87.0-1.5.14-macosx-x86_64.jar
+
+1. libleptonica.6.dylib (内部路径: org/bytedeco/leptonica/macosx-x86_64/libleptonica.6.dylib)
+2. libjnileptonica.dylib (内部路径: org/bytedeco/leptonica/macosx-x86_64/libjnileptonica.dylib)
+
+openblas-0.3.34-1.5.14-macosx-x86_64.jar
+
+1. libgcc_s.1.1.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libgcc_s.1.1.dylib)
+2. libjniopenblas.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libjniopenblas.dylib)
+3. libjniopenblas_nolapack.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libjniopenblas_nolapack.dylib)
+4. libopenblas.0.dylib -> libopenblas_nolapack.0.dylib (内部路径:
+   org/bytedeco/openblas/macosx-x86_64/libopenblas_nolapack.0.dylib)
+5. libgfortran.5.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libgfortran.5.dylib)
+6. libquadmath.0.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libquadmath.0.dylib)
+
+opencv-4.14.0-1.5.14-macosx-x86_64.jar
+
+1. libopencv_imgcodecs.414.dylib (内部路径: org/bytedeco/opencv/macosx-x86_64/libopencv_imgcodecs.414.dylib)
+2. libjniopencv_imgproc.dylib (内部路径: org/bytedeco/opencv/macosx-x86_64/libjniopencv_imgproc.dylib)
+3. libjniopencv_core.dylib (内部路径: org/bytedeco/opencv/macosx-x86_64/libjniopencv_core.dylib)
+4. libopencv_imgproc.414.dylib (内部路径: org/bytedeco/opencv/macosx-x86_64/libopencv_imgproc.414.dylib)
+5. libjniopencv_imgcodecs.dylib (内部路径: org/bytedeco/opencv/macosx-x86_64/libjniopencv_imgcodecs.dylib)
+6. libopencv_core.414.dylib (内部路径: org/bytedeco/opencv/macosx-x86_64/libopencv_core.414.dylib)
+
+tesseract-5.5.3-1.5.14-macosx-x86_64.jar
+
+1. libjnitesseract.dylib (内部路径: org/bytedeco/tesseract/macosx-x86_64/libjnitesseract.dylib)
+2. libtesseract.5.5.dylib (内部路径: org/bytedeco/tesseract/macosx-x86_64/libtesseract.5.5.dylib)
+
 因为需要获取其他进程的窗口信息并进行移动，本项目使用 Jna 调用操作系统 api 获取相关信息， 在 win 系统下直接可以调用操作系统
 api， 但在 macOS 下则需要使用更底层的语言去调用相关 api，本项目使用 Jna 调用 C 语言编写的 dylib 文件实现相关功能。
 

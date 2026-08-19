@@ -1,13 +1,7 @@
-﻿# ======================================================
-# 用户配置区域
-# ======================================================
-$sourceJarPath = "C:\Users\asus\.m2\repository\org\bytedeco"
+﻿$sourceJarPath = "C:\Users\asus\.m2\repository\org\bytedeco"
 $internalPath = ""
-$destinationDir = Join-Path $PSScriptRoot "win"   # 可改为 "mac" 或 "mac_arm"
+$destinationDir = Join-Path $PSScriptRoot "mac_arm"
 
-# ======================================================
-# 脚本主体
-# ======================================================
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 # ---------- 根据目标目录名称决定平台关键词和扩展名 ----------
@@ -193,6 +187,7 @@ if ($existingFiles.Count -eq 0)
     exit 0
 }
 
+# ---------- 构建匹配模式 ----------
 $patterns = @()
 $patternExample = @{ }
 foreach ($file in $existingFiles)
@@ -218,7 +213,38 @@ foreach ($file in $existingFiles)
     }
 }
 
-Write-Host "目标目录匹配模式："
+# ---------- 特殊处理：macOS 下 openblas_nolapack 的备选逻辑 ----------
+$specialOpenBlasNolapack = $false
+if ($platformKeyword -match 'macosx')
+{
+    Write-Host "检测到 macOS 平台，检查 libopenblas_nolapack.0..."
+    $specialBaseName = "libopenblas_nolapack.0"
+    # 使用 StartsWith 判断，不关心扩展名
+    $existsSpecial = $existingFiles | Where-Object { $_.Name.StartsWith($specialBaseName) }
+    if ($existsSpecial)
+    {
+        $specialOpenBlasNolapack = $true
+        Write-Host "目标目录存在以 $specialBaseName 开头的文件，启用特殊重命名逻辑。"
+        # 确保 libopenblas.0 也被匹配（如果尚未包含）
+        $extraPattern = "libopenblas.0"
+        if ($patterns -notcontains $extraPattern)
+        {
+            $patterns += $extraPattern
+            $patternExample[$extraPattern] = "$specialBaseName.dylib"
+            Write-Host "添加额外模式: $extraPattern (用于特殊重命名)"
+        }
+        else
+        {
+            Write-Host "模式 $extraPattern 已存在，跳过添加。"
+        }
+    }
+    else
+    {
+        Write-Host "目标目录不存在以 $specialBaseName 开头的文件，跳过特殊逻辑。"
+    }
+}
+
+Write-Host "`n目标目录匹配模式："
 $patterns | ForEach-Object { Write-Host "  $_" }
 
 if ($internalPath -and $internalPath -ne "")
@@ -323,7 +349,6 @@ foreach ($jarPath in $jarFiles)
                 LastWriteTime = $lastWriteLocal
                 MatchedPattern = $matchedPattern
                 OldFileName = $oldFileName
-                Entry = $entry  # 保留对 ZipArchiveEntry 的引用用于提取（但之后会重新打开）
             }
         }
         $zip.Dispose()
@@ -336,6 +361,51 @@ foreach ($jarPath in $jarFiles)
 }
 
 Write-Host "共扫描到 $( $allCandidates.Count ) 个候选文件。`n"
+
+# ---------- 特殊处理：补充 libopenblas_nolapack.0.dylib 候选 ----------
+if ($specialOpenBlasNolapack)
+{
+    $specialFileName = "libopenblas_nolapack.0.dylib"
+    $sourceFileName = "libopenblas.0.dylib"
+    $hasSpecial = $allCandidates | Where-Object { $_.EntryName -eq $specialFileName }
+    if (-not $hasSpecial)
+    {
+        $sourceCand = $allCandidates | Where-Object { $_.EntryName -eq $sourceFileName } | Select-Object -First 1
+        if ($sourceCand)
+        {
+            $newEntryPath = $sourceCand.EntryPath -replace $sourceFileName, $specialFileName
+            $newBase = [System.IO.Path]::GetFileNameWithoutExtension($specialFileName)
+            $newGroupKey = $newBase -replace '\d+$', ''
+            if ($newGroupKey -eq "")
+            {
+                $newGroupKey = $newBase
+            }
+            $newCand = [PSCustomObject]@{
+                JarPath = $sourceCand.JarPath
+                EntryFullName = $sourceCand.EntryFullName
+                EntryName = $specialFileName
+                EntryPath = $newEntryPath
+                BaseName = $newBase
+                GroupKey = $newGroupKey
+                LastWriteTime = $sourceCand.LastWriteTime
+                MatchedPattern = $specialFileName
+                OldFileName = $specialFileName
+                RenameFrom = $sourceFileName
+                IsRenamed = $true
+            }
+            $allCandidates += $newCand
+            Write-Host "特殊处理：添加了 $specialFileName (来自 $sourceFileName)"
+        }
+        else
+        {
+            Write-Host "警告：未找到 $sourceFileName，无法创建 $specialFileName"
+        }
+    }
+    else
+    {
+        Write-Host "特殊处理：$specialFileName 已存在于候选列表，无需重命名。"
+    }
+}
 
 if ($allCandidates.Count -eq 0)
 {
@@ -373,6 +443,14 @@ foreach ($key in $grouped.Keys)
     if ($latest)
     {
         $selectedEntries += $latest
+    }
+}
+
+# ---------- 如果特殊逻辑启用，过滤掉 libopenblas.0.dylib 的直接提取条目 ----------
+if ($specialOpenBlasNolapack)
+{
+    $selectedEntries = $selectedEntries | Where-Object {
+        -not ($_.EntryName -eq "libopenblas.0.dylib" -and -not $_.IsRenamed)
     }
 }
 
@@ -421,10 +499,20 @@ foreach ($jar in $extractedByJar.Keys)
             if ($entry.LastWriteTime.HasValue)
             {
                 $destFileObj = Get-Item $destFile
-                $destFileObj.LastWriteTime = $entry.LastWriteTime.Value.LocalDateTime
+                $dt = $entry.LastWriteTime.Value.LocalDateTime
+                $destFileObj.LastWriteTime = $dt
+                $destFileObj.CreationTime = $dt
             }
 
-            Write-Host "    $( $sel.OldFileName ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
+            # ---------- 输出格式 ----------
+            if ($sel.IsRenamed)
+            {
+                Write-Host "    $( $sel.OldFileName ) -> $( $sel.RenameFrom ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
+            }
+            else
+            {
+                Write-Host "    $( $sel.OldFileName ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
+            }
             $totalExtracted++
         }
         $zip.Dispose()
@@ -438,4 +526,4 @@ foreach ($jar in $extractedByJar.Keys)
 
 Write-Host "`n全部完成！共提取 $totalExtracted 个文件（按基础名分组后只保留最新版本）。"
 Write-Host "同名文件已覆盖，不同版本已按最新时间筛选。"
-Write-Host "所有提取的文件已保留 JAR 中的原始修改时间。"
+Write-Host "所有提取文件的创建时间和修改时间均设置为 JAR 中的原始修改时间。"
