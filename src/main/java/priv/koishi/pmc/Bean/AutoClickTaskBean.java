@@ -114,4 +114,23 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
      */
     private int maxLogNum;
 
+    /**
+     * 解除 Task 引用
+     */
+    @Override
+    public void clearTask() {
+        // 清理父类字段
+        super.clearTask();
+        // 清理浮窗描述符
+        if (messageFloating != null) {
+            messageFloating.dispose();
+            messageFloating = null;
+        }
+        // 停止并清理时间线
+        if (runTimeline != null) {
+            runTimeline.stop();
+            runTimeline = null;
+        }
+    }
+
 }

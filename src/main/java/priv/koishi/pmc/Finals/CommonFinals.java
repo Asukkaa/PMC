@@ -30,7 +30,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "4.4.2";
+    public static final String version = "4.4.3";
 
     /**
      * PMC 文件版本

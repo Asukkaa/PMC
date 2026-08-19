@@ -3,6 +3,7 @@ package priv.koishi.pmc.UI.CustomFloatingWindow;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -261,20 +262,62 @@ public class FloatingWindowDescriptor {
      */
     public void dispose() {
         if (stage != null) {
-            // 移除事件监听器
-            if (stage.getScene() != null) {
-                Parent parent = stage.getScene().getRoot();
-                parent.setOnMousePressed(null);
-                parent.setOnMouseDragged(null);
-                // 遍历移除所有子节点的监听器
-                parent.getChildrenUnmodifiable().forEach(node -> {
-                    node.setOnMousePressed(null);
-                    node.setOnMouseDragged(null);
-                });
+            // 移除 Stage 自身的事件监听器
+            stage.setOnCloseRequest(null);
+            stage.setOnShowing(null);
+            stage.setOnShown(null);
+            stage.setOnHiding(null);
+            stage.setOnHidden(null);
+            // 移除 Scene 的事件监听器
+            Scene scene = stage.getScene();
+            if (scene != null) {
+                scene.setOnKeyPressed(null);
+                // 递归清理所有子孙节点的事件（使用递归方法）
+                clearNodeHandlers(scene.getRoot());
+                // 断开 Scene 与 Root 的绑定
+                stage.setScene(null);
             }
+            // 从全局列表移除
             FloatingWindow.floatingWindows.remove(this);
+            // 关闭舞台
             stage.close();
             stage = null;
+        }
+        // 强制清空本对象持有的所有 UI 强引用
+        messageLabel = null;
+        floatingPosition = null;
+        nameeLabel = null;
+        button = null;
+        additionalContent = null;
+        rectangle = null;
+        disableNodes = null;
+        // 如果 config 持有大对象或 WindowInfo，也建议置空
+        if (config != null) {
+            config.setWindowInfo(null);
+            config = null;
+        }
+    }
+
+    /**
+     * 递归清除节点及其所有子节点上的事件处理器
+     */
+    private void clearNodeHandlers(Node node) {
+        if (node == null) return;
+        // 清除常见的事件处理器
+        node.setOnMousePressed(null);
+        node.setOnMouseReleased(null);
+        node.setOnMouseClicked(null);
+        node.setOnMouseDragged(null);
+        node.setOnMouseMoved(null);
+        node.setOnKeyPressed(null);
+        node.setOnKeyReleased(null);
+        node.setOnKeyTyped(null);
+        node.setOnDragDetected(null);
+        node.setOnContextMenuRequested(null);
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                clearNodeHandlers(child);
+            }
         }
     }
 

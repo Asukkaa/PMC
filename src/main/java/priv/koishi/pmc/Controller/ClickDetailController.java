@@ -1106,7 +1106,11 @@ public class ClickDetailController extends RootController {
                     ButtonBar.ButtonData buttonData = result.getButtonData();
                     if (!buttonData.isCancelButton()) {
                         // 保存并关闭
-                        saveDetail();
+                        try {
+                            saveDetail();
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
                     } else {
                         // 直接关闭
                         closeStage();
@@ -1303,6 +1307,45 @@ public class ClickDetailController extends RootController {
         buildWindowInfoMenu(stopWindowInfo_Det, stopWindowMonitor, windowInfoDisableNodes, stages);
         buildWindowInfoMenu(clickWindowInfo_Det, clickWindowMonitor, windowInfoDisableNodes, stages);
         buildWindowInfoMenu(moveWindowInfo_Det, clickWindowMonitor, false, windowInfoDisableNodes, stages);
+    }
+
+    /**
+     * 延时执行任务
+     *
+     * @param preparation   准备时间
+     * @param ocrTest       文字识别测试任务线程
+     * @param messageBubble 需要更新的消息气泡
+     */
+    private void executeRunTimeLine(int preparation, Task<List<OCRDataBean>> ocrTest, MessageBubble messageBubble) {
+        if (preparation == 0) {
+            if (!ocrTest.isRunning()) {
+                messageBubble.updateText(tessdata_testing() + "\n" + text_cancelTask());
+                // 使用新线程启动
+                new Thread(ocrTest).start();
+            }
+        }
+        Timeline runTimeline = new Timeline();
+        AtomicInteger preparationTime = new AtomicInteger(preparation);
+        // 创建 Timeline 来实现倒计时
+        Timeline finalTimeline = runTimeline;
+        runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
+            preparationTime.getAndDecrement();
+            if (preparationTime.get() > 0) {
+                String text = preparationTime + tessdata_preparation() + "\n" + text_cancelTask();
+                messageBubble.updateText(text);
+            } else {
+                // 停止 Timeline
+                finalTimeline.stop();
+                if (!ocrTest.isRunning()) {
+                    messageBubble.updateText(tessdata_testing() + "\n" + text_cancelTask());
+                    // 使用新线程启动
+                    new Thread(ocrTest).start();
+                }
+            }
+        }));
+        // 设置 Timeline 的循环次数
+        runTimeline.setCycleCount(preparation);
+        runTimeline.play();
     }
 
     /**
@@ -1810,7 +1853,7 @@ public class ClickDetailController extends RootController {
      * 保存更改并关闭详情页按钮
      */
     @FXML
-    private void saveDetail() {
+    private void saveDetail() throws IllegalAccessException {
         String url = url_Det.getText();
         String link = link_Det.getText();
         int selectIndex = selectedItem.getIndex();
@@ -1833,7 +1876,7 @@ public class ClickDetailController extends RootController {
         boolean randomClickInterval = randomClickInterval_Det.isSelected();
         String startX = String.valueOf(setDefaultIntValue(mouseStartX_Det, 0, 0, screenWidth));
         String startY = String.valueOf(setDefaultIntValue(mouseStartY_Det, 0, 0, screenHeight));
-        FloatingWindowConfig clickFloatingConfig = clickFloating.getConfig();
+        FloatingWindowConfig config = clickFloating.getConfig();
         if (clickType == ClickTypeEnum.OPEN_URL.ordinal() ||
                 clickType == ClickTypeEnum.RUN_SCRIPT.ordinal() ||
                 clickType == ClickTypeEnum.OPEN_FILE.ordinal() ||
@@ -1863,8 +1906,13 @@ public class ClickDetailController extends RootController {
                 startY = String.valueOf(setDefaultIntValue(windowY_Det, 0, 0, screenHeight));
                 boolean ignoreFailure = ignoreFailure_Det.isSelected();
                 clickWindowMonitor.updateWindowInfo();
-                clickFloatingConfig.setWindowInfo(clickWindowMonitor.getWindowInfo())
-                        .setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal());
+                FloatingWindowConfig clickFloatingConfig = new FloatingWindowConfig();
+                copyAllProperties(clickFloating.getConfig(), clickFloatingConfig);
+                WindowInfo originalInfo = clickWindowMonitor.getWindowInfo();
+                WindowInfo infoCopy = new WindowInfo();
+                copyAllProperties(originalInfo, infoCopy);
+                clickFloatingConfig.setFindImgTypeEnum(FindImgTypeEnum.WINDOW.ordinal())
+                        .setWindowInfo(infoCopy);
                 selectedItem.setClickWindowConfig(clickFloatingConfig)
                         .setIgnoreFailure(ignoreFailure);
             }
@@ -1905,7 +1953,10 @@ public class ClickDetailController extends RootController {
             updateFloatingWindowConfig(stopFindImgType_Det, stopRegionInfoHBox_Det, stopRegionHBox_Det,
                     stopWindowInfoHBox_Det, stopFloating, stopWindowMonitor, true);
             saveFloatingWindow(clickFloating, stopFloating);
-            FloatingWindowConfig stopFloatingConfig = stopFloating.getConfig();
+            FloatingWindowConfig clickFloatingConfig = new FloatingWindowConfig();
+            copyAllProperties(config, clickFloatingConfig);
+            FloatingWindowConfig stopFloatingConfig = new FloatingWindowConfig();
+            copyAllProperties(stopFloating.getConfig(), stopFloatingConfig);
             stopFloatingConfig.setAllRegion(stopAllRegion)
                     .setAlwaysRefresh(stopWindowUpdate);
             clickFloatingConfig.setAllRegion(clickAllRegion)
@@ -2677,45 +2728,6 @@ public class ClickDetailController extends RootController {
             }
         });
         executeRunTimeLine(preparation, ocrTest, messageBubble);
-    }
-
-    /**
-     * 延时执行任务
-     *
-     * @param preparation   准备时间
-     * @param ocrTest       文字识别测试任务线程
-     * @param messageBubble 需要更新的消息气泡
-     */
-    private void executeRunTimeLine(int preparation, Task<List<OCRDataBean>> ocrTest, MessageBubble messageBubble) {
-        if (preparation == 0) {
-            if (!ocrTest.isRunning()) {
-                messageBubble.updateText(tessdata_testing() + "\n" + text_cancelTask());
-                // 使用新线程启动
-                new Thread(ocrTest).start();
-            }
-        }
-        Timeline runTimeline = new Timeline();
-        AtomicInteger preparationTime = new AtomicInteger(preparation);
-        // 创建 Timeline 来实现倒计时
-        Timeline finalTimeline = runTimeline;
-        runTimeline = new Timeline(new KeyFrame(Duration.seconds(1), _ -> {
-            preparationTime.getAndDecrement();
-            if (preparationTime.get() > 0) {
-                String text = preparationTime + tessdata_preparation() + "\n" + text_cancelTask();
-                messageBubble.updateText(text);
-            } else {
-                // 停止 Timeline
-                finalTimeline.stop();
-                if (!ocrTest.isRunning()) {
-                    messageBubble.updateText(tessdata_testing() + "\n" + text_cancelTask());
-                    // 使用新线程启动
-                    new Thread(ocrTest).start();
-                }
-            }
-        }));
-        // 设置 Timeline 的循环次数
-        runTimeline.setCycleCount(preparation);
-        runTimeline.play();
     }
 
     /**
