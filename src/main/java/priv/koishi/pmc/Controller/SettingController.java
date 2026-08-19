@@ -1042,10 +1042,10 @@ public class SettingController extends RootController implements MousePositionUp
      */
     private TaskBean<ImgFileVO> creatTaskBean() {
         TaskBean<ImgFileVO> taskBean = new TaskBean<>();
-        taskBean.setProgressBar(progressBar_Set)
+        taskBean.setDisableNodes(windowInfoDisableNodes)
+                .setProgressBar(progressBar_Set)
                 .setMessageLabel(dataNumber_Set)
-                .setTableView(tableView_Set)
-                .setDisableNodes(windowInfoDisableNodes);
+                .setTableView(tableView_Set);
         return taskBean;
     }
 
@@ -1073,11 +1073,6 @@ public class SettingController extends RootController implements MousePositionUp
         Task<Void> loadImgTask = loadImg(taskBean, files);
         taskBean.setWorkingTask(loadImgTask);
         bindingTaskNode(taskBean);
-        loadImgTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            updateTableViewSizeText(tableView_Set, dataNumber_Set, unit_img());
-            tableView_Set.refresh();
-        });
         Thread.ofVirtual()
                 .name("loadImgTask-vThread" + tabId)
                 .start(loadImgTask);
@@ -1091,20 +1086,19 @@ public class SettingController extends RootController implements MousePositionUp
     private void startLoadTessdataTask(List<? extends File> files) {
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
         Task<File> loadTessdataTask = loadTessdata(files);
-        taskBean.setWorkingTask(loadTessdataTask);
+        taskBean.setWorkingTask(loadTessdataTask)
+                .setOnSucceeded(_ -> {
+                    startUpdateTessdataTask();
+                    File selectedFile = loadTessdataTask.getValue();
+                    if (selectedFile != null) {
+                        try {
+                            tessdataPath = updatePathLabel(selectedFile.getPath(), tessdataPath, key_tessdataPath, null, configFile_Click);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
         bindingTaskNode(taskBean);
-        loadTessdataTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            startUpdateTessdataTask();
-            File selectedFile = loadTessdataTask.getValue();
-            if (selectedFile != null) {
-                try {
-                    tessdataPath = updatePathLabel(selectedFile.getPath(), tessdataPath, key_tessdataPath, null, configFile_Click);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
         Thread.ofVirtual()
                 .name("loadTessdataTask-vThread" + tessdataId)
                 .start(loadTessdataTask);

@@ -100,7 +100,8 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.ScriptUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -1254,23 +1255,11 @@ public class ClickDetailController extends RootController {
     private void startLoadImgTask(List<? extends File> files) {
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         loadImgTask = loadImg(taskBean, files);
-        taskBean.setWorkingTask(loadImgTask);
+        taskBean.setWorkingTask(loadImgTask)
+                .setOnFailed(_ -> loadImgTask = null)
+                .setOnCancelled(_ -> loadImgTask = null)
+                .setOnSucceeded(_ -> loadImgTask = null);
         bindingTaskNode(taskBean);
-        loadImgTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            updateTableViewSizeText(tableView_Det, dataNumber_Det, unit_img());
-            tableView_Det.refresh();
-            loadImgTask = null;
-        });
-        loadImgTask.setOnFailed(event -> {
-            taskNotSuccess(taskBean, text_taskFailed());
-            loadImgTask = null;
-            throw new RuntimeException(event.getSource().getException());
-        });
-        loadImgTask.setOnCancelled(_ -> {
-            taskNotSuccess(taskBean, text_taskCancelled());
-            loadImgTask = null;
-        });
         Thread.ofVirtual()
                 .name("loadImgTask-vThread" + tabId)
                 .start(loadImgTask);
@@ -2474,12 +2463,10 @@ public class ClickDetailController extends RootController {
                     TaskBean<?> taskBean = creatTaskBean()
                             .setMessageLabel(log_Det);
                     Task<Void> scriptTask = scriptRun(file, workDir, parameter, minWindow_Det.isSelected());
-                    taskBean.setWorkingTask(scriptTask);
+                    taskBean.setWorkingTask(scriptTask)
+                            .setOnSucceeded(_ ->
+                                    new MessageBubble(text_testSuccess()));
                     bindingTaskNode(taskBean);
-                    scriptTask.setOnSucceeded(_ -> {
-                        taskUnbind(taskBean);
-                        new MessageBubble(text_testSuccess());
-                    });
                     Thread.ofVirtual()
                             .name("scriptTask-vThread" + tabId)
                             .start(scriptTask);

@@ -1150,11 +1150,23 @@ public class TableViewUtils {
      * @param <T>            列表数据类型
      */
     public static <T> void updateTableViewSizeText(TableView<T> tableView, Label dataNumber, String dataNumberUnit) {
+        dataNumber.setText(getTableViewSizeText(tableView, dataNumberUnit));
+    }
+
+    /**
+     * 获取列表数据数量
+     *
+     * @param tableView      列表对象
+     * @param dataNumberUnit 数据单位
+     * @param <T>            列表数据类型
+     * @return 列表数据数量文本
+     */
+    public static <T> String getTableViewSizeText(TableView<T> tableView, String dataNumberUnit) {
         int tableSize = tableView.getItems().size();
         if (tableSize > 0) {
-            dataNumber.setText(text_allHave() + tableSize + dataNumberUnit);
+            return text_allHave() + tableSize + dataNumberUnit;
         } else {
-            dataNumber.setText(listText_dataListNull());
+            return listText_dataListNull();
         }
     }
 

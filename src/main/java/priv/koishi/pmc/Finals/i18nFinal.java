@@ -1185,6 +1185,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 将会开始终止正在进行的任务，但不会立刻终止
+     */
+    public static String tip_cancelButton() {
+        return bundle.getString("tip.cancelButton");
+    }
+
+    /**
      * @return <p>程序版本：{@value priv.koishi.pmc.Finals.CommonFinals#version}</p>
      * <p>构建日期：{@value priv.koishi.pmc.Finals.CommonFinals#buildDate}</p>
      * JDK版本：Amazon.com Inc. 26.0.1+8-LTS

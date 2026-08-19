@@ -144,7 +144,6 @@ public class ScheduledService {
                 } else if (isMac) {
                     getMacTaskDetails(taskDetails);
                 }
-                updateMessage("");
                 return taskDetails;
             }
 

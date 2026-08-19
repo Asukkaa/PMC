@@ -58,7 +58,8 @@ import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -205,18 +206,13 @@ public class ListPMCController extends RootController {
                 taskBean.setMessageLabel(log_List)
                         .setBeanList(tableViewItems);
                 exportPMCTask = exportPMCS(taskBean, autoSavePMCSFileName(), outPath, notOverwrite_List.isSelected());
-                taskBean.setWorkingTask(exportPMCTask);
+                taskBean.setWorkingTask(exportPMCTask)
+                        .setOnFailed(_ -> exportPMCTask = null)
+                        .setOnSucceeded(_ -> {
+                            log_List.setTextFill(Color.GREEN);
+                            exportPMCTask = null;
+                        });
                 bindingTaskNode(taskBean);
-                exportPMCTask.setOnSucceeded(_ -> {
-                    taskUnbind(taskBean);
-                    log_List.setTextFill(Color.GREEN);
-                    exportPMCTask = null;
-                });
-                exportPMCTask.setOnFailed(event -> {
-                    exportPMCTask = null;
-                    taskNotSuccess(taskBean, text_taskFailed());
-                    throw new RuntimeException(event.getSource().getException());
-                });
                 Thread.ofVirtual()
                         .name("exportPMCSTask-vThread" + tabId)
                         .start(exportPMCTask);
@@ -334,14 +330,14 @@ public class ListPMCController extends RootController {
                         mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
                         TaskBean<ClickPositionVO> taskBean = autoClickController.creatTaskBean();
                         Task<List<ClickPositionVO>> copyPMCTask = copyPMC(clickPositionVOS, taskBean);
-                        taskBean.setWorkingTask(copyPMCTask);
+                        taskBean.setWorkingTask(copyPMCTask)
+                                .setOnSucceeded(_ -> {
+                                    taskUnbind(taskBean);
+                                    List<ClickPositionVO> copy = copyPMCTask.getValue();
+                                    autoClickController.addAutoClickPositions(copy, path);
+                                    autoClickController.outFileName_Click.setText(getFileName(path));
+                                });
                         bindingTaskNode(taskBean);
-                        copyPMCTask.setOnSucceeded(_ -> {
-                            taskUnbind(taskBean);
-                            List<ClickPositionVO> copy = copyPMCTask.getValue();
-                            autoClickController.addAutoClickPositions(copy, path);
-                            autoClickController.outFileName_Click.setText(getFileName(path));
-                        });
                         Thread.ofVirtual()
                                 .name("copyPMCSTask-vThread" + tabId)
                                 .start(copyPMCTask);
@@ -394,26 +390,20 @@ public class ListPMCController extends RootController {
                 if (file != null) {
                     TaskBean<PMCListBean> taskBean = creatTaskBean();
                     loadPMCFilsTask = loadPMCSFils(Collections.singletonList(file));
-                    taskBean.setWorkingTask(loadPMCFilsTask);
+                    taskBean.setWorkingTask(loadPMCFilsTask)
+                            .setOnFailed(_ -> loadPMCFilsTask = null)
+                            .setOnSucceeded(_ -> {
+                                PMCSLoadResult value = loadPMCFilsTask.getValue();
+                                List<PMCListBean> clickPositionVOS = value.pmcListBeans();
+                                List<ClickPositionVO> vos = clickPositionVOS.getFirst().getClickPositionVOS();
+                                selected.setPath(file.getAbsolutePath())
+                                        .setClickPositionVOS(vos)
+                                        .setName(file.getName());
+                                updateTableViewSizeText(tableView_List, dataNumber_List, unit_files());
+                                tableView_List.refresh();
+                                loadPMCFilsTask = null;
+                            });
                     bindingTaskNode(taskBean);
-                    loadPMCFilsTask.setOnSucceeded(_ -> {
-                        taskUnbind(taskBean);
-                        PMCSLoadResult value = loadPMCFilsTask.getValue();
-                        List<PMCListBean> clickPositionVOS = value.pmcListBeans();
-                        List<ClickPositionVO> vos = clickPositionVOS.getFirst().getClickPositionVOS();
-                        selected.setPath(file.getAbsolutePath())
-                                .setClickPositionVOS(vos)
-                                .setName(file.getName());
-                        updateTableViewSizeText(tableView_List, dataNumber_List, unit_files());
-                        tableView_List.refresh();
-                        loadPMCFilsTask = null;
-                    });
-                    loadPMCFilsTask.setOnFailed(event -> {
-                        taskUnbind(taskBean);
-                        taskNotSuccess(taskBean, text_taskFailed());
-                        loadPMCFilsTask = null;
-                        throw new RuntimeException(event.getSource().getException());
-                    });
                     Thread.ofVirtual()
                             .name("loadPMCSFilsTask-vThread" + tabId)
                             .start(loadPMCFilsTask);
@@ -502,22 +492,16 @@ public class ListPMCController extends RootController {
     private void startLoadPMCTask(List<? extends File> files) {
         TaskBean<PMCListBean> taskBean = creatTaskBean();
         loadPMCFilsTask = loadPMCSFils(files);
-        taskBean.setWorkingTask(loadPMCFilsTask);
+        taskBean.setWorkingTask(loadPMCFilsTask)
+                .setOnFailed(_ -> loadPMCFilsTask = null)
+                .setOnSucceeded(_ -> {
+                    PMCSLoadResult value = loadPMCFilsTask.getValue();
+                    String lastPMCPath = value.lastPMCPath();
+                    List<PMCListBean> clickPositionVOS = value.pmcListBeans();
+                    addPMCSFile(clickPositionVOS, lastPMCPath);
+                    loadPMCFilsTask = null;
+                });
         bindingTaskNode(taskBean);
-        loadPMCFilsTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            PMCSLoadResult value = loadPMCFilsTask.getValue();
-            String lastPMCPath = value.lastPMCPath();
-            List<PMCListBean> clickPositionVOS = value.pmcListBeans();
-            addPMCSFile(clickPositionVOS, lastPMCPath);
-            loadPMCFilsTask = null;
-        });
-        loadPMCFilsTask.setOnFailed(event -> {
-            taskUnbind(taskBean);
-            taskNotSuccess(taskBean, text_taskFailed());
-            loadPMCFilsTask = null;
-            throw new RuntimeException(event.getSource().getException());
-        });
         Thread.ofVirtual()
                 .name("loadPMCSFilsTask-vThread" + tabId)
                 .start(loadPMCFilsTask);
@@ -595,29 +579,26 @@ public class ListPMCController extends RootController {
         }
         // 运行定时任务
         if (StringUtils.isNotBlank(loadPMCSPath)) {
-            TaskBean<PMCListBean> taskBean = creatTaskBean();
             loadedPMCSTask = buildPMCS(new File(loadPMCSPath));
-            loadedPMCSTask.setOnSucceeded(_ -> {
-                taskUnbind(taskBean);
-                List<PMCListBean> beans = loadedPMCSTask.getValue();
-                addPMCSFile(beans, loadPMCSPath);
-                loadedPMCSTask = null;
-                try {
-                    // 运行自动操作
-                    if (runPMCSFile) {
-                        runClick();
-                    }
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-                // 清空启动参数
-                clearArgs();
-            });
-            loadedPMCSTask.setOnFailed(e -> {
-                taskNotSuccess(taskBean, text_taskFailed());
-                loadedPMCSTask = null;
-                throw new RuntimeException(e.getSource().getException());
-            });
+            TaskBean<PMCListBean> taskBean = creatTaskBean()
+                    .setWorkingTask(loadedPMCSTask)
+                    .setOnFailed(_ -> loadedPMCSTask = null)
+                    .setOnSucceeded(_ -> {
+                        List<PMCListBean> beans = loadedPMCSTask.getValue();
+                        addPMCSFile(beans, loadPMCSPath);
+                        loadedPMCSTask = null;
+                        try {
+                            // 运行自动操作
+                            if (runPMCSFile) {
+                                runClick();
+                            }
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        // 清空启动参数
+                        clearArgs();
+                    });
+            bindingTaskNode(taskBean);
             Thread.ofVirtual()
                     .name("loadedPMCSTask-vThread" + tabId)
                     .start(loadedPMCSTask);
@@ -741,22 +722,17 @@ public class ListPMCController extends RootController {
                 .setBeanList(tableViewItems);
         String fileName = setDefaultFileName(outFileName_List, defaultPMCSFileName());
         exportPMCTask = exportPMCS(taskBean, fileName, outFilePath, notOverwrite_List.isSelected());
-        taskBean.setWorkingTask(exportPMCTask);
+        taskBean.setWorkingTask(exportPMCTask)
+                .setOnFailed(_ -> exportPMCTask = null)
+                .setOnSucceeded(_ -> {
+                    String path = exportPMCTask.getValue();
+                    log_List.setTextFill(Color.GREEN);
+                    if (openDirectory_List.isSelected()) {
+                        openDirectory(path);
+                    }
+                    exportPMCTask = null;
+                });
         bindingTaskNode(taskBean);
-        exportPMCTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            String path = exportPMCTask.getValue();
-            log_List.setTextFill(Color.GREEN);
-            if (openDirectory_List.isSelected()) {
-                openDirectory(path);
-            }
-            exportPMCTask = null;
-        });
-        exportPMCTask.setOnFailed(event -> {
-            exportPMCTask = null;
-            taskNotSuccess(taskBean, text_taskFailed());
-            throw new RuntimeException(event.getSource().getException());
-        });
         Thread.ofVirtual()
                 .name("exportPMCTask-vThread" + tabId)
                 .start(exportPMCTask);

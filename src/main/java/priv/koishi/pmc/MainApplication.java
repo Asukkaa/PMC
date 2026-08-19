@@ -510,20 +510,15 @@ public class MainApplication extends Application {
                 .setMessageLabel(autoClickController.dataNumber_Click)
                 .setTableView(autoClickController.tableView_Click)
                 .setDisableNodes(autoClickController.disableNodes)
-                .setWorkingTask(autoClickController.loadedPMCTask);
+                .setWorkingTask(autoClickController.loadedPMCTask)
+                .setOnFailed(_ -> autoClickController.loadedPMCTask = null)
+                .setOnSucceeded(_ -> {
+                    List<ClickPositionVO> clickPositionVOS = autoClickController.loadedPMCTask.getValue();
+                    autoClickController.addAutoClickPositions(clickPositionVOS, file.getPath());
+                    tabPane.getSelectionModel().select(autoClickTab);
+                    autoClickController.loadedPMCTask = null;
+                });
         bindingTaskNode(taskBean);
-        autoClickController.loadedPMCTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            List<ClickPositionVO> clickPositionVOS = autoClickController.loadedPMCTask.getValue();
-            autoClickController.addAutoClickPositions(clickPositionVOS, file.getPath());
-            tabPane.getSelectionModel().select(autoClickTab);
-            autoClickController.loadedPMCTask = null;
-        });
-        autoClickController.loadedPMCTask.setOnFailed(e -> {
-            taskNotSuccess(taskBean, text_taskFailed());
-            autoClickController.loadedPMCTask = null;
-            throw new RuntimeException(e.getSource().getException());
-        });
     }
 
     /**

@@ -30,7 +30,6 @@ import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -165,23 +164,20 @@ public class TimedTaskController extends RootController {
     private void executeGetScheduleTask(Consumer<? super List<TimedTaskBean>> successHandler) {
         removeAll();
         TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
-        taskBean.setProgressBar(progressBar_Task)
-                .setDisableNodes(disableNodes)
-                .setBindingMessageLabel(true)
-                .setMessageLabel(log_Task);
+        taskBean.setMessageLabel(dataNumber_Task)
+                .setProgressBar(progressBar_Task)
+                .setDisableNodes(disableNodes);
         Task<List<TimedTaskBean>> task = getTaskDetailsTask();
-        taskBean.setWorkingTask(task);
+        taskBean.setWorkingTask(task)
+                .setOnSucceeded(_ -> {
+                    List<TimedTaskBean> result = task.getValue();
+                    Platform.runLater(() ->
+                            addData(result, append, tableView_Task, dataNumber_Task, unit_task(), false));
+                    if (successHandler != null) {
+                        successHandler.accept(result);
+                    }
+                });
         bindingTaskNode(taskBean);
-        task.setOnSucceeded(_ -> {
-            List<TimedTaskBean> result = task.getValue();
-            Platform.runLater(() -> {
-                addData(result, append, tableView_Task, dataNumber_Task, unit_task(), false);
-                taskUnbind(taskBean);
-            });
-            if (successHandler != null) {
-                successHandler.accept(result);
-            }
-        });
         Thread.ofVirtual()
                 .name("task-select-vThread")
                 .start(task);

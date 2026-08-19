@@ -51,7 +51,8 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskNotSuccess;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -480,63 +481,57 @@ public class AboutController extends RootController {
                 .setDisableNodes(disableNodes)
                 .setBindingMessageLabel(true);
         Task<CheckUpdateBean> task = checkLatestVersion();
-        taskBean.setWorkingTask(task);
-        bindingTaskNode(taskBean);
-        task.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            CheckUpdateBean updateInfo = task.getValue();
-            try {
-                // 更新最后检测时间
-                updateProperties(configFile, key_lastCheck, String.valueOf(LocalDate.now()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            // 检查是否有新版本
-            if (isNewVersionAvailable(updateInfo)) {
-                checkMessage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
-                //更新最后检查日期
-                updateCheckDate(Color.BLUE);
-                checkMessage_Abt.setTextFill(Color.BLUE);
-                if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
-                    // 弹出更新对话框
-                    Optional<ButtonType> result = showUpdateDialog(updateInfo);
-                    if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
-                        ProgressDialog progressDialog = new ProgressDialog();
-                        // 用户选择更新
-                        downloadedUpdateTask = downloadAndInstallUpdate(updateInfo, progressDialog);
-                        Thread.ofVirtual()
-                                .name("task-downloadedUpdate-vThread" + tabId)
-                                .start(downloadedUpdateTask);
-                        downloadedUpdateTask.setOnFailed(_ -> {
-                            try {
-                                logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
-                                deleteDirectoryRecursively(Path.of(PMCTempPath));
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            String message = update_downloadFailed();
-                            taskNotSuccess(taskBean, message);
-                            progressDialog.close();
-                            Throwable ex = downloadedUpdateTask.getException();
-                            downloadedUpdateTask = null;
-                            throw new RuntimeException(message, ex);
-                        });
-                        downloadedUpdateTask.setOnCancelled(_ -> downloadedUpdateTask = null);
+        taskBean.setWorkingTask(task)
+                .setOnFailed(_ -> updateCheckDate(Color.RED))
+                .setOnSucceeded(_ -> {
+                    CheckUpdateBean updateInfo = task.getValue();
+                    try {
+                        // 更新最后检测时间
+                        updateProperties(configFile, key_lastCheck, String.valueOf(LocalDate.now()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                }
-            } else {
-                checkMessage_Abt.setText(update_nowIsLast());
-                //更新最后检查日期
-                updateCheckDate(Color.GREEN);
-                checkMessage_Abt.setTextFill(Color.GREEN);
-            }
-        });
-        task.setOnFailed(_ -> {
-            taskNotSuccess(taskBean, update_checkFailed());
-            //更新最后检查日期
-            updateCheckDate(Color.RED);
-            throw new RuntimeException(task.getException());
-        });
+                    // 检查是否有新版本
+                    if (isNewVersionAvailable(updateInfo)) {
+                        checkMessage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
+                        //更新最后检查日期
+                        updateCheckDate(Color.BLUE);
+                        checkMessage_Abt.setTextFill(Color.BLUE);
+                        if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
+                            // 弹出更新对话框
+                            Optional<ButtonType> result = showUpdateDialog(updateInfo);
+                            if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
+                                ProgressDialog progressDialog = new ProgressDialog();
+                                // 用户选择更新
+                                downloadedUpdateTask = downloadAndInstallUpdate(updateInfo, progressDialog);
+                                Thread.ofVirtual()
+                                        .name("task-downloadedUpdate-vThread" + tabId)
+                                        .start(downloadedUpdateTask);
+                                downloadedUpdateTask.setOnFailed(_ -> {
+                                    try {
+                                        logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
+                                        deleteDirectoryRecursively(Path.of(PMCTempPath));
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    String message = update_downloadFailed();
+                                    taskNotSuccess(taskBean, message);
+                                    progressDialog.close();
+                                    Throwable ex = downloadedUpdateTask.getException();
+                                    downloadedUpdateTask = null;
+                                    throw new RuntimeException(message, ex);
+                                });
+                                downloadedUpdateTask.setOnCancelled(_ -> downloadedUpdateTask = null);
+                            }
+                        }
+                    } else {
+                        checkMessage_Abt.setText(update_nowIsLast());
+                        //更新最后检查日期
+                        updateCheckDate(Color.GREEN);
+                        checkMessage_Abt.setTextFill(Color.GREEN);
+                    }
+                });
+        bindingTaskNode(taskBean);
         Thread.ofVirtual()
                 .name("task-checkUpdate-vThread" + tabId)
                 .start(task);

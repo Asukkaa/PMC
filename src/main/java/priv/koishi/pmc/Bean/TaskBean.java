@@ -1,7 +1,10 @@
 package priv.koishi.pmc.Bean;
 
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
@@ -43,6 +46,11 @@ public class TaskBean<T> {
     private Label messageLabel;
 
     /**
+     * 取消任务按钮
+     */
+    private Button cancelButton;
+
+    /**
      * 页面标识符
      */
     private String tabId;
@@ -63,6 +71,21 @@ public class TaskBean<T> {
     private Task<?> workingTask;
 
     /**
+     * 任务成功时的用户回调
+     */
+    private EventHandler<WorkerStateEvent> onSucceeded;
+
+    /**
+     * 任务失败时的用户回调
+     */
+    private EventHandler<WorkerStateEvent> onFailed;
+
+    /**
+     * 任务取消时的用户回调
+     */
+    private EventHandler<WorkerStateEvent> onCancelled;
+
+    /**
      * 解除 Task 引用
      */
     public void clearTask() {
@@ -70,8 +93,12 @@ public class TaskBean<T> {
         tableView = null;
         progressBar = null;
         messageLabel = null;
+        cancelButton = null;
         workingTask = null;
         disableNodes = null;
+        onSucceeded = null;
+        onFailed = null;
+        onCancelled = null;
     }
 
 }

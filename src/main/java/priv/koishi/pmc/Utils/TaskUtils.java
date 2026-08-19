@@ -1,13 +1,17 @@
 package priv.koishi.pmc.Utils;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import priv.koishi.pmc.Bean.TaskBean;
 
 import static priv.koishi.pmc.Finals.i18nFinal.text_taskFailed;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
-import static priv.koishi.pmc.Utils.NodeDisableUtils.changeNodesDisable;
+import static priv.koishi.pmc.Finals.i18nFinal.tip_cancelButton;
+import static priv.koishi.pmc.Utils.NodeDisableUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.showErrLabelText;
 import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
 
@@ -21,7 +25,7 @@ import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
 public class TaskUtils {
 
     /**
-     * 绑定带进度条的线程
+     * 绑定任务程
      *
      * @param taskBean 绑定线程任务所需参数
      */
@@ -30,7 +34,7 @@ public class TaskUtils {
     }
 
     /**
-     * 绑定带进度条的线程
+     * 绑定任务程
      *
      * @param taskBean 绑定线程任务所需参数
      */
@@ -45,7 +49,7 @@ public class TaskUtils {
     }
 
     /**
-     * 绑定带进度条的线程
+     * 绑定任务程
      *
      * @param taskBean 绑定线程任务所需参数
      */
@@ -58,34 +62,66 @@ public class TaskUtils {
             progressBar.setVisible(true);
             // 给进度条设置初始值
             progressBar.setProgress(0);
-            progressBar.progressProperty().bind(task.progressProperty());
+            Platform.runLater(() -> progressBar.progressProperty().bind(task.progressProperty()));
         }
         Label messageLabel = taskBean.getMessageLabel();
         if (messageLabel != null && taskBean.isBindingMessageLabel()) {
             // 绑定 TextField 的值属性
             messageLabel.textProperty().unbind();
             updateLabel(messageLabel, "");
-            messageLabel.textProperty().bind(task.messageProperty());
+            Platform.runLater(() -> messageLabel.textProperty().bind(task.messageProperty()));
+        }
+        Button cancelButton = taskBean.getCancelButton();
+        if (cancelButton != null) {
+            setNodeDisable(cancelButton, false, tip_cancelButton());
+            cancelButton.setVisible(true);
         }
         // 设置默认的异常处理
-        throwTaskException(taskBean);
+        setTaskCallBack(taskBean);
     }
 
     /**
-     * 抛出 task 异常
+     * 设置 Task 回调
      *
      * @param taskBean 线程任务所需参数
      * @throws RuntimeException 线程的异常
      */
-    public static void throwTaskException(TaskBean<?> taskBean) {
+    public static void setTaskCallBack(TaskBean<?> taskBean) {
         Task<?> task = taskBean.getWorkingTask();
-        task.setOnSucceeded(_ -> taskUnbind(taskBean));
-        task.setOnFailed(_ -> {
-            taskNotSuccess(taskBean, text_taskFailed());
-            // 获取抛出的异常
-            throw new RuntimeException(task.getException());
+        task.setOnSucceeded(event -> {
+            taskUnbind(taskBean);
+            EventHandler<WorkerStateEvent> handler = taskBean.getOnSucceeded();
+            try {
+                if (handler != null) {
+                    handler.handle(event);
+                }
+            } finally {
+                taskBean.clearTask();
+            }
         });
-        task.setOnCancelled(_ -> taskNotSuccess(taskBean, text_taskFailed()));
+        task.setOnFailed(event -> {
+            taskNotSuccess(taskBean, text_taskFailed());
+            EventHandler<WorkerStateEvent> handler = taskBean.getOnFailed();
+            try {
+                if (handler != null) {
+                    handler.handle(event);
+                }
+            } finally {
+                taskBean.clearTask();
+            }
+            throw new RuntimeException(event.getSource().getException());
+        });
+        task.setOnCancelled(event -> {
+            taskNotSuccess(taskBean, text_taskFailed());
+            EventHandler<WorkerStateEvent> handler = taskBean.getOnCancelled();
+            try {
+                if (handler != null) {
+                    handler.handle(event);
+                }
+            } finally {
+                taskBean.clearTask();
+            }
+        });
     }
 
     /**
@@ -107,7 +143,10 @@ public class TaskUtils {
             progressBar.setVisible(false);
             progressBar.progressProperty().unbind();
         }
-        taskBean.clearTask();
+        Button cancelButton = taskBean.getCancelButton();
+        if (cancelButton != null) {
+            cancelButton.setVisible(false);
+        }
         System.gc();
     }
 

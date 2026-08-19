@@ -91,7 +91,8 @@ import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskNotSuccess;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -452,18 +453,13 @@ public class AutoClickController extends RootController implements MousePosition
                 taskBean.setMessageLabel(log_Click)
                         .setBeanList(tableViewItems);
                 exportPMCTask = exportPMC(taskBean, autoSavePMCFileName(), outPath, notOverwrite_Click.isSelected());
-                taskBean.setWorkingTask(exportPMCTask);
+                taskBean.setWorkingTask(exportPMCTask)
+                        .setOnFailed(_ -> exportPMCTask = null)
+                        .setOnSucceeded(_ -> {
+                            log_Click.setTextFill(Color.GREEN);
+                            exportPMCTask = null;
+                        });
                 bindingTaskNode(taskBean);
-                exportPMCTask.setOnSucceeded(_ -> {
-                    taskUnbind(taskBean);
-                    log_Click.setTextFill(Color.GREEN);
-                    exportPMCTask = null;
-                });
-                exportPMCTask.setOnFailed(event -> {
-                    exportPMCTask = null;
-                    taskNotSuccess(taskBean, text_taskFailed());
-                    throw new RuntimeException(event.getSource().getException());
-                });
                 Thread.ofVirtual()
                         .name("exportPMCTask-vThread" + tabId)
                         .start(exportPMCTask);
@@ -839,9 +835,9 @@ public class AutoClickController extends RootController implements MousePosition
                 autoClickTask = autoClick(taskBean, new Robot(), new DynamicQueue<>());
             }
             taskBean.setWorkingTask(autoClickTask);
-            // 绑定带进度条的线程
-            bindingTaskNode(taskBean, true);
             setTaskEvent(taskBean);
+            // 绑定线程
+            bindingTaskNode(taskBean, true);
             if (runTimeline == null) {
                 TextField preparationRunTime = isBatch ?
                         listPMCController.preparationRunTime_List : preparationRunTime_Click;
@@ -865,16 +861,15 @@ public class AutoClickController extends RootController implements MousePosition
      * @param taskBean 线程任务参数
      */
     private void setTaskEvent(AutoClickTaskBean taskBean) {
-        autoClickTask.setOnSucceeded(_ -> {
+        Label logLabel = taskBean.getMessageLabel();
+        taskBean.setOnSucceeded(_ -> {
             PMCLogResult value = autoClickTask.getValue();
             if (value != null) {
                 clickLogs = value.clickLogBeans();
                 listPMCController.clickLogs = value.pmcLogBeans();
                 if (clickLogs == null) {
-                    taskNotSuccess(taskBean, text_taskFailed());
+                    showErrLabelText(logLabel, text_taskFailed());
                 } else {
-                    taskUnbind(taskBean);
-                    Label logLabel = taskBean.getMessageLabel();
                     logLabel.setTextFill(Color.GREEN);
                     logLabel.setText(text_taskFinished());
                     CheckBox showWindowRun = settingController.showWindowRun_Set;
@@ -885,8 +880,6 @@ public class AutoClickController extends RootController implements MousePosition
                     }
                 }
             } else {
-                taskUnbind(taskBean);
-                Label logLabel = taskBean.getMessageLabel();
                 logLabel.setTextFill(Color.RED);
                 logLabel.setText(text_taskFailed());
                 if (mainStage.isIconified()) {
@@ -900,10 +893,8 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask = null;
             runTimeline = null;
             runClicking = false;
-        });
-        autoClickTask.setOnFailed(_ -> {
+        }).setOnFailed(_ -> {
             clickLogs = getNowLogs();
-            taskNotSuccess(taskBean, text_taskFailed());
             hideFloatingWindow(messageFloating);
             CheckBox showWindowRun = settingController.showWindowRun_Set;
             if (showWindowRun.isSelected()) {
@@ -916,15 +907,11 @@ public class AutoClickController extends RootController implements MousePosition
                 runTimeline.stop();
                 runTimeline = null;
             }
-            Throwable ex = autoClickTask.getException();
             autoClickTask = null;
             runClicking = false;
             clearReferences();
-            throw new RuntimeException(ex);
-        });
-        autoClickTask.setOnCancelled(_ -> {
+        }).setOnCancelled(_ -> {
             clickLogs = getNowLogs();
-            taskNotSuccess(taskBean, text_taskCancelled());
             hideFloatingWindow(messageFloating);
             CheckBox showWindowRun = settingController.showWindowRun_Set;
             if (showWindowRun.isSelected()) {
@@ -1502,9 +1489,9 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask = null;
             if (taskBean == null) {
                 taskBean = new AutoClickTaskBean();
-                taskBean.setProgressBar(progressBar_Click)
-                        .setMessageLabel(log_Click);
             }
+            taskBean.setProgressBar(progressBar_Click)
+                    .setMessageLabel(log_Click);
             taskNotSuccess(taskBean, text_taskCancelled());
         }
         // 改变要防重复点击的组件状态
@@ -1988,23 +1975,19 @@ public class AutoClickController extends RootController implements MousePosition
     public void startLoadPMCTask(List<? extends File> files) {
         TaskBean<ClickPositionVO> taskBean = creatTaskBean();
         loadPMCFilsTask = loadPMCFils(taskBean, files);
-        taskBean.setWorkingTask(loadPMCFilsTask);
+        taskBean.setWorkingTask(loadPMCFilsTask)
+                .setOnSucceeded(_ -> {
+                    PMCLoadResult value = loadPMCFilsTask.getValue();
+                    String lastPMCPath = value.lastPMCPath();
+                    List<ClickPositionVO> clickPositionVOS = value.clickPositionList();
+                    addAutoClickPositions(clickPositionVOS, lastPMCPath);
+                    mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
+                    loadPMCFilsTask = null;
+                }).setOnFailed(_ -> {
+                    taskNotSuccess(taskBean, text_taskFailed());
+                    loadPMCFilsTask = null;
+                });
         bindingTaskNode(taskBean);
-        loadPMCFilsTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            PMCLoadResult value = loadPMCFilsTask.getValue();
-            String lastPMCPath = value.lastPMCPath();
-            List<ClickPositionVO> clickPositionVOS = value.clickPositionList();
-            addAutoClickPositions(clickPositionVOS, lastPMCPath);
-            mainController.tabPane.getSelectionModel().select(mainController.autoClickTab);
-            loadPMCFilsTask = null;
-        });
-        loadPMCFilsTask.setOnFailed(event -> {
-            taskUnbind(taskBean);
-            taskNotSuccess(taskBean, text_taskFailed());
-            loadPMCFilsTask = null;
-            throw new RuntimeException(event.getSource().getException());
-        });
         Thread.ofVirtual()
                 .name("loadPMCFilsTask-vThread" + tabId)
                 .start(loadPMCFilsTask);
@@ -2071,29 +2054,24 @@ public class AutoClickController extends RootController implements MousePosition
         if (StringUtils.isNotBlank(loadPMCPath)) {
             TaskBean<ClickPositionVO> taskBean = creatTaskBean();
             loadedPMCTask = buildPMC(new File(loadPMCPath));
-            taskBean.setWorkingTask(loadedPMCTask);
+            taskBean.setWorkingTask(loadedPMCTask)
+                    .setOnFailed(_ -> loadedPMCTask = null)
+                    .setOnSucceeded(_ -> {
+                        List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
+                        addAutoClickPositions(clickPositionVOS, loadPMCPath);
+                        loadedPMCTask = null;
+                        try {
+                            // 运行自动操作
+                            if (runPMCFile) {
+                                runClick();
+                            }
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        // 清空启动参数
+                        clearArgs();
+                    });
             bindingTaskNode(taskBean);
-            loadedPMCTask.setOnSucceeded(_ -> {
-                taskUnbind(taskBean);
-                List<ClickPositionVO> clickPositionVOS = loadedPMCTask.getValue();
-                addAutoClickPositions(clickPositionVOS, loadPMCPath);
-                loadedPMCTask = null;
-                try {
-                    // 运行自动操作
-                    if (runPMCFile) {
-                        runClick();
-                    }
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-                // 清空启动参数
-                clearArgs();
-            });
-            loadedPMCTask.setOnFailed(e -> {
-                taskNotSuccess(taskBean, text_taskFailed());
-                loadedPMCTask = null;
-                throw new RuntimeException(e.getSource().getException());
-            });
             Thread.ofVirtual()
                     .name("loadedPMCTask-vThread" + tabId)
                     .start(loadedPMCTask);
@@ -2278,22 +2256,17 @@ public class AutoClickController extends RootController implements MousePosition
                     .setBeanList(tableViewItems);
             String fileName = setDefaultFileName(outFileName_Click, defaultPMCFileName());
             exportPMCTask = exportPMC(taskBean, fileName, outFilePath, notOverwrite_Click.isSelected());
-            taskBean.setWorkingTask(exportPMCTask);
+            taskBean.setWorkingTask(exportPMCTask)
+                    .setOnFailed(_ -> exportPMCTask = null)
+                    .setOnSucceeded(_ -> {
+                        String path = exportPMCTask.getValue();
+                        log_Click.setTextFill(Color.GREEN);
+                        if (openDirectory_Click.isSelected()) {
+                            openDirectory(path);
+                        }
+                        exportPMCTask = null;
+                    });
             bindingTaskNode(taskBean);
-            exportPMCTask.setOnSucceeded(_ -> {
-                taskUnbind(taskBean);
-                String path = exportPMCTask.getValue();
-                log_Click.setTextFill(Color.GREEN);
-                if (openDirectory_Click.isSelected()) {
-                    openDirectory(path);
-                }
-                exportPMCTask = null;
-            });
-            exportPMCTask.setOnFailed(event -> {
-                exportPMCTask = null;
-                taskNotSuccess(taskBean, text_taskFailed());
-                throw new RuntimeException(event.getSource().getException());
-            });
             Thread.ofVirtual()
                     .name("exportPMCTask-vThread" + tabId)
                     .start(exportPMCTask);

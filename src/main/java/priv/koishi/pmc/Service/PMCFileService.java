@@ -44,6 +44,7 @@ import static priv.koishi.pmc.MainApplication.runPMCSFile;
 import static priv.koishi.pmc.Utils.ButtonMappingUtils.recordClickTypeMap;
 import static priv.koishi.pmc.Utils.CommonUtils.*;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.TableViewUtils.getTableViewSizeText;
 import static priv.koishi.pmc.Utils.UiUtils.creatConfirmDialog;
 
 /**
@@ -430,9 +431,9 @@ public class PMCFileService {
             protected Void call() {
                 updateMessage(text_readData());
                 TableView<ImgFileVO> tableView = taskBean.getTableView();
-                ObservableList<ImgFileVO> items = tableView.getItems();
-                int size = files.size();
-                Platform.runLater(() -> {
+                try {
+                    ObservableList<ImgFileVO> items = tableView.getItems();
+                    int size = files.size();
                     updateProgress(0, size);
                     for (int i = 0; i < size; i++) {
                         File file = files.get(i);
@@ -447,7 +448,10 @@ public class PMCFileService {
                         }
                         updateProgress(i + 1, size);
                     }
-                });
+                    updateMessage(getTableViewSizeText(tableView, unit_img()));
+                } finally {
+                    Platform.runLater(tableView::refresh);
+                }
                 return null;
             }
         };

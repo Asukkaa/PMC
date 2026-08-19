@@ -40,7 +40,6 @@ import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -420,20 +419,19 @@ public class TaskDetailController extends ManuallyChangeThemeController {
                 .setMessageLabel(log_TD);
         // 创建定时任务
         Task<Void> task = createTask(timedTaskBean);
-        taskBean.setWorkingTask(task);
+        taskBean.setWorkingTask(task)
+                .setOnSucceeded(_ ->
+                        Platform.runLater(() -> {
+                            // 复制成功消息气泡
+                            new MessageBubble(text_successSave());
+                            removeAllListeners();
+                            closeStage(stage, this::closeRequest);
+                            // 触发列表刷新（通过回调）
+                            if (refreshCallback != null) {
+                                refreshCallback.run();
+                            }
+                        }));
         bindingTaskNode(taskBean);
-        task.setOnSucceeded(_ ->
-                Platform.runLater(() -> {
-                    taskUnbind(taskBean);
-                    // 复制成功消息气泡
-                    new MessageBubble(text_successSave());
-                    removeAllListeners();
-                    closeStage(stage, this::closeRequest);
-                    // 触发列表刷新（通过回调）
-                    if (refreshCallback != null) {
-                        refreshCallback.run();
-                    }
-                }));
         Thread.ofVirtual()
                 .name("task-save-vThread" + "_TD")
                 .start(task);

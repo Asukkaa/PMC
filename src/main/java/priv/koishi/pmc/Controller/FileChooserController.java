@@ -48,7 +48,8 @@ import static priv.koishi.pmc.Utils.FileUtils.openDirectory;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.startClearResourcesTask;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -213,19 +214,18 @@ public class FileChooserController extends ManuallyChangeThemeController {
                     .setDisableNodes(disableNodes)
                     .setTableView(tableView_FC);
             readAllFilesTask = readAllFilesTask(fileConfig);
-            taskBean.setWorkingTask(readAllFilesTask);
+            taskBean.setWorkingTask(readAllFilesTask)
+                    .setOnSucceeded(_ -> {
+                        try {
+                            addRemoveSameFile(readAllFilesTask.getValue(), false, tableView_FC);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        // 获取所选文件路径
+                        setPathLabel(filePath_FC, selectedPath);
+                        updateTableViewSizeText(tableView_FC, fileNumber_FC, unit_files());
+                    });
             bindingTaskNode(taskBean);
-            readAllFilesTask.setOnSucceeded(_ -> {
-                taskUnbind(taskBean);
-                try {
-                    addRemoveSameFile(readAllFilesTask.getValue(), false, tableView_FC);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                // 获取所选文件路径
-                setPathLabel(filePath_FC, selectedPath);
-                updateTableViewSizeText(tableView_FC, fileNumber_FC, unit_files());
-            });
             if (!readAllFilesTask.isRunning()) {
                 Thread.ofVirtual()
                         .name("readAllFilesTask-vThread" + tabId)
