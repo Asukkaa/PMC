@@ -73,8 +73,37 @@ macOS 为 [.icns](appBuilder/PMC.icns) 文件。
 jpackage 打包后 win 系统可直接使用 .exe 文件运行， macOS 需要将依赖的 .dylib 文件复制到 Perfect Mouse
 Control.app/Contents/app/ 目录下。
 
-打包需要的依赖库都已放在 appBuilder 目录中， win 系统为 .dll 文件， macOS 为 .dylib 文件。 win
-系统只整理了 [x86_64](appBuilder/win) 版本的依赖库，
+打包需要的依赖库都已放在 appBuilder 目录中， win 系统为 .dll 文件， macOS 为 .dylib 文件。
+win 系统只整理了 [x86_64](appBuilder/win) 版本的依赖库，
+
+leptonica-1.87.0-1.5.14-windows-x86_64.jar
+
+1. libstdc++-6.dll (内部路径: org/bytedeco/leptonica/windows-x86_64/libstdc++-6.dll)
+2. libleptonica-6.dll (内部路径: org/bytedeco/leptonica/windows-x86_64/libleptonica-6.dll)
+3. jnileptonica.dll (内部路径: org/bytedeco/leptonica/windows-x86_64/jnileptonica.dll)
+4. libgcc_s_seh-1.dll (内部路径: org/bytedeco/leptonica/windows-x86_64/libgcc_s_seh-1.dll)
+5. libwinpthread-1.dll (内部路径: org/bytedeco/leptonica/windows-x86_64/libwinpthread-1.dll)
+
+opencv-4.14.0-1.5.14-windows-x86_64.jar
+
+1. opencv_imgproc4140.dll (内部路径: org/bytedeco/opencv/windows-x86_64/opencv_imgproc4140.dll)
+2. jniopencv_imgcodecs.dll (内部路径: org/bytedeco/opencv/windows-x86_64/jniopencv_imgcodecs.dll)
+3. opencv_core4140.dll (内部路径: org/bytedeco/opencv/windows-x86_64/opencv_core4140.dll)
+4. opencv_imgcodecs4140.dll (内部路径: org/bytedeco/opencv/windows-x86_64/opencv_imgcodecs4140.dll)
+5. jniopencv_imgproc.dll (内部路径: org/bytedeco/opencv/windows-x86_64/jniopencv_imgproc.dll)
+6. jniopencv_core.dll (内部路径: org/bytedeco/opencv/windows-x86_64/jniopencv_core.dll)
+
+openblas-0.3.34-1.5.14-windows-x86_64.jar
+
+1. jniopenblas.dll (内部路径: org/bytedeco/openblas/windows-x86_64/jniopenblas.dll)
+2. jniopenblas_nolapack.dll (内部路径: org/bytedeco/openblas/windows-x86_64/jniopenblas_nolapack.dll)
+3. libopenblas.dll (内部路径: org/bytedeco/openblas/windows-x86_64/libopenblas.dll)
+
+tesseract-5.5.3-1.5.14-windows-x86_64.jar
+
+1. libtesseract55.dll (内部路径: org/bytedeco/tesseract/windows-x86_64/libtesseract55.dll)
+2. jnitesseract.dll (内部路径: org/bytedeco/tesseract/windows-x86_64/jnitesseract.dll)
+
 macOS [x86_64](appBuilder/mac) 版本全部整理完毕， [arm](appBuilder/mac_arm) 版本依赖库只整理了部分，因为没有相关机器无法验证缺失哪些依赖。
 macOS 依赖文件中的 [libopenblas_nolapack.0.dylib](appBuilder/mac/libopenblas_nolapack.0.dylib.zip)
 因文件太大所以进行了压缩，打包时需要在对应目录放入解压后的文件。
