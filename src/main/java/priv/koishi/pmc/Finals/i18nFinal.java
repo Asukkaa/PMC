@@ -3114,13 +3114,6 @@ public class i18nFinal {
     }
 
     /**
-     * @return 拖拽
-     */
-    public static String log_drag() {
-        return bundle.getString("log.drag");
-    }
-
-    /**
      * @return 等待
      */
     public static String log_wait() {
