@@ -3,13 +3,11 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
-            图像识别新增更多可选图片格式 (2026.07.31)
-            修复版本检测更新频率下拉框设置失效的问题 (2026.07.31)
-            修复导入 tessdata 模型文件可能会报错的问题 (2026.07.31)
-            优化缩略图显示速度 (2026.07.31)
-            升级 Java 与 JavaFx 版本由 26.0.1 至 26.0.2 (2026.07.31)
-            优化配置文件保存逻辑 (2026.08.11)
-            修复了一些可能的 BUG (2026.08.11)`,
+            优化窗口识别区域浮窗的实现，添加了文本区域背景避免看不清，并解决文本无法完整显示的问题 (2026.08.20)
+            重构了后台线程任务的处理机制 (2026.08.20)
+            升级依赖版本 (2026.08.20)
+            升级 Java 版本由 26.0.2 至 26.0.2.1 (2026.08.20)
+            修复了一些可能的 BUG (2026.08.20)`,
             mac: `
             新增颜色识别功能，可使用拾色器进行拾色后设置目标颜色 (2026.05.12)
             新增文字识别功能，可以使用自定义 traineddata 模型进行文字识别 (2026.05.12)
@@ -24,13 +22,11 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
-            圖像識別新增更多可選圖片格式 (2026.07.31)
-            修復版本檢測更新頻率下拉選單設定失效的問題 (2026.07.31)
-            修復導入 tessdata 模型文件可能報錯的問題 (2026.07.31)
-            優化縮圖顯示速度 (2026.07.31)
-            將 Java 與 JavaFX 版本由 26.0.1 升級至 26.0.2 (2026.07.31)
-            優化配置文件保存邏輯 (2026.08.11)
-            修復了一些可能的 BUG (2026.08.11)`,
+            優化視窗識別區域浮窗的實作，加入文字區域背景以避免辨識不清，並解決文字無法完整顯示的問題（2026.08.20）
+            重構後台執行緒任務的處理機制（2026.08.20）
+            升級依賴版本（2026.08.20）
+            升級 Java 版本由 26.0.2 至 26.0.2.1（2026.08.20）
+            修復了一些可能的 BUG（2026.08.20）`,
             mac: `
             新增顏色識別功能，可使用拾色器進行拾色後設定目標顏色 (2026.05.12)
             新增文字識別功能，可以使用自定義traineddata模型進行文字識別 (2026.05.12)
@@ -45,13 +41,11 @@ module.exports = {
         versionPrefix: "Version",
         whatsNew: {
             win: `
-            Image recognition adds more optional image formats (2026.07.31)
-            Fixed the issue where the drop-down menu for version update check frequency settings was not working (2026.07.31)
-            Fix the issue where importing tessdata model files may cause errors (2026.07.31)
-            Optimized thumbnail display speed (2026.07.31)
-            Upgraded Java and JavaFX versions from 26.0.1 to 26.0.2 (2026.07.31)
-            Optimize the logic for saving configuration files (2026.08.11)
-            Fixed some potential bugs (2026.08.11)`,
+            Optimized the implementation of the floating window for window recognition areas; added a background to the text area to prevent illegibility and fixed the issue where text could not be fully displayed (2026.08.20)
+            Refactored the handling mechanism for background thread tasks (2026.08.20)
+            Upgraded dependency versions (2026.08.20)
+            Upgraded Java version from 26.0.2 to 26.0.2.1 (2026.08.20)
+            Fixed some potential bugs (2026.08.20)`,
             mac: `
             Added color recognition function, allowing users to use a color picker to pick up colors and set the target color (2026.05.12)
             Added text recognition function, allowing for the use of custom traineddata models for text recognition (2026.05.12)
