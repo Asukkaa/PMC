@@ -40,7 +40,7 @@
 
 ## 如何打包
 
-在 maven 依赖都下载完毕后需要对 jna-5.18.1.jar 、 jna-platform-5.18.1.jar
+在 maven 依赖都下载完毕后需要对 jna-5.19.1.jar 、 jna-platform-5.19.1.jar
 这几个不支持模块化的包进行模块化注入，具体方法可参考： https://blog.csdn.net/weixin_44167999/article/details/135753822
 
 由于 jna-platform 依赖 Jna
@@ -59,7 +59,7 @@ libJJNativeHook.x86_64.dylib （macOS） 复制到 ../Contents/MacOS/
 下并更名为 [libJJNativeHook.dylib](appBuilder/mac/libJNativeHook.dylib) 。
 图像识别功能使用 javacv 实现的，打包时 win 系统只需将相关 .dll 文件复制到 复制到 ../app/bin/ 即可， macOS 需将
 libopenblas.0.dylib 复制到 ../Contents/MacOS/
-下并更名为 [libopenblas_nolapack.0.dylib](appBuilder/mac/libopenblas_nolapack.0.dylib.zip) 。
+下并更名为 [libopenblas_nolapack.0.dylib](appBuilder/mac/libopenblas_nolapack.0.dylib) 。
 
 在使用 jlink 打包后 win 系统直接双击 app.bat 即可运行， macOS 需要修改 app 文件在最后一行前加入 cd $DIR ，即使用 cd
 命令打开程序所在目录才可使用脚本启动。 程序逻辑部分在 ../app/lib 目录中，后续更新只需替换 lib 文件夹即可。
@@ -74,7 +74,7 @@ jpackage 打包后 win 系统可直接使用 .exe 文件运行， macOS 需要�
 Control.app/Contents/app/ 目录下。
 
 打包需要的依赖库都已放在 appBuilder 目录中， win 系统为 .dll 文件， macOS 为 .dylib 文件。
-win 系统只整理了 [x86_64](appBuilder/win) 版本的依赖库，
+win 系统只整理了 [x86_64](appBuilder/win) 版本的依赖库，javacv 依赖来源如下：
 
 leptonica-1.87.0-1.5.14-windows-x86_64.jar
 
@@ -105,8 +105,7 @@ tesseract-5.5.3-1.5.14-windows-x86_64.jar
 2. jnitesseract.dll (内部路径: org/bytedeco/tesseract/windows-x86_64/jnitesseract.dll)
 
 macOS [x86_64](appBuilder/mac) 版本全部整理完毕， [arm](appBuilder/mac_arm) 版本依赖库只整理了部分，因为没有相关机器无法验证缺失哪些依赖。
-macOS 依赖文件中的 [libopenblas_nolapack.0.dylib](appBuilder/mac/libopenblas_nolapack.0.dylib.zip)
-因文件太大所以进行了压缩，打包时需要在对应目录放入解压后的文件。
+macOS javacv 依赖来源如下：
 
 leptonica-1.87.0-1.5.14-macosx-x86_64.jar
 
@@ -118,8 +117,8 @@ openblas-0.3.34-1.5.14-macosx-x86_64.jar
 1. libgcc_s.1.1.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libgcc_s.1.1.dylib)
 2. libjniopenblas.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libjniopenblas.dylib)
 3. libjniopenblas_nolapack.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libjniopenblas_nolapack.dylib)
-4. libopenblas.0.dylib -> libopenblas_nolapack.0.dylib (内部路径:
-   org/bytedeco/openblas/macosx-x86_64/libopenblas_nolapack.0.dylib)
+4. libopenblas.0.dylib 需更名为 libopenblas_nolapack.0.dylib (内部路径:
+   org/bytedeco/openblas/macosx-x86_64/libopenblas.0.dylib)
 5. libgfortran.5.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libgfortran.5.dylib)
 6. libquadmath.0.dylib (内部路径: org/bytedeco/openblas/macosx-x86_64/libquadmath.0.dylib)
 
