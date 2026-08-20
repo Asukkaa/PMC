@@ -377,7 +377,6 @@ if ($specialOpenBlasNolapack)
         $sourceCand = $allCandidates | Where-Object { $_.EntryName -eq $sourceFileName } | Select-Object -First 1
         if ($sourceCand)
         {
-            $newEntryPath = $sourceCand.EntryPath -replace $sourceFileName, $specialFileName
             $newBase = [System.IO.Path]::GetFileNameWithoutExtension($specialFileName)
             $newGroupKey = $newBase -replace '\d+$', ''
             if ($newGroupKey -eq "")
@@ -388,7 +387,8 @@ if ($specialOpenBlasNolapack)
                 JarPath = $sourceCand.JarPath
                 EntryFullName = $sourceCand.EntryFullName
                 EntryName = $specialFileName
-                EntryPath = $newEntryPath
+                EntryPath = $sourceCand.EntryPath
+                OriginalEntryPath = $sourceCand.EntryPath
                 BaseName = $newBase
                 GroupKey = $newGroupKey
                 LastWriteTime = $sourceCand.LastWriteTime
@@ -509,10 +509,10 @@ foreach ($jar in $extractedByJar.Keys)
                 $destFileObj.CreationTime = $dt
             }
 
-            # ---------- 输出格式（带序号） ----------
+            # ---------- 输出格式 ----------
             if ($sel.IsRenamed)
             {
-                Write-Host "    $index. $( $sel.OldFileName ) -> $( $sel.RenameFrom ) -> $( $sel.EntryName ) (内部路径: $( $sel.EntryPath ))"
+                Write-Host "    $index. $( $sel.OldFileName ) -> $( $sel.RenameFrom ) -> $( $sel.EntryName ) (内部路径: $( $sel.OriginalEntryPath ))"
             }
             else
             {
