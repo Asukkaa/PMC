@@ -69,6 +69,7 @@ public class TaskUtils {
             // 绑定 TextField 的值属性
             messageLabel.textProperty().unbind();
             updateLabel(messageLabel, "");
+            // 必须在 Platform.runLater 下绑定，不然可能无法更新文本
             Platform.runLater(() -> messageLabel.textProperty().bind(task.messageProperty()));
         }
         Button cancelButton = taskBean.getCancelButton();
