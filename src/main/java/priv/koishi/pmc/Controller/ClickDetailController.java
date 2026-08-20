@@ -1735,8 +1735,8 @@ public class ClickDetailController extends RootController {
     private void initEnvInfoText() {
         initEnvInfoText(pyTip_Det);
         initEnvInfoText(psTip_Det);
-        initEnvInfoText(javaTip_Det);
         initEnvInfoText(jarTip_Det);
+        initEnvInfoText(javaTip_Det);
     }
 
     /**

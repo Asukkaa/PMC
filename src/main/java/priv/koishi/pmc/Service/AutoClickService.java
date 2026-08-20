@@ -1631,7 +1631,7 @@ public class AutoClickService {
                         moveLog.setClickKey(String.join(",", clickKeys))
                                 .setX(String.valueOf((int) finalX))
                                 .setY(String.valueOf((int) finalY))
-                                .setType(log_drag())
+                                .setType(clickType_drag())
                                 .setName(name);
                         clickLog.add(moveLog);
                     }

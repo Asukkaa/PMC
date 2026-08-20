@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
@@ -243,11 +244,6 @@ public class FloatingWindowDescriptor {
     private boolean addCloseKey = true;
 
     /**
-     * 是否格式化文本容器长度（true 格式化，默认不格式化）
-     */
-    private boolean formattingText;
-
-    /**
      * 是否显示窗口相对位置信息（true 显示，默认不显示）
      */
     private boolean showRelativeInfo;
@@ -256,6 +252,11 @@ public class FloatingWindowDescriptor {
      * 追加的自定义内容
      */
     private Node additionalContent;
+
+    /**
+     * 字体背景
+     */
+    private Background textBackground;
 
     /**
      * 销毁浮窗
@@ -302,21 +303,22 @@ public class FloatingWindowDescriptor {
      * 递归清除节点及其所有子节点上的事件处理器
      */
     private void clearNodeHandlers(Node node) {
-        if (node == null) return;
-        // 清除常见的事件处理器
-        node.setOnMousePressed(null);
-        node.setOnMouseReleased(null);
-        node.setOnMouseClicked(null);
-        node.setOnMouseDragged(null);
-        node.setOnMouseMoved(null);
-        node.setOnKeyPressed(null);
-        node.setOnKeyReleased(null);
-        node.setOnKeyTyped(null);
-        node.setOnDragDetected(null);
-        node.setOnContextMenuRequested(null);
-        if (node instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                clearNodeHandlers(child);
+        if (node != null) {
+            // 清除常见的事件处理器
+            node.setOnMousePressed(null);
+            node.setOnMouseReleased(null);
+            node.setOnMouseClicked(null);
+            node.setOnMouseDragged(null);
+            node.setOnMouseMoved(null);
+            node.setOnKeyPressed(null);
+            node.setOnKeyReleased(null);
+            node.setOnKeyTyped(null);
+            node.setOnDragDetected(null);
+            node.setOnContextMenuRequested(null);
+            if (node instanceof Parent parent) {
+                for (Node child : parent.getChildrenUnmodifiable()) {
+                    clearNodeHandlers(child);
+                }
             }
         }
     }

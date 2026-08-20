@@ -13,9 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
@@ -93,35 +91,35 @@ public class FloatingWindow {
         StackPane root = new StackPane();
         root.setBackground(Background.EMPTY);
         // 浮窗坐标信息栏
-        TextAlignment textAlignment = config.getTextAlignment();
         Label floatingPosition = new Label();
-        Color color = config.getTextFill();
-        String fontSize = "-fx-font-size: " + config.getFontSize() + "px;";
-        floatingPosition.setTextFill(color);
-        floatingPosition.setStyle(fontSize);
-        floatingPosition.setTextAlignment(textAlignment);
+        initLabel(floatingPosition, config);
         config.setFloatingPosition(floatingPosition);
         Label messageLabel = new Label(config.getMessage());
-        messageLabel.setTextFill(color);
-        messageLabel.setStyle(fontSize);
-        messageLabel.setTextAlignment(textAlignment);
+        initLabel(messageLabel, config);
         String name = config.getName();
         config.setMessageLabel(messageLabel);
         Label nameLabel = new Label();
         nameLabel.setText(name);
-        nameLabel.setStyle(fontSize);
-        nameLabel.setTextFill(color);
-        nameLabel.setTextAlignment(textAlignment);
+        initLabel(nameLabel, config);
         config.setNameeLabel(nameLabel);
-        VBox vBox = new VBox();
-        vBox.setAlignment(config.getPos());
-        vBox.getChildren().setAll(nameLabel, floatingPosition, messageLabel);
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(0);
+        gridPane.setVgap(0);
+        ColumnConstraints col = new ColumnConstraints();
+        col.setFillWidth(true);
+        gridPane.getColumnConstraints().add(col);
+        gridPane.add(nameLabel, 0, 1);
+        gridPane.add(floatingPosition, 0, 2);
+        gridPane.add(messageLabel, 0, 3);
+        gridPane.setMaxWidth(Region.USE_PREF_SIZE);
+        gridPane.setMaxHeight(Region.USE_PREF_SIZE);
         Node node = config.getAdditionalContent();
         if (node != null) {
-            vBox.getChildren().add(node);
+            gridPane.add(node, 0, 4);
         }
-        root.getChildren().setAll(rectangle, vBox);
-        StackPane.setMargin(vBox, new Insets(5, 0, 0, 5));
+        root.getChildren().setAll(rectangle, gridPane);
+        StackPane.setAlignment(gridPane, config.getPos());
+        StackPane.setMargin(gridPane, new Insets(5, 0, 0, 5));
         // 创建浮窗舞台
         Stage stage = new Stage();
         Scene scene = new Scene(root, Color.TRANSPARENT);
@@ -140,6 +138,24 @@ public class FloatingWindow {
         if (config.isEnableResize()) {
             addResizeHandler(root, config);
         }
+    }
+
+    /**
+     * 初始化文本栏
+     *
+     * @param label  需要出来的文本栏
+     * @param config 浮窗设置参数
+     */
+    private static void initLabel(Label label, FloatingWindowDescriptor config) {
+        Color color = config.getTextFill();
+        String fontSize = "-fx-font-size: " + config.getFontSize() + "px;";
+        TextAlignment textAlignment = config.getTextAlignment();
+        Background background = config.getTextBackground();
+        label.setTextFill(color);
+        label.setStyle(fontSize);
+        label.setTextAlignment(textAlignment);
+        label.setBackground(background);
+        label.setMaxWidth(Double.MAX_VALUE);
     }
 
     /**
@@ -344,40 +360,6 @@ public class FloatingWindow {
         rect.setFill(new Color(1, 1, 1, 1));
         rect.setCursor(cursor);
         return rect;
-    }
-
-    /**
-     * 设置所有 Label 为相同宽度（取最宽的 Label 的宽度）
-     *
-     * @param config 浮窗配置
-     */
-    private static void setSameLabelWidth(FloatingWindowDescriptor config) {
-        if (config.isFormattingText()) {
-            int minWidth = 100;
-            double maxWidth = minWidth;
-            Label messageLabel = config.getMessageLabel();
-            Label nameLabel = config.getNameeLabel();
-            Label floatingPosition = config.getFloatingPosition();
-            Label[] labels = {messageLabel, nameLabel, floatingPosition};
-            // 找到最宽的 Label
-            for (Label label : labels) {
-                if (label != null) {
-                    // 获取 Label 的实际宽度
-                    double width = label.getWidth();
-                    if (width > maxWidth) {
-                        maxWidth = width;
-                    }
-                }
-            }
-            if (maxWidth > minWidth) {
-                for (Label label : labels) {
-                    if (label != null) {
-                        label.setMinWidth(maxWidth);
-                        label.setPrefWidth(maxWidth);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -683,7 +665,6 @@ public class FloatingWindow {
             floatingStage.setY(y);
             floatingStage.setWidth(w);
             floatingStage.setHeight(h);
-            setSameLabelWidth(config);
             // 模拟一次窗口拖拽来校验位置
             if (config.isShowRelativeInfo()) {
                 mouseDragged(config, null, new double[1], new double[1]);
@@ -745,7 +726,6 @@ public class FloatingWindow {
         }
         Label floatingPosition = config.getFloatingPosition();
         floatingPosition.setText(point);
-        setSameLabelWidth(config);
     }
 
     /**
@@ -843,7 +823,6 @@ public class FloatingWindow {
             Label messageLabel = config.getMessageLabel();
             messageLabel.setText(text);
             config.setMessage(text);
-            setSameLabelWidth(config);
         });
     }
 

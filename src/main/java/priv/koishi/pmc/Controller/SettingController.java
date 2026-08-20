@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -24,8 +25,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
@@ -498,17 +498,22 @@ public class SettingController extends RootController implements MousePositionUp
                 .setAddCloseKey(false)
                 .setEnableDrag(false);
         Color color = new Color(1, 1, 1, 0.6);
+        BackgroundFill backgroundFill = new BackgroundFill(
+                Color.rgb(255, 255, 255, 0.2),
+                CornerRadii.EMPTY,
+                Insets.EMPTY);
+        Background background = new Background(backgroundFill);
         windowRelativeInfoFloating = new FloatingWindowDescriptor()
                 .setConfig(new FloatingWindowConfig())
                 .setMessage(text_saveFindImgConfig())
                 .setTextAlignment(TextAlignment.LEFT)
                 .setName(floatingName_window())
                 .setMinHeight(minFindImgHeight)
+                .setTextBackground(background)
                 .setMinWidth(minFindImgWidth)
                 .setBackgroundColor(color)
                 .setShowRelativeInfo(true)
                 .setTextFill(Color.BLACK)
-                .setFormattingText(true)
                 .setPos(Pos.CENTER)
                 .setOnlyHide(true);
         // 读取配置文件
