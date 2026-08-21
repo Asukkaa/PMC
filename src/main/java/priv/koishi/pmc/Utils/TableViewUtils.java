@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Annotation.CheckBoxColumn;
 import priv.koishi.pmc.Bean.Annotation.IndexColumn;
 import priv.koishi.pmc.Bean.Annotation.PathColumn;
+import priv.koishi.pmc.Bean.Annotation.StatusColumn;
 import priv.koishi.pmc.Bean.Interface.CopyBean;
 import priv.koishi.pmc.Bean.Interface.FilePath;
 import priv.koishi.pmc.Bean.Interface.ImgBean;
@@ -207,6 +208,14 @@ public class TableViewUtils {
                         TableColumn<T, Boolean> boolColumn = (TableColumn<T, Boolean>) m;
                         buildCheckBoxCell(boolColumn, labelText, fieldName, checkBoxCallback);
                     }
+                } else if (f.isAnnotationPresent(StatusColumn.class)) {
+                    // 获取注解配置
+                    StatusColumn annotation = f.getAnnotation(StatusColumn.class);
+                    if (f.getType() == String.class) {
+                        buildStringStatusCell((TableColumn<T, String>) m, annotation, fieldName);
+                    } else if (f.getType() == Boolean.class || f.getType() == boolean.class) {
+                        buildBooleanStatusCellFor((TableColumn<T, Boolean>) m, fieldName);
+                    }
                 } else if (f.getType() == Image.class) {
                     // 创建图片表格
                     buildThumbnailCell((TableColumn<T, Image>) m, bean -> {
@@ -232,6 +241,87 @@ public class TableViewUtils {
         });
         ScrollThumbSizing.enable(tableView, 30);
     }
+
+    /**
+     * 渲染状态类型单元格（启用 - 禁用 - 异常）
+     *
+     * @param column     要处理的列（类型为 String）
+     * @param annotation 标记字段在表格中需渲染为状态模式注解
+     * @param fieldName  字段名
+     * @param <T>        表格数据类型
+     */
+    private static <T> void buildStringStatusCell(TableColumn<T, String> column, StatusColumn annotation, String fieldName) {
+        String enabledVal = annotation.enabledValue();
+        String disabledVal = annotation.disabledValue();
+        // 设置属性值工厂（标准绑定）
+        column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+        // 自定义单元格工厂
+        column.setCellFactory(_ -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                    setStyle("");
+                } else {
+                    String displayText;
+                    Color color;
+                    if (enabledVal.equals(item)) {
+                        displayText = text_enable();
+                        color = Color.GREEN;
+                    } else if (disabledVal.equals(item)) {
+                        displayText = text_disable();
+                        color = Color.RED;
+                    } else {
+                        displayText = text_unusual();
+                        color = Color.RED;
+                    }
+                    setText(displayText);
+                    setTooltip(creatTooltip(getTipText(column, displayText)));
+                    setTextFill(color);
+                }
+            }
+        });
+    }
+
+    /**
+     * 渲染状态类型单元格（启用/禁用）
+     *
+     * @param column    要处理的列（类型为 Boolean）
+     * @param fieldName 字段名
+     * @param <T>       表格数据类型
+     */
+    private static <T> void buildBooleanStatusCellFor(TableColumn<T, Boolean> column, String fieldName) {
+        // 设置属性值工厂
+        column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+        // 自定义单元格渲染
+        column.setCellFactory(_ -> new TableCell<>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                    setStyle("");
+                } else {
+                    String displayText;
+                    Color color;
+                    if (item) {
+                        displayText = text_enable();
+                        color = Color.GREEN;
+                    } else {
+                        displayText = text_disable();
+                        color = Color.RED;
+                    }
+                    setText(displayText);
+                    setTooltip(creatTooltip(getTipText(column, displayText)));
+                    setTextFill(color);
+                }
+            }
+        });
+    }
+
 
     /**
      * 创建 CheckBox 列

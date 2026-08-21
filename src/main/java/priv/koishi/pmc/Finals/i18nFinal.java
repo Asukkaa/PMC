@@ -2372,6 +2372,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 异常
+     */
+    public static String text_unusual() {
+        return bundle.getString("unusual");
+    }
+
+    /**
      * @return 创建配置文件目录失败
      */
     public static String text_configFileErr() {
