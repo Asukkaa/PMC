@@ -25,9 +25,11 @@ import java.util.Map;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
+import static priv.koishi.pmc.Finals.i18nFinal.unit_files;
 import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.releaseEngine;
 import static priv.koishi.pmc.Utils.CommonUtils.setAllSafely;
 import static priv.koishi.pmc.Utils.FileUtils.*;
+import static priv.koishi.pmc.Utils.TableViewUtils.getTableViewSizeText;
 
 /**
  * 文字识别相关文件服务类
@@ -96,90 +98,97 @@ public class TessdataService {
         return new Task<>() {
             @Override
             protected Void call() {
-                updateMessage(text_readData());
                 // 读取模型文件
                 List<TessdataBean> list = new ArrayList<>();
-                File tessdataPathFile = new File(tessdataDirectory);
-                File[] files = tessdataPathFile.listFiles();
-                List<TessdataBean> configList = taskBean.getBeanList();
-                if (files != null) {
-                    int size = files.length;
-                    updateProgress(0, size);
-                    for (int i = 0; i < size; i++) {
-                        File file = files[i];
-                        if (traineddata.equals(getExistsFileType(file))) {
-                            list.add(new TessdataBean(file));
-                        }
-                        updateProgress(i + 1, size);
-                    }
-                    // 如果没有传配置数据则读取配置文件
-                    if (CollectionUtils.isEmpty(configList)) {
-                        ObjectMapper objectMapper = JsonMapper.builder()
-                                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                                .build();
-                        String configPath = getRunningResourcePath(configFile_Tessdata);
-                        File file = new File(configPath);
-                        if (file.exists()) {
-                            configList = objectMapper.readValue(file, new TypeReference<>() {
-                            });
-                        }
-                    }
-                    if (CollectionUtils.isNotEmpty(configList)) {
-                        int configListSize = configList.size();
-                        updateProgress(0, configListSize);
-                        // 构建配置数据与模型文件的映射
-                        Map<String, TessdataBean> configMap = new HashMap<>();
-                        for (int i = 0; i < configListSize; i++) {
-                            TessdataBean config = configList.get(i);
-                            String name = config.getName();
-                            if (name != null) {
-                                configMap.put(name, config);
+                try {
+                    updateMessage(text_readData());
+                    File tessdataPathFile = new File(tessdataDirectory);
+                    File[] files = tessdataPathFile.listFiles();
+                    List<TessdataBean> configList = taskBean.getBeanList();
+                    if (files != null) {
+                        int size = files.length;
+                        updateProgress(0, size);
+                        for (int i = 0; i < size; i++) {
+                            File file = files[i];
+                            if (traineddata.equals(getExistsFileType(file))) {
+                                list.add(new TessdataBean(file));
                             }
-                            updateProgress(i + 1, configListSize);
+                            updateProgress(i + 1, size);
                         }
-                        // 根据配置排序
-                        list.sort((a, b) -> {
-                            String nameA = a.getName();
-                            String nameB = b.getName();
-                            boolean inConfigA = configMap.containsKey(nameA);
-                            boolean inConfigB = configMap.containsKey(nameB);
-                            if (inConfigA && inConfigB) {
-                                // 两个都在配置中，按 index 升序
-                                int cmp = Integer.compare(configMap.get(nameA).getIndex(), configMap.get(nameB).getIndex());
-                                if (cmp != 0) {
-                                    return cmp;
+                        // 如果没有传配置数据则读取配置文件
+                        if (CollectionUtils.isEmpty(configList)) {
+                            ObjectMapper objectMapper = JsonMapper.builder()
+                                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                                    .build();
+                            String configPath = getRunningResourcePath(configFile_Tessdata);
+                            File file = new File(configPath);
+                            if (file.exists()) {
+                                configList = objectMapper.readValue(file, new TypeReference<>() {
+                                });
+                            }
+                        }
+                        if (CollectionUtils.isNotEmpty(configList)) {
+                            int configListSize = configList.size();
+                            updateProgress(0, configListSize);
+                            // 构建配置数据与模型文件的映射
+                            Map<String, TessdataBean> configMap = new HashMap<>();
+                            for (int i = 0; i < configListSize; i++) {
+                                TessdataBean config = configList.get(i);
+                                String name = config.getName();
+                                if (name != null) {
+                                    configMap.put(name, config);
                                 }
-                                return nameA.compareTo(nameB);
-                            } else if (inConfigA) {
-                                // 只有 A 在配置中，A 排在前面
-                                return -1;
-                            } else if (inConfigB) {
-                                // 只有 B 在配置中，B 排在前面
-                                return 1;
-                            } else {
-                                // 都不在配置中，按文件名排序
-                                return a.getName().compareTo(b.getName());
+                                updateProgress(i + 1, configListSize);
                             }
-                        });
-                        int listSize = list.size();
-                        updateProgress(0, listSize);
-                        // 填充备注
-                        for (int i = 0; i < listSize; i++) {
-                            TessdataBean bean = list.get(i);
-                            String name = bean.getName();
-                            if (configMap.containsKey(name)) {
-                                TessdataBean tessdataBean = configMap.get(name);
-                                bean.setRemark(tessdataBean.getRemark())
-                                        .setActive(tessdataBean.isActive());
+                            // 根据配置排序
+                            list.sort((a, b) -> {
+                                String nameA = a.getName();
+                                String nameB = b.getName();
+                                boolean inConfigA = configMap.containsKey(nameA);
+                                boolean inConfigB = configMap.containsKey(nameB);
+                                if (inConfigA && inConfigB) {
+                                    // 两个都在配置中，按 index 升序
+                                    int cmp = Integer.compare(configMap.get(nameA).getIndex(), configMap.get(nameB).getIndex());
+                                    if (cmp != 0) {
+                                        return cmp;
+                                    }
+                                    return nameA.compareTo(nameB);
+                                } else if (inConfigA) {
+                                    // 只有 A 在配置中，A 排在前面
+                                    return -1;
+                                } else if (inConfigB) {
+                                    // 只有 B 在配置中，B 排在前面
+                                    return 1;
+                                } else {
+                                    // 都不在配置中，按文件名排序
+                                    return a.getName().compareTo(b.getName());
+                                }
+                            });
+                            int listSize = list.size();
+                            updateProgress(0, listSize);
+                            // 填充备注
+                            for (int i = 0; i < listSize; i++) {
+                                TessdataBean bean = list.get(i);
+                                String name = bean.getName();
+                                if (configMap.containsKey(name)) {
+                                    TessdataBean tessdataBean = configMap.get(name);
+                                    bean.setRemark(tessdataBean.getRemark())
+                                            .setActive(tessdataBean.isActive());
+                                }
+                                updateProgress(i + 1, listSize);
                             }
-                            updateProgress(i + 1, listSize);
                         }
                     }
+                    return null;
+                } finally {
                     // 展示数据
                     TableView<? super TessdataBean> tableView = taskBean.getTableView();
-                    Platform.runLater(() -> setAllSafely(tableView.getItems(), list));
+                    Platform.runLater(() -> {
+                        setAllSafely(tableView.getItems(), list);
+                        tableView.refresh();
+                        updateMessage(getTableViewSizeText(tableView, unit_files()));
+                    });
                 }
-                return null;
             }
         };
     }
@@ -194,16 +203,23 @@ public class TessdataService {
         return new Task<>() {
             @Override
             protected Void call() {
-                List<TessdataBean> tessdataBeans = taskBean.getBeanList();
-                for (int i = 0; i < tessdataBeans.size(); i++) {
-                    TessdataBean tessdataBean = tessdataBeans.get(i);
-                    tessdataBean.setIndex(i + 1);
+                try {
+                    List<TessdataBean> tessdataBeans = taskBean.getBeanList();
+                    for (int i = 0; i < tessdataBeans.size(); i++) {
+                        TessdataBean tessdataBean = tessdataBeans.get(i);
+                        tessdataBean.setIndex(i + 1);
+                    }
+                    String configPath = getRunningResourcePath(configFile_Tessdata);
+                    // 序列化数据
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.writeValue(new File(configPath), tessdataBeans);
+                    return null;
+                } finally {
+                    TableView<TessdataBean> tableView = taskBean.getTableView();
+                    tableView.refresh();
+                    updateMessage(getTableViewSizeText(tableView, unit_files()));
                 }
-                String configPath = getRunningResourcePath(configFile_Tessdata);
-                // 序列化数据
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.writeValue(new File(configPath), tessdataBeans);
-                return null;
+
             }
         };
     }

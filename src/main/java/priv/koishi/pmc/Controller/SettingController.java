@@ -101,7 +101,6 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -1080,9 +1079,11 @@ public class SettingController extends RootController implements MousePositionUp
         Task<Void> loadImgTask = loadImg(taskBean, files);
         taskBean.setWorkingTask(loadImgTask);
         bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("loadImgTask-vThread" + tabId)
-                .start(loadImgTask);
+        if (!loadImgTask.isRunning()) {
+            Thread.ofVirtual()
+                    .name("loadImgTask-vThread" + tabId)
+                    .start(loadImgTask);
+        }
     }
 
     /**
@@ -1497,24 +1498,23 @@ public class SettingController extends RootController implements MousePositionUp
     /**
      * 启动更新 .traineddata 模型信息任务
      */
-    private void startUpdateTessdataTask() {
+    public void startUpdateTessdataTask() {
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
-        Task<Void> updateTessdata = updateTessdata(taskBean);
-        taskBean.setWorkingTask(updateTessdata);
+        Task<Void> updateTessdataTask = updateTessdata(taskBean);
+        taskBean.setWorkingTask(updateTessdataTask)
+                .setOnSucceeded(_ -> {
+                    if (!tessdataFinished) {
+                        tessdataTableView_set.getItems().addListener((ListChangeListener<TessdataBean>)
+                                _ -> startSaveConfigTask());
+                        tessdataFinished = true;
+                    }
+                });
         bindingTaskNode(taskBean);
-        updateTessdata.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            updateTableViewSizeText(tessdataTableView_set, tessdataNumber_set, unit_files());
-            tessdataTableView_set.refresh();
-            if (!tessdataFinished) {
-                tessdataTableView_set.getItems().addListener((ListChangeListener<TessdataBean>)
-                        _ -> startSaveConfigTask());
-                tessdataFinished = true;
-            }
-        });
-        Thread.ofVirtual()
-                .name("updateTessdataTask-vThread" + tessdataId)
-                .start(updateTessdata);
+        if (autoClickController.isFree() && !updateTessdataTask.isRunning()) {
+            Thread.ofVirtual()
+                    .name("updateTessdataTask-vThread" + tessdataId)
+                    .start(updateTessdataTask);
+        }
     }
 
     /**
@@ -1783,16 +1783,11 @@ public class SettingController extends RootController implements MousePositionUp
         Task<Void> saveTessdataConfig = saveTessdataConfig(taskBean);
         taskBean.setWorkingTask(saveTessdataConfig);
         bindingTaskNode(taskBean);
-        saveTessdataConfig.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            Platform.runLater(() -> {
-                tessdataTableView_set.refresh();
-                updateTableViewSizeText(tessdataTableView_set, tessdataNumber_set, unit_files());
-            });
-        });
-        Thread.ofVirtual()
-                .name("saveTessdataConfigTask-vThread" + tessdataId)
-                .start(saveTessdataConfig);
+        if (autoClickController.isFree() && !saveTessdataConfig.isRunning()) {
+            Thread.ofVirtual()
+                    .name("saveTessdataConfigTask-vThread" + tessdataId)
+                    .start(saveTessdataConfig);
+        }
     }
 
     /**
@@ -1802,10 +1797,10 @@ public class SettingController extends RootController implements MousePositionUp
         FileWatchService fileWatchService = new FileWatchService();
         fileWatchService.setRecursive(true);
         fileWatchService.setOnFileChanged(() -> {
-            // 刷新模型列表
-            selectTessdataPath();
             // 尝试情况模型缓存
             if (autoClickController.isFree()) {
+                // 刷新模型列表
+                selectTessdataPath();
                 releaseEngine();
             } else {
                 isReleasing = true;

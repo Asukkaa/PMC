@@ -101,7 +101,6 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.ScriptUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -1223,11 +1222,6 @@ public class ClickDetailController extends RootController {
         Task<Void> updateTessdata = updateTessdata(taskBean);
         taskBean.setWorkingTask(updateTessdata);
         bindingTaskNode(taskBean);
-        updateTessdata.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            updateTableViewSizeText(tessdataTableView_det, tessdataNumber_det, unit_files());
-            tessdataTableView_det.refresh();
-        });
         Thread.ofVirtual()
                 .name("updateTessdataTask-vThread" + tessdataId)
                 .start(updateTessdata);

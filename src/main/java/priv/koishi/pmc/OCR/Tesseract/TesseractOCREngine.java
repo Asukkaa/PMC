@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.bytedeco.tesseract.global.tesseract.PSM_AUTO;
+import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.tessdataDirectory;
 import static priv.koishi.pmc.Finals.i18nFinal.text_tesseractInitErr;
 
@@ -103,6 +104,9 @@ public class TesseractOCREngine {
             enginePool.clear();
             initialized = false;
             logger.info("所有引擎已释放");
+            if (isReleasing) {
+                settingController.startUpdateTessdataTask();
+            }
         }
         isReleasing = false;
     }
