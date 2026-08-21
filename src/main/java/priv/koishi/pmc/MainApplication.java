@@ -58,7 +58,8 @@ import static priv.koishi.pmc.Service.PMCFileService.buildPMCS;
 import static priv.koishi.pmc.Service.SaveConfigService.saveAllConfig;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
+import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -351,13 +352,14 @@ public class MainApplication extends Application {
     private static void startActivationServer(int port) {
         new Thread(() -> {
             try {
-                serverSocket = new ServerSocket(port);
-                while (!serverSocket.isClosed()) {
-                    try (Socket socket = serverSocket.accept()) {
-                        BufferedReader reader;
-                        try (InputStream in = socket.getInputStream()) {
-                            reader = new BufferedReader(new InputStreamReader(in));
-                        }
+                InputStream in = null;
+                BufferedReader reader = null;
+                try {
+                    serverSocket = new ServerSocket(port);
+                    while (!serverSocket.isClosed()) {
+                        Socket socket = serverSocket.accept();
+                        in = socket.getInputStream();
+                        reader = new BufferedReader(new InputStreamReader(in));
                         // 读取第一行为激活标记
                         String signal = reader.readLine();
                         if (activatePMC.equals(signal)) {
@@ -366,6 +368,14 @@ public class MainApplication extends Application {
                                 showWindow(reader);
                             }
                         }
+                    }
+                } finally {
+                    // 不能使用 try-with-resources
+                    if (in != null) {
+                        in.close();
+                    }
+                    if (reader != null) {
+                        reader.close();
                     }
                 }
             } catch (BindException e) {
@@ -539,20 +549,16 @@ public class MainApplication extends Application {
                 .setMessageLabel(listPMCController.dataNumber_List)
                 .setTableView(listPMCController.tableView_List)
                 .setDisableNodes(listPMCController.disableNodes)
-                .setWorkingTask(listPMCController.loadedPMCSTask);
+                .setWorkingTask(listPMCController.loadedPMCSTask)
+                .setOnFailed(_ -> listPMCController.loadedPMCSTask = null)
+                .setOnSucceeded(_ -> {
+                    taskUnbind(taskBean);
+                    List<PMCListBean> clickPositionVOS = listPMCController.loadedPMCSTask.getValue();
+                    listPMCController.addPMCSFile(clickPositionVOS, file.getPath());
+                    tabPane.getSelectionModel().select(listPMCTab);
+                    listPMCController.loadedPMCSTask = null;
+                });
         bindingTaskNode(taskBean);
-        listPMCController.loadedPMCSTask.setOnSucceeded(_ -> {
-            taskUnbind(taskBean);
-            List<PMCListBean> clickPositionVOS = listPMCController.loadedPMCSTask.getValue();
-            listPMCController.addPMCSFile(clickPositionVOS, file.getPath());
-            tabPane.getSelectionModel().select(listPMCTab);
-            listPMCController.loadedPMCSTask = null;
-        });
-        listPMCController.loadedPMCSTask.setOnFailed(e -> {
-            taskNotSuccess(taskBean, text_taskFailed());
-            listPMCController.loadedPMCSTask = null;
-            throw new RuntimeException(e.getSource().getException());
-        });
     }
 
     /**
