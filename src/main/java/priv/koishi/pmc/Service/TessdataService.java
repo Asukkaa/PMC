@@ -25,6 +25,7 @@ import java.util.Map;
 
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.releaseEngine;
 import static priv.koishi.pmc.Utils.CommonUtils.setAllSafely;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 
@@ -52,6 +53,8 @@ public class TessdataService {
         return new Task<>() {
             @Override
             protected File call() {
+                // 释放所有引擎资源
+                releaseEngine();
                 updateMessage(text_readData());
                 File selectedFile = null;
                 // 过滤不符合的文件格式

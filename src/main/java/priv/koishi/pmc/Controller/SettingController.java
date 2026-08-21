@@ -85,6 +85,8 @@ import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowMonitor.creatDefaultWindowInfoHandler;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasAutomationPermission;
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.isReleasing;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.releaseEngine;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Service.PMCFileService.loadImg;
@@ -1104,9 +1106,11 @@ public class SettingController extends RootController implements MousePositionUp
                     }
                 });
         bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("loadTessdataTask-vThread" + tessdataId)
-                .start(loadTessdataTask);
+        if (autoClickController.isFree() && !loadTessdataTask.isRunning()) {
+            Thread.ofVirtual()
+                    .name("loadTessdataTask-vThread" + tessdataId)
+                    .start(loadTessdataTask);
+        }
     }
 
     /**
@@ -1797,7 +1801,16 @@ public class SettingController extends RootController implements MousePositionUp
     private void startFileWatchService() {
         FileWatchService fileWatchService = new FileWatchService();
         fileWatchService.setRecursive(true);
-        fileWatchService.setOnFileChanged(this::selectTessdataPath);
+        fileWatchService.setOnFileChanged(() -> {
+            // 刷新模型列表
+            selectTessdataPath();
+            // 尝试情况模型缓存
+            if (autoClickController.isFree()) {
+                releaseEngine();
+            } else {
+                isReleasing = true;
+            }
+        });
         fileWatchService.setRootPath(Path.of(tessdataDirectory));
         try {
             fileWatchService.restart();

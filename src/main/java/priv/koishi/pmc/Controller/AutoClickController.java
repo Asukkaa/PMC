@@ -85,6 +85,8 @@ import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.isReleasing;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.releaseEngine;
 import static priv.koishi.pmc.PMCException.ShowException.creatErrorAlert;
 import static priv.koishi.pmc.Service.AutoClickService.*;
 import static priv.koishi.pmc.Service.AutoClickService.autoClick;
@@ -380,8 +382,8 @@ public class AutoClickController extends RootController implements MousePosition
     public TableColumn<ClickPositionVO, ImageView> thumb_Click;
 
     @FXML
-    public TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickKey_Click,
-            waitTime_Click, clickType_Click, matchedType_Click, retryType_Click;
+    public TableColumn<ClickPositionVO, String> name_Click, clickTime_Click, clickNum_Click, clickKey_Click, waitTime_Click,
+            clickType_Click, matchedType_Click, retryType_Click;
 
     /**
      * 组件自适应宽高
@@ -951,6 +953,9 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask = null;
             runTimeline = null;
             runClicking = false;
+            if (isReleasing) {
+                releaseEngine();
+            }
         }).setOnFailed(_ -> {
             clickLogs = getNowLogs();
             hideFloatingWindow(messageFloating);
@@ -968,6 +973,9 @@ public class AutoClickController extends RootController implements MousePosition
             autoClickTask = null;
             runClicking = false;
             clearReferences();
+            if (isReleasing) {
+                releaseEngine();
+            }
         }).setOnCancelled(_ -> {
             clickLogs = getNowLogs();
             hideFloatingWindow(messageFloating);
@@ -981,6 +989,9 @@ public class AutoClickController extends RootController implements MousePosition
             runTimeline = null;
             runClicking = false;
             clearReferences();
+            if (isReleasing) {
+                releaseEngine();
+            }
         });
     }
 

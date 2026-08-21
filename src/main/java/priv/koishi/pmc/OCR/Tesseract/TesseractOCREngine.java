@@ -33,9 +33,14 @@ public class TesseractOCREngine {
     private static final Map<String, TessBaseAPI> enginePool = new ConcurrentHashMap<>();
 
     /**
-     * 引擎是否已成功初始化（true 表示池中至少有一个引擎）
+     * 引擎是否已成功初始化（true 表示池中至少有一个引擎，默认 false）
      */
     private static boolean initialized;
+
+    /**
+     * 引擎关闭状态（true 空闲后将会关闭引擎，默认 false）
+     */
+    public static boolean isReleasing;
 
     /**
      * 批量初始化引擎池（预加载指定语言）
@@ -99,6 +104,7 @@ public class TesseractOCREngine {
             initialized = false;
             logger.info("所有引擎已释放");
         }
+        isReleasing = false;
     }
 
     /**
