@@ -38,13 +38,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.opencv.global.opencv_core.*;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
-import static org.bytedeco.tesseract.global.tesseract.PSM_AUTO;
 import static org.bytedeco.tesseract.global.tesseract.RIL_WORD;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.getEngine;
 import static priv.koishi.pmc.Utils.FileUtils.getFileName;
-import static priv.koishi.pmc.Utils.FileUtils.getTessdataPath;
 
 /**
  * 图像识别工具类
@@ -127,7 +126,7 @@ public class ImageRecognitionService {
             }
         }
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(config.getRetryWait())) {
-            // 创建带名称的线程池（便于问题排查）
+            // 创建带名称的线程池
             try (ExecutorService executor = Executors.newCachedThreadPool(r -> {
                 Thread t = new Thread(r, "ImageRecognitionWorker");
                 // 设置为守护线程
@@ -329,7 +328,8 @@ public class ImageRecognitionService {
         byte[] bytes = Files.readAllBytes(new File(findPositionConfig.getTemplate()).toPath());
         MatchPointBean matchPointBean = new MatchPointBean();
         try (Mat screenMat = bufferedImageToMat(screenImg);
-             Mat templateMat = opencv_imgcodecs.imdecode(new Mat(bytes), opencv_imgcodecs.IMREAD_UNCHANGED)) {
+             Mat bytesMat = new Mat(bytes);
+             Mat templateMat = opencv_imgcodecs.imdecode(bytesMat, opencv_imgcodecs.IMREAD_UNCHANGED)) {
             // 转换为灰度图提升处理效率
             try (Mat screenGray = new Mat(); Mat templateGray = new Mat()) {
                 // 处理屏幕截图（来自 Robot，通常为 3 通道或 4 通道，统一转 BGR）
@@ -365,19 +365,20 @@ public class ImageRecognitionService {
                             // 执行模板匹配并获取最大匹配值位置
                             matchTemplate(screenGray, resizedTemplate, result, TM_CCOEFF_NORMED);
                             try (Point maxLoc = new Point()) {
-                                DoublePointer maxVal = new DoublePointer(1);
-                                minMaxLoc(result, null, maxVal, null, maxLoc, null);
-                                // 线程安全地更新最佳匹配结果
-                                synchronized (bestLocRef) {
-                                    if (maxVal.get() > bestVal.get()) {
-                                        bestVal.set(maxVal.get());
-                                        double templateWidth = resizedTemplate.cols();
-                                        double templateHeight = resizedTemplate.rows();
-                                        double relX = (maxLoc.x() + templateWidth / 2.0) / scale;
-                                        double relY = (maxLoc.y() + templateHeight / 2.0) / scale;
-                                        int absX = (int) Math.round(relX) + offsetX;
-                                        int absY = (int) Math.round(relY) + offsetY;
-                                        bestLocRef.set(new Point(absX, absY));
+                                try (DoublePointer maxVal = new DoublePointer(1)) {
+                                    minMaxLoc(result, null, maxVal, null, maxLoc, null);
+                                    // 线程安全地更新最佳匹配结果
+                                    synchronized (bestLocRef) {
+                                        if (maxVal.get() > bestVal.get()) {
+                                            bestVal.set(maxVal.get());
+                                            double templateWidth = resizedTemplate.cols();
+                                            double templateHeight = resizedTemplate.rows();
+                                            double relX = (maxLoc.x() + templateWidth / 2.0) / scale;
+                                            double relY = (maxLoc.y() + templateHeight / 2.0) / scale;
+                                            int absX = (int) Math.round(relX) + offsetX;
+                                            int absY = (int) Math.round(relY) + offsetY;
+                                            bestLocRef.set(new Point(absX, absY));
+                                        }
                                     }
                                 }
                             }
@@ -447,8 +448,8 @@ public class ImageRecognitionService {
         }
         MatchPointBean result = new MatchPointBean();
         // 将 byte[] 转换为 BytePointer 并创建掩码 Mat（CV_8UC1）
-        BytePointer maskPtr = new BytePointer(maskData);
-        try (Mat mask = new Mat(height, width, CV_8UC1, maskPtr);
+        try (BytePointer maskPtr = new BytePointer(maskData);
+             Mat mask = new Mat(height, width, CV_8UC1, maskPtr);
              // 连通组件分析
              Mat labels = new Mat();
              Mat stats = new Mat();
@@ -466,10 +467,12 @@ public class ImageRecognitionService {
                 int minArea = (int) (900 * dpiScale * dpiScale);
                 minArea = Math.max(50, minArea);
                 for (int i = 1; i < numLabels; i++) {
-                    int area = new IntPointer(stats.ptr(i)).get(CC_STAT_AREA);
-                    if (area > maxArea && area >= minArea) {
-                        maxArea = area;
-                        maxLabel = i;
+                    try (IntPointer areaPtr = new IntPointer(stats.ptr(i))) {
+                        int area = areaPtr.get(CC_STAT_AREA);
+                        if (area > maxArea && area >= minArea) {
+                            maxArea = area;
+                            maxLabel = i;
+                        }
                     }
                 }
                 if (maxLabel == -1) {
@@ -479,9 +482,12 @@ public class ImageRecognitionService {
                             .setMatchThreshold((int) (maxSimilarity * 100));
                 }
                 // 获取该区域的质心坐标
-                DoublePointer centroidPtr = new DoublePointer(centroids.ptr(maxLabel));
-                double centerX = centroidPtr.get(0);
-                double centerY = centroidPtr.get(1);
+                double centerX;
+                double centerY;
+                try (DoublePointer centroidPtr = new DoublePointer(centroids.ptr(maxLabel))) {
+                    centerX = centroidPtr.get(0);
+                    centerY = centroidPtr.get(1);
+                }
                 int finalX = (int) Math.round(centerX) + offsetX;
                 int finalY = (int) Math.round(centerY) + offsetY;
                 result.setPoint(new Point(finalX, finalY));
@@ -572,13 +578,11 @@ public class ImageRecognitionService {
     private static List<OCRDataBean> recognizeAllWords(BufferedImage screenImg, FindPositionConfig config,
                                                        int offsetX, int offsetY) {
         // 转换为 Mat 并灰度化
-        Mat imageMat = bufferedImageToMat(screenImg);
-        Mat grayMat = new Mat();
-        cvtColor(imageMat, grayMat, COLOR_BGR2GRAY);
         List<OCRDataBean> results = new ArrayList<>();
-        // 初始化 Tesseract
-        try (TessBaseAPI api = new TessBaseAPI()) {
-            String tessdataPath = getTessdataPath();
+        try (Mat imageMat = bufferedImageToMat(screenImg);
+             Mat grayMat = new Mat()) {
+            cvtColor(imageMat, grayMat, COLOR_BGR2GRAY);
+            // 构建语言字符串
             List<String> languages = new ArrayList<>();
             for (TessdataBean bean : config.getTessdata()) {
                 if (bean.isActive()) {
@@ -589,50 +593,47 @@ public class ImageRecognitionService {
                 throw new RuntimeException(text_noTessdata());
             }
             String language = String.join("+", languages);
-            int init = api.Init(tessdataPath, language);
-            if (init != 0) {
-                throw new RuntimeException(text_tesseractInitErr() + tessdataPath +
-                        "\ninitCode: " + init + " language: " + language);
-            }
-            // 设置页面分割模式为自动
-            api.SetPageSegMode(PSM_AUTO);
+            // 切换语言模型
+            TessBaseAPI tessBaseAPI = getEngine(language);
             // 将灰度图数据传递给 Tesseract
-            api.SetImage(grayMat.data(), grayMat.cols(), grayMat.rows(),
+            tessBaseAPI.SetImage(grayMat.data(), grayMat.cols(), grayMat.rows(),
                     (int) grayMat.elemSize(), (int) grayMat.step1());
             // 触发识别（可选参数 null 表示使用默认参数）
-            api.Recognize(null);
+            tessBaseAPI.Recognize(null);
             // 获取结果迭代器
-            ResultIterator ri = api.GetIterator();
-            if (ri == null) {
-                return results;
-            }
-            do {
-                // 获取单词文本
-                BytePointer wordTextPtr = ri.GetUTF8Text(RIL_WORD);
-                if (wordTextPtr == null) {
-                    continue;
+            try (ResultIterator ri = tessBaseAPI.GetIterator()) {
+                if (ri == null) {
+                    return results;
                 }
-                String word = wordTextPtr.getString().trim();
-                wordTextPtr.deallocate();
-                if (StringUtils.isNotBlank(word)) {
-                    // 获取单词边界框
-                    IntPointer x1 = new IntPointer(1);
-                    IntPointer y1 = new IntPointer(1);
-                    IntPointer x2 = new IntPointer(1);
-                    IntPointer y2 = new IntPointer(1);
-                    if (ri.BoundingBox(RIL_WORD, x1, y1, x2, y2)) {
-                        int centerX = (x1.get() + x2.get()) / 2 + offsetX;
-                        int centerY = (y1.get() + y2.get()) / 2 + offsetY;
-                        float confidence = ri.Confidence(RIL_WORD);
-                        OCRDataBean bean = new OCRDataBean()
-                                .setConfidence(Math.round(confidence))
-                                .setX(String.valueOf(centerX))
-                                .setY(String.valueOf(centerY))
-                                .setText(word);
-                        results.add(bean);
+                do {
+                    // 获取单词文本
+                    BytePointer wordTextPtr = ri.GetUTF8Text(RIL_WORD);
+                    if (wordTextPtr == null) {
+                        continue;
                     }
-                }
-            } while (ri.Next(RIL_WORD));
+                    String word = wordTextPtr.getString().trim();
+                    wordTextPtr.deallocate();
+                    if (StringUtils.isNotBlank(word)) {
+                        // 获取单词边界框
+                        try (IntPointer x1 = new IntPointer(1);
+                             IntPointer y1 = new IntPointer(1);
+                             IntPointer x2 = new IntPointer(1);
+                             IntPointer y2 = new IntPointer(1)) {
+                            if (ri.BoundingBox(RIL_WORD, x1, y1, x2, y2)) {
+                                int centerX = (x1.get() + x2.get()) / 2 + offsetX;
+                                int centerY = (y1.get() + y2.get()) / 2 + offsetY;
+                                float confidence = ri.Confidence(RIL_WORD);
+                                OCRDataBean bean = new OCRDataBean()
+                                        .setConfidence(Math.round(confidence))
+                                        .setX(String.valueOf(centerX))
+                                        .setY(String.valueOf(centerY))
+                                        .setText(word);
+                                results.add(bean);
+                            }
+                        }
+                    }
+                } while (ri.Next(RIL_WORD));
+            }
         }
         return results;
     }
@@ -644,10 +645,12 @@ public class ImageRecognitionService {
      * @return 识别到的信息
      */
     public static List<OCRDataBean> getAllOCRData(FindPositionConfig config) {
+        // 获取图像识别截图信息
         ScreenCaptureResult captureResult = getScreenCapture(config);
         BufferedImage screenImg = captureResult.image();
         int offsetX = captureResult.offsetX();
         int offsetY = captureResult.offsetY();
+        // 获取文字识别到的所有文本
         return recognizeAllWords(screenImg, config, offsetX, offsetY);
     }
 
@@ -672,9 +675,10 @@ public class ImageRecognitionService {
         }
         // 转换时数据类型为 CV_8U
         try (Java2DFrameConverter frameConverter = new Java2DFrameConverter();
-             OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat()) {
-            Frame frame = frameConverter.convert(converted);
-            return matConverter.convertToMat(frame).clone();
+             OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat();
+             Frame frame = frameConverter.convert(converted);
+             Mat mat = matConverter.convertToMat(frame)) {
+            return mat.clone();
         }
     }
 

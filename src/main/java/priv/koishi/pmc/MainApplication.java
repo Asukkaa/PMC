@@ -50,6 +50,8 @@ import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configPropertie
 import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.configFile_List;
 import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.listPMCProperties;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
+import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.releaseEngine;
+import static priv.koishi.pmc.PMCException.ShowException.showExceptionAlert;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.buildPMC;
 import static priv.koishi.pmc.Service.PMCFileService.buildPMCS;
@@ -249,6 +251,8 @@ public class MainApplication extends Application {
         if (serverSocket != null && !serverSocket.isClosed()) {
             serverSocket.close();
         }
+        // 释放 OCR 引擎资源
+        releaseEngine();
         // 保存设置
         if (mainController != null && !reSetAll) {
             Task<Void> saveAllConfigTask = saveAllConfig();

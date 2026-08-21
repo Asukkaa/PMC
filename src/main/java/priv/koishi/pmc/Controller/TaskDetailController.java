@@ -410,7 +410,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         selectedItem = timedTaskBean;
         isModified = false;
         if (StringUtils.isBlank(timedTaskBean.getDays())) {
-            throw new IllegalArgumentException(taskDetail_noWeekDay());
+            throw new RuntimeException(taskDetail_noWeekDay());
         }
         TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(progressBar_TD)

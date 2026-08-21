@@ -23,8 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static priv.koishi.pmc.Finals.CommonFinals.configFile_Tessdata;
-import static priv.koishi.pmc.Finals.CommonFinals.traineddata;
+import static priv.koishi.pmc.Finals.CommonFinals.*;
 import static priv.koishi.pmc.Finals.i18nFinal.text_readData;
 import static priv.koishi.pmc.Utils.CommonUtils.setAllSafely;
 import static priv.koishi.pmc.Utils.FileUtils.*;
@@ -67,10 +66,9 @@ public class TessdataService {
                 updateProgress(0, size);
                 for (int i = 0; i < size; i++) {
                     File file = selectedFiles.get(i);
-                    String path = getTessdataPath();
                     // 校验模型目录是否存在，不存在则创建
-                    checkDirectory(path);
-                    Path tessdataPath = Path.of(path, file.getName());
+                    checkDirectory(tessdataDirectory);
+                    Path tessdataPath = Path.of(tessdataDirectory, file.getName());
                     try {
                         // 将模型文件复制到 tessdata 目录
                         Files.copy(file.toPath(), tessdataPath, StandardCopyOption.REPLACE_EXISTING);
@@ -98,7 +96,7 @@ public class TessdataService {
                 updateMessage(text_readData());
                 // 读取模型文件
                 List<TessdataBean> list = new ArrayList<>();
-                File tessdataPathFile = new File(getTessdataPath());
+                File tessdataPathFile = new File(tessdataDirectory);
                 File[] files = tessdataPathFile.listFiles();
                 List<TessdataBean> configList = taskBean.getBeanList();
                 if (files != null) {

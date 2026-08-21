@@ -15,14 +15,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HeaderBar;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 import javafx.stage.Window;
@@ -31,8 +33,6 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Controller.AutoClickController;
@@ -74,11 +74,6 @@ import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
  * Time:下午1:38
  */
 public class UiUtils {
-
-    /**
-     * 日志记录器
-     */
-    private static final Logger logger = LogManager.getLogger(UiUtils.class);
 
     /**
      * 字体颜色绑定
@@ -271,74 +266,6 @@ public class UiUtils {
     }
 
     /**
-     * 处理异常的统一弹窗
-     *
-     * @param ex 要处理的异常
-     */
-    public static void showExceptionAlert(Throwable ex) {
-        logger.error(ex, ex);
-        Alert alert = creatErrorAlert(errToString(ex));
-        Throwable cause = ex.getCause();
-        String message;
-        if (cause instanceof RuntimeException) {
-            message = cause.getMessage();
-        } else {
-            if (cause != null) {
-                cause = cause.getCause();
-            }
-            if (cause != null) {
-                if (cause instanceof Exception) {
-                    message = cause.getMessage();
-                } else {
-                    message = ex.getMessage();
-                }
-            } else {
-                message = ex.getMessage();
-            }
-        }
-        if (message.length() > 200) {
-            message = message.substring(0, 200) + " ...";
-        }
-        alert.setHeaderText(message);
-        // 展示弹窗
-        Platform.runLater(alert::show);
-    }
-
-    /**
-     * 创建一个错误弹窗
-     *
-     * @param errString 要展示的异常信息
-     * @return Alert 弹窗对象
-     */
-    public static Alert creatErrorAlert(String errString) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(text_abnormal());
-        DialogPane dialogPane = alert.getDialogPane();
-        Stage stage = (Stage) dialogPane.getScene().getWindow();
-        setWindowLogo(stage, logoPath);
-        // 创建展示异常信息的 TextArea
-        TextArea textArea = new TextArea();
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setText(errString);
-        // 创建 VBox 并添加 TextArea
-        VBox details = new VBox();
-        VBox.setVgrow(textArea, Priority.ALWAYS);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        details.getChildren().add(textArea);
-        dialogPane.setExpandableContent(details);
-        alert.setOnShown(_ -> {
-            Button okBtnNode = (Button) dialogPane.lookupButton(ButtonType.OK);
-            if (okBtnNode != null) {
-                okBtnNode.setCursor(Cursor.HAND);
-            }
-            AutoClickController.isSonOpening = true;
-        });
-        alert.setOnCloseRequest(_ -> AutoClickController.isSonOpening = false);
-        return alert;
-    }
-
-    /**
      * 创建一个确认弹窗
      *
      * @param title   确认弹窗标题
@@ -407,28 +334,6 @@ public class UiUtils {
             stage.requestFocus();
             stage.setAlwaysOnTop(false);
         });
-    }
-
-    /**
-     * 弹出界面和错误弹窗
-     *
-     * @param errs  错误详情
-     * @param title 错误标题
-     * @param stage 错误弹窗的父窗口
-     */
-    public static void showStageAlert(List<String> errs, String title, Stage stage) {
-        if (stage.isIconified()) {
-            stage.setIconified(false);
-            stage.show();
-            stage.toFront();
-            stage.requestFocus();
-        }
-        Alert alert = creatErrorAlert(String.join("\n", errs));
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.initOwner(stage);
-        alertStage.setAlwaysOnTop(true);
-        alert.setHeaderText(title);
-        alert.showAndWait();
     }
 
     /**

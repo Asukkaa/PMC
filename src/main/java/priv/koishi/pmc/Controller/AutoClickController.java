@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,6 +55,8 @@ import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;
 import priv.koishi.pmc.Listener.MousePositionListener;
 import priv.koishi.pmc.Listener.MousePositionUpdater;
 import priv.koishi.pmc.Listener.UnifiedInputRecordListener;
+import priv.koishi.pmc.PMCException.Exception.JumpSettingException;
+import priv.koishi.pmc.PMCException.Exception.WindowValidationException;
 import priv.koishi.pmc.Queue.DynamicQueue;
 import priv.koishi.pmc.UI.CustomEditingCell.EditingCell;
 import priv.koishi.pmc.UI.CustomEditingCell.ItemConsumer;
@@ -76,12 +79,15 @@ import static priv.koishi.pmc.Controller.MainController.listPMCController;
 import static priv.koishi.pmc.Controller.MainController.settingController;
 import static priv.koishi.pmc.Controller.SettingController.*;
 import static priv.koishi.pmc.Finals.CommonFinals.*;
+import static priv.koishi.pmc.Finals.CommonFinals.autoClick;
 import static priv.koishi.pmc.Finals.CommonKeys.*;
 import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.*;
 import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.JnaNative.PermissionChecker.MacChecker.hasScreenCapturePermission;
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.PMCException.ShowException.creatErrorAlert;
 import static priv.koishi.pmc.Service.AutoClickService.*;
+import static priv.koishi.pmc.Service.AutoClickService.autoClick;
 import static priv.koishi.pmc.Service.ImageRecognitionService.*;
 import static priv.koishi.pmc.Service.PMCFileService.*;
 import static priv.koishi.pmc.UI.CustomFloatingWindow.FloatingWindow.*;
@@ -819,39 +825,97 @@ public class AutoClickController extends RootController implements MousePosition
             }
             Label logLabel = isBatch ? listPMCController.log_List : log_Click;
             updateLabel(logLabel, "");
-            AutoClickTaskBean taskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes, isBatch);
-            CheckBox hideWindowRun = settingController.hideWindowRun_Set;
-            if (hideWindowRun.isSelected()) {
-                mainStage.setIconified(true);
-            }
+            // 校验任务参数
+            AutoClickTaskBean validationTaskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes, isBatch);
+            validationTaskBean.setBindingMessageLabel(true);
+            // 自动流程任务参数
+            AutoClickTaskBean clickTaskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes, isBatch);
             // 刷新屏幕参数
             refreshScreenParameters();
-            // 开启键盘监听
-            startNativeKeyListener(taskBean);
+            Task<Map<String, Map<String, Set<ClickPositionVO>>>> validationPMCTask;
             if (isBatch) {
                 ObservableList<PMCListBean> pmcListBeans = listPMCController.tableView_List.getItems();
-                autoClickTask = autoClicks(new Robot(), pmcListBeans, taskBean);
+                validationPMCTask = validationPMC(pmcListBeans);
+                validationTaskBean.setWorkingTask(validationPMCTask)
+                        .setOnFailed(AutoClickController::throwException)
+                        .setOnSucceeded(_ -> {
+                            Map<String, Map<String, Set<ClickPositionVO>>> windowPathMap = validationPMCTask.getValue();
+                            autoClickTask = autoClicks(new Robot(), pmcListBeans, clickTaskBean, windowPathMap);
+                            executeClickTask(clickTaskBean, logLabel, true);
+                        });
             } else {
-                autoClickTask = autoClick(taskBean, new Robot(), new DynamicQueue<>());
+                List<PMCListBean> pmcListBeans = new ArrayList<>();
+                PMCListBean pmcListBean = new PMCListBean()
+                        .setClickPositionVOS(clickPositionVOS)
+                        .setPath(autoClick);
+                pmcListBeans.add(pmcListBean);
+                validationPMCTask = validationPMC(pmcListBeans);
+                validationTaskBean.setWorkingTask(validationPMCTask)
+                        .setOnFailed(AutoClickController::throwException)
+                        .setOnSucceeded(_ -> {
+                            Map<String, Map<String, Set<ClickPositionVO>>> windowPathMap = validationPMCTask.getValue();
+                            autoClickTask = autoClick(clickTaskBean, new Robot(), new DynamicQueue<>(), windowPathMap.get(autoClick));
+                            executeClickTask(clickTaskBean, logLabel, false);
+                        });
             }
-            taskBean.setWorkingTask(autoClickTask);
-            setTaskEvent(taskBean);
-            // 绑定线程
-            bindingTaskNode(taskBean, true);
-            if (runTimeline == null) {
-                TextField preparationRunTime = isBatch ?
-                        listPMCController.preparationRunTime_List : preparationRunTime_Click;
-                // 获取准备时间值
-                int preparation = setDefaultIntValue(preparationRunTime,
-                        Integer.parseInt(defaultPreparationRun), 0, null);
-                // 设置浮窗文本显示准备时间
-                String text = text_cancelTask() + preparation + text_run();
-                updateMessageLabel(messageFloating, text);
-                logLabel.setText(text);
+            bindingTaskNode(validationTaskBean);
+            if (!validationPMCTask.isRunning()) {
+                Thread.ofVirtual()
+                        .name("validationPMCTask-vThread" + tabId)
+                        .start(validationPMCTask);
+            }
+        }
+    }
+
+    /**
+     * 设置校验逻辑异常处理
+     *
+     * @param failed 任务异常事件
+     */
+    private static void throwException(WorkerStateEvent failed) {
+        Throwable exception = failed.getSource().getException();
+        if (exception instanceof JumpSettingException) {
+            throw (JumpSettingException) exception;
+        } else if (exception instanceof WindowValidationException) {
+            throw (WindowValidationException) exception;
+        }
+    }
+
+    /**
+     * 执行自动任务
+     *
+     * @param taskBean 自动任务执行参数
+     * @param logLabel 消息文本栏
+     * @param isBatch  是否为批量执行 PMC 文件（true 批量执行）
+     */
+    private void executeClickTask(AutoClickTaskBean taskBean, Label logLabel, boolean isBatch) {
+        taskBean.setWorkingTask(autoClickTask);
+        // 设置任务事件
+        setTaskEvent(taskBean);
+        bindingTaskNode(taskBean, true);
+        CheckBox hideWindowRun = settingController.hideWindowRun_Set;
+        if (hideWindowRun.isSelected()) {
+            mainStage.setIconified(true);
+        }
+        // 开启键盘监听
+        startNativeKeyListener(taskBean);
+        if (runTimeline == null) {
+            TextField preparationRunTime = isBatch ?
+                    listPMCController.preparationRunTime_List : preparationRunTime_Click;
+            // 获取准备时间值
+            int preparation = setDefaultIntValue(preparationRunTime,
+                    Integer.parseInt(defaultPreparationRun), 0, null);
+            // 设置浮窗文本显示准备时间
+            String text = text_cancelTask() + preparation + text_run();
+            updateMessageLabel(messageFloating, text);
+            logLabel.setText(text);
+            try {
                 showFloatingWindow(true);
-                // 延时执行任务
-                runTimeline = executeRunTimeLine(preparation, isBatch);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+            // 延时执行任务
+            runTimeline = executeRunTimeLine(preparation, isBatch);
         }
     }
 
@@ -878,12 +942,6 @@ public class AutoClickController extends RootController implements MousePosition
                             showStage(mainStage);
                         }
                     }
-                }
-            } else {
-                logLabel.setTextFill(Color.RED);
-                logLabel.setText(text_taskFailed());
-                if (mainStage.isIconified()) {
-                    showStage(mainStage);
                 }
             }
             clearReferences();
@@ -989,7 +1047,9 @@ public class AutoClickController extends RootController implements MousePosition
         if (preparation == 0) {
             if (!autoClickTask.isRunning()) {
                 // 使用新线程启动
-                new Thread(autoClickTask).start();
+                Thread.ofPlatform()
+                        .name("autoClick-platformThread" + tabId)
+                        .start(autoClickTask);
             }
             return runTimeline;
         }

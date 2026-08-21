@@ -1677,6 +1677,20 @@ public class i18nFinal {
     }
 
     /**
+     * @return 出现错误
+     */
+    public static String text_error() {
+        return bundle.getString("error");
+    }
+
+    /**
+     * @return 预热 OCR 引擎，语言：
+     */
+    public static String text_initOCR() {
+        return bundle.getString("initOCR");
+    }
+
+    /**
      * @return 跳转逻辑设置异常
      */
     public static String text_jumpSettingErr() {

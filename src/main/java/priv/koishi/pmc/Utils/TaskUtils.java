@@ -9,8 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import priv.koishi.pmc.Bean.TaskBean;
 
-import static priv.koishi.pmc.Finals.i18nFinal.text_taskFailed;
-import static priv.koishi.pmc.Finals.i18nFinal.tip_cancelButton;
+import static priv.koishi.pmc.Finals.i18nFinal.*;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.*;
 import static priv.koishi.pmc.Utils.UiUtils.showErrLabelText;
 import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
@@ -37,6 +36,7 @@ public class TaskUtils {
      * 绑定任务程
      *
      * @param taskBean 绑定线程任务所需参数
+     * @param disable  true 禁止逻辑为调用组件自身方法，false 调用自定义禁用方法
      */
     public static void bindingTaskNode(TaskBean<?> taskBean, boolean disable) {
         // 设置防重复点击按钮不可点击限制
@@ -113,7 +113,7 @@ public class TaskUtils {
             throw new RuntimeException(event.getSource().getException());
         });
         task.setOnCancelled(event -> {
-            taskNotSuccess(taskBean, text_taskFailed());
+            taskNotSuccess(taskBean, text_taskCancelled());
             EventHandler<WorkerStateEvent> handler = taskBean.getOnCancelled();
             try {
                 if (handler != null) {

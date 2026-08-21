@@ -433,6 +433,16 @@ public class CommonFinals {
     public static final String tessdata = "tessdata";
 
     /**
+     * 直接执行自动任务标志（校验脚本时使用）
+     */
+    public static final String autoClick = "autoClick";
+
+    /**
+     * TesseractOCR 引擎模型目录
+     */
+    public static final String tessdataDirectory = getTessdataPath().replace("/", File.separator);
+
+    /**
      * app 目录
      */
     public static final String appDirectory = "/app";

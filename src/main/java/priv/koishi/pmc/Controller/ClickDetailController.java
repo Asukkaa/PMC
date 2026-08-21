@@ -1721,7 +1721,7 @@ public class ClickDetailController extends RootController {
         FileWatchService fileWatchService = new FileWatchService();
         fileWatchService.setRecursive(true);
         fileWatchService.setOnFileChanged(this::selectTessdataPath);
-        fileWatchService.setRootPath(Path.of(getTessdataPath()));
+        fileWatchService.setRootPath(Path.of(tessdataDirectory));
         try {
             fileWatchService.restart();
         } catch (IOException e) {
