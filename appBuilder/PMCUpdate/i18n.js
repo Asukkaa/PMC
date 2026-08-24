@@ -7,8 +7,8 @@ module.exports = {
             重构了后台线程任务的处理机制 (2026.08.20)
             升级依赖版本 (2026.08.20)
             升级 Java 版本由 26.0.2 至 26.0.2.1 (2026.08.20)
-            重构了整个自动操作流程 (2026.08.21)
-            修复了一些可能的 BUG (2026.08.21)`,
+            重构了整个自动操作流程 (2026.08.24)
+            修复了一些可能的 BUG (2026.08.24)`,
             mac: `
             新增颜色识别功能，可使用拾色器进行拾色后设置目标颜色 (2026.05.12)
             新增文字识别功能，可以使用自定义 traineddata 模型进行文字识别 (2026.05.12)
@@ -27,8 +27,8 @@ module.exports = {
             重構後台執行緒任務的處理機制 (2026.08.20)
             升級依賴版本 (2026.08.20)
             升級 Java 版本由 26.0.2 至 26.0.2.1 (2026.08.20)
-            重構了整個自動操作流程 (2026.08.21)
-            修復了一些可能的 BUG (2026.08.21)`,
+            重構了整個自動操作流程 (2026.08.24)
+            修復了一些可能的 BUG (2026.08.24)`,
             mac: `
             新增顏色識別功能，可使用拾色器進行拾色後設定目標顏色 (2026.05.12)
             新增文字識別功能，可以使用自定義traineddata模型進行文字識別 (2026.05.12)
@@ -47,8 +47,8 @@ module.exports = {
             Refactored the handling mechanism for background thread tasks (2026.08.20)
             Upgraded dependency versions (2026.08.20)
             Upgraded Java version from 26.0.2 to 26.0.2.1 (2026.08.20)
-            The entire automated operation process has been reconstructed (2026.08.21)
-            Fixed some potential bugs (2026.08.21)`,
+            The entire automated operation process has been reconstructed (2026.08.24)
+            Fixed some potential bugs (2026.08.24)`,
             mac: `
             Added color recognition function, allowing users to use a color picker to pick up colors and set the target color (2026.05.12)
             Added text recognition function, allowing for the use of custom traineddata models for text recognition (2026.05.12)
