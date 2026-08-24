@@ -101,6 +101,7 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.changeDisableNodes;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.startTaskOfVirtual;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -1065,7 +1066,8 @@ public class SettingController extends RootController implements MousePositionUp
         taskBean.setProgressBar(tessdataProgressBar_set)
                 .setDisableNodes(tessdataDisableNodes)
                 .setMessageLabel(tessdataNumber_set)
-                .setTableView(tessdataTableView_set);
+                .setTableView(tessdataTableView_set)
+                .setTabId(tabId);
         return taskBean;
     }
 
@@ -1077,13 +1079,10 @@ public class SettingController extends RootController implements MousePositionUp
     private void startLoadImgTask(List<? extends File> files) {
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         Task<Void> loadImgTask = loadImg(taskBean, files);
-        taskBean.setWorkingTask(loadImgTask);
+        taskBean.setWorkingTask(loadImgTask)
+                .setName("loadImgTask");
         bindingTaskNode(taskBean);
-        if (!loadImgTask.isRunning()) {
-            Thread.ofVirtual()
-                    .name("loadImgTask-vThread" + tabId)
-                    .start(loadImgTask);
-        }
+        startTaskOfVirtual(taskBean);
     }
 
     /**
@@ -1095,6 +1094,7 @@ public class SettingController extends RootController implements MousePositionUp
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
         Task<File> loadTessdataTask = loadTessdata(files);
         taskBean.setWorkingTask(loadTessdataTask)
+                .setName("loadTessdataTask")
                 .setOnSucceeded(_ -> {
                     startUpdateTessdataTask();
                     File selectedFile = loadTessdataTask.getValue();
@@ -1107,10 +1107,8 @@ public class SettingController extends RootController implements MousePositionUp
                     }
                 });
         bindingTaskNode(taskBean);
-        if (autoClickController.isFree() && !loadTessdataTask.isRunning()) {
-            Thread.ofVirtual()
-                    .name("loadTessdataTask-vThread" + tessdataId)
-                    .start(loadTessdataTask);
+        if (autoClickController.isFree()) {
+            startTaskOfVirtual(taskBean);
         }
     }
 
@@ -1502,6 +1500,7 @@ public class SettingController extends RootController implements MousePositionUp
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
         Task<Void> updateTessdataTask = updateTessdata(taskBean);
         taskBean.setWorkingTask(updateTessdataTask)
+                .setName("updateTessdataTask")
                 .setOnSucceeded(_ -> {
                     if (!tessdataFinished) {
                         tessdataTableView_set.getItems().addListener((ListChangeListener<TessdataBean>)
@@ -1510,10 +1509,8 @@ public class SettingController extends RootController implements MousePositionUp
                     }
                 });
         bindingTaskNode(taskBean);
-        if (autoClickController.isFree() && !updateTessdataTask.isRunning()) {
-            Thread.ofVirtual()
-                    .name("updateTessdataTask-vThread" + tessdataId)
-                    .start(updateTessdataTask);
+        if (autoClickController.isFree()) {
+            startTaskOfVirtual(taskBean);
         }
     }
 
@@ -1781,12 +1778,11 @@ public class SettingController extends RootController implements MousePositionUp
         ObservableList<TessdataBean> items = tessdataTableView_set.getItems();
         taskBean.setBeanList(items);
         Task<Void> saveTessdataConfig = saveTessdataConfig(taskBean);
-        taskBean.setWorkingTask(saveTessdataConfig);
+        taskBean.setWorkingTask(saveTessdataConfig)
+                .setName("saveTessdataConfigTask");
         bindingTaskNode(taskBean);
-        if (autoClickController.isFree() && !saveTessdataConfig.isRunning()) {
-            Thread.ofVirtual()
-                    .name("saveTessdataConfigTask-vThread" + tessdataId)
-                    .start(saveTessdataConfig);
+        if (autoClickController.isFree()) {
+            startTaskOfVirtual(taskBean);
         }
     }
 

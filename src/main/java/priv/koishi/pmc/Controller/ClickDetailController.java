@@ -105,6 +105,7 @@ import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.ScriptUtils.*;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.startTaskOfVirtual;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -1214,7 +1215,8 @@ public class ClickDetailController extends RootController {
                 .setMessageLabel(tessdataNumber_det)
                 .setTableView(tessdataTableView_det)
                 .setProgressBar(progressBar_Det)
-                .setDisableNodes(disableNodes);
+                .setDisableNodes(disableNodes)
+                .setTabId(tabId);
         return taskBean;
     }
 
@@ -1224,11 +1226,10 @@ public class ClickDetailController extends RootController {
     private void startUpdateTessdataTask() {
         TaskBean<TessdataBean> taskBean = creatTessdatTaskBean();
         Task<Void> updateTessdata = updateTessdata(taskBean);
-        taskBean.setWorkingTask(updateTessdata);
+        taskBean.setWorkingTask(updateTessdata)
+                .setName("updateTessdataTask");
         bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("updateTessdataTask-vThread" + tessdataId)
-                .start(updateTessdata);
+        startTaskOfVirtual(taskBean);
     }
 
     /**
@@ -1241,7 +1242,8 @@ public class ClickDetailController extends RootController {
         taskBean.setProgressBar(progressBar_Det)
                 .setMessageLabel(dataNumber_Det)
                 .setDisableNodes(disableNodes)
-                .setTableView(tableView_Det);
+                .setTableView(tableView_Det)
+                .setTabId(tabId);
         return taskBean;
     }
 
@@ -1254,13 +1256,12 @@ public class ClickDetailController extends RootController {
         TaskBean<ImgFileVO> taskBean = creatTaskBean();
         loadImgTask = loadImg(taskBean, files);
         taskBean.setWorkingTask(loadImgTask)
+                .setName("loadImgTask")
                 .setOnFailed(_ -> loadImgTask = null)
                 .setOnCancelled(_ -> loadImgTask = null)
                 .setOnSucceeded(_ -> loadImgTask = null);
         bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("loadImgTask-vThread" + tabId)
-                .start(loadImgTask);
+        startTaskOfVirtual(taskBean);
     }
 
     /**
@@ -2462,12 +2463,10 @@ public class ClickDetailController extends RootController {
                             .setMessageLabel(log_Det);
                     Task<Void> scriptTask = scriptRun(file, workDir, parameter, minWindow_Det.isSelected());
                     taskBean.setWorkingTask(scriptTask)
-                            .setOnSucceeded(_ ->
-                                    new MessageBubble(text_testSuccess()));
+                            .setName("scriptTask")
+                            .setOnSucceeded(_ -> new MessageBubble(text_testSuccess()));
                     bindingTaskNode(taskBean);
-                    Thread.ofVirtual()
-                            .name("scriptTask-vThread" + tabId)
-                            .start(scriptTask);
+                    startTaskOfVirtual(taskBean);
                 }
             } else {
                 new MessageBubble(text_pathNull());

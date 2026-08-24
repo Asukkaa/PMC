@@ -30,6 +30,7 @@ import static priv.koishi.pmc.Service.ScheduledService.deleteTask;
 import static priv.koishi.pmc.Service.ScheduledService.getTaskDetailsTask;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.startTaskOfVirtual;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -166,9 +167,11 @@ public class TimedTaskController extends RootController {
         TaskBean<TimedTaskBean> taskBean = new TaskBean<>();
         taskBean.setMessageLabel(dataNumber_Task)
                 .setProgressBar(progressBar_Task)
-                .setDisableNodes(disableNodes);
+                .setDisableNodes(disableNodes)
+                .setTabId("_Task");
         Task<List<TimedTaskBean>> task = getTaskDetailsTask();
         taskBean.setWorkingTask(task)
+                .setName("getTaskDetailsTask")
                 .setOnSucceeded(_ -> {
                     List<TimedTaskBean> result = task.getValue();
                     Platform.runLater(() ->
@@ -178,9 +181,7 @@ public class TimedTaskController extends RootController {
                     }
                 });
         bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("task-select-vThread")
-                .start(task);
+        startTaskOfVirtual(taskBean);
     }
 
     /**

@@ -49,8 +49,7 @@ import static priv.koishi.pmc.Utils.FileUtils.openDirectory;
 import static priv.koishi.pmc.Utils.FileUtils.updateProperties;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.TableViewUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.startClearResourcesTask;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -213,9 +212,11 @@ public class FileChooserController extends ManuallyChangeThemeController {
             taskBean.setProgressBar(progressBar_FC)
                     .setMessageLabel(fileNumber_FC)
                     .setDisableNodes(disableNodes)
-                    .setTableView(tableView_FC);
+                    .setTableView(tableView_FC)
+                    .setTabId(tabId);
             readAllFilesTask = readAllFilesTask(fileConfig);
             taskBean.setWorkingTask(readAllFilesTask)
+                    .setName("readAllFilesTask")
                     .setOnSucceeded(_ -> {
                         try {
                             addRemoveSameFile(readAllFilesTask.getValue(), false, tableView_FC);
@@ -227,11 +228,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
                         updateTableViewSizeText(tableView_FC, fileNumber_FC, unit_files());
                     });
             bindingTaskNode(taskBean);
-            if (!readAllFilesTask.isRunning()) {
-                Thread.ofVirtual()
-                        .name("readAllFilesTask-vThread" + tabId)
-                        .start(readAllFilesTask);
-            }
+            startTaskOfVirtual(taskBean);
         }
     }
 

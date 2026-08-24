@@ -26,6 +26,11 @@ import java.util.Set;
 public class TaskBean<T> {
 
     /**
+     * 任务名称
+     */
+    private String name = "";
+
+    /**
      * 要处理的数据
      */
     private List<T> beanList;
@@ -53,7 +58,7 @@ public class TaskBean<T> {
     /**
      * 页面标识符
      */
-    private String tabId;
+    private String tabId = "";
 
     /**
      * 要防重复点击的组件

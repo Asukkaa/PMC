@@ -52,7 +52,7 @@ import static priv.koishi.pmc.Service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.Utils.FileUtils.*;
 import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskNotSuccess;
+import static priv.koishi.pmc.Utils.TaskUtils.startTaskOfVirtual;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -70,11 +70,6 @@ public class AboutController extends RootController {
      * 日志记录器
      */
     private static final Logger logger = LogManager.getLogger(AboutController.class);
-
-    /**
-     * 页面标识符
-     */
-    private final String tabId = "_Abt";
 
     /**
      * 更新时间格式
@@ -345,6 +340,18 @@ public class AboutController extends RootController {
         }
     }
 
+    /**
+     * 创建通用任务线程参数
+     *
+     * @return 任务线程参数
+     */
+    private TaskBean<?> creatTaskBeen() {
+        TaskBean<?> taskBean = new TaskBean<>();
+        taskBean.setMessageLabel(checkMessage_Abt)
+                .setDisableNodes(disableNodes)
+                .setTabId("_Abt");
+        return taskBean;
+    }
 
     /**
      * 界面初始化
@@ -476,11 +483,10 @@ public class AboutController extends RootController {
     @FXML
     private void checkUpdate() {
         checkDate_Abt.setText("");
-        TaskBean<?> taskBean = new TaskBean<>();
-        taskBean.setMessageLabel(checkMessage_Abt)
-                .setDisableNodes(disableNodes);
+        TaskBean<?> checkUpdateTaskBean = creatTaskBeen();
         Task<CheckUpdateBean> task = checkLatestVersion();
-        taskBean.setWorkingTask(task)
+        checkUpdateTaskBean.setWorkingTask(task)
+                .setName("checkUpdate")
                 .setOnFailed(_ -> updateCheckDate(Color.RED))
                 .setOnSucceeded(_ -> {
                     CheckUpdateBean updateInfo = task.getValue();
@@ -502,25 +508,24 @@ public class AboutController extends RootController {
                             if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
                                 ProgressDialog progressDialog = new ProgressDialog();
                                 // 用户选择更新
+                                TaskBean<?> downloadedUpdateTaskBean = creatTaskBeen()
+                                        .setName("downloadedUpdate");
                                 downloadedUpdateTask = downloadAndInstallUpdate(updateInfo, progressDialog);
-                                Thread.ofVirtual()
-                                        .name("task-downloadedUpdate-vThread" + tabId)
-                                        .start(downloadedUpdateTask);
-                                downloadedUpdateTask.setOnFailed(_ -> {
-                                    try {
-                                        logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
-                                        deleteDirectoryRecursively(Path.of(PMCTempPath));
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    String message = update_downloadFailed();
-                                    taskNotSuccess(taskBean, message);
-                                    progressDialog.close();
-                                    Throwable ex = downloadedUpdateTask.getException();
-                                    downloadedUpdateTask = null;
-                                    throw new RuntimeException(message, ex);
-                                });
-                                downloadedUpdateTask.setOnCancelled(_ -> downloadedUpdateTask = null);
+                                downloadedUpdateTaskBean.setWorkingTask(downloadedUpdateTask)
+                                        .setOnCancelled(_ -> downloadedUpdateTask = null)
+                                        .setOnFailed(event -> {
+                                            downloadedUpdateTask = null;
+                                            progressDialog.close();
+                                            try {
+                                                logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
+                                                deleteDirectoryRecursively(Path.of(PMCTempPath));
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                            throw new RuntimeException(update_downloadFailed(), event.getSource().getException());
+                                        });
+                                bindingTaskNode(downloadedUpdateTaskBean);
+                                startTaskOfVirtual(downloadedUpdateTaskBean);
                             }
                         }
                     } else {
@@ -530,10 +535,8 @@ public class AboutController extends RootController {
                         checkMessage_Abt.setTextFill(Color.GREEN);
                     }
                 });
-        bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("task-checkUpdate-vThread" + tabId)
-                .start(task);
+        bindingTaskNode(checkUpdateTaskBean);
+        startTaskOfVirtual(checkUpdateTaskBean);
     }
 
     /**

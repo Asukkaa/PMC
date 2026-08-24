@@ -40,6 +40,7 @@ import static priv.koishi.pmc.Utils.ListenerUtils.integerRangeTextField;
 import static priv.koishi.pmc.Utils.ListenerUtils.textFieldValueListener;
 import static priv.koishi.pmc.Utils.NodeDisableUtils.setNodeDisable;
 import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.Utils.TaskUtils.startTaskOfVirtual;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addValueToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
@@ -416,10 +417,12 @@ public class TaskDetailController extends ManuallyChangeThemeController {
         taskBean.setProgressBar(progressBar_TD)
                 .setDisableNodes(disableNodes)
                 .setBindingMessageLabel(true)
-                .setMessageLabel(log_TD);
+                .setMessageLabel(log_TD)
+                .setTabId("_TD");
         // 创建定时任务
         Task<Void> task = createTask(timedTaskBean);
         taskBean.setWorkingTask(task)
+                .setName("createTask")
                 .setOnSucceeded(_ ->
                         Platform.runLater(() -> {
                             // 复制成功消息气泡
@@ -432,9 +435,7 @@ public class TaskDetailController extends ManuallyChangeThemeController {
                             }
                         }));
         bindingTaskNode(taskBean);
-        Thread.ofVirtual()
-                .name("task-save-vThread" + "_TD")
-                .start(task);
+        startTaskOfVirtual(taskBean);
     }
 
     /**

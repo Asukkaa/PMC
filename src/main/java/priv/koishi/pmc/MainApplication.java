@@ -58,8 +58,7 @@ import static priv.koishi.pmc.Service.PMCFileService.buildPMCS;
 import static priv.koishi.pmc.Service.SaveConfigService.saveAllConfig;
 import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
 import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.bindingTaskNode;
-import static priv.koishi.pmc.Utils.TaskUtils.taskUnbind;
+import static priv.koishi.pmc.Utils.TaskUtils.*;
 import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.Utils.UiUtils.*;
 
@@ -459,16 +458,10 @@ public class MainApplication extends Application {
                         Tab autoClickTab = mainController.autoClickTab;
                         ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
                         if (buttonType == appendButton) {
-                            creatLoadedPMCTask(file, tabPane, autoClickTab);
-                            Thread.ofVirtual()
-                                    .name("loadedPMCTask-vThread")
-                                    .start(autoClickController.loadedPMCTask);
+                            startLoadedPMCTask(file, tabPane, autoClickTab);
                         } else if (buttonType == clearButton) {
                             autoClickController.removeAll();
-                            creatLoadedPMCTask(file, tabPane, autoClickTab);
-                            Thread.ofVirtual()
-                                    .name("loadedPMCTask-vThread")
-                                    .start(autoClickController.loadedPMCTask);
+                            startLoadedPMCTask(file, tabPane, autoClickTab);
                         }
                     }
                 }
@@ -478,16 +471,10 @@ public class MainApplication extends Application {
                         Tab listPMCTab = mainController.listPMCTab;
                         ButtonType buttonType = dialog.showAndWait().orElse(cancelButton);
                         if (buttonType == appendButton) {
-                            creatLoadedPMCSTask(file, tabPane, listPMCTab);
-                            Thread.ofVirtual()
-                                    .name("loadedPMCSTask-vThread")
-                                    .start(listPMCController.loadedPMCSTask);
+                            startLoadedPMCSTask(file, tabPane, listPMCTab);
                         } else if (buttonType == clearButton) {
                             autoClickController.removeAll();
-                            creatLoadedPMCSTask(file, tabPane, listPMCTab);
-                            Thread.ofVirtual()
-                                    .name("loadedPMCSTask-vThread")
-                                    .start(listPMCController.loadedPMCSTask);
+                            startLoadedPMCSTask(file, tabPane, listPMCTab);
                         }
                     }
                 }
@@ -511,13 +498,13 @@ public class MainApplication extends Application {
     }
 
     /**
-     * 创建加载 PMC 文件任务
+     * 启动加载 PMC 文件任务
      *
      * @param file         要加载的文件
      * @param tabPane      主页面布局
      * @param autoClickTab 自动点击页面
      */
-    private static void creatLoadedPMCTask(File file, TabPane tabPane, Tab autoClickTab) {
+    private static void startLoadedPMCTask(File file, TabPane tabPane, Tab autoClickTab) {
         autoClickController.loadedPMCTask = buildPMC(file);
         TaskBean<ClickPositionVO> taskBean = new TaskBean<>();
         taskBean.setProgressBar(autoClickController.progressBar_Click)
@@ -525,6 +512,7 @@ public class MainApplication extends Application {
                 .setTableView(autoClickController.tableView_Click)
                 .setDisableNodes(autoClickController.disableNodes)
                 .setWorkingTask(autoClickController.loadedPMCTask)
+                .setName("loadedPMCTask")
                 .setOnFailed(_ -> autoClickController.loadedPMCTask = null)
                 .setOnSucceeded(_ -> {
                     List<ClickPositionVO> clickPositionVOS = autoClickController.loadedPMCTask.getValue();
@@ -533,23 +521,25 @@ public class MainApplication extends Application {
                     autoClickController.loadedPMCTask = null;
                 });
         bindingTaskNode(taskBean);
+        startTaskOfVirtual(taskBean);
     }
 
     /**
-     * 创建加载 PMCS 文件任务
+     * 启动加载 PMCS 文件任务
      *
      * @param file       要加载的文件
      * @param tabPane    主页面布局
      * @param listPMCTab 批量执行 PMC 文件页面
      */
-    private static void creatLoadedPMCSTask(File file, TabPane tabPane, Tab listPMCTab) {
+    private static void startLoadedPMCSTask(File file, TabPane tabPane, Tab listPMCTab) {
         listPMCController.loadedPMCSTask = buildPMCS(file);
         TaskBean<PMCListBean> taskBean = new TaskBean<>();
         taskBean.setProgressBar(listPMCController.progressBar_List)
                 .setMessageLabel(listPMCController.dataNumber_List)
-                .setTableView(listPMCController.tableView_List)
                 .setDisableNodes(listPMCController.disableNodes)
+                .setTableView(listPMCController.tableView_List)
                 .setWorkingTask(listPMCController.loadedPMCSTask)
+                .setName("loadedPMCSTask")
                 .setOnFailed(_ -> listPMCController.loadedPMCSTask = null)
                 .setOnSucceeded(_ -> {
                     taskUnbind(taskBean);
@@ -559,6 +549,7 @@ public class MainApplication extends Application {
                     listPMCController.loadedPMCSTask = null;
                 });
         bindingTaskNode(taskBean);
+        startTaskOfVirtual(taskBean);
     }
 
     /**

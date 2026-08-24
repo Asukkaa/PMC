@@ -7,6 +7,8 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.Task.TaskBean;
 
 import static priv.koishi.pmc.Finals.i18nFinal.*;
@@ -22,6 +24,11 @@ import static priv.koishi.pmc.Utils.UiUtils.updateLabel;
  * Time:下午3:14
  */
 public class TaskUtils {
+
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(TaskUtils.class);
 
     /**
      * 绑定任务程
@@ -89,7 +96,9 @@ public class TaskUtils {
      */
     public static void setTaskCallBack(TaskBean<?> taskBean) {
         Task<?> task = taskBean.getWorkingTask();
+        String taskName = taskBean.getName();
         task.setOnSucceeded(event -> {
+            logger.info("任务成功：{}", taskName);
             taskUnbind(taskBean);
             EventHandler<WorkerStateEvent> handler = taskBean.getOnSucceeded();
             try {
@@ -101,6 +110,7 @@ public class TaskUtils {
             }
         });
         task.setOnFailed(event -> {
+            logger.error("任务失败：{}", taskName);
             taskNotSuccess(taskBean, text_taskFailed());
             EventHandler<WorkerStateEvent> handler = taskBean.getOnFailed();
             try {
@@ -113,6 +123,7 @@ public class TaskUtils {
             throw new RuntimeException(event.getSource().getException());
         });
         task.setOnCancelled(event -> {
+            logger.warn("任务取消：{}", taskName);
             taskNotSuccess(taskBean, text_taskCancelled());
             EventHandler<WorkerStateEvent> handler = taskBean.getOnCancelled();
             try {
@@ -192,6 +203,36 @@ public class TaskUtils {
         Thread.ofVirtual()
                 .name("clearResourcesTask-vThread" + tabId)
                 .start(clearResources);
+    }
+
+    /**
+     * 使用虚拟线程启动任务
+     *
+     * @param taskBean 线程任务所需参数
+     */
+    public static void startTaskOfVirtual(TaskBean<?> taskBean) {
+        Task<?> workingTask = taskBean.getWorkingTask();
+        String tabId = taskBean.getTabId();
+        if (workingTask != null && !workingTask.isRunning()) {
+            Thread.ofVirtual()
+                    .name(taskBean.getName() + "-vThread" + tabId)
+                    .start(workingTask);
+        }
+    }
+
+    /**
+     * 使用平台线程启动任务
+     *
+     * @param taskBean 线程任务所需参数
+     */
+    public static void startTaskOfPlatform(TaskBean<?> taskBean) {
+        Task<?> workingTask = taskBean.getWorkingTask();
+        String tabId = taskBean.getTabId();
+        if (workingTask != null && !workingTask.isRunning()) {
+            Thread.ofPlatform()
+                    .name(taskBean.getName() + "-pThread" + tabId)
+                    .start(workingTask);
+        }
     }
 
 }
