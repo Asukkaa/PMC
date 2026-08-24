@@ -1047,7 +1047,9 @@ public class UiUtils {
     /**
      * 向列表添加文件并根据文件路径去重
      *
-     * @param files 文件列表
+     * @param files          文件列表
+     * @param isAllDirectory true 列表中的路径都是文件夹
+     * @param tableView      要去重并添加数据的列表
      * @throws IOException 获取文件属性异常、文件创建时间读取异常
      */
     public static void addRemoveSameFile(List<? extends File> files, boolean isAllDirectory, TableView<FileVO> tableView) throws IOException {
@@ -1112,7 +1114,9 @@ public class UiUtils {
     /**
      * 处理无法自动切换主题的页面
      *
-     * @param pane 页面布局
+     * @param pane  页面布局
+     * @param clazz 页面控制器类
+     * @param <T>   页面控制器类型
      */
     public static <T> void manuallyChangeThemePane(Region pane, Class<T> clazz) {
         if (isDarkTheme) {
@@ -1133,7 +1137,8 @@ public class UiUtils {
     /**
      * 根据 Tab ID 查找 Tab
      *
-     * @param tabId Tab ID
+     * @param tabId   Tab ID
+     * @param tabPane Tab 布局容器
      * @return Tab
      */
     public static Tab findTabById(String tabId, TabPane tabPane) {

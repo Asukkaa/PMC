@@ -989,6 +989,7 @@ public class TableViewUtils {
      * @param contextMenu    右键菜单集合
      * @param dataNumber     列表数据数量文本框
      * @param dataNumberUnit 数据数量单位
+     * @param <T>            列表数据类型
      */
     public static <T extends CopyBean> void buildCopyDataMenu(TableView<T> tableView, ContextMenu contextMenu,
                                                               Label dataNumber, String dataNumberUnit) {
@@ -1057,6 +1058,7 @@ public class TableViewUtils {
      * @param contextMenu 右键菜单集合
      * @param dataNumber  列表数据数量文本框
      * @param unit        列表数据数量单位
+     * @return 此菜单选项对象
      */
     public static MenuItem buildEditStopImgPathMenu(TableView<ImgFileVO> tableView, ContextMenu contextMenu,
                                                     Label dataNumber, String unit) {
@@ -1280,6 +1282,7 @@ public class TableViewUtils {
      * 构建文件信息表格右键菜单
      *
      * @param tableView 要添加右键菜单的列表
+     * @return 右键菜单对象
      */
     public static ContextMenu buildFileTableViewContextMenu(TableView<? extends FilePath> tableView) {
         // 添加右键菜单

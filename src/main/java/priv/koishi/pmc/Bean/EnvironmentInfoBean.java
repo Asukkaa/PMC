@@ -42,6 +42,8 @@ public class EnvironmentInfoBean {
 
     /**
      * 判断 Java 版本是否符合最低要求版本
+     *
+     * @return true 符合最低要求
      */
     public boolean isJavaVersionValid() {
         if (StringUtils.isBlank(javaVersion)) {
@@ -59,6 +61,8 @@ public class EnvironmentInfoBean {
 
     /**
      * 判断 Python 版本是否符合最低要求版本
+     *
+     * @return true 符合最低要求
      */
     public boolean isPythonVersionValid() {
         if (StringUtils.isBlank(pythonVersion)) {

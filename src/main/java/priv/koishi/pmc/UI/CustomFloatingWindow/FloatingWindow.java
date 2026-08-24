@@ -631,7 +631,8 @@ public class FloatingWindow {
     /**
      * 显示浮窗
      *
-     * @param config 浮窗配置
+     * @param config          浮窗配置
+     * @param onShownCallback 浮窗显示后的回调函数
      */
     public static void showFloatingWindow(FloatingWindowDescriptor config, Runnable onShownCallback) {
         Platform.runLater(() -> {

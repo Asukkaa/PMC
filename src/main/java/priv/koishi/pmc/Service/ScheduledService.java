@@ -74,6 +74,7 @@ public class ScheduledService {
      * 创建定时任务
      *
      * @param timedTaskBean 定时任务信息
+     * @return 无返回值的 Task
      */
     public static Task<Void> createTask(TimedTaskBean timedTaskBean) {
         return new Task<>() {

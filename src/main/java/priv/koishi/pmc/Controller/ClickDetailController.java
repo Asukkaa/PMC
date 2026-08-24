@@ -410,7 +410,8 @@ public class ClickDetailController extends RootController {
     /**
      * 初始化数据
      *
-     * @param item 列表选中的数据
+     * @param item       列表选中的数据
+     * @param inFilePath 导入文件路径
      * @throws IllegalAccessException 访问属性异常
      */
     public void initData(ClickPositionVO item, String inFilePath) throws IllegalAccessException {

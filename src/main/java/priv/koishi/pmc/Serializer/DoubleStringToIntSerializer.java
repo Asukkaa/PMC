@@ -14,6 +14,9 @@ import tools.jackson.databind.ser.std.StdSerializer;
  */
 public class DoubleStringToIntSerializer extends StdSerializer<String> {
 
+    /**
+     * 构造器
+     */
     public DoubleStringToIntSerializer() {
         super(String.class);
     }

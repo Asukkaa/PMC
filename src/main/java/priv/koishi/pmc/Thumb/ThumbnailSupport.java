@@ -12,16 +12,22 @@ public interface ThumbnailSupport {
 
     /**
      * 获取文件路径
+     *
+     * @return 文件路径
      */
     String getPath();
 
     /**
      * 获取当前缩略图（可能为 null）
+     *
+     * @return 当前缩略图
      */
     Image getThumb();
 
     /**
      * 设置缩略图（由加载器回调，需在 UI 线程执行）
+     *
+     * @param thumb 缩略图
      */
     void setThumb(Image thumb);
 

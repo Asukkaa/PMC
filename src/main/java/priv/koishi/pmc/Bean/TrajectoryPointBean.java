@@ -64,6 +64,8 @@ public class TrajectoryPointBean {
 
     /**
      * 换算绝对和相对坐标
+     *
+     * @param windowInfo 窗口信息
      */
     public void updatePosition(WindowInfo windowInfo) {
         if (windowInfo != null) {

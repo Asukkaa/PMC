@@ -81,6 +81,7 @@ public class SingleInstanceGuard {
      * 检查应用实例是否已运行
      *
      * @param port 激活信号端口
+     * @param args 启动参数
      * @return true-已有实例运行，false-当前是首个实例
      */
     public static boolean checkRunning(int port, String[] args) {
@@ -256,6 +257,7 @@ public class SingleInstanceGuard {
      * 发送激活正在运行的程序窗口信号
      *
      * @param port 端口号
+     * @param args 启动参数
      */
     private static void sendActivationSignal(int port, String[] args) {
         try (Socket socket = new Socket("localhost", port)) {

@@ -1,3 +1,6 @@
+/**
+ * 项目模块化信息
+ */
 module priv.koishi.pmc {
 
     requires static lombok;

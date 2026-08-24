@@ -331,9 +331,10 @@ public class PMCFileService {
     /**
      * 导出 PMCS 文件任务线程
      *
-     * @param taskBean    线程任务参数
-     * @param fileName    要导出的文件名
-     * @param outFilePath 导出文件夹路径
+     * @param taskBean     线程任务参数
+     * @param fileName     要导出的文件名
+     * @param outFilePath  导出文件夹路径
+     * @param notOverwrite true 文件重名不覆盖
      * @return 带有导出文件路径的 task
      */
     public static Task<String> exportPMCS(TaskBean<PMCListBean> taskBean, String fileName,
@@ -373,9 +374,10 @@ public class PMCFileService {
     /**
      * 导出 PMC 文件任务线程
      *
-     * @param taskBean    线程任务参数
-     * @param fileName    要导出的文件名
-     * @param outFilePath 导出文件夹路径
+     * @param taskBean     线程任务参数
+     * @param fileName     要导出的文件名
+     * @param outFilePath  导出文件夹路径
+     * @param notOverwrite true 文件重名不覆盖
      * @return 带有导出文件路径的 task
      */
     public static Task<String> exportPMC(TaskBean<ClickPositionVO> taskBean, String fileName,

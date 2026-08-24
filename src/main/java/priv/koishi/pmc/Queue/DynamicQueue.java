@@ -11,6 +11,7 @@ import static priv.koishi.pmc.Finals.i18nFinal.text_minSize;
 /**
  * 动态容量队列
  *
+ * @param <E> 队列数据类型
  * @author KOISHI
  * Date:2025-05-08
  * Time:19:08
@@ -71,7 +72,7 @@ public class DynamicQueue<E> {
     }
 
     /**
-     * 获取当前快照（线程安全）
+     * 获取当前快照
      *
      * @return 快照
      */

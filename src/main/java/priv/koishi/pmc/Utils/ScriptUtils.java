@@ -53,7 +53,8 @@ public class ScriptUtils {
     /**
      * 启动获取系统环境任务线程
      *
-     * @param tabId 启动页面 ID
+     * @param tabId    启动页面 ID
+     * @param runnable 获取系统环境后的回调函数
      */
     public static void startEnvInfoTask(String tabId, Runnable runnable) {
         if (envInfoTask != null) {

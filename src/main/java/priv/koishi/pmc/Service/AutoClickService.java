@@ -168,6 +168,7 @@ public class AutoClickService {
      * @param robot        Robot 实例
      * @param pmcListBeans 需要批量运行的 PMC 文件列表
      * @param baseTaskBean 任务参数
+     * @param pmcWindowMap 窗口路径映射表
      * @return 带有执行结果的 Task
      */
     public static Task<PMCLogResult> autoClicks(Robot robot, List<? extends PMCListBean> pmcListBeans, AutoClickTaskBean baseTaskBean,
@@ -364,8 +365,10 @@ public class AutoClickService {
     /**
      * 自动点击任务线程
      *
-     * @param taskBean 线程任务参数
-     * @param robot    Robot 实例
+     * @param taskBean      线程任务参数
+     * @param robot         Robot 实例
+     * @param clickLogQueue 操作日志
+     * @param windowPathMap 窗口路径映射表
      * @return 执行记录
      */
     public static Task<PMCLogResult> autoClick(AutoClickTaskBean taskBean, Robot robot, DynamicQueue<ClickLogBean> clickLogQueue,

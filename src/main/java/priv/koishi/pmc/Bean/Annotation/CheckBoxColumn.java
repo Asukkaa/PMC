@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 public @interface CheckBoxColumn {
 
     /**
-     * CheckBox 显示的文本对应的 key
+     * @return CheckBox 显示的文本对应的 key
      */
     String textKey() default "enable";
 

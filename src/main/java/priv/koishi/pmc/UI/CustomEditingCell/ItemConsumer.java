@@ -3,6 +3,7 @@ package priv.koishi.pmc.UI.CustomEditingCell;
 /**
  * 可编辑的 JavaFX 列表单元格接口
  *
+ * @param <T> JavaFX 列表单元格类型
  * @author KOISHI
  * Date:2024-11-04
  * Time:下午6:14

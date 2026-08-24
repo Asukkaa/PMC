@@ -52,6 +52,7 @@ public class RootController extends CommonProperties {
      *
      * @param type 要获取的控制器的类
      * @param <T>  控制器类型
+     * @return 控制器实例
      */
     public static <T extends RootController> T getController(Class<T> type) {
         synchronized (controllers) {
@@ -126,8 +127,9 @@ public class RootController extends CommonProperties {
     /**
      * 统一加载入口：加载 FXML，自动获取控制器并设置根节点，然后执行光标初始化
      *
-     * @param loader Fxml 加载器
-     * @throws IOException Fxml 文件加载失败
+     * @param loader FXML 加载器
+     * @return FXML 根节点
+     * @throws IOException FXML 文件加载失败
      */
     public static Parent loadFXML(FXMLLoader loader) throws IOException {
         Parent root = loader.load();

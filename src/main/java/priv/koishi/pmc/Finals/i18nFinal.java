@@ -4478,28 +4478,28 @@ public class i18nFinal {
     }
 
     /**
-     * 原生模式
+     * @return 原生模式
      */
     public static String theme_javafx() {
         return bundle.getString("theme.javafx");
     }
 
     /**
-     * 浅色模式
+     * @return 浅色模式
      */
     public static String theme_light() {
         return bundle.getString("theme.light");
     }
 
     /**
-     * 深色模式
+     * @return 深色模式
      */
     public static String theme_dark() {
         return bundle.getString("theme.dark");
     }
 
     /**
-     * 跟随系统
+     * @return 跟随系统
      */
     public static String theme_auto() {
         return bundle.getString("theme.auto");

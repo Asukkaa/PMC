@@ -20,6 +20,7 @@ import static priv.koishi.pmc.Utils.ToolTipUtils.creatTooltip;
 /**
  * 可编辑的 JavaFX 列表单元格
  *
+ * @param <T> 表格数据类型
  * @author KOISHI
  * Date:2024-11-04
  * Time:下午6:11

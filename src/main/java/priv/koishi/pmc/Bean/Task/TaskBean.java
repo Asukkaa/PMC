@@ -17,6 +17,7 @@ import java.util.Set;
 /**
  * 多线程任务所需设置类
  *
+ * @param <T> 列表和要处理的数据类型
  * @author KOISHI
  * Date:2024-10-24
  * Time:下午3:15

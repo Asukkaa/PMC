@@ -144,6 +144,7 @@ public class CheckUpdateService {
      *
      * @param updateInfo     更新信息
      * @param progressDialog 进度对话框
+     * @return 无返回值的 Task
      */
     public static Task<Void> downloadAndInstallUpdate(CheckUpdateBean updateInfo, ProgressDialog progressDialog) {
         return new Task<>() {

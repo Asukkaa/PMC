@@ -680,6 +680,7 @@ public class FileUtils {
      *
      * @param zipFilePath   zip 文件路径
      * @param destDirectory 输出目录
+     * @throws IOException 解压异常
      */
     public static void unzip(String zipFilePath, String destDirectory) throws IOException {
         File destDir = new File(destDirectory);
@@ -921,9 +922,10 @@ public class FileUtils {
     }
 
     /**
-     * 筛选出顶级目录
+     * 筛选出顶层目录
      *
      * @param directories 要筛选的目录
+     * @return 顶层目录
      * @throws IOException 获取文件属性异常
      */
     public static List<File> filterTopDirectories(List<? extends File> directories) throws IOException {
@@ -954,6 +956,7 @@ public class FileUtils {
      *
      * @param parent 父目录
      * @param child  子目录
+     * @return true 文件是否是子目录
      * @throws IOException 获取文件属性异常
      */
     public static boolean isSubdirectory(File parent, File child) throws IOException {
