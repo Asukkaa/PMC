@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.CheckUpdateBean;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Finals.Enum.RepeatTypeEnum;
 import priv.koishi.pmc.UI.CustomProgressDialog.ProgressDialog;
 

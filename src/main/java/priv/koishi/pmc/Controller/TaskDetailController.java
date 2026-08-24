@@ -15,7 +15,7 @@ import lombok.Setter;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.lang3.StringUtils;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Bean.TimedTaskBean;
 import priv.koishi.pmc.UI.CustomMessageBubble.MessageBubble;
 

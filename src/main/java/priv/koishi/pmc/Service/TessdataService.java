@@ -6,7 +6,7 @@ import javafx.scene.control.TableView;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Bean.TessdataBean;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.DeserializationFeature;

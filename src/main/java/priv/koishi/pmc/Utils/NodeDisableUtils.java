@@ -10,7 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import org.apache.commons.collections4.CollectionUtils;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 
 import java.util.Set;
 

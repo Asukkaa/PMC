@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Bean.TessdataBean;
 import priv.koishi.pmc.Bean.TrajectoryPointBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;

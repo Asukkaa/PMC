@@ -1,4 +1,4 @@
-package priv.koishi.pmc.Bean;
+package priv.koishi.pmc.Bean.Task;
 
 import javafx.animation.Timeline;
 import lombok.Data;

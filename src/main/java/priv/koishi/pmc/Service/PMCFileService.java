@@ -16,7 +16,7 @@ import priv.koishi.pmc.Bean.ImgFileBean;
 import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.Result.PMCLoadResult;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Bean.VO.ImgFileVO;
 import priv.koishi.pmc.Service.TaskInterface.MessageUpdater;

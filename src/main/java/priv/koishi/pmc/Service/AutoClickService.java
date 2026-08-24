@@ -13,6 +13,7 @@ import priv.koishi.pmc.Bean.*;
 import priv.koishi.pmc.Bean.Config.FindPositionConfig;
 import priv.koishi.pmc.Bean.Config.FloatingWindowConfig;
 import priv.koishi.pmc.Bean.Result.PMCLogResult;
+import priv.koishi.pmc.Bean.Task.AutoClickTaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Finals.Enum.*;
 import priv.koishi.pmc.JnaNative.GlobalWindowMonitor.WindowInfo;

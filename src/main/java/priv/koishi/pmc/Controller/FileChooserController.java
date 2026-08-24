@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.Config.FileConfig;
 import priv.koishi.pmc.Bean.Interface.FilePath;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Bean.VO.FileVO;
 import priv.koishi.pmc.Callback.FileChooserCallback;
 import priv.koishi.pmc.Listener.FileWatchService;

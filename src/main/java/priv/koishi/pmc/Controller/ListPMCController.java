@@ -25,7 +25,7 @@ import priv.koishi.pmc.Bean.Config.FileChooserConfig;
 import priv.koishi.pmc.Bean.PMCListBean;
 import priv.koishi.pmc.Bean.PMCLogBean;
 import priv.koishi.pmc.Bean.Result.PMCSLoadResult;
-import priv.koishi.pmc.Bean.TaskBean;
+import priv.koishi.pmc.Bean.Task.TaskBean;
 import priv.koishi.pmc.Bean.VO.ClickPositionVO;
 import priv.koishi.pmc.Event.AutoClickLoadedEvent;
 import priv.koishi.pmc.Event.EventBus;

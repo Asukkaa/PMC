@@ -56,4 +56,6 @@ module priv.koishi.pmc {
     opens priv.koishi.pmc.Finals.DefaultConfig to javafx.fxml;
     exports priv.koishi.pmc.Thumb;
     opens priv.koishi.pmc.Thumb to javafx.fxml;
+    exports priv.koishi.pmc.Bean.Task;
+    opens priv.koishi.pmc.Bean.Task to javafx.fxml;
 }
