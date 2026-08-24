@@ -335,23 +335,9 @@ public class CommonUtils {
             return;
         }
         // 获取源对象所有字段（包括父类）
-        Map<String, Field> sourceFields = new LinkedHashMap<>();
-        Class<?> currentSource = source.getClass();
-        while (currentSource != null && currentSource != Object.class) {
-            for (Field field : currentSource.getDeclaredFields()) {
-                sourceFields.putIfAbsent(field.getName(), field);
-            }
-            currentSource = currentSource.getSuperclass();
-        }
+        Map<String, Field> sourceFields = getFields(source);
         // 获取目标对象所有字段（包括父类）
-        Map<String, Field> targetFields = new LinkedHashMap<>();
-        Class<?> currentTarget = target.getClass();
-        while (currentTarget != null && currentTarget != Object.class) {
-            for (Field field : currentTarget.getDeclaredFields()) {
-                targetFields.putIfAbsent(field.getName(), field);
-            }
-            currentTarget = currentTarget.getSuperclass();
-        }
+        Map<String, Field> targetFields = getFields(target);
         // 遍历源字段，匹配目标同名字段
         for (Field sourceField : sourceFields.values()) {
             if (isNotCopyField(sourceField)) {
@@ -401,6 +387,24 @@ public class CommonUtils {
                 targetField.set(target, srcVal);
             }
         }
+    }
+
+    /**
+     * 获取对象属性字段（包括父类）
+     *
+     * @param object 需要获取的对象
+     * @return 属性映射 key 字段名称，value 字段 Field
+     */
+    private static Map<String, Field> getFields(Object object) {
+        Map<String, Field> fieldMap = new LinkedHashMap<>();
+        Class<?> currentSource = object.getClass();
+        while (currentSource != null && currentSource != Object.class) {
+            for (Field field : currentSource.getDeclaredFields()) {
+                fieldMap.putIfAbsent(field.getName(), field);
+            }
+            currentSource = currentSource.getSuperclass();
+        }
+        return fieldMap;
     }
 
     /**
