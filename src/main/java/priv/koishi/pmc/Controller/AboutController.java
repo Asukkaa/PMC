@@ -478,8 +478,7 @@ public class AboutController extends RootController {
         checkDate_Abt.setText("");
         TaskBean<?> taskBean = new TaskBean<>();
         taskBean.setMessageLabel(checkMessage_Abt)
-                .setDisableNodes(disableNodes)
-                .setBindingMessageLabel(true);
+                .setDisableNodes(disableNodes);
         Task<CheckUpdateBean> task = checkLatestVersion();
         taskBean.setWorkingTask(task)
                 .setOnFailed(_ -> updateCheckDate(Color.RED))
