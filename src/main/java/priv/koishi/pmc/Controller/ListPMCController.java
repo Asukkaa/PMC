@@ -643,10 +643,9 @@ public class ListPMCController extends RootController {
 
     /**
      * 运行自动点击按钮
-     *
      */
     @FXML
-    private void runClick() throws IOException {
+    private void runClick() {
         ObservableList<PMCListBean> tableViewItems = tableView_List.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new RuntimeException(text_noAutoClickToRun());

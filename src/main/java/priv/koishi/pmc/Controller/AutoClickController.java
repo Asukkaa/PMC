@@ -814,9 +814,8 @@ public class AutoClickController extends RootController implements MousePosition
      * @param clickPositionVOS 自动操作流程
      * @param loopTimes        循环次数
      * @param isBatch          是否为批量执行 PMC 文件（true 批量执行）
-     * @throws IOException 配置文件读取异常
      */
-    public void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes, boolean isBatch) throws IOException {
+    public void launchClickTask(List<ClickPositionVO> clickPositionVOS, int loopTimes, boolean isBatch) {
         if (isFree()) {
             if (cancelKey == noKeyboard) {
                 throw new RuntimeException(text_noCancelKey());
@@ -1148,11 +1147,7 @@ public class AutoClickController extends RootController implements MousePosition
         menuItem.setOnAction(_ -> {
             List<ClickPositionVO> selectedItem = tableView_Click.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selectedItem)) {
-                try {
-                    launchClickTask(selectedItem, 1, false);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                launchClickTask(selectedItem, 1, false);
             }
         });
         contextMenu.getItems().add(menuItem);
@@ -2236,11 +2231,9 @@ public class AutoClickController extends RootController implements MousePosition
 
     /**
      * 运行自动点击按钮
-     *
-     * @throws Exception 列表中没有要执行的操作
      */
     @FXML
-    private void runClick() throws Exception {
+    private void runClick() {
         ObservableList<ClickPositionVO> tableViewItems = tableView_Click.getItems();
         if (CollectionUtils.isEmpty(tableViewItems)) {
             throw new RuntimeException(text_noAutoClickToRun());
