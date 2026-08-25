@@ -1,0 +1,42 @@
+package priv.koishi.pmc.finals.enums;
+
+/**
+ * 要识别的图像识别重试设置枚举类
+ *
+ * @author KOISHI
+ * Date:2025-06-10
+ * Time:17:42
+ */
+public enum RetryTypeEnum {
+
+    /**
+     * 重试直到图像出现
+     */
+    CONTINUOUSLY,
+
+    /**
+     * 按设置次数重试后执行设置操作
+     */
+    CLICK,
+
+    /**
+     * 按设置次数重试后终止操作
+     */
+    STOP,
+
+    /**
+     * 按设置次数重试后跳过本次操作
+     */
+    BREAK,
+
+    /**
+     * 按设置次数重试后跳转指定步骤
+     */
+    STEP,
+
+    /**
+     * 按设置操作直到图像出现
+     */
+    CLICK_RETRY
+
+}

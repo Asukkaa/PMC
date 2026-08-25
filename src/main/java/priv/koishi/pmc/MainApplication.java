@@ -22,11 +22,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
-import priv.koishi.pmc.Bean.PMCListBean;
-import priv.koishi.pmc.Bean.Task.TaskBean;
-import priv.koishi.pmc.Bean.VO.ClickPositionVO;
-import priv.koishi.pmc.Controller.MainController;
-import priv.koishi.pmc.Finals.Enum.ThemeEnum;
+import priv.koishi.pmc.bean.PMCListBean;
+import priv.koishi.pmc.bean.task.TaskBean;
+import priv.koishi.pmc.bean.vo.ClickPositionVO;
+import priv.koishi.pmc.controller.MainController;
+import priv.koishi.pmc.finals.enums.ThemeEnum;
 
 import java.io.*;
 import java.net.BindException;
@@ -35,32 +35,32 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-import static priv.koishi.pmc.Controller.AutoClickController.recordTextColorProperty;
-import static priv.koishi.pmc.Controller.MainController.autoClickController;
-import static priv.koishi.pmc.Controller.MainController.listPMCController;
-import static priv.koishi.pmc.Controller.RootController.loadFXML;
-import static priv.koishi.pmc.Controller.SettingController.reSetAll;
-import static priv.koishi.pmc.Finals.CommonFinals.*;
-import static priv.koishi.pmc.Finals.CommonFinals.isRunningFromIDEA;
-import static priv.koishi.pmc.Finals.CommonKeys.*;
-import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.clickProperties;
-import static priv.koishi.pmc.Finals.DefaultConfig.AutoClickDefault.configFile_Click;
-import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configFile;
-import static priv.koishi.pmc.Finals.DefaultConfig.ConfigDefault.configProperties;
-import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.configFile_List;
-import static priv.koishi.pmc.Finals.DefaultConfig.ListPMCDefault.listPMCProperties;
-import static priv.koishi.pmc.Finals.i18nFinal.*;
-import static priv.koishi.pmc.OCR.Tesseract.TesseractOCREngine.releaseEngine;
-import static priv.koishi.pmc.PMCException.ShowException.showExceptionAlert;
-import static priv.koishi.pmc.Service.ImageRecognitionService.*;
-import static priv.koishi.pmc.Service.PMCFileService.buildPMC;
-import static priv.koishi.pmc.Service.PMCFileService.buildPMCS;
-import static priv.koishi.pmc.Service.SaveConfigService.saveAllConfig;
-import static priv.koishi.pmc.SingleInstanceGuard.SingleInstanceGuard.checkRunning;
-import static priv.koishi.pmc.Utils.FileUtils.*;
-import static priv.koishi.pmc.Utils.TaskUtils.*;
-import static priv.koishi.pmc.Utils.ToolTipUtils.addToolTip;
-import static priv.koishi.pmc.Utils.UiUtils.*;
+import static priv.koishi.pmc.controller.AutoClickController.recordTextColorProperty;
+import static priv.koishi.pmc.controller.MainController.autoClickController;
+import static priv.koishi.pmc.controller.MainController.listPMCController;
+import static priv.koishi.pmc.controller.RootController.loadFXML;
+import static priv.koishi.pmc.controller.SettingController.reSetAll;
+import static priv.koishi.pmc.finals.CommonFinals.*;
+import static priv.koishi.pmc.finals.CommonFinals.isRunningFromIDEA;
+import static priv.koishi.pmc.finals.CommonKeys.*;
+import static priv.koishi.pmc.finals.defaultconfig.AutoClickDefault.clickProperties;
+import static priv.koishi.pmc.finals.defaultconfig.AutoClickDefault.configFile_Click;
+import static priv.koishi.pmc.finals.defaultconfig.ConfigDefault.configFile;
+import static priv.koishi.pmc.finals.defaultconfig.ConfigDefault.configProperties;
+import static priv.koishi.pmc.finals.defaultconfig.ListPMCDefault.configFile_List;
+import static priv.koishi.pmc.finals.defaultconfig.ListPMCDefault.listPMCProperties;
+import static priv.koishi.pmc.finals.i18nFinal.*;
+import static priv.koishi.pmc.ocr.tesseract.TesseractOCREngine.releaseEngine;
+import static priv.koishi.pmc.exc.ShowException.showExceptionAlert;
+import static priv.koishi.pmc.service.ImageRecognitionService.*;
+import static priv.koishi.pmc.service.PMCFileService.buildPMC;
+import static priv.koishi.pmc.service.PMCFileService.buildPMCS;
+import static priv.koishi.pmc.service.SaveConfigService.saveAllConfig;
+import static priv.koishi.pmc.singleinstanceguard.SingleInstanceGuard.checkRunning;
+import static priv.koishi.pmc.utils.FileUtils.*;
+import static priv.koishi.pmc.utils.TaskUtils.*;
+import static priv.koishi.pmc.utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.utils.UiUtils.*;
 
 /**
  * 程序启动类
@@ -312,7 +312,7 @@ public class MainApplication extends Application {
      *
      * @param tabPane 程序页面基础布局
      */
-    private void initMenu(TabPane tabPane) {
+    private static void initMenu(TabPane tabPane) {
         MenuItem about = new MenuItem(macMenu_about() + appName);
         about.setOnAction(_ -> {
             // 只有在程序空闲时才弹出程序窗口

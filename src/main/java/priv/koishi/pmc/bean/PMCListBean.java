@@ -1,0 +1,85 @@
+package priv.koishi.pmc.bean;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+import priv.koishi.pmc.bean.abstractbean.BaseCopyBean;
+import priv.koishi.pmc.bean.annotation.IndexColumn;
+import priv.koishi.pmc.bean.beaninterface.FilePath;
+import priv.koishi.pmc.bean.beaninterface.Indexable;
+import priv.koishi.pmc.bean.vo.ClickPositionVO;
+
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * 批量执行 PMC 流程数据类
+ *
+ * @author KOISHI
+ * Date:2026-01-19
+ * Time:15:25
+ */
+@Data
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+public class PMCListBean extends BaseCopyBean implements Indexable, FilePath {
+
+    /**
+     * 唯一标识符
+     */
+    @JsonIgnore
+    private String uuid = UUID.randomUUID().toString();
+
+    /**
+     * 序号
+     */
+    @JsonIgnore
+    @IndexColumn
+    private Integer index;
+
+    /**
+     * PMC 文件名称
+     */
+    private String name;
+
+    /**
+     * PMC 文件地址
+     */
+    private String path;
+
+    /**
+     * 运行次数（默认 1）
+     */
+    private String runNum = "1";
+
+    /**
+     * 文件执行前等待时间（单位毫秒，默认 0）
+     */
+    private String waitTime = "0";
+
+    /**
+     * PMC 文件解析后的数据
+     */
+    @JsonIgnore
+    private List<ClickPositionVO> clickPositionVOS;
+
+    /**
+     * 为列表数据设置序号接口
+     *
+     * @param index 要设置的序号
+     */
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    /**
+     * 更新 UUID
+     */
+    @Override
+    public void updateUuid() {
+        uuid = UUID.randomUUID().toString();
+    }
+
+}

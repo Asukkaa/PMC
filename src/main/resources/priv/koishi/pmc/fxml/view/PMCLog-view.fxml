@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../../css/Styles.css"
-            fx:controller="priv.koishi.pmc.Controller.PMCLogController" fx:id="scrollPane_PLog">
+            fx:controller="priv.koishi.pmc.controller.PMCLogController" fx:id="scrollPane_PLog">
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
             <HBox spacing="10">

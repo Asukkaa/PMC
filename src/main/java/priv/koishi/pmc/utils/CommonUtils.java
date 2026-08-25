@@ -1,0 +1,551 @@
+package priv.koishi.pmc.utils;
+
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.bean.annotation.IgnoreCopy;
+import priv.koishi.pmc.bean.annotation.ShallowCopy;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static priv.koishi.pmc.finals.i18nFinal.text_unknowGC;
+
+/**
+ * 通用工具类
+ *
+ * @author KOISHI
+ * Date:2024-10-10
+ * Time:下午1:14
+ */
+public class CommonUtils {
+
+    /**
+     * 自然排序比较器（数字按数值大小排序）
+     */
+    public static final Comparator<String> NATURAL_SORT = Comparator.comparing((String str) ->
+            Objects.requireNonNullElse(str, ""), CommonUtils::naturalCompare);
+
+    /**
+     * 深度复制序列化配置
+     */
+    private static final ObjectMapper COPY_MAPPER = new ObjectMapper()
+            .rebuild()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build();
+
+    /**
+     * 标准类型的封装类型
+     */
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER = new HashMap<>();
+
+    static {
+        PRIMITIVE_TO_WRAPPER.put(boolean.class, Boolean.class);
+        PRIMITIVE_TO_WRAPPER.put(byte.class, Byte.class);
+        PRIMITIVE_TO_WRAPPER.put(char.class, Character.class);
+        PRIMITIVE_TO_WRAPPER.put(double.class, Double.class);
+        PRIMITIVE_TO_WRAPPER.put(float.class, Float.class);
+        PRIMITIVE_TO_WRAPPER.put(int.class, Integer.class);
+        PRIMITIVE_TO_WRAPPER.put(long.class, Long.class);
+        PRIMITIVE_TO_WRAPPER.put(short.class, Short.class);
+    }
+
+    /**
+     * 自然排序的核心比较方法
+     *
+     * @param s1 要排序的字符串1
+     * @param s2 要排序的字符串2
+     */
+    private static int naturalCompare(String s1, String s2) {
+        if (s1 == null && s2 == null) {
+            return 0;
+        }
+        if (s1 == null) {
+            return -1;
+        }
+        if (s2 == null) {
+            return 1;
+        }
+        int i1 = 0, i2 = 0;
+        int len1 = s1.length(), len2 = s2.length();
+        while (i1 < len1 && i2 < len2) {
+            char c1 = s1.charAt(i1);
+            char c2 = s2.charAt(i2);
+            if (Character.isDigit(c1) && Character.isDigit(c2)) {
+                int num1 = 0, num2 = 0;
+                while (i1 < len1 && Character.isDigit(s1.charAt(i1))) {
+                    num1 = num1 * 10 + (s1.charAt(i1++) - '0');
+                }
+                while (i2 < len2 && Character.isDigit(s2.charAt(i2))) {
+                    num2 = num2 * 10 + (s2.charAt(i2++) - '0');
+                }
+                if (num1 != num2) {
+                    return Integer.compare(num1, num2);
+                }
+            } else {
+                // 不区分大小写比较
+                int cmp = Character.compare(Character.toLowerCase(c1), Character.toLowerCase(c2));
+                if (cmp != 0) return cmp;
+                i1++;
+                i2++;
+            }
+        }
+        return Integer.compare(len1 - i1, len2 - i2);
+    }
+
+    /**
+     * 正则表达式用于匹配指定范围的整数（不允许 0 开头）
+     *
+     * @param str 要校验的字符串
+     * @param min 最小值，为空则不限制
+     * @param max 最大值，为空则不限制
+     * @return 在设置范围内为 true，不在范围内为 false
+     */
+    public static boolean isInIntegerRange(String str, Integer min, Integer max) {
+        return isInIntegerRange(str, min, max, false);
+    }
+
+    /**
+     * 正则表达式用于匹配指定范围的整数
+     *
+     * @param str       要校验的字符串
+     * @param min       最小值，为空则不限制
+     * @param max       最大值，为空则不限制
+     * @param zeroStart 是否允许 0 开头的数字
+     * @return 在设置范围内为 true，不在范围内为 false
+     */
+    public static boolean isInIntegerRange(String str, Integer min, Integer max, boolean zeroStart) {
+        if (StringUtils.isBlank(str)) {
+            return false;
+        }
+        // 禁止出现 0 开头的非 0 数字
+        if (!zeroStart && str.startsWith("0") && str.length() > 1) {
+            return false;
+        }
+        // 禁止出现 00 开头的数字
+        if (zeroStart && str.startsWith("00") && str.length() > 2) {
+            return false;
+        }
+        // 禁止出现负数开头的 0
+        if (str.startsWith("-0")) {
+            return false;
+        }
+        Pattern integerPattern = Pattern.compile("^-?\\d{1,10}$");
+        // 使用正则表达式判断字符串是否为整数
+        if (!integerPattern.matcher(str).matches()) {
+            return false;
+        }
+        // 将字符串转换为整数并判断是否在指定范围内
+        int value = Integer.parseInt(str);
+        // 只判断是否为整数，不限定范围
+        if (max == null && min == null) {
+            return true;
+        }
+        // 限定最小值
+        if (max == null) {
+            return value >= min;
+        }
+        // 限定最大值
+        if (min == null) {
+            return value <= max;
+        }
+        return value >= min && value <= max;
+    }
+
+    /**
+     * 正则表达式用于匹配指定范围的小数
+     *
+     * @param str 要校验的字符串
+     * @param min 最小值，为空则不限制
+     * @param max 最大值，为空则不限制
+     * @return 在设置范围内为 true，不在范围内为 false
+     */
+    public static boolean isInDecimalRange(String str, Double min, Double max) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        // 处理负号情况
+        boolean isNegative = str.startsWith("-");
+        String absStr = isNegative ? str.substring(1) : str;
+        // 禁止出现0开头的非0数字（整数部分）
+        if (absStr.indexOf("0") == 0 && absStr.length() > 1 && absStr.charAt(1) != '.') {
+            return false;
+        }
+        // 构建数字正则表达式（允许任意小数位数）
+        String decimalPattern = "^-?\\d{1,10}(\\.\\d+)?$";
+        Pattern pattern = Pattern.compile(decimalPattern);
+        if (!pattern.matcher(str).matches()) {
+            return false;
+        }
+        // 将字符串转换为小数并判断是否在指定范围内
+        double value;
+        try {
+            value = Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        // 只判断是否为有效数字，不限定范围
+        if (max == null && min == null) {
+            return !Double.isNaN(value) && Double.isFinite(value);
+        }
+        // 限定最小值
+        if (max == null) {
+            return value >= min && Double.isFinite(value);
+        }
+        // 限定最大值
+        if (min == null) {
+            return value <= max && Double.isFinite(value);
+        }
+        return value >= min && value <= max && Double.isFinite(value);
+    }
+
+    /**
+     * 比较版本号
+     *
+     * @param version          要比较的版本号字符串
+     * @param referenceVersion 参考版本号字符串
+     * @return 1 大于参考版本； 0 等于参考版本； -1 小于参考版本
+     */
+    public static int compareToConstant(String version, String referenceVersion) {
+        // 检查版本号是否有效
+        if (checkVersionFormat(version)) {
+            return -1;
+        }
+        // 检查参考版本是否有效
+        if (checkVersionFormat(referenceVersion)) {
+            return -1;
+        }
+        // 分割版本号并比较
+        return compareVersionParts(version, referenceVersion);
+    }
+
+    /**
+     * 检查版本号格式是否正确
+     *
+     * @param version 要检查的版本号字符串
+     * @return true 表示格式不正确，false 表示格式正确
+     */
+    private static boolean checkVersionFormat(String version) {
+        // 空值视为旧版本
+        if (version == null || version.trim().isEmpty()) {
+            return true;
+        }
+        // 格式不正确，视为旧版本
+        return !isValidVersion(version);
+    }
+
+    /**
+     * 比较两个版本号的各个部分
+     *
+     * @param version          要比较的版本号字符串
+     * @param referenceVersion 参考版本号字符串
+     * @return 1 大于参考版本； 0 等于参考版本； -1 小于参考版本
+     */
+    private static int compareVersionParts(String version, String referenceVersion) {
+        String[] parts1 = version.split("\\.");
+        String[] parts2 = referenceVersion.split("\\.");
+        // 比较主版本号
+        int major1 = Integer.parseInt(parts1[0]);
+        int major2 = Integer.parseInt(parts2[0]);
+        if (major1 != major2) {
+            return major1 > major2 ? 1 : -1;
+        }
+        // 主版本号相同，比较次版本号
+        int minor1 = Integer.parseInt(parts1[1]);
+        int minor2 = Integer.parseInt(parts2[1]);
+        if (minor1 != minor2) {
+            return minor1 > minor2 ? 1 : -1;
+        }
+        // 完全相等
+        return 0;
+    }
+
+    /**
+     * 验证版本号格式是否为有效的 x.x 格式
+     * <p>规则：
+     * <p>1. x 为数字
+     * <p>2. 只能有一个点
+     * <p>3. 点前后都不能有前导零（除非数字本身就是 0）
+     * <p>4. 不能是负数
+     *
+     * @param version 要验证的版本号
+     * @return true: 符合格式，false: 不符合格式
+     */
+    public static boolean isValidVersion(String version) {
+        if (version == null) {
+            return false;
+        }
+        // 使用正则表达式验证
+        if (!Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$").matcher(version).matches()) {
+            return false;
+        }
+        // 额外验证：确保分割后确实只有两部分
+        String[] parts = version.split("\\.");
+        if (parts.length != 2) {
+            return false;
+        }
+        // 验证每部分都是有效的整数且不会溢出
+        try {
+            long major = Long.parseLong(parts[0]);
+            long minor = Long.parseLong(parts[1]);
+            // 检查是否为负数
+            return major >= 0 && minor >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 获取详细的异常信息
+     *
+     * @param e 要获取的异常
+     * @return 详细异常详细
+     */
+    public static String errToString(Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw, true);
+        e.printStackTrace(pw);
+        pw.flush();
+        sw.flush();
+        return sw.toString();
+    }
+
+    /**
+     * 自动复制同名属性（包含父类）
+     *
+     * @param source 源对象
+     * @param target 目标对象
+     * @throws IllegalAccessException 当字段访问权限不足时抛出
+     */
+    public static void copyAllProperties(Object source, Object target) throws IllegalAccessException {
+        if (source == null || target == null) {
+            return;
+        }
+        // 获取源对象所有字段（包括父类）
+        Map<String, Field> sourceFields = getFields(source);
+        // 获取目标对象所有字段（包括父类）
+        Map<String, Field> targetFields = getFields(target);
+        // 遍历源字段，匹配目标同名字段
+        for (Field sourceField : sourceFields.values()) {
+            if (isNotCopyField(sourceField)) {
+                continue;
+            }
+            // 查找目标同名字段
+            Field targetField = targetFields.get(sourceField.getName());
+            // 目标字段也要跳过静态、final、@IgnoreCopy
+            if (targetField == null || isNotCopyField(targetField)) {
+                continue;
+            }
+            sourceField.setAccessible(true);
+            Object srcVal = sourceField.get(source);
+            if (srcVal == null) {
+                continue;
+            }
+            // 检查类型兼容性：目标字段类型必须能接受源值
+            Class<?> targetType = targetField.getType();
+            Class<?> sourceType = srcVal.getClass();
+            boolean compatible = targetType.isAssignableFrom(sourceType);
+            // 如果目标类型是基本类型，且源类型是其对应的包装类，则视为兼容
+            if (!compatible && targetType.isPrimitive()) {
+                compatible = PRIMITIVE_TO_WRAPPER.get(targetType) == sourceType;
+            }
+            if (!compatible) {
+                continue;
+            }
+            try {
+                targetField.setAccessible(true);
+                // 判断是否需要浅拷贝（直接引用），标记了 @ShallowCopy 或属于特殊引用类型
+                if (sourceField.isAnnotationPresent(ShallowCopy.class) || isReferenceOnlyType(sourceField.getType())) {
+                    targetField.set(target, srcVal);
+                } else {
+                    // 其余字段深拷贝
+                    Object copied;
+                    Type genericType = sourceField.getGenericType();
+                    if (srcVal instanceof Collection || srcVal instanceof Map) {
+                        JavaType javaType = COPY_MAPPER.getTypeFactory().constructType(genericType);
+                        copied = COPY_MAPPER.convertValue(srcVal, javaType);
+                    } else {
+                        copied = COPY_MAPPER.convertValue(srcVal, srcVal.getClass());
+                    }
+                    targetField.set(target, copied);
+                }
+            } catch (Exception e) {
+                // 降级：引用复制
+                targetField.set(target, srcVal);
+            }
+        }
+    }
+
+    /**
+     * 获取对象属性字段（包括父类）
+     *
+     * @param object 需要获取的对象
+     * @return 属性映射 key 字段名称，value 字段 Field
+     */
+    private static Map<String, Field> getFields(Object object) {
+        Map<String, Field> fieldMap = new LinkedHashMap<>();
+        Class<?> currentSource = object.getClass();
+        while (currentSource != null && currentSource != Object.class) {
+            for (Field field : currentSource.getDeclaredFields()) {
+                fieldMap.putIfAbsent(field.getName(), field);
+            }
+            currentSource = currentSource.getSuperclass();
+        }
+        return fieldMap;
+    }
+
+    /**
+     * 校验字段是为不可复制字段
+     *
+     * @param field 要校验的字段
+     * @return true 不可复制字段
+     */
+    private static boolean isNotCopyField(Field field) {
+        // 跳过静态字段
+        return Modifier.isStatic(field.getModifiers())
+                // 跳过常量字段
+                || Modifier.isFinal(field.getModifiers())
+                // 跳过标记字段
+                || field.isAnnotationPresent(IgnoreCopy.class);
+    }
+
+    /**
+     * 判断属性是否为仅复制引用的属性类型
+     *
+     * @param clazz 当前属性类型
+     * @return true 当前属性为仅复制引用的属性类型
+     */
+    private static boolean isReferenceOnlyType(Class<?> clazz) {
+        return clazz == TableView.class
+                || clazz == Image.class
+                || Thread.class.isAssignableFrom(clazz)
+                || Node.class.isAssignableFrom(clazz);
+    }
+
+    /**
+     * 获取当前 GC 类型
+     *
+     * @return 当前 GC 类型
+     */
+    public static String getCurrentGCType() {
+        List<String> gcNames = ManagementFactory.getGarbageCollectorMXBeans().stream()
+                .map(GarbageCollectorMXBean::getName).collect(Collectors.toList());
+        if (gcNames.contains("G1 Young Generation") || gcNames.contains("G1 Old Generation")) {
+            return "G1GC";
+        } else if (gcNames.contains("PS Scavenge") || gcNames.contains("PS MarkSweep")) {
+            return "ParallelGC";
+        } else if (gcNames.contains("ZGC Cycles") || gcNames.contains("ZGC Pauses") || gcNames.contains("ZGC Minor Cycles")) {
+            return "ZGC";
+        } else if (gcNames.contains("Shenandoah Pauses") || gcNames.contains("Shenandoah Cycles")) {
+            return "ShenandoahGC";
+        } else if (gcNames.contains("Copy") || gcNames.contains("MarkSweepCompact")) {
+            return "SerialGC";
+        } else {
+            return text_unknowGC() + String.join(", ", gcNames);
+        }
+    }
+
+    /**
+     * 获取当前进程 PID
+     *
+     * @return 当前进程 PID 字符串
+     * @throws Exception 获取 PID 时抛出的异常
+     */
+    public static String getProcessId() throws Exception {
+        Class<?> processHandleClass = Class.forName("java.lang.ProcessHandle");
+        Object currentProcessHandle = processHandleClass.getMethod("current").invoke(null);
+        Object pid = processHandleClass.getMethod("pid").invoke(currentProcessHandle);
+        return String.valueOf(pid);
+    }
+
+    /**
+     * 验证 URL 是否有效
+     *
+     * @param url 要验证的 URL
+     * @return true 表示 URL 有效，false 表示无效
+     */
+    public static boolean isValidUrl(String url) {
+        if (StringUtils.isBlank(url)) {
+            return false;
+        }
+        //  协议
+        String urlRegex = "^(https?|ftp|file)://" +
+                // 域名或 IP
+                "([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}|localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})" +
+                // 端口
+                "(:[0-9]{1,5})?" +
+                // 路径
+                "(/[\\w.-]*)*" +
+                // 查询参数
+                "(\\?[\\w.-=&]*)?$";
+        Pattern urlPattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+        String trimmedUrl = url.trim();
+        // 如果没有协议前缀，自动添加 https:// 进行测试
+        if (!trimmedUrl.matches("^[a-zA-Z]+://.*")) {
+            trimmedUrl = "https://" + trimmedUrl;
+        }
+        return urlPattern.matcher(trimmedUrl).matches();
+    }
+
+    /**
+     * 将指定元素移动到 List 首位
+     *
+     * @param list    需要处理的 List
+     * @param element 需要移动的元素
+     * @param <T>     需要处理的 List 数据类
+     */
+    public static <T> void moveAllToFirst(List<T> list, T element) {
+        // 先删除所有匹配元素
+        List<T> matches = new ArrayList<>();
+        list.removeIf(e -> {
+            if (e.equals(element)) {
+                matches.add(e);
+                return true;
+            }
+            return false;
+        });
+        // 将匹配元素插入到开头
+        list.addAll(0, matches);
+    }
+
+
+    /**
+     * 安全地替换 {@link ObservableList} 的全部内容，允许 {@code newData} 为 {@code null}。
+     * <p>
+     * 如果 {@code newData} 为 {@code null}，则清空列表（等效于 {@link ObservableList#clear()}）。
+     * 否则，调用 {@link ObservableList#setAll(java.util.Collection)} 用给定集合的全部元素替换当前列表内容。
+     * </p>
+     *
+     * <p><b>变更事件触发说明：</b></p>
+     * <ul>
+     *   <li>{@code newData} 不为 {@code null} 时，{@code setAll} 会触发一次列表变更事件（原子操作）。</li>
+     *   <li>{@code newData} 为 {@code null} 时，{@code clear()} 会触发一次列表变更事件。</li>
+     * </ul>
+     *
+     * @param <E>     列表元素的类型
+     * @param list    目标 {@code ObservableList}，不能为 {@code null}
+     * @param newData 新的数据集合，可以为 {@code null}（此时等价于清空列表）
+     * @throws NullPointerException 如果 {@code list} 为 {@code null}
+     */
+    public static <E> void setAllSafely(ObservableList<E> list, Collection<? extends E> newData) {
+        if (newData == null) {
+            list.clear();
+        } else {
+            list.setAll(newData);
+        }
+    }
+
+}

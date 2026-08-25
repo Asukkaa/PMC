@@ -1,0 +1,139 @@
+package priv.koishi.pmc.controller;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
+import priv.koishi.pmc.bean.ClickLogBean;
+
+import java.util.List;
+
+import static priv.koishi.pmc.controller.AutoClickController.logStage;
+import static priv.koishi.pmc.finals.i18nFinal.tip_removeAll_Log;
+import static priv.koishi.pmc.finals.i18nFinal.unit_log;
+import static priv.koishi.pmc.utils.TableViewUtils.*;
+import static priv.koishi.pmc.utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.utils.UiUtils.manuallyChangeThemePane;
+
+/**
+ * 操作记录页面控制器
+ *
+ * @author KOISHI
+ * Date:2025-05-08
+ * Time:12:26
+ */
+public class ClickLogController extends ManuallyChangeThemeController {
+
+    /**
+     * 页面标识符
+     */
+    private static final String tabId = "_Log";
+
+    /**
+     * 更新数据用的回调函数
+     */
+    @Setter
+    private Runnable refreshCallback;
+
+    @FXML
+    public ScrollPane scrollPane_Log;
+
+    @FXML
+    public Button removeAll_Log;
+
+    @FXML
+    public Label dataNumber_Log;
+
+    @FXML
+    public TableView<ClickLogBean> tableView_Log;
+
+    @FXML
+    public TableColumn<ClickLogBean, Integer> index_Log;
+
+    @FXML
+    public TableColumn<ClickLogBean, String> date_Log, name_Log, type_Log, X_Log, Y_Log, clickTime_Log,
+            clickKey_Log, result_Log;
+
+    /**
+     * 组件宽高自适应
+     */
+    public void adaption() {
+        double tableWidth = logStage.getWidth() * 0.95;
+        tableView_Log.setMaxWidth(tableWidth);
+        tableView_Log.setPrefWidth(tableWidth);
+        tableView_Log.setPrefHeight(logStage.getHeight() * 0.8);
+        bindPrefWidthProperty();
+    }
+
+    /**
+     * 设置 JavaFX 单元格宽度
+     */
+    private void bindPrefWidthProperty() {
+        index_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.05));
+        date_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.2));
+        name_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.15));
+        type_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
+        X_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
+        Y_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
+        clickTime_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
+        clickKey_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
+        result_Log.prefWidthProperty().bind(tableView_Log.widthProperty().multiply(0.1));
+    }
+
+    /**
+     * 初始化数据
+     *
+     * @param logs 操作记录
+     */
+    public void initData(List<? extends ClickLogBean> logs) {
+        if (CollectionUtils.isNotEmpty(logs)) {
+            tableView_Log.getItems().setAll(logs);
+            updateTableViewSizeText(tableView_Log, dataNumber_Log, unit_log());
+            tableView_Log.refresh();
+        }
+    }
+
+    /**
+     * 手动处理主题切换
+     */
+    @Override
+    void manuallyChangeTheme() {
+        manuallyChangeThemePane(scrollPane_Log, getClass());
+    }
+
+    /**
+     * 页面初始化
+     */
+    @FXML
+    private void initialize() {
+        // 手动处理主题切换
+        manuallyChangeTheme();
+        Platform.runLater(() -> {
+            // 设置页面关闭事件处理逻辑
+            logStage.setOnCloseRequest(_ -> {
+                removeController();
+                logStage = null;
+            });
+            // 组件宽高自适应
+            adaption();
+            // 添加鼠标悬停提示
+            addToolTip(tip_removeAll_Log(), removeAll_Log);
+            // 自动填充 JavaFX 表格
+            autoBuildTableViewData(tableView_Log, ClickLogBean.class, tabId);
+        });
+    }
+
+    /**
+     * 清空列表
+     */
+    @FXML
+    private void removeAll() {
+        removeTableViewData(tableView_Log, dataNumber_Log);
+        // 触发列表刷新（通过回调）
+        if (refreshCallback != null) {
+            refreshCallback.run();
+        }
+    }
+
+}

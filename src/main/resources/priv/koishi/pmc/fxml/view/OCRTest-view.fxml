@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../../css/Styles.css"
-            fx:controller="priv.koishi.pmc.Controller.OCRTestController" fx:id="scrollPane_Tes">
+            fx:controller="priv.koishi.pmc.controller.OCRTestController" fx:id="scrollPane_Tes">
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="25">
             <HBox spacing="10">

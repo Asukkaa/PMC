@@ -1,0 +1,176 @@
+package priv.koishi.pmc.jnanative.windowmonitor;
+
+import com.sun.jna.Structure;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+import static priv.koishi.pmc.finals.CommonFinals.app;
+
+/**
+ * macOS Native 窗口信息类
+ *
+ * @author applesaucepenguin
+ * Date 2026-01-30
+ * time 16:13
+ */
+public class MacNativeWindowInfo extends Structure {
+
+    /**
+     * 进程 ID
+     */
+    public int pid;
+
+    /**
+     * 窗口 ID
+     */
+    public int windowId;
+
+    /**
+     * 窗口标题
+     */
+    public final byte[] title = new byte[256];
+
+    /**
+     * 窗口横坐标
+     */
+    public int x;
+
+    /**
+     * 窗口纵坐标
+     */
+    public int y;
+
+    /**
+     * 窗口宽度
+     */
+    public int width;
+
+    /**
+     * 窗口高度
+     */
+    public int height;
+
+    /**
+     * 窗口层级
+     */
+    public int layer;
+
+    /**
+     * 进程名称（需要与 C 结构体保持一致，但实际上后续会使用进程路径去获取）
+     */
+    @SuppressWarnings("unused")
+    public final byte[] processName = new byte[256];
+
+    /**
+     * 进程路径
+     */
+    public final byte[] processPath = new byte[1024];
+
+    /**
+     * 获取字段顺序列表，定义了结构体中各个字段的排列顺序
+     *
+     * @return 包含字段名称的有序列表
+     */
+    @Override
+    protected List<String> getFieldOrder() {
+        return Arrays.asList(
+                "pid",
+                "windowId",
+                "title",
+                "x",
+                "y",
+                "width",
+                "height",
+                "layer",
+                "processName",
+                "processPath"
+        );
+    }
+
+    /**
+     * 内部类，用于表示结构体的值
+     */
+    public static class ByValue extends MacNativeWindowInfo implements Structure.ByValue {
+
+        /**
+         * 获取字段顺序列表，继承父类的字段顺序定义
+         *
+         * @return 父类定义的字段顺序列表
+         */
+        @Override
+        protected List<String> getFieldOrder() {
+            return super.getFieldOrder();
+        }
+
+    }
+
+    /**
+     * 将 MacNativeWindowInfo 转换为 WindowInfo
+     *
+     * @return 转换后的窗口信息类
+     */
+    public WindowInfo toWindowInfo() {
+        if (windowId == 0) {
+            return null;
+        }
+        return new WindowInfo()
+                .setProcessName(getProcessNameString())
+                .setProcessPath(getProcessPathString())
+                .setTitle(getTitleString())
+                .setWindowId(windowId)
+                .setHeight(height)
+                .setWidth(width)
+                .setLayer(layer)
+                .setPid(pid)
+                .setX(x)
+                .setY(y);
+    }
+
+    /**
+     * 从字符串获取标题
+     *
+     * @return 标题字符串
+     */
+    public String getTitleString() {
+        return getNullTerminatedString(title);
+    }
+
+    /**
+     * 获取进程名称字符串
+     *
+     * @return 进程名称字符串
+     */
+    public String getProcessNameString() {
+        String path = getProcessPathString();
+        return new File(path).getName();
+    }
+
+    /**
+     * 获取进程路径字符串
+     *
+     * @return 进程路径字符串
+     */
+    public String getProcessPathString() {
+        String path = getNullTerminatedString(processPath);
+        if (path.contains(app)) {
+            path = path.substring(0, path.indexOf(app) + app.length());
+        }
+        return path;
+    }
+
+    /**
+     * 从字节数组获取以 null 结尾的字符串
+     *
+     * @param byteArray 需要处理的字节数组
+     */
+    private static String getNullTerminatedString(byte[] byteArray) {
+        int length = 0;
+        while (length < byteArray.length && byteArray[length] != 0) {
+            length++;
+        }
+        return new String(byteArray, 0, length);
+    }
+
+}

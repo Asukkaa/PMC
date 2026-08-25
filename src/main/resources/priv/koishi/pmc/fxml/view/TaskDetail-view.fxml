@@ -5,7 +5,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:id="scrollPane_TD"
-            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.TaskDetailController">
+            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.controller.TaskDetailController">
     <AnchorPane>
         <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10">
             <HBox spacing="10">

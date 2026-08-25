@@ -1,0 +1,78 @@
+package priv.koishi.pmc.bean;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+import priv.koishi.pmc.jnanative.windowmonitor.WindowInfo;
+
+import java.util.List;
+import java.util.Map;
+
+import static priv.koishi.pmc.finals.CommonFinals.RelativeX;
+import static priv.koishi.pmc.finals.CommonFinals.RelativeY;
+import static priv.koishi.pmc.jnanative.windowmonitor.WindowMonitor.calculateRelativePosition;
+
+/**
+ * 操作轨迹点
+ *
+ * @author KOISHI
+ * Date:2025-04-28
+ * Time:15:48
+ */
+@Data
+@Accessors(chain = true)
+public class TrajectoryPointBean {
+
+    /**
+     * 轨迹点时间戳
+     */
+    private long timestamp;
+
+    /**
+     * 轨迹点横坐标
+     */
+    private int x;
+
+    /**
+     * 轨迹点纵坐标
+     */
+    private int y;
+
+    /**
+     * 轨迹点相对横（X）坐标
+     */
+    private String relativeX;
+
+    /**
+     * 轨迹点相对纵（Y）坐标
+     */
+    private String relativeY;
+
+    /**
+     * 按下的鼠标按键
+     */
+    private List<Integer> pressMouseKeys;
+
+    /**
+     * 按下的键盘按键
+     */
+    private List<Integer> pressKeyboardKeys;
+
+    /**
+     * 滑轮状态（负数上滑，正数下滑，0 为无滑动状态）
+     */
+    private int wheelRotation;
+
+    /**
+     * 换算绝对和相对坐标
+     *
+     * @param windowInfo 窗口信息
+     */
+    public void updatePosition(WindowInfo windowInfo) {
+        if (windowInfo != null) {
+            Map<String, String> relativePosition = calculateRelativePosition(windowInfo, x, y);
+            relativeX = relativePosition.get(RelativeX);
+            relativeY = relativePosition.get(RelativeY);
+        }
+    }
+
+}

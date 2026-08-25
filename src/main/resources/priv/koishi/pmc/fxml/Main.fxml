@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="priv.koishi.pmc.Controller.MainController">
+      fx:controller="priv.koishi.pmc.controller.MainController">
     <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
         <!--自动操作工具-->
         <Tab fx:id="autoClickTab" text="%main.autoClickTab">

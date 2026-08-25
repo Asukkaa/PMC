@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" stylesheets="@../../css/Styles.css"
-            fx:controller="priv.koishi.pmc.Controller.ClickDetailController" fx:id="borderPane_Det">
+            fx:controller="priv.koishi.pmc.controller.ClickDetailController" fx:id="borderPane_Det">
     <center>
         <ScrollPane>
             <AnchorPane>

@@ -1,0 +1,326 @@
+package priv.koishi.pmc.ui.floatingwindow;
+
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import priv.koishi.pmc.bean.config.FloatingWindowConfig;
+
+import java.util.Set;
+
+import static priv.koishi.pmc.finals.defaultconfig.AutoClickDefault.defaultFloatingHeightInt;
+import static priv.koishi.pmc.finals.defaultconfig.AutoClickDefault.defaultFloatingWidthInt;
+import static priv.koishi.pmc.service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.service.ImageRecognitionService.screenWidth;
+
+/**
+ * 浮窗属性类
+ *
+ * @author KOISHI
+ * Date:2025-09-02
+ * Time:18:39
+ */
+@Data
+@Accessors(chain = true)
+public class FloatingWindowDescriptor {
+
+    /**
+     * 浮窗基础属性配置
+     */
+    private FloatingWindowConfig config;
+
+    /**
+     * 浮窗名称
+     */
+    private String name;
+
+    /**
+     * 浮窗所在矩形
+     */
+    private Rectangle rectangle;
+
+    /**
+     * 浮窗 Stage
+     */
+    private Stage stage;
+
+    /**
+     * 浮窗是否只隐藏（true 只隐藏，默认直接关闭而不是隐藏）
+     */
+    private boolean onlyHide;
+
+    /**
+     * 信窗信息展示栏
+     */
+    private Label messageLabel;
+
+    /**
+     * 浮窗坐标展示栏
+     */
+    private Label floatingPosition;
+
+    /**
+     * 浮窗名称展示栏
+     */
+    private Label nameeLabel;
+
+    /**
+     * 修改设置的按钮
+     */
+    private Button button;
+
+    /**
+     * 要防重复点击的组件
+     */
+    private Set<Node> disableNodes;
+
+    /**
+     * 信窗信息展示栏文本
+     */
+    private String message;
+
+    /**
+     * 显示浮窗按钮文本
+     */
+    private String showButtonText;
+
+    /**
+     * 显示浮窗按钮鼠标悬浮提示
+     */
+    private String showButtonToolTip;
+
+    /**
+     * 隐藏浮窗按钮文本
+     */
+    private String hideButtonText;
+
+    /**
+     * 隐藏浮窗按钮鼠标悬浮提示
+     */
+    private String hideButtonToolTip;
+
+    /**
+     * 字体对齐方式（默认左对齐）
+     */
+    private TextAlignment textAlignment = TextAlignment.LEFT;
+
+    /**
+     * 浮窗组件对齐方式（默认左上角）
+     */
+    private Pos pos = Pos.TOP_LEFT;
+
+    /**
+     * 是否允许拖拽移动（true 允许，默认允许）
+     */
+    private boolean enableDrag = true;
+
+    /**
+     * 是否允许调整大小（true 允许，默认允许）
+     */
+    private boolean enableResize = true;
+
+    /**
+     * 是否被修改过（true 修改过）
+     */
+    private boolean modified;
+
+    /**
+     * 是否显示名称（true 显示，默认显示）
+     */
+    private boolean showName = true;
+
+    /**
+     * 浮窗文本颜色（默认百色）
+     */
+    private Color textFill = Color.WHITE;
+
+    /**
+     * 浮窗离屏幕边界距离
+     */
+    private int margin;
+
+    /**
+     * 浮窗文本大小（默认 18）
+     */
+    private int fontSize = 18;
+
+    /**
+     * 浮窗透明度（默认 0.5）
+     */
+    private double opacity = 0.5;
+
+    /**
+     * 浮窗背景颜色
+     */
+    private Color backgroundColor;
+
+    /**
+     * 浮窗是否可透明（true 透明）
+     */
+    private boolean transparent;
+
+    /**
+     * 保存设置时浮窗横坐标 key
+     */
+    private String xKey;
+
+    /**
+     * 保存设置时浮窗纵坐标 key
+     */
+    private String yKey;
+
+    /**
+     * 浮窗保存设置时宽度 key
+     */
+    private String widthKey;
+
+    /**
+     * 浮窗保存设置时高度 key
+     */
+    private String heightKey;
+
+    /**
+     * 浮窗保存设置时配置文件路径
+     */
+    private String configFile;
+
+    /**
+     * 关闭时保存浮窗位置（true 保存，默认保存）
+     */
+    private boolean closeSave = true;
+
+    /**
+     * 浮窗最小宽度（默认 {@value priv.koishi.pmc.finals.defaultconfig.AutoClickDefault#defaultFloatingWidth}）
+     */
+    private int minWidth = defaultFloatingWidthInt;
+
+    /**
+     * 浮窗最小高度（默认 {@value priv.koishi.pmc.finals.defaultconfig.AutoClickDefault#defaultFloatingHeight}）
+     */
+    private int minHeight = defaultFloatingHeightInt;
+
+    /**
+     * 浮窗最大宽度（默认屏幕宽度）
+     */
+    private int maxWidth = screenWidth;
+
+    /**
+     * 浮窗最大高度（默认屏幕高度）
+     */
+    private int maxHeight = screenHeight;
+
+    /**
+     * 浮窗最小横轴坐标
+     */
+    private int minX;
+
+    /**
+     * 浮窗最小纵轴坐标
+     */
+    private int minY;
+
+    /**
+     * 浮窗最大横轴坐标
+     */
+    private int maxX;
+
+    /**
+     * 浮窗最大纵轴坐标
+     */
+    private int maxY;
+
+    /**
+     * 浮窗是否添加关闭快捷键键监听（true 添加，默认添加）
+     */
+    private boolean addCloseKey = true;
+
+    /**
+     * 是否显示窗口相对位置信息（true 显示，默认不显示）
+     */
+    private boolean showRelativeInfo;
+
+    /**
+     * 追加的自定义内容
+     */
+    private Node additionalContent;
+
+    /**
+     * 字体背景
+     */
+    private Background textBackground;
+
+    /**
+     * 销毁浮窗
+     */
+    public void dispose() {
+        if (stage != null) {
+            // 移除 Stage 自身的事件监听器
+            stage.setOnCloseRequest(null);
+            stage.setOnShowing(null);
+            stage.setOnShown(null);
+            stage.setOnHiding(null);
+            stage.setOnHidden(null);
+            // 移除 Scene 的事件监听器
+            Scene scene = stage.getScene();
+            if (scene != null) {
+                scene.setOnKeyPressed(null);
+                // 递归清理所有子孙节点的事件（使用递归方法）
+                clearNodeHandlers(scene.getRoot());
+                // 断开 Scene 与 Root 的绑定
+                stage.setScene(null);
+            }
+            // 从全局列表移除
+            FloatingWindow.floatingWindows.remove(this);
+            // 关闭舞台
+            stage.close();
+            stage = null;
+        }
+        // 强制清空本对象持有的所有 UI 强引用
+        messageLabel = null;
+        floatingPosition = null;
+        nameeLabel = null;
+        button = null;
+        additionalContent = null;
+        rectangle = null;
+        disableNodes = null;
+        // 如果 config 持有大对象或 WindowInfo，也建议置空
+        if (config != null) {
+            config.setWindowInfo(null);
+            config = null;
+        }
+    }
+
+    /**
+     * 递归清除节点及其所有子节点上的事件处理器
+     */
+    private static void clearNodeHandlers(Node node) {
+        if (node != null) {
+            // 清除常见的事件处理器
+            node.setOnMousePressed(null);
+            node.setOnMouseReleased(null);
+            node.setOnMouseClicked(null);
+            node.setOnMouseDragged(null);
+            node.setOnMouseMoved(null);
+            node.setOnKeyPressed(null);
+            node.setOnKeyReleased(null);
+            node.setOnKeyTyped(null);
+            node.setOnDragDetected(null);
+            node.setOnContextMenuRequested(null);
+            if (node instanceof Parent parent) {
+                for (Node child : parent.getChildrenUnmodifiable()) {
+                    clearNodeHandlers(child);
+                }
+            }
+        }
+    }
+
+}

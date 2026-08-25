@@ -1,0 +1,80 @@
+package priv.koishi.pmc.bean;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import priv.koishi.pmc.bean.annotation.CheckBoxColumn;
+import priv.koishi.pmc.bean.annotation.IndexColumn;
+import priv.koishi.pmc.bean.beaninterface.FilePath;
+import priv.koishi.pmc.bean.beaninterface.Indexable;
+
+import java.io.File;
+
+import static priv.koishi.pmc.utils.FileUtils.getExistsFileName;
+
+/**
+ * tessdata 文件展示类
+ *
+ * @author applesaucepenguin
+ * Date 2026-03-30
+ * time 14:39
+ */
+@Data
+@Accessors(chain = true)
+public class TessdataBean implements Indexable, FilePath {
+
+    /**
+     * 序号
+     */
+    @IndexColumn
+    private Integer index;
+
+    /**
+     * tessdata 文件名称（不带扩展名）
+     */
+    private String name;
+
+    /**
+     * tessdata 文件地址
+     */
+    @JsonIgnore
+    private String path;
+
+    /**
+     * tessdata 文件备注
+     */
+    private String remark;
+
+    /**
+     * 启用状态(true 启用模型，默认禁用)
+     */
+    @CheckBoxColumn
+    private boolean active;
+
+    /**
+     * 为列表数据设置序号接口
+     *
+     * @param index 要设置的序号
+     */
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    /**
+     * 有参构造
+     *
+     * @param file 需要读取的文件
+     */
+    public TessdataBean(File file) {
+        name = getExistsFileName(file);
+        path = file.getPath();
+    }
+
+    /**
+     * 无参构造
+     */
+    public TessdataBean() {
+    }
+
+}

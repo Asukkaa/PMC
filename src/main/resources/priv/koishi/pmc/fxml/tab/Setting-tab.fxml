@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <AnchorPane fx:id="anchorPane_Set" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.Controller.SettingController">
+            stylesheets="@../../css/Styles.css" fx:controller="priv.koishi.pmc.controller.SettingController">
     <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="30">
 
         <!--窗口设置：-->

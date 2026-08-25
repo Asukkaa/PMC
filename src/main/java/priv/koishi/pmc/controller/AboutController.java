@@ -1,0 +1,550 @@
+package priv.koishi.pmc.controller;
+
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import priv.koishi.pmc.bean.CheckUpdateBean;
+import priv.koishi.pmc.bean.task.TaskBean;
+import priv.koishi.pmc.finals.enums.RepeatTypeEnum;
+import priv.koishi.pmc.ui.progressdialog.ProgressDialog;
+
+import java.awt.*;
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.List;
+
+import static priv.koishi.pmc.MainApplication.bundle;
+import static priv.koishi.pmc.MainApplication.runPMCFile;
+import static priv.koishi.pmc.controller.MainController.autoClickController;
+import static priv.koishi.pmc.finals.CommonFinals.*;
+import static priv.koishi.pmc.finals.CommonKeys.*;
+import static priv.koishi.pmc.finals.defaultconfig.ConfigDefault.configFile;
+import static priv.koishi.pmc.finals.i18nFinal.*;
+import static priv.koishi.pmc.service.CheckUpdateService.*;
+import static priv.koishi.pmc.service.ImageRecognitionService.screenHeight;
+import static priv.koishi.pmc.service.ImageRecognitionService.screenWidth;
+import static priv.koishi.pmc.utils.FileUtils.*;
+import static priv.koishi.pmc.utils.ListenerUtils.integerRangeTextField;
+import static priv.koishi.pmc.utils.TaskUtils.bindingTaskNode;
+import static priv.koishi.pmc.utils.TaskUtils.startTaskOfVirtual;
+import static priv.koishi.pmc.utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.utils.ToolTipUtils.addValueToolTip;
+import static priv.koishi.pmc.utils.UiUtils.*;
+
+/**
+ * 关于页面控制器
+ *
+ * @author KOISHI
+ * Date:2025-01-07
+ * Time:16:45
+ */
+public class AboutController extends RootController {
+
+    /**
+     * 日志记录器
+     */
+    private static final Logger logger = LogManager.getLogger(AboutController.class);
+
+    /**
+     * 更新时间格式
+     */
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+
+    /**
+     * 要防重复点击的组件
+     */
+    private final Set<Node> disableNodes = new HashSet<>();
+
+    /**
+     * 下载更新任务
+     */
+    private Task<Void> downloadedUpdateTask;
+
+    @FXML
+    public ImageView logo_Abt;
+
+    @FXML
+    public TextField logsNum_Abt;
+
+    @FXML
+    public ChoiceBox<String> autoCheck_Abt;
+
+    @FXML
+    public Label logsPath_Abt, mail_Abt, version_Abt, title_Abt, checkMessage_Abt, checkDate_Abt;
+
+    @FXML
+    public Button openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt, openGitHubLinkBtn_Abt,
+            openGiteeLinkBtn_Abt, appreciate_Abt, checkUpdate_Abt, afdianLinkBtn_Abt;
+
+    /**
+     * 读取配置文件
+     *
+     * @throws IOException 日志文件配置读取异常
+     */
+    private void getConfig() throws IOException {
+        Properties prop = new Properties();
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
+        // 获取日志储存数量配置
+        setControlLastConfig(logsNum_Abt, prop, key_logsNum);
+        // 获取自动检查更新配置
+        setControlLastConfig(autoCheck_Abt, prop, key_autoCheck, repeatTypeMap);
+    }
+
+    /**
+     * 获取 logs 文件夹路径并展示
+     */
+    private void setLogsPath() {
+        String logsPath = getLogsPath();
+        setPathLabel(logsPath_Abt, logsPath);
+    }
+
+    /**
+     * 保存日志问文件数量设置
+     *
+     * @throws IOException 配置文件保存异常
+     */
+    public void saveLastConfig() throws IOException {
+        Properties prop = new Properties();
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
+        String logsNumValue = logsNum_Abt.getText();
+        prop.setProperty(key_logsNum, logsNumValue);
+        String autoCheckValue = autoCheck_Abt.getValue();
+        prop.setProperty(key_autoCheck, repeatTypeMap.getKey(autoCheckValue));
+        try (OutputStream output = new FileOutputStream(getRunningResourcePath(configFile))) {
+            prop.store(output, null);
+        }
+    }
+
+    /**
+     * 清理多余 log 文件
+     */
+    private void deleteLogs() {
+        String logsNumValue = logsNum_Abt.getText();
+        if (StringUtils.isNotBlank(logsNumValue)) {
+            File[] files = new File(logsPath_Abt.getText()).listFiles();
+            if (files != null) {
+                List<File> logList = new ArrayList<>();
+                for (File file : files) {
+                    if (log.equals(getExistsFileType(file))) {
+                        logList.add(file);
+                    }
+                }
+                int logsNum = Integer.parseInt(logsNumValue);
+                if (logList.size() > logsNum) {
+                    logList.sort((f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+                    List<File> removeList = logList.stream().skip(logsNum).toList();
+                    removeList.forEach(r -> {
+                        String path = r.getAbsolutePath();
+                        File file = new File(path);
+                        if (!file.delete()) {
+                            throw new RuntimeException(about_deleteFailed() + path);
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置鼠标悬停提示
+     */
+    private void setToolTip() {
+        // 版本号鼠标悬停提示
+        addToolTip(tip_version(), version_Abt);
+        // 日志文件数量输入框添加鼠标悬停提示
+        addValueToolTip(logsNum_Abt, tip_logsNum());
+        // 赞赏按钮添加鼠标悬停提示
+        addToolTip(tip_appreciate(), appreciate_Abt);
+        // 给 logo 和应用名称添加鼠标悬停提示
+        addToolTip(tip_thanks(), logo_Abt, title_Abt);
+        // 检查更新按钮添加鼠标悬停提示
+        addToolTip(tip_checkUpdate_Abt(), checkUpdate_Abt);
+        // 给 github、gitee 跳转按钮添加鼠标悬停提示
+        addToolTip(tip_openGitLink(), openGitHubLinkBtn_Abt, openGiteeLinkBtn_Abt);
+        // 自动检查更新添加鼠标悬停提示
+        addValueToolTip(autoCheck_Abt, tip_autoCheck_Abt(), autoCheck_Abt.getValue());
+        // 给网盘跳转按钮添加鼠标悬停提示
+        addToolTip(tip_openLink(), openBaiduLinkBtn_Abt, openQuarkLinkBtn_Abt, openXunleiLinkBtn_Abt);
+    }
+
+    /**
+     * 设置要防重复点击的组件
+     */
+    private void setDisableNodes() {
+        disableNodes.add(checkUpdate_Abt);
+    }
+
+    /**
+     * 取消更新
+     */
+    public void cancelUpdate() {
+        if (downloadedUpdateTask != null && downloadedUpdateTask.isRunning()) {
+            downloadedUpdateTask.cancel();
+        }
+    }
+
+    /**
+     * 更新最后检查日期
+     *
+     * @param color 文字颜色
+     */
+    private void updateCheckDate(Color color) {
+        checkDate_Abt.setText(update_lastCheck() + LocalDateTime.now().format(formatter));
+        checkDate_Abt.setTextFill(color);
+    }
+
+    /**
+     * 构建邮件右键菜单
+     */
+    private void buildMailMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        setCopyValueContextMenu(contextMenu, mail_Abt, about_copyEmail());
+        buildMailMenu(contextMenu, mail_Abt);
+        mail_Abt.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                contextMenu.show(mail_Abt, event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    /**
+     * 添加复制 Label 值右键菜单
+     *
+     * @param contextMenu 右键菜单
+     * @param valueLabel  要处理的文本栏
+     */
+    private static void buildMailMenu(ContextMenu contextMenu, Label valueLabel) {
+        MenuItem mailMenuItem = new MenuItem(text_mailTo());
+        mailMenuItem.setOnAction(_ -> {
+            try {
+                String email = valueLabel.getText();
+                URI mailtoURI;
+                String mailto = "mailto:";
+                if (email.startsWith(mailto)) {
+                    mailtoURI = URI.create(email);
+                } else {
+                    mailtoURI = URI.create(mailto + email);
+                }
+                Desktop.getDesktop().mail(mailtoURI);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        contextMenu.getItems().add(mailMenuItem);
+    }
+
+    /**
+     * 显示更新提示框
+     *
+     * @param updateInfo 更新信息
+     * @return 用户选择的按钮类型
+     */
+    private static Optional<ButtonType> showUpdateDialog(CheckUpdateBean updateInfo) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(update_newVersion());
+        alert.setHeaderText(update_findNewVersion() + updateInfo.getVersion() + "        "
+                + update_releaseDate() + updateInfo.getBuildDate() + "\n"
+                + update_currentVersion() + version + "        "
+                + update_releaseDate() + buildDate);
+        // 创建包含更新信息的文本区域
+        TextArea textArea = new TextArea(updateInfo.getWhatsNew());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(textArea, 0, 0);
+        alert.getDialogPane().setContent(expContent);
+        ButtonType updateButton = new ButtonType(update_updateButton());
+        ButtonType laterButton = new ButtonType(update_laterButton(), ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(updateButton, laterButton);
+        Platform.runLater(() -> {
+            alert.getDialogPane().lookupButton(updateButton).setCursor(javafx.scene.Cursor.HAND);
+            alert.getDialogPane().lookupButton(laterButton).setCursor(Cursor.HAND);
+            Label headerLabel = (Label) alert.getDialogPane().lookup(".header-panel .label");
+            if (headerLabel != null) {
+                headerLabel.setStyle("-fx-font-family: 'Consolas', 'Monaco', 'Courier New', monospace;");
+            }
+        });
+        // 设置窗口图标
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        setWindowLogo(stage, logoPath);
+        return alert.showAndWait();
+    }
+
+    /**
+     * 检测更新
+     *
+     * @throws IOException 配置文件读取异常
+     */
+    private void autoCheck() throws IOException {
+        Properties prop = new Properties();
+        String autocheck;
+        String lastCheck;
+        try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
+            prop.load(input);
+        }
+        autocheck = prop.getProperty(key_autoCheck);
+        lastCheck = prop.getProperty(key_lastCheck);
+        LocalDate lastCheckDate = LocalDate.now();
+        if (StringUtils.isNotBlank(lastCheck)) {
+            lastCheckDate = LocalDate.parse(lastCheck);
+        }
+        LocalDate today = LocalDate.now();
+        if (RepeatTypeEnum.LAUNCH.getRepeatType().equals(autocheck)) {
+            checkUpdate();
+        } else if (RepeatTypeEnum.DAILY.getRepeatType().equals(autocheck)) {
+            if (!today.equals(lastCheckDate)) {
+                checkUpdate();
+            }
+        } else if (RepeatTypeEnum.WEEKLY.getRepeatType().equals(autocheck)) {
+            if (ChronoUnit.DAYS.between(lastCheckDate, today) >= 7) {
+                checkUpdate();
+            }
+        } else if (RepeatTypeEnum.MONTHLY.getRepeatType().equals(autocheck)) {
+            if (today.getMonthValue() != lastCheckDate.getMonthValue()
+                    || today.getYear() != lastCheckDate.getYear()) {
+                checkUpdate();
+            }
+        }
+    }
+
+    /**
+     * 创建通用任务线程参数
+     *
+     * @return 任务线程参数
+     */
+    private TaskBean<?> creatTaskBeen() {
+        TaskBean<?> taskBean = new TaskBean<>();
+        taskBean.setMessageLabel(checkMessage_Abt)
+                .setDisableNodes(disableNodes)
+                .setTabId("_Abt");
+        return taskBean;
+    }
+
+    /**
+     * 界面初始化
+     */
+    @FXML
+    private void initialize() {
+        // 设置应用名称
+        title_Abt.setText(appName);
+        // 设置版本号
+        version_Abt.setText(version);
+        // 添加右键菜单
+        buildMailMenu();
+        // 设置鼠标悬停提示
+        setToolTip();
+        // 设置要防重复点击的组件
+        setDisableNodes();
+        // log 文件保留数量输入监听
+        integerRangeTextField(logsNum_Abt, 0, null, tip_logsNum());
+        // 检查更新
+        Platform.runLater(() -> {
+            initializeChoiceBoxItems(autoCheck_Abt, repeatType_monthly(), checkRepeatTypeList);
+            // 读取配置文件
+            try {
+                getConfig();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            // 获取 logs 文件夹路径并展示
+            setLogsPath();
+            // 清理多余 log 文件
+            deleteLogs();
+            try {
+                // 检测更新
+                autoCheck();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * 打开百度云盘链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openBaiduLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(baiduLink));
+    }
+
+    /**
+     * 打开夸克云盘链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openQuarkLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(quarkLink));
+    }
+
+    /**
+     * 打开迅雷云盘链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openXunleiLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(xunleiLink));
+    }
+
+    /**
+     * 打开 GitHub 链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openGitHubLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(githubLink));
+    }
+
+    /**
+     * 打开 Gitee 链接
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openGiteeLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(giteeLink));
+    }
+
+    /**
+     * 打开爱发电主页
+     *
+     * @throws Exception 链接打开失败
+     */
+    @FXML
+    private void openAfdianLink() throws Exception {
+        Desktop.getDesktop().browse(new URI(afdianLink));
+    }
+
+    /**
+     * 赞赏界面人口
+     *
+     * @throws IOException 界面打开失败
+     */
+    @FXML
+    private void appreciate() throws IOException {
+        URL fxmlLocation = getClass().getResource(resourcePath + "fxml/view/Appreciate-view.fxml");
+        FXMLLoader loader = new FXMLLoader(fxmlLocation, bundle);
+        Parent fxmlRoot = loadFXML(loader);
+        Stage appreciateStage = new Stage();
+        var headerBar = createHeaderBar(tip_appreciate());
+        Parent root = creatParent(fxmlRoot, appreciateStage, headerBar);
+        double width = getSafeAttributes(500, screenWidth);
+        double height = getSafeAttributes(500, screenHeight);
+        Scene scene = new Scene(root, width, height);
+        appreciateStage.setScene(scene);
+        appreciateStage.setTitle(tip_appreciate());
+        appreciateStage.initModality(Modality.APPLICATION_MODAL);
+        appreciateStage.setResizable(false);
+        setWindowLogo(appreciateStage, logoPath);
+        appreciateStage.show();
+        AutoClickController.isSonOpening = true;
+    }
+
+    /**
+     * 检查更新
+     */
+    @FXML
+    private void checkUpdate() {
+        checkDate_Abt.setText("");
+        TaskBean<?> checkUpdateTaskBean = creatTaskBeen();
+        Task<CheckUpdateBean> task = checkLatestVersion();
+        checkUpdateTaskBean.setWorkingTask(task)
+                .setName("checkUpdate")
+                .setOnFailed(_ -> updateCheckDate(Color.RED))
+                .setOnSucceeded(_ -> {
+                    CheckUpdateBean updateInfo = task.getValue();
+                    try {
+                        // 更新最后检测时间
+                        updateProperties(configFile, key_lastCheck, String.valueOf(LocalDate.now()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // 检查是否有新版本
+                    if (isNewVersionAvailable(updateInfo)) {
+                        checkMessage_Abt.setText(update_findNewVersion() + updateInfo.getVersion());
+                        //更新最后检查日期
+                        updateCheckDate(Color.BLUE);
+                        checkMessage_Abt.setTextFill(Color.BLUE);
+                        if (!runPMCFile || autoClickController == null || autoClickController.isFree()) {
+                            // 弹出更新对话框
+                            Optional<ButtonType> result = showUpdateDialog(updateInfo);
+                            if (result.isPresent() && result.get().getButtonData() != ButtonBar.ButtonData.CANCEL_CLOSE) {
+                                ProgressDialog progressDialog = new ProgressDialog();
+                                // 用户选择更新
+                                TaskBean<?> downloadedUpdateTaskBean = creatTaskBeen()
+                                        .setName("downloadedUpdate");
+                                downloadedUpdateTask = downloadAndInstallUpdate(updateInfo, progressDialog);
+                                downloadedUpdateTaskBean.setWorkingTask(downloadedUpdateTask)
+                                        .setOnCancelled(_ -> downloadedUpdateTask = null)
+                                        .setOnFailed(event -> {
+                                            downloadedUpdateTask = null;
+                                            progressDialog.close();
+                                            try {
+                                                logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
+                                                deleteDirectoryRecursively(Path.of(PMCTempPath));
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                            throw new RuntimeException(update_downloadFailed(), event.getSource().getException());
+                                        });
+                                bindingTaskNode(downloadedUpdateTaskBean);
+                                startTaskOfVirtual(downloadedUpdateTaskBean);
+                            }
+                        }
+                    } else {
+                        checkMessage_Abt.setText(update_nowIsLast());
+                        //更新最后检查日期
+                        updateCheckDate(Color.GREEN);
+                        checkMessage_Abt.setTextFill(Color.GREEN);
+                    }
+                });
+        bindingTaskNode(checkUpdateTaskBean);
+        startTaskOfVirtual(checkUpdateTaskBean);
+    }
+
+    /**
+     * 自动检测更新下拉框
+     */
+    @FXML
+    public void autoCheckAction() {
+        addValueToolTip(autoCheck_Abt, tip_autoCheck_Abt(), autoCheck_Abt.getValue());
+    }
+
+}
