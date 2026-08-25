@@ -77,6 +77,21 @@ public class TaskBean<T> {
     private Task<?> workingTask;
 
     /**
+     * 任务成功自动解绑组件（true 自动解绑，默认启用）
+     */
+    private boolean onSucceededUnbind = true;
+
+    /**
+     * 任务成失败动解绑组件（true 自动解绑，默认启用）
+     */
+    private boolean onCancelledUnbind = true;
+
+    /**
+     * 任务成取消动解绑组件（true 自动解绑，默认启用）
+     */
+    private boolean onFailedUnbind = true;
+
+    /**
      * 任务成功时的用户回调
      */
     private EventHandler<WorkerStateEvent> onSucceeded;

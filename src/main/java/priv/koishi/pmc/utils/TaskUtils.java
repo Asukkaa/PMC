@@ -99,39 +99,54 @@ public class TaskUtils {
         String taskName = taskBean.getName();
         task.setOnSucceeded(event -> {
             logger.info("任务成功：{}", taskName);
-            taskUnbind(taskBean);
+            boolean onSucceededUnbind = taskBean.isOnSucceededUnbind();
+            if (onSucceededUnbind) {
+                taskUnbind(taskBean);
+            }
             EventHandler<WorkerStateEvent> handler = taskBean.getOnSucceeded();
             try {
                 if (handler != null) {
                     handler.handle(event);
                 }
             } finally {
-                taskBean.clearTask();
+                if (onSucceededUnbind) {
+                    taskBean.clearTask();
+                }
             }
         });
         task.setOnFailed(event -> {
             logger.error("任务失败：{}", taskName);
-            taskNotSuccess(taskBean, text_taskFailed());
+            boolean onFailedUnbind = taskBean.isOnFailedUnbind();
+            if (onFailedUnbind) {
+                taskNotSuccess(taskBean, text_taskFailed());
+            }
             EventHandler<WorkerStateEvent> handler = taskBean.getOnFailed();
             try {
                 if (handler != null) {
                     handler.handle(event);
                 }
             } finally {
-                taskBean.clearTask();
+                if (onFailedUnbind) {
+                    taskBean.clearTask();
+                }
             }
             throw new RuntimeException(event.getSource().getException());
         });
         task.setOnCancelled(event -> {
             logger.warn("任务取消：{}", taskName);
-            taskNotSuccess(taskBean, text_taskCancelled());
+            boolean onCancelledUnbind = taskBean.isOnCancelledUnbind();
+            if (onCancelledUnbind) {
+                taskNotSuccess(taskBean, text_taskCancelled());
+            }
             EventHandler<WorkerStateEvent> handler = taskBean.getOnCancelled();
             try {
                 if (handler != null) {
                     handler.handle(event);
                 }
             } finally {
-                taskBean.clearTask();
+                if (onCancelledUnbind) {
+                    taskBean.clearTask();
+                }
             }
         });
     }
