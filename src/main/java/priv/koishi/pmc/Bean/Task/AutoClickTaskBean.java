@@ -122,9 +122,7 @@ public class AutoClickTaskBean extends TaskBean<ClickPositionVO> {
         // 清理父类字段
         super.clearTask();
         // 清理浮窗描述符
-        if (messageFloating != null) {
-            messageFloating = null;
-        }
+        messageFloating = null;
         // 停止并清理时间线
         if (runTimeline != null) {
             runTimeline.stop();
