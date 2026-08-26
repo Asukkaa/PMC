@@ -1100,7 +1100,7 @@ public class SettingController extends RootController implements MousePositionUp
                     File selectedFile = loadTessdataTask.getValue();
                     if (selectedFile != null) {
                         try {
-                            tessdataPath = updatePathLabel(selectedFile.getPath(), tessdataPath, key_tessdataPath, null, configFile_Click);
+                            tessdataPath = updatePathLabel(selectedFile.getPath(), key_tessdataPath, null, configFile_Click);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -2494,7 +2494,7 @@ public class SettingController extends RootController implements MousePositionUp
         isSonOpening = false;
         if (CollectionUtils.isNotEmpty(imgFiles)) {
             File selectedFile = imgFiles.getFirst();
-            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
+            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), key_stopImgSelectPath, null, configFile_Click);
             startLoadImgTask(imgFiles);
         }
     }

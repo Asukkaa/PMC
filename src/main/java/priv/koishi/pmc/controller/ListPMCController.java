@@ -747,7 +747,7 @@ public class ListPMCController extends RootController {
         AutoClickController.isSonOpening = false;
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_List, configFile_List);
+            updatePathLabel(selectedFile.getPath(), key_outFilePath, outPath_List, configFile_List);
         }
     }
 

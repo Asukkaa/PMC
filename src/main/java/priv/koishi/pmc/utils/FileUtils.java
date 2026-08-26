@@ -295,11 +295,13 @@ public class FileUtils {
      * @return 根据不同运行环境获取到的资源文件路径
      */
     public static String getRunningResourcePath(String path) {
+        String resourcePath;
         if (isRunningFromIDEA) {
-            return resourcesPath + path;
+            resourcePath = resourcesPath + path;
         } else {
-            return getAppResourcePath(path);
+            resourcePath = getAppResourcePath(path);
         }
+        return resourcePath.replace("/", File.separator);
     }
 
     /**
@@ -321,7 +323,7 @@ public class FileUtils {
      * @return 资源文件绝对路径
      */
     public static String getAppResourcePath(String path) {
-        return javaHome + packagePath + path;
+        return (javaHome + packagePath + path).replace("/", File.separator);
     }
 
     /**
@@ -330,15 +332,16 @@ public class FileUtils {
      * @return 不同操作系统下 logs 文件夹地址
      */
     public static String getLogsPath() {
-        if (isRunningFromIDEA) {
-            return userDir + File.separator + logs;
-        }
         String logsPath = rootDir + File.separator + logs;
-        // 处理 macOS 打包成 .app 文件后的路径
-        if (isMac) {
-            logsPath = javaHome + logsDir;
+        if (isRunningFromIDEA) {
+            logsPath = userDir + File.separator + logs;
+        } else {
+            // 处理 macOS 打包成 .app 文件后的路径
+            if (isMac) {
+                logsPath = javaHome + logsDir;
+            }
         }
-        return logsPath;
+        return logsPath.replace("/", File.separator);
     }
 
     /**
@@ -347,12 +350,13 @@ public class FileUtils {
      * @return 不同操作系统下程序启动路径(win - exe 文件路径 ， mac - app 文件路径)
      */
     public static String getAppLaunchPath() {
+        String path = javaHome;
         if (isWin) {
-            return rootDir + File.separator + appName + exe;
+            path = rootDir + File.separator + appName + exe;
         } else if (isMac) {
-            return javaHome.substring(0, javaHome.indexOf(app) + app.length());
+            path = javaHome.substring(0, javaHome.indexOf(app) + app.length());
         }
-        return javaHome;
+        return path.replace("/", File.separator);
     }
 
     /**
@@ -477,7 +481,7 @@ public class FileUtils {
             file = new File(path);
             counter++;
         }
-        return path;
+        return path.replace("/", File.separator);
     }
 
     /**
@@ -492,7 +496,7 @@ public class FileUtils {
         if (!path.contains(desktop)) {
             String desktopPath = path + File.separator + desktop;
             if (new File(desktopPath).exists()) {
-                return desktopPath;
+                return desktopPath.replace("/", File.separator);
             }
         }
         return path;

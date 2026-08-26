@@ -2349,7 +2349,7 @@ public class AutoClickController extends RootController implements MousePosition
         isSonOpening = false;
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            updatePathLabel(selectedFile.getPath(), outFilePath, key_outFilePath, outPath_Click, configFile_Click);
+            updatePathLabel(selectedFile.getPath(), key_outFilePath, outPath_Click, configFile_Click);
         }
     }
 

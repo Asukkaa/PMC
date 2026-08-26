@@ -1487,8 +1487,7 @@ public class ClickDetailController extends RootController {
     private void addClickImg(File selectedFile) throws IOException {
         if (selectedFile != null) {
             // 更新所选文件路径显示
-            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), clickImgSelectPath,
-                    key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
+            clickImgSelectPath = updatePathLabel(selectedFile.getPath(), key_clickImgSelectPath, clickImgPath_Det, configFile_Click);
             showClickImg(clickImgSelectPath);
             clickTypeHBox_Det.setVisible(true);
         }
@@ -2083,7 +2082,7 @@ public class ClickDetailController extends RootController {
         if (CollectionUtils.isNotEmpty(imgFiles)) {
             File selectedFile = imgFiles.getFirst();
             // 更新所选文件路径显示
-            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), stopImgSelectPath, key_stopImgSelectPath, null, configFile_Click);
+            stopImgSelectPath = updatePathLabel(selectedFile.getPath(), key_stopImgSelectPath, null, configFile_Click);
             startLoadImgTask(imgFiles);
         }
     }

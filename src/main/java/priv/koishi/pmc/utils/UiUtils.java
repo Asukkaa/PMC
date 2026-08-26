@@ -44,6 +44,7 @@ import priv.koishi.pmc.ui.messagebubble.MessageBubble;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -384,24 +385,19 @@ public class UiUtils {
     /**
      * 更新所选文件路径显示
      *
-     * @param selectedFilePath 本次所选的文件路径
-     * @param filePath         上次选的文件路径
-     * @param pathKey          配置文件中路径的 key
-     * @param pathLabel        要展示路径的文本框
-     * @param configFile       要更新的配置文件
+     * @param path   本次所选的文件路径
+     * @param key    配置文件中路径的 key
+     * @param label  要展示路径的文本框
+     * @param config 要更新的配置文件
      * @return 所选文件路径
      * @throws IOException 配置文件保存异常
      */
-    public static String updatePathLabel(String selectedFilePath, String filePath, String pathKey, Label pathLabel, String configFile) throws IOException {
-        // 只有跟上次选的路径不一样才更新
-        if (StringUtils.isBlank(filePath) || !filePath.equals(selectedFilePath)) {
-            updateProperties(configFile, pathKey, selectedFilePath);
-            filePath = selectedFilePath;
+    public static String updatePathLabel(String path, String key, Label label, String config) throws IOException {
+        updateProperties(config, key, path);
+        if (label != null) {
+            setPathLabel(label, path);
         }
-        if (pathLabel != null) {
-            setPathLabel(pathLabel, selectedFilePath);
-        }
-        return filePath;
+        return Path.of(path).toString();
     }
 
     /**
@@ -565,7 +561,7 @@ public class UiUtils {
      */
     public static File setPathLabel(Label pathLabel, String path) {
         path = path == null ? "" : path;
-        String finalPath = path.replace("/", File.separator);
+        String finalPath = Path.of(path).toString();
         pathLabel.setText(finalPath);
         if (StringUtils.isBlank(finalPath)) {
             pathLabel.getStyleClass().removeAll("label-button-style", "label-err-style");
