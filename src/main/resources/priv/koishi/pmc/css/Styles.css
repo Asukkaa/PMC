@@ -22,6 +22,11 @@
     -fx-pref-width: 290;
 }
 
+.hBox-350-5 {
+    -fx-spacing: 5;
+    -fx-pref-width: 350;
+}
+
 .hBox-400-5 {
     -fx-spacing: 5;
     -fx-pref-width: 400;

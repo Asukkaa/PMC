@@ -8,10 +8,10 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static priv.koishi.pmc.finals.CommonFinals.*;
-import static priv.koishi.pmc.finals.enums.ClickTypeEnum.*;
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.extendedStage;
+import static priv.koishi.pmc.finals.CommonFinals.*;
+import static priv.koishi.pmc.finals.enums.ClickTypeEnum.*;
 import static priv.koishi.pmc.utils.ButtonMappingUtils.*;
 
 /**
@@ -2049,6 +2049,13 @@ public class i18nFinal {
     }
 
     /**
+     * @return 未知
+     */
+    public static String text_unknow() {
+        return bundle.getString("unknow");
+    }
+
+    /**
      * @return 未知GC类型:
      */
     public static String text_unknowGC() {
@@ -3496,6 +3503,27 @@ public class i18nFinal {
      */
     public static String update_scriptOut() {
         return bundle.getString("update.scriptOut");
+    }
+
+    /**
+     * @return 脚本错误：
+     */
+    public static String update_scriptError() {
+        return bundle.getString("update.scriptError");
+    }
+
+    /**
+     * @return 解压更新中
+     */
+    public static String update_unzipUpdate() {
+        return bundle.getString("update.unzipUpdate");
+    }
+
+    /**
+     * @return 解压完毕，等待重启
+     */
+    public static String update_unzipUpdateDown() {
+        return bundle.getString("update.unzipUpdateDown");
     }
 
     /**

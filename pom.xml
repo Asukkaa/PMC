@@ -11,6 +11,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.46</lombok.version>
+        <log4j.version>2.26.1</log4j.version>
         <javafx.version>26.0.2</javafx.version>
         <java.version>26</java.version>
     </properties>
@@ -45,7 +46,21 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.26.1</version>
+            <version>${log4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+            <version>1.6.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -53,24 +68,28 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.6.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.20.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.22.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.github.kwhat</groupId>
             <artifactId>jnativehook</artifactId>
             <version>2.2.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -84,6 +103,7 @@
             <groupId>de.jangassen</groupId>
             <artifactId>nsmenufx</artifactId>
             <version>3.1.0</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>jna</artifactId>
@@ -110,6 +130,14 @@
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
             <version>2.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core-ffm</artifactId>
+            <version>7.6.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

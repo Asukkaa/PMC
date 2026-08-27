@@ -33,6 +33,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.exec.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -91,10 +92,11 @@ import static priv.koishi.pmc.service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.service.PMCFileService.loadImg;
 import static priv.koishi.pmc.service.TessdataService.*;
-import static priv.koishi.pmc.singleinstanceguard.SingleInstanceGuard.releaseLock;
 import static priv.koishi.pmc.ui.floatingwindow.FloatingWindow.*;
 import static priv.koishi.pmc.ui.floatingwindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.utils.ButtonMappingUtils.*;
+import static priv.koishi.pmc.utils.CpuInfoUtil.checkCPU;
+import static priv.koishi.pmc.utils.CpuInfoUtil.cpuInfo;
 import static priv.koishi.pmc.utils.FileUtils.*;
 import static priv.koishi.pmc.utils.ListenerUtils.*;
 import static priv.koishi.pmc.utils.NodeDisableUtils.changeDisableNodes;
@@ -238,7 +240,7 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     public Label dataNumber_Set, tip_Set, runningMemory_Set, systemMemory_Set, clickWindowInfo_Set, stopWindowInfo_Set,
             gcType_Set, thisPath_Set, noPermission_Set, cancelKeyInput_Set, cancelKey_Set, recordKeyInput_Set, runKey_Set,
-            recordKey_Set, runKeyInput_Set, tessdataNumber_set;
+            recordKey_Set, runKeyInput_Set, tessdataNumber_set, cpuName_Set, physicalCores_Set, logicalCores_Set;
 
     @FXML
     public TextField floatingDistance_Set, offsetX_Set, offsetY_Set, clickRetryNum_Set, stopRetryNum_Set, overtime_Set,
@@ -1811,6 +1813,29 @@ public class SettingController extends RootController implements MousePositionUp
     }
 
     /**
+     * 开始查询 CPU 信息任务
+     */
+    private void startCheckCPUTask() {
+        Task<Void> checkCPUTask = checkCPU();
+        checkCPUTask.setOnSucceeded(_ -> {
+            cpuName_Set.setText(cpuInfo.getName());
+            logicalCores_Set.setText(String.valueOf(cpuInfo.getLogicalCores()));
+            physicalCores_Set.setText(String.valueOf(cpuInfo.getPhysicalCores()));
+            addToolTip(cpuName_Set);
+        });
+        checkCPUTask.setOnFailed(_ -> {
+            cpuName_Set.setTextFill(Color.RED);
+            logicalCores_Set.setTextFill(Color.RED);
+            physicalCores_Set.setTextFill(Color.RED);
+        });
+        if (!checkCPUTask.isRunning()) {
+            Thread.ofVirtual()
+                    .name("checkCPUTask-vThread" + tabId)
+                    .start(checkCPUTask);
+        }
+    }
+
+    /**
      * 界面初始化
      *
      * @throws IOException 配置文件读取异常、配置文件读取异常
@@ -1834,6 +1859,9 @@ public class SettingController extends RootController implements MousePositionUp
         // 监听并保存颜色选择器自定义颜色
         setCustomColorsListener();
         Platform.runLater(() -> {
+            // 开始查询 CPU 信息任务
+            startCheckCPUTask();
+            //添加系统主题变化监听器
             setRegisterListener();
             // 建议自动化权限
             if (!hasAutomationPermission()) {
@@ -2462,20 +2490,35 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void reLaunch() throws IOException {
         if (!isRunningFromIDEA) {
-            // 释放单实例锁，停止心跳
-            releaseLock();
-            // 关闭激活服务端口
-            closeServerSocket();
-            // 执行重启命令
-            ProcessBuilder processBuilder = null;
+            CommandLine cmdLine = null;
             if (isWin) {
-                processBuilder = new ProcessBuilder(appLaunchPath);
+                cmdLine = new CommandLine(appLaunchPath);
             } else if (isMac) {
-                processBuilder = new ProcessBuilder("open", "-n", appLaunchPath);
+                cmdLine = new CommandLine("open");
+                cmdLine.addArgument("-n");
+                cmdLine.addArgument(appLaunchPath);
             }
-            if (processBuilder != null) {
-                logger.info("==============程序重启中====================");
-                processBuilder.start();
+            if (cmdLine != null) {
+                DefaultExecutor executor = DefaultExecutor.builder().get();
+                executor.setStreamHandler(new PumpStreamHandler(null, System.err));
+                // 异步执行，不阻塞当前线程，让 Java 进程可以立即退出
+                try {
+                    logger.info("==============程序重启中====================");
+                    executor.execute(cmdLine, new ExecuteResultHandler() {
+                        @Override
+                        public void onProcessComplete(int exitValue) {
+                            logger.info("重启命令执行成功，退出码: {}", exitValue);
+                        }
+
+                        @Override
+                        public void onProcessFailed(ExecuteException e) {
+                            logger.error("重启命令执行失败", e);
+                        }
+                    });
+                } catch (IOException e) {
+                    // 如果启动命令本身失败（如文件不存在），记录日志，但依然退出
+                    logger.error("启动重启进程失败", e);
+                }
             }
         }
         Platform.exit();

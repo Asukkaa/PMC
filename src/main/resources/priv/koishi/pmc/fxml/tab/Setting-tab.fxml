@@ -123,41 +123,51 @@
         <Label text="%setting.memorySet"/>
 
         <HBox spacing="20">
-            <HBox spacing="5" prefWidth="350">
+            <HBox styleClass="hBox-350-5">
                 <!--当前内存上限:-->
                 <Label text="%setting.runningMemory"/>
                 <Label fx:id="runningMemory_Set"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="350">
+            <HBox styleClass="hBox-350-5">
                 <!--操作系统内存:-->
                 <Label text="%setting.systemMemory"/>
                 <Label fx:id="systemMemory_Set"/>
             </HBox>
-        </HBox>
 
-        <HBox spacing="20">
-            <HBox spacing="5" prefWidth="350">
+            <HBox styleClass="hBox-350-5">
                 <!--下次启动时应用内存上限:-->
                 <Label text="%setting.nextRunMemory"/>
                 <TextField fx:id="nextRunMemory_Set" prefHeight="20" prefWidth="50"/>
                 <Label prefWidth="50" text="GB"/>
             </HBox>
-
-            <!--立刻重启应用-->
-            <Button fx:id="reLaunch_Set" onAction="#reLaunch" text="%setting.reLaunch_Set"/>
-            <!--恢复所有设置并重启-->
-            <Button fx:id="reSetAll_Set" text="%setting.reSetAll_Set" onAction="#reSetAllAction"/>
         </HBox>
 
         <HBox spacing="20">
-            <HBox spacing="5" prefWidth="350">
+            <HBox styleClass="hBox-350-5">
+                <Label text="CPU 型号:"/>
+                <Label fx:id="cpuName_Set" text="%searching"/>
+            </HBox>
+
+            <HBox styleClass="hBox-350-5">
+                <Label text="CPU 物理核心数:"/>
+                <Label fx:id="physicalCores_Set" text="%searching"/>
+            </HBox>
+
+            <HBox styleClass="hBox-350-5">
+                <Label text="CPU 逻辑核心数:"/>
+                <Label fx:id="logicalCores_Set" text="%searching"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="20">
+            <HBox styleClass="hBox-350-5">
                 <!--当前垃圾回收(GC)类型:-->
                 <Label text="%setting.gcType"/>
                 <Label fx:id="gcType_Set"/>
             </HBox>
 
-            <HBox spacing="5" prefWidth="350">
+            <HBox styleClass="hBox-350-5">
                 <!--下次启动时垃圾回收(GC)类型:-->
                 <Label text="%setting.nextGcType"/>
                 <ChoiceBox fx:id="nextGcType_Set" onAction="#nextGcTypeAction" prefWidth="150">
@@ -175,6 +185,12 @@
                     </value>
                 </ChoiceBox>
             </HBox>
+
+            <!--立刻重启应用-->
+            <Button fx:id="reLaunch_Set" onAction="#reLaunch" text="%setting.reLaunch_Set"/>
+
+            <!--恢复所有设置并重启-->
+            <Button fx:id="reSetAll_Set" text="%setting.reSetAll_Set" onAction="#reSetAllAction"/>
         </HBox>
 
         <HBox spacing="5">
