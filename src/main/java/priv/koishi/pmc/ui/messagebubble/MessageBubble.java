@@ -2,7 +2,6 @@ package priv.koishi.pmc.ui.messagebubble;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -147,16 +146,13 @@ public class MessageBubble extends Label implements MousePositionUpdater {
      * @param time 自动关闭延迟时间（秒），小于等于 0 表示取消自动关闭
      */
     public void setAutoCloseTime(double time) {
-        if (bubbleStage == null || !bubbleStage.isShowing()) {
-            return;
-        }
-        Platform.runLater(() -> {
+        if (bubbleStage != null && bubbleStage.isShowing()) {
             if (time > 0) {
                 startAutoCloseTimer(time);
             } else {
                 stopAutoCloseTimer();
             }
-        });
+        }
     }
 
     /**
@@ -165,10 +161,9 @@ public class MessageBubble extends Label implements MousePositionUpdater {
      * @param newText 要更新的文本
      */
     public void updateText(String newText) {
-        if (bubbleStage == null || !bubbleStage.isShowing()) {
-            return;
+        if (bubbleStage != null && bubbleStage.isShowing()) {
+            setText(newText);
         }
-        Platform.runLater(() -> setText(newText));
     }
 
     /**

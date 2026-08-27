@@ -2,11 +2,13 @@ package priv.koishi.pmc.service;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.apache.commons.exec.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.bean.CheckUpdateBean;
 import priv.koishi.pmc.bean.UniCloudResponse;
+import priv.koishi.pmc.ui.messagebubble.MessageBubble;
 import priv.koishi.pmc.ui.progressdialog.ProgressDialog;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
@@ -20,10 +22,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.controller.MainController.aboutController;
@@ -31,6 +33,7 @@ import static priv.koishi.pmc.finals.CommonFinals.*;
 import static priv.koishi.pmc.finals.i18nFinal.*;
 import static priv.koishi.pmc.utils.CommonUtils.getProcessId;
 import static priv.koishi.pmc.utils.FileUtils.*;
+import static priv.koishi.pmc.utils.NodeDisableUtils.changeNodesDisable;
 
 /**
  * 检查更新服务类
@@ -265,6 +268,32 @@ public class CheckUpdateService {
     }
 
     /**
+     * 解压更新任务
+     *
+     * @param zipFilePath   zip 文件路径
+     * @param destDirectory 输出目录
+     * @return 无返回值的 Task
+     */
+    private static Task<Void> unzipUpdate(String zipFilePath, String destDirectory) {
+        return new Task<>() {
+            @Override
+            protected Void call() throws IOException {
+                AtomicReference<MessageBubble> messageBubble = new AtomicReference<>();
+                Platform.runLater(() -> messageBubble.set(new MessageBubble(update_unzipUpdate(), 0)));
+                changeNodesDisable(aboutController.disableNodes, true);
+                unzip(zipFilePath, destDirectory);
+                Platform.runLater(() -> {
+                    MessageBubble bubble = messageBubble.get();
+                    if (bubble != null) {
+                        bubble.updateBubble(update_unzipUpdateDown(), 1.5);
+                    }
+                });
+                return null;
+            }
+        };
+    }
+
+    /**
      * 安装程序
      *
      * @param installerFile 安装程序文件
@@ -272,18 +301,29 @@ public class CheckUpdateService {
      */
     public static void executeInstaller(File installerFile, boolean fullUpdate) {
         logger.info("====================准备开始安装更新======================");
-        try {
-            //解压安装程序
-            String destPath = new File(installerFile.getParentFile(), PMCUpdateUnzipped).getAbsolutePath();
-            unzip(installerFile.getAbsolutePath(), destPath);
-            // 根据操作系统执行安装程序
-            if (isWin) {
-                updateWinApp(fullUpdate);
-            } else if (isMac) {
-                updateMacApp(fullUpdate);
+        //解压安装程序
+        String destPath = new File(installerFile.getParentFile(), PMCUpdateUnzipped).getAbsolutePath();
+        Task<Void> unzipUpdateTask = unzipUpdate(installerFile.getAbsolutePath(), destPath);
+        unzipUpdateTask.setOnSucceeded(_ -> {
+            try {
+                // 根据操作系统执行安装程序
+                if (isWin) {
+                    updateWinApp(fullUpdate);
+                } else if (isMac) {
+                    updateMacApp(fullUpdate);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        });
+        unzipUpdateTask.setOnFailed(event -> {
+            changeNodesDisable(aboutController.disableNodes, false);
+            throw new RuntimeException(event.getSource().getException());
+        });
+        if (!unzipUpdateTask.isRunning()) {
+            Thread.ofVirtual()
+                    .name("unzipUpdateTask-vThread")
+                    .start(unzipUpdateTask);
         }
     }
 
@@ -296,7 +336,7 @@ public class CheckUpdateService {
     private static void updateMacApp(boolean fullUpdate) throws Exception {
         // 获取源目录
         String source = fullUpdate ? appName + app : "lib";
-        String sourceDir = PMCTempPath + PMCUpdateUnzipped + File.separator + source;
+        String sourceDir = Paths.get(PMCTempPath, PMCUpdateUnzipped, source).toString();
         // 获取目标目录
         String targetDir = fullUpdate ? appRootPath : javaHome;
         // 在系统临时目录创建脚本
@@ -340,29 +380,30 @@ public class CheckUpdateService {
         );
         logger.info("-------------------------开始执行 Mac 更新脚本------------------------------");
         // 执行并捕获输出
-        StringBuilder output;
-        int exitCode;
-        try (Process process = new ProcessBuilder("osascript", "-e", scriptCommand)
-                .redirectErrorStream(true)
-                .start()) {
-            // 读取输出
-            output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    logger.info("脚本输出: {}", line);
-                    output.append(line).append("\n");
-                }
-            }
-            // 等待完成
-            exitCode = process.waitFor();
+        CommandLine cmdLine = new CommandLine("osascript");
+        cmdLine.addArgument("-e");
+        cmdLine.addArgument(scriptCommand, false);
+        // 准备捕获输出
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream, errorStream);
+        DefaultExecutor executor = DefaultExecutor.builder().get();
+        executor.setStreamHandler(streamHandler);
+        // 执行并获取退出码
+        int exitCode = executor.execute(cmdLine);
+        String output = outputStream.toString();
+        String error = errorStream.toString();
+        if (StringUtils.isNotBlank(output)) {
+            logger.info("脚本输出: {}", output);
+        }
+        if (StringUtils.isNotBlank(error)) {
+            logger.warn("脚本错误输出: {}", error);
         }
         logger.info("脚本退出码: {}", exitCode);
         if (exitCode != 0) {
-            logger.info("任务失败，删除临时文件夹： {}", PMCTempPath);
             deleteDirectoryRecursively(Path.of(PMCTempPath));
             deleteDirectoryRecursively(updateScriptFile.toPath());
-            throw new IOException(update_scriptExit() + exitCode + update_scriptOut() + output);
+            throw new IOException(update_scriptExit() + exitCode + update_scriptOut() + output + update_scriptError() + error);
         }
     }
 
@@ -374,7 +415,7 @@ public class CheckUpdateService {
      */
     private static void updateWinApp(boolean fullUpdate) throws Exception {
         // 获取源目录
-        String sourceDir = PMCTempPath + PMCUpdateUnzipped;
+        String sourceDir = Paths.get(PMCTempPath, PMCUpdateUnzipped).toString();
         // 获取目标目录
         String targetDir = fullUpdate ? appRootPath : javaHome;
         // 创建临时批处理文件
@@ -394,24 +435,31 @@ public class CheckUpdateService {
                 }
             }
         }
-        // 构建命令参数
-        List<String> command = new ArrayList<>();
-        command.add("cmd.exe");
-        command.add("/c");
-        command.add(batFile.getAbsolutePath());
-        command.add(sourceDir);
-        command.add(targetDir);
-        command.add(appName + exe);
-        command.add(PMCTempPath);
-        command.add(appRootPath);
-        command.add(getProcessId());
-        // 执行批处理
-        ProcessBuilder builder = new ProcessBuilder(command);
-        builder.directory(new File(targetDir));
+        CommandLine cmdLine = new CommandLine("cmd.exe");
+        cmdLine.addArgument("/c");
+        cmdLine.addArgument(batFile.getAbsolutePath());
+        cmdLine.addArgument(sourceDir);
+        cmdLine.addArgument(targetDir);
+        cmdLine.addArgument(appName + exe);
+        cmdLine.addArgument(PMCTempPath);
+        cmdLine.addArgument(appRootPath);
+        cmdLine.addArgument(getProcessId());
         logger.info("-------------------------开始执行 Win 更新脚本------------------------------");
-        try (Process process = builder.start()) {
-            process.waitFor();
-        }
+        // 异步执行，不等待
+        DefaultExecutor executor = DefaultExecutor.builder().get();
+        executor.setStreamHandler(new PumpStreamHandler(System.out, System.err));
+        // 异步执行
+        executor.execute(cmdLine, new ExecuteResultHandler() {
+            @Override
+            public void onProcessComplete(int exitValue) {
+                logger.info("Windows 更新脚本执行完成，退出码: {}", exitValue);
+            }
+
+            @Override
+            public void onProcessFailed(ExecuteException e) {
+                logger.error("Windows 更新脚本执行失败", e);
+            }
+        });
     }
 
 }

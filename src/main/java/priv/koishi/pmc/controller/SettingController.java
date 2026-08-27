@@ -1378,6 +1378,7 @@ public class SettingController extends RootController implements MousePositionUp
      * @param keyLabel  组合键展示栏
      * @param keyHBox   组合键展示容器
      * @param configKey 配置项键
+     * @return 键盘输入监听器
      */
     private NativeKeyListener intitNativeKeyListener(boolean isSetting, Label keyLabel, HBox keyHBox, String configKey) {
         // 创建键盘监听器
@@ -2528,6 +2529,7 @@ public class SettingController extends RootController implements MousePositionUp
      * 选择终止操作的图片
      *
      * @param actionEvent 点击事件
+     * @throws IOException 配置文件更新异常
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {

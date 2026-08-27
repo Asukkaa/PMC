@@ -79,7 +79,7 @@ public class AboutController extends RootController {
     /**
      * 要防重复点击的组件
      */
-    private final Set<Node> disableNodes = new HashSet<>();
+    public final Set<Node> disableNodes = new HashSet<>();
 
     /**
      * 下载更新任务
