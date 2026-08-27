@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import priv.koishi.pmc.MainApplication;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "4.4.3";
+    public static final String version = "4.4.4";
 
     /**
      * PMC 文件版本
@@ -50,7 +51,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.08.26";
+    public static final String buildDate = "2026.08.27";
 
     /**
      * 文件后缀名：bat
@@ -313,6 +314,16 @@ public class CommonFinals {
     public static final String G = "G";
 
     /**
+     * CPU 标识：Intel
+     */
+    public static final String Intel = "Intel";
+
+    /**
+     * CPU 标识：AMD
+     */
+    public static final String AMD = "AMD";
+
+    /**
      * 单位：百分号
      */
     public static final String percentage = " %";
@@ -361,11 +372,6 @@ public class CommonFinals {
      * tessdata 设置配置文件路径
      */
     public static final String configFile_Tessdata = "config/TessdataConfig.json";
-
-    /**
-     * 更新脚本名称
-     */
-    public static final String updateScript = "pmc_update";
 
     /**
      * win 操作系统简称
@@ -520,12 +526,17 @@ public class CommonFinals {
     /**
      * 更新临时文件目录完整地址
      */
-    public static final String PMCTempPath = tmpdir + PMCTemp;
+    public static final String PMCTempPath = Paths.get(tmpdir, PMCTemp).toString();
 
     /**
      * 更新临时文件解压目录
      */
-    public static final String PMCUpdateUnzipped = File.separator + "PMCUpdateUnzipped";
+    public static final String PMCUpdateUnzipped = "PMCUpdateUnzipped";
+
+    /**
+     * 更新脚本名称
+     */
+    public static final String updateScript = "pmc_update";
 
     /**
      * 更新服务阿里云 uniCloud 地址

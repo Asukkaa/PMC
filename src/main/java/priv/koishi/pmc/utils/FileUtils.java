@@ -1,6 +1,10 @@
 package priv.koishi.pmc.utils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.bean.config.FileConfig;
@@ -13,6 +17,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.ProtectionDomain;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -131,14 +136,22 @@ public class FileUtils {
             }
             try {
                 if (app.equals(getFileType(openPath)) && isMac) {
-                    ProcessBuilder pb = new ProcessBuilder("open", openPath);
-                    try (Process process = pb.start()) {
-                        process.waitFor();
-                    }
+                    CommandLine cmdLine;
+                    DefaultExecutor executor = DefaultExecutor.builder().get();
+                    cmdLine = new CommandLine("open");
+                    cmdLine.addArgument(openPath);
+                    // 忽略标准输出，错误输出打印
+                    executor.setStreamHandler(new PumpStreamHandler(null, System.err));
+                    // 设置超时（5 秒）
+                    ExecuteWatchdog watchdog = ExecuteWatchdog.builder()
+                            .setTimeout(Duration.ofSeconds(5))
+                            .get();
+                    executor.setWatchdog(watchdog);
+                    executor.execute(cmdLine);
                 } else {
                     Desktop.getDesktop().open(file);
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -184,15 +197,28 @@ public class FileUtils {
                 throw new RuntimeException(text_fileNotExists());
             }
             openPath = file.getAbsolutePath();
-            ProcessBuilder processBuilder;
+            CommandLine cmdLine;
+            DefaultExecutor executor = DefaultExecutor.builder().get();
             if (isWin) {
-                processBuilder = new ProcessBuilder("explorer.exe", "/select,", openPath);
+                cmdLine = new CommandLine("explorer.exe");
+                cmdLine.addArgument("/select,");
+                cmdLine.addArgument(openPath);
+                executor.setExitValues(new int[]{0, 1});
             } else {
-                processBuilder = new ProcessBuilder("open", "-R", openPath);
+                cmdLine = new CommandLine("open");
+                cmdLine.addArgument("-R");
+                cmdLine.addArgument(openPath);
             }
-            try (Process process = processBuilder.start()) {
-                process.waitFor();
-            } catch (IOException | InterruptedException e) {
+            // 忽略标准输出，错误输出打印
+            executor.setStreamHandler(new PumpStreamHandler(null, System.err));
+            // 设置超时（5 秒）
+            ExecuteWatchdog watchdog = ExecuteWatchdog.builder()
+                    .setTimeout(Duration.ofSeconds(5))
+                    .get();
+            executor.setWatchdog(watchdog);
+            try {
+                executor.execute(cmdLine);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

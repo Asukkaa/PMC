@@ -1,16 +1,18 @@
 package priv.koishi.pmc.utils;
 
 import javafx.concurrent.Task;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import priv.koishi.pmc.bean.EnvironmentInfoBean;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,24 +87,22 @@ public class ScriptUtils {
         boolean systemAvailable = false;
         // 检测系统 java -version
         try {
-            ProcessBuilder pb = new ProcessBuilder(systemJava, "-version");
-            Process process = pb.start();
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                    String line;
-                    Pattern pattern = Pattern.compile("version \"(\\d+)\\.\\d+\\.\\d+\"");
-                    while ((line = reader.readLine()) != null) {
-                        Matcher matcher = pattern.matcher(line);
-                        if (matcher.find()) {
-                            int majorVersion = Integer.parseInt(matcher.group(1));
-                            detectedVersion = line.trim();
-                            if (majorVersion >= minJavaVersion) {
-                                systemAvailable = true;
-                            }
-                            break;
-                        }
-                    }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            PumpStreamHandler psh = new PumpStreamHandler(stream, stream);
+            DefaultExecutor executor = DefaultExecutor.builder().get();
+            executor.setExitValues(null);
+            executor.setStreamHandler(psh);
+            CommandLine cmdLine = new CommandLine(systemJava);
+            cmdLine.addArgument("-version");
+            executor.execute(cmdLine);
+            String output = stream.toString(StandardCharsets.UTF_8);
+            Pattern pattern = Pattern.compile("version \"(\\d+)\\.\\d+\\.\\d+\"");
+            Matcher matcher = pattern.matcher(output);
+            if (matcher.find()) {
+                int majorVersion = Integer.parseInt(matcher.group(1));
+                detectedVersion = matcher.group(0).trim();
+                if (majorVersion >= minJavaVersion) {
+                    systemAvailable = true;
                 }
             }
         } catch (Exception ignored) {
@@ -160,16 +160,18 @@ public class ScriptUtils {
      */
     private static String getPowerShellVersionFromCommand() {
         try {
-            ProcessBuilder pb = new ProcessBuilder("powershell", "-Command", "$PSVersionTable.PSVersion.ToString()");
-            Process p = pb.start();
-            int exitCode = p.waitFor();
-            if (exitCode == 0) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                    String line = reader.readLine();
-                    if (line != null) {
-                        return line.trim();
-                    }
-                }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            PumpStreamHandler psh = new PumpStreamHandler(stream);
+            DefaultExecutor executor = DefaultExecutor.builder().get();
+            executor.setExitValues(null);
+            executor.setStreamHandler(psh);
+            CommandLine cmdLine = new CommandLine("powershell");
+            cmdLine.addArgument("-Command");
+            cmdLine.addArgument("$PSVersionTable.PSVersion.ToString()", false);
+            executor.execute(cmdLine);
+            String output = stream.toString(StandardCharsets.UTF_8).trim();
+            if (!output.isEmpty()) {
+                return output;
             }
         } catch (Exception ignored) {
             logger.warn("PowerShell 版本获取失败");
@@ -185,25 +187,17 @@ public class ScriptUtils {
      */
     private static String getCommandVersion(String command) {
         try {
-            List<String> cmd = new ArrayList<>();
-            cmd.add(command);
-            Collections.addAll(cmd, "--version");
-            ProcessBuilder pb = new ProcessBuilder(cmd);
-            Process process = pb.start();
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    String line = reader.readLine();
-                    if (line != null) {
-                        return line.trim();
-                    }
-                }
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                    String line = reader.readLine();
-                    if (line != null) {
-                        return line.trim();
-                    }
-                }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            PumpStreamHandler psh = new PumpStreamHandler(stream, stream);
+            DefaultExecutor executor = DefaultExecutor.builder().get();
+            executor.setExitValues(null);
+            executor.setStreamHandler(psh);
+            CommandLine cmdLine = new CommandLine(command);
+            cmdLine.addArgument("--version");
+            executor.execute(cmdLine);
+            String output = stream.toString(StandardCharsets.UTF_8).trim();
+            if (!output.isEmpty()) {
+                return output;
             }
         } catch (Exception ignored) {
             logger.warn("环境版本获取失败");
@@ -223,8 +217,7 @@ public class ScriptUtils {
      * @param minScriptWindow 是否最小化窗口 （true 最小化窗口执行）
      * @throws Exception 运行脚本时发生错误
      */
-    public static void runScript(File script, String workDir, String parameter,
-                                 boolean minScriptWindow) throws Exception {
+    public static void runScript(File script, String workDir, String parameter, boolean minScriptWindow) throws Exception {
         String path = script.getAbsolutePath();
         // 验证脚本文件是否可执行
         if (isMac && !script.canExecute()) {
@@ -233,13 +226,15 @@ public class ScriptUtils {
                 throw new RuntimeException(text_scriptNotExecutable() + path);
             }
         }
-        ProcessBuilder pb = new ProcessBuilder();
+        DefaultExecutor.Builder<?> builder = DefaultExecutor.builder();
         if (StringUtils.isNotBlank(workDir)) {
             File workDirFile = new File(workDir);
             if (workDirFile.isDirectory()) {
-                pb.directory(workDirFile);
+                builder.setWorkingDirectory(workDirFile);
             }
         }
+        DefaultExecutor pb = builder.get();
+        pb.setExitValues(null);
         String fileType = getFileType(path);
         // 运行 Java 相关文件前检测是否有相关环境，如果没有则使用应用自身环境
         if (java.equals(fileType) || jar.equals(fileType) || clazz.equals(fileType)) {
@@ -247,13 +242,19 @@ public class ScriptUtils {
         }
         List<String> command = new ArrayList<>();
         if (isWin) {
-            runWithWinTerminal(minScriptWindow, command, fileType, path, parameter, pb);
+            runWithWinTerminal(minScriptWindow, command, fileType, path, parameter);
         } else {
             runWithMacTerminal(minScriptWindow, command, fileType, path, parameter, pb);
         }
-        try (Process process = pb.start()) {
-            process.waitFor();
+        // 将 List<String> 转换为 CommandLine
+        if (command.isEmpty()) {
+            throw new RuntimeException("命令为空");
         }
+        CommandLine cmdLine = new CommandLine(command.getFirst());
+        for (int i = 1; i < command.size(); i++) {
+            cmdLine.addArgument(command.get(i), false);
+        }
+        pb.execute(cmdLine);
     }
 
     /**
@@ -263,10 +264,10 @@ public class ScriptUtils {
      * @param command         命令列表
      * @param fileType        脚本文件类型
      * @param scriptPath      脚本文件路径
-     * @param pb              进程构建器
+     * @param parameter       运行脚本的参数
      */
-    private static void runWithWinTerminal(boolean minScriptWindow, List<String> command, String fileType,
-                                           String scriptPath, String parameter, ProcessBuilder pb) {
+    private static void runWithWinTerminal(boolean minScriptWindow, List<? super String> command, String fileType,
+                                           String scriptPath, String parameter) {
         command.add("cmd");
         command.add("/c");
         command.add("start");
@@ -308,7 +309,6 @@ public class ScriptUtils {
         command.add("cmd");
         command.add("/c");
         command.add(executeCommand.toString());
-        pb.command(command);
     }
 
     /**
@@ -318,10 +318,11 @@ public class ScriptUtils {
      * @param command         命令列表
      * @param fileType        脚本文件类型
      * @param scriptPath      脚本文件路径
-     * @param pb              进程构建器
+     * @param parameter       运行脚本的参数
+     * @param pb              进程构建器（此处为执行器）
      */
-    private static void runWithMacTerminal(boolean minScriptWindow, List<String> command, String fileType,
-                                           String scriptPath, String parameter, ProcessBuilder pb) {
+    private static void runWithMacTerminal(boolean minScriptWindow, List<? super String> command, String fileType,
+                                           String scriptPath, String parameter, DefaultExecutor pb) {
         command.add("osascript");
         command.add("-e");
         String javaPath = envInfo.getJavaPath();
@@ -329,7 +330,7 @@ public class ScriptUtils {
         StringBuilder appleScript = new StringBuilder();
         appleScript.append("tell application \"Terminal\"\n");
         appleScript.append("  do script \"");
-        File directory = pb.directory();
+        File directory = pb.getWorkingDirectory();
         if (directory != null) {
             appleScript.append("cd ")
                     .append(directory.getPath())
@@ -373,7 +374,6 @@ public class ScriptUtils {
         appleScript.append("  close window 1\n");
         appleScript.append("end tell");
         command.add(appleScript.toString());
-        pb.command(command);
     }
 
 }

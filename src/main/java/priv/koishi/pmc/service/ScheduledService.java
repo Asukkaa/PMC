@@ -2,13 +2,15 @@ package priv.koishi.pmc.service;
 
 import javafx.concurrent.Task;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import priv.koishi.pmc.bean.TimedTaskBean;
 import priv.koishi.pmc.finals.enums.RepeatTypeEnum;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -103,17 +105,20 @@ public class ScheduledService {
     public static void deleteTask(String taskName) throws Exception {
         taskName = TASK_NAME + taskName;
         if (isWin) {
-            try (Process process = new ProcessBuilder("schtasks", "/delete", "/tn", taskName, "/f").start()) {
-                process.waitFor();
-            }
+            CommandLine cmdLine = new CommandLine("schtasks");
+            cmdLine.addArgument("/delete");
+            cmdLine.addArgument("/tn");
+            cmdLine.addArgument(taskName);
+            cmdLine.addArgument("/f");
+            execIgnoreOutput(cmdLine);
         } else if (isMac) {
             Path plistFile = Paths.get(userHome, "Library", "LaunchAgents", taskName + plist);
             // 卸载定时任务
-            ProcessBuilder bootoutPb = new ProcessBuilder("launchctl", "bootout",
-                    "gui/" + getCurrentUserId(), plistFile.toString());
-            try (Process bootoutProcess = bootoutPb.start()) {
-                bootoutProcess.waitFor();
-            }
+            CommandLine bootoutCmd = new CommandLine("launchctl");
+            bootoutCmd.addArgument("bootout");
+            bootoutCmd.addArgument("gui/" + getCurrentUserId());
+            bootoutCmd.addArgument(plistFile.toString());
+            execIgnoreOutput(bootoutCmd);
             Files.deleteIfExists(plistFile);
         }
     }
@@ -125,8 +130,9 @@ public class ScheduledService {
      * @throws IOException 获取失败
      */
     private static String getCurrentUserId() throws IOException {
-        Process process = new ProcessBuilder("id", "-u").start();
-        return readProcessOutput(process).trim();
+        CommandLine cmdLine = new CommandLine("id");
+        cmdLine.addArgument("-u");
+        return execToString(cmdLine).trim();
     }
 
     /**
@@ -158,7 +164,6 @@ public class ScheduledService {
                 if (Files.exists(launchAgentsPath)) {
                     // 遍历所有以 TASK_NAME 开头的 .plist 文件
                     try (Stream<Path> stream = Files.list(launchAgentsPath)) {
-                        // 先收集符合条件的文件列表
                         List<Path> filteredFiles = stream.filter(path -> path.toString().endsWith(plist)
                                 && path.getFileName().toString().startsWith(TASK_NAME)).toList();
                         int dataSize = filteredFiles.size();
@@ -167,7 +172,6 @@ public class ScheduledService {
                             updateProgress(i + 1, dataSize);
                             Path path = filteredFiles.get(i);
                             try {
-                                // 解析 mac 定时任务详情
                                 parseMacTaskContent(taskDetails, path);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
@@ -186,25 +190,23 @@ public class ScheduledService {
              * @throws IOException 获取任务详情失败
              */
             private void getWinTaskDetails(List<? super TimedTaskBean> taskDetails) throws IOException {
-                // 获取 Windows 日期格式设置
                 if (StringUtils.isBlank(windowsDatePattern)) {
                     windowsDatePattern = getWindowsDatePattern();
                 }
-                // 获取 Windows 时间格式设置
                 if (StringUtils.isBlank(windowsTimePattern)) {
                     windowsTimePattern = getWindowsTimePattern();
                 }
-                // 改为查询全部任务
-                Process process = new ProcessBuilder("cmd", "/c", "chcp 65001 >nul && schtasks /query /fo LIST /v").start();
-                String output = readProcessOutput(process);
-                // 新增程序路径过滤（使用正则表达式忽略大小写）
+                CommandLine cmdLine = new CommandLine("cmd");
+                cmdLine.addArgument("/c");
+                cmdLine.addArgument("chcp 65001 >nul && schtasks /query /fo LIST /v", false);
+                String output = execToString(cmdLine);
+                // 新增程序路径过滤
                 Pattern exePattern = Pattern.compile(Pattern.quote(appName + exe), Pattern.CASE_INSENSITIVE);
                 String[] taskBlocks = output.split("\n\n");
                 int dataSize = taskBlocks.length;
                 updateProgress(0, dataSize);
                 for (int i = 0; i < dataSize; i++) {
                     updateProgress(i + 1, dataSize);
-                    // 解析 win 定时任务内容
                     parseWinTaskContent(taskDetails, exePattern, taskBlocks[i]);
                 }
             }
@@ -219,17 +221,14 @@ public class ScheduledService {
      * @param taskBlocks  任务文本块
      */
     private static void parseWinTaskContent(List<? super TimedTaskBean> taskDetails, Pattern exePattern, String taskBlocks) {
-        // 只处理包含程序路径的任务块
         if (exePattern.matcher(taskBlocks).find()) {
             TimedTaskBean timedTaskBean = new TimedTaskBean();
-            // 解析 Windows 任务信息
             Pattern startDatePattern = Pattern.compile("Start Date:\\s+(.*?)\\n");
             Pattern startTimePattern = Pattern.compile("Start Time:\\s+(.*?)\\n");
             Pattern scheduleTypePattern = Pattern.compile("Schedule Type:\\s+(.*?)\\n");
             Pattern taskToRunPattern = Pattern.compile("Task To Run:\\s+(.*?)\\n");
             Pattern DaysPattern = Pattern.compile("Days:\\s+(.*?)\\n");
             Pattern taskNamePattern = Pattern.compile("TaskName:\\s+(.*?)\\n");
-            // 提取各字段值
             String startDate = extractValue(startDatePattern, taskBlocks);
             startDate = formatDate(startDate);
             String startTime = extractValue(startTimePattern, taskBlocks);
@@ -244,7 +243,6 @@ public class ScheduledService {
             String daysCN = Arrays.stream(days.split(",\\s*"))
                     .map(day -> dayOfWeekName.getOrDefault(day.trim().toUpperCase(), ""))
                     .filter(day -> !day.isEmpty())
-                    // 根据 dayOfWeekMap 的键（数字星期）排序
                     .sorted(Comparator.comparingInt(day ->
                             dayOfWeekReverseMap().getOrDefault(day, 8)))
                     .collect(Collectors.joining(dayOfWeekRegex));
@@ -261,7 +259,6 @@ public class ScheduledService {
                     .setRepeat(repeatType)
                     .setDays(daysCN);
             if (taskToRun.contains(PMC)) {
-                // 处理文件路径中的空格
                 String path = taskToRun.substring(taskToRun.lastIndexOf(r) + r.length())
                         .replaceAll("\\*", " ");
                 String name = getFileName(path);
@@ -277,7 +274,6 @@ public class ScheduledService {
         }
     }
 
-
     /**
      * 解析 mac 定时任务详情
      *
@@ -289,14 +285,12 @@ public class ScheduledService {
         if (Files.exists(plistPath)) {
             TimedTaskBean timedTaskBean = new TimedTaskBean();
             String content = new String(Files.readAllBytes(plistPath));
-            // 解析任务名称
             Pattern labelPattern = Pattern.compile("<key>Label</key>\\s*<string>(.*?)</string>");
             Matcher labelMatcher = labelPattern.matcher(content);
             if (labelMatcher.find()) {
                 String label = labelMatcher.group(1);
                 timedTaskBean.setTaskName(label.substring(label.indexOf(TASK_NAME) + TASK_NAME.length()));
             }
-            // 解析 macOS 任务信息
             Pattern pathPattern = Pattern.compile("<string>--r\\s*(.+)</string>");
             Matcher pathMatcher = pathPattern.matcher(content);
             if (pathMatcher.find()) {
@@ -322,7 +316,6 @@ public class ScheduledService {
                             .setRepeat(repeatType_daily())
                             .setDays(repeatType_daily());
                 }
-                // 获取起始日期
                 findStartDate(content, timedTaskBean);
             } else if (content.contains("Weekday")) {
                 Pattern arrayPattern = Pattern.compile(
@@ -355,7 +348,6 @@ public class ScheduledService {
                         timedTaskBean.setDays(StringUtils.join(weekdays, dayOfWeekRegex));
                     }
                 }
-                // 获取起始日期
                 findStartDate(content, timedTaskBean);
             } else {
                 Pattern datePattern = Pattern.compile(
@@ -420,25 +412,6 @@ public class ScheduledService {
     }
 
     /**
-     * 读取定时任务结果
-     *
-     * @param process 读取进程
-     * @return 执行结果
-     * @throws IOException 读取失败
-     */
-    private static String readProcessOutput(Process process) throws IOException {
-        StringBuilder output = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
-            }
-        }
-        return output.toString();
-    }
-
-    /**
      * 创建 win 定时任务
      *
      * @param timedTaskBean 定时任务信息
@@ -446,18 +419,15 @@ public class ScheduledService {
      */
     private static void createWinLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
         String workingDir = Paths.get(appLaunchPath).getParent().toString();
-        // 处理文件路径中的空格
         String PMCFilePath = timedTaskBean.getPath().replaceAll(" ", "*");
         LocalDateTime triggerTime = timedTaskBean.getDateTime();
         String repeatType = timedTaskBean.getRepeat();
         List<Integer> days = timedTaskBean.getDayList();
         String taskName = TASK_NAME + timedTaskBean.getTaskName();
-        // 构建基础命令
         StringBuilder psCommand = new StringBuilder();
         psCommand.append("$action = New-ScheduledTaskAction -Execute '\"").append(appLaunchPath).append("'\" ")
                 .append("-WorkingDirectory '").append(workingDir).append("' ")
                 .append("-Argument '--r ").append(PMCFilePath).append("'; ");
-        // 构建触发器
         psCommand.append("$triggers = @(); ");
         if (repeatType_daily().equals(repeatType)) {
             psCommand.append("$trigger = New-ScheduledTaskTrigger -Daily -At '")
@@ -470,18 +440,15 @@ public class ScheduledService {
                     "$trigger = New-ScheduledTaskTrigger -Weekly -At '%s' -DaysOfWeek %s; $triggers += $trigger; ",
                     triggerTime.format(FULL_TIME_FORMATTER), daysOfWeek));
         } else if (repeatType_once().equals(repeatType)) {
-            // 添加单次触发器
             psCommand.append(String.format("$trigger = New-ScheduledTaskTrigger -Once -At '%s'; $triggers += $trigger; ",
                     triggerTime.format(FULL_TIME_FORMATTER)));
         }
-        // 注册任务（支持多个触发器）
         psCommand.append(String.format("Register-ScheduledTask -TaskName '%s' -Action $action -Trigger $triggers" +
                 " -Settings (New-ScheduledTaskSettingsSet -Compatibility Win8) -Force", taskName));
-        // 执行 PowerShell 命令
-        ProcessBuilder pb = new ProcessBuilder("powershell.exe", "-Command", psCommand.toString());
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-        String output = readProcessOutput(process);
+        CommandLine cmdLine = new CommandLine("powershell.exe");
+        cmdLine.addArgument("-Command");
+        cmdLine.addArgument(psCommand.toString(), false);
+        String output = execToStringMerged(cmdLine);
         if (output.contains("Exception") || output.contains("错误")) {
             throw new RuntimeException(text_creatTaskErr() + output);
         }
@@ -516,7 +483,6 @@ public class ScheduledService {
                     triggerTime.getMinute(),
                     triggerTime.toLocalDate());
         } else if (repeatType_weekly().equals(repeatType)) {
-            // 支持多天执行
             String intervals = days.stream().map(day -> String.format("""
                             <dict>
                                 <key>Hour</key><integer>%d</integer>
@@ -573,14 +539,14 @@ public class ScheduledService {
                 "</plist>";
         if (plistPath != null) {
             Files.write(plistPath, plistContent.getBytes());
-            // 先卸载旧配置
-            try (Process process = new ProcessBuilder("launchctl", "unload", plistPath.toString()).start()) {
-                process.waitFor();
-            }
-            // 加载任务
-            try (Process process = new ProcessBuilder("launchctl", "load", plistPath.toString()).start()) {
-                process.waitFor();
-            }
+            CommandLine unloadCmd = new CommandLine("launchctl");
+            unloadCmd.addArgument("unload");
+            unloadCmd.addArgument(plistPath.toString());
+            execIgnoreOutput(unloadCmd);
+            CommandLine loadCmd = new CommandLine("launchctl");
+            loadCmd.addArgument("load");
+            loadCmd.addArgument(plistPath.toString());
+            execIgnoreOutput(loadCmd);
         }
     }
 
@@ -610,7 +576,6 @@ public class ScheduledService {
      */
     private static LocalDate parseDate(String dateStr) {
         if (StringUtils.isNotBlank(dateStr)) {
-            // 移除尾部常见的干扰字符：逗号、中文逗号、空格、星期英文缩写等
             String cleaned = dateStr.replaceAll("[，, ]+$", "").trim();
             if (windowsDatePattern != null) {
                 return LocalDate.parse(cleaned, DateTimeFormatter.ofPattern(windowsDatePattern));
@@ -641,21 +606,19 @@ public class ScheduledService {
      * @return 获取到的日期格式
      */
     private static String getWindowsDatePattern() {
-        ProcessBuilder pb = new ProcessBuilder(
-                "powershell.exe", "-NoProfile", "-Command",
-                // 先设置输出编码为 UTF-8
-                "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; " +
-                        "(Get-Culture).DateTimeFormat.ShortDatePattern");
-        try (Process process = pb.start()) {
-            String output = readProcessOutput(process);
-            process.waitFor();
-            if (process.exitValue() == 0 && !output.isEmpty()) {
+        CommandLine cmdLine = new CommandLine("powershell.exe");
+        cmdLine.addArgument("-NoProfile");
+        cmdLine.addArgument("-Command");
+        cmdLine.addArgument("[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; " +
+                "(Get-Culture).DateTimeFormat.ShortDatePattern", false);
+        try {
+            String output = execToString(cmdLine);
+            if (!output.isEmpty()) {
                 String pattern = output.trim();
                 pattern = formatDate(pattern);
-                // 清理输出，去掉换行符和首尾空格
                 return pattern;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return null;
@@ -667,17 +630,15 @@ public class ScheduledService {
      * @return 获取到的时间格式
      */
     private static String getWindowsTimePattern() {
-        ProcessBuilder pb = new ProcessBuilder(
-                "powershell.exe", "-NoProfile", "-Command",
-                // 强制 UTF-8 输出，避免中文乱码（虽然时间格式通常纯英文，但安全起见）
-                "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; " +
-                        "(Get-Culture).DateTimeFormat.ShortTimePattern");
-        try (Process process = pb.start()) {
-            String output = readProcessOutput(process);
-            process.waitFor();
-            String pattern = output.trim();
-            return pattern.replace("\uFEFF", "");
-        } catch (Exception e) {
+        CommandLine cmdLine = new CommandLine("powershell.exe");
+        cmdLine.addArgument("-NoProfile");
+        cmdLine.addArgument("-Command");
+        cmdLine.addArgument("[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; " +
+                "(Get-Culture).DateTimeFormat.ShortTimePattern", false);
+        try {
+            String output = execToString(cmdLine);
+            return output.trim().replace("\uFEFF", "");
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -696,6 +657,56 @@ public class ScheduledService {
             date = date.substring(0, date.lastIndexOf(" "));
         }
         return date;
+    }
+
+
+    /**
+     * 执行命令并返回标准输出（UTF-8），忽略退出码
+     *
+     * @param cmdLine 要执行的命令
+     * @return 命令执行返回值
+     * @throws IOException 命令执行异常
+     */
+    private static String execToString(CommandLine cmdLine) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DefaultExecutor executor = DefaultExecutor.builder().get();
+        executor.setExitValues(null);
+        executor.setStreamHandler(new PumpStreamHandler(outputStream));
+        executor.execute(cmdLine);
+        return outputStream.toString(StandardCharsets.UTF_8)
+                .replace("\r\n", "\n")
+                .replace('\r', '\n');
+    }
+
+    /**
+     * 执行命令并合并标准输出和错误输出（UTF-8），忽略退出码
+     *
+     * @param cmdLine 要执行的命令
+     * @return 命令执行返回值与错误信息
+     * @throws IOException 命令执行异常
+     */
+    private static String execToStringMerged(CommandLine cmdLine) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DefaultExecutor executor = DefaultExecutor.builder().get();
+        executor.setExitValues(null);
+        executor.setStreamHandler(new PumpStreamHandler(outputStream, outputStream));
+        executor.execute(cmdLine);
+        return outputStream.toString(StandardCharsets.UTF_8)
+                .replace("\r\n", "\n")
+                .replace('\r', '\n');
+    }
+
+    /**
+     * 执行命令并忽略输出，仅等待完成
+     *
+     * @param cmdLine 要执行的命令
+     * @throws IOException 命令执行异常
+     */
+    private static void execIgnoreOutput(CommandLine cmdLine) throws IOException {
+        DefaultExecutor executor = DefaultExecutor.builder().get();
+        executor.setExitValues(null);
+        executor.setStreamHandler(new PumpStreamHandler(null, null));
+        executor.execute(cmdLine);
     }
 
 }
