@@ -11,8 +11,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.46</lombok.version>
-        <log4j.version>2.26.1</log4j.version>
         <javafx.version>26.0.2</javafx.version>
+        <log4j.version>2.26.1</log4j.version>
         <java.version>26</java.version>
     </properties>
 
@@ -28,12 +28,14 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

@@ -92,6 +92,7 @@ import static priv.koishi.pmc.service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.service.PMCFileService.loadImg;
 import static priv.koishi.pmc.service.TessdataService.*;
+import static priv.koishi.pmc.singleinstanceguard.SingleInstanceGuard.releaseLock;
 import static priv.koishi.pmc.ui.floatingwindow.FloatingWindow.*;
 import static priv.koishi.pmc.ui.floatingwindow.FloatingWindow.showFloatingWindow;
 import static priv.koishi.pmc.utils.ButtonMappingUtils.*;
@@ -2491,6 +2492,10 @@ public class SettingController extends RootController implements MousePositionUp
     @FXML
     private void reLaunch() throws IOException {
         if (!isRunningFromIDEA) {
+            // 释放单实例锁，停止心跳
+            releaseLock();
+            // 关闭激活服务端口
+            closeServerSocket();
             CommandLine cmdLine = null;
             if (isWin) {
                 cmdLine = new CommandLine(appLaunchPath);
