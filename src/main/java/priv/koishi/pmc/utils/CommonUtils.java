@@ -66,8 +66,11 @@ public class CommonUtils {
     /**
      * 自然排序的核心比较方法
      *
-     * @param s1 要排序的字符串1
-     * @param s2 要排序的字符串2
+     * @param s1 第一个字符串，允许为 {@code null}
+     * @param s2 第二个字符串，允许为 {@code null}
+     * @return 若 {@code s1} 小于 {@code s2} 返回负整数，等于返回 0，大于返回正整数
+     * <p>
+     * {@code null} 值被视为小于任何非 {@code null} 值，两个 {@code null} 视为相等
      */
     private static int naturalCompare(String s1, String s2) {
         if (s1 == null && s2 == null) {
@@ -328,7 +331,7 @@ public class CommonUtils {
      *
      * @param source 源对象
      * @param target 目标对象
-     * @throws IllegalAccessException 当字段访问权限不足时抛出
+     * @throws IllegalAccessException 对象复制异常
      */
     public static void copyAllProperties(Object source, Object target) throws IllegalAccessException {
         if (source == null || target == null) {

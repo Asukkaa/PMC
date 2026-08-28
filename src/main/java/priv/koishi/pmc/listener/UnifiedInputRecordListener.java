@@ -515,6 +515,8 @@ public class UnifiedInputRecordListener implements NativeMouseListener, NativeMo
 
     /**
      * 检查是否正在记录移动轨迹
+     *
+     * @return true 正在记录移动轨迹
      */
     private boolean isRecordingMoveTrajectory() {
         return movePoint != null && !movePoint.getMoveTrajectory().isEmpty();

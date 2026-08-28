@@ -453,6 +453,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 自动保存操作流程
      *
      * @param autoSave 自动保存开关
+     * @param outPath  导出文件夹路径
      */
     private void autoSave(CheckBox autoSave, String outPath) {
         if (autoSave.isSelected()) {
@@ -1001,6 +1002,7 @@ public class AutoClickController extends RootController implements MousePosition
      * @param clickPositionVOS 自动操作流程
      * @param loopTimes        循环次数
      * @param isBatch          是否为批量执行 PMC 文件（true 批量执行）
+     * @return 自动操作线程任务设置参数
      */
     private AutoClickTaskBean buildAutoClickTaskBean(List<ClickPositionVO> clickPositionVOS, int loopTimes, boolean isBatch) {
         TextField retrySecond = settingController.retrySecond_Set;
@@ -1141,6 +1143,7 @@ public class AutoClickController extends RootController implements MousePosition
      * 执行选中的步骤选项
      *
      * @param contextMenu 右键菜单集合
+     * @return 右键菜单选项
      */
     private MenuItem buildClickTestMenuItem(ContextMenu contextMenu) {
         MenuItem menuItem = new MenuItem(menu_runSelectMenu());
@@ -1531,6 +1534,8 @@ public class AutoClickController extends RootController implements MousePosition
 
     /**
      * 停止所有任务
+     *
+     * @param taskBean 线程任务所需参数
      */
     private void stopAllWork(AutoClickTaskBean taskBean) {
         if (listener != null) {
@@ -2165,6 +2170,7 @@ public class AutoClickController extends RootController implements MousePosition
     /**
      * 获取选择的文件
      *
+     * @param selectedFile 选择的文件
      * @throws IOException 配置文件保存异常
      */
     private void getSelectFile(List<? extends File> selectedFile) throws IOException {

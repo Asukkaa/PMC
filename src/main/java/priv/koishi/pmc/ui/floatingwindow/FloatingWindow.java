@@ -354,6 +354,7 @@ public class FloatingWindow {
      * @param width  矩形宽度
      * @param height 矩形高度
      * @param cursor 鼠标光标
+     * @return 创建的矩形区域
      */
     private static Rectangle createResizeBorder(double width, double height, Cursor cursor) {
         Rectangle rect = new Rectangle(width, height);

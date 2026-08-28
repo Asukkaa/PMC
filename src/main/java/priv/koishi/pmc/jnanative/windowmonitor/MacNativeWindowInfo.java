@@ -164,6 +164,7 @@ public class MacNativeWindowInfo extends Structure {
      * 从字节数组获取以 null 结尾的字符串
      *
      * @param byteArray 需要处理的字节数组
+     * @return 以 null 结尾的字符串
      */
     private static String getNullTerminatedString(byte[] byteArray) {
         int length = 0;

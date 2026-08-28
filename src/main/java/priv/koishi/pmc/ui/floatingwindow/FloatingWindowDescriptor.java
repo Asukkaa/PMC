@@ -301,6 +301,8 @@ public class FloatingWindowDescriptor {
 
     /**
      * 递归清除节点及其所有子节点上的事件处理器
+     *
+     * @param node 要处理的节点
      */
     private static void clearNodeHandlers(Node node) {
         if (node != null) {

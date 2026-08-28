@@ -49,8 +49,8 @@ public class EnvironmentInfoBean {
         if (StringUtils.isBlank(javaVersion)) {
             return false;
         }
-        // 匹配常见格式： "openjdk version \"11.0.12\"  ..." 或 "java version \"17.0.2\""
-        Pattern pattern = Pattern.compile("version \"(\\d+)\\.\\d+\\.\\d+\"");
+        // 支持 "version \"26.0.2.1\"" 或 "version \"1.8.0_201\"" 等多种格式
+        Pattern pattern = Pattern.compile("version \"(\\d+)(?:\\.\\d+)+.*?\"");
         Matcher matcher = pattern.matcher(javaVersion);
         if (matcher.find()) {
             int major = Integer.parseInt(matcher.group(1));
@@ -68,20 +68,21 @@ public class EnvironmentInfoBean {
         if (StringUtils.isBlank(pythonVersion)) {
             return false;
         }
-        int minPyVersion = 3;
-        // 匹配常见格式： "Python 3.12.5" 或 "Python 3.11.0"
-        Pattern pattern = Pattern.compile("Python (\\d+)\\.\\d+\\.\\d+");
-        Matcher matcher = pattern.matcher(pythonVersion);
+        int minMajor = 3;
+        String version = pythonVersion.trim();
+        // 优先尝试匹配 "Python" 后面的第一个数字（支持任意后续格式）
+        Pattern pattern = Pattern.compile("Python\\s+(\\d+)");
+        Matcher matcher = pattern.matcher(version);
         if (matcher.find()) {
             int major = Integer.parseInt(matcher.group(1));
-            return major >= minPyVersion;
+            return major >= minMajor;
         }
-        // 兼容只有 "3.12.5" 等情况
-        pattern = Pattern.compile("^(\\d+)\\.\\d+\\.\\d+");
-        matcher = pattern.matcher(pythonVersion);
+        // 若没有 "Python" 前缀，尝试匹配字符串开头的数字（常见于纯版本号）
+        pattern = Pattern.compile("^(\\d+)");
+        matcher = pattern.matcher(version);
         if (matcher.find()) {
             int major = Integer.parseInt(matcher.group(1));
-            return major >= minPyVersion;
+            return major >= minMajor;
         }
         return false;
     }

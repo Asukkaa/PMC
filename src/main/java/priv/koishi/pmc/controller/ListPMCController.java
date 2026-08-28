@@ -196,6 +196,7 @@ public class ListPMCController extends RootController {
      * 自动保存操作流程
      *
      * @param autoSave 自动保存开关
+     * @param outPath  导出文件夹路径
      */
     private void autoSave(CheckBox autoSave, String outPath) {
         if (autoSave.isSelected()) {
@@ -541,6 +542,7 @@ public class ListPMCController extends RootController {
     /**
      * 获取选择的文件
      *
+     * @param selectedFile 选择的文件
      * @throws IOException 配置文件保存异常
      */
     private void getSelectFile(List<? extends File> selectedFile) throws IOException {

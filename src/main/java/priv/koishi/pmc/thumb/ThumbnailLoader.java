@@ -104,6 +104,9 @@ public class ThumbnailLoader {
 
     /**
      * 将缩略图应用到实体并刷新表格行
+     *
+     * @param support 实现缩略图支持接口的对象
+     * @param thumb   缩略图
      */
     private static void applyThumbnail(ThumbnailSupport support, Image thumb) {
         if (thumb != null) {

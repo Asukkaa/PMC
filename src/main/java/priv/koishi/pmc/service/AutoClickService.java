@@ -231,10 +231,13 @@ public class AutoClickService {
              * @param baseTaskBean 任务参数
              * @param currentLoop  当前批次索引
              * @param loopText     当前循环信息
+             * @param pmcWindowMap 窗口信息映射
+             * @return true 终止后续流程，false 继续后续流程
+             * @throws InterruptedException 线程终止异常
              */
             private boolean executeBatch(List<? extends PMCListBean> pmcListBeans, ExecutorService executor,
                                          AutoClickTaskBean baseTaskBean, int currentLoop, String loopText,
-                                         Map<String, ? extends Map<String, Set<ClickPositionVO>>> pmcWindowMap) throws Exception {
+                                         Map<String, ? extends Map<String, Set<ClickPositionVO>>> pmcWindowMap) throws InterruptedException {
                 AtomicLong start = new AtomicLong();
                 int totalPMCs = pmcListBeans.size();
                 messageFloating = baseTaskBean.getMessageFloating();
@@ -419,6 +422,7 @@ public class AutoClickService {
              * @param loopTimeText   循环信息文案
              * @param windowPathMap  窗口路径映射表
              * @throws Exception 运行脚本时发生错误、链接操作异常
+             * @return 操作日志
              */
             private List<ClickLogBean> clicks(List<? extends ClickPositionVO> tableViewItems, String loopTimeText,
                                               Map<? super String, ? extends Set<ClickPositionVO>> windowPathMap) throws Exception {
@@ -547,6 +551,7 @@ public class AutoClickService {
              * 处理执行前等待
              *
              * @param clickPositionVO 自动操作参数
+             * @return true 中断流程，false 继续后续流程
              */
             private boolean waitAndLog(ClickPositionVO clickPositionVO) {
                 long wait = Long.parseLong(clickPositionVO.getWaitTime());
@@ -791,6 +796,7 @@ public class AutoClickService {
      * @param loopTimeText    信息浮窗日志
      * @param taskBean        线程任务参数
      * @return 执行结果
+     * @throws Exception 匹配失败时抛出异常、当移动超时或线程中断时抛出
      */
     private static ClickResultBean click(ClickPositionVO clickPositionVO, Robot robot, String loopTimeText,
                                          AutoClickTaskBean taskBean) throws Exception {
@@ -1562,6 +1568,7 @@ public class AutoClickService {
      * @param tableViewItems 自动操作设置列表
      * @param messageUpdater 更新消息函数
      * @return 窗口路径映射表
+     * @throws IllegalAccessException 对象复制异常
      */
     private static Map<String, Set<ClickPositionVO>> updateWindowInfos(List<? extends ClickPositionVO> tableViewItems,
                                                                        MessageUpdater messageUpdater) throws IllegalAccessException {
@@ -1599,6 +1606,7 @@ public class AutoClickService {
      * @param windowInfoMap  窗口信息集合
      * @param errs           错误信息
      * @param stopErrIndex   终止操作窗口错误设置步骤索引
+     * @throws IllegalAccessException 对象复制异常
      */
     private static void checkWindowExists(List<? extends ClickPositionVO> tableViewItems,
                                           List<Integer> clickErrIndex, Map<String, ? extends WindowInfo> windowInfoMap,

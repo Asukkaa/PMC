@@ -20,6 +20,7 @@ import javafx.stage.Window;
 import javafx.util.Callback;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import priv.koishi.pmc.bean.TessdataBean;
 import priv.koishi.pmc.bean.annotation.CheckBoxColumn;
 import priv.koishi.pmc.bean.annotation.IndexColumn;
 import priv.koishi.pmc.bean.annotation.PathColumn;
@@ -28,7 +29,6 @@ import priv.koishi.pmc.bean.beaninterface.CopyBean;
 import priv.koishi.pmc.bean.beaninterface.FilePath;
 import priv.koishi.pmc.bean.beaninterface.ImgBean;
 import priv.koishi.pmc.bean.beaninterface.Indexable;
-import priv.koishi.pmc.bean.TessdataBean;
 import priv.koishi.pmc.bean.vo.ClickPositionVO;
 import priv.koishi.pmc.bean.vo.ImgFileVO;
 import priv.koishi.pmc.controller.AutoClickController;
@@ -43,10 +43,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.controller.MainController.settingController;
 import static priv.koishi.pmc.finals.CommonFinals.*;
 import static priv.koishi.pmc.finals.i18nFinal.*;
-import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.utils.CommonUtils.NATURAL_SORT;
 import static priv.koishi.pmc.utils.CommonUtils.moveAllToFirst;
 import static priv.koishi.pmc.utils.FileUtils.*;
@@ -425,6 +425,7 @@ public class TableViewUtils {
      *
      * @param clazz     要获取字段的类
      * @param fieldName 要获取的属性名
+     * @return 字段对象
      */
     private static Field getCachedField(Class<?> clazz, String fieldName) {
         return FIELD_CACHE
@@ -1015,6 +1016,7 @@ public class TableViewUtils {
      * @param copyType       复制类型
      * @param dataNumber     列表数据数量文本框
      * @param dataNumberUnit 数据数量单位
+     * @param <T>            列表数据类型
      */
     private static <T extends CopyBean> void copyDataMenuItem(TableView<T> tableView, String copyType,
                                                               Label dataNumber, String dataNumberUnit) {
@@ -1034,6 +1036,7 @@ public class TableViewUtils {
      * 获取复制的数据
      *
      * @param selectedItem 选中的数据
+     * @param <T>          复制的数据类型
      * @return 复制的数据
      */
     private static <T extends CopyBean> List<T> getCopyList(List<? extends T> selectedItem) {
