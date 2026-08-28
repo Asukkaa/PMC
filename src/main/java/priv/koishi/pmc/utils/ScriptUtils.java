@@ -96,7 +96,8 @@ public class ScriptUtils {
             cmdLine.addArgument("-version");
             executor.execute(cmdLine);
             String output = stream.toString(StandardCharsets.UTF_8);
-            Pattern pattern = Pattern.compile("version \"(\\d+)\\.\\d+\\.\\d+\"");
+            // 支持 "version \"26.0.2.1\"" 或 "version \"1.8.0_201\"" 等多种格式
+            Pattern pattern = Pattern.compile("version \"(\\d+)(?:\\.\\d+)+.*?\"");
             Matcher matcher = pattern.matcher(output);
             if (matcher.find()) {
                 int majorVersion = Integer.parseInt(matcher.group(1));

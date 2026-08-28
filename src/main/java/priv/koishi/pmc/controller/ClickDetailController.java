@@ -665,6 +665,7 @@ public class ClickDetailController extends RootController {
      * 初始识别区域设置相关组件
      *
      * @param item 列表选中的数据
+     * @throws IllegalAccessException 对象复制异常
      */
     private void initFloatingWindowConfig(ClickPositionVO item) throws IllegalAccessException {
         FloatingWindowConfig clickWindowConfig = item.getClickWindowConfig();
@@ -1406,6 +1407,9 @@ public class ClickDetailController extends RootController {
         }
     }
 
+    /**
+     * 检查系统权限
+     */
     private void checkSystemProperties() {
         // 禁用需要自动化权限的组件
         if (noAutomationPermission) {
@@ -1430,6 +1434,7 @@ public class ClickDetailController extends RootController {
     /**
      * 获取选择的文件
      *
+     * @param selectedFile 选中的文件
      * @throws IOException 配置文件保存异常
      */
     private void getSelectFile(List<? extends File> selectedFile) throws IOException {
@@ -1495,6 +1500,8 @@ public class ClickDetailController extends RootController {
 
     /**
      * 初始化键盘输入监听器
+     *
+     * @return 键盘输入监听器
      */
     private NativeKeyListener intitNativeKeyListener() {
         // 创建键盘监听器
@@ -1839,6 +1846,8 @@ public class ClickDetailController extends RootController {
 
     /**
      * 保存更改并关闭详情页按钮
+     *
+     * @throws IllegalAccessException 对象复制异常
      */
     @FXML
     private void saveDetail() throws IllegalAccessException {
@@ -2062,6 +2071,7 @@ public class ClickDetailController extends RootController {
      * 选择要点击的图片
      *
      * @param actionEvent 点击事件
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void addClickImgPath(ActionEvent actionEvent) throws IOException {
@@ -2074,6 +2084,7 @@ public class ClickDetailController extends RootController {
      * 选择终止操作的图片
      *
      * @param actionEvent 点击事件
+     * @throws IOException 配置文件保存异常
      */
     @FXML
     private void addStopImgPath(ActionEvent actionEvent) throws IOException {
