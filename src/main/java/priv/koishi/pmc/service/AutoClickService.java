@@ -298,54 +298,9 @@ public class AutoClickService {
                         // 使用 CountDownLatch 等待子任务完成
                         CountDownLatch latch = new CountDownLatch(1);
                         AtomicBoolean taskSuccess = new AtomicBoolean(false);
-                        AtomicReference<Exception> taskException = new AtomicReference<>();
-                        subTask.setOnSucceeded(_ -> {
-                            try {
-                                taskSuccess.set(true);
-                            } finally {
-                                latch.countDown();
-                            }
-                            long end = System.currentTimeMillis();
-                            PMCLogBean pmcLogBean = new PMCLogBean();
-                            pmcLogBean.setTime(String.valueOf(end - start.get()))
-                                    .setResult(log_success())
-                                    .setName(name)
-                                    .setPath(path);
-                            pmcLog.add(pmcLogBean);
-                        });
-                        subTask.setOnFailed(_ -> {
-                            taskException.set((Exception) subTask.getException());
-                            latch.countDown();
-                            long end = System.currentTimeMillis();
-                            PMCLogBean pmcLogBean = new PMCLogBean();
-                            pmcLogBean.setTime(String.valueOf(end - start.get()))
-                                    .setResult(log_fail())
-                                    .setName(name)
-                                    .setPath(path);
-                            pmcLog.add(pmcLogBean);
-                        });
-                        subTask.setOnCancelled(_ -> {
-                            latch.countDown();
-                            long end = System.currentTimeMillis();
-                            PMCLogBean pmcLogBean = new PMCLogBean();
-                            pmcLogBean.setTime(String.valueOf(end - start.get()))
-                                    .setResult(log_cancel())
-                                    .setName(name)
-                                    .setPath(path);
-                            pmcLog.add(pmcLogBean);
-                        });
+                        AtomicReference<Exception> taskException = setSubTaskCallBack(subTask, taskSuccess, latch, start, pmc);
                         // 在单独的线程中执行子任务
-                        executor.execute(() -> {
-                            Thread subThread = new Thread(subTask);
-                            subThread.setDaemon(true);
-                            subThread.start();
-                            start.set(System.currentTimeMillis());
-                            PMCLogBean pmcLogBean = new PMCLogBean();
-                            pmcLogBean.setResult(log_start())
-                                    .setName(name)
-                                    .setPath(path);
-                            pmcLog.add(pmcLogBean);
-                        });
+                        executeSubTask(executor, subTask, start, pmc);
                         // 等待子任务完成
                         latch.await();
                         // 检查子任务是否成功
@@ -363,6 +318,83 @@ public class AutoClickService {
                 return false;
             }
         };
+    }
+
+    /**
+     * 执行子任务
+     *
+     * @param executor 线程执行器
+     * @param subTask  要执行的子任务
+     * @param start    任务起始时间
+     * @param pmc      要执行的子任务参数
+     */
+    private static void executeSubTask(ExecutorService executor, Task<PMCLogResult> subTask, AtomicLong start, PMCListBean pmc) {
+        String name = pmc.getName();
+        String path = pmc.getPath();
+        executor.execute(() -> {
+            Thread subThread = new Thread(subTask);
+            subThread.setDaemon(true);
+            subThread.start();
+            start.set(System.currentTimeMillis());
+            PMCLogBean pmcLogBean = new PMCLogBean();
+            pmcLogBean.setResult(log_start())
+                    .setName(name)
+                    .setPath(path);
+            pmcLog.add(pmcLogBean);
+        });
+    }
+
+    /**
+     * 设置子任务回调
+     *
+     * @param subTask     要处理的子任务
+     * @param taskSuccess 子任务成功标志（true 子任务成功）
+     * @param latch       子任务执行计数器，用来等待任务完成
+     * @param start       子任务起始时间
+     * @param pmc         要执行的子任务参数
+     * @return 子任务失败时的异常
+     */
+    private static AtomicReference<Exception> setSubTaskCallBack(Task<PMCLogResult> subTask, AtomicBoolean taskSuccess,
+                                                                 CountDownLatch latch, AtomicLong start, PMCListBean pmc) {
+        String name = pmc.getName();
+        String path = pmc.getPath();
+        AtomicReference<Exception> taskException = new AtomicReference<>();
+        subTask.setOnSucceeded(_ -> {
+            try {
+                taskSuccess.set(true);
+            } finally {
+                latch.countDown();
+            }
+            long end = System.currentTimeMillis();
+            PMCLogBean pmcLogBean = new PMCLogBean();
+            pmcLogBean.setTime(String.valueOf(end - start.get()))
+                    .setResult(log_success())
+                    .setName(name)
+                    .setPath(path);
+            pmcLog.add(pmcLogBean);
+        });
+        subTask.setOnFailed(_ -> {
+            taskException.set((Exception) subTask.getException());
+            latch.countDown();
+            long end = System.currentTimeMillis();
+            PMCLogBean pmcLogBean = new PMCLogBean();
+            pmcLogBean.setTime(String.valueOf(end - start.get()))
+                    .setResult(log_fail())
+                    .setName(name)
+                    .setPath(path);
+            pmcLog.add(pmcLogBean);
+        });
+        subTask.setOnCancelled(_ -> {
+            latch.countDown();
+            long end = System.currentTimeMillis();
+            PMCLogBean pmcLogBean = new PMCLogBean();
+            pmcLogBean.setTime(String.valueOf(end - start.get()))
+                    .setResult(log_cancel())
+                    .setName(name)
+                    .setPath(path);
+            pmcLog.add(pmcLogBean);
+        });
+        return taskException;
     }
 
     /**
@@ -569,12 +601,7 @@ public class AutoClickService {
                     }
                 }
                 if (taskBean.isWaitLog()) {
-                    ClickLogBean waitLog = new ClickLogBean();
-                    waitLog.setName(clickPositionVO.getName())
-                            .setClickTime(String.valueOf(wait))
-                            .setClickKey(mouseButton_none())
-                            .setType(log_wait());
-                    clickLog.add(waitLog);
+                    addWaitLog(wait, clickPositionVO.getName());
                 }
                 return false;
             }
@@ -961,12 +988,7 @@ public class AutoClickService {
                     break;
                 }
                 if (taskBean.isWaitLog()) {
-                    ClickLogBean clickLogBean = new ClickLogBean();
-                    clickLogBean.setClickTime(String.valueOf(clickInterval))
-                            .setClickKey(mouseButton_none())
-                            .setType(log_wait())
-                            .setName(name);
-                    clickLog.add(clickLogBean);
+                    addWaitLog(clickInterval, name);
                 }
             }
             MouseButton mouseButton = NativeMouseToMouseButton.get(clickPositionVO.getMouseKeyEnum());
@@ -987,92 +1009,33 @@ public class AutoClickService {
                 if (!clickPositionVO.isNoMove()) {
                     robot.mouseMove(finalStartX, finalStartY);
                     if (taskBean.isMoveLog()) {
-                        ClickLogBean moveLog = new ClickLogBean();
-                        moveLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_move())
-                                .setName(name);
-                        clickLog.add(moveLog);
+                        addClickLog((int) finalStartX, (int) finalStartY, mouseButton_none(), name, log_move());
                     }
                 }
                 // 执行自动流程前点击第一个起始坐标
                 if (firstClick.compareAndSet(true, false)) {
-                    robot.mouseMove(finalStartX, finalStartY);
-                    if (taskBean.isMoveLog()) {
-                        ClickLogBean moveLog = new ClickLogBean();
-                        moveLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_move())
-                                .setName(name);
-                        clickLog.add(moveLog);
-                    }
-                    robot.mousePress(MouseButton.PRIMARY);
-                    if (taskBean.isClickLog()) {
-                        ClickLogBean pressLog = new ClickLogBean();
-                        pressLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setClickKey(clickKey)
-                                .setType(log_press())
-                                .setName(name);
-                        clickLog.add(pressLog);
-                    }
-                    robot.mouseRelease(MouseButton.PRIMARY);
-                    if (taskBean.isClickLog()) {
-                        ClickLogBean releaseLog = new ClickLogBean();
-                        releaseLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setType(log_release())
-                                .setClickKey(clickKey)
-                                .setName(name);
-                        clickLog.add(releaseLog);
-                    }
+                    clickFirst(robot, taskBean, finalStartX, finalStartY, name, clickKey);
                 }
                 if (ClickTypeEnum.CLICK.ordinal() == clickType && mouseButton != MouseButton.NONE) {
                     robot.mousePress(mouseButton);
                     if (taskBean.isClickLog()) {
-                        ClickLogBean pressLog = new ClickLogBean();
-                        pressLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setClickKey(clickKey)
-                                .setType(log_press())
-                                .setName(name);
-                        clickLog.add(pressLog);
+                        addClickLog((int) finalStartX, (int) finalStartY, clickKey, name, log_press());
                     }
                 } else if (ClickTypeEnum.WHEEL_DOWN.ordinal() == clickType) {
                     robot.mouseWheel(1);
                     if (taskBean.isClickLog()) {
-                        ClickLogBean wheelLog = new ClickLogBean();
-                        wheelLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setType(clickType_wheelDown())
-                                .setClickKey(clickKey)
-                                .setName(name);
-                        clickLog.add(wheelLog);
+                        addClickLog((int) finalStartX, (int) finalStartY, clickKey, name, clickType_wheelDown());
                     }
                 } else if (ClickTypeEnum.WHEEL_UP.ordinal() == clickType) {
                     robot.mouseWheel(-1);
                     if (taskBean.isClickLog()) {
-                        ClickLogBean wheelLog = new ClickLogBean();
-                        wheelLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setType(clickType_wheelUp())
-                                .setClickKey(clickKey)
-                                .setName(name);
-                        clickLog.add(wheelLog);
+                        addClickLog((int) finalStartX, (int) finalStartY, clickKey, name, clickType_wheelUp());
                     }
                 } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
                     isRobotInput = true;
                     robot.keyPress(NativeKeyToKeyCode.get(keyCode));
                     if (taskBean.isKeyboardLog()) {
-                        ClickLogBean keyPressLog = new ClickLogBean();
-                        keyPressLog.setX(String.valueOf((int) finalStartX))
-                                .setY(String.valueOf((int) finalStartY))
-                                .setClickKey(keyboard)
-                                .setType(log_press())
-                                .setName(name);
-                        clickLog.add(keyPressLog);
+                        addClickLog((int) finalStartX, (int) finalStartY, keyboard, name, log_press());
                     }
                 }
                 actionFuture.complete(null);
@@ -1102,48 +1065,22 @@ public class AutoClickService {
                     break;
                 }
                 if (taskBean.isClickLog() && !mouseButton_none().equals(clickKey)) {
-                    ClickLogBean logBean = new ClickLogBean();
-                    logBean.setClickTime(String.valueOf(clickTime))
-                            .setX(String.valueOf((int) finalStartX))
-                            .setY(String.valueOf((int) finalStartY))
-                            .setClickKey(clickKey)
-                            .setType(log_hold())
-                            .setName(name);
-                    clickLog.add(logBean);
+                    addClickLog((int) finalStartX, (int) finalStartY, clickKey, name, log_hold());
                 } else if (taskBean.isKeyboardLog() && ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
-                    ClickLogBean logBean = new ClickLogBean();
-                    logBean.setClickTime(String.valueOf(clickTime))
-                            .setX(String.valueOf((int) finalStartX))
-                            .setY(String.valueOf((int) finalStartY))
-                            .setClickKey(keyboard)
-                            .setType(log_hold())
-                            .setName(name);
-                    clickLog.add(logBean);
+                    addClickLog((int) finalStartX, (int) finalStartY, keyboard, name, log_hold());
                 }
                 CompletableFuture<Void> releaseFuture = new CompletableFuture<>();
                 Platform.runLater(() -> {
                     if (ClickTypeEnum.CLICK.ordinal() == clickType && mouseButton != MouseButton.NONE) {
                         robot.mouseRelease(mouseButton);
                         if (taskBean.isClickLog()) {
-                            ClickLogBean releaseLog = new ClickLogBean();
-                            releaseLog.setX(String.valueOf((int) finalStartX))
-                                    .setY(String.valueOf((int) finalStartY))
-                                    .setType(log_release())
-                                    .setClickKey(clickKey)
-                                    .setName(name);
-                            clickLog.add(releaseLog);
+                            addClickLog((int) finalStartX, (int) finalStartY, clickKey, name, log_release());
                         }
                     } else if (ClickTypeEnum.KEYBOARD.ordinal() == clickType) {
                         robot.keyRelease(NativeKeyToKeyCode.get(keyCode));
                         isRobotInput = false;
                         if (taskBean.isKeyboardLog()) {
-                            ClickLogBean releaseLog = new ClickLogBean();
-                            releaseLog.setX(String.valueOf((int) finalStartX))
-                                    .setY(String.valueOf((int) finalStartY))
-                                    .setType(log_release())
-                                    .setClickKey(keyboard)
-                                    .setName(name);
-                            clickLog.add(releaseLog);
+                            addClickLog((int) finalStartX, (int) finalStartY, keyboard, name, log_release());
                         }
                     }
                     releaseFuture.complete(null);
@@ -1161,6 +1098,31 @@ public class AutoClickService {
                 executeTrajectoryPoints(robot, clickPositionVO, taskBean);
                 clickResultBean.setClickLogs(clickLog.getSnapshot());
             }
+        }
+    }
+
+    /**
+     * 执行自动流程前点击第一个起始坐标
+     *
+     * @param robot    Robot 实例
+     * @param taskBean 线程任务设置
+     * @param x        操作起始 X 坐标
+     * @param y        操作起始 Y 坐标
+     * @param name     步骤名称
+     * @param clickKey 操作按键
+     */
+    private static void clickFirst(Robot robot, AutoClickTaskBean taskBean, double x, double y, String name, String clickKey) {
+        robot.mouseMove(x, y);
+        if (taskBean.isMoveLog()) {
+            addClickLog((int) x, (int) y, mouseButton_none(), name, mouseButton_none());
+        }
+        robot.mousePress(MouseButton.PRIMARY);
+        if (taskBean.isClickLog()) {
+            addClickLog((int) x, (int) y, clickKey, name, log_press());
+        }
+        robot.mouseRelease(MouseButton.PRIMARY);
+        if (taskBean.isClickLog()) {
+            addClickLog((int) x, (int) y, clickKey, name, log_release());
         }
     }
 
@@ -1341,12 +1303,7 @@ public class AutoClickService {
                 if (remaining > 0) {
                     Thread.sleep(remaining);
                     if (taskBean.isWaitLog()) {
-                        ClickLogBean sleepLog = new ClickLogBean();
-                        sleepLog.setClickTime(String.valueOf(remaining))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_wait())
-                                .setName(name);
-                        clickLog.add(sleepLog);
+                        addWaitLog(remaining, name);
                     }
                 }
                 Platform.runLater(() -> {
@@ -1354,13 +1311,7 @@ public class AutoClickService {
                         nowPressMouseKeys.forEach(button -> {
                             robot.mousePress(NativeMouseToMouseButton.get(button));
                             if (taskBean.isDragLog()) {
-                                ClickLogBean clickLog = new ClickLogBean();
-                                clickLog.setClickKey(recordClickTypeMap.get(button))
-                                        .setX(String.valueOf((int) finalX))
-                                        .setY(String.valueOf((int) finalY))
-                                        .setType(log_press())
-                                        .setName(name);
-                                AutoClickService.clickLog.add(clickLog);
+                                addClickLog((int) finalX, (int) finalY, recordClickTypeMap.get(button), name, log_press());
                             }
                         });
                     }
@@ -1368,13 +1319,7 @@ public class AutoClickService {
                         finalReleaseButtons.forEach(button -> {
                             robot.mouseRelease(NativeMouseToMouseButton.get(button));
                             if (taskBean.isDragLog()) {
-                                ClickLogBean releaseLog = new ClickLogBean();
-                                releaseLog.setClickKey(recordClickTypeMap.get(button))
-                                        .setX(String.valueOf((int) finalX))
-                                        .setY(String.valueOf((int) finalY))
-                                        .setType(log_release())
-                                        .setName(name);
-                                clickLog.add(releaseLog);
+                                addClickLog((int) finalX, (int) finalY, recordClickTypeMap.get(button), name, log_release());
                             }
                         });
                     }
@@ -1383,13 +1328,7 @@ public class AutoClickService {
                             isRobotInput = true;
                             robot.keyPress(NativeKeyToKeyCode.get(button));
                             if (taskBean.isKeyboardLog()) {
-                                ClickLogBean pressLog = new ClickLogBean();
-                                pressLog.setX(String.valueOf((int) finalX))
-                                        .setY(String.valueOf((int) finalY))
-                                        .setClickKey(getKeyText(button))
-                                        .setType(log_press())
-                                        .setName(name);
-                                clickLog.add(pressLog);
+                                addClickLog((int) finalX, (int) finalY, getKeyText(button), name, log_press());
                             }
                         });
                     }
@@ -1398,13 +1337,7 @@ public class AutoClickService {
                             robot.keyRelease(NativeKeyToKeyCode.get(button));
                             isRobotInput = false;
                             if (taskBean.isKeyboardLog()) {
-                                ClickLogBean releaseLog = new ClickLogBean();
-                                releaseLog.setX(String.valueOf((int) finalX))
-                                        .setY(String.valueOf((int) finalY))
-                                        .setClickKey(getKeyText(button))
-                                        .setType(log_release())
-                                        .setName(name);
-                                clickLog.add(releaseLog);
+                                addClickLog((int) finalX, (int) finalY, getKeyText(button), name, log_release());
                             }
                         });
                     }
@@ -1413,39 +1346,18 @@ public class AutoClickService {
                     }
                     robot.mouseWheel(wheelRotation);
                     if (taskBean.isMouseWheelLog() && wheelRotation != 0) {
-                        ClickLogBean wheelLog = new ClickLogBean();
-                        wheelLog.setX(String.valueOf((int) finalX))
-                                .setY(String.valueOf((int) finalY))
-                                .setClickKey(mouseButton_none())
-                                .setName(name);
-                        if (wheelRotation > 0) {
-                            wheelLog.setType(clickType_wheelDown());
-                        } else {
-                            wheelLog.setType(clickType_wheelUp());
-                        }
-                        clickLog.add(wheelLog);
+                        String clickType = wheelRotation > 0 ? clickType_wheelDown() : clickType_wheelUp();
+                        addClickLog((int) finalX, (int) finalY, mouseButton_none(), name, clickType);
                     }
                     if (CollectionUtils.isEmpty(pressMouseKeys) && taskBean.isMoveLog()) {
-                        ClickLogBean moveLog = new ClickLogBean();
-                        moveLog.setX(String.valueOf((int) finalX))
-                                .setY(String.valueOf((int) finalY))
-                                .setClickKey(mouseButton_none())
-                                .setType(log_move())
-                                .setName(name);
-                        clickLog.add(moveLog);
+                        addClickLog((int) finalX, (int) finalY, mouseButton_none(), name, log_move());
                     } else if (CollectionUtils.isNotEmpty(pressMouseKeys) && taskBean.isDragLog()) {
                         List<String> clickKeys = new ArrayList<>();
                         pressMouseKeys.forEach(button -> {
                             String clickKey = recordClickTypeMap.get(button);
                             clickKeys.add(clickKey);
                         });
-                        ClickLogBean moveLog = new ClickLogBean();
-                        moveLog.setClickKey(String.join(",", clickKeys))
-                                .setX(String.valueOf((int) finalX))
-                                .setY(String.valueOf((int) finalY))
-                                .setType(clickType_drag())
-                                .setName(name);
-                        clickLog.add(moveLog);
+                        addClickLog((int) finalX, (int) finalY, String.join(",", clickKeys), name, clickType_drag());
                     }
                     moveFuture.complete(null);
                 });
@@ -1457,14 +1369,43 @@ public class AutoClickService {
             long waitTime = Long.parseLong(clickTime);
             Thread.sleep(waitTime);
             if (taskBean.isWaitLog()) {
-                ClickLogBean sleepLog = new ClickLogBean();
-                sleepLog.setClickTime(String.valueOf(waitTime))
-                        .setClickKey(mouseButton_none())
-                        .setType(log_wait())
-                        .setName(name);
-                clickLog.add(sleepLog);
+                addWaitLog(waitTime, name);
             }
         }
+    }
+
+    /**
+     * 添加等待 Log
+     *
+     * @param waitTime 等待时长
+     * @param name     步骤名称
+     */
+    private static void addWaitLog(long waitTime, String name) {
+        ClickLogBean sleepLog = new ClickLogBean();
+        sleepLog.setClickTime(String.valueOf(waitTime))
+                .setClickKey(mouseButton_none())
+                .setType(log_wait())
+                .setName(name);
+        clickLog.add(sleepLog);
+    }
+
+    /**
+     * 添加操作日志
+     *
+     * @param x        鼠标横坐标
+     * @param y        鼠标纵坐标
+     * @param clickKey 操作按键
+     * @param name     步骤名称
+     * @param type     操作类型
+     */
+    private static void addClickLog(int x, int y, String clickKey, String name, String type) {
+        ClickLogBean logBean = new ClickLogBean();
+        logBean.setX(String.valueOf(x))
+                .setY(String.valueOf(y))
+                .setClickKey(clickKey)
+                .setType(type)
+                .setName(name);
+        clickLog.add(logBean);
     }
 
     /**
