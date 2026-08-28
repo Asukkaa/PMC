@@ -17,7 +17,6 @@ import priv.koishi.pmc.bean.task.AutoClickTaskBean;
 import priv.koishi.pmc.bean.vo.ClickPositionVO;
 import priv.koishi.pmc.finals.enums.*;
 import priv.koishi.pmc.jnanative.windowmonitor.WindowInfo;
-import priv.koishi.pmc.jnanative.windowmonitor.WindowMonitor;
 import priv.koishi.pmc.queue.DynamicQueue;
 import priv.koishi.pmc.service.taskinterface.MessageUpdater;
 import priv.koishi.pmc.ui.floatingwindow.FloatingWindowDescriptor;
@@ -34,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static priv.koishi.pmc.finals.CommonFinals.*;
 import static priv.koishi.pmc.finals.i18nFinal.*;
+import static priv.koishi.pmc.jnanative.windowmonitor.WindowMonitor.calculateAbsolutePosition;
 import static priv.koishi.pmc.jnanative.windowmonitor.WindowMonitor.getMainWindowInfo;
 import static priv.koishi.pmc.jnanative.windowmonitor.WindowMove.moveWindow;
 import static priv.koishi.pmc.ocr.tesseract.TesseractOCREngine.initEnginePool;
@@ -513,7 +513,7 @@ public class AutoClickService {
                             if (StringUtils.isNotBlank(relativeX) && StringUtils.isNotBlank(relativeY)) {
                                 double rX = Double.parseDouble(relativeX);
                                 double rY = Double.parseDouble(relativeY);
-                                Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, rX, rY);
+                                Map<String, Integer> absolutePosition = calculateAbsolutePosition(windowInfo, rX, rY);
                                 startX = absolutePosition.get(AbsoluteX);
                                 startY = absolutePosition.get(AbsoluteY);
                                 clickPositionVO.setStartX(String.valueOf(startX));
@@ -1281,7 +1281,7 @@ public class AutoClickService {
                         if (StringUtils.isNotBlank(relativeX) && StringUtils.isNotBlank(relativeY)) {
                             double rX = Double.parseDouble(relativeX);
                             double rY = Double.parseDouble(relativeY);
-                            Map<String, Integer> absolutePosition = WindowMonitor.calculateAbsolutePosition(windowInfo, rX, rY);
+                            Map<String, Integer> absolutePosition = calculateAbsolutePosition(windowInfo, rX, rY);
                             x = absolutePosition.get(AbsoluteX);
                             y = absolutePosition.get(AbsoluteY);
                         }

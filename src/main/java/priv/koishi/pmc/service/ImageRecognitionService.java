@@ -215,10 +215,11 @@ public class ImageRecognitionService {
             long end = System.currentTimeMillis();
             ClickLogBean clickLogBean = new ClickLogBean();
             clickLogBean.setResult(result.getMatchThreshold() + percentage)
-                    .setType(log_findImage() + " - " + retry)
                     .setX(String.valueOf(result.getPoint().x()))
                     .setY(String.valueOf(result.getPoint().y()))
                     .setClickTime(String.valueOf(end - start))
+                    .setType(log_findImage() + " - " + retry)
+                    .setClickKey(mouseButton_none())
                     .setName(name);
             dynamicQueue.add(clickLogBean);
         }
