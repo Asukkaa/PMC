@@ -28,8 +28,8 @@ exports.main = async (event) => {
         };
     }
     // win 版本设置
-    const winVersion = "4.4.4";
-    const winBuildDate = "2026.08.28";
+    const winVersion = "4.4.5";
+    const winBuildDate = "2026.08.31";
     // mac 版本设置
     const macVersion = "4.4.0";
     const macBuildDate = "2026.05.12";
