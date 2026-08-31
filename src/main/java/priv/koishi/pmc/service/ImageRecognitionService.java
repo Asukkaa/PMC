@@ -301,11 +301,11 @@ public class ImageRecognitionService {
         BufferedImage screenImg;
         try {
             screenImg = new Robot().createScreenCapture(new Rectangle(
-                    Math.max(0, Math.min(x, screenWidth)),
-                    Math.max(0, Math.min(y, screenHeight)),
-                    Math.max(1, Math.min(w, screenWidth - x)),
-                    Math.max(1, Math.min(h, screenHeight - y))));
-        } catch (AWTException e) {
+                    Math.clamp(x, 0, screenWidth),
+                    Math.clamp(y, 0, screenHeight),
+                    Math.clamp(w, 1, screenWidth - x),
+                    Math.clamp(h, 1, screenHeight - y)));
+        } catch (Exception e) {
             throw new RuntimeException(text_screenErr() + e.getMessage(), e);
         }
         return new ScreenCaptureResult(screenImg, x, y);

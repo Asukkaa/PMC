@@ -999,8 +999,8 @@ public class AutoClickService {
             if (clickPositionVO.isRandomClick()) {
                 int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                 int randomY = Integer.parseInt(clickPositionVO.getRandomY());
-                startX = Math.min(Math.max(0, startX + (random.nextDouble() * 2 - 1) * randomX), screenWidth);
-                startY = Math.min(Math.max(0, startY + (random.nextDouble() * 2 - 1) * randomY), screenHeight);
+                startX = Math.clamp(startX + (random.nextDouble() * 2 - 1) * randomX, 0, screenWidth);
+                startY = Math.clamp(startY + (random.nextDouble() * 2 - 1) * randomY, 0, screenHeight);
             }
             double finalStartX = startX;
             double finalStartY = startY;
@@ -1290,8 +1290,8 @@ public class AutoClickService {
                 if (clickPositionVO.isRandomTrajectory()) {
                     int randomX = Integer.parseInt(clickPositionVO.getRandomX());
                     int randomY = Integer.parseInt(clickPositionVO.getRandomY());
-                    x = Math.min(Math.max(0, x + (random.nextDouble() * 2 - 1) * randomX), screenWidth);
-                    y = Math.min(Math.max(0, y + (random.nextDouble() * 2 - 1) * randomY), screenHeight);
+                    x = Math.clamp(x + (random.nextDouble() * 2 - 1) * randomX, 0, screenWidth);
+                    y = Math.clamp(y + (random.nextDouble() * 2 - 1) * randomY, 0, screenHeight);
                 }
                 CompletableFuture<Void> moveFuture = new CompletableFuture<>();
                 allFutures.add(moveFuture);

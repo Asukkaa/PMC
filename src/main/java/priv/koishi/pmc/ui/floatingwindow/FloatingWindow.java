@@ -273,8 +273,8 @@ public class FloatingWindow {
         if (maxY > 0) {
             maxYAllowed = Math.min(maxYAllowed, maxY - h);
         }
-        newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
-        newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
+        newX = Math.clamp(newX, minXAllowed, maxXAllowed);
+        newY = Math.clamp(newY, minYAllowed, maxYAllowed);
         int x = (int) newX;
         int y = (int) newY;
         // 应用限制后的坐标
@@ -438,7 +438,7 @@ public class FloatingWindow {
                     maxAllowedWidth = Math.min(maxAllowedWidth, maxX - newX);
                 }
                 // 宽度边界约束
-                newWidth = Math.max(config.getMinWidth(), Math.min(newWidth, maxAllowedWidth));
+                newWidth = Math.clamp(newWidth, config.getMinWidth(), maxAllowedWidth);
             }
             if (resizeHeight) {
                 double heightDelta = event.getScreenY() - initialY[0];
@@ -464,7 +464,7 @@ public class FloatingWindow {
                     maxAllowedHeight = Math.min(maxAllowedHeight, maxY - newY);
                 }
                 // 高度边界约束
-                newHeight = Math.max(config.getMinHeight(), Math.min(newHeight, maxAllowedHeight));
+                newHeight = Math.clamp(newHeight, config.getMinHeight(), maxAllowedHeight);
             }
             // 位置边界约束（同时考虑屏幕边界和自定义矩形边界）
             double minXAllowed = Math.max(screenBounds.getMinX() + margin, customMinX);
@@ -480,8 +480,8 @@ public class FloatingWindow {
             if (maxY > 0) {
                 maxYAllowed = Math.min(maxYAllowed, maxY - newHeight);
             }
-            newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
-            newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
+            newX = Math.clamp(newX, minXAllowed, maxXAllowed);
+            newY = Math.clamp(newY, minYAllowed, maxYAllowed);
             int x = (int) newX;
             int y = (int) newY;
             int w = (int) newWidth;
@@ -587,8 +587,8 @@ public class FloatingWindow {
                 maxAllowedHeight = Math.min(maxAllowedHeight, customMaxY - newY);
             }
             // 大小边界约束
-            newWidth = Math.max(config.getMinWidth(), Math.min(newWidth, maxAllowedWidth));
-            newHeight = Math.max(config.getMinHeight(), Math.min(newHeight, maxAllowedHeight));
+            newWidth = Math.clamp(newWidth, config.getMinWidth(), maxAllowedWidth);
+            newHeight = Math.clamp(newHeight, config.getMinHeight(), maxAllowedHeight);
             // 位置边界约束（同时考虑屏幕边界和自定义矩形边界）
             double minXAllowed = Math.max(screenBounds.getMinX() + margin, customMinX);
             double minYAllowed = Math.max(screenBounds.getMinY() + margin, customMinY);
@@ -596,8 +596,8 @@ public class FloatingWindow {
                     minX > 0 ? customMaxX - newWidth : screenBounds.getMaxX() - newWidth - margin);
             double maxYAllowed = Math.min(screenBounds.getMaxY() - newHeight - margin,
                     minY > 0 ? customMaxY - newHeight : screenBounds.getMaxY() - newHeight - margin);
-            newX = Math.max(minXAllowed, Math.min(newX, maxXAllowed));
-            newY = Math.max(minYAllowed, Math.min(newY, maxYAllowed));
+            newX = Math.clamp(newX, minXAllowed, maxXAllowed);
+            newY = Math.clamp(newY, minYAllowed, maxYAllowed);
             int x = (int) newX;
             int y = (int) newY;
             int w = (int) newWidth;

@@ -721,10 +721,10 @@ public class SettingController extends RootController implements MousePositionUp
         int messageWidth = Integer.parseInt(getPropertyWithDefault(prop, key_messageWidth, clickProperties));
         int messageHeight = Integer.parseInt(getPropertyWithDefault(prop, key_messageHeight, clickProperties));
         FloatingWindowConfig messageConfig = new FloatingWindowConfig();
-        messageConfig.setHeight(Math.max(1, Math.min(messageHeight, screenHeight)))
-                .setWidth(Math.max(1, Math.min(messageWidth, screenHeight)))
-                .setX(Math.max(0, Math.min(messageX, screenWidth)))
-                .setY(Math.max(0, Math.min(messageY, screenHeight)));
+        messageConfig.setHeight(Math.clamp(messageHeight, 1, screenHeight))
+                .setWidth(Math.clamp(messageWidth, 1, screenHeight))
+                .setX(Math.clamp(messageX, 0, screenWidth))
+                .setY(Math.clamp(messageY, 0, screenHeight));
         messageFloating.setConfig(messageConfig);
         int clickHeight = Integer.parseInt(getPropertyWithDefault(prop, key_clickHeight, clickProperties));
         int clickWidth = Integer.parseInt(getPropertyWithDefault(prop, key_clickWidth, clickProperties));
@@ -733,10 +733,10 @@ public class SettingController extends RootController implements MousePositionUp
         FloatingWindowConfig clickConfig = new FloatingWindowConfig();
         clickConfig.setFindImgTypeEnum(Integer.parseInt(getPropertyWithDefault(prop, key_clickFindImgType, clickProperties)))
                 .setAllRegion(enable.equals(getPropertyWithDefault(prop, key_clickAllRegion, clickProperties)))
-                .setHeight(Math.max(1, Math.min(clickHeight, screenHeight)))
-                .setWidth(Math.max(1, Math.min(clickWidth, screenHeight)))
-                .setX(Math.max(0, Math.min(clickX, screenWidth)))
-                .setY(Math.max(0, Math.min(clickY, screenHeight)));
+                .setHeight(Math.clamp(clickHeight, 1, screenHeight))
+                .setWidth(Math.clamp(clickWidth, 1, screenHeight))
+                .setX(Math.clamp(clickX, 0, screenWidth))
+                .setY(Math.clamp(clickY, 0, screenHeight));
         clickFloating.setConfig(clickConfig);
         int stopHeight = Integer.parseInt(getPropertyWithDefault(prop, key_stopHeight, clickProperties));
         int stopWidth = Integer.parseInt(getPropertyWithDefault(prop, key_stopWidth, clickProperties));
@@ -745,10 +745,10 @@ public class SettingController extends RootController implements MousePositionUp
         FloatingWindowConfig stopConfig = new FloatingWindowConfig();
         stopConfig.setFindImgTypeEnum(Integer.parseInt(getPropertyWithDefault(prop, key_stopFindImgType, clickProperties)))
                 .setAllRegion(enable.equals(getPropertyWithDefault(prop, key_stopAllRegion, clickProperties)))
-                .setHeight(Math.max(1, Math.min(stopHeight, screenHeight)))
-                .setWidth(Math.max(1, Math.min(stopWidth, screenHeight)))
-                .setX(Math.max(0, Math.min(stopX, screenWidth)))
-                .setY(Math.max(0, Math.min(stopY, screenHeight)));
+                .setHeight(Math.clamp(stopHeight, 1, screenHeight))
+                .setWidth(Math.clamp(stopWidth, 1, screenHeight))
+                .setX(Math.clamp(stopX, 0, screenWidth))
+                .setY(Math.clamp(stopY, 0, screenHeight));
         stopFloating.setConfig(stopConfig);
     }
 

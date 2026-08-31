@@ -310,29 +310,29 @@ public class AboutController extends RootController {
      */
     private void autoCheck() throws IOException {
         Properties prop = new Properties();
-        String autocheck;
+        String autoCheck;
         String lastCheck;
         try (InputStream input = new FileInputStream(getRunningResourcePath(configFile))) {
             prop.load(input);
         }
-        autocheck = prop.getProperty(key_autoCheck);
+        autoCheck = prop.getProperty(key_autoCheck);
         lastCheck = prop.getProperty(key_lastCheck);
         LocalDate lastCheckDate = LocalDate.now();
         if (StringUtils.isNotBlank(lastCheck)) {
             lastCheckDate = LocalDate.parse(lastCheck);
         }
         LocalDate today = LocalDate.now();
-        if (RepeatTypeEnum.LAUNCH.getRepeatType().equals(autocheck)) {
+        if (RepeatTypeEnum.LAUNCH.getRepeatType().equals(autoCheck)) {
             checkUpdate();
-        } else if (RepeatTypeEnum.DAILY.getRepeatType().equals(autocheck)) {
+        } else if (RepeatTypeEnum.DAILY.getRepeatType().equals(autoCheck)) {
             if (!today.equals(lastCheckDate)) {
                 checkUpdate();
             }
-        } else if (RepeatTypeEnum.WEEKLY.getRepeatType().equals(autocheck)) {
+        } else if (RepeatTypeEnum.WEEKLY.getRepeatType().equals(autoCheck)) {
             if (ChronoUnit.DAYS.between(lastCheckDate, today) >= 7) {
                 checkUpdate();
             }
-        } else if (RepeatTypeEnum.MONTHLY.getRepeatType().equals(autocheck)) {
+        } else if (RepeatTypeEnum.MONTHLY.getRepeatType().equals(autoCheck)) {
             if (today.getMonthValue() != lastCheckDate.getMonthValue()
                     || today.getYear() != lastCheckDate.getYear()) {
                 checkUpdate();

@@ -419,7 +419,7 @@ public class ScheduledService {
      */
     private static void createWinLaunchdTask(TimedTaskBean timedTaskBean) throws IOException {
         String workingDir = Paths.get(appLaunchPath).getParent().toString();
-        String PMCFilePath = timedTaskBean.getPath().replaceAll(" ", "*");
+        String PMCFilePath = timedTaskBean.getPath().replace(" ", "*");
         LocalDateTime triggerTime = timedTaskBean.getDateTime();
         String repeatType = timedTaskBean.getRepeat();
         List<Integer> days = timedTaskBean.getDayList();
