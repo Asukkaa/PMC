@@ -7,7 +7,7 @@ package priv.koishi.pmc.controller;
  * Date:2025-10-23
  * Time:03:02
  */
-public abstract class ManuallyChangeThemeController extends RootController {
+public abstract class ChangeThemeController extends RootController {
 
     /**
      * 手动处理主题切换

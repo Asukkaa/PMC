@@ -39,9 +39,9 @@ import java.util.*;
 
 import static priv.koishi.pmc.MainApplication.bundle;
 import static priv.koishi.pmc.MainApplication.isDarkTheme;
+import static priv.koishi.pmc.exc.ShowException.showExceptionAlert;
 import static priv.koishi.pmc.finals.CommonFinals.*;
 import static priv.koishi.pmc.finals.i18nFinal.*;
-import static priv.koishi.pmc.exc.ShowException.showExceptionAlert;
 import static priv.koishi.pmc.service.ImageRecognitionService.screenHeight;
 import static priv.koishi.pmc.service.ImageRecognitionService.screenWidth;
 import static priv.koishi.pmc.service.ReadDataService.readAllFilesTask;
@@ -61,7 +61,7 @@ import static priv.koishi.pmc.utils.UiUtils.*;
  * Date:2025-08-04
  * Time:22:12
  */
-public class FileChooserController extends ManuallyChangeThemeController {
+public class FileChooserController extends ChangeThemeController {
 
     /**
      * 页面标识符
@@ -153,6 +153,7 @@ public class FileChooserController extends ManuallyChangeThemeController {
         if (StringUtils.isBlank(path)) {
             path = defaultFileChooserPath;
         }
+        setRowDoubleClick();
         this.fileChooserConfig = fileChooserConfig;
         String showDirectory = fileChooserConfig.getShowDirectory();
         if (StringUtils.isNotBlank(showDirectory)) {
@@ -564,8 +565,8 @@ public class FileChooserController extends ManuallyChangeThemeController {
      */
     public void manuallyChangeTheme() {
         manuallyChangeThemePane(scrollPane_FC, getClass());
-        setRowDoubleClick();
         setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
+        tableView_FC.refresh();
     }
 
     /**
