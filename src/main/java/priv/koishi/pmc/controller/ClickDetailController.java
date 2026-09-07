@@ -1181,11 +1181,7 @@ public class ClickDetailController extends RootController {
             envInfoTask = null;
         }
         if (fileWatchService != null) {
-            try {
-                fileWatchService.stop();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            fileWatchService.stopAsync();
             fileWatchService = null;
         }
         if (colorPickerFloating != null) {
@@ -1728,11 +1724,7 @@ public class ClickDetailController extends RootController {
         fileWatchService.setRecursive(true);
         fileWatchService.setOnFileChanged(this::selectTessdataPath);
         fileWatchService.setRootPath(Path.of(tessdataDirectory));
-        try {
-            fileWatchService.restart();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fileWatchService.restartAsync();
     }
 
     /**

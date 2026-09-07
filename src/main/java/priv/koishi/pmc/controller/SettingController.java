@@ -1807,11 +1807,7 @@ public class SettingController extends RootController implements MousePositionUp
             }
         });
         fileWatchService.setRootPath(Path.of(tessdataDirectory));
-        try {
-            fileWatchService.restart();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fileWatchService.restartAsync();
     }
 
     /**

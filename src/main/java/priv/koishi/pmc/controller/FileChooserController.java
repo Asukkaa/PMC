@@ -590,11 +590,7 @@ public class FileChooserController extends ChangeThemeController {
         fileWatchService.setOnFileChanged(this::refreshTable);
         filePath_FC.textProperty().addListener((_, _, newValue) -> {
             fileWatchService.setRootPath(Path.of(newValue));
-            try {
-                fileWatchService.restart();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            fileWatchService.restartAsync();
         });
     }
 

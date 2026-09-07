@@ -188,6 +188,39 @@ public class FileWatchService {
     }
 
     /**
+     * 异步重启监听服务（非阻塞）
+     * <p>
+     * 在虚拟线程中执行 {@link #restart()}，不会阻塞调用线程
+     * 重启过程会先停止当前服务再重新启动
+     */
+    public void restartAsync() {
+        Thread.ofVirtual()
+                .name("FileWatchService-RestartAsync")
+                .start(() -> {
+                    try {
+                        restart();
+                    } catch (Throwable t) {
+                        logger.error("异步启动监听失败，根目录: {}", rootPath, t);
+                    }
+                });
+    }
+
+    /**
+     * 异步停止监听服务
+     */
+    public void stopAsync() {
+        Thread.ofVirtual()
+                .name("FileWatchService-StopAsync")
+                .start(() -> {
+                    try {
+                        stop();
+                    } catch (Throwable t) {
+                        logger.error("异步停止监听失败", t);
+                    }
+                });
+    }
+
+    /**
      * 后台监听主循环。
      * 不断阻塞等待文件事件，收到有效事件后通过 {@link Platform#runLater} 调用刷新方法。
      */
@@ -265,14 +298,22 @@ public class FileWatchService {
      * @throws IOException 如果遍历或注册过程中发生 I/O 错误
      */
     private void registerAll(Path start) throws IOException {
-        Files.walkFileTree(start, new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-                    throws IOException {
-                register(dir);
-                return FileVisitResult.CONTINUE;
+        try (var stream = Files.walk(start)) {
+            long count = stream.filter(Files::isDirectory).limit(10000).count();
+            if (recursive && count > 5000) {
+                logger.warn("目录数量超限，强制降级为非递归模式，避免卡顿");
+                recursive = false;
+            } else {
+                Files.walkFileTree(start, new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                            throws IOException {
+                        register(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
             }
-        });
+        }
     }
 
     /**
