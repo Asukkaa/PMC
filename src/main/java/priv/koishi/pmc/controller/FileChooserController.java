@@ -408,12 +408,8 @@ public class FileChooserController extends ChangeThemeController {
         }
         removeController();
         if (fileWatchService != null) {
-            try {
-                fileWatchService.stop();
-                fileWatchService = null;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            fileWatchService.stopAsync();
+            fileWatchService = null;
         }
         disableNodes.clear();
         stage = null;
