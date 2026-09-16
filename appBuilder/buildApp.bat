@@ -52,9 +52,6 @@ if exist "%appName%" (
 jpackage --type app-image -m "%appMainClass%" --runtime-image "%runtimeImage%" ^
 --app-version "%appVersion%" --icon "%appIcon%" --name "%appName%" ^
 --java-options "-XX:+UseZGC" ^
---java-options "-Djavafx.enablePreview=true" ^
---java-options "-Djavafx.suppressPreviewWarning=true" ^
---java-options "--enable-final-field-mutation=com.sun.jna" ^
 --java-options "--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv,org.bytedeco.leptonica,org.bytedeco.tesseract,com.github.oshi.ffm"
 echo 已完成 jpackage 打包
 

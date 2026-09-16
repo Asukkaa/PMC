@@ -69,9 +69,6 @@ fi
 (cd "$target" && jpackage --name "$appName" --type app-image -m "$appMainClass" \
 --icon "$appIcon" --app-version "$appVersion" --runtime-image "$runtimeImage" \
 --java-options "-XX:+UseG1GC" \
---java-options "-Djavafx.enablePreview=true" \
---java-options "-Djavafx.suppressPreviewWarning=true" \
---java-options "--enable-final-field-mutation=com.sun.jna" \
 --java-options "--enable-native-access=javafx.graphics,com.github.kwhat.jnativehook,com.sun.jna,org.bytedeco.javacpp,org.bytedeco.opencv,org.bytedeco.leptonica,org.bytedeco.tesseract,com.github.oshi.ffm")
 echo "已完成 jpackage 打包"
 
