@@ -3,9 +3,8 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
-            优化代码逻辑 (2026.08.31)
-            修复了一些可能的 BUG (2026.09.07)
-            更新依赖版本 (2026.09.07)`,
+            升级 Java 与 JavaFX 版本由 26.0.2 至 27 (2026.09.16)
+            修复应用重启时可能会出现孤儿进程导致内存泄漏的问题 (2026.09.16)`,
             mac: `
             新增颜色识别功能，可使用拾色器进行拾色后设置目标颜色 (2026.05.12)
             新增文字识别功能，可以使用自定义 traineddata 模型进行文字识别 (2026.05.12)
@@ -20,9 +19,8 @@ module.exports = {
         versionPrefix: "版本",
         whatsNew: {
             win: `
-            優化代碼邏輯 (2026.08.31)
-            修復了一些可能的 BUG (2026.09.07)
-            更新依賴版本 (2026.09.07)`,
+            升級 Java 與 JavaFX 版本，由 26.0.2 至 27 (2026.09.16)
+            修復應用程式重新啟動時可能出現孤兒行程，導致記憶體洩漏的問題 (2026.09.16)`,
             mac: `
             新增顏色識別功能，可使用拾色器進行拾色後設定目標顏色 (2026.05.12)
             新增文字識別功能，可以使用自定義traineddata模型進行文字識別 (2026.05.12)
@@ -37,9 +35,8 @@ module.exports = {
         versionPrefix: "Version",
         whatsNew: {
             win: `
-            Optimize code logic (2026.08.31)
-            Fixed some potential bugs (2026.09.07)
-            Update the dependency version (2026.09.07)`,
+            Upgrade Java and JavaFX versions from 26.0.2 to 27 (2026.09.16)
+            Fix an issue where orphan processes may appear when the application restarts, causing memory leaks (2026.09.16)`,
             mac: `
             Added color recognition function, allowing users to use a color picker to pick up colors and set the target color (2026.05.12)
             Added text recognition function, allowing for the use of custom traineddata models for text recognition (2026.05.12)
