@@ -32,6 +32,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.exec.*;
 import org.apache.commons.lang3.StringUtils;
@@ -2523,7 +2524,7 @@ public class SettingController extends RootController implements MousePositionUp
                 }
             }
         }
-        Platform.exit();
+        mainStage.fireEvent(new WindowEvent(mainStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     /**
