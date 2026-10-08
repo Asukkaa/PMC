@@ -4,7 +4,9 @@ module.exports = {
         whatsNew: {
             win: `
             升级 Java 与 JavaFX 版本由 26.0.2 至 27 (2026.09.16)
-            修复应用重启时可能会出现孤儿进程导致内存泄漏的问题 (2026.09.16)`,
+            修复应用重启时可能会出现孤儿进程导致内存泄漏的问题 (2026.09.16)
+            修复应用主题切换异常的问题 (2026.10.08)
+            更新依赖版本 (2026.10.08)`,
             mac: `
             新增颜色识别功能，可使用拾色器进行拾色后设置目标颜色 (2026.05.12)
             新增文字识别功能，可以使用自定义 traineddata 模型进行文字识别 (2026.05.12)
@@ -20,7 +22,9 @@ module.exports = {
         whatsNew: {
             win: `
             升級 Java 與 JavaFX 版本，由 26.0.2 至 27 (2026.09.16)
-            修復應用程式重新啟動時可能出現孤兒行程，導致記憶體洩漏的問題 (2026.09.16)`,
+            修復應用程式重新啟動時可能出現孤兒行程，導致記憶體洩漏的問題 (2026.09.16)
+            修復應用主題切換異常的問題 (2026.10.08)
+            更新依賴版本 (2026.10.08)`,
             mac: `
             新增顏色識別功能，可使用拾色器進行拾色後設定目標顏色 (2026.05.12)
             新增文字識別功能，可以使用自定義traineddata模型進行文字識別 (2026.05.12)
@@ -36,7 +40,9 @@ module.exports = {
         whatsNew: {
             win: `
             Upgrade Java and JavaFX versions from 26.0.2 to 27 (2026.09.16)
-            Fix an issue where orphan processes may appear when the application restarts, causing memory leaks (2026.09.16)`,
+            Fix an issue where orphan processes may appear when the application restarts, causing memory leaks (2026.09.16)
+            Fixed an issue with abnormal application theme switching (2026.10.08)
+            Updated dependency versions (2026.10.08)`,
             mac: `
             Added color recognition function, allowing users to use a color picker to pick up colors and set the target color (2026.05.12)
             Added text recognition function, allowing for the use of custom traineddata models for text recognition (2026.05.12)
