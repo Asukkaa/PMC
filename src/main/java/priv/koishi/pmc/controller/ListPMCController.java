@@ -292,7 +292,7 @@ public class ListPMCController extends RootController {
     private void buildDetailMenuItem(ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_detailMenu());
         detailItem.setOnAction(_ -> {
-            updateLabel(log_List, "");
+            updateLabelText(log_List, "");
             PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 String path = selected.getPath();
@@ -355,7 +355,7 @@ public class ListPMCController extends RootController {
     private void buildAddAllMenuItem(ContextMenu contextMenu) {
         MenuItem addAllItem = new MenuItem(menu_addAllMenu());
         addAllItem.setOnAction(_ -> {
-            updateLabel(log_List, "");
+            updateLabelText(log_List, "");
             List<PMCListBean> selected = tableView_List.getSelectionModel().getSelectedItems();
             if (CollectionUtils.isNotEmpty(selected)) {
                 selected.forEach(pmcListBean -> {
@@ -378,7 +378,7 @@ public class ListPMCController extends RootController {
     private void buildSetPathMenuItem(ContextMenu contextMenu) {
         MenuItem detailItem = new MenuItem(menu_setPathMenu());
         detailItem.setOnAction(_ -> {
-            updateLabel(log_List, "");
+            updateLabelText(log_List, "");
             PMCListBean selected = tableView_List.getSelectionModel().getSelectedItems().getFirst();
             if (selected != null) {
                 Window window = tableView_List.getScene().getWindow();
@@ -478,7 +478,7 @@ public class ListPMCController extends RootController {
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_List, dataNumber_List, unit_files());
         if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-            updateLabel(log_List, text_loadSuccess() + filePath);
+            updateLabelText(log_List, text_loadSuccess() + filePath);
             Platform.runLater(() -> log_List.setTextFill(Color.GREEN));
         }
     }
@@ -631,7 +631,7 @@ public class ListPMCController extends RootController {
             autoBuildTableViewData(tableView_List, PMCListBean.class, tabId);
             // 监听列表数据变化
             tableView_List.getItems().addListener((ListChangeListener<PMCListBean>) _ ->
-                    updateLabel(log_List, ""));
+                    updateLabelText(log_List, ""));
             // 表格设置为可编辑
             makeCellCanEdit();
             // 设置列表通过拖拽排序行

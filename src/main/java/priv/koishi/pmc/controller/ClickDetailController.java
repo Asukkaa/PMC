@@ -117,7 +117,7 @@ import static priv.koishi.pmc.utils.UiUtils.*;
  * Date 2022/3/11
  * Time 15:09
  */
-public class ClickDetailController extends RootController {
+public class ClickDetailController extends ChangeThemeController {
 
     /**
      * 页面数据对象
@@ -1793,12 +1793,22 @@ public class ClickDetailController extends RootController {
     }
 
     /**
+     * 手动处理主题切换
+     */
+    @Override
+    void manuallyChangeTheme() {
+        manuallyChangeThemePane(borderPane_Det, getClass());
+    }
+
+    /**
      * 页面初始化
      *
      * @throws IOException 配置文件读取异常
      */
     @FXML
     private void initialize() throws IOException {
+        // 手动处理深色主题
+        manuallyChangeTheme();
         // 初始化下拉框
         setChoiceBoxItems();
         // 读取配置文件

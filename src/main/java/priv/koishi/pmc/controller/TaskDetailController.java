@@ -52,7 +52,7 @@ import static priv.koishi.pmc.utils.UiUtils.*;
  * Date:2025-05-20
  * Time:14:53
  */
-public class TaskDetailController extends RootController {
+public class TaskDetailController extends ChangeThemeController {
 
     /**
      * 页面数据对象
@@ -329,10 +329,20 @@ public class TaskDetailController extends RootController {
     }
 
     /**
+     * 手动处理主题切换
+     */
+    @Override
+    void manuallyChangeTheme() {
+        manuallyChangeThemePane(scrollPane_TD, getClass());
+    }
+
+    /**
      * 界面初始化
      */
     @FXML
     private void initialize() {
+        // 手动处理深色主题
+        manuallyChangeTheme();
         // 初始化下拉框
         setChoiceBoxItems();
         // 设置要防重复点击的组件

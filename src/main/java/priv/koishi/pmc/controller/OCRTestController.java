@@ -16,6 +16,7 @@ import static priv.koishi.pmc.finals.i18nFinal.*;
 import static priv.koishi.pmc.utils.TableViewUtils.*;
 import static priv.koishi.pmc.utils.ToolTipUtils.addToolTip;
 import static priv.koishi.pmc.utils.UiUtils.copyText;
+import static priv.koishi.pmc.utils.UiUtils.manuallyChangeThemePane;
 
 /**
  * OCR 测试结果页面控制器
@@ -24,7 +25,7 @@ import static priv.koishi.pmc.utils.UiUtils.copyText;
  * Date 2026-04-03
  * time 15:59
  */
-public class OCRTestController extends RootController {
+public class OCRTestController extends ChangeThemeController {
 
     /**
      * 页面标识符
@@ -141,10 +142,20 @@ public class OCRTestController extends RootController {
     }
 
     /**
+     * 手动处理主题切换
+     */
+    @Override
+    void manuallyChangeTheme() {
+        manuallyChangeThemePane(scrollPane_Tes, getClass());
+    }
+
+    /**
      * 页面初始化
      */
     @FXML
     private void initialize() {
+        // 手动处理深色主题
+        manuallyChangeTheme();
         Platform.runLater(() -> {
             // 设置页面关闭事件处理逻辑
             ocrTestStage.setOnCloseRequest(_ -> {

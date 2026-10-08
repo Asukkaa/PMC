@@ -557,15 +557,6 @@ public class FileChooserController extends ChangeThemeController {
     }
 
     /**
-     * 手动处理深色主题
-     */
-    public void manuallyChangeTheme() {
-        manuallyChangeThemePane(scrollPane_FC, getClass());
-        setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
-        tableView_FC.refresh();
-    }
-
-    /**
      * 设置列排序
      */
     private void columnComparator() {
@@ -588,6 +579,16 @@ public class FileChooserController extends ChangeThemeController {
             fileWatchService.setRootPath(Path.of(newValue));
             fileWatchService.restartAsync();
         });
+    }
+
+    /**
+     * 手动处理深色主题
+     */
+    @Override
+    public void manuallyChangeTheme() {
+        manuallyChangeThemePane(scrollPane_FC, getClass());
+        setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
+        tableView_FC.refresh();
     }
 
     /**

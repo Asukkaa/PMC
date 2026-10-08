@@ -597,7 +597,7 @@ public class TableViewUtils {
      */
     public static <T> void removeTableViewData(TableView<T> tableView, Label fileNumber) {
         tableView.getItems().clear();
-        updateLabel(fileNumber, listText_dataListNull());
+        updateLabelText(fileNumber, listText_dataListNull());
     }
 
     /**

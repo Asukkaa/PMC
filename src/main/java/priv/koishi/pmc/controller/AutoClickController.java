@@ -468,7 +468,7 @@ public class AutoClickController extends RootController implements MousePosition
                         .setName("autoSave-exportPMCTask")
                         .setOnFailed(_ -> exportPMCTask = null)
                         .setOnSucceeded(_ -> {
-                            log_Click.setTextFill(Color.GREEN);
+                            updateLabelTextFill(log_Click, Color.GREEN);
                             exportPMCTask = null;
                         });
                 bindingTaskNode(taskBean);
@@ -827,7 +827,7 @@ public class AutoClickController extends RootController implements MousePosition
                 clickLogs.clear();
             }
             Label logLabel = isBatch ? listPMCController.log_List : log_Click;
-            updateLabel(logLabel, "");
+            updateLabelText(logLabel, "");
             // 校验任务参数
             AutoClickTaskBean validationTaskBean = buildAutoClickTaskBean(clickPositionVOS, loopTimes, isBatch);
             validationTaskBean.setBindingMessageLabel(true);
@@ -937,7 +937,7 @@ public class AutoClickController extends RootController implements MousePosition
                 if (clickLogs == null) {
                     showErrLabelText(logLabel, text_taskFailed());
                 } else {
-                    logLabel.setTextFill(Color.GREEN);
+                    updateLabelTextFill(logLabel, Color.GREEN);
                     logLabel.setText(text_taskFinished());
                     CheckBox showWindowRun = settingController.showWindowRun_Set;
                     if (showWindowRun.isSelected()) {
@@ -1434,7 +1434,7 @@ public class AutoClickController extends RootController implements MousePosition
         // 向列表添加数据
         addData(clickPositionVOS, append, tableView_Click, dataNumber_Click, unit_process());
         if (CollectionUtils.isNotEmpty(clickPositionVOS)) {
-            updateLabel(log_Click, text_loadSuccess() + filePath);
+            updateLabelText(log_Click, text_loadSuccess() + filePath);
             Platform.runLater(() -> log_Click.setTextFill(Color.GREEN));
         }
     }
@@ -2031,7 +2031,7 @@ public class AutoClickController extends RootController implements MousePosition
             // 向列表添加数据
             addData(clickPositionVOS, addType, tableView_Click, dataNumber_Click, unit_process());
             // 初始化信息栏
-            updateLabel(log_Click, "");
+            updateLabelText(log_Click, "");
             // 显示详情
             showDetail(clickPositionVO);
         }
@@ -2221,7 +2221,7 @@ public class AutoClickController extends RootController implements MousePosition
             autoBuildTableViewData(tableView_Click, ClickPositionVO.class, tabId);
             // 监听列表数据变化
             tableView_Click.getItems().addListener((ListChangeListener<ClickPositionVO>) _ ->
-                    updateLabel(log_Click, ""));
+                    updateLabelText(log_Click, ""));
             // 表格设置为可编辑
             makeCellCanEdit();
             // 设置列表通过拖拽排序行
@@ -2329,7 +2329,7 @@ public class AutoClickController extends RootController implements MousePosition
                     .setOnFailed(_ -> exportPMCTask = null)
                     .setOnSucceeded(_ -> {
                         String path = exportPMCTask.getValue();
-                        log_Click.setTextFill(Color.GREEN);
+                        updateLabelTextFill(log_Click, Color.GREEN);
                         if (openDirectory_Click.isSelected()) {
                             openDirectory(path);
                         }

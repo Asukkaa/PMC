@@ -1331,6 +1331,7 @@ public class SettingController extends RootController implements MousePositionUp
                     setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
                     isDarkTheme = false;
                 }
+                applyAllHeaderBarScheme();
                 // 处理无法自动切换主题的页面
                 manuallyChangeThemeList.forEach(controllerClass -> {
                     @SuppressWarnings("unchecked")
@@ -2719,8 +2720,8 @@ public class SettingController extends RootController implements MousePositionUp
     private void themeAction() {
         String value = theme_Set.getValue();
         addValueToolTip(theme_Set, tip_theme(), value);
-        int them = themeMap.getKey(value);
-        changeTheme(them);
+        int theme = themeMap.getKey(value);
+        changeTheme(theme);
         if (mainController != null) {
             Platform.runLater(mainController::mainAdaption);
         }

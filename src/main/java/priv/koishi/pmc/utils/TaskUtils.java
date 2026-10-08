@@ -14,7 +14,7 @@ import priv.koishi.pmc.bean.task.TaskBean;
 import static priv.koishi.pmc.finals.i18nFinal.*;
 import static priv.koishi.pmc.utils.NodeDisableUtils.*;
 import static priv.koishi.pmc.utils.UiUtils.showErrLabelText;
-import static priv.koishi.pmc.utils.UiUtils.updateLabel;
+import static priv.koishi.pmc.utils.UiUtils.updateLabelText;
 
 /**
  * 多线程任务工具的方法
@@ -75,7 +75,7 @@ public class TaskUtils {
         if (messageLabel != null && taskBean.isBindingMessageLabel()) {
             // 绑定 TextField 的值属性
             messageLabel.textProperty().unbind();
-            updateLabel(messageLabel, "");
+            updateLabelText(messageLabel, "");
             // 必须在 Platform.runLater 下绑定，不然可能无法更新文本
             Platform.runLater(() -> messageLabel.textProperty().bind(task.messageProperty()));
         }

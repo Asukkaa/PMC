@@ -1,8 +1,12 @@
 package priv.koishi.pmc.utils;
 
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -37,6 +41,7 @@ import priv.koishi.pmc.MainApplication;
 import priv.koishi.pmc.bean.vo.FileVO;
 import priv.koishi.pmc.bean.vo.ImgFileVO;
 import priv.koishi.pmc.controller.AutoClickController;
+import priv.koishi.pmc.finals.enums.ThemeEnum;
 import priv.koishi.pmc.jnanative.windowmonitor.WindowInfo;
 import priv.koishi.pmc.jnanative.windowmonitor.WindowMonitor;
 import priv.koishi.pmc.ui.messagebubble.MessageBubble;
@@ -51,6 +56,7 @@ import java.util.*;
 import java.util.List;
 
 import static priv.koishi.pmc.MainApplication.*;
+import static priv.koishi.pmc.controller.AutoClickController.recordTextColorProperty;
 import static priv.koishi.pmc.controller.MainController.settingController;
 import static priv.koishi.pmc.controller.SettingController.windowInfoFloating;
 import static priv.koishi.pmc.controller.SettingController.windowRelativeInfoFloating;
@@ -260,6 +266,7 @@ public class UiUtils {
     public static void showErrLabelText(Label messageLabel, String log) {
         Platform.runLater(() -> {
             if (messageLabel != null) {
+                messageLabel.textFillProperty().unbind();
                 messageLabel.setTextFill(Color.RED);
                 messageLabel.setText(log);
             }
@@ -372,13 +379,23 @@ public class UiUtils {
      * @param label 要修改的文本栏
      * @param text  要修改的文本
      */
-    public static void updateLabel(Label label, String text) {
+    public static void updateLabelText(Label label, String text) {
         Platform.runLater(() -> {
             label.textProperty().unbind();
-            label.textFillProperty().unbind();
             label.setText(text);
-            label.textFillProperty().bind(textColorProperty);
+        });
+    }
+
+    /**
+     * 修改 label 信息颜色
+     *
+     * @param label 要修改的文本栏
+     * @param color 要修改的文本颜色
+     */
+    public static void updateLabelTextFill(Label label, Color color) {
+        Platform.runLater(() -> {
             label.textFillProperty().unbind();
+            label.setTextFill(color);
         });
     }
 
@@ -1126,6 +1143,7 @@ public class UiUtils {
         } else {
             pane.setStyle(null);
         }
+        applyAllHeaderBarScheme();
         manuallyChangeThemeList.add(clazz);
     }
 
@@ -1227,6 +1245,21 @@ public class UiUtils {
             titleHBox.setAlignment(Pos.CENTER);
             headerBar.setCenter(titleHBox);
         }
+        headerBar.sceneProperty().addListener((_, _, scene) -> {
+            if (scene != null) {
+                // Scene 已经存在时，可能 window 已就绪；否则等 window 就绪
+                if (scene.getWindow() instanceof Stage stage) {
+                    applyHeaderBarScheme(stage);
+                } else {
+                    scene.windowProperty().addListener((_, _, window) -> {
+                        if (window instanceof Stage stage) {
+                            // 等 Stage 完成一次布局后再应用，保证 Scene.fill 生效
+                            Platform.runLater(() -> applyHeaderBarScheme(stage));
+                        }
+                    });
+                }
+            }
+        });
         HeaderBar.setMargin(titleHBox, new Insets(0, 0, 0, 12));
         return headerBar;
     }
@@ -1249,6 +1282,61 @@ public class UiUtils {
         } else {
             return fxmlRoot;
         }
+    }
+
+    /**
+     * 切换主题
+     *
+     * @param theme 主题枚举
+     */
+    public static void changeTheme(int theme) {
+        if (theme == ThemeEnum.Light.ordinal()) {
+            setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+            isDarkTheme = false;
+        } else if (theme == ThemeEnum.Dark.ordinal()) {
+            setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+            isDarkTheme = true;
+        } else if (theme == ThemeEnum.Auto.ordinal()) {
+            ColorScheme scheme = Platform.getPreferences().getColorScheme();
+            if (ColorScheme.DARK == scheme) {
+                setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+                isDarkTheme = true;
+            } else {
+                setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+                isDarkTheme = false;
+            }
+        } else if (theme == ThemeEnum.JavaFx.ordinal()) {
+            setUserAgentStylesheet(null);
+            isDarkTheme = false;
+        }
+        applyAllHeaderBarScheme();
+    }
+
+    /**
+     * 切换所有拓展标题栏主题变化
+     */
+    public static void applyAllHeaderBarScheme() {
+        ObservableList<Window> windows = Window.getWindows();
+        for (Window window : windows) {
+            if (window instanceof Stage) {
+                applyHeaderBarScheme((Stage) window);
+            }
+        }
+    }
+
+    /**
+     * 切换拓展标题栏主题变化
+     *
+     * @param stage 需要切换的窗口
+     */
+    public static void applyHeaderBarScheme(Stage stage) {
+        if (isDarkTheme) {
+            HeaderBar.setSystemColorScheme(stage, ColorScheme.DARK);
+        } else {
+            HeaderBar.setSystemColorScheme(stage, ColorScheme.LIGHT);
+        }
+        setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
+        setTextColorProperty(recordTextColorProperty, isDarkTheme ? Color.AQUA : Color.BLUE);
     }
 
     /**

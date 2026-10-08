@@ -16,6 +16,7 @@ import static priv.koishi.pmc.finals.i18nFinal.tip_removeAll_Log;
 import static priv.koishi.pmc.finals.i18nFinal.unit_log;
 import static priv.koishi.pmc.utils.TableViewUtils.*;
 import static priv.koishi.pmc.utils.ToolTipUtils.addToolTip;
+import static priv.koishi.pmc.utils.UiUtils.manuallyChangeThemePane;
 
 /**
  * PMC 文件操作记录页面控制器
@@ -24,7 +25,7 @@ import static priv.koishi.pmc.utils.ToolTipUtils.addToolTip;
  * Date:2026-01-23
  * Time:18:05
  */
-public class PMCLogController extends RootController {
+public class PMCLogController extends ChangeThemeController {
 
     /**
      * 页面标识符
@@ -104,10 +105,20 @@ public class PMCLogController extends RootController {
     }
 
     /**
+     * 手动处理主题切换
+     */
+    @Override
+    void manuallyChangeTheme() {
+        manuallyChangeThemePane(scrollPane_PLog, getClass());
+    }
+
+    /**
      * 页面初始化
      */
     @FXML
     private void initialize() {
+        // 手动处理深色主题
+        manuallyChangeTheme();
         Platform.runLater(() -> {
             stage = (Stage) scrollPane_PLog.getScene().getWindow();
             // 设置页面关闭事件处理逻辑

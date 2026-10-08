@@ -1,11 +1,8 @@
 package priv.koishi.pmc;
 
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import de.jangassen.MenuToolkit;
 import javafx.application.Application;
-import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +22,6 @@ import priv.koishi.pmc.bean.PMCListBean;
 import priv.koishi.pmc.bean.task.TaskBean;
 import priv.koishi.pmc.bean.vo.ClickPositionVO;
 import priv.koishi.pmc.controller.MainController;
-import priv.koishi.pmc.finals.enums.ThemeEnum;
 
 import java.io.*;
 import java.net.BindException;
@@ -35,11 +30,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-import static priv.koishi.pmc.controller.AutoClickController.recordTextColorProperty;
 import static priv.koishi.pmc.controller.MainController.autoClickController;
 import static priv.koishi.pmc.controller.MainController.listPMCController;
 import static priv.koishi.pmc.controller.RootController.loadFXML;
 import static priv.koishi.pmc.controller.SettingController.reSetAll;
+import static priv.koishi.pmc.exc.ShowException.showExceptionAlert;
 import static priv.koishi.pmc.finals.CommonFinals.*;
 import static priv.koishi.pmc.finals.CommonFinals.isRunningFromIDEA;
 import static priv.koishi.pmc.finals.CommonKeys.*;
@@ -51,7 +46,6 @@ import static priv.koishi.pmc.finals.defaultconfig.ListPMCDefault.configFile_Lis
 import static priv.koishi.pmc.finals.defaultconfig.ListPMCDefault.listPMCProperties;
 import static priv.koishi.pmc.finals.i18nFinal.*;
 import static priv.koishi.pmc.ocr.tesseract.TesseractOCREngine.releaseEngine;
-import static priv.koishi.pmc.exc.ShowException.showExceptionAlert;
 import static priv.koishi.pmc.service.ImageRecognitionService.*;
 import static priv.koishi.pmc.service.PMCFileService.buildPMC;
 import static priv.koishi.pmc.service.PMCFileService.buildPMCS;
@@ -276,35 +270,6 @@ public class MainApplication extends Application {
         Platform.exit();
         logger.info("==============程序退出中====================");
         System.exit(0);
-    }
-
-    /**
-     * 切换主题
-     *
-     * @param theme 主题枚举
-     */
-    public static void changeTheme(int theme) {
-        if (theme == ThemeEnum.Light.ordinal()) {
-            setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
-            isDarkTheme = false;
-        } else if (theme == ThemeEnum.Dark.ordinal()) {
-            setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-            isDarkTheme = true;
-        } else if (theme == ThemeEnum.Auto.ordinal()) {
-            ColorScheme scheme = Platform.getPreferences().getColorScheme();
-            if (ColorScheme.DARK == scheme) {
-                setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-                isDarkTheme = true;
-            } else {
-                setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
-                isDarkTheme = false;
-            }
-        } else if (theme == ThemeEnum.JavaFx.ordinal()) {
-            setUserAgentStylesheet(null);
-            isDarkTheme = false;
-        }
-        setTextColorProperty(textColorProperty, isDarkTheme ? Color.WHITE : Color.BLACK);
-        setTextColorProperty(recordTextColorProperty, isDarkTheme ? Color.AQUA : Color.BLUE);
     }
 
     /**
