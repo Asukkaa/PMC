@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.20.0</version>
+            <version>3.21.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.3</version>
             <scope>compile</scope>
         </dependency>
 
@@ -122,16 +122,16 @@
         </dependency>
 
         <dependency>
-            <groupId>io.xpipe</groupId>
+            <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
-            <version>2.1.2</version>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core-ffm</artifactId>
-            <version>7.6.1</version>
+            <version>7.7.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
