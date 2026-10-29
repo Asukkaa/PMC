@@ -31,7 +31,7 @@ public class CommonFinals {
     /**
      * 程序版本
      */
-    public static final String version = "4.4.6";
+    public static final String version = "4.4.7";
 
     /**
      * PMC 文件版本
@@ -51,7 +51,7 @@ public class CommonFinals {
     /**
      * 程序构建日期
      */
-    public static final String buildDate = "2026.10.08";
+    public static final String buildDate = "2026.10.29";
 
     /**
      * 文件后缀名：bat
