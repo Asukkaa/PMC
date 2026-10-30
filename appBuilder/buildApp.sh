@@ -44,6 +44,14 @@ if [ -z "$appVersion" ]; then
 fi
 echo "已提取版本号：$appVersion"
 
+# ===== 执行 Maven 构建 =====
+echo "正在执行 Maven 构建（clean verify）..."
+if ! mvn -f "$script_dir/../pom.xml" clean verify; then
+    echo "Maven 构建失败，终止打包" >&2
+    exit 1
+fi
+echo "Maven 构建完成"
+
 # 复制文件并处理zip压缩包
 mkdir -p "$bin"
 find "$source" -type f -name "*.zip" -exec sh -c '

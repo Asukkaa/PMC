@@ -28,6 +28,15 @@ if "%appVersion%" == "" (
 )
 echo 版本号：%appVersion%
 
+:: ===== 执行 Maven 构建 =====
+echo 正在执行 Maven 构建（clean verify）...
+call mvn -f "%~dp0..\pom.xml" clean verify
+if errorlevel 1 (
+    echo Maven 构建失败，终止打包
+    exit /b 1
+)
+echo Maven 构建完成
+
 :: 处理ZIP文件
 for /r "%source%" %%F in (*.zip) do (
     set "zipPath=%%F"
